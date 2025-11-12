@@ -3,7 +3,7 @@
     "TeachingRecordSystem.SupportUi": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:44322/",
+      "applicationUrl": "https://localhost:44321/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

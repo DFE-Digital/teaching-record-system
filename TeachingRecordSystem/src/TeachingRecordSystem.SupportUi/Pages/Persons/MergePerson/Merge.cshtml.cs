@@ -25,38 +25,30 @@ public class MergeModel(
     public PersonAttribute<Gender?>? Gender { get; set; }
 
     [BindProperty]
-    [Display(Name = "First name")]
     public PersonAttributeSource? FirstNameSource { get; set; }
 
     [BindProperty]
-    [Display(Name = "Middle name")]
     public PersonAttributeSource? MiddleNameSource { get; set; }
 
     [BindProperty]
-    [Display(Name = "Last name")]
     public PersonAttributeSource? LastNameSource { get; set; }
 
     [BindProperty]
-    [Display(Name = "Date of birth")]
     public PersonAttributeSource? DateOfBirthSource { get; set; }
 
     [BindProperty]
-    [Display(Name = "Email")]
     public PersonAttributeSource? EmailAddressSource { get; set; }
 
     [BindProperty]
-    [Display(Name = "National Insurance number")]
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
 
     [BindProperty]
-    [Display(Name = "Gender")]
     public PersonAttributeSource? GenderSource { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     [BindProperty]
-    [Display(Name = "Add comments (optional)")]
     public string? Comments { get; set; }
 
     private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;

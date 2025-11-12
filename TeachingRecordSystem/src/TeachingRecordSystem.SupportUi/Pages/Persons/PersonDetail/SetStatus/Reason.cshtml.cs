@@ -14,20 +14,16 @@ public class ReasonModel(
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     [BindProperty]
-    [Display(Name = "Why are you deactivating this record?")]
     public DeactivateReasonOption? DeactivateReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? DeactivateReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you reactivating this record?")]
     public ReactivateReasonOption? ReactivateReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ReactivateReasonDetail { get; set; }
 
