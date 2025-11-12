@@ -47,15 +47,6 @@ if (builder.Environment.IsProduction())
     app.UseWhen(ctx => ctx.User.Identity?.IsAuthenticated == true, x => x.UseRateLimiter());
 }
 
-app.Use((ctx, next) =>
-{
-    ctx.Response.Headers.Append("X-Frame-Options", "deny");
-    ctx.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-    ctx.Response.Headers.Append("X-XSS-Protection", "0");
-
-    return next();
-});
-
 app.MapWebhookJwks();
 
 app.MapControllers();
