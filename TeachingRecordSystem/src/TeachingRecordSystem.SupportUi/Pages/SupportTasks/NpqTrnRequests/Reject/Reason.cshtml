@@ -16,7 +16,7 @@
             <span class="govuk-caption-l">TRN request - @Model.PersonName</span>
             <govuk-radios for="RejectionReason" data-testid="reason-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true" />
+                    <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true">Why are you rejecting this request?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@RejectionReasonOption.EvidenceDoesNotMatch">
                         @RejectionReasonOption.EvidenceDoesNotMatch.GetDisplayName()
                     </govuk-radios-item>
