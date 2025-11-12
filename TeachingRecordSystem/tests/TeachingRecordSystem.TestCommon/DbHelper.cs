@@ -147,7 +147,7 @@ public sealed class DbHelper : IDisposable
 
     private async Task SeedDbAsync(TrsDbContext dbContext)
     {
-        await SeedLookupData.ResetTrainingProvidersAsync(dbContext);
+        await SeedLookupData.EnsureTestTrainingProvidersAsync(dbContext);
 
         var existingUserIds = await dbContext.Set<UserBase>().Select(u => u.UserId).ToArrayAsync();
 
