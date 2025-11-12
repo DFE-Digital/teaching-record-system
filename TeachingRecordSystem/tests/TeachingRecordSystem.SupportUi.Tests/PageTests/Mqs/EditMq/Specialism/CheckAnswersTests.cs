@@ -74,7 +74,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(changeSummary);
         Assert.Equal(oldMqSpecialism.GetTitle(), changeSummary.GetElementByTestId("current-specialism")!.TrimmedText());
         Assert.Equal(newMqSpecialism.GetTitle(), changeSummary.GetElementByTestId("new-specialism")!.TrimmedText());
-        var changeReasonSummary = doc.GetElementByTestId("change-summary");
+        var changeReasonSummary = doc.GetElementByTestId("change-reason-summary");
         Assert.NotNull(changeReasonSummary);
         Assert.Equal(changeReason.GetDisplayName(), changeReasonSummary.GetElementByTestId("change-reason")!.TrimmedText());
         Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeReasonSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
