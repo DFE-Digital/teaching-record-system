@@ -173,8 +173,7 @@ public class RejectModel(
             $"The request has been {requestStatus}",
             flashMessage);
 
-        // TODO change this once we've added search and filter to the change requests index page
-        return Redirect(linkGenerator.SupportTasks.Index(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true));
+        return Redirect(linkGenerator.SupportTasks.ChangeRequests.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

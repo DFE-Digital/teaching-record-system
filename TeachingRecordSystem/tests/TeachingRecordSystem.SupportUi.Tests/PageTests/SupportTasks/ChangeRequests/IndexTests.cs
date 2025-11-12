@@ -165,6 +165,91 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
+    [Fact]
+    public async Task Get_SearchByFirstName_ShowsMatchingResult()
+    {
+        // Arrange
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+
+        var search = createPersonResult.FirstName;
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(search)}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var references = GetTaskReferences(doc);
+        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
+    }
+
+    [Fact]
+    public async Task Get_SearchByMiddleName_ShowsMatchingResult()
+    {
+        // Arrange
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+
+        var search = createPersonResult.MiddleName;
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(search)}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var references = GetTaskReferences(doc);
+        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
+    }
+
+    [Fact]
+    public async Task Get_SearchByLastName_ShowsMatchingResult()
+    {
+        // Arrange
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+
+        var search = createPersonResult.LastName;
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(search)}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var references = GetTaskReferences(doc);
+        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
+    }
+
+    [Fact]
+    public async Task Get_SearchByMultipleNameParts_ShowsMatchingResult()
+    {
+        // Arrange
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+
+        var search = $"{createPersonResult.FirstName} {createPersonResult.LastName}";
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(search)}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var references = GetTaskReferences(doc);
+        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
+    }
+
+
     private static IEnumerable<string> GetTaskReferences(IHtmlDocument document) =>
         document.GetElementByTestId("results")?.QuerySelectorAll("tbody>tr").Attr("data-reference") ?? [];
 }

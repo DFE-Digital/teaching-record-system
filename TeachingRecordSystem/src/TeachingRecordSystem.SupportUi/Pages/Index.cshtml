@@ -58,7 +58,7 @@
         <div class="trs-tile-section">
             <h2 class="govuk-heading-m">Record management</h2>
             <div class="trs-tile-row">
-                <a href="@LinkGenerator.SupportTasks.Index(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true)" class="trs-tile trs-tile--branded">
+                <a href="@LinkGenerator.SupportTasks.ChangeRequests.Index()" class="trs-tile trs-tile--branded">
                     <span class="trs-tile__count">@(Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ChangeNameRequest) + Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ChangeDateOfBirthRequest))</span>
                     <span class="trs-tile__title">Name and date of birth change requests</span>
                 </a>
