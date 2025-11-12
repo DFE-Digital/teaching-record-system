@@ -517,12 +517,12 @@
       },
       "Serilog.Sinks.ApplicationInsights": {
         "type": "Direct",
-        "requested": "[4.0.0, )",
-        "resolved": "4.0.0",
-        "contentHash": "AlYq1JFqh+RFKwLKZ3X224Zbe1gnkMbqSELp2FApLN0iMyRPdwwxMJBCCrk49C8qOefBd4zN+J/1Tq3i75DunA==",
+        "requested": "[4.1.0, )",
+        "resolved": "4.1.0",
+        "contentHash": "IC7su1J9FFkceWESs1A+AfM/NnBEKRpLpNYzEl+SYPe+RQWgs9PhPSgrIzsj3Un8oGgC/F9OrxibNNZwe+RDTg==",
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.20.0",
-          "Serilog": "2.11.0"
+          "Microsoft.ApplicationInsights": "2.23.0",
+          "Serilog": "4.2.0"
         }
       },
       "Serilog.Sinks.Console": {
@@ -691,8 +691,8 @@
       },
       "Microsoft.ApplicationInsights": {
         "type": "Transitive",
-        "resolved": "2.20.0",
-        "contentHash": "mb+EC5j06Msn5HhKrhrsMAst6JxvYUnphQMGY2cixCabgGAO3q79Y8o/p1Zce1Azgd1IVkRKAMzAV4vDCbXOqA==",
+        "resolved": "2.23.0",
+        "contentHash": "nWArUZTdU7iqZLycLKWe0TDms48KKGE6pONH2terYNa8REXiqixrMOkf1sk5DHGMaUTqONU2YkS4SAXBhLStgw==",
         "dependencies": {
           "System.Diagnostics.DiagnosticSource": "5.0.0"
         }
