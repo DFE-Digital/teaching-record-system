@@ -29,7 +29,9 @@ public class FlagsEnumStringListModelBinder : IModelBinder
         {
             if (!Enum.TryParse(modelType, v, ignoreCase: true, out var parsed))
             {
-                logger.LogDebug("Failed to parse '{Value}' as {ModelType}.", v, modelType);
+#pragma warning disable CA1873
+                logger.LogDebug("Failed to parse '{Value}' as {ModelType}.", v, modelType.Name);
+#pragma warning restore CA1873
 
                 bindingContext.Result = ModelBindingResult.Failed();
                 return Task.CompletedTask;
@@ -44,7 +46,9 @@ public class FlagsEnumStringListModelBinder : IModelBinder
             }
             else
             {
-                logger.LogDebug("Value '{Result}' is not a single flag of {ModelType}.", parsed, modelType);
+#pragma warning disable CA1873
+                logger.LogDebug("Value '{Result}' is not a single flag of {ModelType}.", parsed, modelType.Name);
+#pragma warning restore CA1873
 
                 bindingContext.Result = ModelBindingResult.Failed();
                 return Task.CompletedTask;
