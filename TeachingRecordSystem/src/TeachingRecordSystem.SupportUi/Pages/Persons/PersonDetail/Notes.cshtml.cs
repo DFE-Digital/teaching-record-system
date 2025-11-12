@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
@@ -37,7 +38,7 @@ public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizat
 
         Notes = await notesResult
             .ToAsyncEnumerable()
-            .SelectAwait(async n => new NoteViewModel(
+            .Select(async (Note n, CancellationToken _) => new NoteViewModel(
                 n.NoteId,
                 await n.GetNoteContentAsync(),
                 n.CreatedOn.ToGmt(),
