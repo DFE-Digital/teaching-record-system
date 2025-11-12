@@ -1,7 +1,8 @@
 @page "/routes/{qualificationId}/edit/age-range/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialismModel
 @{
-    ViewBag.Title = Model.PageHeading;
+    ViewBag.Title = "Edit age range specialism"
+       + (Model.AgeRangeSpecialismRequired ? "" : " (optional)");
 }
 @section BeforeContent {
     <govuk-back-link href="@(Model.FromCheckAnswers == false ? LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(Model.QualificationId, Model.JourneyInstance!.InstanceId) : LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
@@ -14,7 +15,7 @@
             <govuk-radios for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
-                        @Model.PageHeading
+                        @ViewBag.Title
                     </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.FoundationStage">@TrainingAgeSpecialismType.FoundationStage.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage1">@TrainingAgeSpecialismType.KeyStage1.GetDisplayName()</govuk-radios-item>
@@ -26,8 +27,8 @@
                     <govuk-radios-item value="@TrainingAgeSpecialismType.Range">
                         Enter an age range
                         <govuk-radios-item-conditional>
-                            <govuk-input class="govuk-input--width-2" for="TrainingAgeSpecialism.AgeRangeFrom" />
-                            <govuk-input class="govuk-input--width-2" for="TrainingAgeSpecialism.AgeRangeTo" />
+                            <govuk-input input-class="govuk-input--width-2" for="TrainingAgeSpecialism.AgeRangeFrom" />
+                            <govuk-input input-class="govuk-input--width-2" for="TrainingAgeSpecialism.AgeRangeTo" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>

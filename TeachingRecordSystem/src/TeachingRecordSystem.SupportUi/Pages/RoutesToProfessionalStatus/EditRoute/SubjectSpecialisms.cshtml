@@ -3,7 +3,8 @@
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 
 @{
-    ViewBag.Title = Model.PageHeading;
+    ViewBag.Title = "Enter the subject they specialise in teaching"
+        + (Model.SubjectSpecialismRequired ? "" : " (optional)");
 }
 
 @section Styles {
@@ -51,7 +52,7 @@
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select for="SubjectId1" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">
-                    @Model.PageHeading
+                    @ViewBag.Title
                 </govuk-select-label>
                 <govuk-select-hint>Start typing the name of the subject</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>
@@ -64,6 +65,7 @@
                 <govuk-details-summary>Add additional subjects</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-select for="SubjectId2" label-class="govuk-label">
+                        <govuk-select-label>Second subject (optional)</govuk-select-label>
                         <govuk-select-item value=""></govuk-select-item>
                         @foreach (var subject in Model.Subjects)
                         {
@@ -71,6 +73,7 @@
                         }
                     </govuk-select>
                     <govuk-select for="SubjectId3" label-class="govuk-label">
+                        <govuk-select-label>Third subject (optional)</govuk-select-label>
                         <govuk-select-item value=""></govuk-select-item>
                         @foreach (var subject in Model.Subjects)
                         {

@@ -24,8 +24,6 @@ public class StatusModel(
     [Required(ErrorMessage = "Select a route status")]
     public RouteToProfessionalStatusStatus? Status { get; set; }
 
-    public string PageHeading => "Select the route status";
-
     public void OnGet()
     {
         Status = JourneyInstance!.State.Status;

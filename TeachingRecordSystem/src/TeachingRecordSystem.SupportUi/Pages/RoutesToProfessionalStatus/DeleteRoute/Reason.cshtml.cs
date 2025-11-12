@@ -23,16 +23,13 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
 
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    [Display(Name = "Why are you deleting this route?")]
     public ChangeReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to provide more information?")]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you\u2019re deleting this route")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details about this change")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 

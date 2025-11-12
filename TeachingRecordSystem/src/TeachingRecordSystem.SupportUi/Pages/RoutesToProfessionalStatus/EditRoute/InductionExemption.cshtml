@@ -1,7 +1,7 @@
 @page "/routes/{qualificationId}/edit/induction-exemption/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.InductionExemptionModel
 @{
-    ViewBag.Title = Model.PageTitle;
+    ViewBag.Title = "Does this route provide them with an induction exemption?";
 }
 
 @section BeforeContent {
@@ -14,7 +14,9 @@
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-radios for=@Model.IsExemptFromInduction data-testid="induction-exemption">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend data-testid="induction-exemption-legend" class="govuk-fieldset__legend--l" is-page-heading="true" />
+                    <govuk-radios-fieldset-legend data-testid="induction-exemption-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
+                        @ViewBag.Title
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                     </govuk-radios-item>

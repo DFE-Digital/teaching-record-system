@@ -2,7 +2,8 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.AgeRangeSpecialismModel
 
 @{
-    ViewBag.Title = Model.PageHeading;
+    ViewBag.Title = "Select an age range specialism"
+       + (Model.AgeRangeSpecialismRequired ? "" : " (optional)");
 }
 
 @section BeforeContent {
@@ -16,7 +17,7 @@
             <govuk-radios for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
-                        @Model.PageHeading
+                        @ViewBag.Title
                     </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.FoundationStage">@TrainingAgeSpecialismType.FoundationStage.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage1">@TrainingAgeSpecialismType.KeyStage1.GetDisplayName()</govuk-radios-item>

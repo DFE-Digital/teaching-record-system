@@ -13,10 +13,7 @@ public class InductionExemptionModel(
     EvidenceUploadManager evidenceUploadManager)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceUploadManager)
 {
-    public string PageTitle => "Edit induction exemption";
-
     [BindProperty]
-    [Display(Name = "Does this route provide them with an induction exemption?")]
     [Required(ErrorMessage = "Select yes if this route provides an induction exemption")]
     public bool? IsExemptFromInduction { get; set; }
 

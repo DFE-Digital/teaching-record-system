@@ -31,8 +31,6 @@ public class CheckYourAnswersModel(
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public string PageCaption => $"Edit route - {PersonName}";
-
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);

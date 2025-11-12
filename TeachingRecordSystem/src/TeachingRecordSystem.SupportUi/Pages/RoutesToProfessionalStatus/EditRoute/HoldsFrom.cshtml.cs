@@ -19,9 +19,6 @@ public class HoldsFromModel(
     public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(RouteType!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
         == FieldRequirement.Mandatory;
 
-    public string PageHeading => "Enter the date they first held this professional status"
-       + (HoldsFromRequired ? "" : " (optional)");
-
     public void OnGet()
     {
         HoldsFrom = JourneyInstance!.State.HoldsFrom;

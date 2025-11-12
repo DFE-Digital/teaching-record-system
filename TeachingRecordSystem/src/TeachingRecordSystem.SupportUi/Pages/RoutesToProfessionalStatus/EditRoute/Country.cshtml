@@ -2,7 +2,8 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.CountryModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
-    ViewBag.Title = Model.PageHeading;
+    ViewBag.Title = "Enter the country associated with their route"
+       + (Model.CountryRequired ? "" : " (optional)");
 }
 
 @section Styles {
@@ -45,7 +46,7 @@
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select for="TrainingCountryId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">
-                    @Model.PageHeading
+                    @ViewBag.Title
                 </govuk-select-label>
                 <govuk-select-hint>Start typing the name of the country</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>

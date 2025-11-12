@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -17,17 +16,12 @@ public class SubjectSpecialismsModel(
     [BindProperty]
     public Guid? SubjectId1 { get; set; }
     [BindProperty]
-    [Display(Name = "Second subject (optional)")]
     public Guid? SubjectId2 { get; set; }
     [BindProperty]
-    [Display(Name = "Third subject (optional)")]
     public Guid? SubjectId3 { get; set; }
 
     public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingSubjectsRequired, Status.GetSubjectsRequirement())
         == FieldRequirement.Mandatory;
-
-    public string PageHeading => "Enter the subject they specialise in teaching"
-        + (SubjectSpecialismRequired ? "" : " (optional)");
 
     public void OnGet()
     {

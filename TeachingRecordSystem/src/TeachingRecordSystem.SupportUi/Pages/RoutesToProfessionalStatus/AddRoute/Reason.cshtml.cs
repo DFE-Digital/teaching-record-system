@@ -10,16 +10,13 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, ReferenceDataCach
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    [Display(Name = "Why are you adding this route?")]
     public ChangeReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to provide more information?")]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you\u2019re adding this route")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 

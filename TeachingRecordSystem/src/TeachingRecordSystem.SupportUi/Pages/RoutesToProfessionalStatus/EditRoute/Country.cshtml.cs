@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -15,14 +14,10 @@ public class CountryModel(
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
     [BindProperty]
-    [Display(Name = "Enter the country associated with their route")]
     public string? TrainingCountryId { get; set; }
 
     public bool CountryRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingCountryRequired, Status.GetCountryRequirement())
         == FieldRequirement.Mandatory;
-
-    public string PageHeading => "Enter the country associated with their route"
-       + (CountryRequired ? "" : " (optional)");
 
     public void OnGet()
     {
