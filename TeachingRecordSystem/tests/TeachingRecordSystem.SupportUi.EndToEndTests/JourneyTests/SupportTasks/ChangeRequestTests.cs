@@ -27,11 +27,11 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GotoAsync("/support-tasks");
+        await page.GotoAsync("/support-tasks/change-requests");
 
-        await page.AssertOnSupportTasksPageAsync();
+        await page.AssertOnChangeRequestsPageAsync();
 
-        await page.ClickCaseReferenceLinkChangeRequestsPageAsync(supportTaskReference);
+        await page.ClickAsync($"a{TextIsSelector($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}")}");
 
         await page.AssertOnChangeRequestDetailPageAsync(supportTaskReference);
 
@@ -41,7 +41,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.ClickConfirmButtonAsync();
 
-        await page.AssertOnSupportTasksPageAsync();
+        await page.AssertOnChangeRequestsPageAsync();
 
         await page.AssertFlashMessageAsync("The request has been accepted");
     }
@@ -71,11 +71,11 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GotoAsync("/support-tasks");
+        await page.GotoAsync("/support-tasks/change-requests");
 
-        await page.AssertOnSupportTasksPageAsync();
+        await page.AssertOnChangeRequestsPageAsync();
 
-        await page.ClickCaseReferenceLinkChangeRequestsPageAsync(supportTaskReference);
+        await page.ClickAsync($"a{TextIsSelector($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}")}");
 
         await page.AssertOnChangeRequestDetailPageAsync(supportTaskReference);
 
@@ -87,7 +87,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.ClickRejectButtonAsync();
 
-        await page.AssertOnSupportTasksPageAsync();
+        await page.AssertOnChangeRequestsPageAsync();
 
         await page.AssertFlashMessageAsync("The request has been rejected");
     }
@@ -117,9 +117,9 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GotoAsync("/support-tasks");
+        await page.GotoAsync("/support-tasks/change-requests");
 
-        await page.ClickCaseReferenceLinkChangeRequestsPageAsync(supportTaskReference);
+        await page.ClickAsync($"a{TextIsSelector($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}")}");
 
         await page.AssertOnChangeRequestDetailPageAsync(supportTaskReference);
 
@@ -131,7 +131,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.ClickRejectButtonAsync();
 
-        await page.AssertOnSupportTasksPageAsync();
+        await page.AssertOnChangeRequestsPageAsync();
 
         await page.AssertFlashMessageAsync("The request has been cancelled");
     }

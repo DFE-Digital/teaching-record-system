@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -8,6 +9,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests;
 public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int TasksPerPage = 20;
+
+    [BindProperty(SupportsGet = true)]
+    public string? Search { get; set; }
 
     [BindProperty(SupportsGet = true)]
     [FromQuery]
@@ -50,6 +54,19 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         {
             ChangeRequestTypes ??= [];
             tasks = tasks.Where(t => ChangeRequestTypes.Contains(t.SupportTaskType));
+        }
+
+        Search = Search?.Trim() ?? string.Empty;
+
+        var nameParts = Search
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(n => n.ToLower(CultureInfo.InvariantCulture))
+            .ToArray();
+
+        if (nameParts.Length > 0)
+        {
+            tasks = tasks.Where(t =>
+                 nameParts.All(n => EF.Property<string[]>(t.Person!, "names").Contains(n)));
         }
 
         if (sortBy == ChangeRequestsSortByOption.Name)
