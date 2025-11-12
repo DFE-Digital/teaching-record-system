@@ -18,7 +18,6 @@ public class StatusModel(
     private bool _inductionStatusManagedByCpd;
 
     [BindProperty]
-    [Display(Name = "What is their induction status?")]
     [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
     public InductionStatus CurrentInductionStatus { get; set; }
