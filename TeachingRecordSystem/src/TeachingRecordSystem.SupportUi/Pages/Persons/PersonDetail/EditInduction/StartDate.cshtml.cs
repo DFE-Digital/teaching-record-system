@@ -22,7 +22,6 @@ public class StartDateModel(
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
     [Required(ErrorMessage = "Enter an induction start date")]
-    [Display(Name = "When did they start induction?")]
     public DateOnly? StartDate { get; set; }
 
     public string NextPage

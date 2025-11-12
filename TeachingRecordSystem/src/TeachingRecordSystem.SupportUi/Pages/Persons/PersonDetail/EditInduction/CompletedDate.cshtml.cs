@@ -17,7 +17,6 @@ public class CompletedDateModel(
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Completed date")]
     [Required(ErrorMessage = "Enter an induction completed date")]
-    [Display(Name = "When did they complete induction?")]
     public DateOnly? CompletedDate { get; set; }
 
     public InductionJourneyPage NextPage

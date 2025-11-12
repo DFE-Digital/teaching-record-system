@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -18,7 +17,6 @@ public class StatusModel(
     private bool _inductionStatusManagedByCpd;
 
     [BindProperty]
-    [Display(Name = "What is their induction status?")]
     [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
     public InductionStatus CurrentInductionStatus { get; set; }

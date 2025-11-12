@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -24,7 +23,6 @@ public class ExemptionReasonsModel(
     }
 
     [BindProperty]
-    [Display(Name = "Why are they exempt from induction?")]
     public Guid[] ExemptionReasonIds { get; set; } = [];
 
     public Dictionary<ExemptionReasonCategory, IEnumerable<InductionExemptionReason>> ExemptionReasons { get; set; } = new();
