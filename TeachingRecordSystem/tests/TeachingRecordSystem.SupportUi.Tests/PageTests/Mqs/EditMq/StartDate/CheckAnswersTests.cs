@@ -74,9 +74,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(changeSummary);
         Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("current-start-date")!.TrimmedText());
         Assert.Equal(newStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("new-start-date")!.TrimmedText());
-        Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TrimmedText());
-        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
-        var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-file-link");
+        var changeReasonSummary = doc.GetElementByTestId("change-reason-summary");
+        Assert.NotNull(changeReasonSummary);
+        Assert.Equal(changeReason.GetDisplayName(), changeReasonSummary.GetElementByTestId("change-reason")!.TrimmedText());
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeReasonSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
+        var uploadedEvidenceLink = changeReasonSummary.GetElementByTestId("uploaded-evidence-file-link");
         if (uploadEvidence)
         {
             Assert.NotNull(uploadedEvidenceLink);

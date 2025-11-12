@@ -82,14 +82,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var deletionSummary = doc.GetElementByTestId("deletion-summary");
         Assert.NotNull(deletionSummary);
-        Assert.Equal(deletionReason.GetDisplayName(), deletionSummary.GetElementByTestId("deletion-reason")!.TrimmedText());
-        Assert.Equal(!string.IsNullOrEmpty(deletionReasonDetail) ? deletionReasonDetail : "None", deletionSummary.GetElementByTestId("deletion-reason-detail")!.TrimmedText());
         Assert.Equal(provider?.Name ?? "None", deletionSummary.GetElementByTestId("provider")!.TrimmedText());
         Assert.Equal(specialism?.GetTitle() ?? "None", deletionSummary.GetElementByTestId("specialism")!.TrimmedText());
         Assert.Equal(status is not null ? status.Value.ToString() : "None", deletionSummary.GetElementByTestId("status")!.TrimmedText());
         Assert.Equal(startDate is not null ? startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("start-date")!.TrimmedText());
         Assert.Equal(endDate is not null ? endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("end-date")!.TrimmedText());
-        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
+
+        var deletionReasonSummary = doc.GetElementByTestId("change-reason-summary");
+        Assert.NotNull(deletionReasonSummary);
+        Assert.Equal(deletionReason.GetDisplayName(), deletionReasonSummary.GetElementByTestId("deletion-reason")!.TrimmedText());
+        Assert.Equal(!string.IsNullOrEmpty(deletionReasonDetail) ? deletionReasonDetail : "None", deletionReasonSummary.GetElementByTestId("deletion-reason-detail")!.TrimmedText());
+        var uploadedEvidenceLink = deletionReasonSummary.GetElementByTestId("uploaded-evidence-file-link");
         if (uploadEvidence)
         {
             Assert.NotNull(uploadedEvidenceLink);

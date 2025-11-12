@@ -4,6 +4,9 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Qualificatio
 
 public static class QualificationsPageExtensions
 {
+    public static Task ClickConfirmEditButtonAsync(this IPage page) =>
+        page.ClickButtonAsync("Confirm and update qualification");
+
     public static Task GoToAddMqPageAsync(this IPage page, Guid personId) =>
         page.GotoAsync($"/mqs/add?personId={personId}");
 
