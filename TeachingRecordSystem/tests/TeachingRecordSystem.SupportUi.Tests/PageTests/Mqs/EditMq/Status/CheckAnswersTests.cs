@@ -138,9 +138,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Null(changeSummary.GetElementByTestId("new-end-date"));
         }
 
-        Assert.Equal(changeReason, changeSummary.GetElementByTestId("change-reason")!.TrimmedText());
-        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
-        var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-file-link");
+        var changeReasonSummary = doc.GetElementByTestId("change-reason-summary");
+        Assert.NotNull(changeReasonSummary);
+        Assert.Equal(changeReason, changeReasonSummary.GetElementByTestId("change-reason")!.TrimmedText());
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeReasonSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
+        var uploadedEvidenceLink = changeReasonSummary.GetElementByTestId("uploaded-evidence-file-link");
         if (uploadEvidence)
         {
             Assert.NotNull(uploadedEvidenceLink);

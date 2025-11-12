@@ -101,7 +101,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqProviderConfirmPageAsync(qualificationId);
 
-        await page.ClickConfirmChangeButtonAsync();
+        await page.ClickConfirmEditButtonAsync();
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
 
@@ -145,7 +145,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqSpecialismConfirmPageAsync(qualificationId);
 
-        await page.ClickConfirmChangeButtonAsync();
+        await page.ClickConfirmEditButtonAsync();
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
 
@@ -187,7 +187,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqStartDateConfirmPageAsync(qualificationId);
 
-        await page.ClickConfirmChangeButtonAsync();
+        await page.ClickConfirmEditButtonAsync();
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
 
@@ -275,7 +275,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqStatusConfirmPageAsync(qualificationId);
 
-        await page.ClickConfirmChangeButtonAsync();
+        await page.ClickConfirmEditButtonAsync();
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
 
@@ -309,7 +309,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnDeleteMqConfirmPageAsync(qualificationId);
 
-        await page.ClickButtonAsync("Delete qualification");
+        await page.ClickButtonAsync("Confirm and delete qualification");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
 

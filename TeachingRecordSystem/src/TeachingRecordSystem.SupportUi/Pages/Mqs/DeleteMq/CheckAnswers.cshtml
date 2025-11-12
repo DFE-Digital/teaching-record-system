@@ -1,7 +1,7 @@
 @page "/mqs/{qualificationId}/delete/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.CheckAnswersModel
 @{
-    ViewBag.Title = "Confirm you want to delete this mandatory qualification";
+    ViewBag.Title = "Check details before deleting mandatory qualification";
 }
 
 @section BeforeContent {
@@ -15,16 +15,6 @@
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="deletion-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="deletion-reason">@Model.DeletionReason!.GetDisplayName()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="deletion-reason-detail">
-                        @Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.DeletionReasonDetail) ? Model.DeletionReasonDetail : "None")
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="provider">@(Model.ProviderName ?? "None")</govuk-summary-list-row-value>
@@ -45,6 +35,19 @@
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
+            </govuk-summary-list>
+            <h2 class="govuk-heading-m">Why are you deleting this mandatory qualification?</h2>
+            <govuk-summary-list data-testid="change-reason-summary">
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="deletion-reason">@Model.DeletionReason!.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="deletion-reason-detail">
+                        @Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.DeletionReasonDetail) ? Model.DeletionReasonDetail : "None")
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="evidence">
@@ -52,9 +55,9 @@
                     </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
-
+            <h2 class="govuk-heading-m">Are you sure you want to delete this mandatory qualification?</h2>
             <div class="govuk-button-group">
-                <govuk-button class="govuk-button--warning" type="submit">Delete qualification</govuk-button>
+                <govuk-button class="govuk-button--warning" type="submit">Confirm and delete qualification</govuk-button>
                 <govuk-button formaction="@LinkGenerator.Mqs.DeleteMq.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>

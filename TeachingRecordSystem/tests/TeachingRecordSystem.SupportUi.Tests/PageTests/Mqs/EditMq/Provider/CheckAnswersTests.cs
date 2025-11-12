@@ -70,13 +70,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
         Assert.Equal(oldProvider.Name, changeSummary.GetElementByTestId("current-provider")!.TrimmedText());
         Assert.Equal(newProvider.Name, changeSummary.GetElementByTestId("new-provider")!.TrimmedText());
-        Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TrimmedText());
-        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
-        var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-file-link");
+
+        var changeReasonSummary = doc.GetElementByTestId("change-reason-summary");
+        Assert.NotNull(changeReasonSummary);
+        Assert.Equal(changeReason.GetDisplayName(), changeReasonSummary.GetElementByTestId("change-reason")!.TrimmedText());
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeReasonSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
+        var uploadedEvidenceLink = changeReasonSummary.GetElementByTestId("uploaded-evidence-file-link");
         if (uploadEvidence)
         {
             Assert.NotNull(uploadedEvidenceLink);

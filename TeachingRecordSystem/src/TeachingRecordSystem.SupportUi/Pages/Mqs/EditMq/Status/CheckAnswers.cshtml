@@ -1,9 +1,7 @@
 @page "/mqs/{qualificationId}/status/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status.CheckAnswersModel
 @{
-    ViewBag.Title = Model.IsEndDateChange && !Model.IsStatusChange
-        ? "Check details before changing end date"
-        : "Check details before changing status";
+    ViewBag.Title = "Check details before editing mandatory qualification";
 }
 
 @section BeforeContent {
@@ -13,32 +11,35 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.Mqs.EditMq.Status.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
+            <span class="govuk-caption-l">Edit mandatory qualification - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
                 @if (Model.IsStatusChange)
                 {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Current status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="current-status">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
                         <govuk-summary-list-row-key>New status</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="new-status">@(Model.NewStatus.HasValue ? Model.NewStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Previous status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="current-status">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
                 @if (Model.IsEndDateChange)
                 {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Current end date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
                         <govuk-summary-list-row-key>New end date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Previous end date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
                 }
+            </govuk-summary-list>
+            <h2 class="govuk-heading-m">Why are you editing this mandatory qualification?</h2>
+            <govuk-summary-list data-testid="change-reason-summary">
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     @if (Model.IsEndDateChange && !Model.IsStatusChange)
@@ -63,7 +64,7 @@
             </govuk-summary-list>
 
             <div class="govuk-button-group">
-                <govuk-button type="submit">Confirm change</govuk-button>
+                <govuk-button type="submit">Confirm and update qualification</govuk-button>
                 <govuk-button formaction="@LinkGenerator.Mqs.EditMq.Status.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
