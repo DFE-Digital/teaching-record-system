@@ -11,7 +11,7 @@ public class GetIttProvidersTests(HostFixture hostFixture) : TestBase(hostFixtur
     {
         // Arrange
         await DbHelper.ClearDataAsync();
-        await WithDbContextAsync(SeedLookupData.ResetTrainingProvidersAsync);
+        await WithDbContextAsync(SeedLookupData.EnsureTestTrainingProvidersAsync);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/v2/itt-providers");
 
