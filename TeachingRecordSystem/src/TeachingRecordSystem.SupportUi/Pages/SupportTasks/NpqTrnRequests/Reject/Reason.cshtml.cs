@@ -22,7 +22,6 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator) : PageModel
     public bool FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you rejecting this request?")]
     [Required(ErrorMessage = "Select a reason for rejecting this request")]
     public RejectionReasonOption? RejectionReason { get; set; }
 
