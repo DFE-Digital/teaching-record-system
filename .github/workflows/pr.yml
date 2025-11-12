@@ -29,13 +29,13 @@ jobs:
 
       - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9.0.x
+          global-json-file: TeachingRecordSystem/global.json
 
       - name: Install tools
         run: just install-tools
 
       - name: Lint
-        run: cd TeachingRecordSystem && dotnet dotnet-format --verify-no-changes
+        run: cd TeachingRecordSystem && dotnet format --verify-no-changes
 
   validate_terraform:
     name: Validate Terraform
@@ -85,7 +85,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9.0.x
+          global-json-file: TeachingRecordSystem/global.json
 
       - name: Install tools
         run: just install-tools
@@ -157,7 +157,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9.0.x
+          global-json-file: TeachingRecordSystem/global.json
 
       - name: Install tools
         run: just install-tools
@@ -191,7 +191,7 @@ jobs:
       - name: Install Playwright if required
         run: |
           if [[ "$PROJECT_NAME" =~ .*EndToEndTests ]]; then
-            pwsh ./bin/Release/net9.0/playwright.ps1 install chromium
+            pwsh ./bin/Release/net10.0/playwright.ps1 install chromium
           fi
         working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.${{ matrix.project_short_name }}
         env:

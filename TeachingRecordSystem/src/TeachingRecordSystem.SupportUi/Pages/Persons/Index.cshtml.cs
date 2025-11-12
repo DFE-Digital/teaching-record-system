@@ -91,7 +91,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         if (Statuses?.Order().ToArray() is not [PersonStatus.Active, PersonStatus.Deactivated])
         {
-            query = query.Where(p => Statuses!.Contains(p.Status));
+            query = query.Where(p => Statuses!.ToList().Contains(p.Status));
         }
 
         var totalPersonCount = await query.CountAsync();

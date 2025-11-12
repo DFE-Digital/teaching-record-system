@@ -399,7 +399,7 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
             CertificateUrl = certificateUrl,
             ExemptionReasons = await person.GetAllInductionExemptionReasonIds()
                 .ToAsyncEnumerable()
-                .SelectAwait(async id => await referenceDataCache.GetInductionExemptionReasonByIdAsync(id))
+                .Select(async (Guid id, CancellationToken _) => await referenceDataCache.GetInductionExemptionReasonByIdAsync(id))
                 .ToArrayAsync()
         };
 
@@ -436,7 +436,7 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
         IEnumerable<PostgresModels.RouteToProfessionalStatus> routes) =>
         await routes
             .ToAsyncEnumerable()
-            .SelectAwait(async r => new GetPersonResultRouteToProfessionalStatus()
+            .Select(async (PostgresModels.RouteToProfessionalStatus r, CancellationToken _) => new GetPersonResultRouteToProfessionalStatus()
             {
                 RouteToProfessionalStatusId = r.QualificationId,
                 RouteToProfessionalStatusType = r.RouteToProfessionalStatusType!,
@@ -445,8 +445,8 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
                 TrainingStartDate = r.TrainingStartDate,
                 TrainingEndDate = r.TrainingEndDate,
                 TrainingSubjects = await r.TrainingSubjectIds.ToAsyncEnumerable()
-                    .SelectAwait(async id => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
-                    .ToArrayAsync(),
+                    .Select(async (Guid id, CancellationToken _) => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
+                    .ToArrayAsync(CancellationToken.None),
                 TrainingAgeSpecialism = TrainingAgeSpecialismExtensions.FromRoute(r),
                 TrainingCountry = TrainingCountry.FromModel(r.TrainingCountry),
                 TrainingProvider = r.TrainingProvider,
@@ -470,7 +470,7 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
         IEnumerable<PostgresModels.RouteToProfessionalStatus> routes) =>
         await routes
             .ToAsyncEnumerable()
-            .SelectAwait(async r => new GetPersonResultInitialTeacherTraining()
+            .Select(async (PostgresModels.RouteToProfessionalStatus r, CancellationToken _) => new GetPersonResultInitialTeacherTraining()
             {
                 Qualification = null,
                 StartDate = r.TrainingStartDate,
@@ -480,9 +480,9 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
                     ? new GetPersonResultInitialTeacherTrainingProvider { Name = trainingProvider.Name, Ukprn = trainingProvider.Ukprn }
                     : null,
                 Subjects = await r.TrainingSubjectIds.ToAsyncEnumerable()
-                    .SelectAwait(async id => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
+                    .Select(async (Guid id, CancellationToken _) => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
                     .Select(subject => new GetPersonResultInitialTeacherTrainingSubject() { Code = subject.Reference, Name = subject.Name })
-                    .ToArrayAsync()
+                    .ToArrayAsync(CancellationToken.None)
             })
             .ToArrayAsync();
 
