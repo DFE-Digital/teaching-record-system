@@ -18,39 +18,32 @@ public class IndexModel(
     private Person? _person;
 
     [BindProperty]
-    [Display(Name = "First name")]
     [Required(ErrorMessage = "Enter the person\u2019s first name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Person\u2019s first name must be 100 characters or less")]
     public string? FirstName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Middle name (optional)")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Person\u2019s middle name must be 100 characters or less")]
     public string? MiddleName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Last name")]
     [Required(ErrorMessage = "Enter the person\u2019s last name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Person\u2019s last name must be 100 characters or less")]
     public string? LastName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Date of birth")]
     [DateInput(ErrorMessagePrefix = "Person\u2019s date of birth")]
     [Required(ErrorMessage = "Enter the person\u2019s date of birth")]
     public DateOnly? DateOfBirth { get; set; }
 
     [BindProperty]
-    [Display(Name = "Email address (optional)")]
     [MaxLength(Person.EmailAddressMaxLength, ErrorMessage = $"Person\u2019s email address must be 100 characters or less")]
     public string? EmailAddress { get; set; }
 
     [BindProperty]
-    [Display(Name = "National Insurance number (optional)")]
     public string? NationalInsuranceNumber { get; set; }
 
     [BindProperty]
-    [Display(Name = "Gender (optional)")]
     public Gender? Gender { get; set; }
 
     public bool NameChanged =>

@@ -36,28 +36,41 @@
             <span class="govuk-caption-l" data-testid="edit-details-caption">@Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-first-name" />
+            <govuk-input for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-first-name">
+                <govuk-input-label>First name</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-middle-name" />
+            <govuk-input for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-middle-name">
+                <govuk-input-label>Middle name (optional)</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-last-name"/>
+            <govuk-input for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-last-name">
+                <govuk-input-label>Last name</govuk-input-label>
+            </govuk-input>
 
             <govuk-date-input for="DateOfBirth" data-testid="edit-details-date-of-birth">
                 <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--s">
+                        Date of birth
+                    </govuk-date-input-fieldset-legend>
                     <govuk-date-input-hint>For example, 31 3 1980</govuk-date-input-hint>
-                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--s" />
                 </govuk-date-input-fieldset>
             </govuk-date-input>
 
-            <govuk-input for="EmailAddress" type="email" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-email-address"/>
+            <govuk-input for="EmailAddress" type="email" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-email-address">
+                <govuk-input-label>Email address (optional)</govuk-input-label>
+            </govuk-input>
 
             <govuk-input for="NationalInsuranceNumber" label-class="govuk-label--s" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" data-testid="edit-details-national-insurance-number">
+                <govuk-input-label>National Insurance number (optional)</govuk-input-label>
                 <govuk-input-hint>For example, &lsquo;QQ 12 34 56 C&rsquo;</govuk-input-hint>
             </govuk-input>
 
             <govuk-radios for="Gender" data-testid="edit-details-gender-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" data-testid="edit-details-gender-options-legend"/>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" data-testid="edit-details-gender-options-legend">
+                        Gender (optional)
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@Gender.Male">
                         @Gender.Male.GetDisplayName()
                     </govuk-radios-item>

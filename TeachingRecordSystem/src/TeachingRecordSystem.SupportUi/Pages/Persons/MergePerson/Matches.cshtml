@@ -101,7 +101,9 @@
             {
                 <govuk-radios for="PrimaryPersonId" data-testid="primary-person-options">
                     <govuk-radios-fieldset>
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                            Which is the primary record?
+                        </govuk-radios-fieldset-legend>
                         @foreach (var match in Model.PotentialDuplicates!)
                         {
                             <govuk-radios-item value="@match.PersonId">

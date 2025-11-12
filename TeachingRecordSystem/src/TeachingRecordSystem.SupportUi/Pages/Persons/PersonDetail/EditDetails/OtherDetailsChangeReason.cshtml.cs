@@ -15,11 +15,9 @@ public class OtherDetailsChangeReasonModel(
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    [Display(Name = "Why are you changing this record?")]
     public EditDetailsOtherDetailsChangeReasonOption? Reason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ReasonDetail { get; set; }
 

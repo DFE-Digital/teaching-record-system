@@ -16,7 +16,6 @@ public class EnterTrnModel(
 {
     public string? ThisTrn { get; set; }
 
-    [Display(Name = "Enter the TRN of the other record you want to merge")]
     [Required(ErrorMessage = "Enter a TRN")]
     [RegularExpression(@"^\d+$", ErrorMessage = "TRN must be a number")]
     [MaxLength(Person.TrnExactLength, ErrorMessage = "TRN must be 7 digits long")]

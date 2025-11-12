@@ -57,7 +57,7 @@
         <tbody class="govuk-table__body">
             @{
                 await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.FirstNameSource),
+                    "First name",
                     Model.FirstName!.Different,
                     Html.NameFor(m => m.FirstNameSource),
                     Model.FirstName!.PrimaryPersonValue,
@@ -65,7 +65,7 @@
                     Model.FirstNameSource);
 
                 await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.MiddleNameSource),
+                    "Middle name",
                     Model.MiddleName!.Different,
                     Html.NameFor(m => m.MiddleNameSource),
                     Model.MiddleName!.PrimaryPersonValue,
@@ -73,7 +73,7 @@
                     Model.MiddleNameSource);
 
                 await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.LastNameSource),
+                    "Last name",
                     Model.LastName!.Different,
                     Html.NameFor(m => m.LastNameSource),
                     Model.LastName!.PrimaryPersonValue,
@@ -81,7 +81,7 @@
                     Model.LastNameSource);
 
                 await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.DateOfBirthSource),
+                    "Date of birth",
                     Model.DateOfBirth!.Different,
                     Html.NameFor(m => m.DateOfBirthSource),
                     Model.DateOfBirth!.PrimaryPersonValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
@@ -89,7 +89,7 @@
                     Model.DateOfBirthSource);
 
                 await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.EmailAddressSource),
+                    "Email",
                     Model.EmailAddress!.Different,
                     Html.NameFor(m => m.EmailAddressSource),
                     Model.EmailAddress!.PrimaryPersonValue,
@@ -97,7 +97,7 @@
                     Model.EmailAddressSource);
 
                 await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.NationalInsuranceNumberSource),
+                    "National Insurance number",
                     Model.NationalInsuranceNumber!.Different,
                     Html.NameFor(m => m.NationalInsuranceNumberSource),
                     Model.NationalInsuranceNumber!.PrimaryPersonValue,
@@ -105,7 +105,7 @@
                     Model.NationalInsuranceNumberSource);
 
                 await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.GenderSource),
+                    "Gender",
                     Model.Gender!.Different,
                     Html.NameFor(m => m.GenderSource),
                     Model.Gender!.PrimaryPersonValue?.GetDisplayName(),
@@ -119,7 +119,9 @@
         <div class="govuk-grid-column-two-thirds-from-desktop">
             @Html.EditorFor(m => m.Evidence)
 
-            <govuk-textarea for="Comments" label-class="govuk-label--s" />
+            <govuk-textarea for="Comments" label-class="govuk-label--s">
+                <govuk-textarea-label>Add comments (optional)</govuk-textarea-label>
+            </govuk-textarea>
 
             <p class="govuk-body govuk-!-font-size-24 govuk-!-font-weight-bold">Do you want to use these details in the primary record?</p>
 

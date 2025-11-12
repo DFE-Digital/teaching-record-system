@@ -17,13 +17,15 @@
                 <govuk-radios-fieldset>
                     @if (Model.IsAlsoChangingName)
                     {
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l"  is-page-heading="true" data-testid="change-reason-options-legend">
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
                             Why are you changing the other personal details on this record?
                         </govuk-radios-fieldset-legend>
                     }
                     else
                     {
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend"/>
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
+                            Why are you changing this record?
+                        </govuk-radios-fieldset-legend>
                     }
                     <govuk-radios-item value="@EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails">
                         @EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails.GetDisplayName()
@@ -35,7 +37,9 @@
                         @EditDetailsOtherDetailsChangeReasonOption.AnotherReason.GetDisplayName()
 
                         <govuk-radios-item-conditional data-testid="change-reason-detail">
-                            <govuk-character-count for="ReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows" />
+                            <govuk-character-count for="ReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>

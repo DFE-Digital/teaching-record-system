@@ -23,7 +23,9 @@
             {
                 <govuk-radios for="DeactivateReason" data-testid="deactivate-reason-options">
                     <govuk-radios-fieldset>
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="deactivate-reason-options-legend"/>
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="deactivate-reason-options-legend">
+                            Why are you deactivating this record?
+                        </govuk-radios-fieldset-legend>
                         <govuk-radios-item value="@DeactivateReasonOption.RecordHolderDied">
                             @DeactivateReasonOption.RecordHolderDied.GetDisplayName()
                         </govuk-radios-item>
@@ -34,7 +36,9 @@
                             @DeactivateReasonOption.AnotherReason.GetDisplayName()
 
                             <govuk-radios-item-conditional data-testid="deactivate-reason-detail">
-                                <govuk-character-count for="DeactivateReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows" />
+                                <govuk-character-count for="DeactivateReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows">
+                                    <govuk-character-count-label>Enter details</govuk-character-count-label>
+                                </govuk-character-count>
                             </govuk-radios-item-conditional>
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
@@ -44,7 +48,9 @@
             {
                 <govuk-radios for="ReactivateReason" data-testid="reactivate-reason-options">
                     <govuk-radios-fieldset>
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="reactivate-reason-options-legend"/>
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="reactivate-reason-options-legend">
+                            Why are you reactivating this record?
+                        </govuk-radios-fieldset-legend>
                         <govuk-radios-item value="@ReactivateReasonOption.DeactivatedByMistake">
                             @ReactivateReasonOption.DeactivatedByMistake.GetDisplayName()
                         </govuk-radios-item>
@@ -52,7 +58,9 @@
                             @ReactivateReasonOption.AnotherReason.GetDisplayName()
 
                             <govuk-radios-item-conditional data-testid="reactivate-reason-detail">
-                                <govuk-character-count for="ReactivateReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows" />
+                                <govuk-character-count for="ReactivateReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows">
+                                    <govuk-character-count-label>Enter details</govuk-character-count-label>
+                                </govuk-character-count>
                             </govuk-radios-item-conditional>
                         </govuk-radios-item>
                     </govuk-radios-fieldset>

@@ -15,7 +15,9 @@
             <span class="govuk-caption-l" data-testid="create-reason-caption">Create a record</span>
             <govuk-radios for="Reason" data-testid="create-reason-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="create-reason-options-legend"/>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="create-reason-options-legend">
+                        Why are you creating this record?
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@AddPersonReasonOption.MandatoryQualification">
                         @AddPersonReasonOption.MandatoryQualification.GetDisplayName()
                     </govuk-radios-item>
@@ -29,7 +31,9 @@
                         @AddPersonReasonOption.AnotherReason.GetDisplayName()
 
                         <govuk-radios-item-conditional data-testid="create-reason-detail">
-                            <govuk-character-count for="ReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows" />
+                            <govuk-character-count for="ReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>

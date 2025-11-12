@@ -15,11 +15,9 @@ public class ReasonModel(
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    [Display(Name = "Why are you creating this record?")]
     public AddPersonReasonOption? Reason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ReasonDetail { get; set; }
 

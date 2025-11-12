@@ -16,7 +16,9 @@
 
             <govuk-radios for="Reason" data-testid="change-reason-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend"/>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
+                        Why are you changing the name on this record?
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership">
                         @EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership.GetDisplayName()
                     </govuk-radios-item>

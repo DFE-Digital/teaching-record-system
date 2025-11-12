@@ -19,7 +19,6 @@ public class MatchesModel(
 
     public IReadOnlyList<PotentialDuplicate>? PotentialDuplicates { get; private set; }
 
-    [Display(Name = "Which is the primary record?")]
     [Required(ErrorMessage = "Select primary record")]
     [BindProperty]
     public Guid? PrimaryPersonId { get; set; }

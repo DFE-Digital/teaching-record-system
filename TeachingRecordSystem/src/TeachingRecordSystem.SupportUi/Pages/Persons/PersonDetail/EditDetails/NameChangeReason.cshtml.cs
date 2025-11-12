@@ -15,7 +15,6 @@ public class NameChangeReasonModel(
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    [Display(Name = "Why are you changing the name on this record?")]
     public EditDetailsNameChangeReasonOption? Reason { get; set; }
 
     [BindProperty]
