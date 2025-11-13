@@ -14,7 +14,6 @@ public class WhatNpqModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMode
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "Which NPQ do you plan to take?")]
     [Required(ErrorMessage = "Enter the NPQ you plan to take")]
     [MaxLength(200, ErrorMessage = "NPQ Name must be 200 characters or less")]
     public string? NpqName { get; set; }

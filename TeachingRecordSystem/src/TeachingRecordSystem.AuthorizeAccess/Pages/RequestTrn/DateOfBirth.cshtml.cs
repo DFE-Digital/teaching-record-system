@@ -16,7 +16,6 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "What is your date of birth?")]
     [DateInput(ErrorMessagePrefix = "Date of birth")]
     [Required(ErrorMessage = "Enter your date of birth")]
     public DateOnly? DateOfBirth { get; set; }

@@ -13,13 +13,19 @@
         <form action="@LinkGenerator.RequestTrnPreviousName(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <govuk-radios for="HasPreviousName">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">Have you ever changed your name?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-input for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-first-name" />
-                            <govuk-input for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-middle-name" />
-                            <govuk-input for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-last-name" />
+                            <govuk-input for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-first-name">
+                                <govuk-input-label>Previous first name</govuk-input-label>
+                            </govuk-input>
+                            <govuk-input for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-middle-name">
+                                <govuk-input-label>Previous middle name (optional)</govuk-input-label>
+                            </govuk-input>
+                            <govuk-input for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-last-name">
+                                <govuk-input-label>Previous last name</govuk-input-label>
+                            </govuk-input>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">No</govuk-radios-item>

@@ -11,7 +11,6 @@ public class TakingNpqModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMo
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you need a TRN because you’re taking an NPQ?")]
     [Required(ErrorMessage = "Select yes if you need a TRN because you’re taking an NPQ")]
     public bool? IsTakingAnNpq { get; set; }
 

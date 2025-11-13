@@ -12,7 +12,6 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
     [BindProperty]
-    [Display(Name = "Have you already registered for an NPQ?")]
     [Required(ErrorMessage = "Select yes if you’ve already registered for an NPQ")]
     public bool? HaveRegisteredForAnNpq { get; set; }
 

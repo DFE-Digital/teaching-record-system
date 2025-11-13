@@ -12,7 +12,8 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RequestTrnNpqApplication(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <govuk-input for="NpqApplicationId" spellcheck="false">
-                <govuk-input-label is-page-heading="true" class="govuk-label--l" />
+                <govuk-input-label is-page-heading="true" class="govuk-label--l">What is your NPQ application ID?</govuk-input-label>
+                <govuk-input-hint>We’ll use this to check your registration details.</govuk-input-hint>
             </govuk-input>
 
             <govuk-details open="false">

@@ -11,7 +11,6 @@ public class SchoolOrEducationalSettingModel(AuthorizeAccessLinkGenerator linkGe
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
     [BindProperty]
-    [Display(Name = "Are you currently working in a school or other educational setting?")]
     [Required(ErrorMessage = "Select yes if you’re currently working in a school or other educational setting")]
     public bool? IsWorkingInSchoolOrEducationalSetting { get; set; }
 

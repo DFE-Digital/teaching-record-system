@@ -13,7 +13,8 @@
         <form action="@LinkGenerator.RequestTrnWorkEmail(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
 
             <govuk-input for="WorkEmail" type="email" autocomplete="email">
-                <govuk-input-label is-page-heading="true" class="govuk-label--l" />
+                <govuk-input-label is-page-heading="true" class="govuk-label--l">What is your work email address?</govuk-input-label>
+                <govuk-input-hint>We’ll use this to check if you need a TRN.</govuk-input-hint>
             </govuk-input>
 
             <govuk-button type="submit">Continue</govuk-button>

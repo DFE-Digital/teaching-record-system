@@ -12,10 +12,15 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RequestTrnName(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-            <govuk-input for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-first-name" />
-            <govuk-input for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-middle-name" />
-            <govuk-input for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-last-name" />
-
+            <govuk-input for="FirstName" input-class="govuk-input--width-20" data-testid="edit-details-first-name">
+                <govuk-input-label class="govuk-label--s">First name</govuk-input-label>
+            </govuk-input>
+            <govuk-input for="MiddleName" input-class="govuk-input--width-20" data-testid="edit-details-middle-name">
+                <govuk-input-label class="govuk-label--s">Middle name (optional)</govuk-input-label>
+            </govuk-input>
+            <govuk-input for="LastName" input-class="govuk-input--width-20" data-testid="edit-details-last-name">
+                <govuk-input-label class="govuk-label--s">Last name</govuk-input-label>
+            </govuk-input>
             <govuk-button type="submit">Continue</govuk-button>
         </form>
     </div>
