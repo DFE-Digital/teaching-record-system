@@ -20,17 +20,14 @@ public class IndexModel(
     [FromRoute]
     public Guid UserId { get; set; }
 
-    [Display(Name = "Email address")]
     public string? Email { get; set; }
 
     [BindProperty]
-    [Display(Name = "Name")]
     [Required(ErrorMessage = "Enter a name")]
     [MaxLength(Core.DataStore.Postgres.Models.UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
     [BindProperty]
-    [Display(Name = "Role")]
     [Required(ErrorMessage = "Select a role")]
     public string? Role { get; set; }
 

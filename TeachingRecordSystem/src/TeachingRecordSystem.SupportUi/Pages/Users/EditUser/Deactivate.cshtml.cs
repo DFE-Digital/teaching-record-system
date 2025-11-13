@@ -23,21 +23,17 @@ public class DeactivateModel(
     public Guid UserId { get; set; }
 
     [BindProperty]
-    [Display(Name = "Reason for deactivating user")]
     [Required(ErrorMessage = "Select a reason for deactivating this user")]
     public bool? HasAdditionalReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter a reason for deactivating this user")]
     public string? AdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you have more information?")]
     [Required(ErrorMessage = "Select yes if you want to provide more details")]
     public bool? HasMoreInformation { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details")]
     public string? MoreInformationDetail { get; set; }
 
     [BindProperty]
