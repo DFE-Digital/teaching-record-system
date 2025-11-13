@@ -15,13 +15,17 @@
         <form action="@LinkGenerator.ApplicationUsers.EditApplicationUser.Index(Model.UserId!)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input for="Name" label-class="govuk-label--m" />
+            <govuk-input for="Name">
+                <govuk-input-label class="govuk-label--m">Name</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="ShortName" input-class="govuk-input--width-10" label-class="govuk-label--m" />
+            <govuk-input for="ShortName" input-class="govuk-input--width-10">
+                <govuk-input-label class="govuk-label--m">Short name</govuk-input-label>
+            </govuk-input>
 
             <govuk-checkboxes for="ApiRoles">
                 <govuk-checkboxes-fieldset>
-                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m">API roles</govuk-checkboxes-fieldset-legend>
                     @foreach (var role in ApiRoles.All.OrderBy(r => r))
                     {
                         <govuk-checkboxes-item value="@role">@role</govuk-checkboxes-item>
@@ -29,7 +33,7 @@
                 </govuk-checkboxes-fieldset>
             </govuk-checkboxes>
 
-            <h2 class="govuk-heading-m">@Html.DisplayNameFor(m => m.ApiKeys)</h2>
+            <h2 class="govuk-heading-m">API keys</h2>
             <table class="govuk-table govuk-!-margin-bottom-3" data-testid="ApiKeysTable">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -80,29 +84,48 @@
 
             <govuk-checkboxes for="IsOidcClient">
                 <govuk-checkboxes-item value="@true" label-class="govuk-label--m">
-                    @Html.DisplayNameFor(m => m.IsOidcClient)
+                    OIDC Client
                     <govuk-checkboxes-item-conditional>
-                        <govuk-input for="ClientId" label-class="govuk-label--s" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false" />
+                        <govuk-input for="ClientId" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false">
+                            <govuk-input-label class="govuk-label--s">Client ID</govuk-input-label>
+                        </govuk-input>
 
-                        <govuk-input for="ClientSecret" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
+                        <govuk-input for="ClientSecret" input-class="trs-monospace" spellcheck="false">
+                            <govuk-input-label class="govuk-label--s">Client secret</govuk-input-label>
+                        </govuk-input>
 
-                        <govuk-textarea for="RedirectUris" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap">
+                        <govuk-textarea for="RedirectUris" textarea-class="trs-monospace trs-nowrap">
+                            <govuk-textarea-label class="govuk-label--s">Redirect URIs</govuk-textarea-label>
+                            <govuk-textarea-hint>Enter one per line</govuk-textarea-hint>
                             <govuk-textarea-value>@string.Join("\n", Model.RedirectUris!)</govuk-textarea-value>
                         </govuk-textarea>
 
-                        <govuk-textarea for="PostLogoutRedirectUris" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap">
+                        <govuk-textarea for="PostLogoutRedirectUris" textarea-class="trs-monospace trs-nowrap">
+                            <govuk-textarea-label class="govuk-label--s">Post logout redirect URIs</govuk-textarea-label>
+                            <govuk-textarea-hint>Enter one per line</govuk-textarea-hint>
                             <govuk-textarea-value>@string.Join("\n", Model.PostLogoutRedirectUris!)</govuk-textarea-value>
                         </govuk-textarea>
 
-                        <govuk-input for="OneLoginAuthenticationSchemeName" label-class="govuk-label--s" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false" />
+                        <govuk-input for="OneLoginAuthenticationSchemeName" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false">
+                            <govuk-input-label class="govuk-label--s">Authentication scheme name</govuk-input-label>
+                        </govuk-input>
 
-                        <govuk-input for="OneLoginClientId" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
+                        <govuk-input for="OneLoginClientId" input-class="trs-monospace" spellcheck="false">
+                            <govuk-input-label class="govuk-label--s">One Login client ID</govuk-input-label>
+                        </govuk-input>
 
-                        <govuk-textarea for="OneLoginPrivateKeyPem" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap" spellcheck="false" />
+                        <govuk-textarea for="OneLoginPrivateKeyPem" textarea-class="trs-monospace trs-nowrap" spellcheck="false">
+                            <govuk-textarea-label class="govuk-label--s">One Login private key</govuk-textarea-label>
+                            <govuk-textarea-hint>Enter a key in the PEM format</govuk-textarea-hint>
+                        </govuk-textarea>
 
-                        <govuk-input for="OneLoginRedirectUriPath" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
+                        <govuk-input for="OneLoginRedirectUriPath" input-class="trs-monospace" spellcheck="false">
+                            <govuk-input-label class="govuk-label--s">One Login redirect URI path</govuk-input-label>
+                        </govuk-input>
 
-                        <govuk-input for="OneLoginPostLogoutRedirectUriPath" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
+                        <govuk-input for="OneLoginPostLogoutRedirectUriPath" input-class="trs-monospace" spellcheck="false">
+                            <govuk-input-label class="govuk-label--s">OneLogin post logout redirect URI Path</govuk-input-label>
+                        </govuk-input>
                     </govuk-checkboxes-item-conditional>
                 </govuk-checkboxes-item>
             </govuk-checkboxes>

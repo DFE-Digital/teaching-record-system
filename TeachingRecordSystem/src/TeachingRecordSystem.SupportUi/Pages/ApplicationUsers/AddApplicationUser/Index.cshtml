@@ -13,9 +13,13 @@
         <form action="@LinkGenerator.ApplicationUsers.AddApplicationUser.Index()" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input for="Name" label-class="govuk-label--m" />
+            <govuk-input for="Name">
+                <govuk-input-label class="govuk-label--m">Name</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="ShortName" input-class="govuk-input--width-10" label-class="govuk-label--m" />
+            <govuk-input for="ShortName" input-class="govuk-input--width-10">
+                <govuk-input-label class="govuk-label--m">Short name</govuk-input-label>
+            </govuk-input>
 
             <govuk-button type="submit">Save</govuk-button>
         </form>
