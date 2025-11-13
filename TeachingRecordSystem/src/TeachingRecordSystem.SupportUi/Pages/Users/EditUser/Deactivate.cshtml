@@ -16,7 +16,9 @@
         <form method="post">
             <govuk-radios for="HasAdditionalReason">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-visually-hidden" />
+                    <govuk-radios-fieldset-legend class="govuk-visually-hidden">
+                        Reason for deactivating user
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@false">
                         They no longer need access
                     </govuk-radios-item>
@@ -27,7 +29,11 @@
                             <govuk-character-count for="AdditionalReasonDetail"
                                                    textarea-class="govuk-!-width-one-half"
                                                    max-length="UiDefaults.DetailMaxCharacterCount"
-                                                   rows="UiDefaults.DetailTextAreaRows" />
+                                                   rows="UiDefaults.DetailTextAreaRows">
+                                <govuk-character-count-label>
+                                    Enter a reason for deactivating this user
+                                </govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
@@ -37,7 +43,9 @@
 
             <govuk-radios for="HasMoreInformation">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-visually-hidden" />
+                    <govuk-radios-fieldset-legend class="govuk-visually-hidden">
+                        Do you have more information?
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
 
@@ -45,7 +53,11 @@
                             <govuk-character-count for="MoreInformationDetail"
                                                    textarea-class="govuk-!-width-one-half"
                                                    max-length="UiDefaults.DetailMaxCharacterCount"
-                                                   rows="UiDefaults.DetailTextAreaRows" />
+                                                   rows="UiDefaults.DetailTextAreaRows">
+                                <govuk-character-count-label>
+                                    Enter details
+                                </govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">

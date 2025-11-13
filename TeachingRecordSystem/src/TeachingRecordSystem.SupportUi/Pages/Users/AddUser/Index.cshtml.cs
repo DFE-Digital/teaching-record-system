@@ -14,7 +14,6 @@ public class IndexModel(
     IAadUserService userService,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    [Display(Name = "Email address")]
     [Required(ErrorMessage = "Enter an email address")]
     [BindProperty]
     public string? Email { get; set; }

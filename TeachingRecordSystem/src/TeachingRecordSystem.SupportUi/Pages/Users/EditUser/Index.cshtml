@@ -14,13 +14,19 @@
         <form action="@LinkGenerator.Users.EditUser.Index(Model.UserId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true" />
+            <govuk-input for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true">
+                <govuk-input-label>Email address</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="Name" input-class="govuk-!-width-two-thirds" disabled="@(!Model.IsActiveUser)" />
+            <govuk-input for="Name" input-class="govuk-!-width-two-thirds" disabled="@(!Model.IsActiveUser)">
+                <govuk-input-label>Name</govuk-input-label>
+            </govuk-input>
 
             <govuk-radios for="@Model.Role" radios-class="trs-user-roles" radios-style="--trs-user-permission-columns: @UserPermissionTypes.All.Count">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                        Role
+                    </govuk-radios-fieldset-legend>
 
                     @foreach (var role in Model.RoleOptions)
                     {

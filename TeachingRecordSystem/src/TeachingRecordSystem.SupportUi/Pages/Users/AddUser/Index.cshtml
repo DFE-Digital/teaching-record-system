@@ -9,7 +9,9 @@
         <form action="@LinkGenerator.Users.AddUser.Index()" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input for="Email" label-class="govuk-label--m" type="email" />
+            <govuk-input for="Email" label-class="govuk-label--m" type="email">
+                <govuk-input-label>Email address</govuk-input-label>
+            </govuk-input>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Add user</govuk-button>
