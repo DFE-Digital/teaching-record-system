@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
@@ -25,12 +26,6 @@ public class ResolveApiTrnRequestState : IRegisterJourney
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
     public PersonAttributeSource? GenderSource { get; set; }
     public string? Comments { get; set; }
-
-    public enum PersonAttributeSource
-    {
-        ExistingRecord = 0,
-        TrnRequest = 1
-    }
 }
 
 public class ResolveApiTrnRequestStateFactory(IPersonMatchingService personMatchingService) : IJourneyStateFactory<ResolveApiTrnRequestState>

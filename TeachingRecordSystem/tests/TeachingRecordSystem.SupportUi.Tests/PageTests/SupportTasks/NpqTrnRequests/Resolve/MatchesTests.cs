@@ -2,6 +2,7 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
@@ -669,10 +670,10 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
-                DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                GenderSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
+                GenderSource = PersonAttributeSource.ExistingRecord,
                 PersonAttributeSourcesSet = true
             });
 
@@ -710,10 +711,10 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = selectedPersonId,
-                DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                GenderSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
+                GenderSource = PersonAttributeSource.ExistingRecord,
                 PersonAttributeSourcesSet = true
             });
 
@@ -751,10 +752,10 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = selectedPersonId,
-                DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                GenderSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
+                GenderSource = PersonAttributeSource.ExistingRecord,
                 PersonAttributeSourcesSet = true
             });
 

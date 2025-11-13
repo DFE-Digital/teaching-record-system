@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions.Resolve;
 
@@ -52,12 +53,12 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         {
             MatchedPersonIds = [duplicatePerson1.PersonId],
             TeachersPensionPersonId = person.PersonId,
-            FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
-            MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            FirstNameSource = PersonAttributeSource.TrnRequest,
+            MiddleNameSource = PersonAttributeSource.ExistingRecord,
+            LastNameSource = PersonAttributeSource.ExistingRecord,
+            DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+            GenderSource = PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
             PersonId = duplicatePerson1.PersonId,
             PersonAttributeSourcesSet = true,
             Evidence = new()
@@ -130,12 +131,12 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         {
             MatchedPersonIds = [duplicatePerson1.PersonId],
             TeachersPensionPersonId = person.PersonId,
-            DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+            FirstNameSource = PersonAttributeSource.ExistingRecord,
+            MiddleNameSource = PersonAttributeSource.ExistingRecord,
+            LastNameSource = PersonAttributeSource.ExistingRecord,
+            GenderSource = PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
             PersonId = duplicatePerson1.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -184,12 +185,12 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         {
             MatchedPersonIds = [duplicatePerson1.PersonId],
             TeachersPensionPersonId = person.PersonId,
-            FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
-            MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
-            LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
-            DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
-            GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
-            NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            FirstNameSource = PersonAttributeSource.TrnRequest,
+            MiddleNameSource = PersonAttributeSource.TrnRequest,
+            LastNameSource = PersonAttributeSource.TrnRequest,
+            DateOfBirthSource = PersonAttributeSource.TrnRequest,
+            GenderSource = PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
             PersonId = duplicatePerson1.PersonId,
             PersonAttributeSourcesSet = true,
             Evidence = new()
