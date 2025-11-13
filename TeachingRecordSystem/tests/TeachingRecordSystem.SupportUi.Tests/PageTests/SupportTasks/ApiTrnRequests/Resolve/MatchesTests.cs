@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
@@ -587,13 +588,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
-                FirstNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                MiddleNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                LastNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                DateOfBirthSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                EmailAddressSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                NationalInsuranceNumberSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                GenderSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                FirstNameSource = PersonAttributeSource.ExistingRecord,
+                MiddleNameSource = PersonAttributeSource.ExistingRecord,
+                LastNameSource = PersonAttributeSource.ExistingRecord,
+                DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
+                GenderSource = PersonAttributeSource.ExistingRecord,
                 PersonAttributeSourcesSet = true
             });
 
@@ -634,13 +635,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = selectedPersonId,
-                FirstNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                MiddleNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                LastNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                DateOfBirthSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                EmailAddressSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                NationalInsuranceNumberSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                GenderSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                FirstNameSource = PersonAttributeSource.ExistingRecord,
+                MiddleNameSource = PersonAttributeSource.ExistingRecord,
+                LastNameSource = PersonAttributeSource.ExistingRecord,
+                DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
+                GenderSource = PersonAttributeSource.ExistingRecord,
                 PersonAttributeSourcesSet = true
             });
 

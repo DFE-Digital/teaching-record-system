@@ -7,6 +7,7 @@ using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
@@ -17,7 +18,8 @@ public class CheckAnswers(
     TrnRequestService trnRequestService,
     ITrnGenerator trnGenerator,
     SupportUiLinkGenerator linkGenerator,
-    IClock clock) :
+    IClock clock,
+    PersonChangeableAttributesService changedService) :
     ResolveApiTrnRequestPageModel(dbContext)
 {
     [FromRoute]
@@ -44,6 +46,8 @@ public class CheckAnswers(
     public string? Trn { get; set; }
 
     public string? Comments { get; set; }
+
+    public IEnumerable<ResolvedAttribute>? ResolvableAttributes { get; private set; }
 
     public void OnGet()
     {
@@ -195,6 +199,17 @@ public class CheckAnswers(
     {
         var requestData = GetRequestData();
         var state = JourneyInstance!.State;
+        ResolvableAttributes = changedService.GetResolvableAttributes(
+             new List<ResolvedAttribute>
+             {
+                new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
+                new ResolvedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
+                new ResolvedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
+                new ResolvedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
+                new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+                new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
+                new ResolvedAttribute(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
+             });
 
         if (state.PersonId is not Guid personId)
         {
