@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -21,14 +20,10 @@ public class RouteModel(
     public RouteToProfessionalStatusType[] ArchivedRoutes { get; set; } = [];
 
     [BindProperty]
-    [Display(Name = "Route type")]
     public Guid? RouteId { get; set; }
 
     [BindProperty]
-    [Display(Name = "Inactive route type")]
     public Guid? ArchivedRouteId { get; set; }
-
-    public string PageHeading => "Add route type";
 
     public void OnGet()
     {

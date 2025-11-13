@@ -19,9 +19,6 @@ public class CountryModel(
     public bool CountryRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingCountryRequired, Status.GetCountryRequirement())
         == FieldRequirement.Mandatory;
 
-    public string PageHeading => "Enter the country associated with their route"
-       + (CountryRequired ? "" : " (optional)");
-
     public void OnGet()
     {
         TrainingCountryId = JourneyInstance!.State.TrainingCountryId;

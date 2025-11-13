@@ -20,9 +20,6 @@ public class DegreeTypeModel(
     public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteType!.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
         == FieldRequirement.Mandatory;
 
-    public string PageHeading => "Enter the degree type awarded as part of this route"
-       + (DegreeTypeRequired ? "" : " (optional)");
-
     public void OnGet()
     {
         DegreeTypeId = JourneyInstance!.State.DegreeTypeId;

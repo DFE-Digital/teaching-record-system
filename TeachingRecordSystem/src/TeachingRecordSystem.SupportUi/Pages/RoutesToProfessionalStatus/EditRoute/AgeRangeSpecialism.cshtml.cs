@@ -16,9 +16,6 @@ public class AgeRangeSpecialismModel(
     public bool AgeRangeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement())
         == FieldRequirement.Mandatory;
 
-    public string PageHeading => "Edit age range specialism"
-       + (AgeRangeSpecialismRequired ? "" : " (optional)");
-
     public void OnGet()
     {
         TrainingAgeSpecialism.AgeRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom;

@@ -23,16 +23,13 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
 
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    [Display(Name = "Why are you editing this route?")]
     public ChangeReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to provide more information?")]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you’re editing this route")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details about this change")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
@@ -44,8 +41,6 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     public string BackLink => FromCheckAnswers == true
         ? linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId)
         : linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
-
-    public string PageCaption => $"Edit route - {PersonName}";
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {

@@ -2,7 +2,8 @@
 
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.StartAndEndDateModel
 @{
-    ViewBag.Title = Model.PageHeading;
+    ViewBag.Title = "Enter the route start and end dates"
+       + (Model.StartAndEndDatesRequired ? "" : " (optional)");
 }
 
 @section BeforeContent {
@@ -15,18 +16,22 @@
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-fieldset>
                 <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
-                    @Model.PageHeading
+                    @ViewBag.Title
                 </govuk-fieldset-legend>
                 <govuk-date-input for="TrainingStartDate">
                     <govuk-date-input-fieldset>
-                        <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                        <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m">
+                            Route start date
+                        </govuk-date-input-fieldset-legend>
                         <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
                     </govuk-date-input-fieldset>
                 </govuk-date-input>
 
                 <govuk-date-input for="TrainingEndDate">
                     <govuk-date-input-fieldset>
-                        <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                        <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m">
+                            Route end date
+                        </govuk-date-input-fieldset-legend>
                         <govuk-date-input-hint>For example, 27 3 2024</govuk-date-input-hint>
                     </govuk-date-input-fieldset>
                 </govuk-date-input>

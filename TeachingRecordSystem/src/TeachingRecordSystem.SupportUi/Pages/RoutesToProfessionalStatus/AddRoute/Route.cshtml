@@ -3,7 +3,7 @@
 
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.RouteModel
 @{
-    ViewBag.Title = Model.PageHeading;
+    ViewBag.Title = "Enter the route type";
 }
 
 @section Styles {
@@ -49,8 +49,10 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Route(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
-            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-            <govuk-select for="RouteId" label-class="govuk-label--m">
+            <govuk-select for="RouteId" label-class="govuk-label--l">
+                <govuk-select-label is-page-heading="true">
+                    @ViewBag.Title
+                </govuk-select-label>
                 <govuk-select-hint>Start typing the name of the route</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var route in Model.Routes)
@@ -64,6 +66,7 @@
                     <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
                     <govuk-details-text>
                         <govuk-select for=@Model.ArchivedRouteId label-class="govuk-label--m">
+                            <govuk-select-label>Inactive route type</govuk-select-label>
                             <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
                             <govuk-select-item value=""></govuk-select-item>
                             @foreach (var route in Model.ArchivedRoutes)
@@ -80,6 +83,7 @@
                     <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
                     <govuk-details-text>
                         <govuk-select for=@Model.ArchivedRouteId label-class="govuk-label--m">
+                            <govuk-select-label>Inactive route type</govuk-select-label>
                             <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
                             <govuk-select-item value=""></govuk-select-item>
                             @foreach (var route in Model.ArchivedRoutes)

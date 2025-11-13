@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -13,19 +12,14 @@ public class StartAndEndDateModel(
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
-    [Display(Name = "Route start date")]
     public DateOnly? TrainingStartDate { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "End date")]
-    [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 
     public bool StartAndEndDatesRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingEndDateRequired, Status.GetEndDateRequirement())
         == FieldRequirement.Mandatory;
-
-    public string PageHeading => "Enter the route start and end dates"
-       + (StartAndEndDatesRequired ? "" : " (optional)");
 
     public void OnGet()
     {

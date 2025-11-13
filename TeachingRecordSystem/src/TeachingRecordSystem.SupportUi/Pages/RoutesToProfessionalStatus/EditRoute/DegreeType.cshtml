@@ -2,7 +2,8 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.DegreeTypeModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
-    ViewBag.Title = Model.PageHeading;
+    ViewBag.Title = "Enter the degree type awarded as part of this route"
+       + (Model.DegreeTypeRequired ? "" : " (optional)");
 }
 
 @section Styles {
@@ -45,8 +46,9 @@
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select for="DegreeTypeId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">
-                    @Model.PageHeading
+                    @ViewBag.Title
                 </govuk-select-label>
+                <govuk-select-hint>Start typing the name of the degree type</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var degreeType in Model.DegreeTypes)
                 {

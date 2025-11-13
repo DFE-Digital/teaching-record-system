@@ -2,7 +2,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.StatusModel
 
 @{
-    ViewBag.Title = Model.PageHeading;
+    ViewBag.Title = "Select the route status";
 }
 
 @section BeforeContent {
@@ -16,7 +16,7 @@
             <govuk-radios for=@Model.Status data-testid="status">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
-                        @Model.PageHeading
+                        @ViewBag.Title
                     </govuk-radios-fieldset-legend>
                     @foreach (var status in Model.Statuses)
                     {

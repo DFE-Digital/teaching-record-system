@@ -20,9 +20,6 @@ public class TrainingProviderModel(
     public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteType!.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
             == FieldRequirement.Mandatory;
 
-    public string PageHeading => "Enter the training provider for this route"
-        + (TrainingProviderRequired ? "" : " (optional)");
-
     public void OnGet()
     {
         TrainingProviderId = JourneyInstance!.State.TrainingProviderId;
