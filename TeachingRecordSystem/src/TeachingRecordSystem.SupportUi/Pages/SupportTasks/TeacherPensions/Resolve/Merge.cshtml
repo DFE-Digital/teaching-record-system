@@ -56,7 +56,7 @@
         <tbody class="govuk-table__body">
             @{
                 await RenderChoosePersonAttribute(
-                Html.DisplayNameFor(m => m.FirstNameSource),
+                "First name",
                 Model.FirstName!.Different,
                 Html.NameFor(m => m.FirstNameSource),
                 Model.FirstName!.TrnRequestValue,
@@ -64,7 +64,7 @@
                 Model.FirstNameSource);
 
                 await RenderChoosePersonAttribute(
-                Html.DisplayNameFor(m => m.LastNameSource),
+                "Last name",
                 Model.LastName!.Different,
                 Html.NameFor(m => m.LastNameSource),
                 Model.LastName!.TrnRequestValue,
@@ -72,7 +72,7 @@
                 Model.LastNameSource);
 
                 await RenderChoosePersonAttribute(
-                Html.DisplayNameFor(m => m.TRNSource),
+                "TRN",
                 false,
                 Html.NameFor(m => m.TRNSource),
                 Model.Trn!.TrnRequestValue,
@@ -80,7 +80,7 @@
                 PersonAttributeSource.ExistingRecord);
 
                 await RenderChoosePersonAttribute(
-                Html.DisplayNameFor(m => m.DateOfBirthSource),
+                "Date of birth",
                 Model.DateOfBirth!.Different,
                 Html.NameFor(m => m.DateOfBirthSource),
                 Model.DateOfBirth!.TrnRequestValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
@@ -88,7 +88,7 @@
                 Model.DateOfBirthSource);
 
                 await RenderChoosePersonAttribute(
-                Html.DisplayNameFor(m => m.NationalInsuranceNumberSource),
+                "National Insurance number",
                 Model.NationalInsuranceNumber!.Different,
                 Html.NameFor(m => m.NationalInsuranceNumberSource),
                 Model.NationalInsuranceNumber!.TrnRequestValue,
@@ -96,7 +96,7 @@
                 Model.NationalInsuranceNumberSource);
 
                 await RenderChoosePersonAttribute(
-                Html.DisplayNameFor(m => m.GenderSource),
+                "Gender",
                 Model.Gender!.Different,
                 Html.NameFor(m => m.GenderSource),
                 Model.Gender!.TrnRequestValue?.GetDisplayName(),
@@ -108,7 +108,9 @@
 
     @Html.EditorFor(m => m.Evidence)
 
-    <govuk-textarea for="MergeComments" label-class="govuk-label--s" />
+    <govuk-textarea for="MergeComments" label-class="govuk-label--s">
+        <govuk-textarea-label size="s">Add comments (optional)</govuk-textarea-label>
+    </govuk-textarea>
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
