@@ -27,65 +27,51 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [FromRoute]
     public Guid UserId { get; set; }
 
-    [Display(Name = "Name")]
     [Required(ErrorMessage = "Enter a name")]
     [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
     [BindProperty]
-    [Display(Name = "Short name")]
     [MaxLength(ApplicationUser.ShortNameMaxLength, ErrorMessage = "Short name must be 25 characters or less")]
     public string? ShortName { get; set; }
 
-    [Display(Name = "API roles")]
     public string[]? ApiRoles { get; set; }
 
     [BindNever]
-    [Display(Name = "API keys")]
     public ApiKeyInfo[]? ApiKeys { get; set; }
 
-    [Display(Name = "OIDC client")]
     public bool IsOidcClient { get; set; }
 
-    [Display(Name = "Client ID")]
     [Required(ErrorMessage = "Enter a client ID")]
     [MaxLength(ApplicationUser.ClientIdMaxLength, ErrorMessage = "Client ID must be 50 characters or less")]
     public string? ClientId { get; set; }
 
-    [Display(Name = "Client secret")]
     [Required(ErrorMessage = "Enter a client secret")]
     [MinLength(ApplicationUser.ClientSecretMinLength, ErrorMessage = "Client secret must be at least 16 characters")]
     [MaxLength(ApplicationUser.ClientSecretMaxLength, ErrorMessage = "Client secret must be 200 characters or less")]
     public string? ClientSecret { get; set; }
 
-    [Display(Name = "Redirect URIs", Description = "Enter one per line")]
     [ModelBinder(BinderType = typeof(MultiLineStringModelBinder))]
     public string[]? RedirectUris { get; set; }
 
-    [Display(Name = "Post logout redirect URIs", Description = "Enter one per line")]
     [ModelBinder(BinderType = typeof(MultiLineStringModelBinder))]
     public string[]? PostLogoutRedirectUris { get; set; }
 
-    [Display(Name = "Authentication scheme name")]
     [Required(ErrorMessage = "Enter an authentication scheme name")]
     [MaxLength(ApplicationUser.AuthenticationSchemeNameMaxLength, ErrorMessage = "Authentication scheme name must be 50 characters or less")]
     public string? OneLoginAuthenticationSchemeName { get; set; }
 
-    [Display(Name = "One Login client ID")]
     [Required(ErrorMessage = "Enter the One Login client ID")]
     [MaxLength(ApplicationUser.OneLoginClientIdMaxLength, ErrorMessage = "One Login client ID must be 50 characters or less")]
     public string? OneLoginClientId { get; set; }
 
-    [Display(Name = "One Login private key", Description = "Enter a key in the PEM format")]
     [Required(ErrorMessage = "Enter the One Login private key")]
     public string? OneLoginPrivateKeyPem { get; set; }
 
-    [Display(Name = "One Login redirect URI path")]
     [Required(ErrorMessage = "Enter the One Login redirect URI")]
     [MaxLength(ApplicationUser.RedirectUriPathMaxLength, ErrorMessage = "One Login redirect URI must be 100 characters or less")]
     public string? OneLoginRedirectUriPath { get; set; }
 
-    [Display(Name = "One Login post logout redirect URI path")]
     [Required(ErrorMessage = "Enter the One Login post logout redirect URI")]
     [MaxLength(ApplicationUser.RedirectUriPathMaxLength, ErrorMessage = "One Login post logout redirect URI must be 100 characters or less")]
     public string? OneLoginPostLogoutRedirectUriPath { get; set; }

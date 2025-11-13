@@ -13,13 +13,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.AddApplicationUs
 public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     [BindProperty]
-    [Display(Name = "Name")]
     [Required(ErrorMessage = "Enter a name")]
     [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
     [BindProperty]
-    [Display(Name = "Short name")]
     [MaxLength(ApplicationUser.ShortNameMaxLength, ErrorMessage = "Short name must be 25 characters or less")]
     public string? ShortName { get; set; }
 
