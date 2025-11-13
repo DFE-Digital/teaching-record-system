@@ -12,7 +12,6 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
     public string? SupportTaskReference { get; set; }
 
     [BindProperty]
-    [Display(Name = "Have you completed all checks outside this service?")]
     [Required(ErrorMessage = "You must complete all checks before confirming")]
     public bool? ChecksCompleted { get; set; }
 
