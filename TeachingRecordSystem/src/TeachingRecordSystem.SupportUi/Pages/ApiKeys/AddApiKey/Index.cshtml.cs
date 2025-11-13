@@ -19,7 +19,6 @@ public class IndexModel(TrsDbContext dbContext, IClock clock, SupportUiLinkGener
     public string? ApplicationUserName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Key")]
     [Required(ErrorMessage = "Enter a key")]
     [MaxLength(ApiKey.KeyMaxLength, ErrorMessage = "Key must be 100 characters or less")]
     [MinLength(ApiKey.KeyMinLength, ErrorMessage = "Key must be at least 16 characters")]
