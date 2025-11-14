@@ -13,7 +13,7 @@
         <form action="@LinkGenerator.RequestTrnNpqCheck(Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-radios for="HaveRegisteredForAnNpq">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">Have you already registered for an NPQ?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">Yes</govuk-radios-item>
                     <govuk-radios-item value="@false">No</govuk-radios-item>
                 </govuk-radios-fieldset>

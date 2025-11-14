@@ -13,15 +13,25 @@
         <form action="@LinkGenerator.RequestTrnAddress(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input for="AddressLine1" autocomplete="address-line1" spellcheck="false" />
+            <govuk-input for="AddressLine1" autocomplete="address-line1" spellcheck="false">
+                <govuk-input-label>Address line 1</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="AddressLine2" autocomplete="address-line2" spellcheck="false" />
+            <govuk-input for="AddressLine2" autocomplete="address-line2" spellcheck="false">
+                <govuk-input-label>Address line 2 (optional)</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="TownOrCity" autocomplete="address-level2" spellcheck="false" />
+            <govuk-input for="TownOrCity" autocomplete="address-level2" spellcheck="false">
+                <govuk-input-label>Town or city</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="PostalCode" input-class="govuk-input--width-20" autocomplete="postal-code" spellcheck="false" />
+            <govuk-input for="PostalCode" input-class="govuk-input--width-20" autocomplete="postal-code" spellcheck="false">
+                <govuk-input-label>Postal code</govuk-input-label>
+            </govuk-input>
 
-            <govuk-input for="Country" autocomplete="country-name" spellcheck="false" />
+            <govuk-input for="Country" autocomplete="country-name" spellcheck="false">
+                <govuk-input-label>Country</govuk-input-label>
+            </govuk-input>
 
             <govuk-button type="submit">Continue</govuk-button>
         </form>

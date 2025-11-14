@@ -13,7 +13,7 @@
         <form action="@LinkGenerator.RequestTrnWorkingInSchoolOrEducationalSetting(Model.JourneyInstance!.InstanceId)" asp-for="IsWorkingInSchoolOrEducationalSetting" method="post">
             <govuk-radios for="IsWorkingInSchoolOrEducationalSetting">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">Are you currently working in a school or educational setting?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">Yes</govuk-radios-item>
                     <govuk-radios-item value="@false">No</govuk-radios-item>
                 </govuk-radios-fieldset>

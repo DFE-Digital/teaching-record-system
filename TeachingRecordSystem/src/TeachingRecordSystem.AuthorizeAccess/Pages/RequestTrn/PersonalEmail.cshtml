@@ -16,7 +16,8 @@
         <form action="@LinkGenerator.RequestTrnPersonalEmail(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
 
             <govuk-input for="PersonalEmail" type="PersonalEmail" autocomplete="email">
-                <govuk-input-label is-page-heading="true" class="govuk-label--l" />
+                <govuk-input-label is-page-heading="true" class="govuk-label--l">What is your personal email address?</govuk-input-label>
+                <govuk-input-hint>We need this to send you your TRN if you’re eligible for one. Do not use your work email address.</govuk-input-hint>
             </govuk-input>
 
             <govuk-button type="submit">Continue</govuk-button>

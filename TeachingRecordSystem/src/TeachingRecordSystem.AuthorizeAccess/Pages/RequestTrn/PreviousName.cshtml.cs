@@ -16,22 +16,18 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "Have you ever changed your name?")]
     [Required(ErrorMessage = "Select yes if you’ve ever changed your name")]
     public bool? HasPreviousName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Previous first name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous first name must be 100 characters or less")]
     public string? FirstName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Previous middle name (optional)")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous middle name must be 100 characters or less")]
     public string? MiddleName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Previous last name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous last name must be 100 characters or less")]
     public string? LastName { get; set; }
 

@@ -14,7 +14,6 @@ public class NpqApplicationModel(AuthorizeAccessLinkGenerator linkGenerator) : P
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "What is your NPQ application ID?", Description = "We’ll use this to check your registration details.")]
     [Required(ErrorMessage = "Enter your NPQ application ID")]
     public string? NpqApplicationId { get; set; }
 

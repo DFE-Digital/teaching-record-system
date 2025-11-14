@@ -16,18 +16,15 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "First name")]
     [Required(ErrorMessage = "Enter your first name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"First name must be 100 characters or less")]
     public string? FirstName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Middle name (optional)")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Middle name must be 100 characters or less")]
     public string? MiddleName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Last name")]
     [Required(ErrorMessage = "Enter your last name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Last name must be 100 characters or less")]
 

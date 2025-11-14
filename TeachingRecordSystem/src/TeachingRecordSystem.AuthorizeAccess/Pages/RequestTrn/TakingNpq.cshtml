@@ -14,7 +14,7 @@
         <form action="@LinkGenerator.TakingNpqRequireTrn(Model.JourneyInstance!.InstanceId)" asp-for="IsTakingAnNpq" method="post">
             <govuk-radios for="IsTakingAnNpq">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">Do you need a TRN because you’re taking an NPQ?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">Yes</govuk-radios-item>
                     <govuk-radios-item value="@false">No</govuk-radios-item>
                 </govuk-radios-fieldset>

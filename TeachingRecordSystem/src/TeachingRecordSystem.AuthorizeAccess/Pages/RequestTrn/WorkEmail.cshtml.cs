@@ -15,7 +15,6 @@ public class WorkEmailModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMo
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "What is your work email address?", Description = "We’ll use this to check if you need a TRN.")]
     [Required(ErrorMessage = "Enter your work email address")]
     [@EmailAddress(ErrorMessage = "Enter an email address in the correct format, like name@example.com")]
     public string? WorkEmail { get; set; }

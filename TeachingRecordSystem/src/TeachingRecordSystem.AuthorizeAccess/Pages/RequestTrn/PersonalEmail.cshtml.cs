@@ -17,7 +17,6 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsD
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "What is your personal email address?", Description = "We need this to send you your TRN if you’re eligible for one. Do not use your work email address.")]
     [Required(ErrorMessage = "Enter your personal email address")]
     [@EmailAddress(ErrorMessage = "Enter an email address in the correct format, like name@example.com")]
     public string? PersonalEmail { get; set; }

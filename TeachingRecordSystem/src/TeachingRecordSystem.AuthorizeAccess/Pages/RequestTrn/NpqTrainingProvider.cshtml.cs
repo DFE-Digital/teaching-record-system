@@ -14,7 +14,6 @@ public class NpqTrainingProviderModel(AuthorizeAccessLinkGenerator linkGenerator
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "Who is your NPQ training provider?")]
     [Required(ErrorMessage = "Enter your NPQ training provider")]
     [MaxLength(200, ErrorMessage = "NPQ training provider must be 200 characters or less")]
     public string? NpqTrainingProvider { get; set; }
