@@ -3,15 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [Authorize(Policy = AuthorizationPolicies.PersonDataEdit)]
-public class AddNote(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IFileService fileService, IClock clock) : PageModel
+public class AddNote(NoteService noteService, SupportUiLinkGenerator linkGenerator, IFileService fileService, IClock clock) : PageModel
 {
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -20,7 +19,7 @@ public class AddNote(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
 
     [BindProperty]
     [Required(ErrorMessage = "Enter text for the note")]
-    public string? Text { get; set; }
+    public new string? Content { get; set; }
 
     [BindProperty]
     [EvidenceFile]
@@ -45,32 +44,18 @@ public class AddNote(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
             fileId = await fileService.UploadFileAsync(stream, File.ContentType);
         }
 
-        var now = clock.UtcNow;
+        var processContext = new ProcessContext(ProcessType.NoteCreating, clock.UtcNow, User.GetUserId());
 
-        var note = new Core.DataStore.Postgres.Models.Note
-        {
-            NoteId = Guid.NewGuid(),
-            PersonId = PersonId,
-            Content = Text!,
-            UpdatedOn = now,
-            CreatedOn = now,
-            CreatedByUserId = User.GetUserId(),
-            FileId = fileId,
-            OriginalFileName = File?.FileName
-        };
-
-        var noteCreatedEvent = new NoteCreatedEvent
-        {
-            Note = EventModels.Note.FromModel(note),
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId()
-        };
-
-        dbContext.Notes.Add(note);
-        await dbContext.AddEventAndBroadcastAsync(noteCreatedEvent);
-
-        await dbContext.SaveChangesAsync();
+        await noteService.CreateNoteAsync(
+            new CreateNoteOptions
+            {
+                PersonId = PersonId,
+                Content = Content!,
+                CreatedByUserId = User.GetUserId(),
+                FileId = fileId,
+                OriginalFileName = File?.FileName
+            },
+            processContext);
 
         return Redirect(linkGenerator.Persons.PersonDetail.Notes(PersonId));
     }

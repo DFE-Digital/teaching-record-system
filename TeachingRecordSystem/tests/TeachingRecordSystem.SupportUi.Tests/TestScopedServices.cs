@@ -20,6 +20,7 @@ public class TestScopedServices
         Clock = new();
         AzureActiveDirectoryUserServiceMock = new();
         EventObserver = new();
+        Events = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         BlobStorageFileServiceMock = new();
         BlobStorageFileServiceMock
@@ -44,7 +45,9 @@ public class TestScopedServices
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
             .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
             .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler)
-            .AddTestScoped(tss => tss.CurrentUserProvider);
+            .AddTestScoped(tss => tss.CurrentUserProvider)
+            .AddTestScoped(tss => tss.Events)
+            .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>());
 
     public static TestScopedServices GetCurrent() =>
         _current.Value ?? throw new InvalidOperationException("No current instance has been set.");
@@ -64,6 +67,8 @@ public class TestScopedServices
     public Mock<IAadUserService> AzureActiveDirectoryUserServiceMock { get; }
 
     public CaptureEventObserver EventObserver { get; }
+
+    public EventCapture Events { get; }
 
     public TestableFeatureProvider FeatureProvider { get; }
 
