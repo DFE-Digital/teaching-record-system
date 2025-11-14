@@ -17,7 +17,6 @@
     <PackageReference Include="Azure.Storage.Blobs" />
     <PackageReference Include="JustEat.HttpClientInterception" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Moq" />
     <PackageReference Include="xunit.runner.visualstudio">
