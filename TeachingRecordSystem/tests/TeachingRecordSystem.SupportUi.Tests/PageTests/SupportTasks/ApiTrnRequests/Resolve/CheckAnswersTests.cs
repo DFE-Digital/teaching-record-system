@@ -242,7 +242,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Get_CreatingNewRecord_HasBackAndChangeLinksToMatchesPage()
+    public async Task Get_CreatingNewRecord_HasBackChangeLinksToMatchesPage()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -270,7 +270,10 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+        Assert.Null(doc.GetElementByTestId("dob-change-link"));
+        Assert.Null(doc.GetElementByTestId("ni-change-link"));
+        Assert.Null(doc.GetElementByTestId("email-change-link"));
+        Assert.Null(doc.GetElementByTestId("gender-change-link"));
     }
 
     [Fact]
@@ -287,7 +290,11 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
-                PersonAttributeSourcesSet = true
+                PersonAttributeSourcesSet = true,
+                DateOfBirthSource = PersonAttributeSource.TrnRequest,
+                NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
+                EmailAddressSource = PersonAttributeSource.ExistingRecord,
+                GenderSource = PersonAttributeSource.TrnRequest
             });
 
         var expectedBackLink = $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
@@ -303,7 +310,10 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("email-change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("ni-change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("dob-change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("gender-change-link")?.GetAttribute("href"));
     }
 
     [Fact]

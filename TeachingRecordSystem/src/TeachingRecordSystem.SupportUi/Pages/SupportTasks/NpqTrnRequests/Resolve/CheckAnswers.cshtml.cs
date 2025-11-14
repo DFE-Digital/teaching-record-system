@@ -17,7 +17,8 @@ public class CheckAnswersModel(
     TrnRequestService trnRequestService,
     ITrnGenerator trnGenerator,
     SupportUiLinkGenerator linkGenerator,
-    IClock clock) : ResolveNpqTrnRequestPageModel(dbContext)
+    IClock clock, PersonChangeableAttributesService changedService) : ResolveNpqTrnRequestPageModel(dbContext)
+
 {
     public string? SourceApplicationUserName { get; set; }
 
@@ -42,6 +43,16 @@ public class CheckAnswersModel(
     public string? Trn { get; set; }
 
     public string? Comments { get; set; }
+
+    public IEnumerable<ResolvedAttribute>? ResolvableAttributes { get; private set; }
+
+    public bool IsGenderChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.Gender) == true;
+
+    public bool IsDateOfBirthChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.DateOfBirth) == true;
+
+    public bool IsNationalInsuranceNumberChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.NationalInsuranceNumber) == true;
+
+    public bool IsEmailAddressChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.EmailAddress) == true;
 
     public void OnGet()
     {
@@ -248,6 +259,15 @@ public class CheckAnswersModel(
         Comments = state.Comments;
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
         PotentialDuplicate = requestData.PotentialDuplicate;
+
+        ResolvableAttributes = changedService.GetResolvableAttributes(
+             new List<ResolvedAttribute>
+             {
+                        new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
+                        new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+                        new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
+                        new ResolvedAttribute(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
+             });
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

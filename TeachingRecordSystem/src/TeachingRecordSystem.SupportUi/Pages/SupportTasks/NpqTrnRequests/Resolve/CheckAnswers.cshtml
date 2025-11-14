@@ -32,51 +32,54 @@
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.FirstName</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@changeLink" data-testid="change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.MiddleName</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@changeLink" data-testid="change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.LastName</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@changeLink" data-testid="change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@changeLink" data-testid="change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
+                    @if (Model.IsDateOfBirthChangeable)
+                    {
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@changeLink" data-testid="dob-change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    }
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@changeLink" data-testid="change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
+                    @if (Model.IsEmailAddressChangeable)
+                    {
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@changeLink" data-testid="email-change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    }
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@changeLink" data-testid="change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
+                    @if (Model.IsNationalInsuranceNumberChangeable)
+                    {
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@changeLink" data-testid="ni-change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    }
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@changeLink" data-testid="change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
+                    @if (Model.IsGenderChangeable)
+                    {
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@changeLink" data-testid="gender-change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    }
                 </govuk-summary-list-row>
                 @if (Model.Trn is not null)
                 {
@@ -88,13 +91,16 @@
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.Comments</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@changeLink" data-testid="change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                @if (!Model.CreatingNewRecord)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Comments</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@changeLink" data-testid="comments-change-link" visually-hidden-text="name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
             </govuk-summary-list>
 
             <div class="govuk-button-group">
