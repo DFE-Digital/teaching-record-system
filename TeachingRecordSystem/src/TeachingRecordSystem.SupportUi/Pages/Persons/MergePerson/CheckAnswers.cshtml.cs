@@ -149,13 +149,13 @@ public class CheckAnswersModel(
             clock.UtcNow);
 
         var changes = PersonsMergedEventChanges.None |
-            (state.FirstNameSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.FirstName : 0) |
-            (state.MiddleNameSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.MiddleName : 0) |
-            (state.LastNameSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.LastName : 0) |
-            (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.DateOfBirth : 0) |
-            (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.EmailAddress : 0) |
-            (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
-            (state.GenderSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.Gender : 0);
+            (state.FirstNameSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.FirstName : 0) |
+            (state.MiddleNameSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.MiddleName : 0) |
+            (state.LastNameSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.LastName : 0) |
+            (state.DateOfBirthSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.DateOfBirth : 0) |
+            (state.EmailAddressSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.EmailAddress : 0) |
+            (state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
+            (state.GenderSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.Gender : 0);
 
         var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
         secondaryPerson.Status = PersonStatus.Deactivated;

@@ -160,67 +160,6 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task MergePerson_CYA_ChangePrimaryPerson_NavigatesBackToCYA()
-    {
-        var person1 = await TestData.CreatePersonAsync(p => p
-            .WithEmailAddress(TestData.GenerateUniqueEmail())
-            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
-
-        var person2 = await TestData.CreatePersonAsync(p => p
-            .WithEmailAddress(TestData.GenerateUniqueEmail())
-            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToPersonDetailPageAsync(person1.PersonId);
-        await page.ClickButtonAsync("Merge with another record");
-
-        await page.AssertOnMergePersonEnterTrnPageAsync(person1.PersonId);
-        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn!);
-        await page.ClickContinueButtonAsync();
-
-        await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
-        // select Person 1 as primary record
-        await page.ClickRadioByLabelAsync($"TRN {person1.Trn}");
-        await page.ClickContinueButtonAsync();
-
-        await page.AssertOnMergePersonMergePageAsync(person1.PersonId);
-        await page.ClickContinueButtonAsync();
-
-        await page.ClickRadioByLabelAsync(person2.FirstName);
-        await page.ClickRadioByLabelAsync(person2.MiddleName);
-        await page.ClickRadioByLabelAsync(person2.LastName);
-        await page.ClickRadioByLabelAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        await page.ClickRadioByLabelAsync(person2.EmailAddress!);
-        await page.ClickRadioByLabelAsync(person2.NationalInsuranceNumber!);
-        await page.SelectUploadEvidenceAsync(false);
-        await page.ClickContinueButtonAsync();
-
-        await page.AssertOnMergePersonCheckAnswersPageAsync(person1.PersonId);
-
-        //TODO: FIX ONCE we know if the CYA page is going to have lots of change links
-        //await page.ClickLinkForElementWithTestIdAsync("change-primary-person-link");
-
-        //await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
-        //await page.ClickBackLinkAsync();
-
-        //await page.AssertOnMergePersonCheckAnswersPageAsync(person1.PersonId);
-        //await page.ClickBackLinkAsync();
-
-        //await page.AssertOnMergePersonMergePageAsync(person1.PersonId);
-        //await page.ClickBackLinkAsync();
-
-        //await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
-        //await page.ClickBackLinkAsync();
-
-        //await page.AssertOnMergePersonEnterTrnPageAsync(person1.PersonId);
-        //await page.ClickBackLinkAsync();
-
-        //await page.AssertOnPersonDetailPageAsync(person1.PersonId);
-    }
-
-    [Fact]
     public async Task MergePerson_CYA_ChangeDetails_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -279,16 +218,22 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
-    [Fact]
-    public async Task MergePerson_CYA_ChangePrimaryPerson_ContinuesToCYA()
+    [Theory]
+    [InlineData("change-firstname-link")]
+    [InlineData("change-middlename-link")]
+    [InlineData("change-lastname-link")]
+    [InlineData("change-dob-link")]
+    [InlineData("change-email-link")]
+    [InlineData("change-gender-link")]
+    public async Task MergePerson_CYA_ClickChangeLink_RedirectsToMergePage(string testIdSelector)
     {
         var person1 = await TestData.CreatePersonAsync(p => p
             .WithEmailAddress(TestData.GenerateUniqueEmail())
-            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()).WithGender(Gender.Male));
 
         var person2 = await TestData.CreatePersonAsync(p => p
             .WithEmailAddress(TestData.GenerateUniqueEmail())
-            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()).WithGender(Gender.Female));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -312,6 +257,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
         await page.ClickRadioByLabelAsync(person2.EmailAddress!);
         await page.ClickRadioByLabelAsync(person2.NationalInsuranceNumber!);
+        await page.ClickRadioByLabelAsync(person2.Gender.ToString()!);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -322,32 +268,8 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertContentEqualsAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
         await page.AssertContentEqualsAsync(person2.EmailAddress!, "Email");
         await page.AssertContentEqualsAsync(person2.NationalInsuranceNumber!, "National Insurance number");
-        await page.ClickLinkForElementWithTestIdAsync("change-primary-person-link");
-
-        await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
-        // select Person 2 as primary record
-        await page.ClickRadioByLabelAsync($"TRN {person2.Trn}");
-        await page.ClickContinueButtonAsync();
-
-        await page.AssertOnMergePersonCheckAnswersPageAsync(person1.PersonId);
-        await page.AssertContentEqualsAsync(person2.FirstName, "First name");
-        await page.AssertContentEqualsAsync(person2.MiddleName, "Middle name");
-        await page.AssertContentEqualsAsync(person2.LastName, "Last name");
-        await page.AssertContentEqualsAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEqualsAsync(person2.EmailAddress!, "Email");
-        await page.AssertContentEqualsAsync(person2.NationalInsuranceNumber!, "National Insurance number");
-        await page.ClickBackLinkAsync();
-
+        await page.ClickLinkForElementWithTestIdAsync(testIdSelector);
         await page.AssertOnMergePersonMergePageAsync(person1.PersonId);
-        await page.ClickBackLinkAsync();
-
-        await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
-        await page.ClickBackLinkAsync();
-
-        await page.AssertOnMergePersonEnterTrnPageAsync(person1.PersonId);
-        await page.ClickBackLinkAsync();
-
-        await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
     [Fact]
