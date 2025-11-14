@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
@@ -91,13 +92,13 @@ public class MatchesModel(
                 PrimaryPersonId is Guid newPrimaryPersonId &&
                 originalPrimaryPersonId != newPrimaryPersonId)
             {
-                state.FirstNameSource = state.FirstNameSource is not PersonAttributeSource firstNameSource ? null : firstNameSource == PersonAttributeSource.PrimaryPerson ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-                state.MiddleNameSource = state.MiddleNameSource is not PersonAttributeSource middleNameSource ? null : middleNameSource == PersonAttributeSource.PrimaryPerson ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-                state.LastNameSource = state.LastNameSource is not PersonAttributeSource lastNameSource ? null : lastNameSource == PersonAttributeSource.PrimaryPerson ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-                state.DateOfBirthSource = state.DateOfBirthSource is not PersonAttributeSource dateOfBirthSource ? null : dateOfBirthSource == PersonAttributeSource.PrimaryPerson ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-                state.EmailAddressSource = state.EmailAddressSource is not PersonAttributeSource emailAddressSource ? null : emailAddressSource == PersonAttributeSource.PrimaryPerson ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-                state.NationalInsuranceNumberSource = state.NationalInsuranceNumberSource is not PersonAttributeSource nationalInsuranceNumberSource ? null : nationalInsuranceNumberSource == PersonAttributeSource.PrimaryPerson ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-                state.GenderSource = state.GenderSource is not PersonAttributeSource genderSource ? null : genderSource == PersonAttributeSource.PrimaryPerson ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
+                state.FirstNameSource = state.FirstNameSource is not PersonAttributeSource firstNameSource ? null : firstNameSource == PersonAttributeSource.TrnRequest ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+                state.MiddleNameSource = state.MiddleNameSource is not PersonAttributeSource middleNameSource ? null : middleNameSource == PersonAttributeSource.TrnRequest ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+                state.LastNameSource = state.LastNameSource is not PersonAttributeSource lastNameSource ? null : lastNameSource == PersonAttributeSource.TrnRequest ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+                state.DateOfBirthSource = state.DateOfBirthSource is not PersonAttributeSource dateOfBirthSource ? null : dateOfBirthSource == PersonAttributeSource.TrnRequest ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+                state.EmailAddressSource = state.EmailAddressSource is not PersonAttributeSource emailAddressSource ? null : emailAddressSource == PersonAttributeSource.TrnRequest ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+                state.NationalInsuranceNumberSource = state.NationalInsuranceNumberSource is not PersonAttributeSource nationalInsuranceNumberSource ? null : nationalInsuranceNumberSource == PersonAttributeSource.TrnRequest ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+                state.GenderSource = state.GenderSource is not PersonAttributeSource genderSource ? null : genderSource == PersonAttributeSource.TrnRequest ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
             }
             state.PrimaryPersonId = PrimaryPersonId;
         });

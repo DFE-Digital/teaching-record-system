@@ -3,6 +3,7 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
@@ -131,13 +132,13 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
-                .WithFirstNameSource(PersonAttributeSource.PrimaryPerson)
-                .WithMiddleNameSource(PersonAttributeSource.PrimaryPerson)
-                .WithLastNameSource(PersonAttributeSource.PrimaryPerson)
-                .WithDateOfBirthSource(PersonAttributeSource.PrimaryPerson)
-                .WithEmailAddressSource(PersonAttributeSource.PrimaryPerson)
-                .WithNationalInsuranceNumberSource(PersonAttributeSource.PrimaryPerson)
-                .WithGenderSource(PersonAttributeSource.PrimaryPerson)
+                .WithFirstNameSource(PersonAttributeSource.ExistingRecord)
+                .WithMiddleNameSource(PersonAttributeSource.ExistingRecord)
+                .WithLastNameSource(PersonAttributeSource.ExistingRecord)
+                .WithDateOfBirthSource(PersonAttributeSource.ExistingRecord)
+                .WithEmailAddressSource(PersonAttributeSource.ExistingRecord)
+                .WithNationalInsuranceNumberSource(PersonAttributeSource.ExistingRecord)
+                .WithGenderSource(PersonAttributeSource.ExistingRecord)
                 .WithComments(null)
                 .Build());
 
@@ -168,13 +169,13 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
-                .WithFirstNameSource(PersonAttributeSource.SecondaryPerson)
-                .WithMiddleNameSource(PersonAttributeSource.SecondaryPerson)
-                .WithLastNameSource(PersonAttributeSource.SecondaryPerson)
-                .WithDateOfBirthSource(PersonAttributeSource.SecondaryPerson)
-                .WithEmailAddressSource(PersonAttributeSource.SecondaryPerson)
-                .WithNationalInsuranceNumberSource(PersonAttributeSource.SecondaryPerson)
-                .WithGenderSource(PersonAttributeSource.SecondaryPerson)
+                .WithFirstNameSource(PersonAttributeSource.ExistingRecord)
+                .WithMiddleNameSource(PersonAttributeSource.ExistingRecord)
+                .WithLastNameSource(PersonAttributeSource.ExistingRecord)
+                .WithDateOfBirthSource(PersonAttributeSource.ExistingRecord)
+                .WithEmailAddressSource(PersonAttributeSource.ExistingRecord)
+                .WithNationalInsuranceNumberSource(PersonAttributeSource.ExistingRecord)
+                .WithGenderSource(PersonAttributeSource.ExistingRecord)
                 .WithComments(null)
                 .Build());
 
@@ -583,13 +584,13 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
-                .WithFirstNameSource(PersonAttributeSource.SecondaryPerson)
-                .WithMiddleNameSource(PersonAttributeSource.SecondaryPerson)
-                .WithLastNameSource(PersonAttributeSource.SecondaryPerson)
-                .WithDateOfBirthSource(PersonAttributeSource.SecondaryPerson)
-                .WithEmailAddressSource(PersonAttributeSource.SecondaryPerson)
-                .WithNationalInsuranceNumberSource(PersonAttributeSource.SecondaryPerson)
-                .WithGenderSource(PersonAttributeSource.SecondaryPerson)
+                .WithFirstNameSource(PersonAttributeSource.ExistingRecord)
+                .WithMiddleNameSource(PersonAttributeSource.ExistingRecord)
+                .WithLastNameSource(PersonAttributeSource.ExistingRecord)
+                .WithDateOfBirthSource(PersonAttributeSource.ExistingRecord)
+                .WithEmailAddressSource(PersonAttributeSource.ExistingRecord)
+                .WithNationalInsuranceNumberSource(PersonAttributeSource.ExistingRecord)
+                .WithGenderSource(PersonAttributeSource.ExistingRecord)
                 .WithComments(null)
                 .Build());
 

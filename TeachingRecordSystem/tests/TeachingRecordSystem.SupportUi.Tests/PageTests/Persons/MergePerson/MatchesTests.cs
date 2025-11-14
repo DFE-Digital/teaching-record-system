@@ -1,5 +1,6 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
@@ -428,13 +429,13 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
-                .WithFirstNameSource(PersonAttributeSource.PrimaryPerson)
-                .WithMiddleNameSource(PersonAttributeSource.SecondaryPerson)
+                .WithFirstNameSource(PersonAttributeSource.ExistingRecord)
+                .WithMiddleNameSource(PersonAttributeSource.ExistingRecord)
                 // Leaving LastNameSource unselected
-                .WithDateOfBirthSource(PersonAttributeSource.SecondaryPerson)
-                .WithEmailAddressSource(PersonAttributeSource.SecondaryPerson)
+                .WithDateOfBirthSource(PersonAttributeSource.ExistingRecord)
+                .WithEmailAddressSource(PersonAttributeSource.ExistingRecord)
                 // Leaving NationalInsuranceNumberSource unselected
-                .WithGenderSource(PersonAttributeSource.PrimaryPerson)
+                .WithGenderSource(PersonAttributeSource.ExistingRecord)
                 .WithUploadEvidenceChoice(false)
                 .WithComments(null)
                 .Build());
@@ -456,13 +457,13 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
 
-        Assert.Equal(PersonAttributeSource.SecondaryPerson, journeyInstance.State.FirstNameSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.MiddleNameSource);
+        Assert.Equal(PersonAttributeSource.ExistingRecord, journeyInstance.State.FirstNameSource);
+        Assert.Equal(PersonAttributeSource.TrnRequest, journeyInstance.State.MiddleNameSource);
         Assert.Null(journeyInstance.State.LastNameSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.DateOfBirthSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.EmailAddressSource);
+        Assert.Equal(PersonAttributeSource.ExistingRecord, journeyInstance.State.DateOfBirthSource);
+        Assert.Equal(PersonAttributeSource.ExistingRecord, journeyInstance.State.EmailAddressSource);
         Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
-        Assert.Equal(PersonAttributeSource.SecondaryPerson, journeyInstance.State.GenderSource);
+        Assert.Equal(PersonAttributeSource.ExistingRecord, journeyInstance.State.GenderSource);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergePersonState>? journeyInstance = null) =>

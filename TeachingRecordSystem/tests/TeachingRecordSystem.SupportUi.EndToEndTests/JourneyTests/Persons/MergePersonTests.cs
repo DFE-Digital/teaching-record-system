@@ -349,6 +349,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
+
     [Fact]
     public async Task MergePerson_CYA_ChangeDetails_ContinuesToCYA()
     {

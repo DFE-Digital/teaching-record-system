@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
@@ -12,7 +13,8 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
-    IClock clock)
+    IClock clock,
+    PersonChangeableAttributesService changedService)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     public string BackLink => GetPageLink(MergePersonJourneyPage.Merge);
@@ -31,6 +33,22 @@ public class CheckAnswersModel(
     public string? Comments { get; set; }
 
     private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
+
+    public IEnumerable<ResolvedAttribute>? ResolvableAttributes { get; private set; }
+
+    public bool IsGenderChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.Gender) == true;
+
+    public bool IsFirstNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.FirstName) == true;
+
+    public bool IsMiddleNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.MiddleName) == true;
+
+    public bool IsLastNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.LastName) == true;
+
+    public bool IsDateOfBirthChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.DateOfBirth) == true;
+
+    public bool IsNationalInsuranceNumberChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.NationalInsuranceNumber) == true;
+
+    public bool IsEmailAddressChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.EmailAddress) == true;
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
@@ -59,21 +77,33 @@ public class CheckAnswersModel(
 
         _potentialDuplicates = await GetPotentialDuplicatesAsync(personAId, personBId);
 
+
         var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
 
         var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
         var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
 
-        FirstName = state.FirstNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.FirstName : secondaryPerson.FirstName;
-        MiddleName = state.MiddleNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.MiddleName : secondaryPerson.MiddleName;
-        LastName = state.LastNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.LastName : secondaryPerson.LastName;
-        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.DateOfBirth : secondaryPerson.DateOfBirth;
-        EmailAddress = state.EmailAddressSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.EmailAddress : secondaryPerson.EmailAddress;
-        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.NationalInsuranceNumber : secondaryPerson.NationalInsuranceNumber;
-        Gender = state.GenderSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.Gender : secondaryPerson.Gender;
+        FirstName = state.FirstNameSource == PersonAttributeSource.TrnRequest ? primaryPerson.FirstName : secondaryPerson.FirstName;
+        MiddleName = state.MiddleNameSource == PersonAttributeSource.TrnRequest ? primaryPerson.MiddleName : secondaryPerson.MiddleName;
+        LastName = state.LastNameSource == PersonAttributeSource.TrnRequest ? primaryPerson.LastName : secondaryPerson.LastName;
+        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.TrnRequest ? primaryPerson.DateOfBirth : secondaryPerson.DateOfBirth;
+        EmailAddress = state.EmailAddressSource == PersonAttributeSource.TrnRequest ? primaryPerson.EmailAddress : secondaryPerson.EmailAddress;
+        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.TrnRequest ? primaryPerson.NationalInsuranceNumber : secondaryPerson.NationalInsuranceNumber;
+        Gender = state.GenderSource == PersonAttributeSource.TrnRequest ? primaryPerson.Gender : secondaryPerson.Gender;
         Trn = primaryPerson.Trn;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
         Comments = state.Comments;
+        ResolvableAttributes = changedService.GetResolvableAttributes(
+             new List<ResolvedAttribute>
+             {
+                 new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
+             });
     }
 
     public IActionResult OnGet()
@@ -119,13 +149,13 @@ public class CheckAnswersModel(
             clock.UtcNow);
 
         var changes = PersonsMergedEventChanges.None |
-            (state.FirstNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.FirstName : 0) |
-            (state.MiddleNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.MiddleName : 0) |
-            (state.LastNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.LastName : 0) |
-            (state.DateOfBirthSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.DateOfBirth : 0) |
-            (state.EmailAddressSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.EmailAddress : 0) |
-            (state.NationalInsuranceNumberSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
-            (state.GenderSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.Gender : 0);
+            (state.FirstNameSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.FirstName : 0) |
+            (state.MiddleNameSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.MiddleName : 0) |
+            (state.LastNameSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.LastName : 0) |
+            (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.DateOfBirth : 0) |
+            (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.EmailAddress : 0) |
+            (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
+            (state.GenderSource is PersonAttributeSource.TrnRequest ? PersonsMergedEventChanges.Gender : 0);
 
         var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
         secondaryPerson.Status = PersonStatus.Deactivated;
