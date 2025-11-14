@@ -202,7 +202,7 @@ public class CommonPageTests(HostFixture hostFixture) : MergePersonTestBase(host
     [InlineData("enter-trn", "Continue", "Cancel and return to record")]
     [InlineData("matches", "Continue", "Cancel and return to record")]
     [InlineData("merge", "Continue", "Cancel and return to record")]
-    [InlineData("check-answers", "Confirm and update primary record", "Cancel")]
+    [InlineData("check-answers", "Confirm and update primary record", "Cancel and return to record")]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage(string page, string continueButtonText, string cancelButtonText)
     {
         // Arrange

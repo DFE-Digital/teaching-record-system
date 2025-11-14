@@ -256,7 +256,11 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
-                PersonAttributeSourcesSet = true
+                PersonAttributeSourcesSet = true,
+                DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+                GenderSource = PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = PersonAttributeSource.ExistingRecord,
             });
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
@@ -272,11 +276,15 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("gender-change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("dob-change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("ni-change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("email-change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("comments-change-link")?.GetAttribute("href"));
     }
 
     [Fact]
-    public async Task Get_CreatingNewRecord_RequestHasMatches_HasBackLinkAndChangeLinkToMatchPage()
+    public async Task Get_CreatingNewRecord_RequestHasMatches_HasBackLinkAndNoChangeLinks()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -305,7 +313,11 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+        Assert.Null(doc.GetElementByTestId("gender-change-link"));
+        Assert.Null(doc.GetElementByTestId("dob-change-link"));
+        Assert.Null(doc.GetElementByTestId("ni-change-link"));
+        Assert.Null(doc.GetElementByTestId("email-change-link"));
+        Assert.Null(doc.GetElementByTestId("comments-change-link"));
     }
 
     [Fact]
