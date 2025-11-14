@@ -33,18 +33,18 @@ public static class Extensions
             .AddWorkforceData()
             .AddMemoryCache();
 
-        //if (configuration.GetValue<string>("TrsSyncService:CrmConnectionString") is string dataSyncCrmConnectionString)
-        //{
-        //    var dataSyncCrmServiceClient = new ServiceClient(dataSyncCrmConnectionString);
-        //    services.AddNamedServiceClient(TrsDataSyncHelper.CrmClientName, ServiceLifetime.Transient, _ => dataSyncCrmServiceClient);
-        //    services.AddSingleton<IAuditRepository, BlobStorageAuditRepository>();
-        //    services.AddSingleton<TrsDataSyncHelper>();
-        //}
+        if (configuration.GetValue<string>("TrsSyncService:CrmConnectionString") is string dataSyncCrmConnectionString)
+        {
+            var dataSyncCrmServiceClient = new ServiceClient(dataSyncCrmConnectionString);
+            services.AddNamedServiceClient(TrsDataSyncHelper.CrmClientName, ServiceLifetime.Transient, _ => dataSyncCrmServiceClient);
+            services.AddSingleton<IAuditRepository, BlobStorageAuditRepository>();
+            services.AddSingleton<TrsDataSyncHelper>();
+        }
 
-        //if (!environment.IsTests() && !environment.IsEndToEndTests())
-        //{
-        //    services.AddGias(configuration);
-        //}
+        if (!environment.IsTests() && !environment.IsEndToEndTests())
+        {
+            services.AddGias(configuration);
+        }
 
         if (environment.IsProduction())
         {

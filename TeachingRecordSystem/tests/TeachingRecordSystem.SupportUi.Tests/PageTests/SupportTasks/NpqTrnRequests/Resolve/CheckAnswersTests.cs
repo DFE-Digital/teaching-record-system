@@ -260,7 +260,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 GenderSource = PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
-                EmailAddressSource = PersonAttributeSource.ExistingRecord,       
+                EmailAddressSource = PersonAttributeSource.ExistingRecord,
             });
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
