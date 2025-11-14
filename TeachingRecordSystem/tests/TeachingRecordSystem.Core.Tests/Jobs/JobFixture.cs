@@ -18,6 +18,6 @@ public class JobFixture : ServiceProviderFixture
             .AddSingleton<ReferenceDataCache>()
             .AddEventPublisher()
             .AddSingleton<EventCapture>()
-            .AddSingleton<IEventHandler>(sp => sp.GetRequiredService<EventCapture>());
+            .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>());
     }
 }

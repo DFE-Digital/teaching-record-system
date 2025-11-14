@@ -28,6 +28,8 @@ public abstract class TestBase
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
+    protected EventCapture Events => TestScopedServices.GetCurrent().Events;
+
     protected CaptureEventObserver EventObserver => TestScopedServices.GetCurrent().EventObserver;
 
     protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;

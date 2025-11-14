@@ -51,6 +51,8 @@ public class ProcessContext
 {
     public ProcessContext(ProcessType processType, DateTime now, EventModels.RaisedByUserInfo raisedBy)
     {
+        Now = now;
+
         Process = new Process
         {
             ProcessId = Guid.NewGuid(),
@@ -62,6 +64,8 @@ public class ProcessContext
             PersonIds = []
         };
     }
+
+    public DateTime Now { get; }
 
     public Process Process { get; }
 

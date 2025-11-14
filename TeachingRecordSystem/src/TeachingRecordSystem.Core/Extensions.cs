@@ -13,6 +13,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
+using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
@@ -105,7 +106,8 @@ public static class Extensions
             .AddEventPublisher()
             .AddSupportTaskService()
             .AddSingleton<PersonInfoCache>()
-            .AddTrnGeneration();
+            .AddTrnGeneration()
+            .AddNoteService();
 
         return services;
     }
