@@ -81,7 +81,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var firstName = doc.GetSummaryListValueElementByKey("First name");
         var lastName = doc.GetSummaryListValueElementByKey("Last name");
-        var niNumber = doc.GetSummaryListValueElementByKey("NI number");
+        var niNumber = doc.GetSummaryListValueElementByKey("National Insurance number");
         var dob = doc.GetSummaryListValueElementByKey("Date of birth");
         var trn = doc.GetSummaryListValueElementByKey("TRN");
         var evidenceFile = doc.GetSummaryListValueElementByKey("Evidence");

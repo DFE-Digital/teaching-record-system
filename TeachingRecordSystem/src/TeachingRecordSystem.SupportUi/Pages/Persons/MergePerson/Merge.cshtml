@@ -1,5 +1,6 @@
 @page "/persons/{personId}/merge/merge"
 @using TeachingRecordSystem.SupportUi.Pages.Shared
+@using TeachingRecordSystem.SupportUi.Services
 @model TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson.MergeModel
 @{
     Layout = "_Layout";
@@ -25,9 +26,9 @@
             Label = label,
             Different = different,
             Name = name,
-            LeftValue = PersonAttributeSource.PrimaryPerson,
+            LeftValue = PersonAttributeSource.TrnRequest,
             LeftLabel = leftLabel,
-            RightValue = PersonAttributeSource.SecondaryPerson,
+            RightValue = PersonAttributeSource.ExistingRecord,
             RightLabel = rightLabel,
             SelectedValue = selectedValue
         };

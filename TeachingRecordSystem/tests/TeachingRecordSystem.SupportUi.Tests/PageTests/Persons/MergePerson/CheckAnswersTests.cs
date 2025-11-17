@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
@@ -248,13 +249,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
 
     private static void SetPersonAttributeSourceToSecondaryPerson(MergePersonState state, PersonMatchedAttribute attribute)
     {
-        state.FirstNameSource = attribute is PersonMatchedAttribute.FirstName ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-        state.MiddleNameSource = attribute is PersonMatchedAttribute.MiddleName ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-        state.LastNameSource = attribute is PersonMatchedAttribute.LastName ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-        state.DateOfBirthSource = attribute is PersonMatchedAttribute.DateOfBirth ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-        state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-        state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
-        state.GenderSource = attribute is PersonMatchedAttribute.Gender ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
+        state.FirstNameSource = attribute is PersonMatchedAttribute.FirstName ? PersonAttributeSource.ExistingRecord : PersonAttributeSource.TrnRequest;
+        state.MiddleNameSource = attribute is PersonMatchedAttribute.MiddleName ? PersonAttributeSource.ExistingRecord : PersonAttributeSource.TrnRequest;
+        state.LastNameSource = attribute is PersonMatchedAttribute.LastName ? PersonAttributeSource.ExistingRecord : PersonAttributeSource.TrnRequest;
+        state.DateOfBirthSource = attribute is PersonMatchedAttribute.DateOfBirth ? PersonAttributeSource.ExistingRecord : PersonAttributeSource.TrnRequest;
+        state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.ExistingRecord : PersonAttributeSource.TrnRequest;
+        state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.ExistingRecord : PersonAttributeSource.TrnRequest;
+        state.GenderSource = attribute is PersonMatchedAttribute.Gender ? PersonAttributeSource.ExistingRecord : PersonAttributeSource.TrnRequest;
     }
 
     public static PersonAttributeInfo[] PersonAttributeInfos { get; } =

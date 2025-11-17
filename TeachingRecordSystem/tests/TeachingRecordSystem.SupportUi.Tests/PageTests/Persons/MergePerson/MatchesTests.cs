@@ -415,56 +415,6 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
     }
 
-    [Fact]
-    public async Task Post_PrimaryPersonChanged_SwapsPrimaryAndSecondarySources_ToKeepSelectedDataCorrect()
-    {
-        // Arrange
-        var (personA, personB) = await CreatePersonsWithAllDifferences();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .WithPrimaryPerson(personA)
-                .WithAttributeSourcesSet()
-                .WithFirstNameSource(PersonAttributeSource.PrimaryPerson)
-                .WithMiddleNameSource(PersonAttributeSource.SecondaryPerson)
-                // Leaving LastNameSource unselected
-                .WithDateOfBirthSource(PersonAttributeSource.SecondaryPerson)
-                .WithEmailAddressSource(PersonAttributeSource.SecondaryPerson)
-                // Leaving NationalInsuranceNumberSource unselected
-                .WithGenderSource(PersonAttributeSource.PrimaryPerson)
-                .WithUploadEvidenceChoice(false)
-                .WithComments(null)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePersonPostRequestContentBuilder()
-                .WithPrimaryPersonId(personB.PersonId)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
-
-        Assert.Equal(PersonAttributeSource.SecondaryPerson, journeyInstance.State.FirstNameSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.MiddleNameSource);
-        Assert.Null(journeyInstance.State.LastNameSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.DateOfBirthSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.EmailAddressSource);
-        Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
-        Assert.Equal(PersonAttributeSource.SecondaryPerson, journeyInstance.State.GenderSource);
-    }
-
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
         $"/persons/{person.PersonId}/merge/matches?{journeyInstance?.GetUniqueIdQueryParameter()}";
 

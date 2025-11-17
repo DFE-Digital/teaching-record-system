@@ -14,8 +14,15 @@ public record ResolvedAttribute(PersonMatchedAttribute Attribute, PersonAttribut
 #pragma warning restore CA1711
 
 
+//public enum PersonAttributeSource
+//{
+//    ExistingRecord = 0,
+//    TrnRequest = 1
+//}
+
+
 public enum PersonAttributeSource
 {
-    ExistingRecord = 0,
-    TrnRequest = 1
+    PrimaryPerson = 0,
+    SecondaryPerson = 1
 }

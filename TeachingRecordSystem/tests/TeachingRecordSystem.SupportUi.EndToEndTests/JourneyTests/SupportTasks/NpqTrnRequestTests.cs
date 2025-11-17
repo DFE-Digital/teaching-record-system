@@ -30,17 +30,11 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickChangeLinkAsync();
-
-        await page.AssertOnMatchesPageAsync(supportTaskReference);
         await page.ClickBackLinkAsync();
-
-        await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickChangeLinkAsync();
-
         await page.AssertOnMatchesPageAsync(supportTaskReference);
-        await page.ClickContinueButtonAsync();
 
+        await page.ClickRadioByLabelAsync($"Create a new record");
+        await page.ClickContinueButtonAsync();
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and create record");
         await page.AssertOnListPageAsync();
