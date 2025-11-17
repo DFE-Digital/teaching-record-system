@@ -1,194 +1,253 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.Core.Events.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services;
+using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
-[Journey(JourneyNames.MergePerson), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    TrnRequestService trnRequestService,
+    ITrnGenerator trnGenerator,
     SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager,
-    IClock clock,
-    PersonChangeableAttributesService changedService)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    IClock clock) : ResolveNpqTrnRequestPageModel(dbContext)
 {
-    public string BackLink => GetPageLink(MergePersonJourneyPage.Merge);
-    public string ChangePrimaryPersonLink => GetPageLink(MergePersonJourneyPage.Matches, fromCheckAnswers: true);
-    public string ChangeDetailsLink => GetPageLink(MergePersonJourneyPage.Merge, fromCheckAnswers: true);
+    public string? SourceApplicationUserName { get; set; }
+
+    public bool CreatingNewRecord { get; set; }
+
+    public bool? PotentialDuplicate { get; set; }
 
     public string? FirstName { get; set; }
+
     public string? MiddleName { get; set; }
+
     public string? LastName { get; set; }
+
     public DateOnly? DateOfBirth { get; set; }
+
     public string? EmailAddress { get; set; }
+
     public string? NationalInsuranceNumber { get; set; }
+
     public Gender? Gender { get; set; }
+
     public string? Trn { get; set; }
-    public UploadedEvidenceFile? EvidenceFile { get; set; }
+
     public string? Comments { get; set; }
 
-    private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
-
-    public IEnumerable<ResolvedAttribute>? ResolvableAttributes { get; private set; }
-
-    public bool IsGenderChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.Gender) == true;
-
-    public bool IsFirstNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.FirstName) == true;
-
-    public bool IsMiddleNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.MiddleName) == true;
-
-    public bool IsLastNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.LastName) == true;
-
-    public bool IsDateOfBirthChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.DateOfBirth) == true;
-
-    public bool IsNationalInsuranceNumberChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.NationalInsuranceNumber) == true;
-
-    public bool IsEmailAddressChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.EmailAddress) == true;
-
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public void OnGet()
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        var state = JourneyInstance!.State;
-
-        if (state.PersonAId is not Guid personAId || state.PersonBId is not Guid personBId)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.EnterTrn));
-            return;
-        }
-
-        if (state.PrimaryPersonId is not Guid primaryPersonId)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.Matches));
-            return;
-        }
-
-        if (state.PersonAttributeSourcesSet is false ||
-            !state.Evidence.IsComplete)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.Merge));
-            return;
-        }
-
-        _potentialDuplicates = await GetPotentialDuplicatesAsync(personAId, personBId);
-
-
-        var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
-
-        var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
-        var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
-
-        FirstName = state.FirstNameSource == PersonAttributeSource.TrnRequest ? primaryPerson.FirstName : secondaryPerson.FirstName;
-        MiddleName = state.MiddleNameSource == PersonAttributeSource.TrnRequest ? primaryPerson.MiddleName : secondaryPerson.MiddleName;
-        LastName = state.LastNameSource == PersonAttributeSource.TrnRequest ? primaryPerson.LastName : secondaryPerson.LastName;
-        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.TrnRequest ? primaryPerson.DateOfBirth : secondaryPerson.DateOfBirth;
-        EmailAddress = state.EmailAddressSource == PersonAttributeSource.TrnRequest ? primaryPerson.EmailAddress : secondaryPerson.EmailAddress;
-        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.TrnRequest ? primaryPerson.NationalInsuranceNumber : secondaryPerson.NationalInsuranceNumber;
-        Gender = state.GenderSource == PersonAttributeSource.TrnRequest ? primaryPerson.Gender : secondaryPerson.Gender;
-        Trn = primaryPerson.Trn;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-        Comments = state.Comments;
-        ResolvableAttributes = changedService.GetResolvableAttributes(
-             new List<ResolvedAttribute>
-             {
-                 new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
-             });
-    }
-
-    public IActionResult OnGet()
-    {
-        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (_potentialDuplicates!.Any(p => p.IsInvalid))
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var requestData = supportTask.TrnRequestMetadata!;
+        var state = JourneyInstance!.State;
+
+        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
+        NpqTrnRequestDataPersonAttributes? selectedPersonAttributes;
+        EventModels.PersonDetails? oldPersonAttributes;
+
+        var now = clock.UtcNow;
+
+        if (CreatingNewRecord)
         {
-            return BadRequest();
+            var trn = await trnGenerator.GenerateTrnAsync();
+
+            var (person, _) = trnRequestService.CreatePersonFromTrnRequest(requestData, trn, now);
+            DbContext.Add(person);
+
+            requestData.SetResolvedPerson(person.PersonId);
+            selectedPersonAttributes = null;
+            oldPersonAttributes = null;
+
+            var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
+
+            supportTask.Status = SupportTaskStatus.Closed;
+            supportTask.UpdatedOn = now;
+            supportTask.UpdateData<NpqTrnRequestData>(data => data with
+            {
+                SupportRequestOutcome = SupportRequestOutcome.Approved,
+                ResolvedAttributes = resolvedPersonAttributes,
+                SelectedPersonAttributes = selectedPersonAttributes
+            });
+
+            var @event = new NpqTrnRequestSupportTaskResolvedEvent()
+            {
+                PersonId = requestData.ResolvedPersonId!.Value,
+                RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+                ChangeReason = NpqTrnRequestResolvedReason.RecordCreated,
+                Changes = NpqTrnRequestSupportTaskResolvedEventChanges.Status,
+                PersonAttributes = EventModels.PersonDetails.FromModel(person),
+                OldPersonAttributes = oldPersonAttributes,
+                SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                OldSupportTask = oldSupportTaskEventModel,
+                Comments = Comments,
+                EventId = Guid.NewGuid(),
+                CreatedUtc = now,
+                RaisedBy = User.GetUserId()
+            };
+
+            await DbContext.AddEventAndBroadcastAsync(@event);
+
+            await DbContext.SaveChangesAsync();
+        }
+        else // updating
+        {
+            var existingContactId = state.PersonId!.Value;
+            requestData.SetResolvedPerson(existingContactId);
+
+            selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
+            var attributesToUpdate = GetAttributesToUpdate();
+
+            oldPersonAttributes = new EventModels.PersonDetails()
+            {
+                FirstName = selectedPersonAttributes.FirstName,
+                MiddleName = selectedPersonAttributes.MiddleName,
+                LastName = selectedPersonAttributes.LastName,
+                DateOfBirth = selectedPersonAttributes.DateOfBirth,
+                EmailAddress = selectedPersonAttributes.EmailAddress,
+                NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber,
+                Gender = selectedPersonAttributes.Gender
+            };
+
+            // update the person
+            var person = await DbContext.Persons.SingleAsync(p => p.PersonId == requestData.ResolvedPersonId);
+
+            trnRequestService.UpdatePersonFromTrnRequest(person, requestData, attributesToUpdate, now);
+
+            var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
+
+            supportTask.Status = SupportTaskStatus.Closed;
+            supportTask.UpdatedOn = now;
+            supportTask.UpdateData<NpqTrnRequestData>(data => data with
+            {
+                SupportRequestOutcome = SupportRequestOutcome.Approved,
+                ResolvedAttributes = resolvedPersonAttributes,
+                SelectedPersonAttributes = selectedPersonAttributes
+            });
+
+            var changes = NpqTrnRequestSupportTaskResolvedEventChanges.Status |
+                (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth : 0) |
+                (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress : 0) |
+                (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber : 0) |
+                (state.GenderSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender : 0);
+
+            var @event = new NpqTrnRequestSupportTaskResolvedEvent()
+            {
+                PersonId = requestData.ResolvedPersonId!.Value,
+                SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                OldSupportTask = oldSupportTaskEventModel,
+                RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+                ChangeReason = NpqTrnRequestResolvedReason.RecordMerged,
+                Changes = changes,
+                PersonAttributes = new EventModels.PersonDetails()
+                {
+                    FirstName = resolvedPersonAttributes.FirstName,
+                    MiddleName = resolvedPersonAttributes.MiddleName,
+                    LastName = resolvedPersonAttributes.LastName,
+                    DateOfBirth = resolvedPersonAttributes.DateOfBirth,
+                    EmailAddress = resolvedPersonAttributes.EmailAddress,
+                    NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber,
+                    Gender = resolvedPersonAttributes.Gender
+                },
+                OldPersonAttributes = oldPersonAttributes,
+                Comments = Comments,
+                EventId = Guid.NewGuid(),
+                CreatedUtc = now,
+                RaisedBy = User.GetUserId()
+            };
+            await DbContext.AddEventAndBroadcastAsync(@event);
         }
 
-        var state = JourneyInstance!.State;
-        var primaryPersonId = state.PrimaryPersonId!.Value;
-        var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId!.Value;
-
-        var primaryPersonAttributes = _potentialDuplicates!.Single(p => p.PersonId == primaryPersonId).Attributes;
-
-        var newPrimaryPersonAttributes = new PersonDetails()
-        {
-            FirstName = FirstName ?? string.Empty,
-            MiddleName = MiddleName ?? string.Empty,
-            LastName = LastName ?? string.Empty,
-            DateOfBirth = DateOfBirth,
-            EmailAddress = EmailAddress,
-            NationalInsuranceNumber = NationalInsuranceNumber,
-            Gender = Gender
-        };
-
-        // update the person
-        var primaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == primaryPersonId);
-
-        primaryPerson.UpdateDetails(
-            firstName: newPrimaryPersonAttributes.FirstName,
-            middleName: newPrimaryPersonAttributes.MiddleName,
-            lastName: newPrimaryPersonAttributes.LastName,
-            dateOfBirth: newPrimaryPersonAttributes.DateOfBirth,
-            emailAddress: newPrimaryPersonAttributes.EmailAddress is not null ? Core.EmailAddress.Parse(newPrimaryPersonAttributes.EmailAddress) : null,
-            nationalInsuranceNumber: newPrimaryPersonAttributes.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(newPrimaryPersonAttributes.NationalInsuranceNumber) : null,
-            gender: newPrimaryPersonAttributes.Gender,
-            clock.UtcNow);
-
-        var changes = PersonsMergedEventChanges.None |
-            (state.FirstNameSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.FirstName : 0) |
-            (state.MiddleNameSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.MiddleName : 0) |
-            (state.LastNameSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.LastName : 0) |
-            (state.DateOfBirthSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.DateOfBirth : 0) |
-            (state.EmailAddressSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.EmailAddress : 0) |
-            (state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
-            (state.GenderSource is PersonAttributeSource.ExistingRecord ? PersonsMergedEventChanges.Gender : 0);
-
-        var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
-        secondaryPerson.Status = PersonStatus.Deactivated;
-        secondaryPerson.MergedWithPersonId = primaryPersonId;
-
-        var @event = new PersonsMergedEvent()
-        {
-            PersonId = primaryPersonId,
-            PersonTrn = primaryPerson.Trn!,
-            SecondaryPersonId = secondaryPersonId,
-            SecondaryPersonTrn = secondaryPerson.Trn!,
-            SecondaryPersonStatus = secondaryPerson.Status,
-            PersonAttributes = newPrimaryPersonAttributes,
-            OldPersonAttributes = primaryPersonAttributes,
-            EvidenceFile = EvidenceFile?.ToEventModel(),
-            Comments = Comments,
-            Changes = changes,
-            EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
-            RaisedBy = User.GetUserId()
-        };
-
-        await DbContext.AddEventAndBroadcastAsync(@event);
         await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId))
-            );
-
+            $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed",
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value)));
 
         await JourneyInstance!.CompleteAsync();
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
+    }
 
-        return Redirect(GetPageLink(null));
+    public async Task<IActionResult> OnPostCancelAsync()
+    {
+        await JourneyInstance!.DeleteAsync();
+
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var requestData = GetRequestData();
+        var state = JourneyInstance!.State;
+
+        if (state.PersonId is not Guid personId)
+        {
+            context.Result = Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
+            return;
+        }
+
+        if (personId != CreateNewRecordPersonIdSentinel && !state.PersonAttributeSourcesSet)
+        {
+            context.Result = Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
+            return;
+        }
+
+        if (state.PersonId == CreateNewRecordPersonIdSentinel)
+        {
+            FirstName = requestData.FirstName;
+            MiddleName = requestData.MiddleName;
+            LastName = requestData.LastName;
+            CreatingNewRecord = true;
+            DateOfBirth = requestData.DateOfBirth;
+            EmailAddress = requestData.EmailAddress;
+            NationalInsuranceNumber = requestData.NationalInsuranceNumber;
+            Gender = requestData.Gender;
+            Trn = null;
+        }
+        else
+        {
+            Debug.Assert(state.PersonId is not null);
+
+            var selectedPerson = await DbContext.Persons
+                .Where(p => p.PersonId == state.PersonId)
+                .Select(p => new
+                {
+                    p.FirstName,
+                    p.MiddleName,
+                    p.LastName,
+                    p.DateOfBirth,
+                    p.EmailAddress,
+                    p.NationalInsuranceNumber,
+                    p.Gender,
+                    p.Trn
+                })
+                .SingleAsync();
+
+            CreatingNewRecord = false;
+            FirstName = selectedPerson.FirstName;
+            MiddleName = selectedPerson.MiddleName;
+            LastName = selectedPerson.LastName;
+            DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.ExistingRecord ? selectedPerson.DateOfBirth : requestData.DateOfBirth;
+            EmailAddress = state.EmailAddressSource == PersonAttributeSource.ExistingRecord ? selectedPerson.EmailAddress : requestData.EmailAddress;
+            NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.ExistingRecord ? selectedPerson.NationalInsuranceNumber : requestData.NationalInsuranceNumber;
+            Gender = state.GenderSource == PersonAttributeSource.ExistingRecord ? selectedPerson.Gender : requestData.Gender;
+            Trn = selectedPerson.Trn;
+        }
+
+        Comments = state.Comments;
+        SourceApplicationUserName = requestData.ApplicationUser!.Name;
+        PotentialDuplicate = requestData.PotentialDuplicate;
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
