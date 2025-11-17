@@ -27,6 +27,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var evidenceFileName = "SomeFileName.png";
+        var mergeComments = "THIS IS A MERGE RECORD";
         var fileName = "test.txt";
         long integrationTransactionId = 1;
         var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender(Gender.Male));
@@ -70,7 +71,8 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                     FileName = evidenceFileName,
                     FileSizeDescription = "5MB"
                 }
-            }
+            },
+            MergeComments = mergeComments
         };
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
@@ -85,6 +87,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         var dob = doc.GetSummaryListValueElementByKey("Date of birth");
         var trn = doc.GetSummaryListValueElementByKey("TRN");
         var evidenceFile = doc.GetSummaryListValueElementByKey("Evidence");
+        var merge = doc.GetSummaryListValueElementByKey("Comments");
 
         // Assert
         Assert.NotNull(firstName);
@@ -93,12 +96,14 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(niNumber);
         Assert.NotNull(trn);
         Assert.NotNull(evidenceFile);
+        Assert.NotNull(merge);
         Assert.Contains(person.FirstName, firstName.TextContent);
         Assert.Contains(duplicatePerson1.LastName, lastName.TextContent);
         Assert.Contains(duplicatePerson1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dob.TextContent);
         Assert.Contains(person.NationalInsuranceNumber!, niNumber.TextContent);
         Assert.Contains(duplicatePerson1!.Trn!, trn.TextContent);
         Assert.Contains(evidenceFileName, evidenceFile.TextContent);
+        Assert.Contains(mergeComments, merge.TextContent);
     }
 
     [Fact]

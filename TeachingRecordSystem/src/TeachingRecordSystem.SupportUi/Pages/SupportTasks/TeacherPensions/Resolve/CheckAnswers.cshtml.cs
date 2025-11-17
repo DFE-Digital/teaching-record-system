@@ -18,7 +18,8 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     TrnRequestService trnRequestService,
     EvidenceUploadManager evidenceController,
-    IClock clock) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+    IClock clock,
+    PersonChangeableAttributesService changedService) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? SourceApplicationUserName { get; set; }
 
@@ -45,6 +46,21 @@ public class CheckAnswersModel(
     public string? MergeComments { get; set; }
 
     public UploadedEvidenceFile? EvidenceFile { get; set; }
+
+    public IEnumerable<ResolvedAttribute>? ResolvableAttributes { get; private set; }
+
+    public bool IsGenderChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.Gender) == true;
+
+    public bool IsFirstNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.FirstName) == true;
+
+    public bool IsMiddleNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.MiddleName) == true;
+
+    public bool IsLastNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.LastName) == true;
+
+    public bool IsDateOfBirthChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.DateOfBirth) == true;
+
+    public bool IsNationalInsuranceNumberChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.NationalInsuranceNumber) == true;
+
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
@@ -91,6 +107,18 @@ public class CheckAnswersModel(
         MergeComments = state.MergeComments;
         PotentialDuplicate = requestData.PotentialDuplicate;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+
+        ResolvableAttributes = changedService.GetResolvableAttributes(
+             new List<ResolvedAttribute>
+             {
+                 new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+                 new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
+             });
+
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
