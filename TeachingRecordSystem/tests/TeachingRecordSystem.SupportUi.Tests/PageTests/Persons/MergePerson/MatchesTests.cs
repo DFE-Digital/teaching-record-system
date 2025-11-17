@@ -1,6 +1,5 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
-using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
