@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
@@ -21,6 +22,14 @@ public class AddMqState : IRegisterJourney
 
     public DateOnly? EndDate { get; set; }
 
+    public AddMqReasonOption? AddReason { get; set; }
+
+    public bool? HasAdditionalReasonDetail { get; set; }
+
+    public string? AddReasonDetail { get; set; }
+
+    public EvidenceUploadModel Evidence { get; set; } = new();
+
     [JsonIgnore]
     [MemberNotNullWhen(true, nameof(ProviderId), nameof(Specialism), nameof(StartDate), nameof(Status))]
     public bool IsComplete =>
@@ -28,5 +37,9 @@ public class AddMqState : IRegisterJourney
         Specialism.HasValue &&
         StartDate.HasValue &&
         Status.HasValue &&
-        (Status != MandatoryQualificationStatus.Passed || (Status == MandatoryQualificationStatus.Passed && EndDate.HasValue));
+        (Status != MandatoryQualificationStatus.Passed || (Status == MandatoryQualificationStatus.Passed && EndDate.HasValue)) &&
+        AddReason.HasValue &&
+        HasAdditionalReasonDetail is bool hasDetail &&
+        (!hasDetail || AddReasonDetail is not null) &&
+        Evidence.IsComplete;
 }

@@ -2,11 +2,14 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class StartDateModel(SupportUiLinkGenerator linkGenerator) : PageModel
+public class StartDateModel(
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -48,6 +51,7 @@ public class StartDateModel(SupportUiLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

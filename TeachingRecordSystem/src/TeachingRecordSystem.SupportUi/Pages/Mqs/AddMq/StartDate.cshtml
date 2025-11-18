@@ -1,11 +1,11 @@
-@page "/mqs/add/start-date"
+@page "/mqs/add/start-date/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.StartDateModel
 @{
     ViewBag.Title = Html.DisplayNameFor(m => m.StartDate);
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Mqs.AddMq.Specialism(Model.PersonId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.Mqs.AddMq.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Mqs.AddMq.Specialism(Model.PersonId, Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">

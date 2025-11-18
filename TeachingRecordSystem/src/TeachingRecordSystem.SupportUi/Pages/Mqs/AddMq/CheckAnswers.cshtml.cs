@@ -3,11 +3,16 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class CheckAnswersModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
+public class CheckAnswersModel(
+    TrsDbContext dbContext,
+    SupportUiLinkGenerator linkGenerator,
+    IClock clock,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -28,6 +33,13 @@ public class CheckAnswersModel(TrsDbContext dbContext, SupportUiLinkGenerator li
 
     public DateOnly? EndDate { get; set; }
 
+    public AddMqReasonOption AddReason { get; set; }
+
+    public string? AddReasonDetail { get; set; }
+
+    [BindProperty]
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
+
     public async Task<IActionResult> OnPostAsync()
     {
         var qualification = MandatoryQualification.Create(
@@ -37,6 +49,9 @@ public class CheckAnswersModel(TrsDbContext dbContext, SupportUiLinkGenerator li
             Status,
             StartDate,
             EndDate,
+            AddReason.GetDisplayName(),
+            AddReasonDetail,
+            evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             clock.UtcNow,
             out var createdEvent);
@@ -53,6 +68,7 @@ public class CheckAnswersModel(TrsDbContext dbContext, SupportUiLinkGenerator li
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
@@ -74,6 +90,9 @@ public class CheckAnswersModel(TrsDbContext dbContext, SupportUiLinkGenerator li
         StartDate = JourneyInstance.State.StartDate.Value;
         Status = JourneyInstance.State.Status.Value;
         EndDate = JourneyInstance.State.EndDate;
+        AddReason = JourneyInstance.State.AddReason!.Value;
+        AddReasonDetail = JourneyInstance.State.AddReasonDetail;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
 
         await next();
     }

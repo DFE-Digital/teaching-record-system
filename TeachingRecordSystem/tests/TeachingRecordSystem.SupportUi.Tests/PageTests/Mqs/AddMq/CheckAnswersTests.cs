@@ -1,6 +1,7 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
@@ -33,6 +34,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2021, 3, 1);
         var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
+        var addReason = AddMqReasonOption.NewInformationReceived;
+        var addReasonDetail = "More details about the MQ";
+        var evidence = new EvidenceUploadModel
+        {
+            UploadEvidence = true,
+            UploadedEvidenceFile = new()
+            {
+                FileId = Guid.NewGuid(),
+                FileName = "evidence.jpeg",
+                FileSizeDescription = "5MB"
+            }
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -42,7 +55,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Specialism = specialism,
                 StartDate = startDate,
                 Status = status,
-                EndDate = endDate
+                EndDate = endDate,
+                AddReason = addReason,
+                HasAdditionalReasonDetail = true,
+                AddReasonDetail = addReasonDetail,
+                Evidence = evidence
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -66,6 +83,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
+        var addReason = AddMqReasonOption.NewInformationReceived;
+        var addReasonDetail = "More details about the MQ";
+        var evidence = new EvidenceUploadModel
+        {
+            UploadEvidence = true,
+            UploadedEvidenceFile = new()
+            {
+                FileId = Guid.NewGuid(),
+                FileName = "evidence.jpeg",
+                FileSizeDescription = "5MB"
+            }
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -75,7 +104,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Specialism = specialism,
                 StartDate = startDate,
                 Status = status,
-                EndDate = endDate
+                EndDate = endDate,
+                AddReason = addReason,
+                HasAdditionalReasonDetail = true,
+                AddReasonDetail = addReasonDetail,
+                Evidence = evidence
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -131,6 +164,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
+        var addReason = AddMqReasonOption.NewInformationReceived;
+        var addReasonDetail = "More details about the MQ";
+        var evidence = new EvidenceUploadModel
+        {
+            UploadEvidence = true,
+            UploadedEvidenceFile = new()
+            {
+                FileId = Guid.NewGuid(),
+                FileName = "evidence.jpeg",
+                FileSizeDescription = "5MB"
+            }
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -140,7 +185,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Specialism = specialism,
                 StartDate = startDate,
                 Status = status,
-                EndDate = endDate
+                EndDate = endDate,
+                AddReason = addReason,
+                HasAdditionalReasonDetail = true,
+                AddReasonDetail = addReasonDetail,
+                Evidence = evidence
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -195,7 +244,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Status = status,
                     StartDate = startDate,
                     EndDate = endDate
-                }
+                },
+                AddReason = addReason.GetDisplayName(),
+                AddReasonDetail = addReasonDetail,
+                EvidenceFile = evidence.UploadedEvidenceFile?.ToEventModel()
             };
 
             var actualMqCreatedEvent = Assert.IsType<MandatoryQualificationCreatedEvent>(e);
@@ -213,6 +265,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2021, 3, 1);
         var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
+        var addReason = AddMqReasonOption.NewInformationReceived;
+        var addReasonDetail = "More details about the MQ";
+        var evidence = new EvidenceUploadModel
+        {
+            UploadEvidence = true,
+            UploadedEvidenceFile = new()
+            {
+                FileId = Guid.NewGuid(),
+                FileName = "evidence.jpeg",
+                FileSizeDescription = "5MB"
+            }
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -222,7 +286,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Specialism = specialism,
                 StartDate = startDate,
                 Status = status,
-                EndDate = endDate
+                EndDate = endDate,
+                AddReason = addReason,
+                HasAdditionalReasonDetail = true,
+                AddReasonDetail = addReasonDetail,
+                Evidence = evidence
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/check-answers/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")

@@ -29,6 +29,12 @@ public class AddMqLinkGenerator(LinkGenerator linkGenerator)
     public string StatusCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         linkGenerator.GetRequiredPathByPage("/Mqs/AddMq/Status", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
+    public string Reason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        linkGenerator.GetRequiredPathByPage("/Mqs/AddMq/Reason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string ReasonCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetRequiredPathByPage("/Mqs/AddMq/Reason", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
     public string CheckAnswers(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         linkGenerator.GetRequiredPathByPage("/Mqs/AddMq/CheckAnswers", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
