@@ -20,6 +20,7 @@ public static class HttpResponseMessageExtensions
         var doc = (IHtmlDocument)await browsingContext.OpenAsync(req => req.Content(content));
 
         AssertSmartQuotesUsed();
+        AssertDateInputsIncludeHint();
 
         return doc;
 
@@ -58,6 +59,38 @@ public static class HttpResponseMessageExtensions
                         }
                     }
                 });
+        }
+
+        void AssertDateInputsIncludeHint()
+        {
+            foreach (var dateInputContainer in doc.QuerySelectorAll(".govuk-date-input"))
+            {
+                // Find the closest fieldset ancestor
+                var dateParentElement = dateInputContainer.ParentElement;
+                while (dateParentElement != null && !(dateParentElement is IHtmlElement htmlElem && !(dateParentElement is IHtmlFieldSetElement)))
+                {
+                    dateParentElement = dateParentElement.ParentElement;
+                }
+
+                if (dateParentElement is IHtmlElement fieldsetElement)
+                {
+                    var describedBy = fieldsetElement.GetAttribute("aria-describedby");
+                    if (string.IsNullOrEmpty(describedBy))
+                    {
+                        throw new XunitException("Date input fieldset is missing aria-describedby for hint.");
+                    }
+
+                    var hintElement = doc.GetElementById(describedBy);
+                    if (hintElement == null || !hintElement.ClassList.Contains("govuk-hint"))
+                    {
+                        throw new XunitException("Date input is missing a govuk-hint element referenced by aria-describedby.");
+                    }
+                }
+                else
+                {
+                    throw new XunitException("Date input is not inside a fieldset.");
+                }
+            }
         }
 
         void VisitDocumentNodes(IHtmlDocument document, Action<INode> visit)
