@@ -67,12 +67,12 @@ public static class HttpResponseMessageExtensions
             {
                 // Find the closest fieldset ancestor
                 var dateParentElement = dateInputContainer.ParentElement;
-                while (dateParentElement != null && !(dateParentElement is IHtmlElement htmlElem && !(dateParentElement is IHtmlFieldSetElement)))
+                while (dateParentElement != null && dateParentElement is not IHtmlFieldSetElement)
                 {
                     dateParentElement = dateParentElement.ParentElement;
                 }
 
-                if (dateParentElement is IHtmlElement fieldsetElement)
+                if (dateParentElement is IHtmlFieldSetElement fieldsetElement)
                 {
                     var describedBy = fieldsetElement.GetAttribute("aria-describedby");
                     if (string.IsNullOrEmpty(describedBy))
