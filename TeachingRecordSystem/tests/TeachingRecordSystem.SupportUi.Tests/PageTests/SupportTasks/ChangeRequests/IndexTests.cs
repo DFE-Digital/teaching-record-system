@@ -66,7 +66,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(resultRow);
         AssertRowHasContent("name", $"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}");
         AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
-        AssertRowHasContent("change-type", supportTaskType == SupportTaskType.ChangeNameRequest ? "Name" : "DOB");
+        AssertRowHasContent("change-type", supportTaskType == SupportTaskType.ChangeNameRequest ? "Name" : "Date of birth");
 
         void AssertRowHasContent(string testId, string expectedText)
         {
