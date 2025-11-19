@@ -1,7 +1,7 @@
 @page "/support-tasks/change-requests"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.IndexModel
 @{
-    ViewBag.Title = "Change details requests";
+    ViewBag.Title = "Name and date of birth change requests";
 }
 
 @section BeforeContent {
@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <span class="govuk-caption-l">Support tasks</span>
+        <span class="govuk-caption-l">Record management</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
     </div>
     <div class="govuk-grid-column-full-from-desktop" data-testid="results">
@@ -49,7 +49,7 @@
             <filter-layout-content>
                 @if (Model.Results!.Count == 0)
                 {
-                    <p class="govuk-body-l govuk-!-font-weight-bold" data-testid="no-tasks-message">
+                    <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-tasks-message">
                         No matching requests found
                     </p>
                     <p class="govuk-body-m">Try searching again with different details.</p>
@@ -63,7 +63,7 @@
                                     sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.Name ? Model.SortDirection : null)"
                                     link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.Name, sortDirection: direction))">
                                     Name
-                                </th>                    
+                                </th>
                                 <th scope="col" class="govuk-table__header trs-!-width-150"
                                     sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
                                     link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.RequestedOn, sortDirection: direction))">
