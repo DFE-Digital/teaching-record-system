@@ -48,9 +48,11 @@ jobs:
           key: ${{ hashFiles('**/packages.lock.json', '**/libman.json') }}
 
       - name: Docker build & push
+        id: build
         run: |
           if skopeo inspect "docker://$TAG" >/dev/null 2>&1; then
             echo "::notice::Skipping build - tag already exists"
+            echo "skipped=true" >> $GITHUB_OUTPUT
           else
             just docker-build --build-arg GIT_SHA=$GITHUB_SHA --tag $TAG
             docker push $TAG
@@ -59,6 +61,7 @@ jobs:
           TAG: ${{ steps.image_tags.outputs.tag }}
 
       - name: Run Snyk to check Docker image for vulnerabilities
+        if: steps.build.outputs.skipped != 'true'
         uses: snyk/actions/docker@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
