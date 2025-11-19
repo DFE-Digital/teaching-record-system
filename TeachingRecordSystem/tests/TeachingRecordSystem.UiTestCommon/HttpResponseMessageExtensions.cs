@@ -74,16 +74,11 @@ public static class HttpResponseMessageExtensions
 
                 if (dateParentElement is IHtmlFieldSetElement fieldsetElement)
                 {
-                    var describedBy = fieldsetElement.GetAttribute("aria-describedby");
-                    if (string.IsNullOrEmpty(describedBy))
+                    // Look for a .govuk-hint element inside the fieldset
+                    var hintElement = fieldsetElement.QuerySelector(".govuk-hint");
+                    if (hintElement == null)
                     {
-                        throw new XunitException("Date input fieldset is missing aria-describedby for hint.");
-                    }
-
-                    var hintElement = doc.GetElementById(describedBy);
-                    if (hintElement == null || !hintElement.ClassList.Contains("govuk-hint"))
-                    {
-                        throw new XunitException("Date input is missing a govuk-hint element referenced by aria-describedby.");
+                        throw new XunitException("Date input is missing a govuk-hint element in the fieldset.");
                     }
                 }
                 else
