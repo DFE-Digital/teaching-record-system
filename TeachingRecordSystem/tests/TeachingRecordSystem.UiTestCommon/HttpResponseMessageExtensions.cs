@@ -20,6 +20,7 @@ public static class HttpResponseMessageExtensions
         var doc = (IHtmlDocument)await browsingContext.OpenAsync(req => req.Content(content));
 
         AssertSmartQuotesUsed();
+        AssertDateInputsIncludeHint();
 
         return doc;
 
@@ -58,6 +59,33 @@ public static class HttpResponseMessageExtensions
                         }
                     }
                 });
+        }
+
+        void AssertDateInputsIncludeHint()
+        {
+            foreach (var dateInputContainer in doc.QuerySelectorAll(".govuk-date-input"))
+            {
+                // Find the closest fieldset ancestor
+                var dateParentElement = dateInputContainer.ParentElement;
+                while (dateParentElement != null && dateParentElement is not IHtmlFieldSetElement)
+                {
+                    dateParentElement = dateParentElement.ParentElement;
+                }
+
+                if (dateParentElement is IHtmlFieldSetElement fieldsetElement)
+                {
+                    // Look for a .govuk-hint element inside the fieldset
+                    var hintElement = fieldsetElement.QuerySelector(".govuk-hint");
+                    if (hintElement == null)
+                    {
+                        throw new XunitException("Date input is missing a govuk-hint element in the fieldset.");
+                    }
+                }
+                else
+                {
+                    throw new XunitException("Date input is not inside a fieldset.");
+                }
+            }
         }
 
         void VisitDocumentNodes(IHtmlDocument document, Action<INode> visit)
