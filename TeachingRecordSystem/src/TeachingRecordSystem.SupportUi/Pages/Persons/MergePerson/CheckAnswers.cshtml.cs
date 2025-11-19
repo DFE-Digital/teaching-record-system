@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
@@ -12,7 +13,8 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
-    IClock clock)
+    IClock clock,
+    PersonChangeableAttributesService changedService)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     public string BackLink => GetPageLink(MergePersonJourneyPage.Merge);
@@ -31,6 +33,22 @@ public class CheckAnswersModel(
     public string? Comments { get; set; }
 
     private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
+
+    public IEnumerable<ResolvedMergedAttribute>? ResolvableAttributes { get; private set; }
+
+    public bool IsGenderChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.Gender) == true;
+
+    public bool IsFirstNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.FirstName) == true;
+
+    public bool IsMiddleNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.MiddleName) == true;
+
+    public bool IsLastNameChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.LastName) == true;
+
+    public bool IsDateOfBirthChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.DateOfBirth) == true;
+
+    public bool IsNationalInsuranceNumberChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.NationalInsuranceNumber) == true;
+
+    public bool IsEmailAddressChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.EmailAddress) == true;
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
@@ -58,6 +76,18 @@ public class CheckAnswersModel(
         }
 
         _potentialDuplicates = await GetPotentialDuplicatesAsync(personAId, personBId);
+
+        ResolvableAttributes = changedService.GetResolvableMergedAttributes(
+             new List<ResolvedMergedAttribute>
+             {
+                 new ResolvedMergedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
+                 new ResolvedMergedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
+                 new ResolvedMergedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
+                 new ResolvedMergedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
+                 new ResolvedMergedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+                 new ResolvedMergedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
+                 new ResolvedMergedAttribute(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
+             });
 
         var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
 
