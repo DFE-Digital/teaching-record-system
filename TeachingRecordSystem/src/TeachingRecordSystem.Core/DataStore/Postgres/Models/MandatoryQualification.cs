@@ -29,6 +29,9 @@ public class MandatoryQualification : Qualification
         MandatoryQualificationStatus status,
         DateOnly startDate,
         DateOnly? endDate,
+        string? addReason,
+        string? addReasonDetail,
+        EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo createdBy,
         DateTime now,
         out MandatoryQualificationCreatedEvent @event)
@@ -56,7 +59,10 @@ public class MandatoryQualification : Qualification
             PersonId = personId,
             MandatoryQualification = EventModels.MandatoryQualification.FromModel(
                 qualification,
-                providerNameHint: MandatoryQualificationProvider.GetById(providerId).Name)
+                providerNameHint: MandatoryQualificationProvider.GetById(providerId).Name),
+            AddReason = addReason,
+            AddReasonDetail = addReasonDetail,
+            EvidenceFile = evidenceFile
         };
 
         return qualification;

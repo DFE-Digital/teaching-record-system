@@ -2,11 +2,14 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class StatusModel(SupportUiLinkGenerator linkGenerator) : PageModel
+public class StatusModel(
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -60,11 +63,12 @@ public class StatusModel(SupportUiLinkGenerator linkGenerator) : PageModel
                 state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
 
-        return Redirect(linkGenerator.Mqs.AddMq.CheckAnswers(PersonId, JourneyInstance.InstanceId));
+        return Redirect(linkGenerator.Mqs.AddMq.Reason(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

@@ -1,5 +1,7 @@
+using Microsoft.Playwright;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
@@ -20,6 +22,10 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var result = dfeta_qualification_dfeta_MQ_Status.Passed;
         var endDate = new DateOnly(2021, 11, 5);
         var personId = person.PersonId;
+        var reason = AddMqReasonOption.NewInformationReceived;
+        var reasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -54,6 +60,24 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.CheckAsync($"label{TextIsSelector(result.ToString())}");
 
         await page.FillDateInputAsync(endDate);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnAddMqReasonPageAsync();
+
+        await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Enter details')", reasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
 
         await page.ClickContinueButtonAsync();
 

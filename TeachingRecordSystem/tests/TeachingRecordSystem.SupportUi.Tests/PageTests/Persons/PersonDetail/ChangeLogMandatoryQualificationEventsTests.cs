@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
@@ -19,12 +20,18 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         Clock.UtcNow = nows.SingleRandom();
     }
 
-    [Fact]
-    public async Task Person_WithMandatoryQualificationCreatedEvent_RendersExpectedContent()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Person_WithMandatoryQualificationCreatedEvent_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
-        var (personId, mq) = await CreateFullyPopulatedMq(createdByUser.UserId);
+        var status = populateOptional ? MandatoryQualificationStatus.Passed : MandatoryQualificationStatus.InProgress;
+        AddMqReasonOption? addReason = populateOptional ? AddMqReasonOption.NewInformationReceived : null;
+        var addReasonDetail = populateOptional ? "More information" : null;
+        (Guid FileId, string Name)? evidenceFile = populateOptional ? (FileId: Guid.NewGuid(), Name: "evidence.jpeg") : null;
+        var (personId, mq) = await CreateFullyPopulatedMq(createdByUser.UserId, status, addReason, addReasonDetail, evidenceFile);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/change-history");
 
@@ -40,6 +47,24 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             {
                 Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
                 Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedText());
+                Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText());
+                Assert.Equal(mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                Assert.Equal(mq.Status!.Value.GetTitle(), item.GetElementByTestId("status")?.TrimmedText());
+                if (populateOptional)
+                {
+                    Assert.Equal(mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
+                    Assert.Equal(addReason?.GetDisplayName(), item.GetElementByTestId("reason")?.TrimmedText());
+                    Assert.Equal(addReasonDetail, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                    Assert.Equal($"{evidenceFile!.Value.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TrimmedText());
+                }
+                else
+                {
+                    Assert.Equal("None", item.GetElementByTestId("end-date")?.TrimmedText());
+                    Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason")?.TrimmedText());
+                    Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                    Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("evidence")?.TrimmedText());
+                }
             });
     }
 
@@ -883,12 +908,18 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
     //public async Task Person_WithMandatoryQualificationUpdatedEventWithoutChangedEndDate_DoesNotRenderEndDateRowWithinPreviousData()
 
-    private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification)> CreateFullyPopulatedMq(EventModels.RaisedByUserInfo? createdByUser = null)
+    private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification)> CreateFullyPopulatedMq(
+        EventModels.RaisedByUserInfo? createdByUser = null,
+        MandatoryQualificationStatus? status = null,
+        AddMqReasonOption? reason = null,
+        string? reasonDetail = null,
+        (Guid FileId, string Name)? evidenceFile = null)
     {
         var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q =>
             {
-                q.WithStatus(MandatoryQualificationStatus.Passed);
+                q.WithStatus(status ?? MandatoryQualificationStatus.Passed);
+                q.WithAddReason(reason?.GetDisplayName(), reasonDetail, evidenceFile);
 
                 if (createdByUser is not null)
                 {
@@ -902,8 +933,15 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         Debug.Assert(mq.ProviderId.HasValue);
         Debug.Assert(mq.Specialism.HasValue);
         Debug.Assert(mq.StartDate.HasValue);
+        if (mq.Status == MandatoryQualificationStatus.Passed || mq.Status == MandatoryQualificationStatus.Failed)
+        {
+            Debug.Assert(mq.EndDate.HasValue);
+        }
+        else
+        {
+            Debug.Assert(!mq.EndDate.HasValue);
+        }
         Debug.Assert(mq.Status.HasValue);
-        Debug.Assert(mq.EndDate.HasValue);
 
         return (person.PersonId, mq);
     }

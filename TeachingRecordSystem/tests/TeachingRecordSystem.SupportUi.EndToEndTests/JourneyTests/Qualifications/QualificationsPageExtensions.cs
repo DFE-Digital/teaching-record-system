@@ -22,6 +22,9 @@ public static class QualificationsPageExtensions
     public static Task AssertOnAddMqStatusPageAsync(this IPage page) =>
         page.WaitForUrlPathAsync($"/mqs/add/status");
 
+    public static Task AssertOnAddMqReasonPageAsync(this IPage page) =>
+        page.WaitForUrlPathAsync($"/mqs/add/reason");
+
     public static Task AssertOnAddMqCheckAnswersPageAsync(this IPage page) =>
         page.WaitForUrlPathAsync($"/mqs/add/check-answers");
 

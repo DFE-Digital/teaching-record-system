@@ -1,11 +1,11 @@
-@page "/mqs/add/specialism"
+@page "/mqs/add/specialism/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.SpecialismModel
 @{
     ViewBag.Title = Html.DisplayNameFor(m => m.Specialism);
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Mqs.AddMq.Provider(Model.PersonId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.Mqs.AddMq.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Mqs.AddMq.Provider(Model.PersonId, Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
