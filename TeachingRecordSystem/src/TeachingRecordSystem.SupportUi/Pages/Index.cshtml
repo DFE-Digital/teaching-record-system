@@ -7,75 +7,83 @@
     ViewBag.Title = "Records";
 }
 
-<h2 class="govuk-heading-m">@ViewBag.Title</h2>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-m">@ViewBag.Title</h2>
 
-<div class="govuk-!-margin-bottom-6">
-    <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
-        <div class="moj-search govuk-!-margin-bottom-4">
-            <govuk-input name="Search" input-class="moj-search__input" data-testid="search-input" type="search">
-                <govuk-input-label class="moj-search__label">
-                    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Search for a record</h3>
-                </govuk-input-label>
-                <govuk-input-hint class="moj-search__hint">
-                    Enter a name, date of birth or teacher reference number (TRN)
-                </govuk-input-hint>
-            </govuk-input>
-            <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
+        <div class="govuk-!-margin-bottom-6">
+            <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
+                <div class="govuk-!-margin-bottom-4">
+                    <govuk-input name="Search" data-testid="search-input" type="search">
+                        <govuk-input-label>
+                            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Search for a record</h3>
+                        </govuk-input-label>
+                        <govuk-input-hint>
+                            Enter a name, date of birth or teacher reference number (TRN)
+                        </govuk-input-hint>
+                        <govuk-input-after-input>
+                            <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                        </govuk-input-after-input>
+                    </govuk-input>
+                </div>
+            </form>
         </div>
-    </form>
-</div>
 
-@if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
-{
-    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Create a record</h2>
-    <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
-}
+        @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
+        {
+            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Create a record</h2>
+            <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
+        }
+    </div>
 
-<div class="trs-tiles govuk-!-margin-top-5">
-    @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
-    {
-        <div class="trs-tile-section">
-            <h2 class="govuk-heading-m">TRN requests</h2>
-            <div class="trs-tile-row">
-                <a href="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" class="trs-tile trs-tile--branded">
-                    <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.NpqTrnRequest)</span>
-                    <span class="trs-tile__title">NPQ TRN requests</span>
-                </a>
-                <a href="@LinkGenerator.SupportTasks.ApiTrnRequests.Index()" class="trs-tile trs-tile--branded">
-                    <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ApiTrnRequest)</span>
-                    <span class="trs-tile__title">Potential duplicates via API</span>
-                </a>
-                <a href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index()" class="trs-tile trs-tile--branded">
-                    <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.TrnRequestManualChecksNeeded)</span>
-                    <span class="trs-tile__title">Matched records:<br />manual checks needed</span>
-                </a>
+    <div class="govuk-grid-column-full">
+        <div class="trs-tiles govuk-!-margin-top-5">
+            @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
+            {
+                <div class="trs-tile-section">
+                    <h2 class="govuk-heading-m">TRN requests</h2>
+                    <div class="trs-tile-row">
+                        <a href="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" class="trs-tile trs-tile--branded">
+                            <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.NpqTrnRequest)</span>
+                            <span class="trs-tile__title">NPQ TRN requests</span>
+                        </a>
+                        <a href="@LinkGenerator.SupportTasks.ApiTrnRequests.Index()" class="trs-tile trs-tile--branded">
+                            <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ApiTrnRequest)</span>
+                            <span class="trs-tile__title">Potential duplicates via API</span>
+                        </a>
+                        <a href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index()" class="trs-tile trs-tile--branded">
+                            <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.TrnRequestManualChecksNeeded)</span>
+                            <span class="trs-tile__title">Matched records:<br />manual checks needed</span>
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
+            {
+                <div class="trs-tile-section">
+                    <h2 class="govuk-heading-m">Record management</h2>
+                    <div class="trs-tile-row">
+                        <a href="@LinkGenerator.SupportTasks.ChangeRequests.Index()" class="trs-tile trs-tile--branded">
+                            <span class="trs-tile__count">@(Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ChangeNameRequest) + Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ChangeDateOfBirthRequest))</span>
+                            <span class="trs-tile__title">Name and date of birth change requests</span>
+                        </a>
+                    </div>
+                </div>
+            }
+
+            <div class="trs-tile-section">
+                <h2 class="govuk-heading-m">Third-party tasks</h2>
+                <div class="trs-tile-row">
+                    <a href="@LinkGenerator.SupportTasks.IntegrationTransactions.Index()" class="trs-tile">
+                        <span class="trs-tile__title">Integration transactions</span>
+                    </a>
+                    <a href="@LinkGenerator.SupportTasks.TeacherPensions.Index()" class="trs-tile">
+                        <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.TeacherPensionsPotentialDuplicate)</span>
+                        <span class="trs-tile__title">Potential duplicates via Teachers&rsquo; Pensions</span>
+                    </a>
+                </div>
             </div>
-        </div>
-    }
-
-    @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
-    {
-        <div class="trs-tile-section">
-            <h2 class="govuk-heading-m">Record management</h2>
-            <div class="trs-tile-row">
-                <a href="@LinkGenerator.SupportTasks.ChangeRequests.Index()" class="trs-tile trs-tile--branded">
-                    <span class="trs-tile__count">@(Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ChangeNameRequest) + Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ChangeDateOfBirthRequest))</span>
-                    <span class="trs-tile__title">Name and date of birth change requests</span>
-                </a>
-            </div>
-        </div>
-    }
-
-    <div class="trs-tile-section">
-        <h2 class="govuk-heading-m">Third-party tasks</h2>
-        <div class="trs-tile-row">
-            <a href="@LinkGenerator.SupportTasks.IntegrationTransactions.Index()" class="trs-tile">
-                <span class="trs-tile__title">Integration transaction records (ITRs)</span>
-            </a>
-            <a href="@LinkGenerator.SupportTasks.TeacherPensions.Index()" class="trs-tile">
-                <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.TeacherPensionsPotentialDuplicate)</span>
-                <span class="trs-tile__title">Potential duplicates via Teachers&rsquo; Pensions</span>
-            </a>
         </div>
     </div>
 </div>

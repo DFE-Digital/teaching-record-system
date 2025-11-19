@@ -1,7 +1,7 @@
 @page "/support-tasks/npq-trn-requests"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Index
 @{
-    ViewBag.Title = "TRN requests";
+    ViewBag.Title = "NPQ TRN requests";
 }
 
 @section BeforeContent {
@@ -9,28 +9,31 @@
 }
 
 <div class="govuk-grid-row">
-    <span class="govuk-caption-l">Support tasks</span>
-    <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">TRN requests</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-    <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" method="get" asp-antiforgery="false">
-        <div class="moj-search govuk-!-margin-bottom-4">
-            <govuk-input name="Search" input-class="moj-search__input" type="search" autocomplete="off">
-                <govuk-input-label class="moj-search__label">
-                    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Search</h3>
-                </govuk-input-label>
-                <govuk-input-hint class="moj-search__hint">
-                    Enter a name, email address or request date, for example 31/3/2025
-                </govuk-input-hint>
-            </govuk-input>
-            @* TODO move this inside input when GFA library is updated *@
-            <govuk-button class="moj-search__button govuk-!-margin-bottom-0" type="submit">Search</govuk-button>
-        </div>
-    </form>
+        <form action="@LinkGenerator.SupportTasks.ApiTrnRequests.Index()" method="get" asp-antiforgery="false">
+            <div class="govuk-!-margin-bottom-4">
+                <govuk-input for="Search" type="search" autocomplete="off">
+                    <govuk-input-label>
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h3>
+                    </govuk-input-label>
+                    <govuk-input-hint>
+                        Enter a name, email address or request date, for example 31/3/2025
+                    </govuk-input-hint>
+                    <govuk-input-after-input>
+                        <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                    </govuk-input-after-input>
+                </govuk-input>
+            </div>
+        </form>
+    </div>
 
-    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
-        @if(Model.Results!.Count == 0)
+    <div class="govuk-grid-column-full" data-testid="results">
+        @if (Model.Results!.Count == 0)
         {
-            <p class="govuk-body-l govuk-!-font-weight-bold" data-testid="no-tasks-message">
+            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-tasks-message">
                 No matching requests found
             </p>
             <p class="govuk-body-m">Try searching again with different details</p>
@@ -39,49 +42,49 @@
         {
             <table class="govuk-table">
                 <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                         sort-direction="@(Model.SortBy == SortByOption.Name ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Name, direction))">
-                            Name
-                        </th>
-                        <th scope="col" class="govuk-table__header"
+                        Name
+                    </th>
+                    <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == SortByOption.Email ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Email, direction))">
-                            Email
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
+                        Email
+                    </th>
+                    <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == SortByOption.RequestedOn ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.RequestedOn, direction))">
-                            Requested on
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
+                        Requested on
+                    </th>
+                    <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == SortByOption.PotentialDuplicate ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.PotentialDuplicate, direction))">
-                            Potential duplicate
-                        </th>
-                    </tr>
+                        Potential duplicate
+                    </th>
+                </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                    @foreach (var result in Model.Results)
-                    {
-                        var tagValue = result.PotentialDuplicate.HasValue ? (result.PotentialDuplicate.Value ? "Yes" : "No") : null;
-                        var tagClass = result.PotentialDuplicate.HasValue ? (result.PotentialDuplicate.Value ? "govuk-tag--red" : "govuk-tag--green") : null;
-                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                            <th scope="row" class="govuk-table__header" data-testid="name">
-                                <a href="@LinkGenerator.SupportTasks.NpqTrnRequests.Details(result.SupportTaskReference)" class="govuk-link">
-                                    @result.FirstName @result.MiddleName @result.LastName
-                                </a>
-                            </th>
-                            <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
-                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</td>
-                            <td class="govuk-table__cell" data-testid="potential-duplicate"><colored-tag class="@tagClass">@tagValue</colored-tag></td>
-                        </tr>
-                    }
+                @foreach (var result in Model.Results)
+                {
+                    var tagValue = result.PotentialDuplicate.HasValue ? (result.PotentialDuplicate.Value ? "Yes" : "No") : null;
+                    var tagClass = result.PotentialDuplicate.HasValue ? (result.PotentialDuplicate.Value ? "govuk-tag--red" : "govuk-tag--green") : null;
+                    <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                        <th scope="row" class="govuk-table__header" data-testid="name">
+                            <a href="@LinkGenerator.SupportTasks.NpqTrnRequests.Details(result.SupportTaskReference)" class="govuk-link">
+                                @result.FirstName @result.MiddleName @result.LastName
+                            </a>
+                        </th>
+                        <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                        <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</td>
+                        <td class="govuk-table__cell" data-testid="potential-duplicate"><colored-tag class="@tagClass">@tagValue</colored-tag></td>
+                    </tr>
+                }
                 </tbody>
             </table>
 
-            <partial name="_Pagination" model=@Model.Pagination />
+            <partial name="_Pagination" model=@Model.Pagination/>
         }
     </div>
 </div>
