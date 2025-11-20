@@ -146,11 +146,19 @@ public class DqtReportingService : BackgroundService
             {
                 await foreach (var value in tuple)
                 {
+                    if (value.IsUnchangedToastedValue)
+                    {
+                        yield return _unchangedToastedValueSentinel;
+                        continue;
+                    }
+
                     yield return value.IsDBNull ? null : await value.Get();
                 }
             }
         }
     }
+
+    private static readonly object _unchangedToastedValueSentinel = new();
 
     private async Task<PgOutputReplicationSlot> GetReplicationSlotAsync(
         LogicalReplicationConnection replicationConn,
@@ -192,6 +200,11 @@ public class DqtReportingService : BackgroundService
         foreach (var (columnName, columnValue) in columnValues)
         {
             object? value = columnValue;
+
+            if (ReferenceEquals(value, _unchangedToastedValueSentinel))
+            {
+                continue;
+            }
 
             if (value is not null)
             {
