@@ -31,7 +31,7 @@
                                     Type of request
                                 </govuk-checkboxes-fieldset-legend>
                                 <govuk-checkboxes-item value="@SupportTaskType.ChangeDateOfBirthRequest">
-                                    DOB (@Model.DateOfBirthChangeRequestCount)
+                                    Date of birth (@Model.DateOfBirthChangeRequestCount)
                                 </govuk-checkboxes-item>
                                 <govuk-checkboxes-item value="@SupportTaskType.ChangeNameRequest">
                                     Name (@Model.NameChangeRequestCount)
@@ -84,7 +84,7 @@
                                         <a href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Index(result.SupportTaskReference)" class="govuk-link">@result.Name</a>
                                     </th>
                                     <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
-                                    <td class="govuk-table__cell" data-testid="change-type">@(result.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest ? "DOB" : "Name")</td>
+                                    <td class="govuk-table__cell" data-testid="change-type">@(result.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest ? "Date of birth" : "Name")</td>
                                 </tr>
                             }
                         </tbody>
