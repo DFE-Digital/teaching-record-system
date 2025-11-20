@@ -1,8 +1,12 @@
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
+using System.Text;
+using System.Text.Json;
+using AngleSharp;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -16,6 +20,10 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Files;
+using Entity = Microsoft.Xrm.Sdk.Entity;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
+using NoteCreatedEvent = TeachingRecordSystem.Core.Events.NoteCreatedEvent;
+using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -52,6 +60,396 @@ public class TrsDataSyncHelper(
     public IObservable<object[]> GetSyncedEntitiesObservable() => _syncedEntitiesSubject;
 
     private bool IsFakeXrm { get; } = organizationService.GetType().FullName == "Castle.Proxies.ObjectProxy_2";
+
+    public async Task SyncAnnotationAuditsAsync(IReadOnlyCollection<Guid> annotationIds, CancellationToken cancellationToken)
+    {
+        string[] attributeNames =
+        [
+            Annotation.PrimaryIdAttribute,
+            Annotation.Fields.ObjectId,
+            Annotation.Fields.ObjectTypeCode,
+            Annotation.Fields.Subject,
+            Annotation.Fields.CreatedOn,
+            Annotation.Fields.CreatedBy,
+            Annotation.Fields.ModifiedOn,
+            Annotation.Fields.ModifiedBy,
+            Annotation.Fields.NoteText,
+            Annotation.Fields.MimeType,
+            Annotation.Fields.FileName,
+            Annotation.Fields.DocumentBody
+        ];
+
+        var annotations = await GetEntitiesAsync<Annotation>(
+            Annotation.EntityLogicalName,
+            Annotation.PrimaryIdAttribute,
+            annotationIds,
+            attributeNames,
+            activeOnly: false,
+            cancellationToken);
+
+        var audits = await GetAuditRecordsFromAuditRepositoryAsync(
+            Annotation.EntityLogicalName,
+            Annotation.PrimaryIdAttribute,
+            annotationIds,
+            cancellationToken);
+
+        var processes = new List<(Process Process, IEvent Event)>();
+
+        var contentHashFileIds = new Dictionary<(Guid, string), EventModels.File>();
+
+        foreach (var annotationId in annotationIds)
+        {
+            try
+            {
+                var latest = annotations.Single(a => a.Id == annotationId);
+                var annotationAudits = audits[annotationId].AuditDetails;
+                var versions = GetEntityVersions(latest, annotationAudits, attributeNames.Except([Annotation.PrimaryIdAttribute]).ToArray());
+
+                if (GetContentHash(latest.DocumentBody) is string contentHash)
+                {
+                    contentHashFileIds.Add((annotationId, contentHash), new EventModels.File { FileId = annotationId, Name = latest.FileName });
+                }
+
+                if (annotationAudits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create))
+                {
+                    await AddCreatedEventAsync(versions.First());
+                }
+                else
+                {
+                    await AddImportedEventAsync(versions.First());
+                }
+
+                foreach (var (thisVersion, previousVersion) in versions.Skip(1).Zip(versions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+                {
+                    await AddUpdatedEventAsync(thisVersion, previousVersion);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed syncing annotation {annotationId}", ex);
+            }
+
+            await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+            await using var txn = await connection.BeginTransactionAsync(cancellationToken);
+
+            await SyncProcessesAsync();
+            await SyncEventsAsync();
+
+            await txn.CommitAsync();
+
+            static string? GetContentHash(string? content)
+            {
+                if (string.IsNullOrEmpty(content))
+                {
+                    return null;
+                }
+
+                var bytes = Convert.FromBase64String(content);
+                using var sha256 = System.Security.Cryptography.SHA256.Create();
+                var hashBytes = sha256.ComputeHash(bytes);
+                return Convert.ToHexString(hashBytes).ToLowerInvariant();
+            }
+
+            async Task<EventModels.File?> UploadContentAsync(string? content, string contentType, string fileName)
+            {
+                var hash = GetContentHash(content);
+
+                if (hash is null)
+                {
+                    return null;
+                }
+
+                if (contentHashFileIds.TryGetValue((annotationId, hash), out var existingFile))
+                {
+                    return existingFile;
+                }
+
+                using var ms = new MemoryStream(Convert.FromBase64String(content!));
+                var fileId = await fileService.UploadFileAsync(ms, contentType);
+
+                contentHashFileIds.Add((annotationId, hash), new EventModels.File { FileId = fileId, Name = fileName });
+
+                return contentHashFileIds[(annotationId, hash)];
+            }
+
+            static string GetNoteContent(string? content)
+            {
+                var text = content;
+
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    return string.Empty;
+                }
+
+                using var context = BrowsingContext.New(Configuration.Default);
+                using var doc = (IHtmlDocument)context.OpenAsync(req => req.Content(text)).GetAwaiter().GetResult();
+
+                var blocks = new StringBuilder();
+
+                VisitDocumentNodes(
+                    doc,
+                    node =>
+                    {
+                        if (node.NodeType != NodeType.Text)
+                        {
+                            return;
+                        }
+
+                        if (node.ParentElement is IHtmlScriptElement)
+                        {
+                            return;
+                        }
+
+                        var nodeText = node.Text();
+                        if (!string.IsNullOrWhiteSpace(nodeText))
+                        {
+                            blocks.AppendLine(nodeText);
+                        }
+                    });
+
+                return blocks.ToString();
+
+                void VisitDocumentNodes(IHtmlDocument document, Action<INode> visit)
+                {
+                    VisitNode(document.DocumentElement);
+
+                    void VisitNode(INode node)
+                    {
+                        visit(node);
+
+                        foreach (var child in node.GetDescendants())
+                        {
+                            visit(child);
+                        }
+                    }
+                }
+            }
+
+            async Task AddCreatedEventAsync(EntityVersionInfo<Annotation> snapshot)
+            {
+                var process = new Process
+                {
+                    ProcessId = snapshot.Id,
+                    ProcessType = ProcessType.NoteCreatingInDqt,
+                    CreatedOn = snapshot.Timestamp,
+                    UserId = null,
+                    DqtUserId = snapshot.UserId,
+                    DqtUserName = snapshot.UserName,
+                    PersonIds = [snapshot.Entity.ObjectId.Id]
+                };
+
+                var @event = new NoteCreatedEvent
+                {
+                    EventId = snapshot.Id,
+                    PersonId = snapshot.Entity.ObjectId.Id,
+                    Note = new EventModels.Note
+                    {
+                        NoteId = snapshot.Entity.Id,
+                        PersonId = snapshot.Entity.ObjectId.Id,
+                        Content = GetNoteContent(snapshot.Entity.NoteText),
+                        File = await UploadContentAsync(snapshot.Entity.DocumentBody, snapshot.Entity.MimeType, snapshot.Entity.FileName)
+                    }
+                };
+
+                processes.Add((process, @event));
+            }
+
+            async Task AddImportedEventAsync(EntityVersionInfo<Annotation> snapshot)
+            {
+                var process = new Process
+                {
+                    ProcessId = snapshot.Id,
+                    ProcessType = ProcessType.NoteImportingIntoDqt,
+                    CreatedOn = snapshot.Timestamp,
+                    UserId = null,
+                    DqtUserId = snapshot.UserId,
+                    DqtUserName = snapshot.UserName,
+                    PersonIds = [snapshot.Entity.ObjectId.Id]
+                };
+
+                var @event = new NoteImportedIntoDqtEvent
+                {
+                    EventId = snapshot.Id,
+                    PersonId = snapshot.Entity.ObjectId.Id,
+                    Note = new EventModels.Note
+                    {
+                        NoteId = snapshot.Entity.Id,
+                        PersonId = snapshot.Entity.ObjectId.Id,
+                        Content = GetNoteContent(snapshot.Entity.NoteText),
+                        File = await UploadContentAsync(snapshot.Entity.DocumentBody, snapshot.Entity.MimeType, snapshot.Entity.FileName)
+                    }
+                };
+
+                processes.Add((process, @event));
+            }
+
+            async Task AddUpdatedEventAsync(EntityVersionInfo<Annotation> snapshot, EntityVersionInfo<Annotation> previous)
+            {
+                if (snapshot.ChangedAttributes.Contains("statecode"))
+                {
+                    var nonStateAttributes = snapshot.ChangedAttributes
+                        .Where(a => a is not "statecode" and not "statuscode")
+                        .ToArray();
+
+                    if (nonStateAttributes.Any())
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                    }
+
+                    throw new NotSupportedException("Annotation state changes are not supported.");
+                }
+
+                var changes = NoteUpdatedInDqtEventChanges.None |
+                    (snapshot.Entity.NoteText != previous.Entity.NoteText ? NoteUpdatedInDqtEventChanges.Content : 0) |
+                    (snapshot.Entity.DocumentBody != previous.Entity.DocumentBody ? NoteUpdatedInDqtEventChanges.File : 0);
+
+                if (changes is NoteUpdatedInDqtEventChanges.None)
+                {
+                    return;
+                }
+
+                var process = new Process
+                {
+                    ProcessId = snapshot.Id,
+                    ProcessType = ProcessType.NoteUpdatingInDqt,
+                    CreatedOn = snapshot.Timestamp,
+                    UserId = null,
+                    DqtUserId = snapshot.UserId,
+                    DqtUserName = snapshot.UserName,
+                    PersonIds = [snapshot.Entity.ObjectId.Id]
+                };
+
+                var @event = new NoteUpdatedEvent
+                {
+                    EventId = snapshot.Id,
+                    PersonId = snapshot.Entity.ObjectId.Id,
+                    Changes = changes,
+                    Note = new EventModels.Note
+                    {
+                        NoteId = snapshot.Entity.Id,
+                        PersonId = snapshot.Entity.ObjectId.Id,
+                        Content = GetNoteContent(snapshot.Entity.NoteText),
+                        File = await UploadContentAsync(snapshot.Entity.DocumentBody, snapshot.Entity.MimeType, snapshot.Entity.FileName)
+                    },
+                    OldNote = new EventModels.Note
+                    {
+                        NoteId = previous.Entity.Id,
+                        PersonId = previous.Entity.ObjectId.Id,
+                        Content = GetNoteContent(previous.Entity.NoteText),
+                        File = await UploadContentAsync(previous.Entity.DocumentBody, previous.Entity.MimeType, previous.Entity.FileName)
+                    }
+                };
+
+                processes.Add((process, @event));
+            }
+
+            async Task SyncProcessesAsync()
+            {
+                using (var createTempTableCommand = connection.CreateCommand())
+                {
+                    createTempTableCommand.CommandText =
+                        """
+                        create temp table temp_processes (like processes including defaults);
+                        """;
+                    createTempTableCommand.Transaction = txn;
+                    await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+                }
+
+                using var writer = await connection.BeginBinaryImportAsync(
+                    """
+                    copy temp_processes (process_id, process_type, created_on, user_id, dqt_user_id, dqt_user_name, person_ids) from stdin (format binary);
+                    """,
+                    cancellationToken);
+
+                foreach (var process in processes.Select(x => x.Process))
+                {
+                    writer.StartRow();
+                    writer.WriteValueOrNull(process.ProcessId, NpgsqlDbType.Uuid);
+                    writer.WriteValueOrNull((int)process.ProcessType, NpgsqlDbType.Integer);
+                    writer.WriteValueOrNull(process.CreatedOn, NpgsqlDbType.TimestampTz);
+                    writer.WriteValueOrNull(process.UserId, NpgsqlDbType.Uuid);
+                    writer.WriteValueOrNull(process.DqtUserId, NpgsqlDbType.Uuid);
+                    writer.WriteValueOrNull(process.DqtUserName, NpgsqlDbType.Varchar);
+                    writer.WriteValueOrNull(process.PersonIds.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Uuid);
+                }
+
+                await writer.CompleteAsync(cancellationToken);
+                await writer.CloseAsync(cancellationToken);
+
+                using (var mergeCommand = connection.CreateCommand())
+                {
+                    mergeCommand.CommandText =
+                        """
+                        insert into processes as t (process_id, process_type, created_on, user_id, dqt_user_id, dqt_user_name, person_ids)
+                        select process_id, process_type, created_on, user_id, dqt_user_id, dqt_user_name, person_ids from temp_processes
+                        on conflict (process_id) do update
+                        set
+                            process_type = excluded.process_type,
+                            created_on = excluded.created_on,
+                            user_id = excluded.user_id,
+                            dqt_user_id = excluded.dqt_user_id,
+                            dqt_user_name = excluded.dqt_user_name,
+                            person_ids = excluded.person_ids
+                        where t.process_type <> 7;  -- don't overwrite PersonMergingInDqt processes
+                        """;
+                    mergeCommand.Transaction = txn;
+                    mergeCommand.CommandTimeout = 0;
+                    await mergeCommand.ExecuteNonQueryAsync(cancellationToken);
+                }
+            }
+
+            async Task SyncEventsAsync()
+            {
+                using (var createTempTableCommand = connection.CreateCommand())
+                {
+                    createTempTableCommand.CommandText =
+                        """
+                        create temp table temp_events (like process_events including defaults);
+                        """;
+                    createTempTableCommand.Transaction = txn;
+                    await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+                }
+
+                using var writer = await connection.BeginBinaryImportAsync(
+                    """
+                    copy temp_events (process_event_id, process_id, event_name, payload, person_ids) from stdin (format binary);
+                    """,
+                    cancellationToken);
+
+                foreach (var (process, @event) in processes)
+                {
+                    writer.StartRow();
+                    writer.WriteValueOrNull(@event.EventId, NpgsqlDbType.Uuid);
+                    writer.WriteValueOrNull(process.ProcessId, NpgsqlDbType.Uuid);
+                    writer.WriteValueOrNull(@event.GetType().Name, NpgsqlDbType.Varchar);
+                    writer.WriteValueOrNull(JsonSerializer.Serialize(@event, typeof(IEvent), IEvent.SerializerOptions), NpgsqlDbType.Jsonb);
+                    writer.WriteValueOrNull(@event.PersonIds.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Uuid);
+                }
+
+                await writer.CompleteAsync(cancellationToken);
+                await writer.CloseAsync(cancellationToken);
+
+                using (var mergeCommand = connection.CreateCommand())
+                {
+                    mergeCommand.CommandText =
+                        """
+                        insert into process_events as t (process_event_id, process_id, event_name, payload, person_ids)
+                        select process_event_id, process_id, event_name, payload, person_ids from temp_events
+                        on conflict (process_event_id) do update
+                        set
+                            process_id = excluded.process_id,
+                            event_name = excluded.event_name,
+                            payload = excluded.payload,
+                            person_ids = excluded.person_ids;
+                        """;
+                    mergeCommand.Transaction = txn;
+                    mergeCommand.CommandTimeout = 0;
+                    await mergeCommand.ExecuteNonQueryAsync(cancellationToken);
+                }
+            }
+        }
+    }
 
     public (string EntityLogicalName, string[] AttributeNames) GetEntityInfoForModelType(string modelType)
     {

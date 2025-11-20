@@ -12,5 +12,8 @@ public enum ProcessType
     SupportTaskDeleting = 8,
     TrnRequestResetting = 9,
     NotifyingTrnRecipient = 10,
-    NoteCreating = 11
+    NoteCreating = 11,
+    NoteCreatingInDqt = 12,
+    NoteImportingIntoDqt = 13,
+    NoteUpdatingInDqt = 14
 }

@@ -288,6 +288,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(professionalStatusEmailJobOptions.JobSchedule));
 
+            recurringJobManager.AddOrUpdate<CreateDqtAnnotationAuditEventsJob>(
+                nameof(CreateDqtAnnotationAuditEventsJob),
+                job => job.ExecuteAsync(/*performContext: */null!, CancellationToken.None),
+                Cron.Never);
+
             return Task.CompletedTask;
         });
 
