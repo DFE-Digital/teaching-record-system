@@ -101,7 +101,7 @@
                 @foreach (var match in Model.PotentialDuplicates!)
                 {
                     <govuk-summary-card data-testid="match" data-personid="@match.PersonId" class="trs-potential-duplicates__item">
-                        <govuk-summary-card-title>
+                        <govuk-summary-card-title heading-level="3">
                             Record @match.Identifier
                         </govuk-summary-card-title>
                         <govuk-summary-card-actions>
