@@ -21,9 +21,6 @@ public class TypeModel(
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -47,17 +44,15 @@ public class TypeModel(
         }
 
         var selectedType = AlertTypes!.Single(t => t.AlertTypeId == AlertTypeId);
+        var nextStep = linkGenerator.Alerts.AddAlert.Details(PersonId, JourneyInstance!.InstanceId);
 
-        await JourneyInstance!.UpdateStateAsync(
+        return await JourneyInstance.UpdateStateAndRedirectToNextStepAsync(
             state =>
             {
                 state.AlertTypeId = AlertTypeId;
                 state.AlertTypeName = selectedType.Name;
-            });
-
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.AddAlert.Details(PersonId, JourneyInstance.InstanceId));
+            },
+            nextStep);
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
