@@ -26,7 +26,7 @@ jobs:
     environment: dev
     concurrency: deploy_dev
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: ./.github/workflows/actions/deploy-aks-environment
         id: deploy
@@ -76,7 +76,7 @@ jobs:
     environment: pre-production
     concurrency: deploy_pre-production
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: ./.github/workflows/actions/deploy-aks-environment
         id: deploy
@@ -95,7 +95,7 @@ jobs:
     environment: production
     concurrency: deploy_production
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: ./.github/workflows/actions/deploy-aks-environment
         id: deploy
@@ -114,7 +114,7 @@ jobs:
     environment: tps-sandbox
     concurrency: deploy_tps-sandbox
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: ./.github/workflows/actions/deploy-aks-environment
         id: deploy
