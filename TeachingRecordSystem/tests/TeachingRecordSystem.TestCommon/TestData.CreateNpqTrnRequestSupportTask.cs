@@ -197,31 +197,31 @@ public partial class TestData
                 // Matches wasn't explicitly specified; create two person records that match details in this request
 
                 matchedPersons = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, 2)
-                        .ToAsyncEnumerable()
-                        .SelectAwait(async _ =>
+                    .ToAsyncEnumerable()
+                    .Select(async (int _, CancellationToken _) =>
+                    {
+                        var person = await testData.CreatePersonAsync(p =>
                         {
-                            var person = await testData.CreatePersonAsync(p =>
+                            p
+                                .WithFirstName(firstName)
+                                .WithMiddleName(middleName)
+                                .WithLastName(lastName)
+                                .WithDateOfBirth(dateOfBirth)
+                                .WithEmailAddress(emailAddress);
+
+                            if (nationalInsuranceNumber is not null)
                             {
-                                p
-                                    .WithFirstName(firstName)
-                                    .WithMiddleName(middleName)
-                                    .WithLastName(lastName)
-                                    .WithDateOfBirth(dateOfBirth)
-                                    .WithEmailAddress(emailAddress);
+                                p.WithNationalInsuranceNumber(nationalInsuranceNumber);
+                            }
 
-                                if (nationalInsuranceNumber is not null)
-                                {
-                                    p.WithNationalInsuranceNumber(nationalInsuranceNumber);
-                                }
+                            if (gender is not null)
+                            {
+                                p.WithGender(gender.Value);
+                            }
+                        });
 
-                                if (gender is not null)
-                                {
-                                    p.WithGender(gender.Value);
-                                }
-                            });
-
-                            return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
-                        }));
+                        return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
+                    }));
             }
 
             var matches = new TrnRequestMatches() { MatchedPersons = matchedPersons };

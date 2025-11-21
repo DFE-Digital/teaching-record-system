@@ -57,6 +57,7 @@ public partial class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFix
             var it = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).FirstOrDefaultAsync(x => x.IntegrationTransactionId == integrationTransactionId);
             Assert.Null(integrationTransactionId);
             Assert.Null(it);
+#pragma warning disable CA1873
             Fixture.Logger.Verify(
                 x => x.Log(
                     LogLevel.Error,
@@ -65,6 +66,7 @@ public partial class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFix
                     null,
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
+#pragma warning restore CA1873
         });
     }
 }

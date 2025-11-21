@@ -18,7 +18,7 @@ public record InductionInfo
             CompletedDate = person.InductionCompletedDate,
             ExemptionReasons = await person.GetAllInductionExemptionReasonIds()
                 .ToAsyncEnumerable()
-                .SelectAwait(async id => await referenceDataCache.GetInductionExemptionReasonByIdAsync(id))
+                .Select(async (Guid id, CancellationToken _) => await referenceDataCache.GetInductionExemptionReasonByIdAsync(id))
                 .ToArrayAsync()
         };
     }
