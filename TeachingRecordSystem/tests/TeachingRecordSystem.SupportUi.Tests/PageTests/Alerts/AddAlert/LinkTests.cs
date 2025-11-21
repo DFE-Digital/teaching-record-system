@@ -2,8 +2,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
 {
-    private const string PreviousStep = JourneySteps.Details;
-    private const string ThisStep = JourneySteps.Link;
+    private const string PreviousStep = JourneyStepNames.Details;
+    private const string ThisStep = JourneyStepNames.Link;
 
     async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
@@ -45,11 +45,11 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
     }
 
     [Fact]
-    public async Task Get_MissingDetailsInJourneyState_ReturnsOk()
+    public async Task Get_MissingDetailsInJourneyState_Redirects()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForIncompleteStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -57,7 +57,8 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(GetStepUrl(PreviousStep, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -129,11 +130,11 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
     }
 
     [Fact]
-    public async Task Post_WithMissingDetailsDataInJourneyState_RedirectsToStartDatePage()
+    public async Task Post_WithMissingDetailsDataInJourneyState_Redirects()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneyStepNames.AlertType, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -144,10 +145,10 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(GetStepUrl(PreviousStep, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.False(journeyInstance.State.AddLink);
+        Assert.Null(journeyInstance.State.AddLink);
         Assert.Null(journeyInstance.State.Link);
     }
 
@@ -207,7 +208,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(GetStepUrl(JourneyStepNames.StartDate, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.AddLink);
@@ -231,7 +232,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(GetStepUrl(JourneyStepNames.StartDate, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.False(journeyInstance.State.AddLink);
@@ -245,7 +246,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?handler=cancel&personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

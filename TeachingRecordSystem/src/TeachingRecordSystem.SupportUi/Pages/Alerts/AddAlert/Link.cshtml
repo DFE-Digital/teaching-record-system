@@ -1,16 +1,16 @@
-@page "/alerts/add/link/{handler?}"
+@page "/alerts/add/link"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.LinkModel
 @{
     ViewBag.Title = Html.DisplayNameFor(m => m.AddLink);
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.AddAlert.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.AddAlert.Details(Model.PersonId, Model.JourneyInstance!.InstanceId))" />
+    <govuk-back-link href="@Model.JourneyInstance!.GetBackLinkUrl()" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.Alerts.AddAlert.Link(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form method="post">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
 
             <govuk-radios for="AddLink">

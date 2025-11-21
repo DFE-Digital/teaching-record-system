@@ -4,8 +4,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
 {
-    private const string PreviousStep = JourneySteps.Index;
-    private const string ThisStep = JourneySteps.AlertType;
+    private const string PreviousStep = JourneyStepNames.Index;
+    private const string ThisStep = JourneyStepNames.AlertType;
 
     async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
@@ -19,7 +19,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -35,7 +35,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(personId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -51,7 +51,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -69,7 +69,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -89,7 +89,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -109,7 +109,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -150,7 +150,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -166,7 +166,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(personId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -182,7 +182,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -198,7 +198,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
         var alertType = await GetKnownAlertTypeAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -222,9 +222,9 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?handler=cancel&personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -248,7 +248,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
             person.Person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(httpMethod, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

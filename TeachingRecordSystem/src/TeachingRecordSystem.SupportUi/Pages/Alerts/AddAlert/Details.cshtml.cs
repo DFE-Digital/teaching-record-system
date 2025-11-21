@@ -14,9 +14,6 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMa
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
     public string? PersonName { get; set; }
 
     public string? AlertTypeName { get; set; }
@@ -37,14 +34,11 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMa
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.Details = Details;
-        });
+        var nextStep = linkGenerator.Alerts.AddAlert.Link(PersonId, JourneyInstance!.InstanceId);
 
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.AddAlert.Link(PersonId, JourneyInstance.InstanceId));
+        return await JourneyInstance.UpdateStateAndRedirectToNextStepAsync(
+            state => state.Details = Details,
+            nextStep);
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -56,15 +50,9 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMa
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.AlertTypeId is null)
-        {
-            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Type(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        AlertTypeName = JourneyInstance.State.AlertTypeName;
+        AlertTypeName = JourneyInstance!.State.AlertTypeName;
     }
 }

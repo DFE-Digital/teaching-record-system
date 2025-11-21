@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
 {
-    private const string PreviousStep = JourneySteps.Reason;
+    private const string PreviousStep = JourneyStepNames.Reason;
 
     async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
@@ -45,11 +45,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
     }
 
     [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToReasonPage()
+    public async Task Get_MissingDataInJourneyState_RedirectsToTypePage()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForIncompleteStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -58,7 +58,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/reason?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(GetStepUrl(PreviousStep, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
     }
 
     [Theory]
@@ -68,7 +68,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId, populateOptional: populateOptional);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -128,7 +128,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId, populateOptional: populateOptional);
 
         EventObserver.Clear();
 
@@ -182,9 +182,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional: true);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers?handler=cancel&personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -209,7 +209,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
             await dbContext.SaveChangesAsync();
         });
 
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional: true);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(httpMethod, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

@@ -15,9 +15,14 @@ public record JourneyStep(string StepId, string StepUrl)
 }
 
 [JsonConverter(typeof(JourneyStepsJsonConverter))]
-public class JourneySteps(IReadOnlyCollection<JourneyStep> steps)
+public class JourneySteps(IEnumerable<JourneyStep> steps)
 {
     private readonly List<JourneyStep> _steps = steps.ToList();
+
+    public JourneySteps(params IEnumerable<string> stepUrls)
+        : this(stepUrls.Select(url => new JourneyStep(url)))
+    {
+    }
 
     public string LastStepUrl => _steps.Last().StepUrl;
 

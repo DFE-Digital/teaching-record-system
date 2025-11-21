@@ -1,16 +1,15 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
-
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-public class AddAlertState : IRegisterJourney
+public class AddAlertState : IRegisterJourney, IJourneyWithSteps
 {
     public static JourneyDescriptor Journey => new(
         JourneyNames.AddAlert,
         typeof(AddAlertState),
         requestDataKeys: ["personId"],
         appendUniqueKey: true);
+
+    public required JourneySteps Steps { get; init; }
 
     public Guid? AlertTypeId { get; set; }
 
@@ -32,14 +31,14 @@ public class AddAlertState : IRegisterJourney
 
     public EvidenceUploadModel Evidence { get; set; } = new();
 
-    [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(AlertTypeId), nameof(Details), nameof(StartDate))]
-    public bool IsComplete =>
-        AlertTypeId.HasValue &&
-        AddLink.HasValue &&
-        StartDate.HasValue &&
-        AddReason.HasValue &&
-        HasAdditionalReasonDetail is bool hasDetail &&
-        (!hasDetail || AddReasonDetail is not null) &&
-        Evidence.IsComplete;
+}
+public class AddAlertStateJourneyStateFactory(SupportUiLinkGenerator linkGenerator) : IJourneyStateFactory<AddAlertState>
+{
+    public Task<AddAlertState> CreateAsync(CreateJourneyStateContext context)
+    {
+        var personId = context.HttpContext.GetCurrentPersonFeature().PersonId;
+        var firstStep = new JourneyStep(linkGenerator.Alerts.AddAlert.Index(personId, context.InstanceId));
+        var state = new AddAlertState { Steps = JourneySteps.Create(firstStep) };
+        return Task.FromResult(state);
+    }
 }
