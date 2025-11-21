@@ -13,6 +13,7 @@
         <form action="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <h2 class="govuk-visually-hidden">Details</h2>
             <partial name="_RouteDetail" model="@Model.RouteDetail" />
             <h2 class="govuk-heading-l">Why are you adding this route?</h2>
             <govuk-summary-list>
