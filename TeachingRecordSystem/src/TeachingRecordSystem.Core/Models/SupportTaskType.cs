@@ -24,7 +24,10 @@ public enum SupportTaskType
     TrnRequestManualChecksNeeded = 6,
 
     [SupportTaskTypeDescription("teacher pensions potential duplicate", SupportTaskCategory.TeacherPensions, typeof(TeacherPensionsPotentialDuplicateData))]
-    TeacherPensionsPotentialDuplicate = 7
+    TeacherPensionsPotentialDuplicate = 7,
+
+    [SupportTaskTypeDescription("GOV.UK One Login - identity verification", SupportTaskCategory.OneLogin, typeof(OneLoginUserIdVerificationData))]
+    OneLoginUserIdVerification = 8
 }
 
 public static class SupportTaskTypeRegistry
