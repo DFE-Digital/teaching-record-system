@@ -19,22 +19,15 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
     public Task<JourneyInstance> CreateInstanceAsync(
         JourneyInstanceId instanceId,
         Type stateType,
-        object state,
-        IReadOnlyDictionary<object, object>? properties)
+        object state)
     {
         _instances.TryAdd(instanceId, new Entry()
         {
             StateType = stateType,
-            State = CloneState(state, stateType),
-            Properties = properties
+            State = CloneState(state, stateType)
         });
 
-        var instance = JourneyInstance.Create(
-            this,
-            instanceId,
-            stateType,
-            state,
-            properties ?? PropertiesBuilder.CreateEmpty());
+        var instance = JourneyInstance.Create(this, instanceId, stateType, state);
 
         return Task.FromResult(instance);
     }
@@ -56,7 +49,7 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
         _instances.TryGetValue(instanceId, out var entry);
 
         var instance = entry != null ?
-            JourneyInstance.Create(this, instanceId, entry.StateType!, CloneState(entry.State!, entry.StateType!), entry.Properties!, entry.Completed) :
+            JourneyInstance.Create(this, instanceId, entry.StateType!, CloneState(entry.State!, entry.StateType!), entry.Completed) :
             null;
 
         return Task.FromResult(instance);

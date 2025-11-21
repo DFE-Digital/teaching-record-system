@@ -20,8 +20,7 @@ public class JourneyInstanceTests
             stateProvider.Object,
             instanceId,
             stateType,
-            new MyState(),
-            properties: new Dictionary<object, object>());
+            new MyState());
 
         var newState = new MyState();
 
@@ -46,8 +45,7 @@ public class JourneyInstanceTests
             stateProvider.Object,
             instanceId,
             stateType,
-            new MyState(),
-            properties: new Dictionary<object, object>());
+            new MyState());
 
         var newState = new MyState();
 
@@ -72,8 +70,7 @@ public class JourneyInstanceTests
             stateProvider.Object,
             instanceId,
             stateType,
-            new MyState(),
-            properties: new Dictionary<object, object>());
+            new MyState());
 
         var newState = new MyState();
 
@@ -100,8 +97,7 @@ public class JourneyInstanceTests
             stateProvider.Object,
             instanceId,
             stateType,
-            new MyState(),
-            properties: new Dictionary<object, object>());
+            new MyState());
 
         var newState = new MyState();
 

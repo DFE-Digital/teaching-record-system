@@ -40,10 +40,6 @@ public abstract class MvcTestBase
 
         var instanceStateProvider = Fixture.Services.GetRequiredService<IUserInstanceStateProvider>();
 
-        return (JourneyInstance<TState>)await instanceStateProvider.CreateInstanceAsync(
-            instanceId,
-            typeof(TState),
-            state,
-            properties);
+        return (JourneyInstance<TState>)await instanceStateProvider.CreateInstanceAsync(instanceId, typeof(TState), state);
     }
 }

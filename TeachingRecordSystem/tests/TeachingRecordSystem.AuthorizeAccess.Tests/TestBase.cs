@@ -54,7 +54,7 @@ public abstract class TestBase
 
         var stateType = typeof(SignInJourneyState);
 
-        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state, properties: null);
+        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state);
         return (JourneyInstance<SignInJourneyState>)instance;
     }
 

@@ -38,7 +38,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => instanceProvider.CreateInstanceAsync(actionContext, (object)state));
+        var ex = await Record.ExceptionAsync(() => instanceProvider.CreateInstanceAsync(actionContext, id => state));
 
         // Act & Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -71,7 +71,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => instanceProvider.CreateInstanceAsync(actionContext, (object)state));
+        var ex = await Record.ExceptionAsync(() => instanceProvider.CreateInstanceAsync(actionContext, _ => state));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -109,8 +109,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties: PropertiesBuilder.CreateEmpty()));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.GetRouteData().Values.AddRange(routeValues);
@@ -128,7 +127,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => instanceProvider.CreateInstanceAsync(actionContext, state));
+        var ex = await Record.ExceptionAsync(() => instanceProvider.CreateInstanceAsync(actionContext, _ => state));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -144,26 +143,18 @@ public class JourneyInstanceProviderTests
         var stateType = typeof(TestState);
         object state = new TestState();
 
-        var properties = new PropertiesBuilder()
-            .Add("foo", 1)
-            .Add("bar", 2)
-            .Build();
-
         var stateProvider = new Mock<IUserInstanceStateProvider>();
         stateProvider
             .Setup(mock => mock.CreateInstanceAsync(
                 It.IsAny<JourneyInstanceId>(),  // FIXME
                 stateType,
-                state,
-                It.Is<IReadOnlyDictionary<object, object>>(d =>
-                    d.Count == 2 && (int)d["foo"] == 1 && (int)d["bar"] == 2)))
+                state))
             .ReturnsAsync(
                 JourneyInstance.Create(
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties))
+                    state))
             .Verifiable();
 
         var httpContext = new DefaultHttpContext();
@@ -180,7 +171,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var result = await instanceProvider.CreateInstanceAsync(actionContext, state, properties);
+        var result = await instanceProvider.CreateInstanceAsync(actionContext, _ => state);
 
         // Assert
         stateProvider.Verify();
@@ -191,9 +182,6 @@ public class JourneyInstanceProviderTests
         Assert.Same(state, result.State);
         Assert.False(result.Completed);
         Assert.False(result.Deleted);
-        Assert.Equal(2, result.Properties.Count);
-        Assert.Equal(1, result.Properties["foo"]);
-        Assert.Equal(2, result.Properties["bar"]);
     }
 
     [Fact]
@@ -222,7 +210,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => instanceProvider.CreateInstanceAsync(actionContext, state));
+        var ex = await Record.ExceptionAsync(() => instanceProvider.CreateInstanceAsync(actionContext, _ => state));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -266,11 +254,6 @@ public class JourneyInstanceProviderTests
         var stateType = typeof(TestState);
         object state = new TestState();
 
-        var properties = new PropertiesBuilder()
-            .Add("foo", 1)
-            .Add("bar", 2)
-            .Build();
-
         var stateProvider = new Mock<IUserInstanceStateProvider>();
         stateProvider
             .Setup(mock => mock.GetInstanceAsync(instanceId, stateType))
@@ -304,11 +287,6 @@ public class JourneyInstanceProviderTests
         var stateType = typeof(TestState);
         object state = new TestState();
 
-        var properties = new PropertiesBuilder()
-            .Add("foo", 1)
-            .Add("bar", 2)
-            .Build();
-
         var stateProvider = new Mock<IUserInstanceStateProvider>();
         stateProvider
             .Setup(mock => mock.GetInstanceAsync(instanceId, stateType))
@@ -317,8 +295,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
@@ -344,9 +321,6 @@ public class JourneyInstanceProviderTests
         Assert.Same(state, result.State);
         Assert.False(result.Completed);
         Assert.False(result.Deleted);
-        Assert.Equal(2, result.Properties.Count);
-        Assert.Equal(1, result.Properties["foo"]);
-        Assert.Equal(2, result.Properties["bar"]);
     }
 
     [Fact]
@@ -358,11 +332,6 @@ public class JourneyInstanceProviderTests
         var stateType = typeof(TestState);
         object state = new TestState();
 
-        var properties = new PropertiesBuilder()
-            .Add("foo", 1)
-            .Add("bar", 2)
-            .Build();
-
         var stateProvider = new Mock<IUserInstanceStateProvider>();
         stateProvider
             .Setup(mock => mock.GetInstanceAsync(instanceId, stateType))
@@ -371,8 +340,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
@@ -410,7 +378,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => instanceProvider.GetOrCreateInstanceAsync(actionContext, () => new TestState()));
+        var ex = await Record.ExceptionAsync(() => instanceProvider.GetOrCreateInstanceAsync(actionContext, _ => new TestState()));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -426,29 +394,21 @@ public class JourneyInstanceProviderTests
         var stateType = typeof(TestState);
         object state = new TestState();
 
-        var properties = new PropertiesBuilder()
-            .Add("foo", 1)
-            .Add("bar", 2)
-            .Build();
-
         var stateProvider = new Mock<IUserInstanceStateProvider>();
         stateProvider
             .Setup(mock => mock.GetInstanceAsync(instanceId, stateType))
             .ReturnsAsync((JourneyInstance?)null);
         stateProvider
             .Setup(mock => mock.CreateInstanceAsync(
-                It.IsAny<JourneyInstanceId>(),  // FIXME
+                It.IsAny<JourneyInstanceId>(),
                 stateType,
-                 It.IsAny<object>(),
-                It.Is<IReadOnlyDictionary<object, object>>(d =>
-                    d.Count == 2 && (int)d["foo"] == 1 && (int)d["bar"] == 2)))
+                It.IsAny<object>()))
             .ReturnsAsync(
                 JourneyInstance.Create(
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties))
+                    state))
             .Verifiable();
 
         var httpContext = new DefaultHttpContext();
@@ -465,7 +425,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var result = await instanceProvider.GetOrCreateInstanceAsync(actionContext, () => new TestState(), properties);
+        var result = await instanceProvider.GetOrCreateInstanceAsync(actionContext, _ => new TestState());
 
         // Assert
         stateProvider.Verify();
@@ -476,9 +436,6 @@ public class JourneyInstanceProviderTests
         Assert.Same(state, result.State);
         Assert.False(result.Completed);
         Assert.False(result.Deleted);
-        Assert.Equal(2, result.Properties.Count);
-        Assert.Equal(1, result.Properties["foo"]);
-        Assert.Equal(2, result.Properties["bar"]);
     }
 
     [Fact]
@@ -509,7 +466,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => instanceProvider.GetOrCreateInstanceAsync(actionContext, () => (object)new OtherTestState()));
+        var ex = await Record.ExceptionAsync(() => instanceProvider.GetOrCreateInstanceAsync(actionContext, _ => (object)new OtherTestState()));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -525,11 +482,6 @@ public class JourneyInstanceProviderTests
         var stateType = typeof(TestState);
         object originalState = new TestState();
 
-        var properties = new PropertiesBuilder()
-            .Add("foo", 1)
-            .Add("bar", 2)
-            .Build();
-
         var stateProvider = new Mock<IUserInstanceStateProvider>();
         stateProvider
             .Setup(mock => mock.GetInstanceAsync(instanceId, stateType))
@@ -538,8 +490,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    originalState,
-                    properties));
+                    originalState));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
@@ -559,12 +510,11 @@ public class JourneyInstanceProviderTests
         // Act
         var result = await instanceProvider.GetOrCreateInstanceAsync(
             actionContext,
-            () =>
+            _ =>
             {
                 executedStateFactory = true;
                 return new TestState();
-            },
-            properties);
+            });
 
         // Assert
         Assert.False(executedStateFactory);
@@ -575,9 +525,6 @@ public class JourneyInstanceProviderTests
         Assert.Same(originalState, result.State);
         Assert.False(result.Completed);
         Assert.False(result.Deleted);
-        Assert.Equal(2, result.Properties.Count);
-        Assert.Equal(1, result.Properties["foo"]);
-        Assert.Equal(2, result.Properties["bar"]);
     }
 
     [Fact]
@@ -609,7 +556,7 @@ public class JourneyInstanceProviderTests
 
         // Act
         var ex = await Record.ExceptionAsync(
-            () => instanceProvider.GetOrCreateInstanceAsync(actionContext, () => new OtherTestState()));
+            () => instanceProvider.GetOrCreateInstanceAsync(actionContext, _ => new OtherTestState()));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -625,11 +572,6 @@ public class JourneyInstanceProviderTests
         var stateType = typeof(TestState);
         object state = new TestState();
 
-        var properties = new PropertiesBuilder()
-            .Add("foo", 1)
-            .Add("bar", 2)
-            .Build();
-
         var stateProvider = new Mock<IUserInstanceStateProvider>();
         stateProvider
             .Setup(mock => mock.GetInstanceAsync(instanceId, stateType))
@@ -638,8 +580,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
@@ -655,7 +596,7 @@ public class JourneyInstanceProviderTests
         var instanceProvider = new JourneyInstanceProvider(stateProvider.Object, _options);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => instanceProvider.GetOrCreateInstanceAsync(actionContext, () => new OtherTestState()));
+        var ex = await Record.ExceptionAsync(() => instanceProvider.GetOrCreateInstanceAsync(actionContext, _ => new OtherTestState()));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -816,8 +757,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties: PropertiesBuilder.CreateEmpty()));
+                    state));
 
         var httpContext = new DefaultHttpContext();
 
@@ -922,8 +862,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties: PropertiesBuilder.CreateEmpty()));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
@@ -966,8 +905,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties: PropertiesBuilder.CreateEmpty()));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
@@ -1006,8 +944,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties: PropertiesBuilder.CreateEmpty()));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
@@ -1063,8 +1000,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties: PropertiesBuilder.CreateEmpty()));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Path = "/foo/42/69";
@@ -1112,8 +1048,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties: PropertiesBuilder.CreateEmpty());
+                    state);
                 instance.Deleted = true;
                 return instance;
             });
@@ -1155,8 +1090,7 @@ public class JourneyInstanceProviderTests
                     stateProvider.Object,
                     instanceId,
                     stateType,
-                    state,
-                    properties: PropertiesBuilder.CreateEmpty()));
+                    state));
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");

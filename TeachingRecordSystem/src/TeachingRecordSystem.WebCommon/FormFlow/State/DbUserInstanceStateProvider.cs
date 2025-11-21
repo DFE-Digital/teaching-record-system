@@ -29,18 +29,9 @@ public class DbUserInstanceStateProvider(
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<JourneyInstance> CreateInstanceAsync(
-        JourneyInstanceId instanceId,
-        Type stateType,
-        object state,
-        IReadOnlyDictionary<object, object>? properties)
+    public async Task<JourneyInstance> CreateInstanceAsync(JourneyInstanceId instanceId, Type stateType, object state)
     {
         var userId = currentUserIdProvider.GetCurrentUserId();
-
-        if (properties is { Count: > 0 })
-        {
-            throw new NotSupportedException("Specifying properties is not supported.");
-        }
 
         var serializedState = SerializeState(stateType, state);
         var instance = new JourneyState()
@@ -54,7 +45,7 @@ public class DbUserInstanceStateProvider(
         dbContext.JourneyStates.Add(instance);
         await dbContext.SaveChangesAsync();
 
-        return JourneyInstance.Create(this, instanceId, stateType, state, PropertiesBuilder.CreateEmpty(), completed: false);
+        return JourneyInstance.Create(this, instanceId, stateType, state, completed: false);
     }
 
     public async Task DeleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
@@ -81,7 +72,7 @@ public class DbUserInstanceStateProvider(
 
         var state = DeserializeState(stateType, instance.State);
 
-        return JourneyInstance.Create(this, instanceId, stateType, state, PropertiesBuilder.CreateEmpty(), completed: instance.Completed.HasValue);
+        return JourneyInstance.Create(this, instanceId, stateType, state, completed: instance.Completed.HasValue);
     }
 
     public async Task UpdateInstanceStateAsync(JourneyInstanceId instanceId, Type stateType, object state)

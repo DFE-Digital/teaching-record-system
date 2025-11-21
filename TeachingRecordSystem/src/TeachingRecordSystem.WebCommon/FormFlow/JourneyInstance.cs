@@ -11,13 +11,12 @@ public class JourneyInstance
         JourneyInstanceId instanceId,
         Type stateType,
         object state,
-        IReadOnlyDictionary<object, object> properties,
         bool completed = false)
     {
         _stateProvider = stateProvider;
         StateType = stateType;
         InstanceId = instanceId;
-        Properties = properties;
+        Properties = new Dictionary<object, object>();
         State = state;
         Completed = completed;
     }
@@ -30,7 +29,7 @@ public class JourneyInstance
 
     public JourneyInstanceId InstanceId { get; }
 
-    public IReadOnlyDictionary<object, object> Properties { get; }
+    public IDictionary<object, object> Properties { get; }
 
     public object State { get; private set; }
 
@@ -41,7 +40,6 @@ public class JourneyInstance
         JourneyInstanceId instanceId,
         Type stateType,
         object state,
-        IReadOnlyDictionary<object, object> properties,
         bool completed = false)
     {
         var genericType = typeof(JourneyInstance<>).MakeGenericType(stateType);
@@ -51,7 +49,6 @@ public class JourneyInstance
             stateProvider,
             instanceId,
             state,
-            properties,
             completed)!;
     }
 
@@ -118,9 +115,8 @@ public sealed class JourneyInstance<TState> : JourneyInstance
         IUserInstanceStateProvider stateProvider,
         JourneyInstanceId instanceId,
         TState state,
-        IReadOnlyDictionary<object, object> properties,
         bool completed = false)
-        : base(stateProvider, instanceId, typeof(TState), state!, properties, completed)
+        : base(stateProvider, instanceId, typeof(TState), state!, completed)
     {
     }
 

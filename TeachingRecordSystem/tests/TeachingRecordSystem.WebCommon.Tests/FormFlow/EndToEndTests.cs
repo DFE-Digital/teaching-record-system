@@ -16,18 +16,16 @@ public class EndToEndTests : MvcTestBase
     }
 
     [Fact]
-    public async Task ReadState_ReturnsStateAndProperties()
+    public async Task ReadState_ReturnsState()
     {
         // Arrange
         var instance = await StateProvider.CreateInstanceAsync(
             instanceId: GenerateInstanceId(out var id, out var subid),
             stateType: typeof(E2ETestsState),
-            state: E2ETestsState.CreateInitialState(),
-            properties: new PropertiesBuilder().Add("bar", 42).Build());
+            state: E2ETestsState.CreateInitialState());
 
         // Act & Assert
         var responseJson = await ReadStateAndAssertAsync(instance.InstanceId, expectedValue: "initial");
-        Assert.Equal("42", responseJson["properties"]?["bar"]?.ToString());
     }
 
     [Fact]
@@ -37,8 +35,7 @@ public class EndToEndTests : MvcTestBase
         var instance = await StateProvider.CreateInstanceAsync(
             instanceId: GenerateInstanceId(out var id, out var subid),
             stateType: typeof(E2ETestsState),
-            state: E2ETestsState.CreateInitialState(),
-            properties: new PropertiesBuilder().Add("bar", 42).Add("baz", "ah").Build());
+            state: E2ETestsState.CreateInitialState());
 
         // Act & Assert
         await UpdateStateAsync(instance.InstanceId, newValue: "updated");
@@ -51,8 +48,7 @@ public class EndToEndTests : MvcTestBase
         var instance = await StateProvider.CreateInstanceAsync(
             instanceId: GenerateInstanceId(out var id, out var subid),
             stateType: typeof(E2ETestsState),
-            state: E2ETestsState.CreateInitialState(),
-            properties: new PropertiesBuilder().Add("bar", 42).Build());
+            state: E2ETestsState.CreateInitialState());
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -76,8 +72,7 @@ public class EndToEndTests : MvcTestBase
         var instance = await StateProvider.CreateInstanceAsync(
             instanceId: GenerateInstanceId(out var id, out var subid),
             stateType: typeof(E2ETestsState),
-            state: E2ETestsState.CreateInitialState(),
-            properties: new PropertiesBuilder().Add("bar", 42).Build());
+            state: E2ETestsState.CreateInitialState());
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -101,8 +96,7 @@ public class EndToEndTests : MvcTestBase
         var instance = await StateProvider.CreateInstanceAsync(
             instanceId: GenerateInstanceId(out var id, out var subid),
             stateType: typeof(E2ETestsState),
-            state: E2ETestsState.CreateInitialState(),
-            properties: new PropertiesBuilder().Add("bar", 42).Build());
+            state: E2ETestsState.CreateInitialState());
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -191,8 +185,7 @@ public class E2ETestsController : Controller
     {
         return Json(new
         {
-            Properties = _journeyInstance!.Properties,
-            State = _journeyInstance.State
+            State = _journeyInstance!.State
         });
     }
 
@@ -225,8 +218,7 @@ public class E2ETestsController : Controller
     {
         _journeyInstance = await _journeyInstanceProvider.GetOrCreateInstanceAsync(
             context,
-            E2ETestsState.CreateInitialState,
-            properties: new PropertiesBuilder().Add("bar", 42).Add("baz", "wwww").Build());
+            _ => E2ETestsState.CreateInitialState());
 
         if (!_journeyInstanceProvider.IsCurrentInstance(context, _journeyInstance))
         {

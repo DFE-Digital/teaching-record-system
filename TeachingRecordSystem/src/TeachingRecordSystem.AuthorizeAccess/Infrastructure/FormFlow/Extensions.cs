@@ -52,7 +52,7 @@ public static class Extensions
         var instanceId = JourneyInstanceId.Create(SignInJourneyState.JourneyDescriptor, valueProvider);
 
         var newState = createState();
-        var instance = (JourneyInstance<SignInJourneyState>)await userInstanceStateProvider.CreateInstanceAsync(instanceId, typeof(SignInJourneyState), newState, properties: null);
+        var instance = (JourneyInstance<SignInJourneyState>)await userInstanceStateProvider.CreateInstanceAsync(instanceId, typeof(SignInJourneyState), newState);
 
         httpContext.Items[typeof(JourneyInstance)] = instance;
 

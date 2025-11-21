@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddOptions<State.JsonOptions>();
         services.AddTransient<MissingInstanceFilter>();
         services.AddTransient<ActivateInstanceFilter>();
+        services.AddTransient<CheckJourneyStepsFilter>();
 
         var conventions = new FormFlowConventions();
 
@@ -34,6 +35,7 @@ public static class ServiceCollectionExtensions
 
             options.Filters.Add(new ServiceFilterAttribute(typeof(MissingInstanceFilter)) { Order = MissingInstanceFilter.Order });
             options.Filters.Add(new ServiceFilterAttribute(typeof(ActivateInstanceFilter)) { Order = ActivateInstanceFilter.Order });
+            options.Filters.Add(new ServiceFilterAttribute(typeof(CheckJourneyStepsFilter)) { Order = CheckJourneyStepsFilter.Order });
 
             options.ModelBinderProviders.Insert(0, new JourneyInstanceModelBinderProvider());
         });

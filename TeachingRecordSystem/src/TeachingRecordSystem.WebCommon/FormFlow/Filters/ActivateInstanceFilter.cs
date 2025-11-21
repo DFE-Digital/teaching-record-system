@@ -9,7 +9,7 @@ internal class ActivateInstanceFilter(JourneyInstanceProvider journeyInstancePro
 {
     public const int Order = -100;  // Must run before MissingInstanceFilter
 
-    int IOrderedFilter.Order => -100;
+    int IOrderedFilter.Order => Order;
 
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -29,8 +29,7 @@ internal class ActivateInstanceFilter(JourneyInstanceProvider journeyInstancePro
         }
 
         var journeyDescriptor = journeyInstanceProvider.ResolveJourneyDescriptor(context, throwIfNotFound: true)!;
-        var state = await CreateStateAsync();
-        var newInstance = await journeyInstanceProvider.CreateInstanceAsync(context, state);
+        var newInstance = await journeyInstanceProvider.CreateInstanceAsync(context, async id => await CreateStateAsync(id));
 
         if (journeyDescriptor.AppendUniqueKey)
         {
@@ -45,7 +44,7 @@ internal class ActivateInstanceFilter(JourneyInstanceProvider journeyInstancePro
 
         await next();
 
-        async Task<object> CreateStateAsync()
+        async Task<object> CreateStateAsync(JourneyInstanceId instanceId)
         {
             var journeyStateFactoryType = typeof(IJourneyStateFactory<>).MakeGenericType(journeyDescriptor.StateType);
             if (context.HttpContext.RequestServices.GetService(journeyStateFactoryType) is { } journeyStateFactory)
@@ -54,7 +53,7 @@ internal class ActivateInstanceFilter(JourneyInstanceProvider journeyInstancePro
                     typeof(FactoryWrapper<>).MakeGenericType(journeyDescriptor.StateType),
                     journeyStateFactory)!;
 
-                var createStateContext = new CreateJourneyStateContext(journeyDescriptor, context.HttpContext);
+                var createStateContext = new CreateJourneyStateContext(journeyDescriptor, instanceId, context.HttpContext);
                 return await wrapperInstance.CreateAsync(createStateContext);
             }
 
