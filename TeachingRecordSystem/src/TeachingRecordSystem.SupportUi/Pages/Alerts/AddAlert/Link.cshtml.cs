@@ -14,9 +14,6 @@ public class LinkModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManag
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -44,15 +41,15 @@ public class LinkModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManag
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.AddLink = AddLink;
-            state.Link = AddLink == true ? Link : null;
-        });
+        var nextStep = linkGenerator.Alerts.AddAlert.StartDate(PersonId, JourneyInstance!.InstanceId);
 
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.AddAlert.StartDate(PersonId, JourneyInstance.InstanceId));
+        return await JourneyInstance.UpdateStateAndRedirectToNextStepAsync(
+            state =>
+            {
+                state.AddLink = AddLink;
+                state.Link = AddLink == true ? Link : null;
+            },
+            nextStep);
     }
 
     public async Task<IActionResult> OnPostCancelAsync()

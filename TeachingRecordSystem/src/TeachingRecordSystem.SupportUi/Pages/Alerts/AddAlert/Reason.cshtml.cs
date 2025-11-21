@@ -14,9 +14,6 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -69,15 +66,17 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.AddReason = AddReason;
-            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.AddReasonDetail = AddReasonDetail;
-            state.Evidence = Evidence;
-        });
+        var nextStep = linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance!.InstanceId);
 
-        return Redirect(linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId));
+        return await JourneyInstance!.UpdateStateAndRedirectToNextStepAsync(
+            state =>
+            {
+                state.AddReason = AddReason;
+                state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
+                state.AddReasonDetail = AddReasonDetail;
+                state.Evidence = Evidence;
+            },
+            nextStep);
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
