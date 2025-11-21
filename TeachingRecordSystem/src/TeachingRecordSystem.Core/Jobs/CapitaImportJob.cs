@@ -130,18 +130,6 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                     {
                         //create person if incoming record is not known in trs
                         var (newPerson, personAttributes) = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddleName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow, createdByTps: true);
-                        var createdEvent = new LegacyEvents.PersonCreatedEvent
-                        {
-                            EventId = Guid.NewGuid(),
-                            CreatedUtc = now,
-                            RaisedBy = capitaUser.Value.CapitaTpsUserId,
-                            PersonId = newPerson.PersonId,
-                            PersonAttributes = personAttributes,
-                            CreateReason = null,
-                            CreateReasonDetail = null,
-                            EvidenceFile = null,
-                            TrnRequestMetadata = null
-                        };
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
@@ -153,33 +141,46 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                             }
                         }
                         dbContext.Persons.Add(newPerson);
-                        await dbContext.AddEventAndBroadcastAsync(createdEvent);
                         personId = newPerson.PersonId;
 
-                        //create task
-                        if (potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || potentialMatches.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
-                        {
-                            var trnRequestMetadata = new TrnRequestMetadata()
-                            {
-                                ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
-                                RequestId = Guid.NewGuid().ToString(),
-                                CreatedOn = now,
-                                IdentityVerified = null,
-                                OneLoginUserSubject = null,
-                                Name = new[] { newPerson.FirstName, newPerson.MiddleName, newPerson.LastName }.GetNonEmptyValues(),
-                                FirstName = newPerson.FirstName,
-                                MiddleName = newPerson.MiddleName,
-                                LastName = newPerson.LastName,
-                                DateOfBirth = newPerson.DateOfBirth!.Value!,
-                                EmailAddress = null,
-                                NationalInsuranceNumber = newPerson.NationalInsuranceNumber,
-                                Gender = newPerson.Gender,
-                                PotentialDuplicate = true,
-                                Matches = new TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] }
-                            };
-                            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
-                            potentialDuplicate = true;
+                        potentialDuplicate = (potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || potentialMatches.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch);
+                        var trnRequestMetadata = new TrnRequestMetadata()
+                        {
+                            ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
+                            RequestId = Guid.NewGuid().ToString(),
+                            CreatedOn = now,
+                            IdentityVerified = null,
+                            OneLoginUserSubject = null,
+                            Name = new[] { newPerson.FirstName, newPerson.MiddleName, newPerson.LastName }.GetNonEmptyValues(),
+                            FirstName = newPerson.FirstName,
+                            MiddleName = newPerson.MiddleName,
+                            LastName = newPerson.LastName,
+                            DateOfBirth = newPerson.DateOfBirth!.Value!,
+                            EmailAddress = null,
+                            NationalInsuranceNumber = newPerson.NationalInsuranceNumber,
+                            Gender = newPerson.Gender,
+                            PotentialDuplicate = potentialDuplicate,
+                            Matches = new TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] }
+                        };
+                        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+                        var createdEvent = new LegacyEvents.PersonCreatedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            CreatedUtc = now,
+                            RaisedBy = capitaUser.Value.CapitaTpsUserId,
+                            PersonId = newPerson.PersonId,
+                            PersonAttributes = personAttributes,
+                            CreateReason = null,
+                            CreateReasonDetail = null,
+                            EvidenceFile = null,
+                            TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata)
+                        };
+                        await dbContext.AddEventAndBroadcastAsync(createdEvent);
+
+                        // create support task if imported record is a potential duplicate
+                        if (potentialDuplicate)
+                        {
                             var supportTask = SupportTask.Create(
                                 SupportTaskType.TeacherPensionsPotentialDuplicate,
                                 new Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
@@ -401,7 +402,8 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
             PreviousLastName = row.PreviousLastName,
             Name = [row.GetFirstName()!, row.GetMiddleName()!, row.LastName!],
             DateOfBirth = row.GetDateOfBirth()!.Value,
-            NationalInsuranceNumber = row.NINumber
+            NationalInsuranceNumber = row.NINumber,
+            Gender = (Gender?)row.Gender
         };
         var matches = await personMatchingService.MatchFromTrnRequestAsync(requestData);
         return matches;
@@ -444,7 +446,7 @@ public class CapitaImportMap : ClassMap<CapitaImportRecord>
         Map(m => m.PreviousLastName).Index(4).Optional();
         Map(m => m.DateOfBirth).Index(5)
             .TypeConverterOption.Format("yyyyMMdd")
-            .TypeConverterOption.NullValues(string.Empty);
+            .TypeConverterOption.NullValues(string.Empty, null);
         Map(m => m.NINumber).Index(6).Optional();
         Map(m => m.DateOfDeath).Index(7).Optional();
     }
