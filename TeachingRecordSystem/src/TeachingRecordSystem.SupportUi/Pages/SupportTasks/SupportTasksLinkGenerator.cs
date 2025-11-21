@@ -10,11 +10,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks;
 
 public class SupportTasksLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index() =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/Index");
-    public string Index(SupportTaskCategory[]? categories = null, IndexModel.SortByOption? sortBy = null, string? reference = null, bool? filtersApplied = null) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/Index", routeValues: new { category = categories, sortBy, reference, _f = filtersApplied == true ? "1" : null });
-
     public ApiTrnRequestsLinkGenerator ApiTrnRequests { get; } = new(linkGenerator);
     public ChangeRequestsLinkGenerator ChangeRequests => new(linkGenerator);
     public ConnectOneLoginUserLinkGenerator ConnectOneLoginUser { get; } = new(linkGenerator);

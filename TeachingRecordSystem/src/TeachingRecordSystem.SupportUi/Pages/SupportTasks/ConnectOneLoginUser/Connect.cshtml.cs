@@ -52,7 +52,8 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
             heading: "Teaching record connected",
             messageText: $"{PersonDetail.Name} will get an email to say they can sign in.");
 
-        return Redirect(linkGenerator.SupportTasks.Index());
+        // TEMP, until we have a list page for these type of support tasks
+        return Redirect(linkGenerator.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
