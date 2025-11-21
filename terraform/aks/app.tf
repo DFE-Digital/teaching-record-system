@@ -66,7 +66,8 @@ module "api_application" {
   kubernetes_secret_name     = module.api_application_configuration.kubernetes_secret_name
 
   docker_image    = var.docker_image
-  command         = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
+  command         = ["dotnet", "TeachingRecordSystem.Api.dll"]
+  working_dir     = "/Apps/Api"
   web_port        = 3000
   probe_path      = "/health"
   replicas        = var.api_replicas
@@ -109,7 +110,8 @@ module "authz_application" {
   kubernetes_secret_name     = module.authz_application_configuration.kubernetes_secret_name
 
   docker_image    = var.docker_image
-  command         = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
+  command         = ["dotnet", "TeachingRecordSystem.AuthorizeAccess.dll"]
+  working_dir     = "/Apps/AuthorizeAccess"
   web_port        = 3000
   probe_path      = "/health"
   replicas        = var.authz_replicas
@@ -152,7 +154,8 @@ module "ui_application" {
   kubernetes_secret_name     = module.ui_application_configuration.kubernetes_secret_name
 
   docker_image                 = var.docker_image
-  command                      = ["/bin/ash", "-c", "cd /Apps/SupportUi/; dotnet TeachingRecordSystem.SupportUi.dll;"]
+  command                      = ["dotnet", "TeachingRecordSystem.SupportUi.dll"]
+  working_dir                  = "/Apps/SupportUi"
   web_port                     = 3000
   probe_path                   = "/health"
   replicas                     = var.ui_replicas
@@ -197,7 +200,8 @@ module "worker_application" {
   kubernetes_secret_name     = module.worker_application_configuration.kubernetes_secret_name
 
   docker_image                 = var.docker_image
-  command                      = ["/bin/ash", "-c", "cd /Apps/Worker/; dotnet TeachingRecordSystem.Worker.dll;"]
+  command                      = ["dotnet", "TeachingRecordSystem.Worker.dll"]
+  working_dir                  = "/Apps/Worker"
   replicas                     = var.worker_replicas
   max_memory                   = var.worker_max_memory
   enable_logit                 = var.enable_logit
