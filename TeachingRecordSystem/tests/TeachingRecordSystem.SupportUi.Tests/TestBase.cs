@@ -51,10 +51,19 @@ public abstract class TestBase
 
     protected TrnRequestOptions TrnRequestOptions => TestScopedServices.GetCurrent().TrnRequestOptions;
 
+    protected Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
+        string journeyName,
+        TState state,
+        params KeyValuePair<string, object>[] keys)
+        where TState : notnull
+    {
+        return CreateJourneyInstance(journeyName, _ => state, keys);
+    }
+
     protected async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
-            string journeyName,
-            TState state,
-            params KeyValuePair<string, object>[] keys)
+        string journeyName,
+        Func<JourneyInstanceId, TState> createState,
+        params KeyValuePair<string, object>[] keys)
         where TState : notnull
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();
@@ -74,8 +83,9 @@ public abstract class TestBase
         var instanceId = new JourneyInstanceId(journeyDescriptor.JourneyName, keysDict);
 
         var stateType = typeof(TState);
+        var state = createState(instanceId);
 
-        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state, properties: null);
+        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state);
         return (JourneyInstance<TState>)instance;
     }
 

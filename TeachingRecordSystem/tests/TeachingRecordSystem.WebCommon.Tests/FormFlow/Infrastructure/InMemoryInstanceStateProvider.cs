@@ -5,34 +5,19 @@ namespace TeachingRecordSystem.WebCommon.Tests.FormFlow.Infrastructure;
 
 public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
 {
-    private readonly Dictionary<string, Entry> _instances;
-
-    public InMemoryInstanceStateProvider()
-    {
-        _instances = new();
-    }
+    private readonly Dictionary<string, Entry> _instances = new();
 
     public void Clear() => _instances.Clear();
 
-    public Task<JourneyInstance> CreateInstanceAsync(
-        JourneyInstanceId instanceId,
-        Type stateType,
-        object state,
-        IReadOnlyDictionary<object, object>? properties)
+    public Task<JourneyInstance> CreateInstanceAsync(JourneyInstanceId instanceId, Type stateType, object state)
     {
         _instances.Add(instanceId, new Entry()
         {
             StateType = stateType,
-            State = state,
-            Properties = properties
+            State = state
         });
 
-        var instance = JourneyInstance.Create(
-            this,
-            instanceId,
-            stateType,
-            state,
-            properties ?? PropertiesBuilder.CreateEmpty());
+        var instance = JourneyInstance.Create(this, instanceId, stateType, state);
 
         return Task.FromResult(instance);
     }
@@ -54,7 +39,7 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
         _instances.TryGetValue(instanceId, out var entry);
 
         var instance = entry != null ?
-            JourneyInstance.Create(this, instanceId, entry.StateType!, entry.State!, entry.Properties!, entry.Completed) :
+            JourneyInstance.Create(this, instanceId, entry.StateType!, entry.State!, entry.Completed) :
             null;
 
         return Task.FromResult(instance);
@@ -68,7 +53,6 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
 
     private class Entry
     {
-        public IReadOnlyDictionary<object, object>? Properties { get; set; }
         public object? State { get; set; }
         public Type? StateType { get; set; }
         public bool Completed { get; set; }

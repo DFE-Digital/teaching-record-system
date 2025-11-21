@@ -8,7 +8,7 @@ internal class MissingInstanceFilter(IOptions<FormFlowOptions> optionsAccessor, 
 {
     public const int Order = 0;  // Must run after ActivateInstanceFilter
 
-    int IOrderedFilter.Order => 0;
+    int IOrderedFilter.Order => Order;
 
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {

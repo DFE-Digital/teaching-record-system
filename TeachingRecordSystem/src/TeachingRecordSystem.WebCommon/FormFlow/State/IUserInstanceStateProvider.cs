@@ -4,11 +4,7 @@ public interface IUserInstanceStateProvider
 {
     Task CompleteInstanceAsync(JourneyInstanceId instanceId, Type stateType);
 
-    Task<JourneyInstance> CreateInstanceAsync(
-        JourneyInstanceId instanceId,
-        Type stateType,
-        object state,
-        IReadOnlyDictionary<object, object>? properties);
+    Task<JourneyInstance> CreateInstanceAsync(JourneyInstanceId instanceId, Type stateType, object state);
 
     Task DeleteInstanceAsync(JourneyInstanceId instanceId, Type stateType);
 

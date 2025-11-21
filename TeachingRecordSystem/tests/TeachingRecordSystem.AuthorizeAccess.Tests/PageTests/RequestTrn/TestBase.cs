@@ -48,7 +48,7 @@ public abstract class TestBase : IDisposable
 
         var stateType = typeof(RequestTrnJourneyState);
 
-        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state, properties: null);
+        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state);
         return (JourneyInstance<RequestTrnJourneyState>)instance;
     }
 
