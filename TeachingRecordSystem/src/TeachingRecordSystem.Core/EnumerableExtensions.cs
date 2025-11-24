@@ -3,28 +3,20 @@ namespace TeachingRecordSystem.Core;
 public static class EnumerableExtensions
 {
     public static IReadOnlyCollection<T> AsReadOnly<T>(this IEnumerable<T> enumerable) =>
-        enumerable is IReadOnlyCollection<T> roc ? roc : enumerable.ToArray();
+        enumerable as IReadOnlyCollection<T> ?? enumerable.ToArray();
 
     public static T First<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) =>
         source.FirstOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);
 
+#pragma warning disable CA1720
     public static T Single<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) =>
+#pragma warning restore CA1720
         source.SingleOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);
 
     public static string ToCommaDelimitedString(
         this IEnumerable<string> values,
         string finalValuesConjunction = "and")
     {
-        if (values is null)
-        {
-            throw new ArgumentNullException(nameof(values));
-        }
-
-        if (finalValuesConjunction is null)
-        {
-            throw new ArgumentNullException(nameof(finalValuesConjunction));
-        }
-
         var valuesArray = values.ToArray();
 
         return valuesArray switch

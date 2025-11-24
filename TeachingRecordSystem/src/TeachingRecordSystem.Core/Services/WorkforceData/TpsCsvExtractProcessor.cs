@@ -17,7 +17,7 @@ public class TpsCsvExtractProcessor(
         using var dbContext = dbContextFactory.CreateDbContext();
         var invalidTrns = await dbContext.TpsCsvExtractItems
             .Where(r => r.TpsCsvExtractId == tpsCsvExtractId && !dbContext.Persons.IgnoreQueryFilters().Any(p => p.Trn == r.Trn))
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
 
         foreach (var item in invalidTrns)
         {
@@ -83,7 +83,7 @@ public class TpsCsvExtractProcessor(
                                 WHERE
                                     x.local_authority_code = e.la_code
                                     AND (e.establishment_number = x.establishment_number
-                                         OR (e.establishment_type_code = '29' 
+                                         OR (e.establishment_type_code = '29'
                                              AND x.establishment_postcode = e.postcode
                                              AND NOT EXISTS (SELECT
                                                                 1
@@ -153,7 +153,7 @@ public class TpsCsvExtractProcessor(
                     JOIN
                         unique_establishments e ON x.local_authority_code = e.la_code
                             AND (x.establishment_number = e.establishment_number
-                                 OR (e.establishment_type_code = '29' 
+                                 OR (e.establishment_type_code = '29'
                                      AND x.establishment_postcode = e.postcode
                                      AND NOT EXISTS (SELECT
                                                          1
@@ -191,7 +191,7 @@ public class TpsCsvExtractProcessor(
                     u.last_known_tps_employed_date,
                     u.employment_type,
                     u.withdrawal_confirmed,
-                    u.last_extract_date,                    
+                    u.last_extract_date,
                     u.key,
                     u.national_insurance_number,
                     u.person_postcode,
@@ -209,7 +209,7 @@ public class TpsCsvExtractProcessor(
                     last_known_tps_employed_date,
                     employment_type,
                     withdrawal_confirmed,
-                    last_extract_date,                 
+                    last_extract_date,
                     key,
                     national_insurance_number,
                     person_postcode,
@@ -349,7 +349,7 @@ public class TpsCsvExtractProcessor(
                 WHERE
                     x.tps_csv_extract_item_id = u.tps_csv_extract_item_id
                 RETURNING
-                    u.tps_employment_id,                    
+                    u.tps_employment_id,
                     u.current_end_date,
                     u.current_last_known_tps_employed_date,
                     u.current_employment_type,
@@ -396,7 +396,7 @@ public class TpsCsvExtractProcessor(
                 te.start_date,
                 changes.current_end_date,
                 changes.current_last_known_tps_employed_date,
-                changes.current_employment_type,            
+                changes.current_employment_type,
                 changes.current_withdrawal_confirmed,
                 changes.current_last_extract_date,
                 changes.current_national_insurance_number,
@@ -555,17 +555,17 @@ public class TpsCsvExtractProcessor(
             SET
                 establishment_id = changes.new_establishment_id,
                 updated_on = {clock.UtcNow}
-            FROM                
+            FROM
                 (SELECT
                     ec.tps_employment_id,
                     ec.current_establishment_id,
-                    ue.establishment_id as new_establishment_id				 
+                    ue.establishment_id as new_establishment_id
                 FROM
-                        establishment_changes ec                
+                        establishment_changes ec
                     JOIN
                         unique_establishments ue ON ue.la_code = ec.la_code
                             AND (ue.establishment_number = ec.establishment_number
-                                OR (ec.establishment_type_code = '29' 
+                                OR (ec.establishment_type_code = '29'
                                     AND ue.postcode = ec.postcode
                                     AND NOT EXISTS (SELECT
                                                         1
@@ -592,7 +592,7 @@ public class TpsCsvExtractProcessor(
                 te.employer_postcode,
                 te.employer_email_address,
                 te.key,
-                changes.new_establishment_id            
+                changes.new_establishment_id
             """;
 
         bool hasRecordsToUpdate = false;
@@ -687,7 +687,7 @@ public class TpsCsvExtractProcessor(
                 end_date = new_end_date,
                 updated_on = {clock.UtcNow}
             FROM
-                changes 
+                changes
             WHERE
                 te.tps_employment_id = changes.tps_employment_id
             RETURNING

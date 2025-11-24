@@ -1,6 +1,5 @@
 #nullable disable
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V1.Responses;
 
@@ -20,4 +19,11 @@ public class Induction
 
     [JsonPropertyName("state_name")]
     public string StateName { get; set; }
+}
+
+#pragma warning disable CA1707
+public enum dfeta_inductionState
+#pragma warning restore CA1707
+{
+    Active = 0
 }

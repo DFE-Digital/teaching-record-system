@@ -25,7 +25,7 @@ public class BackfillDqtReportingAlertTypesJob(IOptions<DqtReportingOptions> dqt
             dataTable.Columns.Add("__Inserted", typeof(DateTime));
             dataTable.Columns.Add("__Updated", typeof(DateTime));
 
-            var alertCategories = await dbContext.AlertCategories.ToListAsync();
+            var alertCategories = await dbContext.AlertCategories.ToListAsync(cancellationToken: cancellationToken);
 
             foreach (var ac in alertCategories)
             {
@@ -64,7 +64,7 @@ public class BackfillDqtReportingAlertTypesJob(IOptions<DqtReportingOptions> dqt
             dataTable.Columns.Add("__Inserted", typeof(DateTime));
             dataTable.Columns.Add("__Updated", typeof(DateTime));
 
-            var alertTypes = await dbContext.AlertTypes.ToListAsync();
+            var alertTypes = await dbContext.AlertTypes.ToListAsync(cancellationToken: cancellationToken);
 
             foreach (var at in alertTypes)
             {

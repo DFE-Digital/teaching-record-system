@@ -7,7 +7,7 @@ public static class StringExtensions
     public static string ToLowerInvariantFirstLetter(this string text)
     {
         return text.Length > 1
-            ? text.Substring(0, 1).ToLowerInvariant() + text.Substring(1)
+            ? text.Substring(0, 1).ToLowerInvariant() + text[1..]
             : text.ToLowerInvariant();
     }
 

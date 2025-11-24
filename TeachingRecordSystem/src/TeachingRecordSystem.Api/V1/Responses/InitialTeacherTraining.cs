@@ -1,6 +1,5 @@
 #nullable disable
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V1.Responses;
 
@@ -44,4 +43,11 @@ public class InitialTeacherTraining
 
     [JsonPropertyName("subject3_code")]
     public string Subject3Code { get; set; }
+}
+
+#pragma warning disable CA1707
+public enum dfeta_initialteachertrainingState
+#pragma warning restore CA1707
+{
+    Active = 0
 }

@@ -296,8 +296,6 @@
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
-    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" />
-    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" />
     <PackageReference Include="morelinq" />
     <PackageReference Include="Npgsql.DependencyInjection" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />

@@ -18,7 +18,7 @@ public class BatchSendInductionCompletedEmailsJob(
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        var lastPassedEndUtc = await dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.PassedEndUtc) ??
+        var lastPassedEndUtc = await dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.PassedEndUtc, cancellationToken: cancellationToken) ??
             jobOptionsAccessor.Value.InitialLastPassedEndUtc;
 
         // Look for new induction awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.

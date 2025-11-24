@@ -1,20 +1,19 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.Core.Models
+namespace TeachingRecordSystem.Core.Models;
+
+public enum IntegrationTransactionRecordStatus
 {
-    public enum IntegrationTransactionRecordStatus
-    {
-        [Description("Success")]
-        [Display(Name = "Success")]
-        Success = 0,
+    [Description("Success")]
+    [Display(Name = "Success")]
+    Success = 0,
 
-        [Description("Failure")]
-        [Display(Name = "Failure")]
-        Failure = 1,
+    [Description("Failure")]
+    [Display(Name = "Failure")]
+    Failure = 1,
 
-        [Description("Warning")]
-        [Display(Name = "Warning")]
-        Warning = 2
-    }
+    [Description("Warning")]
+    [Display(Name = "Warning")]
+    Warning = 2
 }

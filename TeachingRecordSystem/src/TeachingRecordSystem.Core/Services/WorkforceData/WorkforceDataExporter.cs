@@ -47,7 +47,7 @@ public class WorkforceDataExporter(
             	t.updated_on
             FROM
             		tps_employments t
-            	JOIN		
+            	JOIN
             		persons p ON p.person_id = t.person_id
             	JOIN
             		establishments e ON e.establishment_id = t.establishment_id
@@ -70,7 +70,7 @@ public class WorkforceDataExporter(
             if (i % 50000 == 0)
             {
                 fileNumber++;
-                await ParquetSerializer.SerializeAsync(itemsToExport, Path.Combine(tempDirectory, $"workforce_data_{fileDateTime}_{fileNumber}.parquet"));
+                await ParquetSerializer.SerializeAsync(itemsToExport, Path.Combine(tempDirectory, $"workforce_data_{fileDateTime}_{fileNumber}.parquet"), cancellationToken: cancellationToken);
                 itemsToExport.Clear();
             }
         }
@@ -78,13 +78,13 @@ public class WorkforceDataExporter(
         if (itemsToExport.Count > 0)
         {
             fileNumber++;
-            await ParquetSerializer.SerializeAsync(itemsToExport, Path.Combine(tempDirectory, $"workforce_data_{fileDateTime}_{fileNumber}.parquet"));
+            await ParquetSerializer.SerializeAsync(itemsToExport, Path.Combine(tempDirectory, $"workforce_data_{fileDateTime}_{fileNumber}.parquet"), cancellationToken: cancellationToken);
             itemsToExport.Clear();
         }
 
         using var stream = new MemoryStream();
         var merger = new FileMerger(new DirectoryInfo(tempDirectory));
-        await merger.MergeFilesAsync(stream);
+        await merger.MergeFilesAsync(stream, cancellationToken: cancellationToken);
         await UploadFileAsync(stream, $"workforce_data_{clock.UtcNow:yyyyMMddHHmm}.parquet", cancellationToken);
         Directory.Delete(tempDirectory, true);
     }

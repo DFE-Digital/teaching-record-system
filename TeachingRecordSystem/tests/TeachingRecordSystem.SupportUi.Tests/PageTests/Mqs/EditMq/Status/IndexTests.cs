@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
@@ -153,7 +152,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var startDate = new DateOnly(2021, 12, 5);
-        var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = startDate.AddDays(-daysBefore);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(startDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
@@ -182,7 +181,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var oldStatus = MandatoryQualificationStatus.Failed;
-        var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var newStatus = "Passed";
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
@@ -192,7 +191,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "Status", newStatus.ToString() },
+                { "Status", newStatus },
                 { "EndDate.Day", $"{newEndDate:%d}" },
                 { "EndDate.Month", $"{newEndDate:%M}" },
                 { "EndDate.Year", $"{newEndDate:yyyy}" }

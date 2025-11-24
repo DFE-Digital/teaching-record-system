@@ -37,12 +37,12 @@ public class NotificationSender : INotificationSender
 
                 if (_noSendNotificationClient is not null)
                 {
-                    _logger.LogDebug("Email {email} does not have domain in the allow list; using the 'no send' client.", to);
+                    _logger.LogDebug("Email {Email} does not have domain in the allow list; using the 'no send' client.", to);
                     client = _noSendNotificationClient;
                 }
                 else
                 {
-                    _logger.LogInformation("Email {email} does not have domain in the allow list; skipping send.", to);
+                    _logger.LogInformation("Email {Email} does not have domain in the allow list; skipping send.", to);
                     return;
                 }
             }

@@ -71,8 +71,8 @@ public class WebhookDeliveryService(
     {
         var startedAt = clock.UtcNow;
 
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, cancellationToken: cancellationToken);
 
         // Get the first batch of messages that are due to be sent.
         // Constrain the batch to `batchSize`, but return one more record so we know if there are more that need to be processed.
@@ -136,8 +136,8 @@ public class WebhookDeliveryService(
                 }
             });
 
-        await dbContext.SaveChangesAsync();
-        await txn.CommitAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
+        await txn.CommitAsync(cancellationToken);
 
         return new(moreRecords);
     }

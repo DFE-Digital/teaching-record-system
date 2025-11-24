@@ -37,13 +37,14 @@ public class TpsEstablishmentRefresher(
                 )
             FROM
                 STDIN (FORMAT BINARY)
-            """);
+            """,
+            cancellationToken);
 
         var stream = await tpsExtractStorageService.GetFileAsync(fileName, cancellationToken);
         using var streamReader = new StreamReader(stream);
         using var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.CurrentCulture) { HasHeaderRecord = true });
 
-        await foreach (var row in csvReader.GetRecordsAsync<TpsEstablishmentCsvRow>())
+        await foreach (var row in csvReader.GetRecordsAsync<TpsEstablishmentCsvRow>(cancellationToken))
         {
             if (string.IsNullOrEmpty(row.LaCode) || !Regex.IsMatch(row.LaCode, @"^\d{3}$")
                 || string.IsNullOrEmpty(row.EstablishmentCode) || !Regex.IsMatch(row.EstablishmentCode, @"^\d{4}$")
@@ -198,7 +199,7 @@ public class TpsEstablishmentRefresher(
         int i = 0;
         await foreach (var item in readDbContext.Database.SqlQuery<NewEstablishment>(querySql).AsAsyncEnumerable())
         {
-            var existingEstablishment = await writeDbContext.Establishments.SingleOrDefaultAsync(e => e.LaCode == item.LaCode && e.EstablishmentNumber == item.EstablishmentNumber);
+            var existingEstablishment = await writeDbContext.Establishments.SingleOrDefaultAsync(e => e.LaCode == item.LaCode && e.EstablishmentNumber == item.EstablishmentNumber, cancellationToken: cancellationToken);
             if (existingEstablishment == null)
             {
                 writeDbContext.Establishments.Add(new()

@@ -61,13 +61,14 @@ public class TpsCsvExtractFileImporter(
                     full_or_part_time_indicator,
                     withdrawal_indicator,
                     extract_date,
-                    gender,                    
+                    gender,
                     created,
                     errors
                 )
             FROM
                 STDIN (FORMAT BINARY)
-            """);
+            """,
+            cancellationToken);
 
         writer.Timeout = TimeSpan.FromMinutes(5);
 
@@ -78,7 +79,7 @@ public class TpsCsvExtractFileImporter(
         var validGenderValues = new List<string>() { "Male", "Female" };
         var validFullOrPartTimeIndicatorValues = new List<string>() { "FT", "PTI", "PTR", "PT" };
 
-        await foreach (var row in csvReader.GetRecordsAsync<TpsCsvExtractRowRaw>())
+        await foreach (var row in csvReader.GetRecordsAsync<TpsCsvExtractRowRaw>(cancellationToken))
         {
             var loadErrors = TpsCsvExtractItemLoadErrors.None;
             if (row.Trn is null || !Regex.IsMatch(row.Trn, @"^\d{7}$"))
@@ -197,7 +198,7 @@ public class TpsCsvExtractFileImporter(
                 tps_csv_extract_items (
                     tps_csv_extract_item_id,
                     tps_csv_extract_id,
-                    tps_csv_extract_load_item_id,                    
+                    tps_csv_extract_load_item_id,
                     trn,
                     national_insurance_number,
                     date_of_birth,
@@ -213,17 +214,18 @@ public class TpsCsvExtractFileImporter(
                     employment_type,
                     withdrawal_indicator,
                     extract_date,
-                    gender,                    
+                    gender,
                     created,
                     key
                 )
             FROM
                 STDIN (FORMAT BINARY)
-            """);
+            """,
+           cancellationToken);
 
         writer.Timeout = TimeSpan.FromMinutes(5);
 
-        await foreach (var item in readDbContext.TpsCsvExtractLoadItems.Where(x => x.TpsCsvExtractId == tpsCsvExtractId && x.Errors == TpsCsvExtractItemLoadErrors.None).AsNoTracking().AsAsyncEnumerable())
+        await foreach (var item in readDbContext.TpsCsvExtractLoadItems.Where(x => x.TpsCsvExtractId == tpsCsvExtractId && x.Errors == TpsCsvExtractItemLoadErrors.None).AsNoTracking().AsAsyncEnumerable().WithCancellation(cancellationToken))
         {
             var employmentStartDate = DateOnly.ParseExact(item.EmploymentStartDate!, "dd/MM/yyyy");
 

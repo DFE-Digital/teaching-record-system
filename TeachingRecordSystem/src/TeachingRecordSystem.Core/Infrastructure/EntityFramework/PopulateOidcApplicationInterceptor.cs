@@ -20,7 +20,7 @@ internal class PopulateOidcApplicationInterceptor : SaveChangesInterceptor
 
             var existingOpenIddictApp = context.ChangeTracker.Entries<OpenIddictEntityFrameworkCoreApplication<Guid>>()
                     .SingleOrDefault(e => e.Entity.Id == entry.Entity.UserId)?.Entity
-                ?? await openIddictAppSet.SingleOrDefaultAsync(u => u.Id == entry.Entity.UserId);
+                ?? await openIddictAppSet.SingleOrDefaultAsync(u => u.Id == entry.Entity.UserId, cancellationToken: cancellationToken);
 
             if (existingOpenIddictApp is not null)
             {

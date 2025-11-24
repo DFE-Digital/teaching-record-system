@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Xrm.Sdk.Metadata;
 using Npgsql;
 using Npgsql.Replication;
 using Npgsql.Replication.PgOutput;
@@ -33,7 +32,6 @@ public class DqtReportingService : BackgroundService
     private readonly IClock _clock;
     private readonly IConfiguration _configuration;
     private readonly ILogger<DqtReportingService> _logger;
-    private readonly Dictionary<string, (EntityMetadata EntityMetadata, EntityTableMapping EntityTableMapping)> _entityMetadata = new();
 
     public DqtReportingService(
         IOptions<DqtReportingOptions> optionsAccessor,
@@ -72,7 +70,7 @@ public class DqtReportingService : BackgroundService
         CancellationToken cancellationToken)
     {
         await using var replicationConn = new LogicalReplicationConnection(_configuration.GetPostgresConnectionString());
-        await replicationConn.Open();
+        await replicationConn.Open(cancellationToken);
 
         var slot = await GetReplicationSlotAsync(replicationConn, cancellationToken);
         observer?.OnNext(TrsReplicationStatus.ReplicationSlotEstablished);
@@ -138,9 +136,9 @@ public class DqtReportingService : BackgroundService
 
         static string GetTargetTableName(RelationMessage relation) => $"trs_{relation.RelationName}";
 
-        static ValueTask<object?[]> GetTupleValuesAsync(ReplicationTuple tuple)
+        ValueTask<object?[]> GetTupleValuesAsync(ReplicationTuple tuple)
         {
-            return CoreAsync().ToArrayAsync();
+            return CoreAsync().ToArrayAsync(cancellationToken: cancellationToken);
 
             async IAsyncEnumerable<object?> CoreAsync()
             {
@@ -152,7 +150,7 @@ public class DqtReportingService : BackgroundService
                         continue;
                     }
 
-                    yield return value.IsDBNull ? null : await value.Get();
+                    yield return value.IsDBNull ? null : await value.Get(cancellationToken);
                 }
             }
         }
@@ -175,7 +173,7 @@ public class DqtReportingService : BackgroundService
 
             await using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
             {
-                if (await reader.ReadAsync())
+                if (await reader.ReadAsync(cancellationToken))
                 {
                     startLsn = reader.GetFieldValue<NpgsqlLogSequenceNumber>(0);
                 }
@@ -184,7 +182,7 @@ public class DqtReportingService : BackgroundService
 
         if (startLsn == NpgsqlLogSequenceNumber.Invalid)
         {
-            return await replicationConn.CreatePgOutputReplicationSlot(slotName);
+            return await replicationConn.CreatePgOutputReplicationSlot(slotName, cancellationToken: cancellationToken);
         }
         else
         {

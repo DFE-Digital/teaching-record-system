@@ -7,7 +7,7 @@ public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContex
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        using var readDbContext = await dbContextFactory.CreateDbContextAsync();
+        using var readDbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
         readDbContext.Database.SetCommandTimeout(0);
 
         var personIds = readDbContext.Database
@@ -21,7 +21,7 @@ public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContex
 
         await foreach (var chunk in personIds.ChunkAsync(250).WithCancellation(cancellationToken))
         {
-            using var writeDbContext = await dbContextFactory.CreateDbContextAsync();
+            using var writeDbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
             writeDbContext.Database.SetCommandTimeout(0);
 
             await writeDbContext.Database.ExecuteSqlRawAsync(

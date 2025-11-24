@@ -9,9 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.PersonMatching;
-
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -112,19 +110,21 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                 var personId = default(Guid?);
                 var recordStatus = IntegrationTransactionRecordStatus.Success;
                 var potentialDuplicate = false;
-                var hasWarnings = warnings.Any();
+                var hasWarnings = warnings.Count != 0;
                 var rowFailureMessage = new StringBuilder();
                 rowFailureMessage.Append(string.Concat(errors.Select(e => e + ",")));
                 rowFailureMessage.Append(string.Concat(warnings.Select(e => e + ",")));
 
-                if (errors.Any())
+                if (errors.Count != 0)
                 {
                     recordStatus = IntegrationTransactionRecordStatus.Failure;
                     failureRowCount++;
                 }
                 else
                 {
+#pragma warning disable CA1806
                     NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
+#pragma warning restore CA1806
                     var potentialMatches = await GetPotentialMatchingPersonsAsync(row);
                     if (person is null)
                     {
@@ -226,7 +226,7 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                         {
                             person.NationalInsuranceNumber = row.NINumber;
                         }
-                        else if (ni is not null && person.NationalInsuranceNumber is not null && !person.NationalInsuranceNumber.Equals(row.NINumber))
+                        else if (ni is not null && person.NationalInsuranceNumber is not null && !person.NationalInsuranceNumber.Equals(row.NINumber, StringComparison.Ordinal))
                         {
                             rowFailureMessage.Append($"Warning: Attempted to update NationalInsuranceNumber from {person.NationalInsuranceNumber} to {row.NINumber}");
                             hasWarnings = true;
@@ -342,7 +342,7 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
             {
                 errors.Add("Validation Failed: Invalid Date of Birth");
             }
-            else if (dateOfBirth > clock.UtcNow.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+            else if (dateOfBirth > clock.Today)
             {
                 errors.Add("Validation Failed: Date of Birth cannot be in the future");
             }
@@ -354,7 +354,7 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
             {
                 errors.Add("Validation Failed: Invalid Date of death");
             }
-            else if (dateOfDeath > clock.UtcNow.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+            else if (dateOfDeath > clock.Today)
             {
                 errors.Add("Validation Failed: Date of death cannot be in the future");
             }
@@ -465,7 +465,10 @@ public class CapitaImportRecord
     {
         var parts = FirstNameOrMiddleName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (parts?.Length > 0)
+        {
             return parts[0];
+        }
+
         return string.Empty;
     }
 
@@ -473,14 +476,20 @@ public class CapitaImportRecord
     {
         var parts = FirstNameOrMiddleName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (parts?.Length > 0)
+        {
             return string.Join(" ", parts, 1, parts.Length - 1);
+        }
+
         return string.Empty;
     }
 
     public DateOnly? GetDateOfBirth()
     {
         if (DateOnly.TryParseExact(DateOfBirth, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfBirth))
+        {
             return dateOfBirth;
+        }
+
         return null;
     }
 

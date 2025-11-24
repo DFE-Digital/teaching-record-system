@@ -24,7 +24,7 @@ public class PublishApiClient : IPublishApiClient
 
     public async Task<IReadOnlyCollection<ProviderResource>> GetAccreditedProvidersAsync()
     {
-        var response = await _resiliencePipeline.ExecuteAsync(async _ => await _httpClient.GetAsync("recruitment_cycles/current/providers?filter[is_accredited_body]=true&page[per_page]=500"));
+        var response = await _resiliencePipeline.ExecuteAsync(async _ => await _httpClient.GetAsync("recruitment_cycles/current/providers?filter[is_accredited_body]=true&page[per_page]=500", _));
 
         if (!response.IsSuccessStatusCode)
         {

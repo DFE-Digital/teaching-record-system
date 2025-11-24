@@ -110,9 +110,6 @@ public record GetPersonResultInitialTeacherTraining
     public required GetPersonResultInitialTeacherTrainingQualification? Qualification { get; init; }
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
-    public required IttProgrammeType? ProgrammeType { get; init; }
-    public required string? ProgrammeTypeDescription { get; init; }
-    public required IttOutcome? Result { get; init; }
     public required GetPersonResultInitialTeacherTrainingAgeRange? AgeRange { get; init; }
     public required GetPersonResultInitialTeacherTrainingProvider? Provider { get; init; }
     public required IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject> Subjects { get; init; }
@@ -478,9 +475,6 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
                 Qualification = null,
                 StartDate = r.TrainingStartDate,
                 EndDate = r.TrainingEndDate,
-                ProgrammeType = null,
-                ProgrammeTypeDescription = null,
-                Result = null,
                 AgeRange = MapAgeRange(r.TrainingAgeSpecialismType, r.TrainingAgeSpecialismRangeFrom, r.TrainingAgeSpecialismRangeTo),
                 Provider = r.TrainingProvider is { Ukprn: not null } trainingProvider
                     ? new GetPersonResultInitialTeacherTrainingProvider { Name = trainingProvider.Name, Ukprn = trainingProvider.Ukprn }

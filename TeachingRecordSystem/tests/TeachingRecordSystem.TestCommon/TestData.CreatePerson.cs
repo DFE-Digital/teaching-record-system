@@ -2,7 +2,6 @@ using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
@@ -406,13 +405,6 @@ public partial class TestData
                 DateOfBirth = dateOfBirth,
                 EmailAddress = _email,
                 NationalInsuranceNumber = _nationalInsuranceNumber,
-                DqtContactId = PersonId,
-                DqtState = (int)ContactState.Active,
-                DqtCreatedOn = createdOn,
-                DqtModifiedOn = updatedOn,
-                DqtFirstName = firstName,
-                DqtMiddleName = middleName,
-                DqtLastName = lastName,
                 Gender = _gender,
                 CreatedByTps = createdByTps,
                 MergedWithPersonId = _mergedWithPersonId

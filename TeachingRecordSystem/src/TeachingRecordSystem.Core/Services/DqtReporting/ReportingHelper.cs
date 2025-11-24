@@ -74,7 +74,9 @@ public class ReportingHelper(
             }
 
             if (rows.Count == 0)
+            {
                 break;
+            }
 
             var dataTable = new DataTable();
             foreach (var col in columns)

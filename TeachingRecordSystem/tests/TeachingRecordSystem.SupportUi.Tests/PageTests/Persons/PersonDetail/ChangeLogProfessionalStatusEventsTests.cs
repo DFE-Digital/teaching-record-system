@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
@@ -689,10 +688,10 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var ittSubject1 = new { dfeta_Value = "100078", dfeta_name = "Subject 1" };
         var ittSubject2 = new { dfeta_Value = "100079", dfeta_name = "Subject 2" };
         var ittSubject3 = new { dfeta_Value = "100343", dfeta_name = "Subject 3" };
-        var dqtAgeRangeFrom = dfeta_AgeRange._10;
-        var dqtAgeRangeTo = dfeta_AgeRange._16;
-        var programmeType = dfeta_ITTProgrammeType.AssessmentOnlyRoute;
-        var ittResult = dfeta_ITTResult.Pass;
+        var dqtAgeRangeFrom = "10";
+        var dqtAgeRangeTo = "16";
+        var programmeType = "AssessmentOnlyRoute";
+        var ittResult = "Pass";
         var dqtCountry = new { dfeta_Value = "XK", dfeta_name = "United Kingdom" };
 
         // Use populateOptional to deliberately populate OR not populate ALL optional fields to test rendering.
@@ -740,7 +739,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             {
                 InitialTeacherTrainingId = Guid.NewGuid(),
                 SlugId = sourceApplicationReference,
-                ProgrammeType = programmeType.ToString(),
+                ProgrammeType = programmeType,
                 ProgrammeStartDate = startDate,
                 ProgrammeEndDate = endDate,
                 Result = ittResult.ToString(),
@@ -861,7 +860,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var ittResult = dfeta_ITTResult.InTraining;
+        var ittResult = "InTraining";
         var createdByUser = await TestData.CreateUserAsync();
 
         var createdEvent = new DqtInitialTeacherTrainingCreatedEvent
@@ -901,8 +900,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var ittResult = dfeta_ITTResult.Pass;
-        var oldIttResult = dfeta_ITTResult.InTraining;
+        var ittResult = "Pass";
+        var oldIttResult = "InTraining";
         var createdByUser = await TestData.CreateUserAsync();
 
         var updatedEvent = new DqtInitialTeacherTrainingUpdatedEvent

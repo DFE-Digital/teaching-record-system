@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Jobs;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 

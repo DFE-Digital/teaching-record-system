@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
@@ -724,7 +723,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.FirstName,
             "FirstName",
             "First name",
-            [Contact.Fields.FirstName],
             d => d.FirstName,
             p => p.FirstName
         ),
@@ -732,7 +730,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.MiddleName,
             "MiddleName",
             "Middle name",
-            [Contact.Fields.MiddleName],
             d => d.MiddleName,
             p => p.MiddleName
         ),
@@ -740,7 +737,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.LastName,
             "LastName",
             "Last name",
-            [Contact.Fields.LastName],
             d => d.LastName,
             p => p.LastName
         ),
@@ -748,7 +744,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.DateOfBirth,
             "DateOfBirth",
             "Date of birth",
-            [Contact.Fields.BirthDate],
             d => d.DateOfBirth,
             p => p.DateOfBirth,
             value => ((DateOnly?)value)?.ToString(UiDefaults.DateOnlyDisplayFormat)
@@ -757,7 +752,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.EmailAddress,
             "EmailAddress",
             "Email address",
-            [Contact.Fields.EMailAddress1],
             d => d.EmailAddress,
             p => p.EmailAddress
         ),
@@ -765,7 +759,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.NationalInsuranceNumber,
             "NationalInsuranceNumber",
             "National Insurance number",
-            [Contact.Fields.dfeta_NINumber],
             d => d.NationalInsuranceNumber,
             p => p.NationalInsuranceNumber
         ),
@@ -773,7 +766,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.Gender,
             "Gender",
             "Gender",
-            [Contact.Fields.GenderCode],
             d => d.Gender,
             p => p.Gender,
             value => ((Gender?)value)?.GetDisplayName()
@@ -784,7 +776,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         PersonMatchedAttribute Attribute,
         string FieldName,
         string SummaryListRowKey,
-        string[] CrmAttributes,
         Func<TrnRequestMetadata, object?> GetValueFromRequestData,
         Func<TestData.CreatePersonResult, object?> GetValueFromPerson,
         Func<object?, object?>? MapValueToSummaryListRowValue = null);

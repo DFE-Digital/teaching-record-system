@@ -87,7 +87,7 @@ public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> 
                 dataTable.Rows.Clear();
             }
 
-            await txn.CommitAsync();
+            await txn.CommitAsync(cancellationToken);
         }
 
         async Task SyncTpsEstablishmentsAsync()
@@ -137,7 +137,7 @@ public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> 
                 dataTable.Rows.Clear();
             }
 
-            await txn.CommitAsync();
+            await txn.CommitAsync(cancellationToken);
         }
 
         async Task SyncTpsEmploymentsAsync()
@@ -145,7 +145,7 @@ public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> 
             dbContext.Database.SetCommandTimeout(0);
 
             using var conn = new SqlConnection(dqtReportingOptionsAccessor.Value.ReportingDbConnectionString);
-            conn.Open();
+            await conn.OpenAsync(cancellationToken);
             var txn = conn.BeginTransaction();
 
             var dataTable = new DataTable();
@@ -203,7 +203,7 @@ public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> 
                 dataTable.Rows.Clear();
             }
 
-            await txn.CommitAsync();
+            await txn.CommitAsync(cancellationToken);
         }
     }
 }

@@ -8,11 +8,11 @@ public class RefreshTrainingProvidersJob(IPublishApiClient publishApiClient, IDb
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var providers = await publishApiClient.GetAccreditedProvidersAsync();
-        using var dbContext = await dbContextFactory.CreateDbContextAsync();
+        using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         foreach (var item in providers)
         {
-            var existingProvider = await dbContext.TrainingProviders.SingleOrDefaultAsync(p => p.Ukprn == item.Attributes.Ukprn);
+            var existingProvider = await dbContext.TrainingProviders.SingleOrDefaultAsync(p => p.Ukprn == item.Attributes.Ukprn, cancellationToken: cancellationToken);
             if (existingProvider == null)
             {
                 dbContext.TrainingProviders.Add(new()
@@ -30,7 +30,7 @@ public class RefreshTrainingProvidersJob(IPublishApiClient publishApiClient, IDb
             }
         }
 
-        foreach (var existingProvider in await dbContext.TrainingProviders.ToListAsync())
+        foreach (var existingProvider in await dbContext.TrainingProviders.ToListAsync(cancellationToken: cancellationToken))
         {
             if (!providers.Any(p => p.Attributes.Ukprn == existingProvider.Ukprn))
             {
