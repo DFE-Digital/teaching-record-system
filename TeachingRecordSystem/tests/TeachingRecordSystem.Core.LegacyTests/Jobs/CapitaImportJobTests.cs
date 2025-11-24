@@ -1250,7 +1250,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
         Assert.True(trnRequest.PotentialDuplicate);
-        // Question: shouldn't this contain existingPerson.PersonId?
         Assert.Empty(trnRequest.Matches?.MatchedPersons!);
     }
 
@@ -1309,7 +1308,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
         Assert.True(trnRequest.PotentialDuplicate);
-        // Question: shouldn't this contain existingPerson.PersonId?
         Assert.Empty(trnRequest.Matches?.MatchedPersons!);
     }
 
