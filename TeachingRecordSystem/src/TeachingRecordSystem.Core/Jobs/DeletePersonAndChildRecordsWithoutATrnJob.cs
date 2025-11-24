@@ -68,15 +68,15 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
                 INSERT INTO trn_request_ids_to_delete
                 SELECT request_id FROM trn_request_metadata
                 WHERE resolved_person_id = ANY ({personIds});
-            
+
                 -- Clear references to person via merged_with_person_id
-            
+
                 UPDATE persons
                 SET merged_with_person_id = NULL
                 WHERE merged_with_person_id = ANY ({personIds});
-            
-                -- Clear references to trn_request_metadata of requests to be deleted from person via source_trn_request_id 
-            
+
+                -- Clear references to trn_request_metadata of requests to be deleted from person via source_trn_request_id
+
                 UPDATE persons
                 SET source_trn_request_id = NULL
                 WHERE source_trn_request_id IN (SELECT trn_request_id FROM trn_request_ids_to_delete);
@@ -85,7 +85,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
 
                 DELETE FROM support_tasks
                 WHERE person_id = ANY ({personIds});
-            
+
                 DELETE FROM support_tasks
                 WHERE trn_request_id IN (SELECT trn_request_id FROM trn_request_ids_to_delete);
 
@@ -96,7 +96,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
                 WHERE request_id IN (SELECT trn_request_id FROM trn_request_ids_to_delete);
 
                 -- Delete integration_transaction_records referencing person
-            
+
                 DELETE FROM integration_transaction_records
                 WHERE person_id = ANY ({personIds});
 
@@ -129,7 +129,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
         using var writer = new StreamWriter(stream);
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
         await csv.WriteRecordsAsync(deletedPersonIds.Select(p => new { PersonId = p }), cancellationToken);
-        await writer.FlushAsync();
+        await writer.FlushAsync(cancellationToken);
 
         if (!dryRun)
         {

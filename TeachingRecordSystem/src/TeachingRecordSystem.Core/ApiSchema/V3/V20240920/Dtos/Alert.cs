@@ -10,11 +10,6 @@ public record Alert
 
     public static async Task<Alert> FromEventAsync(EventModels.Alert alert, ReferenceDataCache referenceDataCache)
     {
-        if (alert.AlertTypeId is null)
-        {
-            throw new ArgumentNullException("", nameof(alert.AlertTypeId));
-        }
-
         var alertType = await referenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId!.Value);
 
         return new()

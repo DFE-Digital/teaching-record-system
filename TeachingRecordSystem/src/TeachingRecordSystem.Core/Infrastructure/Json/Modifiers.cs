@@ -38,8 +38,7 @@ public static class Modifiers
             var parentParameter = Expression.Parameter(typeof(object));
             var propertyParameter = Expression.Parameter(typeof(object));
 
-            return (Func<object, object?, bool>)Expression.Lambda(
-                typeof(Func<object, object?, bool>),
+            return Expression.Lambda<Func<object, object?, bool>>(
                 body: Expression.Property(
                     Expression.Convert(propertyParameter, propertyType),
                     "HasValue"),

@@ -1,6 +1,5 @@
 #nullable disable
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V1.Responses;
 
@@ -38,4 +37,9 @@ public class GetTeacherResponse
 
     [JsonPropertyName("state_name")]
     public string StateName { get; set; }
+}
+
+public enum ContactState
+{
+    Active = 0
 }

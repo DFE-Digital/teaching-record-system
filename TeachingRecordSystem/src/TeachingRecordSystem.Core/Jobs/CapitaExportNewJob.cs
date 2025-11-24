@@ -9,6 +9,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 
+namespace TeachingRecordSystem.Core.Jobs;
+
 public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportNewJob> logger, TrsDbContext dbContext, IClock clock)
 {
     public const string JobSchedule = "0 3 * * *";
@@ -23,7 +25,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
 
         // start job
         var fileName = GetFileName(clock);
-        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, cancellationToken: cancellationToken);
         var integrationJob = new IntegrationTransaction()
         {
             IntegrationTransactionId = 0,
@@ -39,7 +41,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
             IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
         };
         dbContext.IntegrationTransactions.Add(integrationJob);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         var integrationId = integrationJob.IntegrationTransactionId;
 
         // running counts for job
@@ -135,14 +137,14 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
                 integrationJob.FailureCount = failureRowCount;
                 integrationJob.SuccessCount = successCount;
                 integrationJob.DuplicateCount = duplicateRowCount;
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
 
             }
-            streamWriter.Flush();
+            await streamWriter.FlushAsync(cancellationToken);
 
             // upload file contents to storage container
             memoryStream.Position = 0;
-            await UploadFileAsync(memoryStream, fileName);
+            await UploadFileAsync(memoryStream, fileName, cancellationToken);
         }
 
         // mark job as complete
@@ -177,8 +179,8 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
             };
             dbContext.JobMetadata.Add(job);
         }
-        await dbContext.SaveChangesAsync();
-        await txn.CommitAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
+        await txn.CommitAsync(cancellationToken);
         return integrationJob.IntegrationTransactionId;
     }
 
@@ -252,13 +254,19 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
         var previousName = previousNameResult?.FirstOrDefault()?.PreviousLastName;
 
         if (string.IsNullOrEmpty(previousName))
+        {
             return string.Empty;
+        }
 
         if (string.IsNullOrEmpty(person.Trn))
+        {
             throw new Exception("Person does not have a trn");
+        }
 
         if (string.IsNullOrEmpty(previousName))
+        {
             throw new Exception($"Previous name not found in {nameof(PersonDetailsUpdatedEvent)} events.");
+        }
 
         var gender = " ";
         if (person.Gender.HasValue && (person.Gender == Gender.Male || person.Gender == Gender.Female))
@@ -304,7 +312,9 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
         var builder = new StringBuilder();
 
         if (string.IsNullOrEmpty(person.Trn))
+        {
             throw new Exception("Person does not have a trn");
+        }
 
         // ssis job either puts gender as 1,2 or a padded empty string
         var gender = " ";
@@ -333,7 +343,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
             dateOfBirth = person.DateOfBirth.Value.ToString("ddMMyy"); // D365
         }
         builder.Append(dateOfBirth);
-        builder.Append(" ");
+        builder.Append(' ');
 
 
         /*
@@ -366,7 +376,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
             name = firstAndMiddleName.Length > 35 ? firstAndMiddleName.Substring(0, 35) : firstAndMiddleName.PadRight(35, ' ');
         }
         builder.Append(name);
-        builder.Append(" ");
+        builder.Append(' ');
 
 
         /*

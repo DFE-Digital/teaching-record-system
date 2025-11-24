@@ -34,7 +34,7 @@ public class BackfillDqtReportingSupportTasksJob(IOptions<DqtReportingOptions> d
                 task.SupportTaskReference,
                 (int)task.SupportTaskType,
                 (int)task.Status,
-                JsonSerializer.Serialize(task.Data, typeof(ISupportTaskData), ISupportTaskData.SerializerOptions),
+                JsonSerializer.Serialize(task.Data, ISupportTaskData.SerializerOptions),
                 task.OneLoginUserSubject,
                 task.PersonId,
                 task.CreatedOn,

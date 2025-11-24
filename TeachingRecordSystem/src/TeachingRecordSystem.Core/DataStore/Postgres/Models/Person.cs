@@ -548,13 +548,13 @@ public class Person
             return false;
         }
 
-        if (requiresExemptionReason && !exemptionReasonIds.Any())
+        if (requiresExemptionReason && exemptionReasonIds.Length == 0)
         {
             error = $"Exemption reasons cannot be empty when the status is: '{status}'.";
             return false;
         }
 
-        if (!requiresExemptionReason && exemptionReasonIds.Any())
+        if (!requiresExemptionReason && exemptionReasonIds.Length != 0)
         {
             error = $"Exemption reasons must be empty when the status is: '{status}'.";
             return false;
@@ -591,7 +591,7 @@ public class Person
             .ToArray();
 
         var awardedBeforeInduction = holdsQtsProfessionalStatuses.Any(p => p.ExemptFromInductionDueToQtsDate == true);
-        var requiredToComplete = holdsQtsProfessionalStatuses.Any() && !awardedBeforeInduction;
+        var requiredToComplete = holdsQtsProfessionalStatuses.Length != 0 && !awardedBeforeInduction;
 
         if (!requiredToComplete && currentStatus is not InductionStatus.RequiredToComplete && currentStatus.RequiresQts())
         {
@@ -602,7 +602,7 @@ public class Person
             (InductionStatus.RequiredToComplete.IsHigherPriorityThan(currentStatusWithoutExemption) ? InductionStatus.RequiredToComplete : currentStatusWithoutExemption) :
             InductionStatus.None;
 
-        var exempt = InductionExemptWithoutReason || InductionExemptionReasonIds.Any() || holdsQtsProfessionalStatuses.Any(r => r.ExemptFromInduction == true);
+        var exempt = InductionExemptWithoutReason || InductionExemptionReasonIds.Length != 0 || holdsQtsProfessionalStatuses.Any(r => r.ExemptFromInduction == true);
         var newStatus = exempt && InductionStatus.Exempt.IsHigherPriorityThan(newStatusWithoutExemption) ? InductionStatus.Exempt : newStatusWithoutExemption;
 
         bool changed = false;
@@ -648,7 +648,7 @@ public class Person
         // We don't have awarded dates for EYPS
         if (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus)
         {
-            var awarded = holds.Any();
+            var awarded = holds.Length != 0;
 
             var changed = HasEyps != awarded;
             HasEyps = awarded;

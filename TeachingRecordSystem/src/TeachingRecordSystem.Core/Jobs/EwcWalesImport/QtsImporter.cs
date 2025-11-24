@@ -10,11 +10,11 @@ namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class QtsImporter
 {
-    public const string DATE_FORMAT = "dd/MM/yyyy";
+    public const string DateFormat = "dd/MM/yyyy";
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
     private readonly ReferenceDataCache _cache;
-    public DateOnly _ecDirectiveQualifiedTeacherRegsChangeDate => new DateOnly(2023, 02, 01);
+    private DateOnly _ecDirectiveQualifiedTeacherRegsChangeDate = new DateOnly(2023, 02, 01);
     private readonly IClock _clock;
 
     public QtsImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, IClock clock)
@@ -84,7 +84,7 @@ public class QtsImporter
 
                 //append non processable errors to list of failures that will be a line in
                 //the IntegrationTransaction (job) failuremessage field.
-                if (validationFailures.Errors.Any())
+                if (validationFailures.Errors.Count != 0)
                 {
                     foreach (var error in validationFailures.Errors)
                     {
@@ -95,13 +95,13 @@ public class QtsImporter
                 else
                 {
                     DateOnly? awardedDate = null;
-                    if (DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedQtsDate))
+                    if (DateOnly.TryParseExact(row.QtsDate, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedQtsDate))
                     {
                         awardedDate = parsedQtsDate;
                     }
 
                     var routeToProfessionalStatusTypeId = RouteToProfessionalStatusType.WelshRId;
-                    if (awardedDate < _ecDirectiveQualifiedTeacherRegsChangeDate && row.QtsStatus.Equals("67", StringComparison.InvariantCultureIgnoreCase))
+                    if (awardedDate < _ecDirectiveQualifiedTeacherRegsChangeDate && row.QtsStatus.Equals("67", StringComparison.OrdinalIgnoreCase))
                     {
                         routeToProfessionalStatusTypeId = RouteToProfessionalStatusType.ECDirective;
                     }
@@ -171,7 +171,7 @@ public class QtsImporter
 
                 //increase failurecount if row is processable or if there are validation failures
                 //else increase success counter
-                if (validationFailures.Errors.Any())
+                if (validationFailures.Errors.Count != 0)
                 {
                     failureRowCount++;
                 }
@@ -220,7 +220,7 @@ public class QtsImporter
         if (person != null)
         {
 
-            hasActiveAlerts = _dbContext.Alerts.Where(x => x.PersonId == person.PersonId && x.IsOpen).Count() > 0;
+            hasActiveAlerts = _dbContext.Alerts.Any(x => x.PersonId == person.PersonId && x.IsOpen);
         }
 
         var lookupData = new QtsImportLookupData
@@ -249,7 +249,7 @@ public class QtsImporter
         {
             errors.Add("Missing Date of Birth");
         }
-        else if (!DateOnly.TryParseExact(row.DateOfBirth, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
+        else if (!DateOnly.TryParseExact(row.DateOfBirth, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
         {
             errors.Add($"Validation Failed: Invalid Date of Birth {row.DateOfBirth}");
         }
@@ -270,12 +270,12 @@ public class QtsImporter
         {
             errors.Add("Misssing QTS Date");
         }
-        else if (!DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
+        else if (!DateOnly.TryParseExact(row.QtsDate, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
         {
             errors.Add($"Validation Failed: Invalid QTS Date {row.QtsDate}");
         }
         else if (!string.IsNullOrEmpty(row.QtsStatus) &&
-            DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly qtsDate)
+            DateOnly.TryParseExact(row.QtsDate, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly qtsDate)
         )
         {
             if (qtsDate > _clock.Today)
@@ -286,15 +286,15 @@ public class QtsImporter
             if (qtsDate >= _ecDirectiveQualifiedTeacherRegsChangeDate)
             {
                 var validStatuses = new List<string>() { "49", "71" };
-                if (!validStatuses.Any(val => string.Equals(val, row.QtsStatus, StringComparison.InvariantCultureIgnoreCase)))
+                if (!validStatuses.Any(val => string.Equals(val, row.QtsStatus, StringComparison.OrdinalIgnoreCase)))
                 {
-                    errors.Add($"Qts Status can only be 71 or 49 when qts date is on or past {_ecDirectiveQualifiedTeacherRegsChangeDate.ToString(DATE_FORMAT)}");
+                    errors.Add($"Qts Status can only be 71 or 49 when qts date is on or past {_ecDirectiveQualifiedTeacherRegsChangeDate.ToString(DateFormat)}");
                 }
             }
             else
             {
                 var validStatuses = new List<string>() { "67", "68", "69", "71", "102", "49", "71" };
-                if (!validStatuses.Any(val => string.Equals(val, row.QtsStatus, StringComparison.InvariantCultureIgnoreCase)))
+                if (!validStatuses.Any(val => string.Equals(val, row.QtsStatus, StringComparison.OrdinalIgnoreCase)))
                 {
                     errors.Add($"Qts Status can only be 67, 68, 69, 71, 102, 49 or 71 when qts date is on or before 31/01/2023");
                 }
@@ -337,23 +337,23 @@ public class QtsImporter
 
     public EwcWalesMatchStatus GetTeacherStatus(string qtsStatus)
     {
-        if (qtsStatus != null && (qtsStatus.Equals("67", StringComparison.InvariantCultureIgnoreCase)))
+        if (qtsStatus != null && (qtsStatus.Equals("67", StringComparison.OrdinalIgnoreCase)))
         {
             //67 - Qualified Teacher: under the EC Directive
             return (EwcWalesMatchStatus.OneMatch);
         }
-        else if (qtsStatus != null && (qtsStatus.Equals("71", StringComparison.InvariantCultureIgnoreCase) ||
-            qtsStatus.Equals("49", StringComparison.InvariantCultureIgnoreCase)))
+        else if (qtsStatus != null && (qtsStatus.Equals("71", StringComparison.OrdinalIgnoreCase) ||
+            qtsStatus.Equals("49", StringComparison.OrdinalIgnoreCase)))
         {
             //213 - Qualified Teacher: QTS awarded in Wales
             return (EwcWalesMatchStatus.OneMatch);
         }
-        else if (qtsStatus != null && (qtsStatus.Equals("68", StringComparison.InvariantCultureIgnoreCase)))
+        else if (qtsStatus != null && (qtsStatus.Equals("68", StringComparison.OrdinalIgnoreCase)))
         {
             //68 - Qualified Teacher: Teachers trained/registered in Scotland
             return (EwcWalesMatchStatus.OneMatch);
         }
-        else if (qtsStatus != null && (qtsStatus.Equals("69", StringComparison.InvariantCultureIgnoreCase)))
+        else if (qtsStatus != null && (qtsStatus.Equals("69", StringComparison.OrdinalIgnoreCase)))
         {
             //69 - Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
             return (EwcWalesMatchStatus.OneMatch);
@@ -374,7 +374,7 @@ public class QtsImporter
             return (EwcWalesMatchStatus.NoMatch, null);
         }
 
-        if ((DateOnly.TryParseExact(item.DateOfBirth, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dob)) &&
+        if ((DateOnly.TryParseExact(item.DateOfBirth, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dob)) &&
             person.DateOfBirth != dob)
         {
             return (EwcWalesMatchStatus.TrnAndDateOfBirthMatchFailed, null);

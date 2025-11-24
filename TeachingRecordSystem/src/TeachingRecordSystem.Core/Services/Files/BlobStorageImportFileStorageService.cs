@@ -44,7 +44,7 @@ public class BlobStorageImportFileStorageService(BlobServiceClient blobServiceCl
 
             var targetBlobClient = blobContainerClient.GetBlobClient(targetFileName);
             var copyOperation = await targetBlobClient.StartCopyFromUriAsync(sourceBlobClient.Uri, cancellationToken: cancellationToken);
-            await copyOperation.WaitForCompletionAsync();
+            await copyOperation.WaitForCompletionAsync(cancellationToken);
 
             // Release the lease
             var sourceProperties = await sourceBlobClient.GetPropertiesAsync(cancellationToken: cancellationToken);

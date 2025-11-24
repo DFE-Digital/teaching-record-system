@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Text;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -302,7 +301,7 @@ public partial class EwcWalesImportJobTests
         var passDate = DateTime.ParseExact("28/09/2017", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.WelshRId, passDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
+            x.WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.WelshRId, DateOnly.FromDateTime(passDate));
         });
 
         var trn = person.Trn;

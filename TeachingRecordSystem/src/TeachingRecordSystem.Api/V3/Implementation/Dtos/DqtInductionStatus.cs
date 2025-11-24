@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Dqt.Models;
-
 namespace TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
 public enum DqtInductionStatus
@@ -17,22 +15,6 @@ public enum DqtInductionStatus
 
 public static class DqtInductionStatusExtensions
 {
-    public static DqtInductionStatus ConvertToDqtInductionStatus(this dfeta_InductionStatus input) => input switch
-    {
-        dfeta_InductionStatus.Exempt => DqtInductionStatus.Exempt,
-        dfeta_InductionStatus.Fail => DqtInductionStatus.Fail,
-        dfeta_InductionStatus.FailedinWales => DqtInductionStatus.FailedInWales,
-        dfeta_InductionStatus.InductionExtended => DqtInductionStatus.InductionExtended,
-        dfeta_InductionStatus.InProgress => DqtInductionStatus.InProgress,
-        dfeta_InductionStatus.NotYetCompleted => DqtInductionStatus.NotYetCompleted,
-        dfeta_InductionStatus.Pass => DqtInductionStatus.Pass,
-        dfeta_InductionStatus.PassedinWales => DqtInductionStatus.PassedInWales,
-        dfeta_InductionStatus.RequiredtoComplete => DqtInductionStatus.RequiredToComplete,
-        _ => throw new ArgumentException($"Unknown {nameof(DqtInductionStatus)}: '{input}'.")
-    };
-
-    public static string GetDescription(this dfeta_InductionStatus input) => ConvertToDqtInductionStatus(input).GetDescription();
-
     public static string GetDescription(this DqtInductionStatus input) => input switch
     {
         DqtInductionStatus.Exempt => "Exempt",

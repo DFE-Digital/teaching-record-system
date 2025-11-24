@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class InductionImporter
 {
-    private const string DATE_FORMAT = "dd/MM/yyyy";
+    private const string DateFormat = "dd/MM/yyyy";
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
     private readonly IClock _clock;
@@ -71,19 +71,19 @@ public class InductionImporter
                     personId = lookupData.Person?.PersonId;
                     DateOnly? awardedDate = null;
                     DateOnly? startDate = null;
-                    if (DateOnly.TryParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedQtsDate))
+                    if (DateOnly.TryParseExact(row.PassedDate, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedQtsDate))
                     {
                         awardedDate = parsedQtsDate;
                     }
 
-                    if (DateOnly.TryParseExact(row.StartDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parseStartDate))
+                    if (DateOnly.TryParseExact(row.StartDate, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parseStartDate))
                     {
                         startDate = parseStartDate;
                     }
 
                     //append non processable errors to list of failures that will be a line in
                     //the IntegrationTransaction (job) failuremessage field.
-                    if (validationFailures.Errors.Any())
+                    if (validationFailures.Errors.Count != 0)
                     {
                         failureRowCount++;
                         foreach (var error in validationFailures.Errors)
@@ -125,7 +125,7 @@ public class InductionImporter
 
                         //increase failurecount if row is processable or if there are validation failures
                         //else increase success counter
-                        if (validationFailures.Errors.Any())
+                        if (validationFailures.Errors.Count != 0)
                         {
                             failureRowCount++;
                         }
@@ -140,7 +140,7 @@ public class InductionImporter
                     {
                         IntegrationTransactionRecordId = 0,
                         CreatedDate = _clock.UtcNow,
-                        RowData = ConvertToCSVString(row),
+                        RowData = ConvertToCsvString(row),
                         Status = validationFailures.Errors.Count == 0 ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
                         PersonId = lookupData.Person != null ? lookupData.Person!.PersonId : null,
                         FailureMessage = itrFailureMessage.ToString(),
@@ -173,17 +173,6 @@ public class InductionImporter
             await txn.CommitAsync();
 
             return new InductionImportResult(totalRowCount, successCount, duplicateRowCount, failureRowCount, failureMessage.ToString(), integrationId);
-        }
-    }
-
-    public string ConvertToCSVString(EwcWalesInductionImportData row)
-    {
-        using (var writer = new StringWriter())
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-        {
-            csv.WriteRecord(row);
-            csv.Flush();
-            return writer.ToString();
         }
     }
 
@@ -229,7 +218,7 @@ public class InductionImporter
         }
         else
         {
-            if (!DateOnly.TryParseExact(row.DateOfBirth, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
+            if (!DateOnly.TryParseExact(row.DateOfBirth, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 errors.Add("Validation Failed: Invalid Date of Birth");
             }
@@ -243,7 +232,7 @@ public class InductionImporter
         }
         else
         {
-            if (!DateOnly.TryParseExact(row.StartDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedStartDate))
+            if (!DateOnly.TryParseExact(row.StartDate, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedStartDate))
             {
                 errors.Add("Validation Failed: Invalid Induction start date");
             }
@@ -261,7 +250,7 @@ public class InductionImporter
         }
         else
         {
-            if (!DateOnly.TryParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedPassedDate))
+            if (!DateOnly.TryParseExact(row.PassedDate, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedPassedDate))
             {
                 errors.Add("Validation Failed: Invalid Induction passed date");
             }
@@ -333,7 +322,7 @@ public class InductionImporter
             return (ContactLookupResult.NoMatch, null);
         }
 
-        if (DateOnly.TryParseExact(item.DateOfBirth, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dob) && contact!.DateOfBirth != dob)
+        if (DateOnly.TryParseExact(item.DateOfBirth, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dob) && contact!.DateOfBirth != dob)
         {
             return (ContactLookupResult.TrnAndDateOfBirthMatchFailed, null);
         }

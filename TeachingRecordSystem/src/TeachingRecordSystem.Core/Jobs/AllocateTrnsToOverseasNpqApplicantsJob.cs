@@ -60,7 +60,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
 
         var now = clock.UtcNow;
 
-        var inputRows = await csvReader.GetRecordsAsync<AllocateTrnsToOverseasNpqApplicantsInputRowRaw>().ToArrayAsync();
+        var inputRows = await csvReader.GetRecordsAsync<AllocateTrnsToOverseasNpqApplicantsInputRowRaw>(cancellationToken).ToArrayAsync(cancellationToken: cancellationToken);
         var outputRows = new List<AllocateTrnsToOverseasNpqApplicantsOutputRowRaw>();
         foreach (var inputRow in inputRows)
         {
@@ -230,7 +230,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
                             .Where(p => personMatchingResult.PotentialMatchesPersonIds.Contains(p.PersonId))
                             .OrderBy(p => p.Trn)
                             .Select(p => p.Trn)
-                            .ToArrayAsync();
+                            .ToArrayAsync(cancellationToken: cancellationToken);
 
                         outputRow.PotentialDuplicateTrns = string.Join(",", trns);
                         break;
@@ -238,7 +238,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
             }
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         txn.Complete();
 
         await fileStorageService.MoveFileAsync(ContainerName, fileName, ImportedFolderName, cancellationToken);

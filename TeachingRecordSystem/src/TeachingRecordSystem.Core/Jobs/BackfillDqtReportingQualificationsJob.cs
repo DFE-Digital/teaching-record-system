@@ -28,7 +28,7 @@ public class BackfillDqtReportingQualificationsJob(IOptions<DqtReportingOptions>
         dataTable.Columns.Add("__Inserted", typeof(DateTime));
         dataTable.Columns.Add("__Updated", typeof(DateTime));
 
-        var mqs = await dbContext.MandatoryQualifications.ToListAsync();
+        var mqs = await dbContext.MandatoryQualifications.ToListAsync(cancellationToken: cancellationToken);
 
         foreach (var mq in mqs)
         {

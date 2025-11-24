@@ -11,6 +11,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 
+namespace TeachingRecordSystem.Core.Jobs;
+
 public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportAmendJob> logger, TrsDbContext dbContext, IClock clock, IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 3 * * *";
@@ -25,7 +27,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
 
         // start job
         var fileName = GetFileName(clock);
-        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, cancellationToken: cancellationToken);
         var integrationJob = new IntegrationTransaction()
         {
             IntegrationTransactionId = 0,
@@ -41,7 +43,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
             IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
         };
         dbContext.IntegrationTransactions.Add(integrationJob);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         var integrationId = integrationJob.IntegrationTransactionId;
 
         // running counts for job
@@ -88,14 +90,14 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
                     integrationJob.FailureCount = failureRowCount;
                     integrationJob.SuccessCount = successCount;
                     integrationJob.DuplicateCount = duplicateRowCount;
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(cancellationToken);
 
                 }
                 streamWriter.Flush();
 
                 // upload file contents to storage container
                 memoryStream.Position = 0;
-                await UploadFileAsync(memoryStream, fileName);
+                await UploadFileAsync(memoryStream, fileName, cancellationToken);
             }
             catch (Exception e)
             {
@@ -136,8 +138,8 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
                     };
                     dbContext.JobMetadata.Add(job);
                 }
-                await dbContext.SaveChangesAsync();
-                await txn.CommitAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
+                await txn.CommitAsync(cancellationToken);
             }
         }
         return integrationJob.IntegrationTransactionId;
@@ -177,7 +179,10 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
          */
         var trn = person!.Trn;
         if (!string.IsNullOrEmpty(trn) && trn.Length != 7)
+        {
             throw new Exception("Person does not have a trn");
+        }
+
         var gender = " ";
         if (person.Gender.HasValue && (person.Gender == Gender.Male || person.Gender == Gender.Female))
         {
@@ -193,7 +198,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
         sb.Append(gender);
         sb.Append("//");
         sb.Append(lastName);
-        sb.Append(" ");
+        sb.Append(' ');
 
         /*
          * Column 2:
@@ -206,7 +211,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
             dateOfBirth = person.DateOfBirth.Value.ToString("ddMMyy*");
         }
         sb.Append(dateOfBirth);
-        sb.Append(" ");
+        sb.Append(' ');
 
         /*
          * Column 3:
@@ -292,7 +297,9 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
             //run. The results are returned with most recent events first, if an event has already processed
             //skip it.
             if (processedPersons.Contains(person.PersonId))
+            {
                 continue;
+            }
 
             processedPersons.Add(person.PersonId);
             if (person.ChangeType.HasFlag(PersonAttributesChanges.NationalInsuranceNumber))

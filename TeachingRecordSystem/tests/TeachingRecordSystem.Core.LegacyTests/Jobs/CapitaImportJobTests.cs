@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
@@ -1285,7 +1284,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             LastName = null,
             FirstNameOrMiddleName = null,
             PreviousLastName = null,
-            DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd"),
+            DateOfBirth = dateOfBirth.ToString("yyyyMMdd"),
             NINumber = null,
             DateOfDeath = null
         };
@@ -1310,7 +1309,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             LastName = null,
             FirstNameOrMiddleName = null,
             PreviousLastName = null,
-            DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd"),
+            DateOfBirth = dateOfBirth.ToString("yyyyMMdd"),
             NINumber = null,
             DateOfDeath = null
         };
@@ -1335,9 +1334,9 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             LastName = null,
             FirstNameOrMiddleName = null,
             PreviousLastName = null,
-            DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd"),
+            DateOfBirth = dateOfBirth.ToString("yyyyMMdd"),
             NINumber = null,
-            DateOfDeath = dateOfDeath.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd")
+            DateOfDeath = dateOfDeath.ToString("yyyyMMdd")
         };
 
         // Act
@@ -1361,7 +1360,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             LastName = null,
             FirstNameOrMiddleName = null,
             PreviousLastName = null,
-            DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd"),
+            DateOfBirth = dateOfBirth.ToString("yyyyMMdd"),
             NINumber = null,
             DateOfDeath = dateOfDeath
         };

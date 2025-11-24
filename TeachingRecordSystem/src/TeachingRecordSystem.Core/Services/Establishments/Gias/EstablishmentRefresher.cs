@@ -9,9 +9,9 @@ public class EstablishmentRefresher(
     public async Task RefreshEstablishmentsAsync(CancellationToken cancellationToken)
     {
         int i = 0;
-        await foreach (var establishment in establishmentMasterDataService.GetEstablishmentsAsync())
+        await foreach (var establishment in establishmentMasterDataService.GetEstablishmentsAsync().WithCancellation(cancellationToken))
         {
-            var existingEstablishment = await dbContext.Establishments.SingleOrDefaultAsync(e => e.Urn == establishment.Urn);
+            var existingEstablishment = await dbContext.Establishments.SingleOrDefaultAsync(e => e.Urn == establishment.Urn, cancellationToken: cancellationToken);
             if (existingEstablishment == null)
             {
                 dbContext.Establishments.Add(new()

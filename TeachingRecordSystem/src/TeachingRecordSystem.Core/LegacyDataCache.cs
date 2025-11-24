@@ -6,7 +6,7 @@ public class LegacyDataCache
 
     public static LegacyDataCache Instance { get; } = new();
 
-    public IReadOnlyCollection<MqEstablishment> MqEstablishments =
+    public IReadOnlyCollection<MqEstablishment> MqEstablishments { get; } =
     [
         new("Liverpool John Moores University", "964",  true),
         new("Plymouth University",  "965",  true),
@@ -50,7 +50,7 @@ public class LegacyDataCache
         new("University of Oxford/Oxford Polytechnic", "963", true)
     ];
 
-    public IReadOnlyCollection<MqSpecialism> MqSpecialisms =
+    public IReadOnlyCollection<MqSpecialism> MqSpecialisms { get; } =
     [
         new("Deaf education", "Deaf education", true),
         new("N/A", "N/A", true),
@@ -60,7 +60,7 @@ public class LegacyDataCache
         new("Visual Impairment", "Visual", true)
     ];
 
-    public IReadOnlyCollection<SanctionCode> SanctionCodes =
+    public IReadOnlyCollection<SanctionCode> SanctionCodes { get; } =
     [
         new("FOR INTERNAL INFORMATION ONLY - known duplicate record", "T10", true),
         new("FOR INTERNAL INFORMATION ONLY - see alert details", "T9", true),
@@ -105,7 +105,9 @@ public class LegacyDataCache
         new("Formerly on List 99", "B6", false),
         new("Prohibited by the Secretary of State  -  failed probation", "C1", true),
         new("Failed induction", "C2", true),
-        new("Restricted by the Secretary of State  -  failed probation  -  permitted to carry out specified work for a period equal in length to a statutory induction period only", "C3", true),
+        new(
+            "Restricted by the Secretary of State  -  failed probation  -  permitted to carry out specified work for a period equal in length to a statutory induction period only",
+            "C3", true),
         new("Ineligible for registration  -  refer to General Teaching Council for Scotland", "D1", false),
         new("Eligible for registration subject to General Teaching Council for Scotland disciplinary order", "D2", false),
         new("Ineligible for registration subject to General Teaching Council for Wales disciplinary order", "D3", false),
@@ -130,7 +132,7 @@ public class LegacyDataCache
         new("Council Member  -  do not register", "Z2", false)
     ];
 
-    public IReadOnlyCollection<TeacherStatus> TeacherStatuses =
+    public IReadOnlyCollection<TeacherStatus> TeacherStatuses { get; } =
     [
         new("Early Years Teacher Status", "221", false),
         new("Early Years Trainee", "220", false),
@@ -139,7 +141,9 @@ public class LegacyDataCache
         new("Qualified teacher: by virtue of achieving international qualified teacher status", "90", true),
         new("Qualified Teacher (by virtue of non-UK teaching qualifications)", "104", true),
         new("Partial qualified teacher status: qualified to teach in SEN establishments", "214", true),
-        new("Teacher, other than an uncertificated or supplementary teacher, employed under Regulation 16(3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959", "10", false),
+        new(
+            "Teacher, other than an uncertificated or supplementary teacher, employed under Regulation 16(3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959",
+            "10", false),
         new("Qualified Teacher: Assessment Only Route", "100", true),
         new("Qualified Teacher: Teach First Programme (TNP)", "101", false),
         new("Qualified Teacher: Troops to Teach Programme", "102", false),
@@ -158,27 +162,51 @@ public class LegacyDataCache
         new("Trainee Teacher: HESA", "210", false),
         new("Trainee Teacher", "211", true),
         new("AOR Candidate", "212", true),
-        new("Qualified teacher: following at least 1 terms service as a licensed teacher (in respect of 3 yrs OTT), further qualified to teach the deaf or partially hearing impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils", "23", false),
-        new("Qualified Teacher: following at least 1 school yrs service as a licensed teacher (in respect of those with 2 years or more experience in an independent school), further qualified to teach the deaf or partially hearing impaired under Re", "24", false),
-        new("Qualified Teacher: Teacher trained/registered in Scotland, further qualified to teach the deaf or partially hearing impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959.", "28", true),
-        new("Teacher employed as an uncertificated teacher under Regulation 16 (3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959", "30", false),
-        new("Qualified teacher: following at least one terms service as a licensed teacher (in respect of 3 years overseas trained teachers), further qualified to teach the blind or visually impaired under Regulation 15(2) of the Special Schools and", "33", false),
-        new("Qualified Teacher: following at least one school years service as a licensed teacher (in respect of those with 2 years or more experience in an independent school), further qualified to teach the blind or visually impaired under Regul", "34", false),
-        new("Qualified Teacher: Teachers trained/registered in Scotland, further qualified to teach the blind or visually impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959.", "38", false),
-        new("Supplementary teacher employed under Regulation 16(3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959", "40", false),
-        new("Person who has completed a course of instruction in the care of young children and whose appointment to the assistant staff of a nursery school or to the staff of a nursery class is approved under Regulation 16(3)(c) of the Schools Regulati", "44", false),
+        new(
+            "Qualified teacher: following at least 1 terms service as a licensed teacher (in respect of 3 yrs OTT), further qualified to teach the deaf or partially hearing impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils",
+            "23", false),
+        new(
+            "Qualified Teacher: following at least 1 school yrs service as a licensed teacher (in respect of those with 2 years or more experience in an independent school), further qualified to teach the deaf or partially hearing impaired under Re",
+            "24", false),
+        new(
+            "Qualified Teacher: Teacher trained/registered in Scotland, further qualified to teach the deaf or partially hearing impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959.",
+            "28", true),
+        new(
+            "Teacher employed as an uncertificated teacher under Regulation 16 (3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959",
+            "30", false),
+        new(
+            "Qualified teacher: following at least one terms service as a licensed teacher (in respect of 3 years overseas trained teachers), further qualified to teach the blind or visually impaired under Regulation 15(2) of the Special Schools and",
+            "33", false),
+        new(
+            "Qualified Teacher: following at least one school years service as a licensed teacher (in respect of those with 2 years or more experience in an independent school), further qualified to teach the blind or visually impaired under Regul",
+            "34", false),
+        new(
+            "Qualified Teacher: Teachers trained/registered in Scotland, further qualified to teach the blind or visually impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959.",
+            "38", false),
+        new(
+            "Supplementary teacher employed under Regulation 16(3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959",
+            "40", false),
+        new(
+            "Person who has completed a course of instruction in the care of young children and whose appointment to the assistant staff of a nursery school or to the staff of a nursery class is approved under Regulation 16(3)(c) of the Schools Regulati",
+            "44", false),
         new("Qualified teacher: Following at least one school year's service on the Teach First Programme", "45", false),
         new("Trainee on Registered Teacher Programme", "46", false),
         new("Qualified teacher: Following at least one year's service on the Registered Teacher Programme", "47", true),
         new("Trainee on Graduate Teacher Programme", "48", false),
         new("Qualified teacher: Following at least one term's service on the Graduate Teacher Programme", "49", true),
-        new("Person not qualified for employment as a regular teacher whose employment as an Instructor is allowed under Regulation 18 of the Schools Regulations 1959", "50", true),
+        new(
+            "Person not qualified for employment as a regular teacher whose employment as an Instructor is allowed under Regulation 18 of the Schools Regulations 1959",
+            "50", true),
         new("Qualified Teacher (Overseas Trained Teacher needing to complete induction)", "51", false),
         new("Qualified Teacher (Overseas Trained Teacher exempt from induction)", "52", false),
         new("Qualified Teacher (Further Education)", "53", false),
         new("Registered Teacher", "54", false),
-        new("Person whose employment is authorised under Regulation 153c of The Handicapped Pupils and Special Schools Regulations 1959 as holder of the Diploma in the Teaching on Mentally Handicapped Children awarded by the Training Council for Teacher", "55", false),
-        new("Person whose employment is authorised under Regulation 15(3)(c) of The Handicapped Pupils and Special Schools Regulations 1959 as holder of the Declaration of Recognition of Experience awarded by the Training Council for Teachers of the Men", "56", false),
+        new(
+            "Person whose employment is authorised under Regulation 153c of The Handicapped Pupils and Special Schools Regulations 1959 as holder of the Diploma in the Teaching on Mentally Handicapped Children awarded by the Training Council for Teacher",
+            "55", false),
+        new(
+            "Person whose employment is authorised under Regulation 15(3)(c) of The Handicapped Pupils and Special Schools Regulations 1959 as holder of the Declaration of Recognition of Experience awarded by the Training Council for Teachers of the Men",
+            "56", false),
         new("Person whose employment is authorised under Regulation 16A of the Handicapped Pupils and Special Schools Regulations 1959", "57", false),
         new("Qualified teacher: TCMH  3 year,s experience.", "58", false),
         new("Licenced teacher who has withdrawn and licence is cancelled", "59", false),
@@ -186,9 +214,15 @@ public class LegacyDataCache
         new("Licensed Teacher", "61", false),
         new("Qualified Teacher: following at least 2 year's service as a licensed teacher", "62", false),
         new("Qualified Teacher: following at least one term's service as a licensed teacher (in respect of 3 year's overseas trained teachers)", "63", false),
-        new("Qualified Teacher: following at least one school year's service as a licensed teacher (in respect of those with 2 year's or more experience in an independent school)", "64", false),
-        new("Qualified Teacher: following at least one school year's service as a licensed teacher (in respect of those with 2 year's or more experience in further education)", "65", false),
-        new("Qualified Teacher: following at least one schoolyear's service as a licensed teacher (in respect of those with 2 year's or more experience in the educational services of the Armed Forces)", "66", false),
+        new(
+            "Qualified Teacher: following at least one school year's service as a licensed teacher (in respect of those with 2 year's or more experience in an independent school)",
+            "64", false),
+        new(
+            "Qualified Teacher: following at least one school year's service as a licensed teacher (in respect of those with 2 year's or more experience in further education)",
+            "65", false),
+        new(
+            "Qualified Teacher: following at least one schoolyear's service as a licensed teacher (in respect of those with 2 year's or more experience in the educational services of the Armed Forces)",
+            "66", false),
         new("Qualified Teacher: Under the EC Directive", "67", true),
         new("Qualified Teacher: Teachers trained/registered in Scotland", "68", true),
         new("Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)", "69", true),
@@ -196,29 +230,53 @@ public class LegacyDataCache
         new("Qualified teacher (trained)", "71", true),
         new("Qualified teacher (graduate non-trained)", "72", false),
         new("Qualified teacher (by virtue of long service)", "73", false),
-        new("Qualified teacher following at least one years employment as a licensed teacher with at least two years previous experience as an instructor in a maintained school (from 1 September 1991)", "74", false),
+        new(
+            "Qualified teacher following at least one years employment as a licensed teacher with at least two years previous experience as an instructor in a maintained school (from 1 September 1991)",
+            "74", false),
         new("Authorised teacher (from 1 September 1991)", "75", false),
-        new("Qualified teacher following at least one terms employment as an authorized teacher with at least one years teaching experience (from 1 september 1991)", "76", false),
+        new(
+            "Qualified teacher following at least one terms employment as an authorized teacher with at least one years teaching experience (from 1 september 1991)",
+            "76", false),
         new("Qualified teacher following a school centred Initial Teacher Training course (SCITT)", "77", false),
         new("Qualified teacher following successful completion of a period of Registration in a CTC or CCTA", "78", false),
         new("Qualified teacher (by virtue of other qualifications)", "79", false),
         new("Qualified Teacher (under the Flexible Post-graduate route)", "80", false),
-        new("Qualified teacher (trained) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "81", false),
-        new("Qualified teacher (graduate non-trained) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "82", false),
-        new("Qualified teacher (by virtue of long service) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "83", false),
+        new(
+            "Qualified teacher (trained) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            "81", false),
+        new(
+            "Qualified teacher (graduate non-trained) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            "82", false),
+        new(
+            "Qualified teacher (by virtue of long service) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            "83", false),
         new("Qualified teacher of children with Multi-sensory Impairments (from 1 June 1991)", "85", false),
-        new("Qualified teacher (under the EC Directive) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "87", true),
-        new("Qualified teacher (by virtue of other qualifications) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations", "89", false),
-        new("Qualified teacher (trained) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "91", false),
-        new("Qualified teacher (graduate non-trained) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "92", false),
-        new("Qualified teacher (by virtue of long service) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "93", false),
-        new("Qualified teacher (under the EC Directive) further qualifed to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "97", false),
-        new("Qualified teacher (by virtue of other qualifications) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959 a maintained school.", "99", false),
+        new(
+            "Qualified teacher (under the EC Directive) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            "87", true),
+        new(
+            "Qualified teacher (by virtue of other qualifications) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations",
+            "89", false),
+        new(
+            "Qualified teacher (trained) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            "91", false),
+        new(
+            "Qualified teacher (graduate non-trained) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            "92", false),
+        new(
+            "Qualified teacher (by virtue of long service) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            "93", false),
+        new(
+            "Qualified teacher (under the EC Directive) further qualifed to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            "97", false),
+        new(
+            "Qualified teacher (by virtue of other qualifications) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959 a maintained school.",
+            "99", false),
         new("QTS Awarded in error", "999", false),
         new("Qualified Teacher: QTS awarded in Wales", "213", true)
     ];
 
-    public IReadOnlyCollection<EarlyYearsStatus> EarlyYearsStatuses =
+    public IReadOnlyCollection<EarlyYearsStatus> EarlyYearsStatuses { get; } =
     [
         new("Early Years Trainee", "220", true),
         new("Early Years Teacher Status", "221", true),

@@ -23,7 +23,7 @@ public static class ExemptionReasonCategories
             InductionExemptionReason.QtlsId,
             InductionExemptionReason.OverseasTrainedTeacherId,
             InductionExemptionReason.ExemptId,
-            InductionExemptionReason.QualifiedThroughEEAMutualRecognitionRouteId} },
+            InductionExemptionReason.QualifiedThroughEeaMutualRecognitionRouteId} },
         { ExemptionReasonCategory.HistoricalQualificationRoute, new List<Guid> {
             InductionExemptionReason.QualifiedBetween7May1999And1April2003FirstPostInWalesId,
             InductionExemptionReason.RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceId,
@@ -45,7 +45,7 @@ public static class ExemptionReasonCategories
             InductionExemptionReason.QualifiedThroughFurtherEducationRouteBetween1Sep2001And1Sep2004Id,
             InductionExemptionReason.ExemptDataLossOrErrorCriteriaId,
             InductionExemptionReason.ExemptId,
-            InductionExemptionReason.QualifiedThroughEEAMutualRecognitionRouteId} },
+            InductionExemptionReason.QualifiedThroughEeaMutualRecognitionRouteId} },
         { ExemptionReasonCategory.HistoricalQualificationRoute, new List<Guid> {
             InductionExemptionReason.QualifiedBetween7May1999And1April2003FirstPostInWalesId,
             InductionExemptionReason.RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceId,

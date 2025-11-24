@@ -117,11 +117,6 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
-                nameof(CpdInductionImporterJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
             recurringJobManager.AddOrUpdate<BackfillDqtReportingAlertTypesJob>(
                 nameof(BackfillDqtReportingAlertTypesJob),
                 job => job.ExecuteAsync(CancellationToken.None),
@@ -140,16 +135,6 @@ public static class Extensions
 
             recurringJobManager.AddOrUpdate<BackfillEmployerEmailAddressInEmploymentHistoryJob>(
                 nameof(BackfillEmployerEmailAddressInEmploymentHistoryJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<FixIncorrectOttRouteMigrationMappingsJob>(
-                nameof(FixIncorrectOttRouteMigrationMappingsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<BackfillPersonCreatedByTpsJob>(
-                nameof(BackfillPersonCreatedByTpsJob),
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
@@ -249,6 +234,9 @@ public static class Extensions
             recurringJobManager.RemoveIfExists("ResyncAllPersonsJob");
             recurringJobManager.RemoveIfExists("CreatePersonMigratedEventsJob");
             recurringJobManager.RemoveIfExists("SyncAllDqtAnnotationAuditsJob");
+            recurringJobManager.RemoveIfExists("BackfillPersonCreatedByTpsJob");
+            recurringJobManager.RemoveIfExists("FixIncorrectOttRouteMigrationMappingsJob");
+            recurringJobManager.RemoveIfExists("CpdInductionImporterJob");
 
             return Task.CompletedTask;
         });

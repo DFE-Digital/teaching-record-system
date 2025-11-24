@@ -3,8 +3,6 @@ using MediatR;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V1.Handlers;
 
@@ -17,7 +15,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             return null;
         }
 
-        var birthDate = request.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)!.Value.ToString("yyyy-MM-dd");
+        var birthDate = request.BirthDate!.Value.ToString("yyyy-MM-dd");
         var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
         var matched = await dbContext.Persons.FromSql(
@@ -65,7 +63,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             Name = StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
             DateOfBirth = person.DateOfBirth.ToDateTime(),
             ActiveAlert = person.HasOpenAlert,
-            State = ContactState.Active,
+            State = 0,
             StateName = "Active"
         };
 
@@ -79,7 +77,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
                     StartDate = person.InductionStartDate.ToDateTime(),
                     CompletionDate = person.InductionCompletedDate.ToDateTime(),
                     InductionStatusName = statusDescription,
-                    State = dfeta_inductionState.Active,
+                    State = 0,
                     StateName = "Active"
                 } :
                 null;
@@ -92,7 +90,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
                 return new QualifiedTeacherStatus
                 {
                     Name = "",
-                    State = dfeta_qtsregistrationState.Active,
+                    State = 0,
                     StateName = "Active",
                     QtsDate = person.QtsDate.ToDateTime()
                 };
@@ -101,8 +99,4 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             return null;
         }
     }
-
-#pragma warning disable IDE1006 // Naming Styles
-    private record PersonIdResult(Guid person_id);
-#pragma warning restore IDE1006 // Naming Styles
 }

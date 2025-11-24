@@ -22,7 +22,7 @@ public class BackfillDqtReportingPersonsJob(IConfiguration configuration, TrsDbC
         {
             truncateCmd.Transaction = txn;
             truncateCmd.CommandText = "truncate table trs_persons";
-            await truncateCmd.ExecuteNonQueryAsync();
+            await truncateCmd.ExecuteNonQueryAsync(cancellationToken);
         }
 
         var dataTable = new DataTable();
@@ -95,6 +95,6 @@ public class BackfillDqtReportingPersonsJob(IConfiguration configuration, TrsDbC
             dataTable.Rows.Clear();
         }
 
-        await txn.CommitAsync();
+        await txn.CommitAsync(cancellationToken);
     }
 }

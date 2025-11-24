@@ -46,7 +46,7 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
                 data!.FileName,
                 data!.IntegrationTransactionId,
                 $"{t.Person!.FirstName} {t.Person!.LastName}",
-                t.CreatedOn.ToDateOnlyWithDqtBstFix(true)
+                DateOnly.FromDateTime(t.CreatedOn)
             );
         }).ToList();
 

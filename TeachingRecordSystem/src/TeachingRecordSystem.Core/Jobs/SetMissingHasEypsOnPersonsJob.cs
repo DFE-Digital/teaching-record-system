@@ -71,7 +71,7 @@ public class SetMissingHasEypsOnPersonsJob(
         using var writer = new StreamWriter(stream);
         using var csv = new CsvHelper.CsvWriter(writer, System.Globalization.CultureInfo.InvariantCulture);
         await csv.WriteRecordsAsync(updatedPersons.Select(p => new { PersonId = p }), cancellationToken);
-        await writer.FlushAsync();
+        await writer.FlushAsync(cancellationToken);
         stream.Position = 0;
 
         await fileService.UploadFileAsync($"setmissinghaseyps{clock.UtcNow:yyyyMMddHHmmss}.csv", stream, "text/csv");
