@@ -458,9 +458,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         // Create enough tasks to create 3 pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId)));
+        foreach (var _ in Enumerable.Range(1, (pageSize * page) + 1))
+        {
+            await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        }
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
