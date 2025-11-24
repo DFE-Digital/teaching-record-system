@@ -1,0 +1,264 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
+
+namespace TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
+
+[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
+public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
+{
+    [Fact]
+    public async Task SearchApiTrnRequests_TextIsDate_ReturnsTasksCreatedOnDate()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var search = task.CreatedOn.ToString("d/M/yyyy");
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_TextIsEmailAddress_ReturnsTaskWithMatchingTrnRequestEmailAddress()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var search = task.TrnRequestMetadata!.EmailAddress;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_TextIsNeitherADateNorAnEmailAddress_ReturnsTasksWithMatchingTrnRequestName()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var search = $"{task.TrnRequestMetadata!.FirstName} {task.TrnRequestMetadata.LastName}";
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchWithNoSearchText_ReturnsOpenApiTrnRequestSupportTasks()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_DoesNotReturnClosedTasks()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbTask = await dbContext.SupportTasks.FindAsync(task.SupportTaskReference);
+            dbTask!.Status = SupportTaskStatus.Closed;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Empty(results);
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_WithSortByNameAscending_SortsByNameAscending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Alice").WithLastName("Zephyr"));
+        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Bob").WithLastName("Yellow"));
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Name, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results,
+            r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference),
+            r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_WithSortByNameDescending_SortsByNameDescending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Alice").WithLastName("Zephyr"));
+        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Bob").WithLastName("Yellow"));
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Name, SortDirection.Descending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results,
+            r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference),
+            r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_WithSortByEmailAscending_SortsByEmailAddressAscending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("alice@example.com"));
+        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("bob@example.com"));
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Email, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results,
+            r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference),
+            r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_WithSortByEmailDescending_SortsByEmailAddressDescending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("alice@example.com"));
+        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("bob@example.com"));
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Email, SortDirection.Descending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results,
+            r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference),
+            r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_WithSortByRequestedOnAscending_SortsByRequestedOnAscending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        Clock.Advance();
+        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results,
+            r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference),
+            r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_WithSortByRequestedOnDescending_SortsByRequestedOnDescending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        Clock.Advance();
+        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Descending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results,
+            r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference),
+            r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_WithSortBySourceAscending_SortsBySourceApplicationUserNameAscending()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var taskForUser1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        var taskForUser2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Source, SortDirection.Ascending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results,
+            r => Assert.Equal(taskForUser1.SupportTaskReference, r.SupportTaskReference),
+            r => Assert.Equal(taskForUser2.SupportTaskReference, r.SupportTaskReference));
+    }
+
+    [Fact]
+    public async Task SearchApiTrnRequests_WithSortBySourceDescending_SortsBySourceApplicationUserNameDescending()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var taskForUser1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        var taskForUser2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
+
+        var search = string.Empty;
+        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Source, SortDirection.Descending);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+
+        // Assert
+        Assert.Collection(results,
+            r => Assert.Equal(taskForUser2.SupportTaskReference, r.SupportTaskReference),
+            r => Assert.Equal(taskForUser1.SupportTaskReference, r.SupportTaskReference));
+    }
+}

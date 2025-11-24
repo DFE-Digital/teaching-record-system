@@ -21,6 +21,7 @@ using TeachingRecordSystem.SupportUi.Pages;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.WebCommon.Filters;
 using TeachingRecordSystem.WebCommon.Infrastructure.Redis;
@@ -97,7 +98,8 @@ public static class Extensions
             .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>()
             .AddTransient<EvidenceUploadManager>()
             .AddScoped<SupportUiFormContext>()
-            .AddSingleton<PersonChangeableAttributesService>();
+            .AddSingleton<PersonChangeableAttributesService>()
+            .AddSupportTaskSearchService();
 
         if (environment.IsProduction())
         {

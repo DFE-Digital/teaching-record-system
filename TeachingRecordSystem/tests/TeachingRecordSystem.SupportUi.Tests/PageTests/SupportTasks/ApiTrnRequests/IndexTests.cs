@@ -1,6 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests;
 

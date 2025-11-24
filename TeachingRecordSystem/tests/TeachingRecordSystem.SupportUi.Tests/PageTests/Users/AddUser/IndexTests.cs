@@ -1,3 +1,5 @@
+using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -136,7 +138,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(email, new User
         {
             Email = email,
             Name = name,
@@ -171,7 +173,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var userId = Guid.NewGuid();
         var existingUser = await TestData.CreateUserAsync(name: name, email: email, azureAdUserId: userId);
 
-        ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(email, new User
         {
             Email = email,
             Name = name,
@@ -194,8 +196,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/users/{existingUser.UserId}", response.Headers.Location?.OriginalString);
     }
 
-
-    private void ConfigureUserServiceMock(string email, Services.AzureActiveDirectory.User? user) =>
+    private void ConfigureUserServiceMock(string email, User? user) =>
         AzureActiveDirectoryUserServiceMock
             .Setup(mock => mock.GetUserByEmailAsync(email))
             .ReturnsAsync(user);

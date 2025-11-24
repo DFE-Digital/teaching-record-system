@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 public enum ApiTrnRequestsSortByOption
 {
