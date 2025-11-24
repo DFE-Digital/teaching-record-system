@@ -5,8 +5,10 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
+using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
@@ -34,7 +36,7 @@ public abstract class TestBase
 
     protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
 
-    protected Mock<Services.AzureActiveDirectory.IAadUserService> AzureActiveDirectoryUserServiceMock =>
+    protected Mock<IAadUserService> AzureActiveDirectoryUserServiceMock =>
         TestScopedServices.GetCurrent().AzureActiveDirectoryUserServiceMock;
 
     protected HttpClient HttpClient { get; }

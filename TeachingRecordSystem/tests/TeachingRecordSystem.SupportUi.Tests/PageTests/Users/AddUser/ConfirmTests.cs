@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
 
@@ -15,7 +16,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -62,7 +63,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -93,7 +94,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -126,7 +127,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newName = TestData.GenerateName();
         var role = UserRoles.RecordManager;
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -190,7 +191,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var userId = Guid.NewGuid().ToString();
         var role = UserRoles.RecordManager;
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -224,7 +225,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -258,7 +259,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -292,7 +293,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -326,7 +327,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -362,7 +363,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newName = TestData.GenerateName();
         var role = UserRoles.RecordManager;
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
+        ConfigureUserServiceMock(userId, new User
         {
             Email = email,
             Name = name,
@@ -409,7 +410,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, $"{newName} has been added as a record manager.");
     }
 
-    private void ConfigureUserServiceMock(string userId, Services.AzureActiveDirectory.User? user) =>
+    private void ConfigureUserServiceMock(string userId, User? user) =>
         AzureActiveDirectoryUserServiceMock
             .Setup(mock => mock.GetUserByIdAsync(userId))
             .ReturnsAsync(user);
