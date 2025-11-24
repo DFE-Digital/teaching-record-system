@@ -66,11 +66,6 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(inductionEmailJobOptions.JobSchedule));
 
-            recurringJobManager.AddOrUpdate<SyncAllPersonsFromCrmJob>(
-                nameof(SyncAllPersonsFromCrmJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
             recurringJobManager.AddOrUpdate<PopulateNameSynonymsJob>(
                 nameof(PopulateNameSynonymsJob),
                 job => job.ExecuteAsync(CancellationToken.None),
@@ -127,39 +122,9 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<ClearAlertsJob>(
-                nameof(ClearAlertsJob),
-                job => job.ExecuteAsync(),
-                Cron.Never);
-
             recurringJobManager.AddOrUpdate<BackfillDqtReportingAlertTypesJob>(
                 nameof(BackfillDqtReportingAlertTypesJob),
                 job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<SyncAllDqtContactAuditsJob>(
-                nameof(SyncAllDqtContactAuditsJob),
-                job => job.ExecuteAsync(/*performContext: */null!, CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<SyncAllDqtInductionAuditsJob>(
-                nameof(SyncAllDqtInductionAuditsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<SyncAllDqtIttAuditsJob>(
-                nameof(SyncAllDqtIttAuditsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<SyncAllDqtQtsAuditsJob>(
-                nameof(SyncAllDqtQtsAuditsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<SyncDqtContactAuditsMopUpJob>(
-                nameof(SyncDqtContactAuditsMopUpJob),
-                job => job.ExecuteAsync(/*modifiedSince: */new DateTime(2024, 12, 24), CancellationToken.None),
                 Cron.Never);
 
             recurringJobManager.AddOrUpdate<EwcWalesImportJob>(
@@ -178,11 +143,6 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<ResyncAllPersonsJob>(
-                nameof(ResyncAllPersonsJob),
-                job => job.ExecuteAsync(new DateTime(2025, 8, 22, 0, 0, 0, DateTimeKind.Utc), CancellationToken.None),
-                Cron.Never);
-
             recurringJobManager.AddOrUpdate<FixIncorrectOttRouteMigrationMappingsJob>(
                 nameof(FixIncorrectOttRouteMigrationMappingsJob),
                 job => job.ExecuteAsync(CancellationToken.None),
@@ -190,11 +150,6 @@ public static class Extensions
 
             recurringJobManager.AddOrUpdate<BackfillPersonCreatedByTpsJob>(
                 nameof(BackfillPersonCreatedByTpsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<CreatePersonMigratedEventsJob>(
-                nameof(CreatePersonMigratedEventsJob),
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
@@ -253,11 +208,6 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<SyncAllDqtAnnotationAuditsJob>(
-                nameof(SyncAllDqtAnnotationAuditsJob),
-                job => job.ExecuteAsync(/*performContext: */null!, CancellationToken.None),
-                Cron.Never);
-
             recurringJobManager.AddOrUpdate<BackfillCapitaImportWarningStatusesJob>(
                 $"{nameof(BackfillCapitaImportWarningStatusesJob)} (dry-run)",
                 job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
@@ -289,6 +239,16 @@ public static class Extensions
                 GetRecurringJobSchedule(professionalStatusEmailJobOptions.JobSchedule));
 
             recurringJobManager.RemoveIfExists("CreateDqtAnnotationAuditEventsJob");
+            recurringJobManager.RemoveIfExists("SyncAllPersonsFromCrmJob");
+            recurringJobManager.RemoveIfExists("ClearAlertsJob");
+            recurringJobManager.RemoveIfExists("SyncAllDqtContactAuditsJob");
+            recurringJobManager.RemoveIfExists("SyncAllDqtInductionAuditsJob");
+            recurringJobManager.RemoveIfExists("SyncAllDqtIttAuditsJob");
+            recurringJobManager.RemoveIfExists("SyncAllDqtQtsAuditsJob");
+            recurringJobManager.RemoveIfExists("SyncDqtContactAuditsMopUpJob");
+            recurringJobManager.RemoveIfExists("ResyncAllPersonsJob");
+            recurringJobManager.RemoveIfExists("CreatePersonMigratedEventsJob");
+            recurringJobManager.RemoveIfExists("SyncAllDqtAnnotationAuditsJob");
 
             return Task.CompletedTask;
         });
