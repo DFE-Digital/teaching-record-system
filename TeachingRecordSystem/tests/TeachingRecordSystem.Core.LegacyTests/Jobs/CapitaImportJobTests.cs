@@ -507,7 +507,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var existingPerson = await TestData.CreatePersonAsync(p => p
             .WithNationalInsuranceNumber());
 
-        var newFirstName = Faker.Name.First();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
         var newGender = Gender.Female;
         var newDob = new DateOnly(1981, 08, 20);
         var dateOfDeath = DateOnly.FromDateTime(Clock.UtcNow.AddDays(-1));
@@ -737,7 +737,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithGender(Gender.Male)
             .WithDateOfBirth(new DateOnly(1972, 01, 01)));
 
-        var newFirstName = Faker.Name.First();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
         var newNino = Faker.Identification.UkNationalInsuranceNumber();
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
@@ -787,8 +787,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithGender(Gender.Male)
             .WithDateOfBirth(new DateOnly(1972, 01, 01)));
 
-        var newFirstName = Faker.Name.First();
-        var newLastName = Faker.Name.Last();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
+        var newLastName = TestData.GenerateChangedLastName(existingPerson.LastName);
         var newNino = Faker.Identification.UkNationalInsuranceNumber();
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, newLastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
@@ -838,8 +838,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithGender(Gender.Male)
             .WithDateOfBirth(new DateOnly(1972, 01, 01)));
 
-        var newFirstName = Faker.Name.First();
-        var newLastName = Faker.Name.Last();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
+        var newLastName = TestData.GenerateChangedLastName(existingPerson.LastName);
         var newNino = Faker.Identification.UkNationalInsuranceNumber();
         var newDob = new DateOnly(1980, 02, 02);
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, newLastName, newFirstName, newDob, newNino);
@@ -890,7 +890,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithGender(Gender.Male)
             .WithDateOfBirth(new DateOnly(1972, 01, 01)));
 
-        var newLastName = Faker.Name.Last();
+        var newLastName = TestData.GenerateChangedLastName(existingPerson.LastName);
         var newNino = Faker.Identification.UkNationalInsuranceNumber();
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, newLastName, existingPerson.FirstName, existingPerson.DateOfBirth, newNino);
 
@@ -1143,8 +1143,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithNationalInsuranceNumber());
 
         var newTrn = "1234567";
-        var newFirstName = Faker.Name.First();
-        var newLastName = Faker.Name.Last();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
+        var newLastName = TestData.GenerateChangedLastName(existingPerson.LastName);
         var newDob = new DateOnly(1981, 08, 20);
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, existingPerson.Gender, newLastName, newFirstName, newDob, existingPerson.NationalInsuranceNumber);
 
@@ -1203,8 +1203,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithDateOfBirth(new DateOnly(1972, 01, 01)));
 
         var newTrn = "8000038";
-        var newFirstName = Faker.Name.First();
-        var newLastName = Faker.Name.Last();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
+        var newLastName = TestData.GenerateChangedLastName(existingPerson.LastName);
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, existingPerson.Gender, newLastName, newFirstName, existingPerson.DateOfBirth, existingPerson.NationalInsuranceNumber);
 
         // Act
@@ -1263,8 +1263,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithDateOfBirth(new DateOnly(1972, 01, 01)));
 
         var newTrn = "8000038";
-        var newFirstName = Faker.Name.First();
-        var newLastName = Faker.Name.Last();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
+        var newLastName = TestData.GenerateChangedLastName(existingPerson.LastName);
         var newGender = Gender.Female;
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, newGender, newLastName, newFirstName, existingPerson.DateOfBirth, existingPerson.NationalInsuranceNumber);
 
@@ -1320,8 +1320,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithNationalInsuranceNumber());
 
         var newTrn = "1234567";
-        var newFirstName = Faker.Name.First();
-        var newLastName = Faker.Name.Last();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
+        var newLastName = TestData.GenerateChangedLastName(existingPerson.LastName);
         var newDob = new DateOnly(1981, 08, 20);
         var newGender = Gender.Female;
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, newGender, newLastName, newFirstName, newDob, existingPerson.NationalInsuranceNumber);
@@ -1377,7 +1377,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithDateOfBirth(new DateOnly(1981, 08, 20)));
 
         var newTrn = "1234567";
-        var newFirstName = Faker.Name.First();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
         var newNino = Faker.Identification.UkNationalInsuranceNumber();
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, existingPerson.Gender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
@@ -1425,7 +1425,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var existingPerson = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
 
         var newTrn = "1234567";
-        (var reader, var rowData) = BuildSingleRowCsv("1234567", Gender.Male, "test", "Test", existingPerson.DateOfBirth, Faker.Identification.UkNationalInsuranceNumber());
+        var newNino = TestData.GenerateChangedNationalInsuranceNumber(existingPerson.NationalInsuranceNumber!);
+        (var reader, var rowData) = BuildSingleRowCsv("1234567", Gender.Male, "test", "Test", existingPerson.DateOfBirth, newNino);
 
         // Act
         var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
@@ -1548,8 +1549,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithDateOfBirth(new DateOnly(1972, 01, 01))
             .WithNationalInsuranceNumber());
 
-        var newFirstName = Faker.Name.First();
-        var newNino = Faker.Identification.UkNationalInsuranceNumber();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
+        var newNino = TestData.GenerateChangedNationalInsuranceNumber(existingPerson.NationalInsuranceNumber!);
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
@@ -1598,9 +1599,9 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             .WithGender(Gender.Male)
             .WithDateOfBirth(new DateOnly(1972, 01, 01)));
 
-        var newFirstName = Faker.Name.First();
+        var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
         var newGender = Gender.Female;
-        var newNino = Faker.Identification.UkNationalInsuranceNumber();
+        var newNino = TestData.GenerateChangedNationalInsuranceNumber(existingPerson.NationalInsuranceNumber!);
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, newGender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
