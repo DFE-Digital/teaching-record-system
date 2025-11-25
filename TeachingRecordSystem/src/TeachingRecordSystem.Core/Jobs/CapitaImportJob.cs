@@ -125,11 +125,30 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
 #pragma warning disable CA1806
                     NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
 #pragma warning restore CA1806
-                    var potentialMatches = await GetPotentialMatchingPersonsAsync(row);
                     if (person is null)
                     {
                         //create person if incoming record is not known in trs
                         var (newPerson, personAttributes) = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddleName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow, createdByTps: true);
+
+                        var trnRequestMetadata = new TrnRequestMetadata()
+                        {
+                            ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
+                            RequestId = Guid.NewGuid().ToString(),
+                            CreatedOn = now,
+                            IdentityVerified = null,
+                            OneLoginUserSubject = null,
+                            Name = new[] { newPerson.FirstName, newPerson.MiddleName, newPerson.LastName }.GetNonEmptyValues(),
+                            FirstName = newPerson.FirstName,
+                            MiddleName = newPerson.MiddleName,
+                            LastName = newPerson.LastName,
+                            PreviousFirstName = null,
+                            PreviousLastName = row.PreviousLastName,
+                            DateOfBirth = newPerson.DateOfBirth!.Value!,
+                            EmailAddress = null,
+                            NationalInsuranceNumber = newPerson.NationalInsuranceNumber,
+                            Gender = newPerson.Gender,
+                        };
+
                         var createdEvent = new LegacyEvents.PersonCreatedEvent
                         {
                             EventId = Guid.NewGuid(),
@@ -140,7 +159,7 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                             CreateReason = null,
                             CreateReasonDetail = null,
                             EvidenceFile = null,
-                            TrnRequestMetadata = null
+                            TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata)
                         };
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
@@ -156,27 +175,14 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                         await dbContext.AddEventAndBroadcastAsync(createdEvent);
                         personId = newPerson.PersonId;
 
+                        var potentialMatches = await personMatchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
+
                         //create task
                         if (potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || potentialMatches.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
                         {
-                            var trnRequestMetadata = new TrnRequestMetadata()
-                            {
-                                ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
-                                RequestId = Guid.NewGuid().ToString(),
-                                CreatedOn = now,
-                                IdentityVerified = null,
-                                OneLoginUserSubject = null,
-                                Name = new[] { newPerson.FirstName, newPerson.MiddleName, newPerson.LastName }.GetNonEmptyValues(),
-                                FirstName = newPerson.FirstName,
-                                MiddleName = newPerson.MiddleName,
-                                LastName = newPerson.LastName,
-                                DateOfBirth = newPerson.DateOfBirth!.Value!,
-                                EmailAddress = null,
-                                NationalInsuranceNumber = newPerson.NationalInsuranceNumber,
-                                Gender = newPerson.Gender,
-                                PotentialDuplicate = true,
-                                Matches = new TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] }
-                            };
+                            trnRequestMetadata.PotentialDuplicate = true;
+                            trnRequestMetadata.Matches = new TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] };
+
                             dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
                             potentialDuplicate = true;
@@ -245,6 +251,7 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                             rowFailureMessage.Append($"Warning: Attempted to update lastname from {person.LastName} to {row.LastName},");
                             hasWarnings = true;
                         }
+
                         if (hasWarnings)
                         {
                             recordStatus = IntegrationTransactionRecordStatus.Warning;
@@ -382,29 +389,6 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
         }
 
         return (errors, warnings, person);
-    }
-
-    public async Task<TrnRequestMatchResult> GetPotentialMatchingPersonsAsync(CapitaImportRecord row)
-    {
-        var requestData = new TrnRequestMetadata()
-        {
-            ApplicationUserId = SystemUser.SystemUserId,
-            RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = clock.UtcNow,
-            IdentityVerified = null,
-            EmailAddress = null,
-            OneLoginUserSubject = null,
-            FirstName = row.GetFirstName(),
-            MiddleName = row.GetMiddleName(),
-            LastName = row.LastName,
-            PreviousFirstName = null,
-            PreviousLastName = row.PreviousLastName,
-            Name = [row.GetFirstName()!, row.GetMiddleName()!, row.LastName!],
-            DateOfBirth = row.GetDateOfBirth()!.Value,
-            NationalInsuranceNumber = row.NINumber
-        };
-        var matches = await personMatchingService.MatchFromTrnRequestAsync(requestData);
-        return matches;
     }
 
     public async Task<Stream> GetDownloadStreamAsync(string fileName)
