@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,6 +8,21 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<ReasonModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.AddReason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+            .NotNull().WithMessage("Select yes if you want to add more information"),
+        v => v.RuleFor(m => m.AddReasonDetail)
+            .NotNull().WithMessage("Enter additional detail")
+            .MaximumLength(4000).WithMessage("Additional detail must be 4000 characters or less")
+            .When(m => m.HasAdditionalReasonDetail == true),
+        v => v.RuleFor(m => m.Evidence.UploadEvidence)
+            .NotNull().WithMessage("Select yes if you want to upload evidence"),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -20,15 +34,12 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason")]
     public AddAlertReasonOption? AddReason { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to add more information")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? AddReasonDetail { get; set; }
 
     [BindProperty]
@@ -57,17 +68,9 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (HasAdditionalReasonDetail == true && AddReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(AddReasonDetail), "Enter additional detail");
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
-        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await evidenceUploadManager.UploadAsync(Evidence);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
