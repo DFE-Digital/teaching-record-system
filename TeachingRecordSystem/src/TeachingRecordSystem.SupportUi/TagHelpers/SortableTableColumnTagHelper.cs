@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.WebUtilities;
@@ -99,7 +100,7 @@ public class SortableTableCaptionTagHelper(SupportUiSortableTableContext tableCo
 
             var content = await output.GetChildContentAsync();
             tableContext.CaptionAttributes = context.AllAttributes.ToDictionary(a => a.Name, a => a.Value.ToString());
-            tableContext.CaptionContent = content;
+            tableContext.CaptionContent = new HtmlString(content.GetContent());
             output.SuppressOutput();
         }
     }
@@ -132,7 +133,7 @@ public class SortableTableTagHelper(SupportUiSortableTableContext tableContext) 
                     }
                 }
 
-                if (tableContext.CaptionContent is TagHelperContent captionContent)
+                if (tableContext.CaptionContent is HtmlString captionContent)
                 {
                     caption.InnerHtml.AppendHtml(captionContent);
                 }
@@ -169,11 +170,16 @@ public class SortableTableTagHelper(SupportUiSortableTableContext tableContext) 
     }
 }
 
+// Context class for SortableTable tag helpers to communicate with each other.
+// Unfortunately TagHelperContext.Items cannot be used for this purpose as any
+// partial view or view component within the hierarchy interrupts the TagHelperContext
+// and causes a new context to be created, making it unusable for this purpose
+// This must be injected in request scope using .AddScoped()
 public class SupportUiSortableTableContext
 {
     public bool IsWithinTableContext { get; set; }
     public bool HasSortableColumn { get; set; }
     public bool HasCaption { get; set; }
     public Dictionary<string, string?>? CaptionAttributes { get; set; }
-    public TagHelperContent? CaptionContent { get; set; }
+    public HtmlString? CaptionContent { get; set; }
 }

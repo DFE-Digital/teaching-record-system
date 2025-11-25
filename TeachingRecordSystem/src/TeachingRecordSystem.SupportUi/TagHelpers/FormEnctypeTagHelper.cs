@@ -30,6 +30,11 @@ public class FileUploadTagHelper(SupportUiFormContext formContext) : TagHelper
     }
 }
 
+// Context class for form tag helpers to communicate with each other.
+// Unfortunately TagHelperContext.Items cannot be used for this purpose as any
+// partial view or view component within the hierarchy interrupts the TagHelperContext
+// and causes a new context to be created, making it unusable for this purpose
+// This must be injected in request scope using .AddScoped()
 public class SupportUiFormContext
 {
     public bool HasFileUpload { get; set; }
