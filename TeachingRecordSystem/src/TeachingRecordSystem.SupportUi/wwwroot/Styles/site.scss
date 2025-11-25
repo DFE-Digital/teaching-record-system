@@ -367,3 +367,53 @@
 .trs-\!-height-full {
   height: 100% !important;
 }
+
+// Table column header sorting buttons - overriding styles from MOJ component to move
+// sort direction indicators ▼ and ▲ into span element with aria-hidden="true".
+// Also tweaks visual style so they line up better with the button text.
+
+[aria-sort] button:before,
+[aria-sort] button:after,
+[aria-sort=descending] button:before,
+[aria-sort=ascending] button:before,
+[aria-sort=descending] button:after,
+[aria-sort=ascending] button:after {
+    display: none;
+}
+
+[aria-sort] button [aria-hidden]:before {
+    content: " ▼";
+    position: absolute;
+    right: -8px;
+    top: 9px;
+    font-size: .6em;
+}
+
+[aria-sort] button [aria-hidden]:after {
+    content: " ▲";
+    position: absolute;
+    right: -8px;
+    top: -1px;
+    font-size: .6em;
+}
+
+[aria-sort=descending] button [aria-hidden]:after {
+    content: " ▼";
+    font-size: .8em;
+    position: absolute;
+    right: -9px;
+    top: 4px;
+}
+
+[aria-sort=ascending] button [aria-hidden]:after {
+    content: " ▲";
+    font-size: .8em;
+    position: absolute;
+    right: -9px;
+    top: 4px;
+}
+
+[aria-sort=descending] button [aria-hidden]:before,
+[aria-sort=ascending] button [aria-hidden]:before {
+    content: none;
+}

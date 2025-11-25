@@ -96,8 +96,9 @@ public static class Extensions
             .AddTransient<RedirectWithPersonIdFilter>()
             .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
             .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>()
-            .AddTransient<EvidenceUploadManager>()
             .AddScoped<SupportUiFormContext>()
+            .AddScoped<SupportUiSortableTableContext>()
+            .AddTransient<EvidenceUploadManager>()
             .AddSingleton<PersonChangeableAttributesService>()
             .AddSupportTaskSearchService();
 

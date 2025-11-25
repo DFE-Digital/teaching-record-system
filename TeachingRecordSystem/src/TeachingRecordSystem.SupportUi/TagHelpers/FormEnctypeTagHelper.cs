@@ -16,7 +16,7 @@ public class FormEnctypeTagHelper(SupportUiFormContext formContext) : TagHelper
             output.Attributes.Add("enctype", "multipart/form-data");
         }
 
-        // Reset for the next form
+        // Reset context for the next form in the page
         formContext.HasFileUpload = false;
     }
 }
