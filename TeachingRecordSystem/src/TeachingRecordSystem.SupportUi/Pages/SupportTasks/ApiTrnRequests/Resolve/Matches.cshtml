@@ -1,4 +1,5 @@
 @page "/support-tasks/api-trn-requests/{supportTaskReference}/resolve/matches/{handler?}"
+@using TeachingRecordSystem.Core.Services.PersonMatching
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.Matches
 @{
     ViewBag.Title = $"Compare {Model.SourceApplicationUserName} request with potential matches";
@@ -20,9 +21,24 @@
     </div>
     <div class="govuk-grid-row">
         <div class=@(showDuplicatesSideBySide ? "govuk-grid-column-full-from-desktop" : "govuk-grid-column-two-thirds-from-desktop")>
-            <govuk-inset-text class="govuk-!-margin-top-0">
-                Differences are <highlight>highlighted</highlight> on the existing records
-            </govuk-inset-text>
+            @if (Model.MatchOutcome == TrnRequestMatchResultOutcome.DefiniteMatch)
+            {
+                <govuk-inset-text class="govuk-!-margin-top-0">
+                    This request matches an existing record. To complete the task, you need to merge the request with the record.
+                </govuk-inset-text>
+            }
+            else if (Model.MatchOutcome == TrnRequestMatchResultOutcome.NoMatches)
+            {
+                <govuk-inset-text class="govuk-!-margin-top-0">
+                    This record is no longer flagged as a potential duplicate. You can now create a new record.
+                </govuk-inset-text>
+            }
+            else
+            {
+                <govuk-inset-text class="govuk-!-margin-top-0">
+                    Differences are <highlight>highlighted</highlight> on the existing records
+                </govuk-inset-text>
+            }
 
             <div class="trs-potential-duplicates @(showDuplicatesSideBySide ? "trs-potential-duplicates--side-by-side" : "")">
                 <govuk-summary-card data-testid="request" class="trs-potential-duplicates__item">
@@ -77,7 +93,7 @@
                     </govuk-summary-list>
                 </govuk-summary-card>
 
-                @if (!showDuplicatesSideBySide)
+                @if (!showDuplicatesSideBySide && Model.MatchOutcome == TrnRequestMatchResultOutcome.PotentialMatches)
                 {
                     <h2 class="govuk-heading-m">Potential matches</h2>
                 }
@@ -180,29 +196,45 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
-            <govuk-radios for="PersonId">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                        What do you want to do with the @Model.SourceApplicationUserName request?
-                    </govuk-radios-fieldset-legend>
+            @if (Model.MatchOutcome == TrnRequestMatchResultOutcome.PotentialMatches)
+            {
+                <govuk-radios for="PersonId">
+                    <govuk-radios-fieldset>
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                            What do you want to do with the @Model.SourceApplicationUserName request?
+                        </govuk-radios-fieldset-legend>
 
-                    @foreach (var match in Model.PotentialDuplicates!)
-                    {
-                        <govuk-radios-item value="@match.PersonId">
-                            Merge it with Record @match.Identifier
+                        @foreach (var match in Model.PotentialDuplicates!)
+                        {
+                            <govuk-radios-item value="@match.PersonId">
+                                Merge it with Record @match.Identifier
+                            </govuk-radios-item>
+                        }
+
+                        <govuk-radios-divider>or</govuk-radios-divider>
+
+                        <govuk-radios-item value="@ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel">
+                            Create a new record from it
                         </govuk-radios-item>
-                    }
-
-                    <govuk-radios-divider>or</govuk-radios-divider>
-
-                    <govuk-radios-item value="@ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel">
-                        Create a new record from it
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
-            </govuk-radios>
+                    </govuk-radios-fieldset>
+                </govuk-radios>
+            }
 
             <div class="govuk-button-group">
-                <govuk-button type="submit">Continue</govuk-button>
+                @if (Model.MatchOutcome == TrnRequestMatchResultOutcome.DefiniteMatch)
+                {
+                    <input type="hidden" asp-for="PersonId" value="@Model.PotentialDuplicates[0].PersonId" />
+                    <govuk-button type="submit" data-testid="merge-record-button">Merge this request with Record A</govuk-button>
+                }
+                else if (Model.MatchOutcome == TrnRequestMatchResultOutcome.NoMatches)
+                {
+                    <input type="hidden" asp-for="PersonId" value="@ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel" />
+                    <govuk-button type="submit" data-testid="create-new-record-button">Create a record from this request</govuk-button>
+                }
+                else
+                {
+                    <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+                }
                 <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.ApiTrnRequests.Resolve.MatchesCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>

@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 
@@ -199,6 +200,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchOutcome = TrnRequestMatchResultOutcome.PotentialMatches,
                 PersonId = firstMatchId
             });
 
@@ -229,6 +231,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchOutcome = TrnRequestMatchResultOutcome.PotentialMatches,
                 PersonId = ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel
             });
 
@@ -344,6 +347,103 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var shownMatchedPersonIds = doc.GetAllElementsByTestId("match").Select(e => e.GetAttribute("data-personid")!).Select(Guid.Parse).ToList();
         Assert.Contains(initialMatchedPerson.PersonId, shownMatchedPersonIds);
         Assert.Contains(subsequentMatchedPerson.PersonId, shownMatchedPersonIds);
+    }
+
+    [Fact]
+    public async Task Get_WithDefiniteMatch_ShowsMergeRecordButton()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p =>
+        {
+            p.WithFirstName(firstName);
+            p.WithMiddleName(middleName);
+            p.WithLastName(lastName);
+            p.WithDateOfBirth(dateOfBirth);
+            p.WithEmailAddress(emailAddress);
+            p.WithNationalInsuranceNumber(nationalInsuranceNumber);
+        });
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t
+                .WithMatchedPersons(matchedPerson.PersonId)
+                .WithStatus(SupportTaskStatus.Open)
+                .WithFirstName(firstName)
+                .WithMiddleName(middleName)
+                .WithLastName(lastName)
+                .WithDateOfBirth(dateOfBirth)
+                .WithGender(matchedPerson.Gender)
+                .WithEmailAddress(emailAddress)
+                .WithNationalInsuranceNumber(nationalInsuranceNumber)
+            );
+
+        var journeyInstance = await CreateJourneyInstance(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        Assert.NotEmpty(doc.GetAllElementsByTestId("merge-record-button"));
+    }
+
+    [Fact]
+    public async Task Get_WithNoMatches_ShowsCreateNewRecordButton()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p =>
+        {
+            p.WithFirstName(firstName);
+            p.WithMiddleName(middleName);
+            p.WithLastName(lastName);
+            p.WithDateOfBirth(dateOfBirth);
+            p.WithEmailAddress(emailAddress);
+        });
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t
+                .WithMatchedPersons(matchedPerson.PersonId)
+                .WithStatus(SupportTaskStatus.Open)
+                .WithFirstName(TestData.GenerateChangedFirstName(firstName))
+                .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
+                .WithLastName(TestData.GenerateChangedLastName(lastName))
+                .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
+                .WithEmailAddress(TestData.GenerateUniqueEmail())
+            );
+
+        var journeyInstance = await CreateJourneyInstance(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        Assert.NotEmpty(doc.GetAllElementsByTestId("create-new-record-button"));
     }
 
     public static TheoryData<PersonMatchedAttribute[]> GetHighlightedDifferencesData() => new(

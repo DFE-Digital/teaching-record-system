@@ -16,6 +16,7 @@ public class ResolveApiTrnRequestState : IRegisterJourney
         appendUniqueKey: true);
 
     public required IReadOnlyCollection<Guid> MatchedPersonIds { get; init; }
+    public TrnRequestMatchResultOutcome MatchOutcome { get; set; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }
@@ -45,6 +46,7 @@ public class ResolveApiTrnRequestStateFactory(IPersonMatchingService personMatch
 
         var state = new ResolveApiTrnRequestState
         {
+            MatchOutcome = matchResult.Outcome,
             MatchedPersonIds = matchResult.Outcome switch
             {
                 TrnRequestMatchResultOutcome.DefiniteMatch => [matchResult.PersonId],

@@ -16,6 +16,7 @@ public class ResolveNpqTrnRequestState : IRegisterJourney
         appendUniqueKey: true);
 
     public required IReadOnlyCollection<Guid> MatchedPersonIds { get; init; }
+    public TrnRequestMatchResultOutcome MatchOutcome { get; set; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? DateOfBirthSource { get; set; }
@@ -42,6 +43,7 @@ public class ResolveNpqTrnRequestStateFactory(IPersonMatchingService personMatch
 
         var state = new ResolveNpqTrnRequestState
         {
+            MatchOutcome = matchResult.Outcome,
             MatchedPersonIds = matchResult.Outcome switch
             {
                 TrnRequestMatchResultOutcome.DefiniteMatch => [matchResult.PersonId],
