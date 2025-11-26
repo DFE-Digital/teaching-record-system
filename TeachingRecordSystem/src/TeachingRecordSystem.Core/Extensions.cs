@@ -146,6 +146,7 @@ public static class Extensions
 
         services.Scan(s => s.FromAssemblyOf<IEvent>()
             .AddClasses(c => c.AssignableTo<IEventHandler>())
+            .AddClasses(c => c.AssignableTo(typeof(IEventHandler<>)))
             .AsImplementedInterfaces()
             .WithTransientLifetime());
 
