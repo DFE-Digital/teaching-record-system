@@ -21,6 +21,7 @@ public partial class TestData
                 ProcessId = Guid.NewGuid(),
                 ProcessType = processType,
                 CreatedOn = Clock.UtcNow,
+                UpdatedOn = Clock.UtcNow,
                 UserId = userId ?? SystemUser.SystemUserId,
                 DqtUserId = null,
                 DqtUserName = null,
@@ -37,7 +38,8 @@ public partial class TestData
                     ProcessId = process.ProcessId,
                     EventName = @event.GetType().Name,
                     Payload = @event,
-                    PersonIds = @event.PersonIds
+                    PersonIds = @event.PersonIds,
+                    CreatedOn = Clock.UtcNow
                 });
             }
 
