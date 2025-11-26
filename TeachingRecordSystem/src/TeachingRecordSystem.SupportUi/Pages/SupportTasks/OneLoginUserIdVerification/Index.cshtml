@@ -1,2 +1,56 @@
 @page "/support-tasks/one-login-user-id-verification/"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Index
+
+{
+    ViewBag.Title = "GOV.UK One Login - identity verification";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Index()" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">Record management</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    </div>
+
+    <div class="govuk-grid-column-full" data-testid="results">
+        @if (Model.Results!.Count() == 0)
+        {
+            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-tasks-message">
+                No tasks
+            </p>
+        }
+        else
+        {
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
+                            Name
+                        </th>
+                        <th scope="col" class="govuk-table__header">
+                            Email
+                        </th>
+                        <th scope="col" class="govuk-table__header trs-!-width-150">
+                            Requested on
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var result in Model.Results!)
+                    {
+                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                            <th scope="row" class="govuk-table__header" data-testid="name">
+                                    @result.Name
+                            </th>
+                            <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
