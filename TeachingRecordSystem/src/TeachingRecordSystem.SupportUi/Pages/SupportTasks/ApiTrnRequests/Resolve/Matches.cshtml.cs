@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
@@ -16,6 +17,8 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
     public bool FromCheckAnswers { get; set; }
 
     public TrnRequestMetadata? RequestData { get; set; }
+
+    public TrnRequestMatchResultOutcome MatchOutcome { get; set; }
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
@@ -80,6 +83,7 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
         RequestData = GetRequestData();
 
         var matchedPersonIds = JourneyInstance!.State.MatchedPersonIds.ToArray();
+        MatchOutcome = JourneyInstance.State.MatchOutcome;
 
         PotentialDuplicates = (await DbContext.Persons
             .Where(p => matchedPersonIds.Contains(p.PersonId))

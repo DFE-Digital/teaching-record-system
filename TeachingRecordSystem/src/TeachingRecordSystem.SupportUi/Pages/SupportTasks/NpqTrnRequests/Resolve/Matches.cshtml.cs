@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
@@ -13,6 +14,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resol
 public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }
+
+    public TrnRequestMatchResultOutcome MatchOutcome { get; set; }
 
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
@@ -76,6 +79,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
         RequestData = GetRequestData();
 
         var matchedPersonIds = JourneyInstance!.State.MatchedPersonIds.ToArray();
+        MatchOutcome = JourneyInstance.State.MatchOutcome;
 
         PotentialDuplicates = (await DbContext.Persons
             .Where(p => matchedPersonIds.Contains(p.PersonId))
