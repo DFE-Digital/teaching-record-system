@@ -8,8 +8,11 @@ public class EventCapture : IEventHandler
 
     public void Clear() => _events.Clear();
 
-    public void AssertEventsPublished(params Action<EventAndProcess>[] eventInspectors) =>
-        Assert.Collection(_events, eventInspectors);
+    public void AssertEventsPublished(params Action<IEvent>[] eventInspectors) =>
+        Assert.Collection(_events.Select(t => t.Event), eventInspectors);
+
+    public void AssertProcessesAndEventsPublished(params Action<EventAndProcess>[] eventAndProcessInspectors) =>
+        Assert.Collection(_events, eventAndProcessInspectors);
 
     public void AssertNoEventsPublished() =>
         Assert.Empty(_events);

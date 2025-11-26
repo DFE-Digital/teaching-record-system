@@ -42,7 +42,7 @@ public class NoteServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
             Assert.Equal(options.OriginalFileName, dbNote.OriginalFileName);
         });
 
-        Events.AssertEventsPublished(x =>
+        Events.AssertProcessesAndEventsPublished(x =>
         {
             var noteCreatedEvent = Assert.IsType<NoteCreatedEvent>(x.Event);
             Assert.Equal(person.PersonId, noteCreatedEvent.PersonId);

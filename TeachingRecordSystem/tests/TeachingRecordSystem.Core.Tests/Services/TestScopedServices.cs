@@ -20,7 +20,7 @@ public class TestScopedServices
     public static void ConfigureServices(IServiceCollection services) =>
         services
             .AddSingleton<IClock>(new ForwardToTestScopedClock())
-            .AddSingleton<EventCapture>()
+            .AddTestScoped<EventCapture>(tss => tss.Events)
             .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>());
 
     public static TestScopedServices GetCurrent() =>
