@@ -6,3 +6,8 @@ public interface IEventHandler
 {
     Task HandleEventAsync(IEvent @event, ProcessContext processContext);
 }
+
+public interface IEventHandler<TEvent> where TEvent : IEvent
+{
+    Task HandleEventAsync(TEvent @event, ProcessContext processContext);
+}

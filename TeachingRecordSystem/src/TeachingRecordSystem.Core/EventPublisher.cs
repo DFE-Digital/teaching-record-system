@@ -44,6 +44,23 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
         {
             await handler.HandleEventAsync(@event, processContext);
         }
+
+        var eventType = @event.GetType();
+        var typeSpecificHandlers = serviceProvider.GetServices(typeof(IEventHandler<>).MakeGenericType(eventType));
+
+        foreach (var handler in typeSpecificHandlers)
+        {
+            var wrapper = (IEventHandler)Activator.CreateInstance(typeof(TypedHandlerWrapper<>).MakeGenericType(eventType), handler)!;
+            await wrapper.HandleEventAsync(@event, processContext);
+        }
+    }
+
+    private class TypedHandlerWrapper<TEvent>(IEventHandler<TEvent> innerHandler) : IEventHandler where TEvent : IEvent
+    {
+        public Task HandleEventAsync(IEvent @event, ProcessContext processContext)
+        {
+            return innerHandler.HandleEventAsync(((TEvent)@event), processContext);
+        }
     }
 }
 
