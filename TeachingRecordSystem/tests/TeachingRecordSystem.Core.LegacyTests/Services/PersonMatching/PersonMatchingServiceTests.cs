@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using Xunit.Abstractions;
 
 namespace TeachingRecordSystem.Core.Tests.Services.PersonMatching;
 
@@ -7,7 +8,8 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
 {
     public PersonMatchingServiceTests(
         DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache)
+        ReferenceDataCache referenceDataCache,
+        ITestOutputHelper outputHelper)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -16,6 +18,8 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
             dbFixture.DbContextFactory,
             referenceDataCache,
             Clock);
+
+        OutputHelper = outputHelper;
     }
 
     private DbFixture DbFixture { get; }
@@ -23,6 +27,8 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
     private TestData TestData { get; }
 
     private TestableClock Clock { get; }
+
+    private ITestOutputHelper OutputHelper { get; }
 
     public Task InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
 

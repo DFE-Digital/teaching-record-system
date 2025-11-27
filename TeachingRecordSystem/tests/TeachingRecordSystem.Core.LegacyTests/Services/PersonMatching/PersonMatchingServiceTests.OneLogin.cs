@@ -46,10 +46,10 @@ public partial class PersonMatchingServiceTests
             {
                 OneLogin.NameArgumentOption.NoFullName => [[person.FirstName]],
                 OneLogin.NameArgumentOption.MatchesPersonName => [[person.FirstName, person.LastName]],
-                OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName => [[person.FirstName, person.LastName], [TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName]), person.LastName]],
+                OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName => [[person.FirstName, person.LastName], [TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName]), person.LastName]],
                 OneLogin.NameArgumentOption.MatchesAlias => [[alias!, person.LastName]],
-                OneLogin.NameArgumentOption.SpecifiedButDifferentFirstName => [[TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName]), person.LastName]],
-                OneLogin.NameArgumentOption.SpecifiedButDifferentLastName => [[person.FirstName, TestData.GenerateChangedLastName(person.LastName)]],
+                OneLogin.NameArgumentOption.SpecifiedButDifferentFirstName => [[TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName]), person.LastName]],
+                OneLogin.NameArgumentOption.SpecifiedButDifferentLastName => [[person.FirstName, TestData.GenerateChangedLastName([person.FirstName, alias, person.MiddleName, person.LastName])]],
                 _ => []
             };
 

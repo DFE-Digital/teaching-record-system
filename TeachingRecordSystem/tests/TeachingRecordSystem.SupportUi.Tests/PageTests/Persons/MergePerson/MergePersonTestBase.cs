@@ -56,9 +56,9 @@ public class MergePersonTestBase(HostFixture hostFixture)
             .WithGender(!useNullValues));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithFirstName(TestData.GenerateChangedFirstName(personA.FirstName))
-            .WithMiddleName(TestData.GenerateChangedMiddleName(personA.MiddleName))
-            .WithLastName(TestData.GenerateChangedLastName(personA.LastName))
+            .WithFirstName(TestData.GenerateChangedFirstName([personA.FirstName, personA.MiddleName, personA.LastName]))
+            .WithMiddleName(TestData.GenerateChangedMiddleName([personA.FirstName, personA.MiddleName, personA.LastName]))
+            .WithLastName(TestData.GenerateChangedLastName([personA.FirstName, personA.MiddleName, personA.LastName]))
             .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(personA.DateOfBirth))
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(personA.NationalInsuranceNumber ?? ""))
@@ -82,15 +82,15 @@ public class MergePersonTestBase(HostFixture hostFixture)
                 .WithFirstName(
                     differentAttribute != PersonMatchedAttribute.FirstName
                         ? personA.FirstName
-                        : TestData.GenerateChangedFirstName(personA.FirstName))
+                        : TestData.GenerateChangedFirstName([personA.FirstName, personA.MiddleName, personA.LastName]))
                 .WithMiddleName(
                     differentAttribute != PersonMatchedAttribute.MiddleName
                         ? personA.MiddleName
-                        : TestData.GenerateChangedMiddleName(personA.MiddleName))
+                        : TestData.GenerateChangedMiddleName([personA.FirstName, personA.MiddleName, personA.LastName]))
                 .WithLastName(
                     differentAttribute != PersonMatchedAttribute.LastName
                         ? personA.LastName
-                        : TestData.GenerateChangedLastName(personA.LastName))
+                        : TestData.GenerateChangedLastName([personA.FirstName, personA.MiddleName, personA.LastName]))
                 .WithDateOfBirth(
                     differentAttribute != PersonMatchedAttribute.DateOfBirth
                         ? personA.DateOfBirth
@@ -142,15 +142,15 @@ public class MergePersonTestBase(HostFixture hostFixture)
                 .WithFirstName(
                     matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
                         ? personA.FirstName
-                        : TestData.GenerateChangedFirstName(personA.FirstName))
+                        : TestData.GenerateChangedFirstName([personA.FirstName, personA.MiddleName, personA.LastName]))
                 .WithMiddleName(
                     matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
                         ? personA.MiddleName
-                        : TestData.GenerateChangedMiddleName(personA.MiddleName))
+                        : TestData.GenerateChangedMiddleName([personA.FirstName, personA.MiddleName, personA.LastName]))
                 .WithLastName(
                     matchedAttributes.Contains(PersonMatchedAttribute.LastName)
                         ? personA.LastName
-                        : TestData.GenerateChangedLastName(personA.LastName))
+                        : TestData.GenerateChangedLastName([personA.FirstName, personA.MiddleName, personA.LastName]))
                 .WithDateOfBirth(
                     matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)
                         ? personA.DateOfBirth
