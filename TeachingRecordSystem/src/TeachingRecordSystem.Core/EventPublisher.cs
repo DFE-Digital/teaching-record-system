@@ -19,6 +19,8 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
             dbContext.Set<Process>().Add(processContext.Process);
         }
 
+        processContext.Process.UpdatedOn = processContext.Now;
+
         @event.PersonIds.Except(processContext.Process.PersonIds).ForEach(e => processContext.Process.PersonIds.Add(e));
 
         var processEvent = new ProcessEvent
@@ -27,7 +29,8 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
             ProcessId = processContext.Process.ProcessId,
             EventName = @event.GetType().Name,
             Payload = @event,
-            PersonIds = @event.PersonIds
+            PersonIds = @event.PersonIds,
+            CreatedOn = processContext.Now
         };
         dbContext.Set<ProcessEvent>().Add(processEvent);
 
@@ -75,6 +78,7 @@ public class ProcessContext
             ProcessId = Guid.NewGuid(),
             ProcessType = processType,
             CreatedOn = now,
+            UpdatedOn = now,
             UserId = raisedBy.UserId,
             DqtUserId = raisedBy.DqtUserId,
             DqtUserName = raisedBy.DqtUserName,

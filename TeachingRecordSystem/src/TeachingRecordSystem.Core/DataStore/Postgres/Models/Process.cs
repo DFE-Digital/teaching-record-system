@@ -5,6 +5,7 @@ public class Process
     public required Guid ProcessId { get; init; }
     public required ProcessType ProcessType { get; init; }
     public required DateTime CreatedOn { get; init; }
+    public required DateTime UpdatedOn { get; set; }
     public required Guid? UserId { get; init; }
     public UserBase? User { get; }
     public required Guid? DqtUserId { get; init; }
