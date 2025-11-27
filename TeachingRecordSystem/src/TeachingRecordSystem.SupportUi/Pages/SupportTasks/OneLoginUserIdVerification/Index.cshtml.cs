@@ -20,16 +20,22 @@ public class Index(TrsDbContext dbContext) : PageModel
             .OrderBy(t => t.CreatedOn);
 
         Results = tasks
+            .Select(t => new
+            {
+                t,
+                Data = t.Data as OneLoginUserIdVerificationData
+            })
+            .Where(item => item.Data != null)
             .Join(
                 dbContext.OneLoginUsers,
-                t => ((OneLoginUserIdVerificationData)t.Data).OneLoginUserSubject,
-                u => u.Subject,
-                (t, u) => new Result(
-                    t.SupportTaskReference,
-                    ((OneLoginUserIdVerificationData)t.Data).StatedFirstName,
-                    ((OneLoginUserIdVerificationData)t.Data).StatedLastName,
-                    u.EmailAddress,
-                    t.CreatedOn));
+                y => y.Data!.OneLoginUserSubject,
+                user => user.Subject,
+                (item, user) => new Result(
+                    item.t.SupportTaskReference,
+                    item.Data!.StatedFirstName,
+                    item.Data!.StatedLastName,
+                    user.EmailAddress,
+                    item.t.CreatedOn));
     }
 
     public record Result(
