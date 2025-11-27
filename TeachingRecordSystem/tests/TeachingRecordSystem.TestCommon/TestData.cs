@@ -196,6 +196,20 @@ public partial class TestData
         return newLastName;
     }
 
+    public string GenerateChangedLastName(string?[] currentNames)
+    {
+        var names = currentNames.GetNonEmptyValues();
+        string newLastName;
+
+        do
+        {
+            newLastName = GenerateLastName();
+        }
+        while (names.Contains(newLastName));
+
+        return newLastName;
+    }
+
     public string GenerateName()
     {
         string fullName;

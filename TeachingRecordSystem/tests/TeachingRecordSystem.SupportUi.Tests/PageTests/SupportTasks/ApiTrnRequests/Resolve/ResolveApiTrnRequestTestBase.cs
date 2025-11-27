@@ -12,9 +12,9 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
             applicationUserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
-                .WithFirstName(TestData.GenerateChangedFirstName(matchedPerson.FirstName))
-                .WithMiddleName(TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
-                .WithLastName(TestData.GenerateChangedLastName(matchedPerson.LastName))
+                .WithFirstName(TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
+                .WithMiddleName(TestData.GenerateChangedMiddleName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
+                .WithLastName(TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
                 .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!))
@@ -49,15 +49,15 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
                 .WithFirstName(
                     differentAttribute != PersonMatchedAttribute.FirstName
                         ? matchedPerson.FirstName
-                        : TestData.GenerateChangedFirstName(matchedPerson.FirstName))
+                        : TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithMiddleName(
                     differentAttribute != PersonMatchedAttribute.MiddleName
                         ? matchedPerson.MiddleName
-                        : TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
+                        : TestData.GenerateChangedMiddleName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithLastName(
                     differentAttribute != PersonMatchedAttribute.LastName
                         ? matchedPerson.LastName
-                        : TestData.GenerateChangedLastName(matchedPerson.LastName))
+                        : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithDateOfBirth(
                     differentAttribute != PersonMatchedAttribute.DateOfBirth
                         ? matchedPerson.DateOfBirth

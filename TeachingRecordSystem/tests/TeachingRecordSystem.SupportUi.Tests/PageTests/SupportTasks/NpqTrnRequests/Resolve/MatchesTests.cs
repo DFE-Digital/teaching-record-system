@@ -569,15 +569,15 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 .WithFirstName(
                     matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
                         ? matchedPerson.FirstName
-                        : TestData.GenerateChangedFirstName(matchedPerson.FirstName))
+                        : TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithMiddleName(
                     matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
                         ? matchedPerson.MiddleName
-                        : TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
+                        : TestData.GenerateChangedMiddleName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithLastName(
                     matchedAttributes.Contains(PersonMatchedAttribute.LastName)
                         ? matchedPerson.LastName
-                        : TestData.GenerateChangedLastName(matchedPerson.LastName))
+                        : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithDateOfBirth(
                     matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)
                         ? matchedPerson.DateOfBirth

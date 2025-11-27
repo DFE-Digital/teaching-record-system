@@ -745,7 +745,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.EmailAddress!, TrnVerificationLevel.Medium);
 
             var firstName = person.FirstName;
-            var lastName = TestData.GenerateChangedLastName(person.LastName);
+            var lastName = TestData.GenerateChangedLastName([person.FirstName, person.MiddleName, person.LastName]);
             var dateOfBirth = person.DateOfBirth;
 
             var state = new SignInJourneyState(
@@ -1048,7 +1048,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnToken = await CreateTrnToken(person.Trn!, user.EmailAddress!);
 
             var firstName = person.FirstName;
-            var lastName = TestData.GenerateChangedLastName(person.LastName);
+            var lastName = TestData.GenerateChangedLastName([person.FirstName, person.MiddleName, person.LastName]);
             var dateOfBirth = person.DateOfBirth;
 
             var state = new SignInJourneyState(

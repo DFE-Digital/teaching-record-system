@@ -13,7 +13,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
                 createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+                b => b.WithLastName(TestData.GenerateChangedLastName([createPersonResult.FirstName, createPersonResult.MiddleName, createPersonResult.LastName])));
             supportTaskReference = supportTask.SupportTaskReference;
         }
         else
@@ -57,7 +57,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
                 createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+                b => b.WithLastName(TestData.GenerateChangedLastName([createPersonResult.FirstName, createPersonResult.MiddleName, createPersonResult.LastName])));
             supportTaskReference = supportTask.SupportTaskReference;
         }
         else
@@ -103,7 +103,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
                 createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+                b => b.WithLastName(TestData.GenerateChangedLastName([createPersonResult.FirstName, createPersonResult.MiddleName, createPersonResult.LastName])));
             supportTaskReference = supportTask.SupportTaskReference;
         }
         else

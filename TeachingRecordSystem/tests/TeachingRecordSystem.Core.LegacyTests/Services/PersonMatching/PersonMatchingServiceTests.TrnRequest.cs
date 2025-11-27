@@ -110,19 +110,19 @@ public partial class PersonMatchingServiceTests
             {
                 TrnRequest.FirstNameArgumentOption.Matches => person.FirstName,
                 TrnRequest.FirstNameArgumentOption.MatchesAlias => alias!,
-                _ => TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName])
+                _ => TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName])
             };
 
             var middleName = middleNameOption switch
             {
                 TrnRequest.MiddleNameArgumentOption.Matches => person.MiddleName,
-                _ => TestData.GenerateChangedMiddleName([person.FirstName, alias, person.MiddleName])
+                _ => TestData.GenerateChangedMiddleName([person.FirstName, alias, person.MiddleName, person.LastName])
             };
 
             var lastName = lastNameOption switch
             {
                 TrnRequest.LastNameArgumentOption.Matches => person.LastName,
-                _ => TestData.GenerateChangedLastName(person.LastName)
+                _ => TestData.GenerateChangedLastName([person.FirstName, alias, person.MiddleName, person.LastName])
             };
 
             var dateOfBirth = dateOfBirthOption switch
@@ -171,6 +171,20 @@ public partial class PersonMatchingServiceTests
             var result = await service.MatchFromTrnRequestAsync(requestData);
 
             // Assert
+            if (expectedOutcome != result.Outcome)
+            {
+                var pad = new[] { person.EmailAddress, person.FirstName, person.MiddleName, person.LastName, person.DateOfBirth.ToShortDateString(), person.NationalInsuranceNumber, person.Gender.ToString() }
+                    .Max(s => s?.Length ?? 0);
+                OutputHelper.WriteLine($"                         {"Record".PadRight(pad)} Request");
+                OutputHelper.WriteLine($"EmailAddress:            {(person.EmailAddress ?? "").PadRight(pad)} {emailAddress}");
+                OutputHelper.WriteLine($"FirstName:               {(person.FirstName ?? "").PadRight(pad)} {firstName}");
+                OutputHelper.WriteLine($"MiddleName:              {(person.MiddleName ?? "").PadRight(pad)} {middleName}");
+                OutputHelper.WriteLine($"LastName:                {(person.LastName ?? "").PadRight(pad)} {lastName}");
+                OutputHelper.WriteLine($"DateOfBirth:             {(person.DateOfBirth.ToShortDateString() ?? "").PadRight(pad)} {dateOfBirth}");
+                OutputHelper.WriteLine($"NationalInsuranceNumber: {(person.NationalInsuranceNumber ?? "").PadRight(pad)} {nationalInsuranceNumber}");
+                OutputHelper.WriteLine($"Gender:                  {(person.Gender?.ToString() ?? "").PadRight(pad)} {gender}");
+            }
+
             Assert.Equal(expectedOutcome, result.Outcome);
 
             if (expectedOutcome == TrnRequestMatchResultOutcome.DefiniteMatch)
