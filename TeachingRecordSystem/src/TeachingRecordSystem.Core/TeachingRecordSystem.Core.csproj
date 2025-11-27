@@ -117,6 +117,7 @@
     <None Remove="Services\DqtReporting\Migrations\0093_RemoveITRPersonForeignKey.sql" />
     <None Remove="Services\DqtReporting\Migrations\0098_RemoveITRForeignKey.sql" />
     <None Remove="Services\DqtReporting\Migrations\0099_Users.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0100_ProcessTimestamps.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -262,6 +263,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0097_FixProcessesColumnName.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0098_RemoveITRForeignKey.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0099_Users.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0100_ProcessTimestamps.sql" />
   </ItemGroup>
 
   <ItemGroup>
