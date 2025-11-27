@@ -8,11 +8,12 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUs
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_ShowsListOfOpenTasks()
+    public async Task Get_ShowsListOfOpenTasksWithOldestFirst()
     {
         var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some(person.EmailAddress), verifiedInfo: null);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationDataSupportTaskAsync(oneLoginUser.Subject);
+        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationDataSupportTaskAsync(oneLoginUser.Subject);
+        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationDataSupportTaskAsync(oneLoginUser.Subject);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 

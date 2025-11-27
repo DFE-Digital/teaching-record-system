@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification;
 
-public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
+public class Index(TrsDbContext dbContext) : PageModel
 {
     private const int TasksPerPage = 20;
 

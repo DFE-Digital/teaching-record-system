@@ -18,6 +18,7 @@
     <div class="govuk-grid-column-full" data-testid="results">
         @if (Model.Results!.Count() == 0)
         {
+            @* This needs to say "Try searching again with different details" when search functionality is added" *@
             <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-tasks-message">
                 No tasks
             </p>
