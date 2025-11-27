@@ -39,11 +39,11 @@ public class Index(TrsDbContext dbContext) : PageModel
     }
 
     public record Result(
-    string SupportTaskReference,
-    string FirstName,
-    string LastName,
-    string? EmailAddress,
-    DateTime CreatedOn)
+        string SupportTaskReference,
+        string FirstName,
+        string LastName,
+        string? EmailAddress,
+        DateTime CreatedOn)
     {
         public string Name => $"{FirstName} {LastName}";
     }
