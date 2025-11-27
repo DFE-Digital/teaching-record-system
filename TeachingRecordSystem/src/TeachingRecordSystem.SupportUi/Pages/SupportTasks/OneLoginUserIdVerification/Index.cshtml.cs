@@ -7,8 +7,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerifi
 
 public class Index(TrsDbContext dbContext) : PageModel
 {
-    private const int TasksPerPage = 20;
-
     [BindProperty(SupportsGet = true)]
     [FromQuery]
     public string? Search { get; set; }
@@ -18,14 +16,20 @@ public class Index(TrsDbContext dbContext) : PageModel
     public void OnGet()
     {
         var tasks = dbContext.SupportTasks
-            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open);
+            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
+            .OrderBy(t => t.CreatedOn);
 
-        Results = tasks.Select(t => new Result(
-            t.SupportTaskReference,
-            ((OneLoginUserIdVerificationData)t.Data).StatedFirstName,
-            ((OneLoginUserIdVerificationData)t.Data).StatedLastName,
-            dbContext.OneLoginUsers.Single(u => u.Subject == ((OneLoginUserIdVerificationData)t.Data).OneLoginUserSubject).EmailAddress,
-            t.CreatedOn));
+        Results = tasks
+            .Join(
+                dbContext.OneLoginUsers,
+                t => ((OneLoginUserIdVerificationData)t.Data).OneLoginUserSubject,
+                u => u.Subject,
+                (t, u) => new Result(
+                    t.SupportTaskReference,
+                    ((OneLoginUserIdVerificationData)t.Data).StatedFirstName,
+                    ((OneLoginUserIdVerificationData)t.Data).StatedLastName,
+                    u.EmailAddress,
+                    t.CreatedOn));
     }
 
     public record Result(

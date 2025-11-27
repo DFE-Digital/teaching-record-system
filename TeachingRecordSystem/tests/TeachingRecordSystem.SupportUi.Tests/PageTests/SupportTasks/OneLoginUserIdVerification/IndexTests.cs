@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -10,10 +11,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_ShowsListOfOpenTasksWithOldestFirst()
     {
-        var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some(person.EmailAddress), verifiedInfo: null);
-        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationDataSupportTaskAsync(oneLoginUser.Subject);
-        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationDataSupportTaskAsync(oneLoginUser.Subject);
+        var person1 = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
+        var person2 = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some(person1.EmailAddress), verifiedInfo: null);
+        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some(person2.EmailAddress), verifiedInfo: null);
+        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
+        Clock.Advance(TimeSpan.FromDays(1));
+        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 
@@ -23,20 +27,26 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultRow = doc.GetElementByTestId("results")
+        var resultRows = doc.GetElementByTestId("results")
             ?.GetElementsByTagName("tbody")
             .FirstOrDefault()
-            ?.GetElementsByTagName("tr")
-            .FirstOrDefault();
+            ?.GetElementsByTagName("tr");
 
-        Assert.NotNull(resultRow);
-        AssertRowHasContent("name", $"{((OneLoginUserIdVerificationData)supportTask.Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)supportTask.Data)!.StatedLastName}");
-        AssertRowHasContent("email", person.EmailAddress!);
-        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        Assert.NotNull(resultRows);
+        var topRow = resultRows[0];
+        AssertRowHasContent(topRow, "name", $"{((OneLoginUserIdVerificationData)supportTask1.Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)supportTask1.Data)!.StatedLastName}");
+        AssertRowHasContent(topRow, "email", person1.EmailAddress!);
+        AssertRowHasContent(topRow, "requested-on", supportTask1.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(topRow, "requested-on", supportTask1.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
 
-        void AssertRowHasContent(string testId, string expectedText)
+        var nextRow = resultRows[1];
+        AssertRowHasContent(nextRow, "name", $"{((OneLoginUserIdVerificationData)supportTask2.Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)supportTask2.Data)!.StatedLastName}");
+        AssertRowHasContent(nextRow, "email", person2.EmailAddress!);
+        AssertRowHasContent(nextRow, "requested-on", supportTask2.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+
+        void AssertRowHasContent(IElement row, string testId, string expectedText)
         {
-            var column = resultRow.GetElementByTestId(testId);
+            var column = row.GetElementByTestId(testId);
             Assert.NotNull(column);
             Assert.Equal(expectedText, column.TrimmedText());
         }
@@ -47,7 +57,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some(person.EmailAddress), verifiedInfo: null);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationDataSupportTaskAsync(oneLoginUser.Subject);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 
