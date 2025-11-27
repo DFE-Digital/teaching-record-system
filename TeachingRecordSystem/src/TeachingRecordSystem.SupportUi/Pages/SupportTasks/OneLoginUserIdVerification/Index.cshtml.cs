@@ -20,16 +20,11 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
         var tasks = dbContext.SupportTasks
             .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open);
 
-        // CML
-        var task = tasks.First();
-        var email = dbContext.OneLoginUsers.Single(u => u.Subject == ((OneLoginUserIdVerificationData)task.Data).OneLoginUserSubject).EmailAddress;
-        // ---------------------
-
         Results = tasks.Select(t => new Result(
             t.SupportTaskReference,
             ((OneLoginUserIdVerificationData)t.Data).StatedFirstName,
             ((OneLoginUserIdVerificationData)t.Data).StatedLastName,
-            dbContext.OneLoginUsers.Single(u => u.Subject == ((OneLoginUserIdVerificationData)task.Data).OneLoginUserSubject).EmailAddress,
+            dbContext.OneLoginUsers.Single(u => u.Subject == ((OneLoginUserIdVerificationData)t.Data).OneLoginUserSubject).EmailAddress,
             t.CreatedOn));
     }
 

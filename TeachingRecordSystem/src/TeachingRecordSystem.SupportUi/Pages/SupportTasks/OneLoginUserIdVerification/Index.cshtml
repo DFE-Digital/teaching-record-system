@@ -1,7 +1,7 @@
 @page "/support-tasks/one-login-user-id-verification/"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Index
 
-{
+@{
     ViewBag.Title = "GOV.UK One Login - identity verification";
 }
 
@@ -30,11 +30,11 @@
                         <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
                             Name
                         </th>
-                        <th scope="col" class="govuk-table__header">
-                            Email
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150">
+                        <th scope="col" class="govuk-table__header trs-\!-width-150">
                             Requested on
+                        </th>
+                        <th scope="col" class="govuk-table__header">
+                            Email address
                         </th>
                     </tr>
                 </thead>
@@ -42,11 +42,9 @@
                     @foreach (var result in Model.Results!)
                     {
                         <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                            <th scope="row" class="govuk-table__header" data-testid="name">
-                                    @result.Name
-                            </th>
+                            <th scope="row" class="govuk-table__header" data-testid="name"><a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Details(result.SupportTaskReference)">@result.Name</a></th>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                             <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
-                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</td>
                         </tr>
                     }
                 </tbody>
