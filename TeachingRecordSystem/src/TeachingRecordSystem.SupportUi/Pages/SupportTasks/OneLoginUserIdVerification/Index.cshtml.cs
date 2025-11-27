@@ -11,15 +11,15 @@ public class Index(TrsDbContext dbContext) : PageModel
     [FromQuery]
     public string? Search { get; set; }
 
-    public IQueryable<Result>? Results { get; set; }
+    public IReadOnlyCollection<Result>? Results { get; set; }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
         var tasks = dbContext.SupportTasks
             .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
             .OrderBy(t => t.CreatedOn);
 
-        Results = tasks
+        Results = await tasks
             .Select(t => new
             {
                 t,
@@ -35,7 +35,8 @@ public class Index(TrsDbContext dbContext) : PageModel
                     item.Data!.StatedFirstName,
                     item.Data!.StatedLastName,
                     user.EmailAddress,
-                    item.t.CreatedOn));
+                    item.t.CreatedOn))
+            .ToArrayAsync();
     }
 
     public record Result(

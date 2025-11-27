@@ -11,6 +11,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_ShowsListOfOpenTasksWithOldestFirst()
     {
+        // Arrange
         var person1 = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var person2 = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some(person1.EmailAddress), verifiedInfo: null);
@@ -55,6 +56,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_TaskListItemLinksToSupportTask()
     {
+        // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some(person.EmailAddress), verifiedInfo: null);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
@@ -81,6 +83,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_NoTasks_ShowsNoTasksMessage()
     {
+        // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 
         // Act
