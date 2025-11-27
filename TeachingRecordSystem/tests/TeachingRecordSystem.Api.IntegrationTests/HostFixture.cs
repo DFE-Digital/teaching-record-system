@@ -72,6 +72,9 @@ public class HostFixture : InitializeDbFixture
     {
         await InitializeDbAsync();
 
+        using var dbContext = DbHelper.Instance.DbContextFactory.CreateDbContext();
+        AddApplicationUsers(dbContext);
+
         _ = Services;  // Start the server
     }
 

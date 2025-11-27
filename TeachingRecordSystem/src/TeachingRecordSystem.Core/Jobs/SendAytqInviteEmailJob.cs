@@ -9,10 +9,11 @@ namespace TeachingRecordSystem.Core.Jobs;
 public class SendAytqInviteEmailJob(
     INotificationSender notificationSender,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IGetAnIdentityApiClient identityApiClient,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptions,
     IClock clock) :
-    SendEmailJob(dbContext, notificationSender, clock)
+    SendEmailJob(dbContext, eventPublisher, notificationSender, clock)
 {
     private const string MagicLinkPersonalizationKey = "link to access your teaching qualifications service";
 

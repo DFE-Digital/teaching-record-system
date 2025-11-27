@@ -42,7 +42,9 @@ public abstract class OperationTestBase : IDisposable
 
     protected Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => Mock.Get(Services.GetRequiredService<IGetAnIdentityApiClient>());
 
-    protected CaptureEventObserver EventObserver => TestScopedServices.GetCurrent().EventObserver;
+    protected EventCapture Events => TestScopedServices.GetCurrent().Events;
+
+    protected CaptureEventObserver LegacyEventObserver => TestScopedServices.GetCurrent().LegacyEventObserver;
 
     protected TestableFeatureProvider FeatureProvider => (TestableFeatureProvider)Services.GetRequiredService<IFeatureProvider>();
 

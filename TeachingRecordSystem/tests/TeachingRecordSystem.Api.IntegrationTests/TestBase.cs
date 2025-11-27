@@ -38,6 +38,7 @@ public abstract class TestBase
         _testServices = TestScopedServices.Reset(hostFixture.Services);
         SetCurrentApiClient([]);
     }
+
     protected HostFixture HostFixture { get; }
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();

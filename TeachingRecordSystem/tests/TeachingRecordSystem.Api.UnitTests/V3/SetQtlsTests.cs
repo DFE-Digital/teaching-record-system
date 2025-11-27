@@ -32,7 +32,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
 
         // Assert
         AssertSuccess(result);
-        EventObserver.AssertNoEventsSaved();
+        LegacyEventObserver.AssertNoEventsSaved();
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
 
         var command = new SetQtlsCommand(person.Trn!, QtsDate: null);
 
-        EventObserver.Clear();
+        LegacyEventObserver.Clear();
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -58,7 +58,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         var qtlsStatus = await GetQtlsStatus(person.PersonId);
         Assert.Equal(QtlsStatus.Expired, qtlsStatus);
 
-        EventObserver.AssertEventsSaved(e =>
+        LegacyEventObserver.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
             Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
@@ -76,7 +76,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         var qtlsDate = new DateOnly(2025, 4, 1);
         var command = new SetQtlsCommand(person.Trn!, qtlsDate);
 
-        EventObserver.Clear();
+        LegacyEventObserver.Clear();
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -93,7 +93,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         var qtlsStatus = await GetQtlsStatus(person.PersonId);
         Assert.Equal(QtlsStatus.Active, qtlsStatus);
 
-        EventObserver.AssertEventsSaved(e =>
+        LegacyEventObserver.AssertEventsSaved(e =>
         {
             var createdEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
             Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
@@ -111,7 +111,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
 
         var command = new SetQtlsCommand(person.Trn!, qtlsDate);
 
-        EventObserver.Clear();
+        LegacyEventObserver.Clear();
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -119,7 +119,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         // Assert
         AssertSuccess(result);
 
-        EventObserver.AssertNoEventsSaved();
+        LegacyEventObserver.AssertNoEventsSaved();
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         var newQtlsDate = new DateOnly(2025, 4, 10);
         var command = new SetQtlsCommand(person.Trn!, newQtlsDate);
 
-        EventObserver.Clear();
+        LegacyEventObserver.Clear();
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -146,7 +146,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
         Assert.Equal(Clock.UtcNow, route.UpdatedOn);
 
-        EventObserver.AssertEventsSaved(e =>
+        LegacyEventObserver.AssertEventsSaved(e =>
         {
             var updatedEvent = Assert.IsType<RouteToProfessionalStatusUpdatedEvent>(e);
             Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);

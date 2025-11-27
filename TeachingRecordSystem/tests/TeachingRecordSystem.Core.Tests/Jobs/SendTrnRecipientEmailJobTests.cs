@@ -51,14 +51,19 @@ public class SendTrnRecipientEmailJobTests(JobFixture fixture) : JobTestBase(fix
         email = await WithDbContextAsync(dbContext => dbContext.Emails.SingleAsync(e => e.EmailId == email.EmailId));
         Assert.Equal(Clock.UtcNow, email.SentOn);
 
-        Events.AssertProcessesAndEventsPublished(x =>
+        Events.AssertProcessesCreated(x =>
         {
             Assert.Equal(ProcessType.NotifyingTrnRecipient, x.ProcessContext.ProcessType);
             Assert.Collection(x.ProcessContext.Process.PersonIds, id => Assert.Equal(person.PersonId, id));
 
-            var emailSentEvent = Assert.IsType<EmailSentEvent>(x.Event);
-            Assert.Equal(person.PersonId, emailSentEvent.PersonId);
-            Assert.Equal(email.EmailId, emailSentEvent.Email.EmailId);
+            Assert.Collection(
+                x.Events,
+                e =>
+                {
+                    var emailSentEvent = Assert.IsType<EmailSentEvent>(e);
+                    Assert.Equal(person.PersonId, emailSentEvent.PersonId);
+                    Assert.Equal(email.EmailId, emailSentEvent.Email.EmailId);
+                });
         });
     }
 }

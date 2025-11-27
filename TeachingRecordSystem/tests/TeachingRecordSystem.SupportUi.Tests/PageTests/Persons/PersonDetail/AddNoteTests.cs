@@ -53,10 +53,10 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(content, note.Content);
         Assert.Null(note.FileId);
 
-        Events.AssertProcessesAndEventsPublished(x =>
+        Events.AssertProcessesCreated(x =>
         {
             Assert.Equal(ProcessType.NoteCreating, x.ProcessContext.ProcessType);
-            Assert.IsType<NoteCreatedEvent>(x.Event);
+            Assert.Collection(x.Events, e => Assert.IsType<NoteCreatedEvent>(e));
         });
     }
 
@@ -89,10 +89,10 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(content, note.Content);
         Assert.NotNull(note.FileId);
 
-        Events.AssertProcessesAndEventsPublished(x =>
+        Events.AssertProcessesCreated(x =>
         {
             Assert.Equal(ProcessType.NoteCreating, x.ProcessContext.ProcessType);
-            Assert.IsType<NoteCreatedEvent>(x.Event);
+            Assert.Collection(x.Events, e => Assert.IsType<NoteCreatedEvent>(e));
         });
     }
 

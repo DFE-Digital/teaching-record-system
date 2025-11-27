@@ -42,14 +42,19 @@ public class NoteServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
             Assert.Equal(options.OriginalFileName, dbNote.OriginalFileName);
         });
 
-        Events.AssertProcessesAndEventsPublished(x =>
+        Events.AssertProcessesCreated(x =>
         {
-            var noteCreatedEvent = Assert.IsType<NoteCreatedEvent>(x.Event);
-            Assert.Equal(person.PersonId, noteCreatedEvent.PersonId);
-            Assert.Equal(note.NoteId, noteCreatedEvent.Note.NoteId);
-            Assert.Equal(content, noteCreatedEvent.Note.Content);
-            Assert.Equal(fileId, noteCreatedEvent.Note.File?.FileId);
-            Assert.Equal(fileName, noteCreatedEvent.Note.File?.Name);
+            Assert.Collection(
+                x.Events,
+                e =>
+                {
+                    var noteCreatedEvent = Assert.IsType<NoteCreatedEvent>(e);
+                    Assert.Equal(person.PersonId, noteCreatedEvent.PersonId);
+                    Assert.Equal(note.NoteId, noteCreatedEvent.Note.NoteId);
+                    Assert.Equal(content, noteCreatedEvent.Note.Content);
+                    Assert.Equal(fileId, noteCreatedEvent.Note.File?.FileId);
+                    Assert.Equal(fileName, noteCreatedEvent.Note.File?.Name);
+                });
         });
     }
 }
