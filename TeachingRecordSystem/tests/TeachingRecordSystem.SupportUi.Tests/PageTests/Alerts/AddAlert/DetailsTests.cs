@@ -4,8 +4,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
 {
-    private const string PreviousStep = JourneySteps.AlertType;
-    private const string ThisStep = JourneySteps.Details;
+    private const string PreviousStep = JourneyStepNames.AlertType;
+    private const string ThisStep = JourneyStepNames.Details;
 
     async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
@@ -51,7 +51,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForIncompleteStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -60,7 +60,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/type?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(GetStepUrl(PreviousStep, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForNoStepsCompletedAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -223,7 +223,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?handler=cancel&personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
