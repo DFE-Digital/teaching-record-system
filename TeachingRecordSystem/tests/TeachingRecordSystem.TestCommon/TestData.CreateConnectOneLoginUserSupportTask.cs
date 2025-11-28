@@ -30,8 +30,6 @@ public partial class TestData
                 TrnTokenTrn = trnTokenTrn
             };
 
-            var reference = SupportTask.GenerateSupportTaskReference();
-
             var supportTask = new SupportTask()
             {
                 CreatedOn = Clock.UtcNow,
@@ -39,7 +37,6 @@ public partial class TestData
                 Data = data,
                 OneLoginUserSubject = oneLoginUserSubject,
                 Status = SupportTaskStatus.Open,
-                SupportTaskReference = reference,
                 UpdatedOn = Clock.UtcNow
             };
 
