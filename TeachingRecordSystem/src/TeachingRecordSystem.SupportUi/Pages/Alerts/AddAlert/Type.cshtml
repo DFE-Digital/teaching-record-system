@@ -21,7 +21,7 @@
 
                     @foreach (var category in Model.Categories!)
                     {
-                        <govuk-radios-divider class="trs-radios__divider--heading-s">@category.Name</govuk-radios-divider>
+                        <govuk-radios-divider><h2 class="trs-radios__divider--heading-s">@category.Name</h2></govuk-radios-divider>
                         @foreach (var type in category.AlertTypes)
                         {
                             <govuk-radios-item value="@type.AlertTypeId">

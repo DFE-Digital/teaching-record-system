@@ -32,7 +32,7 @@ else
         var cardTitle = $"{professionalStatus.RouteToProfessionalStatusType?.ProfessionalStatusType.GetDisplayName()}";
 
             <govuk-summary-card data-testid="professionalstatus-@professionalStatus.QualificationId">
-                <govuk-summary-card-title>@cardTitle</govuk-summary-card-title>
+            <govuk-summary-card-title heading-level="3">@cardTitle</govuk-summary-card-title>
                 <govuk-summary-card-actions>
                     @if (Model.CanEdit)
                     {
@@ -168,7 +168,7 @@ else
     @foreach (var mq in Model.MandatoryQualifications)
     {
         <govuk-summary-card data-testid="mq-@mq.QualificationId">
-            <govuk-summary-card-title>Mandatory qualification@(mq.Specialism is not null ? $" for {mq.Specialism?.GetName()}" : "")</govuk-summary-card-title>
+            <govuk-summary-card-title heading-level="3">Mandatory qualification@(mq.Specialism is not null ? $" for {mq.Specialism?.GetName()}" : "")</govuk-summary-card-title>
             <govuk-summary-card-actions>
                 @if (Model.CanEdit)
                 {

@@ -31,7 +31,7 @@
 
         @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
         {
-            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Create a record</h2>
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Create a record</h3>
             <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
         }
     </div>

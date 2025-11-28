@@ -101,7 +101,7 @@
                 @foreach (var match in Model.PotentialDuplicates!)
                 {
                     <govuk-summary-card data-testid="match" data-personid="@match.PersonId" class="trs-potential-duplicates__item">
-                        <govuk-summary-card-title>
+                        <govuk-summary-card-title heading-level="3">
                             Record @match.Identifier
                         </govuk-summary-card-title>
                         <govuk-summary-card-actions>
@@ -200,8 +200,8 @@
             {
                 <govuk-radios for="PersonId">
                     <govuk-radios-fieldset>
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                            What do you want to do with the @Model.SourceApplicationUserName request?
+                        <govuk-radios-fieldset-legend>
+                            <h2 class="govuk-fieldset__legend--m">What do you want to do with the @Model.SourceApplicationUserName request?</h2>
                         </govuk-radios-fieldset-legend>
 
                         @foreach (var match in Model.PotentialDuplicates!)

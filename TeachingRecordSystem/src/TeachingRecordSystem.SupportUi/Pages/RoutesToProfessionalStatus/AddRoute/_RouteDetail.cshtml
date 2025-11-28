@@ -91,7 +91,7 @@
             <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingCountry</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-country-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Country(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training country">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-country-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Country(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="country of training">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -137,7 +137,7 @@
                 }
             </govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-subjects-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.SubjectSpecialisms(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training subjects">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-subjects-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.SubjectSpecialisms(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="subjects">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
