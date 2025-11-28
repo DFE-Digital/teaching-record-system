@@ -86,9 +86,19 @@ public class ProcessContext
         };
     }
 
+    public ProcessContext(Process process, DateTime now)
+    {
+        Now = now;
+        Process = process;
+    }
+
     public DateTime Now { get; }
 
+    public IReadOnlyCollection<Guid> PersonIds => Process.PersonIds;
+
     public Process Process { get; }
+
+    public Guid ProcessId => Process.ProcessId;
 
     public ProcessType ProcessType => Process.ProcessType;
 }

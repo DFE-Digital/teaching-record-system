@@ -22,10 +22,10 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
     public async Task HandleAsync_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var command = await CreateCommand() with
         {
-            Trn = createPersonResult.Trn!,
+            Trn = person.Trn!,
             EvidenceFileUrl = "https://nonexistenturl.com"
         };
 
@@ -40,10 +40,10 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
     public async Task HandleAsync_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var command = await CreateCommand() with
         {
-            Trn = createPersonResult.Trn!
+            Trn = person.Trn!
         };
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -54,7 +54,7 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
 
         await WithDbContextAsync(async dbContext =>
         {
-            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
+            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == person.PersonId);
             Assert.NotNull(supportTask);
             Assert.Equal(SupportTaskType.ChangeNameRequest, supportTask.SupportTaskType);
             var requestData = supportTask.Data as ChangeNameRequestData;
@@ -69,6 +69,18 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
                 .SingleOrDefaultAsync();
             Assert.NotNull(email);
             Assert.NotNull(email.SentOn);
+        });
+
+        Events.AssertProcessesCreated(t =>
+        {
+            var process = t.ProcessContext;
+            Assert.Equal(ProcessType.ChangeOfNameRequestCreating, process.ProcessType);
+            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, process.Process.UserId);
+
+            Assert.Collection(
+                t.Events,
+                e => Assert.IsType<SupportTaskCreatedEvent>(e),
+                e => Assert.IsType<EmailSentEvent>(e));
         });
     }
 

@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.StaticFiles;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -20,12 +22,13 @@ public record CreateDateOfBirthChangeRequestCommand : ICommand<CreateDateOfBirth
 public record CreateDateOfBirthChangeRequestResult(string CaseNumber);
 
 public class CreateDateOfBirthChangeRequestHandler(
-    IConfiguration configuration,
     IBackgroundJobScheduler backgroundJobScheduler,
     IHttpClientFactory httpClientFactory,
     TrsDbContext dbContext,
+    SupportTaskService supportTaskService,
     IFileService fileService,
-    IClock clock) :
+    IClock clock,
+    ICurrentUserProvider currentUserProvider) :
     ICommandHandler<CreateDateOfBirthChangeRequestCommand, CreateDateOfBirthChangeRequestResult>
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
@@ -56,7 +59,7 @@ public class CreateDateOfBirthChangeRequestHandler(
             evidenceFileMimeType = "application/octet-stream";
         }
 
-        using var stream = await evidenceFileResponse.Content.ReadAsStreamAsync();
+        await using var stream = await evidenceFileResponse.Content.ReadAsStreamAsync();
         var evidenceFileId = await fileService.UploadFileAsync(stream, evidenceFileMimeType);
 
         var changeRequestData = new ChangeDateOfBirthRequestData()
@@ -68,23 +71,22 @@ public class CreateDateOfBirthChangeRequestHandler(
             ChangeRequestOutcome = null
         };
 
-        var getAnIdentityApplicationUserId = configuration.GetValue<Guid>("GetAnIdentityApplicationUserId");
+        var (userId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        var supportTask = SupportTask.Create(
-            SupportTaskType.ChangeDateOfBirthRequest,
-            changeRequestData,
-            person.PersonId,
-            oneLoginUserSubject: null,
-            trnRequestApplicationUserId: null,
-            trnRequestId: null,
-            createdBy: getAnIdentityApplicationUserId,
-            clock.UtcNow,
-            out var supportTaskCreatedEvent);
+        var processContext = new ProcessContext(ProcessType.ChangeOfDateOfBirthRequestCreating, clock.UtcNow, userId);
 
-        dbContext.SupportTasks.Add(supportTask);
-        await dbContext.AddEventAndBroadcastAsync(supportTaskCreatedEvent);
+        var supportTask = await supportTaskService.CreateSupportTaskAsync(
+            new CreateSupportTaskOptions
+            {
+                SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
+                Data = changeRequestData,
+                PersonId = person.PersonId,
+                OneLoginUserSubject = null,
+                TrnRequest = null
+            },
+            processContext);
 
-        var emailAddress = string.IsNullOrEmpty(command.EmailAddress) ? person.EmailAddress : command.EmailAddress;
+        var emailAddress = !string.IsNullOrEmpty(command.EmailAddress) ? command.EmailAddress : person.EmailAddress;
 
         if (!string.IsNullOrEmpty(emailAddress))
         {
@@ -97,10 +99,11 @@ public class CreateDateOfBirthChangeRequestHandler(
             };
 
             dbContext.Emails.Add(email);
-            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
-        }
 
-        await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
+
+            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
+        }
 
         return new CreateDateOfBirthChangeRequestResult(supportTask.SupportTaskReference);
     }

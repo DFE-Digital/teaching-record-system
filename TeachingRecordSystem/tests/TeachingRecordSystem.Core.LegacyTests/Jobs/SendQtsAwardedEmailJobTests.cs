@@ -60,6 +60,7 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
             var job = new SendAytqInviteEmailJob(
                 notificationSender.Object,
                 dbContext,
+                Mock.Of<IEventPublisher>(),
                 getAnIdentityApiClient.Object,
                 accessYourQualificationOptions,
                 Clock);

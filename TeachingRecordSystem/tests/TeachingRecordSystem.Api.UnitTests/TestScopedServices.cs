@@ -17,7 +17,8 @@ public class TestScopedServices
     {
         Clock = new();
         GetAnIdentityApiClient = new();
-        EventObserver = new();
+        Events = new();
+        LegacyEventObserver = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         TrnRequestOptions = new();
         BlobStorageFileService = new();
@@ -29,6 +30,8 @@ public class TestScopedServices
             .AddSingleton<IClock>(new ForwardToTestScopedClock())
             .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
             .AddTestScoped(tss => tss.BlobStorageFileService.Object)
+            .AddTestScoped(tss => tss.Events)
+            .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>())
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
             .AddSingleton<IEventObserver>(new ForwardToTestScopedEventObserver())
             .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
@@ -63,7 +66,9 @@ public class TestScopedServices
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 
-    public CaptureEventObserver EventObserver { get; }
+    public EventCapture Events { get; }
+
+    public CaptureEventObserver LegacyEventObserver { get; }
 
     public TestableFeatureProvider FeatureProvider { get; }
 
@@ -80,7 +85,7 @@ public class TestScopedServices
 
     private class ForwardToTestScopedEventObserver : IEventObserver
     {
-        public void OnEventCreated(LegacyEvents.EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventCreated(@event);
+        public void OnEventCreated(LegacyEvents.EventBase @event) => TestScopedServices.GetCurrent().LegacyEventObserver.OnEventCreated(@event);
     }
 }
 

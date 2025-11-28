@@ -1,18 +1,47 @@
+using System.Transactions;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class SendEmailJob(TrsDbContext dbContext, INotificationSender notificationSender, IClock clock)
+public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher, INotificationSender notificationSender, IClock clock)
 {
     protected TrsDbContext DbContext => dbContext;
+
+    protected IEventPublisher EventPublisher => eventPublisher;
 
     protected INotificationSender NotificationSender => notificationSender;
 
     protected IClock Clock => clock;
 
     public virtual Task ExecuteAsync(Guid emailId) => SendEmailAsync(emailId);
+
+    public virtual async Task ExecuteAsync(Guid emailId, Guid processId)
+    {
+        using var txn = new TransactionScope(
+            TransactionScopeOption.Required,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
+
+        var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processId);
+        var processContext = new ProcessContext(process, clock.UtcNow);
+
+        var personId = processContext.PersonIds.Single();
+
+        var email = await GetEmailByIdAsync(emailId);
+        await SendEmailAsync(email);
+
+        await eventPublisher.PublishEventAsync(
+            new EmailSentEvent
+            {
+                PersonId = personId,
+                Email = EventModels.Email.FromModel(email)
+            },
+            processContext);
+
+        txn.Complete();
+    }
 
     protected Task<Email> GetEmailByIdAsync(Guid emailId) =>
         dbContext.Emails.SingleAsync(e => e.EmailId == emailId);

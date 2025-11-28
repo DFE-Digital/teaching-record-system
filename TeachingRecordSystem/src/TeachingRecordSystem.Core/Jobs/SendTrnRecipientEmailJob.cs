@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Services.Notify;
 namespace TeachingRecordSystem.Core.Jobs;
 
 public class SendTrnRecipientEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher, INotificationSender notificationSender, IClock clock) :
-    SendEmailJob(dbContext, notificationSender, clock)
+    SendEmailJob(dbContext, eventPublisher, notificationSender, clock)
 {
     public override async Task ExecuteAsync(Guid emailId)
     {
@@ -21,7 +21,7 @@ public class SendTrnRecipientEmailJob(TrsDbContext dbContext, IEventPublisher ev
 
         var processContext = new ProcessContext(ProcessType.NotifyingTrnRecipient, email.SentOn!.Value, SystemUser.SystemUserId);
 
-        await eventPublisher.PublishEventAsync(
+        await EventPublisher.PublishEventAsync(
             new EmailSentEvent
             {
                 PersonId = personId,
