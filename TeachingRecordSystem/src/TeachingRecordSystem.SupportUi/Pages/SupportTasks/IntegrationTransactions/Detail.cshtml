@@ -131,22 +131,22 @@
 
                                     @if (result.Duplicate == true)
                                     {
-                                        <span class="govuk-tag--orange govuk-!-static-padding-1">Duplicate</span>
+                                        <tag color="TagColor.Orange" class="govuk-!-static-padding-1">Duplicate</tag>
                                     }
                                 </td>
                                 <td class="govuk-table__cell"
                                     data-testid="integration-transaction-record:@result.IntegrationTransactionRecordId:status">
                                     @if (result.Status == IntegrationTransactionRecordStatus.Success)
                                     {
-                                        <span class="govuk-tag--green govuk-!-static-padding-1">@result.Status.GetDisplayName()</span>
+                                        <tag color="TagColor.Green" class="govuk-!-static-padding-1">@result.Status.GetDisplayName()</tag>
                                     }
                                     else @if (result.Status == IntegrationTransactionRecordStatus.Warning)
                                     {
-                                        <span class="govuk-tag--yellow govuk-!-static-padding-1">@result.Status.GetDisplayName()</span>
+                                        <tag color="TagColor.Yellow" class="govuk-!-static-padding-1">@result.Status.GetDisplayName()</tag>
                                     }
                                     else @if (result.Status == IntegrationTransactionRecordStatus.Failure)
                                     {
-                                        <span class="govuk-tag--red govuk-!-static-padding-1">@result.Status.GetDisplayName()</span>
+                                        <tag color="TagColor.Red" class="govuk-!-static-padding-1">@result.Status.GetDisplayName()</tag>
                                     }
                                 </td>
                             </tr>
