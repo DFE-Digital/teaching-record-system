@@ -42,8 +42,7 @@ public class Index(SupportTaskSearchService supportTaskSearchService, SupportUiL
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser!.Name,
-                t.TrnRequestMetadata.ApplicationUser.ShortName))
+                t.TrnRequestMetadata.ApplicationUser!.Name))
             .GetPageAsync(PageNumber, TasksPerPage);
 
         Pagination = PaginationViewModel.Create(
@@ -60,9 +59,5 @@ public class Index(SupportTaskSearchService supportTaskSearchService, SupportUiL
         string LastName,
         string? EmailAddress,
         DateTime CreatedOn,
-        string SourceApplicationName,
-        string? SourceApplicationShortName)
-    {
-        public string Source => !string.IsNullOrEmpty(SourceApplicationShortName) ? SourceApplicationShortName : SourceApplicationName;
-    }
+        string SourceApplicationName);
 }

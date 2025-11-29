@@ -66,7 +66,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
-        var applicationUser = await TestData.CreateApplicationUserAsync("Apply for QTS", "AfQTS");
+        var applicationUser = await TestData.CreateApplicationUserAsync("Apply for QTS");
         var person = await TestData.CreatePersonAsync();
         var updateComments = TestData.GenerateLoremIpsum();
 
@@ -187,7 +187,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             item.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal(updateComments, v.TrimmedText()));
         }
 
-        item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("AfQTS", v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(Clock.UtcNow.ToString(UiDefaults.DateTimeDisplayFormat), v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
