@@ -95,7 +95,6 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
                 t.TrnRequestMetadata.ApplicationUser!.Name,
-                t.TrnRequestMetadata.ApplicationUser.ShortName,
                 t.TrnRequestMetadata.PotentialDuplicate))
             .GetPageAsync(PageNumber, TasksPerPage);
 
@@ -120,9 +119,5 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
         string? EmailAddress,
         DateTime CreatedOn,
         string SourceApplicationName,
-        string? SourceApplicationShortName,
-        bool? PotentialDuplicate)
-    {
-        public string Source => !string.IsNullOrEmpty(SourceApplicationShortName) ? SourceApplicationShortName : SourceApplicationName;
-    }
+        bool? PotentialDuplicate);
 }

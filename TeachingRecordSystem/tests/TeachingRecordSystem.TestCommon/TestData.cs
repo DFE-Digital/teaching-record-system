@@ -9,7 +9,6 @@ public partial class TestData
     private static readonly Lock _gate = new();
     private static readonly HashSet<string> _emails = [];
     private static readonly HashSet<string> _mobileNumbers = [];
-    private static int _applicationUserNumber = 1;
 
     private readonly Func<Task<string>> _generateTrn;
 
@@ -70,8 +69,6 @@ public partial class TestData
     }
 
     public string GenerateApplicationUserName() => Faker.Company.Name();
-
-    public string GenerateApplicationUserShortName() => $"app-{Interlocked.Increment(ref _applicationUserNumber)}";
 
     public string GenerateChangedApplicationUserName(string currentName)
     {
