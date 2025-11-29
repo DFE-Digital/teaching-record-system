@@ -17,10 +17,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
-    [BindProperty]
-    [MaxLength(ApplicationUser.ShortNameMaxLength, ErrorMessage = "Short name must be 25 characters or less")]
-    public string? ShortName { get; set; }
-
     public void OnGet()
     {
     }
@@ -36,8 +32,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         {
             ApiRoles = [],
             Name = Name!,
-            UserId = Guid.NewGuid(),
-            ShortName = ShortName
+            UserId = Guid.NewGuid()
         };
 
         dbContext.ApplicationUsers.Add(newUser);
