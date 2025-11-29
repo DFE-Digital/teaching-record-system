@@ -15,7 +15,6 @@ public record ApplicationUser
     public string? OneLoginAuthenticationSchemeName { get; init; }
     public string? OneLoginRedirectUriPath { get; init; }
     public string? OneLoginPostLogoutRedirectUriPath { get; init; }
-    public string? ShortName { get; init; }
 
     public static ApplicationUser FromModel(DataStore.Postgres.Models.ApplicationUser user) => new()
     {
@@ -32,6 +31,5 @@ public record ApplicationUser
         OneLoginAuthenticationSchemeName = user.OneLoginAuthenticationSchemeName,
         OneLoginRedirectUriPath = user.OneLoginRedirectUriPath,
         OneLoginPostLogoutRedirectUriPath = user.OneLoginPostLogoutRedirectUriPath,
-        ShortName = user.ShortName
     };
 }

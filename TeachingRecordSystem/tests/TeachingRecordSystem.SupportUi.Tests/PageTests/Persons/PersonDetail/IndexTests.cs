@@ -582,12 +582,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (expectPersonToBeMarkedAsDeactivated)
         {
             Assert.Equal("Lily The Pink (deactivated)", pageTitle.TrimmedText());
-            doc.AssertSummaryListRowValueContentMatches("Status", "DEACTIVATED");
+            doc.AssertSummaryListRowValueContentMatches("Status", "Deactivated");
         }
         else
         {
             Assert.Equal("Lily The Pink", pageTitle.TrimmedText());
-            doc.AssertSummaryListRowValueContentMatches("Status", "ACTIVE");
+            doc.AssertSummaryListRowValueContentMatches("Status", "Active");
         }
     }
 

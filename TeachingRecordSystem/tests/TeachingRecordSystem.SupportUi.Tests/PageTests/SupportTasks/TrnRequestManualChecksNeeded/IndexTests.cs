@@ -376,39 +376,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
-    [Fact]
-    public async Task Get_UsesApplicationShortNameIfSetOtherwiseApplicationName()
-    {
-        // Arrange
-        var applicationUserWithShortName = await TestData.CreateApplicationUserAsync(shortName: TestData.GenerateApplicationUserShortName());
-        var applicationUserWithoutShortName = await TestData.CreateApplicationUserAsync(shortName: "");
-
-        await CreateSupportTaskAsync(applicationUserWithShortName.UserId);
-        Clock.Advance();
-        await CreateSupportTaskAsync(applicationUserWithoutShortName.UserId);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateCreated}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var resultRows = GetResultRows(doc);
-        Assert.Collection(
-            resultRows,
-            row => AssertSourceColumnEquals(row, applicationUserWithShortName.ShortName!),
-            row => AssertSourceColumnEquals(row, applicationUserWithoutShortName.Name));
-
-        static void AssertSourceColumnEquals(IElement row, string expectedSource)
-        {
-            var source = row.Children[3];
-            Assert.Equal(expectedSource, source.TrimmedText());
-        }
-    }
-
     private static IElement[] GetResultRows(IHtmlDocument doc) =>
         doc
             .GetElementsByTagName("tbody")

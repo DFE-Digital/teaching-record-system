@@ -116,8 +116,7 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.DateOfBirth,
                 t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser!.Name,
-                t.TrnRequestMetadata.ApplicationUser.ShortName))
+                t.TrnRequestMetadata.ApplicationUser!.Name))
             .GetPageAsync(PageNumber, TasksPerPage, totalTaskCount);
 
         Pagination = PaginationViewModel.Create(
@@ -132,11 +131,7 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
         string LastName,
         DateOnly DateOfBirth,
         DateTime CreatedOn,
-        string SourceApplicationName,
-        string? SourceApplicationShortName)
-    {
-        public string Source => !string.IsNullOrEmpty(SourceApplicationShortName) ? SourceApplicationShortName : SourceApplicationName;
-    }
+        string SourceApplicationName);
 
     public record Source(Guid UserId, string UserName);
 }
