@@ -12,6 +12,6 @@ public interface IEvent
     static JsonSerializerOptions SerializerOptions => new()
     {
         AllowOutOfOrderMetadataProperties = true,  // jsonb columns may have properties in any order
-        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { Modifiers.Events } }
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { Modifiers.Events, Modifiers.SupportTaskData } }
     };
 }
