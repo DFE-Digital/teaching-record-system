@@ -1,19 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 public abstract class CommonJourneyPage(
-    TrsDbContext dbContext,
+    PersonService personService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
 
-    protected TrsDbContext DbContext { get; } = dbContext;
+    protected PersonService PersonService { get; } = personService;
     protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
     protected EvidenceUploadManager EvidenceUploadManager { get; } = evidenceUploadManager;
 
@@ -64,7 +64,18 @@ public abstract class CommonJourneyPage(
 
     protected virtual async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(DbContext, PersonId, StartPage);
+        if (!JourneyInstance!.State.Initialized)
+        {
+            var person = await PersonService.GetPersonAsync(PersonId);
+
+            if (person is null)
+            {
+                context.Result = NotFound();
+                return;
+            }
+
+            JourneyInstance!.State.EnsureInitialized(person, StartPage);
+        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;

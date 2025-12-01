@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -9,19 +9,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class ExemptionReasonsModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    ReferenceDataCache referenceDataCache,
+    PersonService personService,
     EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    : CommonJourneyPage(personService, linkGenerator, evidenceController)
 {
-    protected class RouteWithExemption
-    {
-        public required Guid RouteToProfessionalStatusId { get; init; }
-        public required Guid InductionExemptionReasonId { get; init; }
-        public required string RouteToProfessionalStatusName { get; init; }
-        public required string InductionExemptionReasonName { get; init; }
-    }
-
     [BindProperty]
     public Guid[] ExemptionReasonIds { get; set; } = [];
 
@@ -143,52 +134,6 @@ public class ExemptionReasonsModel(
             return;
         }
 
-        var exemptionReasons = await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true);
-
-        RoutesWithInductionExemptions = DbContext.RouteToProfessionalStatuses
-            .Include(p => p.RouteToProfessionalStatusType)
-            .ThenInclude(r => r!.InductionExemptionReason)
-            .Where(
-                p => p.PersonId == PersonId &&
-                p.ExemptFromInduction == true &&
-                p.RouteToProfessionalStatusType!.InductionExemptionReason != null)
-            .Select(r => new RouteWithExemption()
-            {
-                InductionExemptionReasonId = r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value,
-                RouteToProfessionalStatusId = r.RouteToProfessionalStatusTypeId,
-                InductionExemptionReasonName = r.RouteToProfessionalStatusType.InductionExemptionReason!.Name,
-                RouteToProfessionalStatusName = r.RouteToProfessionalStatusType.Name
-            });
-
-        // note: RoutesWithInductionExemptions is null if the Feature RoutesToProfessionalStatus isn't enabled
-        if (RoutesWithInductionExemptions is not null && RoutesWithInductionExemptions.Any()) // exclude some exemptions from the choices if they apply because of a route
-        {
-            var exemptionReasonIdsToExclude = ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld
-                .Join(RoutesWithInductionExemptions,
-                    guid => guid,
-                    r => r.InductionExemptionReasonId,
-                    (guid, route) => route.InductionExemptionReasonId);
-
-            var exemptionReasonsToDisplay = ExemptionReasonCategories.RouteFeatureExemptionReasonIds
-                .Where(id => !exemptionReasonIdsToExclude.Contains(id))
-                .Join(exemptionReasons,
-                    guid => guid,
-                    exemption => exemption.InductionExemptionReasonId,
-                    (guid, exemption) => exemption)
-                .ToArray();
-
-            ExemptionReasons = ExemptionReasonCategories.CreateFilteredDictionaryFromIds(exemptionReasonsToDisplay);
-        }
-        else
-        {
-            var exemptionReasonsToDisplay = ExemptionReasonCategories.ExemptionReasonIds
-                .Join(exemptionReasons,
-                        guid => guid,
-                        exemption => exemption.InductionExemptionReasonId,
-                        (guid, exemption) => exemption)
-                    .ToArray();
-
-            ExemptionReasons = ExemptionReasonCategories.CreateFilteredDictionaryFromIds(exemptionReasonsToDisplay);
-        }
+        (RoutesWithInductionExemptions, ExemptionReasons) = await PersonService.GetExemptionReasonsAsync(PersonId);
     }
 }

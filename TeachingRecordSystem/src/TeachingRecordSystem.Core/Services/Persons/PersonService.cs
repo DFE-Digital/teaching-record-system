@@ -175,7 +175,78 @@ public class PersonService(
         }
     }
 
+    public async Task SetPersonInductionStatusAsync(SetPersonInductionStatusRequest request)
+    {
+        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == request.PersonId);
 
+        person.SetInductionStatus(
+            request.InductionStatus,
+            request.StartDate,
+            request.CompletedDate,
+            request.ExemptionReasonIds ?? [],
+            request.ChangeReason.GetDisplayName(),
+            request.ChangeReasonDetail,
+            request.EvidenceFile?.ToEventModel(),
+            request.UserId,
+            clock.UtcNow,
+            out var updatedEvent);
+
+        if (updatedEvent is not null)
+        {
+            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    public async Task<(IEnumerable<RouteWithExemption>?, Dictionary<ExemptionReasonCategory, IEnumerable<InductionExemptionReason>>)> GetExemptionReasonsAsync(Guid personId)
+    {
+        var exemptionReasons = await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true);
+
+        var RoutesWithInductionExemptions = dbContext.RouteToProfessionalStatuses
+            .Include(p => p.RouteToProfessionalStatusType)
+            .ThenInclude(r => r!.InductionExemptionReason)
+            .Where(
+                p => p.PersonId == personId &&
+                p.ExemptFromInduction == true &&
+                p.RouteToProfessionalStatusType!.InductionExemptionReason != null)
+            .Select(r => new RouteWithExemption()
+            {
+                InductionExemptionReasonId = r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value,
+                RouteToProfessionalStatusId = r.RouteToProfessionalStatusTypeId,
+                InductionExemptionReasonName = r.RouteToProfessionalStatusType.InductionExemptionReason!.Name,
+                RouteToProfessionalStatusName = r.RouteToProfessionalStatusType.Name
+            });
+
+        // note: RoutesWithInductionExemptions is null if the Feature RoutesToProfessionalStatus isn't enabled
+        if (RoutesWithInductionExemptions is not null && RoutesWithInductionExemptions.Any()) // exclude some exemptions from the choices if they apply because of a route
+        {
+            var exemptionReasonIdsToExclude = ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld
+                .Join(RoutesWithInductionExemptions,
+                    guid => guid,
+                    r => r.InductionExemptionReasonId,
+                    (guid, route) => route.InductionExemptionReasonId);
+
+            var exemptionReasonsToDisplay = ExemptionReasonCategories.RouteFeatureExemptionReasonIds
+                .Where(id => !exemptionReasonIdsToExclude.Contains(id))
+                .Join(exemptionReasons,
+                    guid => guid,
+                    exemption => exemption.InductionExemptionReasonId,
+                    (guid, exemption) => exemption)
+                .ToArray();
+
+            return (RoutesWithInductionExemptions, ExemptionReasonCategories.CreateFilteredDictionaryFromIds(exemptionReasonsToDisplay));
+        }
+        else
+        {
+            var exemptionReasonsToDisplay = ExemptionReasonCategories.ExemptionReasonIds
+                .Join(exemptionReasons,
+                        guid => guid,
+                        exemption => exemption.InductionExemptionReasonId,
+                        (guid, exemption) => exemption)
+                    .ToArray();
+
+            return (RoutesWithInductionExemptions, ExemptionReasonCategories.CreateFilteredDictionaryFromIds(exemptionReasonsToDisplay));
+        }
     }
 }
 
@@ -231,6 +302,20 @@ public record SetPersonStatusRequest
     public required File? EvidenceFile { get; init; }
     public required Guid UserId { get; init; }
 }
+
+public record SetPersonInductionStatusRequest
+{
+    public required Guid PersonId { get; init; }
+    public required InductionStatus InductionStatus { get; init; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? CompletedDate { get; set; }
+    public Guid[]? ExemptionReasonIds { get; set; } = [];
+    public required InductionChangeReasonOption ChangeReason { get; init; }
+    public required string? ChangeReasonDetail { get; init; }
+    public required File? EvidenceFile { get; init; }
+    public required Guid UserId { get; init; }
+}
+
 
 public enum EditDetailsNameChangeReasonOption
 {
@@ -304,3 +389,105 @@ public enum ReactivateReasonOption
     AnotherReason
 }
 
+public enum InductionChangeReasonOption
+{
+    [Display(Name = "Data loss or incomplete information")]
+    IncompleteDetails,
+    [Display(Name = "New information received")]
+    NewInformation,
+    [Display(Name = "No longer exempt from induction")]
+    NoLongerExempt,
+    [Display(Name = "Another reason")]
+    AnotherReason
+}
+
+public enum ExemptionReasonCategory
+{
+    [Display(Name = "Miscellaneous exemptions")]
+    Miscellaneous = 1,
+    [Display(Name = "Exemptions for historical qualification routes")]
+    HistoricalQualificationRoute = 2,
+    [Display(Name = "Induction completed outside England")]
+    InductionCompletedOutsideEngland = 3
+}
+
+public static class ExemptionReasonCategories
+{
+    private static Dictionary<ExemptionReasonCategory, IEnumerable<Guid>> ExemptionReasonCategoryMap => new()
+    {
+        { ExemptionReasonCategory.Miscellaneous, new List<Guid> {
+            InductionExemptionReason.QualifiedThroughFurtherEducationRouteBetween1Sep2001And1Sep2004Id,
+            InductionExemptionReason.ExemptDataLossOrErrorCriteriaId,
+            InductionExemptionReason.QtlsId,
+            InductionExemptionReason.OverseasTrainedTeacherId,
+            InductionExemptionReason.ExemptId,
+            InductionExemptionReason.QualifiedThroughEeaMutualRecognitionRouteId} },
+        { ExemptionReasonCategory.HistoricalQualificationRoute, new List<Guid> {
+            InductionExemptionReason.QualifiedBetween7May1999And1April2003FirstPostInWalesId,
+            InductionExemptionReason.RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceId,
+            InductionExemptionReason.QualifiedBefore7May2000Id} },
+        { ExemptionReasonCategory.InductionCompletedOutsideEngland, new List<Guid> {
+            InductionExemptionReason.HasOrIsEligibleForFullRegistrationInScotlandId,
+            InductionExemptionReason.PassedInductionInJerseyId,
+            InductionExemptionReason.PassedInductionInNorthernIrelandId,
+            InductionExemptionReason.PassedInWalesId,
+            InductionExemptionReason.PassedInductionInServiceChildrensEducationSchoolsInGermanyOrCyprusId,
+            InductionExemptionReason.PassedProbationaryPeriodInGibraltarId,
+            InductionExemptionReason.PassedInductionInIsleOfManId,
+            InductionExemptionReason.PassedInductionInGuernseyId} }
+    };
+
+    private static Dictionary<ExemptionReasonCategory, IEnumerable<Guid>> RoutesFeatureExemptionReasonCategoryMap => new()
+    {
+        { ExemptionReasonCategory.Miscellaneous, new List<Guid> {
+            InductionExemptionReason.QualifiedThroughFurtherEducationRouteBetween1Sep2001And1Sep2004Id,
+            InductionExemptionReason.ExemptDataLossOrErrorCriteriaId,
+            InductionExemptionReason.ExemptId,
+            InductionExemptionReason.QualifiedThroughEeaMutualRecognitionRouteId} },
+        { ExemptionReasonCategory.HistoricalQualificationRoute, new List<Guid> {
+            InductionExemptionReason.QualifiedBetween7May1999And1April2003FirstPostInWalesId,
+            InductionExemptionReason.RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceId,
+            InductionExemptionReason.QualifiedBefore7May2000Id} },
+        { ExemptionReasonCategory.InductionCompletedOutsideEngland, new List<Guid> {
+            InductionExemptionReason.HasOrIsEligibleForFullRegistrationInScotlandId,
+            InductionExemptionReason.PassedInductionInJerseyId,
+            InductionExemptionReason.PassedInductionInNorthernIrelandId,
+            InductionExemptionReason.PassedInWalesId,
+            InductionExemptionReason.PassedInductionInServiceChildrensEducationSchoolsInGermanyOrCyprusId,
+            InductionExemptionReason.PassedProbationaryPeriodInGibraltarId,
+            InductionExemptionReason.PassedInductionInIsleOfManId,
+            InductionExemptionReason.PassedInductionInGuernseyId} }
+    };
+
+    public static Dictionary<ExemptionReasonCategory, IEnumerable<InductionExemptionReason>> CreateFilteredDictionaryFromIds(InductionExemptionReason[] exemptionReasons)
+    {
+        return ExemptionReasonCategoryMap
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => exemptionReasons.Where(r => kvp.Value.Contains(r.InductionExemptionReasonId))
+            )
+            .Where(kvp => kvp.Value.Any())
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    }
+
+
+    public static IEnumerable<Guid> ExemptionsToBeExcludedIfRouteQualificationIsHeld =>
+        new List<Guid>() {
+            InductionExemptionReason.PassedInductionInNorthernIrelandId,
+            InductionExemptionReason.HasOrIsEligibleForFullRegistrationInScotlandId
+        };
+
+    public static IEnumerable<Guid> ExemptionReasonIds =>
+        ExemptionReasonCategoryMap.Values.SelectMany(g => g);
+
+    public static IEnumerable<Guid> RouteFeatureExemptionReasonIds =>
+        RoutesFeatureExemptionReasonCategoryMap.Values.SelectMany(g => g);
+}
+
+public class RouteWithExemption
+{
+    public required Guid RouteToProfessionalStatusId { get; init; }
+    public required Guid InductionExemptionReasonId { get; init; }
+    public required string RouteToProfessionalStatusName { get; init; }
+    public required string InductionExemptionReasonName { get; init; }
+}
