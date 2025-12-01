@@ -16,7 +16,7 @@ public class SupportTaskServiceTests(SupportTaskService supportTaskService, IClo
     public async Task DeleteSupportTaskAsync_TaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var supportTaskReference = SupportTask.GenerateSupportTaskReference();
+        var supportTaskReference = "ABC-123";
         var deleteReason = Faker.Lorem.Paragraph();
         var options = new DeleteSupportTaskOptions(supportTaskReference, deleteReason);
 

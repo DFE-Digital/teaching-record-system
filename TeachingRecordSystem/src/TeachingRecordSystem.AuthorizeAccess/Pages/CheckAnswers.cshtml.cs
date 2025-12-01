@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -36,7 +35,6 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
 
         var supportTask = new SupportTask()
         {
-            SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
             CreatedOn = clock.UtcNow,
             UpdatedOn = clock.UtcNow,
             SupportTaskType = SupportTaskType.ConnectOneLoginUser,
@@ -65,19 +63,7 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
             SupportTask = EventModels.SupportTask.FromModel(supportTask)
         });
 
-        while (true)
-        {
-            try
-            {
-                await dbContext.SaveChangesAsync();
-                break;
-            }
-            catch (Exception ex) when (ex.InnerException is PostgresException postgresException && postgresException.SqlState == PostgresErrorCodes.UniqueViolation)
-            {
-                supportTask.SupportTaskReference = SupportTask.GenerateSupportTaskReference();
-                continue;
-            }
-        }
+        await dbContext.SaveChangesAsync();
 
         await JourneyInstance.UpdateStateAsync(state => state.HasPendingSupportRequest = true);
 
