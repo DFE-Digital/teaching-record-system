@@ -15,6 +15,7 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -107,7 +108,8 @@ public static class Extensions
             .AddSupportTaskService()
             .AddSingleton<PersonInfoCache>()
             .AddTrnGeneration()
-            .AddNoteService();
+            .AddNoteService()
+            .AddTransient<PersonService>();
 
         return services;
     }
@@ -169,7 +171,7 @@ public static class Extensions
             "hangfire-schema-prepared");
 
         // Try to skip schema preparation in development to speed up startup
-        if (environment.IsDevelopment() && File.Exists(schemaPreparedMarkerFile))
+        if (environment.IsDevelopment() && System.IO.File.Exists(schemaPreparedMarkerFile))
         {
             prepareSchemaIfNecessary = false;
         }
@@ -188,10 +190,10 @@ public static class Extensions
                     }));
         }
 
-        if (environment.IsDevelopment() && !File.Exists(schemaPreparedMarkerFile))
+        if (environment.IsDevelopment() && !System.IO.File.Exists(schemaPreparedMarkerFile))
         {
             Directory.CreateDirectory(Directory.GetParent(schemaPreparedMarkerFile)!.FullName);
-            File.WriteAllText(schemaPreparedMarkerFile, string.Empty);
+            System.IO.File.WriteAllText(schemaPreparedMarkerFile, string.Empty);
         }
 
         return services;

@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
@@ -10,11 +8,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 [Journey(JourneyNames.AddPerson), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    IClock clock,
-    ITrnGenerator trnGenerator,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    EvidenceUploadManager evidenceUploadManager,
+    PersonService personService)
+    : CommonJourneyPage(linkGenerator, evidenceUploadManager)
 {
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
@@ -63,12 +59,7 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
-
-        var trn = await trnGenerator.GenerateTrnAsync();
-
-        var (person, personAttributes) = Person.Create(
-            trn,
+        var personId = await personService.CreatePersonAsync(new(
             FirstName ?? string.Empty,
             MiddleName ?? string.Empty,
             LastName ?? string.Empty,
@@ -76,31 +67,17 @@ public class CheckAnswersModel(
             EmailAddress,
             NationalInsuranceNumber,
             Gender,
-            now);
-
-        var createdEvent = new LegacyEvents.PersonCreatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId(),
-            PersonId = person.PersonId,
-            PersonAttributes = personAttributes,
-            CreateReason = Reason?.GetDisplayName(),
-            CreateReasonDetail = ReasonDetail,
-            EvidenceFile = EvidenceFile?.ToEventModel(),
-            TrnRequestMetadata = null
-        };
-
-        DbContext.Add(person);
-        await DbContext.AddEventAndBroadcastAsync(createdEvent);
-        await DbContext.SaveChangesAsync();
+            User.GetUserId(),
+            Reason?.GetDisplayName(),
+            ReasonDetail,
+            EvidenceFile?.ToFile()));
 
         await JourneyInstance!.CompleteAsync();
 
         TempData.SetFlashSuccess($"Record created for {Name}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(person.PersonId))
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(personId))
             );
 
-        return Redirect(LinkGenerator.Persons.PersonDetail.Index(person.PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(personId));
     }
 }

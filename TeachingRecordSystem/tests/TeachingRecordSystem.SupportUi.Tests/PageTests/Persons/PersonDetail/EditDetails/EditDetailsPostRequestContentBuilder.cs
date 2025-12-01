@@ -1,4 +1,4 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
