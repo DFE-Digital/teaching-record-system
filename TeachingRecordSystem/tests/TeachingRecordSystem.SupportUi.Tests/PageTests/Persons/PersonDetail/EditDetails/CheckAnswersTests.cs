@@ -24,7 +24,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("A", "New", "Name")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -49,7 +49,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("A", "New", "Name")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -84,9 +84,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmail("test@test.com")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithGender(Gender.Male)
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -118,9 +118,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(person)
                 .WithName("Alfred", null, "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -151,7 +151,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.DeedPollOrOtherLegalProcess)
                 .WithNameChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -193,7 +193,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -236,9 +236,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.DeedPollOrOtherLegalProcess)
                 .WithNameChangeUploadEvidenceChoice(true, evidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "other-evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -285,7 +285,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.DeedPollOrOtherLegalProcess)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -319,7 +319,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -381,9 +381,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmail(emailAddress)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithGender(gender)
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
 
@@ -462,7 +462,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("Alfrede", "Thee", "Greate")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -497,9 +497,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)]
-    [InlineData(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)]
-    public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames(EditDetailsNameChangeReasonOption reason)
+    [InlineData(PersonNameChangeReason.DeedPollOrOtherLegalProcess)]
+    [InlineData(PersonNameChangeReason.MarriageOrCivilPartnership)]
+    public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames(PersonNameChangeReason reason)
     {
         // Arrange
         var ethelredDate = DateTime.Parse("1 Jan 1990").ToUniversalTime();

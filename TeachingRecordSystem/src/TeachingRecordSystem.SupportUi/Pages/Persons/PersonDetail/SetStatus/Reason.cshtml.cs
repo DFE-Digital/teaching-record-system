@@ -14,14 +14,14 @@ public class ReasonModel(
     : CommonJourneyPage(personService, linkGenerator, evidenceController)
 {
     [BindProperty]
-    public DeactivateReasonOption? DeactivateReason { get; set; }
+    public PersonDeactivateReason? DeactivateReason { get; set; }
 
     [BindProperty]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? DeactivateReasonDetail { get; set; }
 
     [BindProperty]
-    public ReactivateReasonOption? ReactivateReason { get; set; }
+    public PersonReactivateReason? ReactivateReason { get; set; }
 
     [BindProperty]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
@@ -52,7 +52,7 @@ public class ReasonModel(
                 ModelState.AddModelError(nameof(DeactivateReason), "Select a reason");
             }
 
-            if (DeactivateReason == DeactivateReasonOption.AnotherReason && DeactivateReasonDetail is null)
+            if (DeactivateReason == Core.Services.Persons.PersonDeactivateReason.AnotherReason && DeactivateReasonDetail is null)
             {
                 ModelState.AddModelError(nameof(DeactivateReasonDetail), "Enter a reason");
             }
@@ -64,7 +64,7 @@ public class ReasonModel(
                 ModelState.AddModelError(nameof(ReactivateReason), "Select a reason");
             }
 
-            if (ReactivateReason == ReactivateReasonOption.AnotherReason && ReactivateReasonDetail is null)
+            if (ReactivateReason == Core.Services.Persons.PersonReactivateReason.AnotherReason && ReactivateReasonDetail is null)
             {
                 ModelState.AddModelError(nameof(ReactivateReasonDetail), "Enter a reason");
             }
@@ -80,9 +80,9 @@ public class ReasonModel(
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.DeactivateReason = DeactivateReason;
-            state.DeactivateReasonDetail = DeactivateReason is DeactivateReasonOption.AnotherReason ? DeactivateReasonDetail : null;
+            state.DeactivateReasonDetail = DeactivateReason is Core.Services.Persons.PersonDeactivateReason.AnotherReason ? DeactivateReasonDetail : null;
             state.ReactivateReason = ReactivateReason;
-            state.ReactivateReasonDetail = ReactivateReason is ReactivateReasonOption.AnotherReason ? ReactivateReasonDetail : null;
+            state.ReactivateReasonDetail = ReactivateReason is Core.Services.Persons.PersonReactivateReason.AnotherReason ? ReactivateReasonDetail : null;
             state.Evidence = Evidence;
         });
 

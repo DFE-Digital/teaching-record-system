@@ -29,8 +29,8 @@ public record PersonDetails
         MiddleName = person.MiddleName,
         LastName = person.LastName,
         DateOfBirth = person.DateOfBirth,
-        EmailAddress = person.EmailAddress,
-        NationalInsuranceNumber = person.NationalInsuranceNumber,
+        EmailAddress = person.EmailAddress?.ToString(),
+        NationalInsuranceNumber = person.NationalInsuranceNumber?.ToString(),
         Gender = person.Gender
     };
 }

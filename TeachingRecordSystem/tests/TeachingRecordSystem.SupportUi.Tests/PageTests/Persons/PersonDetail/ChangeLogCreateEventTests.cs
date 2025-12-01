@@ -1,4 +1,4 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
@@ -31,7 +31,7 @@ public class ChangeLogCreateEventTests : TestBase
         string? nationalInsuranceNumber = "AB 12 34 56 D";
         Gender? gender = Gender.Female;
 
-        var createReason = AddPersonReasonOption.AnotherReason.GetDisplayName();
+        var createReason = PersonCreateReason.AnotherReason.GetDisplayName();
         var createReasonDetail = "Reason detail";
         var evidenceFile = new EventModels.File
         {
@@ -105,7 +105,7 @@ public class ChangeLogCreateEventTests : TestBase
         string lastName = "Great";
         DateOnly? dateOfBirth = Clock.Today.AddYears(-30);
 
-        var createReason = AddPersonReasonOption.AnotherReason.GetDisplayName();
+        var createReason = PersonCreateReason.AnotherReason.GetDisplayName();
 
         var details = new EventModels.PersonDetails
         {

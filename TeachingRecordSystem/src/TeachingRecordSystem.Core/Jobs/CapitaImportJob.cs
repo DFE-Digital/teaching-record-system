@@ -129,7 +129,20 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                     if (person is null)
                     {
                         //create person if incoming record is not known in trs
-                        var (newPerson, personAttributes) = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddleName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow, createdByTps: true);
+                        var (newPerson, personAttributes) = Person.Create(
+                            row.TRN!,
+                            new()
+                            {
+                                FirstName = row.GetFirstName()!,
+                                MiddleName = row.GetMiddleName()!,
+                                LastName = row.LastName!,
+                                DateOfBirth = row.GetDateOfBirth(),
+                                EmailAddress = null,
+                                NationalInsuranceNumber = ni,
+                                Gender = (Gender?)row.Gender,
+                            },
+                            clock.UtcNow,
+                            createdByTps: true);
                         var createdEvent = new LegacyEvents.PersonCreatedEvent
                         {
                             EventId = Guid.NewGuid(),

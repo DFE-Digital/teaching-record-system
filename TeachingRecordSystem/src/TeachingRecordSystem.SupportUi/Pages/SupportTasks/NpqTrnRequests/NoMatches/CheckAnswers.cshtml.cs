@@ -51,13 +51,16 @@ public class CheckAnswersModel(
 
         var (person, _) = Person.Create(
             trn,
-            requestData.FirstName ?? string.Empty,
-            requestData.MiddleName ?? string.Empty,
-            requestData.LastName ?? string.Empty,
-            requestData.DateOfBirth,
-            requestData.EmailAddress is not null ? Core.EmailAddress.Parse(requestData.EmailAddress) : null,
-            requestData.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(requestData.NationalInsuranceNumber) : null,
-            requestData.Gender,
+            new()
+            {
+                FirstName = requestData.FirstName ?? string.Empty,
+                MiddleName = requestData.MiddleName ?? string.Empty,
+                LastName = requestData.LastName ?? string.Empty,
+                DateOfBirth = requestData.DateOfBirth,
+                EmailAddress = requestData.EmailAddress is not null ? Core.EmailAddress.Parse(requestData.EmailAddress) : null,
+                NationalInsuranceNumber = requestData.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(requestData.NationalInsuranceNumber) : null,
+                Gender = requestData.Gender,
+            },
             clock.UtcNow,
             sourceTrnRequest: (requestData.ApplicationUserId, requestData.RequestId));
 

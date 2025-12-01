@@ -902,9 +902,9 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
                 .WithEmail("new@email.com")
                 .WithNationalInsuranceNumber("AB654321D")
                 .WithGender(Gender.Other)
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.MarriageOrCivilPartnership)
                 .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason")
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, "Some reason")
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png", "1.3 KB")
                 .Build());
 
@@ -938,7 +938,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
         Assert.Equal(Gender.Other, journeyInstance.State.Gender);
-        Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, journeyInstance.State.OtherDetailsChangeReason);
+        Assert.Equal(PersonDetailsChangeReason.AnotherReason, journeyInstance.State.OtherDetailsChangeReason);
         Assert.Equal("Some reason", journeyInstance.State.OtherDetailsChangeReasonDetail);
         Assert.Equal(true, journeyInstance.State.OtherDetailsChangeEvidence.UploadEvidence);
         Assert.Equal(otherEvidenceFileId, journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile!.FileId);
@@ -971,9 +971,9 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
                 .WithEmail("new@email.com")
                 .WithNationalInsuranceNumber("AB654321D")
                 .WithGender(Gender.Female)
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.MarriageOrCivilPartnership)
                 .WithNameChangeUploadEvidenceChoice(true, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason")
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, "Some reason")
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png", "1.3 KB")
                 .Build());
 
@@ -999,7 +999,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("Megan", journeyInstance.State.FirstName);
         Assert.Equal("Thee", journeyInstance.State.MiddleName);
         Assert.Equal("Stallion", journeyInstance.State.LastName);
-        Assert.Equal(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership, journeyInstance.State.NameChangeReason);
+        Assert.Equal(PersonNameChangeReason.MarriageOrCivilPartnership, journeyInstance.State.NameChangeReason);
         Assert.Equal(true, journeyInstance.State.NameChangeEvidence.UploadEvidence);
         Assert.Equal(nameEvidenceFileId, journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile!.FileId);
         Assert.Equal("name-evidence.pdf", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileName);

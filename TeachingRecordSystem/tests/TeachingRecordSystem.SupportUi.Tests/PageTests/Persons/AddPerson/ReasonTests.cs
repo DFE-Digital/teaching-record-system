@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -38,7 +39,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
-        var reasonChoice = AddPersonReasonOption.AnotherReason;
+        var reasonChoice = PersonCreateReason.AnotherReason;
         var reasonDetail = "A description about why the change typed into the box";
         var evidenceFileId = Guid.NewGuid();
         var urlEncoder = UrlEncoder.Default;
@@ -86,7 +87,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
-        var expectedChoices = Enum.GetValues<AddPersonReasonOption>().Select(s => s.ToString());
+        var expectedChoices = Enum.GetValues<PersonCreateReason>().Select(s => s.ToString());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
@@ -124,7 +125,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
-        var changeReason = AddPersonReasonOption.AnotherReason;
+        var changeReason = PersonCreateReason.AnotherReason;
         var changeReasonDetails = "A description about why the change typed into the box";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -189,7 +190,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.AnotherReason, null)
+                .WithReason(PersonCreateReason.AnotherReason, null)
                 .BuildFormUrlEncoded()
         };
 
@@ -214,7 +215,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.MandatoryQualification)
+                .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(true)
                 .BuildMultipartFormData()
         };
@@ -240,7 +241,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.MandatoryQualification)
+                .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
                 .BuildMultipartFormData()
         };
@@ -267,7 +268,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.AnotherReason)
+                .WithReason(PersonCreateReason.AnotherReason)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .BuildMultipartFormData()
         };
@@ -309,7 +310,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.AnotherReason)
+                .WithReason(PersonCreateReason.AnotherReason)
                 .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
@@ -350,7 +351,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.AnotherReason)
+                .WithReason(PersonCreateReason.AnotherReason)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
@@ -381,7 +382,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.AnotherReason)
+                .WithReason(PersonCreateReason.AnotherReason)
                 .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
@@ -409,7 +410,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.MandatoryQualification)
+                .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -440,7 +441,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.MandatoryQualification)
+                .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -469,7 +470,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
             Content = new AddPersonPostRequestContentBuilder()
-                .WithReason(AddPersonReasonOption.MandatoryQualification, "A description about why the change typed into the box")
+                .WithReason(PersonCreateReason.MandatoryQualification, "A description about why the change typed into the box")
                 .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -483,7 +484,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasNotUploaded();
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(AddPersonReasonOption.MandatoryQualification, journeyInstance.State.Reason);
+        Assert.Equal(PersonCreateReason.MandatoryQualification, journeyInstance.State.Reason);
         Assert.Null(journeyInstance.State.ReasonDetail);
         Assert.False(journeyInstance.State.Evidence.UploadEvidence);
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);

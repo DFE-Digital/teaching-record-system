@@ -19,7 +19,7 @@ public class CheckAnswersModel(
     public EmailAddress? EmailAddress { get; set; }
     public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
-    public AddPersonReasonOption? Reason { get; set; }
+    public PersonCreateReason? Reason { get; set; }
     public string? ReasonDetail { get; set; }
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
@@ -59,18 +59,26 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var personId = await personService.CreatePersonAsync(new(
-            FirstName ?? string.Empty,
-            MiddleName ?? string.Empty,
-            LastName ?? string.Empty,
-            DateOfBirth,
-            EmailAddress,
-            NationalInsuranceNumber,
-            Gender,
-            User.GetUserId(),
-            Reason?.GetDisplayName(),
-            ReasonDetail,
-            EvidenceFile?.ToFile()));
+        var personId = await personService.CreatePersonAsync(new()
+        {
+            PersonDetails = new()
+            {
+                FirstName = FirstName ?? string.Empty,
+                MiddleName = MiddleName ?? string.Empty,
+                LastName = LastName ?? string.Empty,
+                DateOfBirth = DateOfBirth,
+                EmailAddress = EmailAddress,
+                NationalInsuranceNumber = NationalInsuranceNumber,
+                Gender = Gender,
+            },
+            UserId = User.GetUserId(),
+            Justification = new()
+            {
+                Reason = Reason!.Value,
+                ReasonDetail = ReasonDetail,
+                Evidence = EvidenceFile?.ToFile()
+            }
+        });
 
         await JourneyInstance!.CompleteAsync();
 

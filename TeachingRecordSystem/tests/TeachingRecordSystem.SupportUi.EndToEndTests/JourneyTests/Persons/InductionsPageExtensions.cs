@@ -75,7 +75,7 @@ public static class InductionsPageExtensions
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
-    public static Task SelectChangeReasonAsync(this IPage page, InductionChangeReasonOption reason)
+    public static Task SelectChangeReasonAsync(this IPage page, PersonInductionChangeReason reason)
     {
         var radioButton = page.Locator($"input[type='radio'][value='{reason}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();

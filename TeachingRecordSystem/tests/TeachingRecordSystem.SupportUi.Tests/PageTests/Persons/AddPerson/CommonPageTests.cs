@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
@@ -58,7 +59,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (hasCreateReason)
         {
             state = state
-                .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(false);
         }
 
@@ -94,7 +95,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+            .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
             .WithUploadEvidenceChoice(false);
 
         var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
@@ -131,7 +132,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+            .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
             .WithUploadEvidenceChoice(false);
 
         var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
@@ -145,7 +146,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmailAddress(emailAddress)
                 .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
-                .WithReason(AddPersonReasonOption.MandatoryQualification)
+                .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -172,7 +173,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState()
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(false)
                 .Build());
 
@@ -213,7 +214,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState()
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
                 .Build());
 
@@ -255,7 +256,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+            .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
             .WithUploadEvidenceChoice(false);
 
         var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
@@ -291,7 +292,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+            .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
             .WithUploadEvidenceChoice(false);
 
         var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
@@ -305,7 +306,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmailAddress(emailAddress)
                 .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
-                .WithReason(AddPersonReasonOption.MandatoryQualification)
+                .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };

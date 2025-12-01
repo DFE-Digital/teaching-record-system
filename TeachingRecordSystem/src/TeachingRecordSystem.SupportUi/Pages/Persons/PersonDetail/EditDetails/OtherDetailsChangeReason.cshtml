@@ -28,14 +28,14 @@
                             Why are you changing this record?
                         </govuk-radios-fieldset-legend>
                     }
-                    <govuk-radios-item value="@EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails">
-                        @EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails.GetDisplayName()
+                    <govuk-radios-item value="@PersonDetailsChangeReason.IncompleteDetails">
+                        @PersonDetailsChangeReason.IncompleteDetails.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@EditDetailsOtherDetailsChangeReasonOption.NewInformation">
-                        @EditDetailsOtherDetailsChangeReasonOption.NewInformation.GetDisplayName()
+                    <govuk-radios-item value="@PersonDetailsChangeReason.NewInformation">
+                        @PersonDetailsChangeReason.NewInformation.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@EditDetailsOtherDetailsChangeReasonOption.AnotherReason">
-                        @EditDetailsOtherDetailsChangeReasonOption.AnotherReason.GetDisplayName()
+                    <govuk-radios-item value="@PersonDetailsChangeReason.AnotherReason">
+                        @PersonDetailsChangeReason.AnotherReason.GetDisplayName()
 
                         <govuk-radios-item-conditional data-testid="change-reason-detail">
                             <govuk-character-count for="ReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows">

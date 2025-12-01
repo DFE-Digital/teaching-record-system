@@ -57,17 +57,20 @@ public class TrnRequestService(
     public CreatePersonResult CreatePersonFromTrnRequest(TrnRequestMetadata requestData, string trn, DateTime now) =>
         Person.Create(
             trn,
-            requestData.FirstName!,
-            requestData.MiddleName ?? string.Empty,
-            requestData.LastName!,
-            requestData.DateOfBirth,
-            requestData.EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
-                ? EmailAddress.Parse(emailAddress)
-                : null,
-            requestData.NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
-                ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
-                : null,
-            requestData.Gender,
+            new()
+            {
+                FirstName = requestData.FirstName!,
+                MiddleName = requestData.MiddleName ?? string.Empty,
+                LastName = requestData.LastName!,
+                DateOfBirth = requestData.DateOfBirth,
+                EmailAddress = requestData.EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
+                      ? EmailAddress.Parse(emailAddress)
+                      : null,
+                NationalInsuranceNumber = requestData.NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
+                      ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
+                      : null,
+                Gender = requestData.Gender,
+            },
             now,
             (requestData.ApplicationUserId, requestData.RequestId));
 

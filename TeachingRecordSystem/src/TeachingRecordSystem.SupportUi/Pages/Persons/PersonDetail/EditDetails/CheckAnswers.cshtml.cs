@@ -22,9 +22,9 @@ public class CheckAnswersModel(
     public EmailAddress? EmailAddress { get; set; }
     public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
-    public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    public PersonNameChangeReason? NameChangeReason { get; set; }
     public UploadedEvidenceFile? NameChangeEvidenceFile { get; set; }
-    public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
+    public PersonDetailsChangeReason? OtherDetailsChangeReason { get; set; }
     public string? OtherDetailsChangeReasonDetail { get; set; }
     public UploadedEvidenceFile? OtherDetailsChangeEvidenceFile { get; set; }
 
@@ -83,19 +83,28 @@ public class CheckAnswersModel(
         await PersonService.UpdatePersonAsync(new()
         {
             PersonId = PersonId,
+            PersonDetails = new()
+            {
+                FirstName = FirstName ?? string.Empty,
+                MiddleName = MiddleName ?? string.Empty,
+                LastName = LastName ?? string.Empty,
+                DateOfBirth = DateOfBirth,
+                EmailAddress = EmailAddress,
+                NationalInsuranceNumber = NationalInsuranceNumber,
+                Gender = Gender
+            },
             UserId = User.GetUserId(),
-            FirstName = FirstName ?? string.Empty,
-            MiddleName = MiddleName ?? string.Empty,
-            LastName = LastName ?? string.Empty,
-            DateOfBirth = DateOfBirth,
-            EmailAddress = EmailAddress,
-            NationalInsuranceNumber = NationalInsuranceNumber,
-            Gender = Gender,
-            NameChangeReason = NameChangeReason,
-            NameChangeEvidenceFile = NameChangeEvidenceFile?.ToFile(),
-            DetailsChangeReason = OtherDetailsChangeReason,
-            DetailsChangeReasonDetail = OtherDetailsChangeReasonDetail,
-            DetailsChangeEvidenceFile = OtherDetailsChangeEvidenceFile?.ToFile(),
+            NameChangeJustification = NameChangeReason is PersonNameChangeReason nameChangeReason ? new()
+            {
+                Reason = nameChangeReason,
+                Evidence = NameChangeEvidenceFile?.ToFile()
+            } : null,
+            DetailsChangeJustification = OtherDetailsChangeReason is PersonDetailsChangeReason detailsChangeReason ? new()
+            {
+                Reason = detailsChangeReason,
+                ReasonDetail = OtherDetailsChangeReasonDetail,
+                Evidence = OtherDetailsChangeEvidenceFile?.ToFile()
+            } : null
         });
 
         await JourneyInstance!.CompleteAsync();

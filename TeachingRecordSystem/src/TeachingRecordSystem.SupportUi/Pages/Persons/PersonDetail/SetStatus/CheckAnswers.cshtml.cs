@@ -13,9 +13,9 @@ public class CheckAnswersModel(
     EvidenceUploadManager evidenceController)
     : CommonJourneyPage(personService, linkGenerator, evidenceController)
 {
-    public DeactivateReasonOption? DeactivateReason { get; set; }
+    public PersonDeactivateReason? DeactivateReason { get; set; }
     public string? DeactivateReasonDetail { get; set; }
-    public ReactivateReasonOption? ReactivateReason { get; set; }
+    public PersonReactivateReason? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
@@ -51,11 +51,18 @@ public class CheckAnswersModel(
         {
             PersonId = PersonId,
             TargetStatus = TargetStatus,
-            DeactivateReason = DeactivateReason,
-            ReactivateReason = ReactivateReason,
-            DeactivateReasonDetail = DeactivateReasonDetail,
-            ReactivateReasonDetail = ReactivateReasonDetail,
-            EvidenceFile = EvidenceFile?.ToFile(),
+            DeactivateJustification = DeactivateReason is PersonDeactivateReason deactivateReason ? new()
+            {
+                Reason = deactivateReason,
+                ReasonDetail = DeactivateReasonDetail,
+                Evidence = EvidenceFile?.ToFile()
+            } : null,
+            ReactivateJustification = ReactivateReason is PersonReactivateReason reactivateReason ? new()
+            {
+                Reason = reactivateReason,
+                ReasonDetail = ReactivateReasonDetail,
+                Evidence = EvidenceFile?.ToFile()
+            } : null,
             UserId = User.GetUserId()
         });
 

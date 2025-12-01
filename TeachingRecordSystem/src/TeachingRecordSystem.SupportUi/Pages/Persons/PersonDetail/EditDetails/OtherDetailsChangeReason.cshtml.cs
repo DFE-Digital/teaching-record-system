@@ -15,7 +15,7 @@ public class OtherDetailsChangeReasonModel(
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    public EditDetailsOtherDetailsChangeReasonOption? Reason { get; set; }
+    public PersonDetailsChangeReason? Reason { get; set; }
 
     [BindProperty]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
@@ -46,7 +46,7 @@ public class OtherDetailsChangeReasonModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Reason is EditDetailsOtherDetailsChangeReasonOption.AnotherReason && ReasonDetail is null)
+        if (Reason is PersonDetailsChangeReason.AnotherReason && ReasonDetail is null)
         {
             ModelState.AddModelError(nameof(ReasonDetail), "Enter a reason");
         }
@@ -61,7 +61,7 @@ public class OtherDetailsChangeReasonModel(
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.OtherDetailsChangeReason = Reason;
-            state.OtherDetailsChangeReasonDetail = Reason is EditDetailsOtherDetailsChangeReasonOption.AnotherReason ? ReasonDetail : null;
+            state.OtherDetailsChangeReasonDetail = Reason is PersonDetailsChangeReason.AnotherReason ? ReasonDetail : null;
             state.OtherDetailsChangeEvidence = Evidence;
         });
 

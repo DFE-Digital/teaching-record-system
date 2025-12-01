@@ -32,11 +32,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -77,11 +77,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.RecordHolderDied);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.RecordHolderDied);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.DeactivatedByMistake);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.DeactivatedByMistake);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -126,11 +126,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(

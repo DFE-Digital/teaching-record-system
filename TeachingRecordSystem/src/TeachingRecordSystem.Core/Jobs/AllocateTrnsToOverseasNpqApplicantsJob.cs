@@ -176,13 +176,16 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
 
                         var person = Person.Create(
                             newTrn,
-                            firstName!,
-                            middleName ?? "",
-                            lastName!,
-                            dateOfBirth,
-                            email,
-                            nino,
-                            gender,
+                            new()
+                            {
+                                FirstName = firstName!,
+                                MiddleName = middleName ?? "",
+                                LastName = lastName!,
+                                DateOfBirth = dateOfBirth,
+                                EmailAddress = email,
+                                NationalInsuranceNumber = nino,
+                                Gender = gender,
+                            },
                             now,
                             sourceTrnRequest: (applicationUserId, requestId));
 

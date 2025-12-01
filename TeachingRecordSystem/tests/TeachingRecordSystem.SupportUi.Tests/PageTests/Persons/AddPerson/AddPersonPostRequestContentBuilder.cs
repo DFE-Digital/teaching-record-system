@@ -1,4 +1,4 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -12,7 +12,7 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
     public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
-    public AddPersonReasonOption? Reason { get; set; }
+    public PersonCreateReason? Reason { get; set; }
     public string? ReasonDetail { get; set; }
     public TestEvidenceUploadModel Evidence { get; set; } = new();
 
@@ -64,7 +64,7 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public AddPersonPostRequestContentBuilder WithReason(AddPersonReasonOption reason, string? detail = null)
+    public AddPersonPostRequestContentBuilder WithReason(PersonCreateReason reason, string? detail = null)
     {
         Reason = reason;
         ReasonDetail = detail;
