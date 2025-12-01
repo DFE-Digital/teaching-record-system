@@ -10,8 +10,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
-        var requestData = supportTask.TrnRequestMetadata!;
+        var (supportTask, requestData, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
         var supportTaskReference = supportTask.SupportTaskReference;
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -52,11 +51,9 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         // Set up two potential matched records to merge with
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
-        var requestData = supportTask.TrnRequestMetadata!;
+        var (supportTask, requestData, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
         var supportTaskReference = supportTask.SupportTaskReference;
-        var matchedPersonA = await WithDbContextAsync(dbContext =>
-            dbContext.Persons.SingleAsync(p => p.PersonId == supportTask.TrnRequestMetadata!.Matches!.MatchedPersons[0].PersonId));
+        var matchedPersonA = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == matchedPersonIds[0]));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -119,7 +116,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
             p.WithEmailAddress(emailAddress);
         });
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, requestData, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
                 .WithMatchedPersons(matchedPerson1.PersonId)
@@ -131,7 +128,6 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
             );
 
-        var requestData = supportTask.TrnRequestMetadata!;
         var supportTaskReference = supportTask.SupportTaskReference;
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -175,7 +171,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
             p.WithEmailAddress(TestData.GenerateUniqueEmail());
             p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
         });
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, requestData, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t =>
             {
@@ -184,7 +180,6 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
                 t.WithEmailAddress(matchedPerson1.EmailAddress!);
             });
-        var requestData = supportTask.TrnRequestMetadata!;
         var supportTaskReference = supportTask.SupportTaskReference;
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -232,12 +227,11 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
+        var (supportTask, requestData, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
         {
             configure.WithMatches(false);
         });
 
-        var requestData = supportTask.TrnRequestMetadata!;
         var supportTaskReference = supportTask.SupportTaskReference;
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -275,10 +269,9 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
+        var (supportTask, requestData, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
             configure.WithMatches(false).WithMiddleName(TestData.GenerateMiddleName()));
 
-        var requestData = supportTask.TrnRequestMetadata!;
         var supportTaskReference = supportTask.SupportTaskReference;
 
         await using var context = await HostFixture.CreateBrowserContext();

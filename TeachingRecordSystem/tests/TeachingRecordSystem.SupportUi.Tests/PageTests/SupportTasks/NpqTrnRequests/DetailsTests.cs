@@ -11,11 +11,10 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
+        var (supportTask, metadata, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithMiddleName(TestData.GenerateMiddleName())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
-        var metadata = supportTask.TrnRequestMetadata!;
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -40,7 +39,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
         var request = new HttpRequestMessage(
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details")
@@ -66,7 +65,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
@@ -95,7 +94,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
         var request = new HttpRequestMessage(
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details")

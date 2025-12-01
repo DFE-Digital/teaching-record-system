@@ -30,7 +30,7 @@ public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnR
                 .SingleAsync() :
             null;
 
-        var status = requestData.Status ?? TrnRequestStatus.Pending;
+        var status = requestData.Status;
         var trn = status == TrnRequestStatus.Completed ? resolvedPersonTrn : null;
 
         if (await trnRequestService.TryEnsureTrnTokenAsync(requestData, resolvedPersonTrn))
@@ -54,7 +54,7 @@ public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnR
             },
             Trn = trn,
             Status = status,
-            PotentialDuplicate = requestData.PotentialDuplicate ?? false,
+            PotentialDuplicate = requestData.PotentialDuplicate,
             AccessYourTeachingQualificationsLink = requestData is { TrnToken: string trnToken, Status: TrnRequestStatus.Completed } ?
                 trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) :
                 null

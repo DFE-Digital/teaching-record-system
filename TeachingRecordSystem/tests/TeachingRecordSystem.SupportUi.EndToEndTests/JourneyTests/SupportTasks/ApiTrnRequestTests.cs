@@ -10,8 +10,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest).ExecuteDeleteAsync());
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t.WithStatus(SupportTaskStatus.Open));
-        var requestData = supportTask.TrnRequestMetadata!;
+        var (supportTask, requestData, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t.WithStatus(SupportTaskStatus.Open));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -66,7 +65,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         // Set up two potential matched records to merge with
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, requestData, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
                 .WithMatchedPersons(matchedPerson1.PersonId, matchedPerson2.PersonId)
@@ -78,9 +77,6 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithGender(matchedPerson1.Gender)
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
             );
-        var requestData = supportTask.TrnRequestMetadata!;
-        var matchedPersonA = await WithDbContextAsync(dbContext =>
-            dbContext.Persons.SingleAsync(p => p.PersonId == supportTask.TrnRequestMetadata!.Matches!.MatchedPersons[0].PersonId));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -132,7 +128,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, requestData, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
                 .WithMatchedPersons(matchedPerson1.PersonId)
@@ -143,10 +139,6 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
             );
-
-        var requestData = supportTask.TrnRequestMetadata!;
-        var matchedPersonA = await WithDbContextAsync(dbContext =>
-            dbContext.Persons.SingleAsync(p => p.PersonId == supportTask.TrnRequestMetadata!.Matches!.MatchedPersons[0].PersonId));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -192,7 +184,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, requestData, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
@@ -205,9 +197,6 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmailAddress(emailAddress)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
             );
-        var requestData = supportTask.TrnRequestMetadata!;
-        var matchedPersonA = await WithDbContextAsync(dbContext =>
-            dbContext.Persons.SingleAsync(p => p.PersonId == supportTask.TrnRequestMetadata!.Matches!.MatchedPersons[0].PersonId));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

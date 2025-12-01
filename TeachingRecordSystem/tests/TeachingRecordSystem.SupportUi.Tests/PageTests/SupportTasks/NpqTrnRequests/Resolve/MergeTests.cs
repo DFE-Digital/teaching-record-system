@@ -17,14 +17,14 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = matchedPersonIds,
+                PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true
             });
 
@@ -46,13 +46,13 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = null
             });
 
@@ -76,13 +76,13 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -109,11 +109,11 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            personId: supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId);
+            personId: matchedPersonIds[0]);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -180,14 +180,14 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var (supportTask, _) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = [matchedPerson.PersonId],
+                PersonId = matchedPerson.PersonId,
                 DateOfBirthSource = PersonAttributeSource.TrnRequest,
                 EmailAddressSource = PersonAttributeSource.TrnRequest,
                 NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
@@ -223,7 +223,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = [matchedPerson.PersonId],
                 PersonId = matchedPerson.PersonId,
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = PersonAttributeSource.ExistingRecord,
@@ -251,7 +251,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var comments = "Some comments";
 
@@ -259,8 +259,8 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = matchedPersonIds,
+                PersonId = matchedPersonIds[0],
                 Comments = comments
             });
 
@@ -282,13 +282,13 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = null
             });
 
@@ -315,13 +315,13 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -378,11 +378,11 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            personId: supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId);
+            personId: matchedPersonIds[0]);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,

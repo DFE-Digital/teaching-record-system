@@ -131,20 +131,7 @@ public class CheckAnswersModel(
 
         // look for potential matches
         var matchResult = await matchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
-        trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is not TrnRequestMatchResultOutcome.NoMatches;
-
-        trnRequestMetadata.Matches = new TrnRequestMatches()
-        {
-            MatchedPersons = matchResult.Outcome switch
-            {
-                TrnRequestMatchResultOutcome.PotentialMatches =>
-                    matchResult.PotentialMatchesPersonIds
-                        .Select(id => new TrnRequestMatchedPerson() { PersonId = id })
-                        .ToList(),
-                TrnRequestMatchResultOutcome.DefiniteMatch => [new TrnRequestMatchedPerson() { PersonId = matchResult.PersonId }],
-                _ => []
-            }
-        };
+        trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches;
 
         dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 

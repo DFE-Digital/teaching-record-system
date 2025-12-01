@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<SupportTask> CreateApiTrnRequestSupportTaskAsync(
+    public Task<CreateApiTrnRequestSupportTaskResult> CreateApiTrnRequestSupportTaskAsync(
         Guid applicationUserId,
         Action<CreateApiTrnRequestSupportTaskBuilder>? configure = null)
     {
@@ -16,7 +16,7 @@ public partial class TestData
         return builder.ExecuteAsync(this);
     }
 
-    public Task<SupportTask> CreateApiTrnRequestSupportTaskAsync(
+    public Task<CreateApiTrnRequestSupportTaskResult> CreateApiTrnRequestSupportTaskAsync(
         Guid applicationUserId,
         Person matchedPerson,
         Action<CreateApiTrnRequestSupportTaskBuilder>? configure = null)
@@ -40,7 +40,7 @@ public partial class TestData
             });
     }
 
-    public Task<SupportTask> CreateResolvedApiTrnRequestSupportTaskAsync(
+    public Task<CreateApiTrnRequestSupportTaskResult> CreateResolvedApiTrnRequestSupportTaskAsync(
         Guid applicationUserId,
         Person matchedPerson,
         Action<CreateApiTrnRequestSupportTaskBuilder>? configure = null)
@@ -73,7 +73,7 @@ public partial class TestData
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
         private Option<Gender?> _gender;
-        private Option<TrnRequestMatchedPerson[]> _matchedPersons;
+        private Option<Guid[]> _matchedPersonIds;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
         private Option<TrnRequestStatus> _trnRequestStatus;
@@ -125,7 +125,7 @@ public partial class TestData
 
         public CreateApiTrnRequestSupportTaskBuilder WithMatchedPersons(params Guid[] personIds)
         {
-            _matchedPersons = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
+            _matchedPersonIds = Option.Some(personIds);
             return this;
         }
 
@@ -171,7 +171,7 @@ public partial class TestData
             return this;
         }
 
-        public async Task<SupportTask> ExecuteAsync(TestData testData)
+        public async Task<CreateApiTrnRequestSupportTaskResult> ExecuteAsync(TestData testData)
         {
             var trnRequestId = _requestId.ValueOr(Guid.NewGuid().ToString);
             var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail);
@@ -183,41 +183,40 @@ public partial class TestData
             var gender = _gender.ValueOr(testData.GenerateGender());
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
 
-            var matchedPersons = _matchedPersons.ValueOrDefault();
+            var matchedPersons = _matchedPersonIds.ValueOrDefault();
 
             if (matchedPersons is null)
             {
                 // Matches wasn't explicitly specified; create two person records that match details in this request
 
-                matchedPersons = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, 2)
-                        .ToAsyncEnumerable()
-                        .SelectAwait(async _ =>
+                matchedPersons = await Enumerable.Range(1, 2)
+                    .ToAsyncEnumerable()
+                    .SelectAwait(async _ =>
+                    {
+                        var person = await testData.CreatePersonAsync(p =>
                         {
-                            var person = await testData.CreatePersonAsync(p =>
+                            p
+                                .WithFirstName(firstName)
+                                .WithMiddleName(middleName ?? string.Empty)
+                                .WithLastName(lastName)
+                                .WithDateOfBirth(dateOfBirth)
+                                .WithEmailAddress(emailAddress);
+
+                            if (gender is not null)
                             {
-                                p
-                                    .WithFirstName(firstName)
-                                    .WithMiddleName(middleName ?? string.Empty)
-                                    .WithLastName(lastName)
-                                    .WithDateOfBirth(dateOfBirth)
-                                    .WithEmailAddress(emailAddress);
+                                p.WithGender(gender.Value);
+                            }
 
-                                if (gender is not null)
-                                {
-                                    p.WithGender(gender.Value);
-                                }
+                            if (nationalInsuranceNumber is not null)
+                            {
+                                p.WithNationalInsuranceNumber(nationalInsuranceNumber);
+                            }
+                        });
 
-                                if (nationalInsuranceNumber is not null)
-                                {
-                                    p.WithNationalInsuranceNumber(nationalInsuranceNumber);
-                                }
-                            });
-
-                            return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
-                        }));
+                        return person.PersonId;
+                    })
+                    .ToArrayAsync();
             }
-
-            var matches = new TrnRequestMatches() { MatchedPersons = matchedPersons };
 
             var potentialDuplicate = matchedPersons.Length > 0;
 
@@ -234,7 +233,7 @@ public partial class TestData
                 LastName = lastName,
                 PreviousFirstName = null,
                 PreviousLastName = null,
-                Name = (new List<string?> { firstName, middleName, lastName }).OfType<string>().ToArray(),
+                Name = new[] { firstName, middleName!, lastName }.Where(n => n is not null).ToArray(),
                 DateOfBirth = dateOfBirth,
                 PotentialDuplicate = potentialDuplicate,
                 NationalInsuranceNumber = nationalInsuranceNumber,
@@ -245,8 +244,7 @@ public partial class TestData
                 City = null,
                 Postcode = null,
                 Country = null,
-                TrnToken = null,
-                Matches = matches
+                TrnToken = null
             };
 
             if (_resolvedPersonId.ValueOrDefault() is Guid personId)
@@ -266,6 +264,7 @@ public partial class TestData
                 SystemUser.SystemUserId,
                 createdOn,
                 out var createdEvent);
+
             task.Status = status;
 
             return await testData.WithDbContextAsync(async dbContext =>
@@ -276,11 +275,15 @@ public partial class TestData
                 await dbContext.SaveChangesAsync();
 
                 // Re-query what we've just added so we return a SupportTask with TrnRequestMetadata populated
-                return await dbContext.SupportTasks
+                var dbTask = await dbContext.SupportTasks
                     .Include(t => t.TrnRequestMetadata)
                     .ThenInclude(m => m!.ApplicationUser!)
                     .SingleAsync(t => t.SupportTaskReference == task.SupportTaskReference);
+
+                return new CreateApiTrnRequestSupportTaskResult(dbTask, dbTask.TrnRequestMetadata!, matchedPersons);
             });
         }
     }
+
+    public record CreateApiTrnRequestSupportTaskResult(SupportTask SupportTask, TrnRequestMetadata TrnRequest, Guid[] MatchedPersonIds);
 }

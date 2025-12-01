@@ -30,7 +30,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/npq-trn-requests/");
 
@@ -50,7 +50,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
         AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat));
-        AssertRowHasContent("potential-duplicate", supportTask.TrnRequestMetadata!.PotentialDuplicate!.Value ? "Yes" : "No");
+        AssertRowHasContent("potential-duplicate", supportTask.TrnRequestMetadata!.PotentialDuplicate ? "Yes" : "No");
 
         void AssertRowHasContent(string testId, string expectedText)
         {
@@ -66,7 +66,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var firstName = TestData.GenerateFirstName();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithFirstName(firstName));
 
@@ -88,7 +88,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var middleName = TestData.GenerateMiddleName();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithMiddleName(middleName));
 
@@ -110,7 +110,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var lastName = TestData.GenerateLastName();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithLastName(lastName));
 
@@ -133,7 +133,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var firstName = TestData.GenerateFirstName();
         var lastName = TestData.GenerateFirstName();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithFirstName(firstName).WithLastName(lastName));
 
@@ -155,7 +155,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var emailAddress = TestData.GenerateUniqueEmail();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithEmailAddress(emailAddress));
 
@@ -179,7 +179,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = supportTask.CreatedOn.ToString(dateFormat);
 
@@ -199,11 +199,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
 
@@ -228,11 +228,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithFirstName("Zavier"));
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithFirstName("Aaron"));
 
@@ -257,11 +257,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithFirstName("Zavier"));
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithFirstName("Aaron"));
 
@@ -286,11 +286,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithEmailAddress("zavier@example.com"));
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithEmailAddress("aaron@example.com"));
 
@@ -315,11 +315,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithEmailAddress("zavier@example.com"));
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithEmailAddress("aaron@example.com"));
 
@@ -344,11 +344,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
 
@@ -373,11 +373,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
 
@@ -402,14 +402,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t =>
             {
                 t.WithMatches(true);
             });
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t =>
             {
@@ -437,14 +437,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
-        var supportTask1 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t =>
             {
                 t.WithMatches(true);
             });
 
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t =>
             {
@@ -475,9 +475,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         // Create enough tasks to create 3 pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId)));
+        await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
+            .ToAsyncEnumerable()
+            .SelectAwait(async _ => await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId)));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

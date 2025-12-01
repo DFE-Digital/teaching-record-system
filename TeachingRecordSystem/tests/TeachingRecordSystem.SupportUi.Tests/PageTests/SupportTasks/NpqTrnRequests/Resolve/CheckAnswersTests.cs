@@ -31,13 +31,13 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = null
             });
 
@@ -61,14 +61,14 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = matchedPersonIds,
+                PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = false
             });
 
@@ -100,7 +100,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+            MatchedPersonIds = [matchedPerson.PersonId],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -159,13 +159,13 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -187,14 +187,14 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = matchedPersonIds,
+                PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true
             });
 
@@ -216,7 +216,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var comments = Faker.Lorem.Paragraph();
 
@@ -224,8 +224,8 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = matchedPersonIds,
+                PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true,
                 Comments = comments
             });
@@ -248,14 +248,14 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = matchedPersonIds,
+                PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true,
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 GenderSource = PersonAttributeSource.ExistingRecord,
@@ -289,13 +289,13 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = CreateNewRecordPersonIdSentinel,
                 PersonAttributeSourcesSet = true
             });
@@ -326,13 +326,13 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = null
             });
 
@@ -356,14 +356,14 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = matchedPersonIds,
+                PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = false
             });
 
@@ -401,7 +401,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+            MatchedPersonIds = [matchedPerson.PersonId],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true,
             Comments = comments
@@ -535,7 +535,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+            MatchedPersonIds = [matchedPerson.PersonId],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -578,7 +578,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+            MatchedPersonIds = [matchedPerson.PersonId],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -627,7 +627,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s =>
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s =>
         {
             s.WithMiddleName(TestData.GenerateMiddleName());
             s.WithEmailAddress(TestData.GenerateUniqueEmail());
@@ -641,7 +641,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = CreateNewRecordPersonIdSentinel,
                 PersonAttributeSourcesSet = true,
                 Comments = comments

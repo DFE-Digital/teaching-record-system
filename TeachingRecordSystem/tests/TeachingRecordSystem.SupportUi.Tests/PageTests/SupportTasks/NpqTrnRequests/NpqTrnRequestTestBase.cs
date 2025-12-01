@@ -10,7 +10,7 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
             .WithNationalInsuranceNumber()
             .WithGender());
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
@@ -31,7 +31,7 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithGender());
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)

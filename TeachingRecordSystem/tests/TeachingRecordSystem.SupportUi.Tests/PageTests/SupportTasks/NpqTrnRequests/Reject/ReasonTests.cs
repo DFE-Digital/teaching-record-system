@@ -14,7 +14,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
@@ -47,7 +47,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
@@ -80,7 +80,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
@@ -116,7 +116,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
@@ -143,7 +143,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 

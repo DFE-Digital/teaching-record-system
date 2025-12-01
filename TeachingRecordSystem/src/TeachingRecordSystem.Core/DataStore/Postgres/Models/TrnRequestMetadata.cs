@@ -18,7 +18,7 @@ public class TrnRequestMetadata
     public string? PreviousLastName { get; init; }
     public required string[] Name { get; init; }
     public required DateOnly DateOfBirth { get; init; }
-    public bool? PotentialDuplicate { get; set; }
+    public bool PotentialDuplicate { get; set; }
     public string? NationalInsuranceNumber { get; init; }
     public Gender? Gender { get; init; }
     public string? AddressLine1 { get; init; }
@@ -29,8 +29,7 @@ public class TrnRequestMetadata
     public string? Country { get; init; }
     public string? TrnToken { get; set; }
     public Guid? ResolvedPersonId { get; private set; }
-    public TrnRequestStatus? Status { get; private set; } = TrnRequestStatus.Pending;
-    public TrnRequestMatches? Matches { get; set; }
+    public TrnRequestStatus Status { get; private set; } = TrnRequestStatus.Pending;
     public bool? NpqWorkingInEducationalSetting { get; init; }
     public string? NpqApplicationId { get; init; }
     public string? NpqName { get; init; }
@@ -60,14 +59,4 @@ public class TrnRequestMetadata
 
         Status = TrnRequestStatus.Completed;
     }
-}
-
-public record TrnRequestMatches
-{
-    public required IReadOnlyList<TrnRequestMatchedPerson> MatchedPersons { get; init; }
-}
-
-public record TrnRequestMatchedPerson
-{
-    public required Guid PersonId { get; init; }
 }
