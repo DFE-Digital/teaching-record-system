@@ -1,5 +1,5 @@
 using Microsoft.Playwright;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 

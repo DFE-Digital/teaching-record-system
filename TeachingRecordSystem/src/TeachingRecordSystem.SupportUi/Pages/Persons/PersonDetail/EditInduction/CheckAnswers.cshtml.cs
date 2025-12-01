@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -9,11 +9,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
+    PersonService personService,
     ReferenceDataCache referenceDataCache,
-    IClock clock,
     EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
     public InductionStatus InductionStatus { get; set; }
 
@@ -89,25 +88,18 @@ public class CheckAnswersModel(
                     fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers));
         }
 
-        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
-
-        person.SetInductionStatus(
-            InductionStatus,
-            StartDate,
-            CompletedDate,
-            JourneyInstance!.State.ExemptionReasonIds ?? [],
-            ChangeReason.GetDisplayName(),
-            ChangeReasonDetail,
-            EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
-            clock.UtcNow,
-            out var updatedEvent);
-
-        if (updatedEvent is not null)
+        await PersonService.SetPersonInductionStatusAsync(new()
         {
-            await DbContext.AddEventAndBroadcastAsync(updatedEvent);
-            await DbContext.SaveChangesAsync();
-        }
+            PersonId = PersonId,
+            InductionStatus = InductionStatus,
+            StartDate = StartDate,
+            CompletedDate = CompletedDate,
+            ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds ?? [],
+            ChangeReason = ChangeReason,
+            ChangeReasonDetail = ChangeReasonDetail,
+            EvidenceFile = EvidenceFile?.ToFile(),
+            UserId = User.GetUserId()
+        });
 
         await JourneyInstance!.CompleteAsync();
 
