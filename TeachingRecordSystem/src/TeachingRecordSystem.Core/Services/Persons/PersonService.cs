@@ -10,7 +10,8 @@ public class PersonService(
     TrsDbContext dbContext,
     IClock clock,
     ITrnGenerator trnGenerator,
-    IEventPublisher eventPublisher)
+    IEventPublisher eventPublisher,
+    ReferenceDataCache referenceDataCache)
 {
     public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
     {
@@ -40,9 +41,16 @@ public class PersonService(
         return (await dbContext.Persons.SingleAsync(q => q.PersonId == personId)).Trn;
     }
 
-    public async Task<Person?> GetPersonAsync(Guid personId)
+    public async Task<Person?> GetPersonAsync(Guid personId, bool includeDeactivatedPersons = false)
     {
-        return await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == personId);
+        var persons = dbContext.Persons.AsQueryable();
+
+        if (includeDeactivatedPersons)
+        {
+            persons = persons.IgnoreQueryFilters();
+        }
+
+        return await persons.SingleOrDefaultAsync(p => p.PersonId == personId);
     }
 
     public async Task<Guid> CreatePersonAsync(CreatePersonRequest request)
@@ -137,6 +145,35 @@ public class PersonService(
             await dbContext.AddEventAndBroadcastAsync(updatedEvent);
             await dbContext.SaveChangesAsync();
         }
+    }
+
+    public async Task SetPersonStatusAsync(SetPersonStatusRequest request)
+    {
+        var now = clock.UtcNow;
+
+        var person = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(p => p.PersonId == request.PersonId);
+
+        person!.SetStatus(
+            request.TargetStatus,
+            request.TargetStatus == PersonStatus.Deactivated
+                ? request.DeactivateReason!.GetDisplayName()
+                : request.ReactivateReason!.GetDisplayName(),
+            request.TargetStatus == PersonStatus.Deactivated
+                ? request.DeactivateReasonDetail
+                : request.ReactivateReasonDetail,
+            request.EvidenceFile?.ToEventModel(),
+            request.UserId,
+            now,
+            out var @event);
+
+        if (@event is not null)
+        {
+            await dbContext.AddEventAndBroadcastAsync(@event);
+            await dbContext.SaveChangesAsync();
+        }
+    }
 
 
     }
@@ -181,6 +218,18 @@ public record UpdatePersonRequest
     public required EditDetailsOtherDetailsChangeReasonOption? DetailsChangeReason { get; init; }
     public required string? DetailsChangeReasonDetail { get; init; }
     public required File? DetailsChangeEvidenceFile { get; init; }
+}
+
+public record SetPersonStatusRequest
+{
+    public required Guid PersonId { get; init; }
+    public required PersonStatus TargetStatus { get; init; }
+    public required DeactivateReasonOption? DeactivateReason { get; init; }
+    public required ReactivateReasonOption? ReactivateReason { get; init; }
+    public required string? DeactivateReasonDetail { get; init; }
+    public required string? ReactivateReasonDetail { get; init; }
+    public required File? EvidenceFile { get; init; }
+    public required Guid UserId { get; init; }
 }
 
 public enum EditDetailsNameChangeReasonOption
@@ -236,3 +285,22 @@ public record PersonDetails
         Gender = Gender,
     };
 }
+
+public enum DeactivateReasonOption
+{
+    [Display(Name = "The record holder died")]
+    RecordHolderDied,
+    [Display(Name = "There is a problem with the record")]
+    ProblemWithTheRecord,
+    [Display(Name = "Another reason")]
+    AnotherReason
+}
+
+public enum ReactivateReasonOption
+{
+    [Display(Name = "The record was deactivated by mistake")]
+    DeactivatedByMistake,
+    [Display(Name = "Another reason")]
+    AnotherReason
+}
+
