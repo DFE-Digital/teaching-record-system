@@ -164,7 +164,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(IntegrationTransactionImportStatus.InProgress, "govuk-tag--light-blue")]
+    [InlineData(IntegrationTransactionImportStatus.InProgress, "govuk-tag--blue")]
     [InlineData(IntegrationTransactionImportStatus.Success, "govuk-tag--green")]
     [InlineData(IntegrationTransactionImportStatus.Failed, "govuk-tag--red")]
     public async Task Get_IntegrationSingleIntegrationTransaction_RendersStatusWithCssClass(IntegrationTransactionImportStatus status, string cssClass)

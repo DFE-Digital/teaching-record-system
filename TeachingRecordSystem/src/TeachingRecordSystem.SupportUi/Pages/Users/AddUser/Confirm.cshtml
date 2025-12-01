@@ -52,25 +52,19 @@
                                             {
                                                 case UserPermissionLevel.Edit:
                                                     <td class="govuk-table__cell">
-                                                        <govuk-tag class="govuk-tag--green">
-                                                        EDIT
-                                                        </govuk-tag>
+                                                        <tag color="TagColor.Green">Edit</tag>
                                                     </td>
                                                     break;
 
                                                 case UserPermissionLevel.View:
                                                     <td class="govuk-table__cell">
-                                                        <govuk-tag class="govuk-tag--yellow">
-                                                        VIEW
-                                                        </govuk-tag>
+                                                        <tag color="TagColor.LightBlue">View</tag>
                                                     </td>
                                                     break;
 
                                                 default:
                                                     <td class="govuk-table__cell">
-                                                        <govuk-tag class="govuk-tag--red">
-                                                        NO
-                                                        </govuk-tag>
+                                                        <tag color="TagColor.Grey">No</tag>
                                                     </td>
                                                     break;
                                             }

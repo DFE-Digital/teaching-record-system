@@ -62,18 +62,13 @@
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
                 <govuk-summary-list-row-value use-empty-fallback>
-                    @if (Model.IsActive == true)
-                    {
-                        <govuk-tag class="govuk-tag--green">
-                            ACTIVE
-                        </govuk-tag>
-                    }
-
                     @if (Model.IsActive == false)
                     {
-                        <govuk-tag class="govuk-tag--red">
-                            DEACTIVATED
-                        </govuk-tag>
+                        <tag color="TagColor.Grey">Deactivated</tag>
+                    }
+                    else
+                    {
+                        <tag color="TagColor.Green">Active</tag>
                     }
                 </govuk-summary-list-row-value>
             </govuk-summary-list-row>
