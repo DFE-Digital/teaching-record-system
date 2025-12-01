@@ -1,2 +1,51 @@
-@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/matches"
+@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/matches/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.Matches
+
+@{
+        ViewData["Title"] = "Check if this GOV.UK One Login account matches an existing record";
+}
+
+@section BeforeContent {
+    <govuk-back-link asp-page="/SupportTasks/OneLoginUserIdVerification/Resolve/Index">Back</govuk-back-link> @* TODO CML *@
+}
+
+<form action="" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">Record management</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <govuk-summary-card data-testid="request">
+                <govuk-summary-card-title>Request details</govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.Email</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value> @* CML TODO *@
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.NationalInsuranceNumber</govuk-summary-list-row-value> @* CML TODO *@
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+        </div>
+    </div>
+
+    <govuk-hint>Details that do not match are <govuk-tag class="govuk-tag--orange">highlighted</govuk-tag> in the existing record</govuk-hint>
+
+</form>
