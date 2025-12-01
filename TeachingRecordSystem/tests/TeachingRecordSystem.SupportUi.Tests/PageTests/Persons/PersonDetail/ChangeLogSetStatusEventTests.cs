@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 

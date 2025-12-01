@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using static TeachingRecordSystem.TestCommon.TestData;
 

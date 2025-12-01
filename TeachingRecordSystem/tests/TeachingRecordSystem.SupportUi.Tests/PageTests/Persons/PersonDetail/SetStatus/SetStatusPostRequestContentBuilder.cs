@@ -1,4 +1,4 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 

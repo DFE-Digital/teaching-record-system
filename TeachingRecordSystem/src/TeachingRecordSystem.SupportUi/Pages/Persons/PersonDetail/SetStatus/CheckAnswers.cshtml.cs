@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
@@ -9,10 +9,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 [AllowDeactivatedPerson]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    IClock clock,
+    PersonService personService,
     EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    : CommonJourneyPage(personService, linkGenerator, evidenceController)
 {
     public DeactivateReasonOption? DeactivateReason { get; set; }
     public string? DeactivateReasonDetail { get; set; }
@@ -48,26 +47,17 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
-
-        Person!.SetStatus(
-            TargetStatus,
-            TargetStatus == PersonStatus.Deactivated
-                ? DeactivateReason!.GetDisplayName()
-                : ReactivateReason!.GetDisplayName(),
-            TargetStatus == PersonStatus.Deactivated
-                ? DeactivateReasonDetail
-                : ReactivateReasonDetail,
-            EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
-            now,
-            out var @event);
-
-        if (@event is not null)
+        await PersonService.SetPersonStatusAsync(new()
         {
-            await DbContext.AddEventAndBroadcastAsync(@event);
-            await DbContext.SaveChangesAsync();
-        }
+            PersonId = PersonId,
+            TargetStatus = TargetStatus,
+            DeactivateReason = DeactivateReason,
+            ReactivateReason = ReactivateReason,
+            DeactivateReasonDetail = DeactivateReasonDetail,
+            ReactivateReasonDetail = ReactivateReasonDetail,
+            EvidenceFile = EvidenceFile?.ToFile(),
+            UserId = User.GetUserId()
+        });
 
         await JourneyInstance!.CompleteAsync();
 
