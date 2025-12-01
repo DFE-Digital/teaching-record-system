@@ -13,7 +13,6 @@ permissions:
   packages: write
   id-token: write
 
-concurrency: deploy_${{ inputs.environment }}
 jobs:
   package:
     name: Package application
@@ -26,18 +25,19 @@ jobs:
     needs: package
     if: always() && (needs.package.result == 'success' || needs.package.result == 'skipped')
     runs-on: ubuntu-latest
+    concurrency: deploy_${{ inputs.environment }}
 
     environment:
       name: ${{ inputs.environment }}
 
     steps:
-    - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-    - uses: ./.github/workflows/actions/deploy-aks-environment
-      id: deploy
-      with:
-        environment_name: ${{ inputs.environment }}
-        docker_image: ${{ inputs.docker_image || needs.package.outputs.docker_image }}
-        azure-client-id:  ${{ secrets.AZURE_CLIENT_ID }}
-        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      - uses: ./.github/workflows/actions/deploy-aks-environment
+        id: deploy
+        with:
+          environment_name: ${{ inputs.environment }}
+          docker_image: ${{ inputs.docker_image || needs.package.outputs.docker_image }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
