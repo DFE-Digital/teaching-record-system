@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -133,20 +132,4 @@ public class InductionExemptionService(ReferenceDataCache referenceDataCache, Tr
             };
         }
     }
-}
-
-public enum ExemptionReasonCategory
-{
-    [Display(Name = "Miscellaneous exemptions")]
-    Miscellaneous = 1,
-    [Display(Name = "Exemptions for historical qualification routes")]
-    HistoricalQualificationRoute = 2,
-    [Display(Name = "Induction completed outside England")]
-    InductionCompletedOutsideEngland = 3
-}
-
-public record ExemptionReasonsResponse
-{
-    public required IEnumerable<RouteWithExemption>? RoutesWithInductionExemptions { get; init; }
-    public required Dictionary<ExemptionReasonCategory, IEnumerable<InductionExemptionReason>> ExemptionReasonCategories { get; init; }
 }
