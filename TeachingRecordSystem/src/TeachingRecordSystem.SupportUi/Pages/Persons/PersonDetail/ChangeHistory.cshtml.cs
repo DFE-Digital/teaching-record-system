@@ -111,8 +111,7 @@ public class ChangeHistoryModel(
                     e.payload as event_payload,
                     u.name as trs_user_name,
                     e.payload #>> Array['RaisedBy','DqtUserName'] as dqt_user_name,
-                    a.name as application_user_name,
-                    a.short_name as application_user_short_name
+                    a.name as application_user_name
                 FROM
                         events as e
                     LEFT JOIN
@@ -206,7 +205,6 @@ public class ChangeHistoryModel(
         ApplicationUserInfo? applicationUser = eventWithUser.ApplicationUserName == null ? null : new()
         {
             Name = eventWithUser.ApplicationUserName,
-            ShortName = eventWithUser.ApplicationUserShortName ?? eventWithUser.ApplicationUserName
         };
 
         var timelineEventType = typeof(TimelineEvent<>).MakeGenericType(@event.GetType()!);
@@ -232,6 +230,5 @@ public class ChangeHistoryModel(
         public required string? TrsUserName { get; init; }
         public required string? DqtUserName { get; init; }
         public required string? ApplicationUserName { get; init; }
-        public required string? ApplicationUserShortName { get; init; }
     }
 }

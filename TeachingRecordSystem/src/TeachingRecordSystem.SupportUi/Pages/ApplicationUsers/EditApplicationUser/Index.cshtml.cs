@@ -31,10 +31,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
-    [BindProperty]
-    [MaxLength(ApplicationUser.ShortNameMaxLength, ErrorMessage = "Short name must be 25 characters or less")]
-    public string? ShortName { get; set; }
-
     public string[]? ApiRoles { get; set; }
 
     [BindNever]
@@ -90,7 +86,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         OneLoginPrivateKeyPem = _user.OneLoginPrivateKeyPem;
         OneLoginRedirectUriPath = _user.OneLoginRedirectUriPath;
         OneLoginPostLogoutRedirectUriPath = _user.OneLoginPostLogoutRedirectUriPath;
-        ShortName = _user.ShortName;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -164,7 +159,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         var changes = ApplicationUserUpdatedEventChanges.None |
             (Name != _user!.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
-            (ShortName != _user!.ShortName ? ApplicationUserUpdatedEventChanges.ShortName : 0) |
             (!new HashSet<string>(_user.ApiRoles ?? []).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
             (IsOidcClient != _user.IsOidcClient ? ApplicationUserUpdatedEventChanges.IsOidcClient : 0);
 
@@ -187,7 +181,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             var oldApplicationUser = EventModels.ApplicationUser.FromModel(_user);
 
             _user.Name = Name!;
-            _user.ShortName = ShortName;
             _user.ApiRoles = newApiRoles;
             _user.IsOidcClient = IsOidcClient;
 

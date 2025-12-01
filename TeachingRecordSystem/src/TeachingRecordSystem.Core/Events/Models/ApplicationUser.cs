@@ -32,6 +32,5 @@ public record ApplicationUser
         OneLoginAuthenticationSchemeName = user.OneLoginAuthenticationSchemeName,
         OneLoginRedirectUriPath = user.OneLoginRedirectUriPath,
         OneLoginPostLogoutRedirectUriPath = user.OneLoginPostLogoutRedirectUriPath,
-        ShortName = user.ShortName
     };
 }
