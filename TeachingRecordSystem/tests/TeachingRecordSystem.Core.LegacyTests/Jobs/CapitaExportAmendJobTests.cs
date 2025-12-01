@@ -136,7 +136,18 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             x.WithCreatedByTps(true);
         });
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
-        var dobChangedEvent = trsPerson.UpdateDetails(person.FirstName, person.MiddleName, person.LastName, updatedDateOfBirth, null, null, person.Gender, Clock.UtcNow.AddHours(-1));
+        var dobChangedEvent = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person.FirstName,
+                MiddleName = person.MiddleName,
+                LastName = person.LastName,
+                DateOfBirth = updatedDateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person.Gender
+            },
+            Clock.UtcNow.AddHours(-1));
         var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -239,7 +250,18 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             x.WithCreatedByTps(true);
         });
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
-        var changeEvent = trsPerson.UpdateDetails(person.FirstName, person.MiddleName, person.LastName, person.DateOfBirth, null, updatedNationalInsuranceNumber, person.Gender, Clock.UtcNow.AddHours(-1));
+        var changeEvent = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person.FirstName,
+                MiddleName = person.MiddleName,
+                LastName = person.LastName,
+                DateOfBirth = person.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = updatedNationalInsuranceNumber,
+                Gender = person.Gender
+            },
+            Clock.UtcNow.AddHours(-1));
         var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -342,7 +364,18 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             x.WithCreatedByTps(true);
         });
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
-        var changeEvent = trsPerson.UpdateDetails(person.FirstName, person.MiddleName, person.LastName, updatedDateOfBirth, null, updatedNationalInsuranceNumber, person.Gender, Clock.UtcNow.AddHours(-1));
+        var changeEvent = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person.FirstName,
+                MiddleName = person.MiddleName,
+                LastName = person.LastName,
+                DateOfBirth = updatedDateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = updatedNationalInsuranceNumber,
+                Gender = person.Gender
+            },
+            Clock.UtcNow.AddHours(-1));
         var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),

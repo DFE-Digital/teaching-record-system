@@ -37,7 +37,7 @@ public class CheckAnswersModel(
 
     public InductionExemptionReason[] ExemptionReasons { get; set; } = [];
 
-    public InductionChangeReasonOption ChangeReason { get; set; }
+    public PersonInductionChangeReason ChangeReason { get; set; }
 
     public string? ChangeReasonDetail { get; set; }
 
@@ -95,9 +95,12 @@ public class CheckAnswersModel(
             StartDate = StartDate,
             CompletedDate = CompletedDate,
             ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds ?? [],
-            ChangeReason = ChangeReason,
-            ChangeReasonDetail = ChangeReasonDetail,
-            EvidenceFile = EvidenceFile?.ToFile(),
+            Justification = new()
+            {
+                Reason = ChangeReason,
+                ReasonDetail = ChangeReasonDetail,
+                Evidence = EvidenceFile?.ToFile()
+            },
             UserId = User.GetUserId()
         });
 

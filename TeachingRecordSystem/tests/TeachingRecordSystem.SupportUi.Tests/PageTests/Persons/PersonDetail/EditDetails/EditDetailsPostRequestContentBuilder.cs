@@ -64,13 +64,13 @@ public class EditDetailsPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public EditDetailsPostRequestContentBuilder WithReason(EditDetailsNameChangeReasonOption nameChangeReason)
+    public EditDetailsPostRequestContentBuilder WithReason(PersonNameChangeReason nameChangeReason)
     {
         Reason = nameChangeReason;
         return this;
     }
 
-    public EditDetailsPostRequestContentBuilder WithReason(EditDetailsOtherDetailsChangeReasonOption otherDetailsChangeReason, string? detail = null)
+    public EditDetailsPostRequestContentBuilder WithReason(PersonDetailsChangeReason otherDetailsChangeReason, string? detail = null)
     {
         Reason = otherDetailsChangeReason;
         ReasonDetail = detail;

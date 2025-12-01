@@ -15,7 +15,7 @@ public class NameChangeReasonModel(
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    public EditDetailsNameChangeReasonOption? Reason { get; set; }
+    public PersonNameChangeReason? Reason { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();

@@ -130,14 +130,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (hasNameChangeReason)
         {
             state = state
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false);
         }
 
         if (hasOtherDetailsChangeReason)
         {
             state = state
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false);
         }
 
@@ -195,14 +195,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
             state = state
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false);
         }
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
         {
             state = state
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false);
         }
 
@@ -275,22 +275,22 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (hasNameChangeReason)
         {
             state = state
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false);
 
             content = content
-                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithReason(PersonNameChangeReason.CorrectingAnError)
                 .WithUploadEvidence(false);
         }
 
         if (hasOtherDetailsChangeReason)
         {
             state = state
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false);
 
             content = content
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithReason(PersonDetailsChangeReason.IncompleteDetails)
                 .WithUploadEvidence(false);
         }
 
@@ -381,14 +381,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
             state = state
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false);
         }
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
         {
             state = state
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false);
         }
 
@@ -404,14 +404,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (fromPage.Contains("name"))
         {
             content = content
-                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithReason(PersonNameChangeReason.CorrectingAnError)
                 .WithUploadEvidence(false);
         }
 
         if (fromPage.Contains("other-details"))
         {
             content = content
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithReason(PersonDetailsChangeReason.IncompleteDetails)
                 .WithUploadEvidence(false);
         }
 
@@ -447,9 +447,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -492,9 +492,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
                 .Build());
 
@@ -561,14 +561,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
             state = state
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false);
         }
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
         {
             state = state
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false);
         }
 
@@ -646,14 +646,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (originalChanges.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
             state = state
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false);
         }
 
         if (originalChanges.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
         {
             state = state
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false);
         }
 
@@ -669,14 +669,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (fromPage.Contains("name"))
         {
             content = content
-                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithReason(PersonNameChangeReason.CorrectingAnError)
                 .WithUploadEvidence(false);
         }
 
         if (fromPage.Contains("other-details"))
         {
             content = content
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithReason(PersonDetailsChangeReason.IncompleteDetails)
                 .WithUploadEvidence(false);
         }
 

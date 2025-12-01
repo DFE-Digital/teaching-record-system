@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.InductionExemptions;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -10,7 +11,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class ExemptionReasonsModel(
     SupportUiLinkGenerator linkGenerator,
     PersonService personService,
-    EvidenceUploadManager evidenceController)
+    EvidenceUploadManager evidenceController,
+    InductionExemptionService inductionExemptionService)
     : CommonJourneyPage(personService, linkGenerator, evidenceController)
 {
     [BindProperty]
@@ -22,7 +24,7 @@ public class ExemptionReasonsModel(
 
     public bool ShowInductionExemptionReasonNotAvailableMessage =>
         RoutesWithInductionExemptions?
-            .Any(r => ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)) ?? false;
+            .Any(r => InductionExemptionService.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)) ?? false;
 
     public string[]? InductionExemptionFromRoutesMessages
     {
@@ -56,7 +58,7 @@ public class ExemptionReasonsModel(
             {
                 List<string> messages = [];
                 foreach (var route in RoutesWithInductionExemptions!
-                    .Where(r => ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)))
+                    .Where(r => InductionExemptionService.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)))
                 {
                     messages.Add($"To add/remove the induction exemption reason of: \"{route.InductionExemptionReasonName}\" please modify the \"{route.RouteToProfessionalStatusName}\" route.");
                 }
@@ -134,6 +136,9 @@ public class ExemptionReasonsModel(
             return;
         }
 
-        (RoutesWithInductionExemptions, ExemptionReasons) = await PersonService.GetExemptionReasonsAsync(PersonId);
+        var response = await inductionExemptionService.GetExemptionReasonsAsync(PersonId);
+
+        RoutesWithInductionExemptions = response.RoutesWithInductionExemptions;
+        ExemptionReasons = response.ExemptionReasonCategories;
     }
 }

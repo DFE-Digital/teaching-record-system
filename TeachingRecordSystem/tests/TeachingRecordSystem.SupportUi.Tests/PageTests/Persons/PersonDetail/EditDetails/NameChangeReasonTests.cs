@@ -72,7 +72,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
-        var reasonChoice = EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership;
+        var reasonChoice = PersonNameChangeReason.MarriageOrCivilPartnership;
         var evidenceFileId = Guid.NewGuid();
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
@@ -122,7 +122,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
-        var expectedChoices = Enum.GetValues<EditDetailsNameChangeReasonOption>().Select(s => s.ToString());
+        var expectedChoices = Enum.GetValues<PersonNameChangeReason>().Select(s => s.ToString());
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithFirstName("Alfred")
@@ -210,7 +210,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithReason(PersonNameChangeReason.CorrectingAnError)
                 .WithUploadEvidence(true)
                 .BuildMultipartFormData()
         };
@@ -241,7 +241,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithReason(PersonNameChangeReason.CorrectingAnError)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
                 .BuildMultipartFormData()
         };
@@ -431,7 +431,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithReason(PersonNameChangeReason.CorrectingAnError)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -467,7 +467,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithReason(PersonNameChangeReason.CorrectingAnError)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -500,7 +500,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithReason(PersonNameChangeReason.CorrectingAnError)
                 .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -514,7 +514,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         FileServiceMock.AssertFileWasNotUploaded();
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(EditDetailsNameChangeReasonOption.CorrectingAnError, journeyInstance.State.NameChangeReason);
+        Assert.Equal(PersonNameChangeReason.CorrectingAnError, journeyInstance.State.NameChangeReason);
         Assert.False(journeyInstance.State.NameChangeEvidence.UploadEvidence);
         Assert.Null(journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile);
     }

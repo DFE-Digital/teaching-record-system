@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
@@ -19,7 +19,7 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddPersonReasonPageAsync();
-        await page.SelectChangeReasonAsync("create-reason-options", AddPersonReasonOption.MandatoryQualification);
+        await page.SelectChangeReasonAsync("create-reason-options", PersonCreateReason.MandatoryQualification);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -46,7 +46,7 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddPersonReasonPageAsync();
-        await page.SelectChangeReasonAsync("create-reason-options", AddPersonReasonOption.MandatoryQualification);
+        await page.SelectChangeReasonAsync("create-reason-options", PersonCreateReason.MandatoryQualification);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -76,7 +76,7 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddPersonReasonPageAsync();
-        await page.SelectChangeReasonAsync("create-reason-options", AddPersonReasonOption.MandatoryQualification);
+        await page.SelectChangeReasonAsync("create-reason-options", PersonCreateReason.MandatoryQualification);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -112,7 +112,7 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddPersonReasonPageAsync();
-        await page.SelectChangeReasonAsync("create-reason-options", AddPersonReasonOption.MandatoryQualification);
+        await page.SelectChangeReasonAsync("create-reason-options", PersonCreateReason.MandatoryQualification);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 

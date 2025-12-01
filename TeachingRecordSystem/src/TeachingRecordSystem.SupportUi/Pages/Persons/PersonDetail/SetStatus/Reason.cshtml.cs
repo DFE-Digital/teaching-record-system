@@ -52,7 +52,7 @@ public class ReasonModel(
     };
 
     [BindProperty]
-    public DeactivateReasonOption? DeactivateReason { get; set; }
+    public PersonDeactivateReason? DeactivateReason { get; set; }
 
     [BindProperty]
     public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
@@ -62,7 +62,7 @@ public class ReasonModel(
     public string? DeactivateReasonDetail { get; set; }
 
     [BindProperty]
-    public ReactivateReasonOption? ReactivateReason { get; set; }
+    public PersonReactivateReason? ReactivateReason { get; set; }
 
     [BindProperty]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]

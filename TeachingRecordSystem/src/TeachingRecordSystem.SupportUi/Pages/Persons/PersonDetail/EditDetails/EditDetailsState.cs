@@ -29,10 +29,10 @@ public class EditDetailsState : IRegisterJourney
     public EditDetailsFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new("", null);
     public Gender? Gender { get; set; }
 
-    public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    public PersonNameChangeReason? NameChangeReason { get; set; }
     public EvidenceUploadModel NameChangeEvidence { get; set; } = new();
 
-    public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
+    public PersonDetailsChangeReason? OtherDetailsChangeReason { get; set; }
     public string? OtherDetailsChangeReasonDetail { get; set; }
     public EvidenceUploadModel OtherDetailsChangeEvidence { get; set; } = new();
 
@@ -74,7 +74,7 @@ public class EditDetailsState : IRegisterJourney
     public bool IsOtherDetailsChangeReasonComplete =>
         !OtherDetailsChanged ||
             (OtherDetailsChangeReason.HasValue &&
-            (OtherDetailsChangeReason.Value is not EditDetailsOtherDetailsChangeReasonOption.AnotherReason || OtherDetailsChangeReasonDetail is not null) &&
+            (OtherDetailsChangeReason.Value is not PersonDetailsChangeReason.AnotherReason || OtherDetailsChangeReasonDetail is not null) &&
             OtherDetailsChangeEvidence.IsComplete);
 
     public void EnsureInitialized(Person person)

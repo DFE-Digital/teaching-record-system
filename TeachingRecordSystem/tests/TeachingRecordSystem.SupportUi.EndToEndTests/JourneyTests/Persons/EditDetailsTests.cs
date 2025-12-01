@@ -20,7 +20,7 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
+        await page.SelectChangeReasonAsync("change-reason-options", PersonNameChangeReason.CorrectingAnError);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -47,7 +47,7 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
+        await page.SelectChangeReasonAsync("change-reason-options", PersonDetailsChangeReason.AnotherReason, "Some reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -75,12 +75,12 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
+        await page.SelectChangeReasonAsync("change-reason-options", PersonNameChangeReason.CorrectingAnError);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
+        await page.SelectChangeReasonAsync("change-reason-options", PersonDetailsChangeReason.AnotherReason, "Some reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -107,7 +107,7 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
+        await page.SelectChangeReasonAsync("change-reason-options", PersonNameChangeReason.CorrectingAnError);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -140,7 +140,7 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
+        await page.SelectChangeReasonAsync("change-reason-options", PersonDetailsChangeReason.AnotherReason, "Some reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -174,12 +174,12 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
+        await page.SelectChangeReasonAsync("change-reason-options", PersonNameChangeReason.CorrectingAnError);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
+        await page.SelectChangeReasonAsync("change-reason-options", PersonDetailsChangeReason.AnotherReason, "Some reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -217,12 +217,12 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
+        await page.SelectChangeReasonAsync("change-reason-options", PersonNameChangeReason.CorrectingAnError);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
+        await page.SelectChangeReasonAsync("change-reason-options", PersonDetailsChangeReason.AnotherReason, "Some reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -264,12 +264,12 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
+        await page.SelectChangeReasonAsync("change-reason-options", PersonNameChangeReason.CorrectingAnError);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
+        await page.SelectChangeReasonAsync("change-reason-options", PersonDetailsChangeReason.AnotherReason, "Some reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -322,7 +322,7 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
+        await page.SelectChangeReasonAsync("change-reason-options", PersonDetailsChangeReason.AnotherReason, "Some reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -334,7 +334,7 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
+        await page.SelectChangeReasonAsync("change-reason-options", PersonNameChangeReason.CorrectingAnError);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -363,7 +363,7 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
+        await page.SelectChangeReasonAsync("change-reason-options", PersonNameChangeReason.CorrectingAnError);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -375,7 +375,7 @@ public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
+        await page.SelectChangeReasonAsync("change-reason-options", PersonDetailsChangeReason.AnotherReason, "Some reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 

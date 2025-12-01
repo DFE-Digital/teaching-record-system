@@ -32,11 +32,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -82,11 +82,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -122,11 +122,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.RecordHolderDied, ProvideMoreInformationOption.No);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.RecordHolderDied, ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.DeactivatedByMistake, ProvideMoreInformationOption.No);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.DeactivatedByMistake, ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -171,11 +171,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(

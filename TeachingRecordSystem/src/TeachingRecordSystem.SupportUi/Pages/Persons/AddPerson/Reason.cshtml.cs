@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
@@ -13,7 +14,7 @@ public class ReasonModel(
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    public AddPersonReasonOption? Reason { get; set; }
+    public PersonCreateReason? Reason { get; set; }
 
     [BindProperty]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
@@ -49,7 +50,7 @@ public class ReasonModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Reason is not null && Reason.Value == AddPersonReasonOption.AnotherReason && ReasonDetail is null)
+        if (Reason is not null && Reason.Value == PersonCreateReason.AnotherReason && ReasonDetail is null)
         {
             ModelState.AddModelError(nameof(ReasonDetail), "Enter a reason");
         }
@@ -64,7 +65,7 @@ public class ReasonModel(
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.Reason = Reason;
-            state.ReasonDetail = Reason is AddPersonReasonOption.AnotherReason ? ReasonDetail : null;
+            state.ReasonDetail = Reason is PersonCreateReason.AnotherReason ? ReasonDetail : null;
             state.Evidence = Evidence;
         });
 

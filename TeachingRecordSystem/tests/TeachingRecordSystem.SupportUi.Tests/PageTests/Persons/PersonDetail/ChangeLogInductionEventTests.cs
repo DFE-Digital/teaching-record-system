@@ -580,7 +580,7 @@ public class ChangeLogInductionEventTests : TestBase
         string[] exemptionReasonNames = ["Qualified through Further Education route between 1 Sep 2001 and 1 Sep 2004"];
         var cpdModifiedOn = Clock.UtcNow;
 
-        var changeReason = InductionChangeReasonOption.AnotherReason.GetDisplayName();
+        var changeReason = PersonInductionChangeReason.AnotherReason.GetDisplayName();
         var changeReasonDetail = "Reason detail";
         var evidenceFile = new EventModels.File
         {
@@ -750,7 +750,7 @@ public class ChangeLogInductionEventTests : TestBase
         string[] exemptionReasonNames = oldExemptionReasonNames;
         var cpdModifiedOn = Clock.UtcNow;
 
-        var changeReason = InductionChangeReasonOption.AnotherReason.GetDisplayName();
+        var changeReason = PersonInductionChangeReason.AnotherReason.GetDisplayName();
         var changeReasonDetail = "Reason detail";
 
         var induction = new EventModels.Induction

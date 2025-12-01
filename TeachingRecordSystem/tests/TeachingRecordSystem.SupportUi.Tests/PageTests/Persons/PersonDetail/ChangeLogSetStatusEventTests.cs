@@ -31,7 +31,7 @@ public class ChangeLogSetStatusEventTests : TestBase
             await dbContext.SaveChangesAsync();
         });
 
-        var reason = DeactivateReasonOption.AnotherReason.GetDisplayName();
+        var reason = PersonDeactivateReason.AnotherReason.GetDisplayName();
         var reasonDetail = "Reason detail";
         var evidenceFile = new EventModels.File
         {
@@ -89,7 +89,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync();
 
-        var reason = ReactivateReasonOption.AnotherReason.GetDisplayName();
+        var reason = PersonReactivateReason.AnotherReason.GetDisplayName();
         var reasonDetail = "Reason detail";
         var evidenceFile = new EventModels.File
         {

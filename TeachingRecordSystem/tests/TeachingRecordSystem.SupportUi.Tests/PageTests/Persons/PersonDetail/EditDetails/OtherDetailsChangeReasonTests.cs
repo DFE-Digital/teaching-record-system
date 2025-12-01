@@ -25,7 +25,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
                 .WithInitializedState(person)
                 .WithName("A", "New", "Name")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -76,7 +76,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
-        var reasonChoice = EditDetailsOtherDetailsChangeReasonOption.AnotherReason;
+        var reasonChoice = PersonDetailsChangeReason.AnotherReason;
         var reasonDetail = "A description about why the change typed into the box";
         var evidenceFileId = Guid.NewGuid();
         var urlEncoder = UrlEncoder.Default;
@@ -130,7 +130,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
-        var expectedChoices = Enum.GetValues<EditDetailsOtherDetailsChangeReasonOption>().Select(s => s.ToString());
+        var expectedChoices = Enum.GetValues<PersonDetailsChangeReason>().Select(s => s.ToString());
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithFirstName("Alfred")
@@ -174,7 +174,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
     public async Task Get_WhenNameAlsoChanged_PageTitleChangesAccordingly()
     {
         // Arrange
-        var expectedChoices = Enum.GetValues<EditDetailsOtherDetailsChangeReasonOption>().Select(s => s.ToString());
+        var expectedChoices = Enum.GetValues<PersonDetailsChangeReason>().Select(s => s.ToString());
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithFirstName("Alfred")
@@ -187,7 +187,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("Megan", "Thee", "Stallion")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.MarriageOrCivilPartnership)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
@@ -208,7 +208,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
-        var changeReason = EditDetailsOtherDetailsChangeReasonOption.AnotherReason;
+        var changeReason = PersonDetailsChangeReason.AnotherReason;
         var changeReasonDetails = "A description about why the change typed into the box";
 
         var person = await TestData.CreatePersonAsync(p => p
@@ -292,7 +292,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, null)
+                .WithReason(PersonDetailsChangeReason.AnotherReason, null)
                 .BuildFormUrlEncoded()
         };
 
@@ -323,7 +323,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .WithReason(PersonDetailsChangeReason.NewInformation)
                 .WithUploadEvidence(true)
                 .BuildMultipartFormData()
         };
@@ -355,7 +355,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .WithReason(PersonDetailsChangeReason.NewInformation)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
                 .BuildMultipartFormData()
         };
@@ -388,7 +388,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .WithReason(PersonDetailsChangeReason.AnotherReason)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .BuildMultipartFormData()
         };
@@ -436,7 +436,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .WithReason(PersonDetailsChangeReason.AnotherReason)
                 .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
@@ -483,7 +483,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .WithReason(PersonDetailsChangeReason.AnotherReason)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
@@ -520,7 +520,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .WithReason(PersonDetailsChangeReason.AnotherReason)
                 .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
@@ -554,7 +554,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .WithReason(PersonDetailsChangeReason.NewInformation)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -591,7 +591,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .WithReason(PersonDetailsChangeReason.NewInformation)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -626,7 +626,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation, "A description about why the change typed into the box")
+                .WithReason(PersonDetailsChangeReason.NewInformation, "A description about why the change typed into the box")
                 .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
@@ -640,7 +640,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         FileServiceMock.AssertFileWasNotUploaded();
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.NewInformation, journeyInstance.State.OtherDetailsChangeReason);
+        Assert.Equal(PersonDetailsChangeReason.NewInformation, journeyInstance.State.OtherDetailsChangeReason);
         Assert.Null(journeyInstance.State.OtherDetailsChangeReasonDetail);
         Assert.False(journeyInstance.State.OtherDetailsChangeEvidence.UploadEvidence);
         Assert.Null(journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile);

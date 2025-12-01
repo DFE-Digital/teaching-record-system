@@ -52,13 +52,16 @@ public class SetPiiHandler(
         var now = clock.UtcNow;
 
         var updateResult = person.UpdateDetails(
-            command.FirstName,
-            command.MiddleName ?? string.Empty,
-            command.LastName,
-            command.DateOfBirth,
-            command.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
-            command.NationalInsuranceNumber is string nino ? NationalInsuranceNumber.Parse(nino) : null,
-            command.Gender,
+            new()
+            {
+                FirstName = command.FirstName,
+                MiddleName = command.MiddleName ?? string.Empty,
+                LastName = command.LastName,
+                DateOfBirth = command.DateOfBirth,
+                EmailAddress = command.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
+                NationalInsuranceNumber = command.NationalInsuranceNumber is string nino ? NationalInsuranceNumber.Parse(nino) : null,
+                Gender = command.Gender,
+            },
             now);
 
         var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
