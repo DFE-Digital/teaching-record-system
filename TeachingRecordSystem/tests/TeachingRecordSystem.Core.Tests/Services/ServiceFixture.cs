@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Tests.Services;
 
 [assembly: AssemblyFixture(typeof(ServiceFixture))]
@@ -13,7 +15,9 @@ public class ServiceFixture : ServiceProviderFixture
         services
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
-            .AddEventPublisher();
+            .AddEventPublisher()
+            .AddPersonMatching()
+            .AddSupportTaskService();
 
         TestScopedServices.ConfigureServices(services);
     }

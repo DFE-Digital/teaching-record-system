@@ -14,5 +14,5 @@ public enum ProcessType
     NotifyingTrnRecipient = 10,
     NoteCreating = 11,
     ChangeOfDateOfBirthRequestCreating = 12,
-    ChangeOfNameRequestCreating = 13,
+    ChangeOfNameRequestCreating = 13
 }

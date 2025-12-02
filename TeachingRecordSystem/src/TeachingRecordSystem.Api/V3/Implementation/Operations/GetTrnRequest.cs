@@ -33,7 +33,7 @@ public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnR
         var status = requestData.Status;
         var trn = status == TrnRequestStatus.Completed ? resolvedPersonTrn : null;
 
-        if (await trnRequestService.TryEnsureTrnTokenAsync(requestData, resolvedPersonTrn))
+        if (await trnRequestService.TryEnsureTrnTokenAsync(requestData, resolvedPersonTrn!))
         {
             await dbContext.SaveChangesAsync();
         }
