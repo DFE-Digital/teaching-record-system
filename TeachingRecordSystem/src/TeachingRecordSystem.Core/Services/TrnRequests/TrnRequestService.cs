@@ -12,6 +12,8 @@ using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
+public record TrnRequestInfo(TrnRequestMetadata TrnRequest, string? ResolvedPersonTrn);
+
 public class TrnRequestService(
     TrsDbContext dbContext,
     IEventPublisher eventPublisher,
@@ -22,7 +24,7 @@ public class TrnRequestService(
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
 {
-    public async Task<TrnRequestMetadata> CreateTrnRequestAsync(CreateTrnRequestOptions options, ProcessContext processContext)
+    public async Task<TrnRequestInfo> CreateTrnRequestAsync(CreateTrnRequestOptions options, ProcessContext processContext)
     {
         var trnRequest = new TrnRequestMetadata
         {
@@ -59,17 +61,18 @@ public class TrnRequestService(
 
         await dbContext.SaveChangesAsync();
 
+        string? trn = null;
         if (options.TryResolve)
         {
             if (matchResult.Outcome is TrnRequestMatchResultOutcome.DefiniteMatch)
             {
                 // TODO Amend matchResult to include TRN so we don't have to re-query DB
-                var matchedPersonTrn = await dbContext.Persons.Where(p => p.PersonId == matchResult.PersonId).Select(p => p.Trn!).SingleAsync();
-                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, matchedPersonTrn), processContext);
+                trn = await dbContext.Persons.Where(p => p.PersonId == matchResult.PersonId).Select(p => p.Trn!).SingleAsync();
+                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), processContext);
             }
             else if (matchResult.Outcome is TrnRequestMatchResultOutcome.NoMatches)
             {
-                await CompleteTrnRequestWithNewRecordAsync(trnRequest, processContext);
+                trn = await CompleteTrnRequestWithNewRecordAsync(trnRequest, processContext);
             }
             else
             {
@@ -85,7 +88,7 @@ public class TrnRequestService(
             },
             processContext);
 
-        return trnRequest;
+        return new TrnRequestInfo(trnRequest, trn);
     }
 
     public async Task CompleteTrnRequestWithMatchedPersonAsync(TrnRequestMetadata trnRequest, (Guid PersonId, string Trn) person, ProcessContext processContext)
@@ -114,7 +117,7 @@ public class TrnRequestService(
         }
     }
 
-    public async Task CompleteTrnRequestWithNewRecordAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public async Task<string> CompleteTrnRequestWithNewRecordAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         var trn = await trnGenerator.GenerateTrnAsync();
 
@@ -154,9 +157,11 @@ public class TrnRequestService(
                 TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequest)
             },
             processContext);
+
+        return trn;
     }
 
-    public async Task<TrnRequestMetadata?> GetTrnRequestAsync(Guid applicationUserId, string requestId)
+    public async Task<TrnRequestInfo?> GetTrnRequestAsync(Guid applicationUserId, string requestId)
     {
         // TODO Use LeftJoin when we've moved to EF Core 10
         var result = await (
@@ -177,7 +182,7 @@ public class TrnRequestService(
             await dbContext.SaveChangesAsync();
         }
 
-        return result.TrnRequest;
+        return new(result.TrnRequest, result.Trn);
     }
 
     public string GetAccessYourTeachingQualificationsLink(string trnToken) =>
@@ -264,8 +269,8 @@ public class TrnRequestService(
         return response.TrnToken;
     }
 
-    // TODO Make this private
-    public async Task<bool> TryEnsureTrnTokenAsync(TrnRequestMetadata trnRequest, string resolvedPersonTrn)
+    // internal for testing
+    internal async Task<bool> TryEnsureTrnTokenAsync(TrnRequestMetadata trnRequest, string resolvedPersonTrn)
     {
         if (trnRequest.Status is not TrnRequestStatus.Completed || trnRequest.TrnToken is not null || trnRequest.EmailAddress is null)
         {

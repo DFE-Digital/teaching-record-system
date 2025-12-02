@@ -47,7 +47,7 @@ public class EventCapture : IEventHandler
 
         internal void AddEvent(IEvent @event) => _events.Add(@event);
 
-        public void AssertProcessHasEvent<TEvent>(Action<TEvent> inspector) where TEvent : IEvent
+        public void AssertProcessHasEvent<TEvent>(Action<TEvent>? inspector = null) where TEvent : IEvent
         {
             var events = _events.OfType<TEvent>().ToArray();
 
@@ -61,7 +61,53 @@ public class EventCapture : IEventHandler
                 throw new XunitException($"Multiple {typeof(TEvent).Name} events found on process.");
             }
 
-            inspector(events[0]);
+            inspector?.Invoke(events[0]);
+        }
+
+        public void AssertProcessHasEvents<T1>(
+            Action<T1>? inspector1 = null)
+            where T1 : IEvent
+        {
+            AssertProcessHasEvent(inspector1);
+        }
+
+        public void AssertProcessHasEvents<T1, T2>(
+            Action<T1>? inspector1 = null,
+            Action<T2>? inspector2 = null)
+            where T1 : IEvent
+            where T2 : IEvent
+        {
+            AssertProcessHasEvent(inspector1);
+            AssertProcessHasEvent(inspector2);
+        }
+
+        public void AssertProcessHasEvents<T1, T2, T3>(
+            Action<T1>? inspector1 = null,
+            Action<T2>? inspector2 = null,
+            Action<T3>? inspector3 = null)
+            where T1 : IEvent
+            where T2 : IEvent
+            where T3 : IEvent
+        {
+            AssertProcessHasEvent(inspector1);
+            AssertProcessHasEvent(inspector2);
+            AssertProcessHasEvent(inspector3);
+        }
+
+        public void AssertProcessHasEvents<T1, T2, T3, T4>(
+            Action<T1>? inspector1 = null,
+            Action<T2>? inspector2 = null,
+            Action<T3>? inspector3 = null,
+            Action<T4>? inspector4 = null)
+            where T1 : IEvent
+            where T2 : IEvent
+            where T3 : IEvent
+            where T4 : IEvent
+        {
+            AssertProcessHasEvent(inspector1);
+            AssertProcessHasEvent(inspector2);
+            AssertProcessHasEvent(inspector3);
+            AssertProcessHasEvent(inspector4);
         }
     }
 }

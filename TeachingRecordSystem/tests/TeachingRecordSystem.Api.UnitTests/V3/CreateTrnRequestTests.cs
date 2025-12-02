@@ -162,6 +162,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
+        });
     }
 
     [Fact]
@@ -199,6 +206,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
 
         await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent>();
+        });
     }
 
     [Fact]
@@ -237,6 +251,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
+        });
     }
 
     [Fact]
@@ -271,6 +292,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
+        });
     }
 
     [Fact]
@@ -313,6 +341,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
+        });
     }
 
     [Fact]
@@ -360,6 +395,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent>();
+        });
     }
 
     [Fact]
@@ -409,6 +451,13 @@ public class CreateTrnRequestTests : OperationTestBase
                 .ToArrayAsync();
 
             Assert.Empty(supportTasks);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent>();
         });
     }
 
@@ -460,6 +509,13 @@ public class CreateTrnRequestTests : OperationTestBase
 
             Assert.NotEmpty(supportTasks);
         });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
+        });
     }
 
     [Fact]
@@ -488,6 +544,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent, PersonCreatedEvent>();
+        });
     }
 
     [Fact]
@@ -535,6 +598,13 @@ public class CreateTrnRequestTests : OperationTestBase
                 .ToArrayAsync();
 
             Assert.Empty(supportTasks);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent>();
         });
     }
 
@@ -642,6 +712,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
+        });
     }
 
     private CreateTrnRequestCommand CreateCommand() => new CreateTrnRequestCommand
