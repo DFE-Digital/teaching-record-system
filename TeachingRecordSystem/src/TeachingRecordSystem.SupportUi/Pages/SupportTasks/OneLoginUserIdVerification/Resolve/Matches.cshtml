@@ -43,9 +43,38 @@
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>
+            <govuk-inset-text>Details that do not match are <govuk-tag class="govuk-tag--orange">highlighted</govuk-tag> in the existing record</govuk-inset-text>
+            @foreach (var match in Model.SuggestedMatches!)
+            {
+                <govuk-summary-card data-testid="match">
+                    <govuk-summary-card-title>Record TODO</govuk-summary-card-title>
+                    <govuk-summary-list>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@(match.FirstName + " " + match.LastName)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@match.EmailAddress</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@match.DateOfBirth!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@match.Trn</govuk-summary-list-row-value> @* CML TODO *@
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(match.NationalInsuranceNumber != Model.NationalInsuranceNumber)">@match.NationalInsuranceNumber</govuk-summary-list-row-value> @* CML TODO *@
+                        </govuk-summary-list-row>
+                    </govuk-summary-list>
+                </govuk-summary-card>
+            }
         </div>
     </div>
 
-    <govuk-hint>Details that do not match are <govuk-tag class="govuk-tag--orange">highlighted</govuk-tag> in the existing record</govuk-hint>
+    
 
 </form>
