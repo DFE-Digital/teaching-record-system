@@ -2,10 +2,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
@@ -16,7 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resol
 public class CheckAnswers(
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
-    ITrnGenerator trnGenerator,
+    SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
     IClock clock,
     PersonChangeableAttributesService changedService) :
@@ -73,127 +71,50 @@ public class CheckAnswers(
         var requestData = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
 
-        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
-        EventModels.PersonDetails? oldPersonAttributes;
 
-        var now = clock.UtcNow;
-
-        async Task<string?> GenerateTrnTokenIfHaveEmailAsync(string trn)
-        {
-            if (string.IsNullOrEmpty(requestData.EmailAddress))
-            {
-                return null;
-            }
-
-            return await trnRequestService.CreateTrnTokenAsync(trn, requestData.EmailAddress);
-        }
+        var processContext = new ProcessContext(ProcessType.ApiTrnRequestResolving, clock.UtcNow, User.GetUserId());
 
         if (CreatingNewRecord)
         {
-            var trn = await trnGenerator.GenerateTrnAsync();
-            var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
-            requestData.TrnToken = trnToken;
-
-            var (newPerson, _) = trnRequestService.CreatePersonFromTrnRequest(requestData, trn, now);
-            DbContext.Persons.Add(newPerson);
-
-            requestData.SetResolvedPerson(newPerson.PersonId);
+            await trnRequestService.CompleteTrnRequestWithNewRecordAsync(requestData, processContext);
 
             selectedPersonAttributes = null;
-            oldPersonAttributes = null;
         }
         else
         {
             Debug.Assert(state.PersonId is not null);
             var existingPersonId = state.PersonId!.Value;
-
-            var furtherChecksNeeded = await trnRequestService.RequiresFurtherChecksNeededSupportTaskAsync(
-                existingPersonId,
-                requestData.ApplicationUserId);
-
-            requestData.SetResolvedPerson(existingPersonId, furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed);
-
-            if (furtherChecksNeeded)
-            {
-                var furtherChecksSupportTask = SupportTask.Create(
-                    SupportTaskType.TrnRequestManualChecksNeeded,
-                    new TrnRequestManualChecksNeededData(),
-                    existingPersonId,
-                    requestData.OneLoginUserSubject,
-                    requestData.ApplicationUserId,
-                    requestData.RequestId,
-                    User.GetUserId(),
-                    now,
-                    out var furtherChecksSupportTaskCreatedEvent);
-
-                DbContext.SupportTasks.Add(furtherChecksSupportTask);
-                await DbContext.AddEventAndBroadcastAsync(furtherChecksSupportTaskCreatedEvent);
-            }
-
-            Debug.Assert(Trn is not null);
-            requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);
-
             var selectedPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
+
             selectedPersonAttributes = GetPersonAttributes(selectedPerson);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            var updateResult = trnRequestService.UpdatePersonFromTrnRequest(selectedPerson, requestData, attributesToUpdate, now);
-            oldPersonAttributes = updateResult.OldPersonAttributes;
+            await trnRequestService.UpdatePersonFromTrnRequestAsync(selectedPerson, requestData, attributesToUpdate, processContext);
+
+            await trnRequestService.CompleteTrnRequestWithMatchedPersonAsync(
+                requestData,
+                (selectedPerson.PersonId, selectedPerson.Trn!),
+                processContext);
         }
 
         Debug.Assert(requestData.ResolvedPersonId is not null);
 
         var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
-        supportTask.Status = SupportTaskStatus.Closed;
-        supportTask.UpdatedOn = now;
-        supportTask.UpdateData<ApiTrnRequestData>(data => data with
-        {
-            ResolvedAttributes = resolvedPersonAttributes,
-            SelectedPersonAttributes = selectedPersonAttributes
-        });
-
-        var changes = ApiTrnRequestSupportTaskUpdatedEventChanges.Status;
-
-        if (!CreatingNewRecord)
-        {
-            changes |=
-                (state.FirstNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName : 0) |
-                (state.MiddleNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName : 0) |
-                (state.LastNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName : 0) |
-                (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
-                (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
-                (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0) |
-                (state.GenderSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender : 0);
-        }
-
-        var @event = new ApiTrnRequestSupportTaskUpdatedEvent()
-        {
-            PersonId = requestData.ResolvedPersonId!.Value,
-            SupportTask = EventModels.SupportTask.FromModel(supportTask),
-            OldSupportTask = oldSupportTaskEventModel,
-            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
-            Changes = changes,
-            PersonAttributes = new EventModels.PersonDetails
+        await supportTaskService.UpdateSupportTaskAsync<ApiTrnRequestData>(
+            new()
             {
-                FirstName = resolvedPersonAttributes.FirstName,
-                MiddleName = resolvedPersonAttributes.MiddleName,
-                LastName = resolvedPersonAttributes.LastName,
-                DateOfBirth = resolvedPersonAttributes.DateOfBirth,
-                EmailAddress = resolvedPersonAttributes.EmailAddress,
-                NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber,
-                Gender = resolvedPersonAttributes.Gender
+                SupportTaskReference = supportTask.SupportTaskReference,
+                UpdateData = data => data with
+                {
+                    ResolvedAttributes = resolvedPersonAttributes,
+                    SelectedPersonAttributes = selectedPersonAttributes
+                },
+                Status = SupportTaskStatus.Closed,
+                Comments = state.Comments
             },
-            OldPersonAttributes = oldPersonAttributes,
-            Comments = state.Comments,
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId()
-        };
-        await DbContext.AddEventAndBroadcastAsync(@event);
-
-        await DbContext.SaveChangesAsync();
+            processContext);
 
         TempData.SetFlashSuccess(
             $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",

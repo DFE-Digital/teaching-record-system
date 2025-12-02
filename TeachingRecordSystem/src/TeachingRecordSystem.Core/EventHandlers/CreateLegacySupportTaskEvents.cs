@@ -2,7 +2,9 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Core.EventHandlers;
 
-public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) : IEventHandler<SupportTaskCreatedEvent>
+public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
+    IEventHandler<SupportTaskCreatedEvent>,
+    IEventHandler<SupportTaskUpdatedEvent>
 {
     public async Task HandleEventAsync(SupportTaskCreatedEvent @event, ProcessContext processContext)
     {
@@ -17,5 +19,65 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) : IEventHandl
         dbContext.AddEventWithoutBroadcast(legacyEvent);
 
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task HandleEventAsync(SupportTaskUpdatedEvent @event, ProcessContext processContext)
+    {
+        if (processContext.ProcessType is ProcessType.ApiTrnRequestResolving)
+        {
+            var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
+            var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
+
+            var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
+
+            var changes = LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.Status;
+            EventModels.PersonDetails? oldPersonAttributes;
+
+            if (personDetailsUpdatedEvent is { })
+            {
+                changes |=
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender : 0);
+
+                oldPersonAttributes = personDetailsUpdatedEvent.OldPersonDetails;
+            }
+            else
+            {
+                oldPersonAttributes = null;
+            }
+
+            var legacyEvent = new LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent()
+            {
+                PersonId = resolvedPerson.PersonId,
+                SupportTask = @event.SupportTask,
+                OldSupportTask = @event.OldSupportTask,
+                RequestData = trnRequestUpdatedEvent.TrnRequest,
+                Changes = changes,
+                PersonAttributes = new EventModels.PersonDetails
+                {
+                    FirstName = resolvedPerson.FirstName,
+                    MiddleName = resolvedPerson.MiddleName,
+                    LastName = resolvedPerson.LastName,
+                    DateOfBirth = resolvedPerson.DateOfBirth,
+                    EmailAddress = resolvedPerson.EmailAddress,
+                    NationalInsuranceNumber = resolvedPerson.NationalInsuranceNumber,
+                    Gender = resolvedPerson.Gender
+                },
+                OldPersonAttributes = oldPersonAttributes,
+                Comments = @event.Comments,
+                EventId = @event.EventId,
+                CreatedUtc = processContext.Now,
+                RaisedBy = processContext.UserId
+            };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

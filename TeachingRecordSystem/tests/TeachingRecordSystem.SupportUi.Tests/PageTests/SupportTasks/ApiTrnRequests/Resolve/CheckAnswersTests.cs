@@ -5,6 +5,9 @@ using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
+using PersonCreatedEvent = TeachingRecordSystem.Core.Events.PersonCreatedEvent;
+using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.PersonDetailsUpdatedEvent;
+using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpdatedEvent;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
@@ -496,6 +499,12 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: false, expectedPersonId: person.PersonId, comments);
         });
 
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestResolving, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonCreatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
+        });
+
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
@@ -558,6 +567,12 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         {
             var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
             AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiTrnRequestResolving, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonDetailsUpdatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);

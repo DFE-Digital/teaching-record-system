@@ -1,6 +1,5 @@
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -67,7 +66,7 @@ public partial class TestData
                         now);
 
                     var updatedEvent = updatePersonResult.Changes != 0 ?
-                        new PersonDetailsUpdatedEvent
+                        new LegacyEvents.PersonDetailsUpdatedEvent
                         {
                             EventId = Guid.NewGuid(),
                             CreatedUtc = now,
@@ -80,11 +79,11 @@ public partial class TestData
                             DetailsChangeReason = null,
                             DetailsChangeReasonDetail = null,
                             DetailsChangeEvidenceFile = null,
-                            Changes = (PersonDetailsUpdatedEventChanges)updatePersonResult.Changes
+                            Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)updatePersonResult.Changes
                         } :
                         null;
 
-                    if (updatedEvent?.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) == true)
+                    if (updatedEvent?.Changes.HasAnyFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.NameChange) == true)
                     {
                         dbContext.PreviousNames.Add(new PreviousName
                         {

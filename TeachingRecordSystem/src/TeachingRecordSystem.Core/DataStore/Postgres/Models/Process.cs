@@ -10,6 +10,6 @@ public class Process
     public UserBase? User { get; }
     public required Guid? DqtUserId { get; init; }
     public required string? DqtUserName { get; init; }
-    public ICollection<ProcessEvent>? Events { get; }
+    public ICollection<ProcessEvent>? Events { get; init; }
     public required List<Guid> PersonIds { get; init; }
 }

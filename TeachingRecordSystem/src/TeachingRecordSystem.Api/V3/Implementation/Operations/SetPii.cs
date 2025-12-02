@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -62,7 +61,7 @@ public class SetPiiHandler(
             command.Gender,
             now);
 
-        var personUpdatedEvent = new PersonDetailsUpdatedEvent
+        var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
@@ -75,7 +74,7 @@ public class SetPiiHandler(
             DetailsChangeReason = null,
             DetailsChangeReasonDetail = null,
             DetailsChangeEvidenceFile = null,
-            Changes = PersonDetailsUpdatedEventChanges.None
+            Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.None
         };
         await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent);
 

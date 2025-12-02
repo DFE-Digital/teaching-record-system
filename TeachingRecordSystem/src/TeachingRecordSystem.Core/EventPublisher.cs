@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -36,6 +37,8 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
 
         await dbContext.SaveChangesAsync();
 
+        processContext.AddEvent(@event);
+
         await InvokeEventHandlersAsync(@event, processContext);
     }
 
@@ -69,6 +72,8 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
 
 public class ProcessContext
 {
+    private readonly List<IEvent> _events = new();
+
     public ProcessContext(ProcessType processType, DateTime now, EventModels.RaisedByUserInfo raisedBy)
     {
         Now = now;
@@ -82,23 +87,44 @@ public class ProcessContext
             UserId = raisedBy.UserId,
             DqtUserId = raisedBy.DqtUserId,
             DqtUserName = raisedBy.DqtUserName,
-            PersonIds = []
+            PersonIds = [],
+            Events = []
         };
     }
 
-    public ProcessContext(Process process, DateTime now)
+    private ProcessContext(Process process, DateTime now)
     {
         Now = now;
         Process = process;
+        _events = process.Events?.Select(e => e.Payload).ToList() ?? throw new InvalidOperationException("Process must have its Events loaded.");
+    }
+
+    public static async Task<ProcessContext> FromDbAsync(TrsDbContext dbContext, Guid processId, DateTime now)
+    {
+        var process = await dbContext.Processes
+            .Include(p => p.Events)
+            .SingleAsync(p => p.ProcessId == processId);
+
+        return new(process, now);
     }
 
     public DateTime Now { get; }
 
     public IReadOnlyCollection<Guid> PersonIds => Process.PersonIds;
 
+    public IReadOnlyCollection<IEvent> Events => _events.AsReadOnly();
+
     public Process Process { get; }
 
     public Guid ProcessId => Process.ProcessId;
 
     public ProcessType ProcessType => Process.ProcessType;
+
+    public Guid UserId => Process.UserId!.Value;
+
+    [EditorBrowsable(EditorBrowsableState.Never)]  // This is meant to be consumed by EventPublisher only
+    internal void AddEvent(IEvent @event)
+    {
+        _events.Add(@event);
+    }
 }
