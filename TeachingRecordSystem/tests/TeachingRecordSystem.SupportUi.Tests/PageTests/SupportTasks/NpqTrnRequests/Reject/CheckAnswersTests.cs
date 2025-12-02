@@ -5,6 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 using Xunit.Sdk;
 using static TeachingRecordSystem.TestCommon.TestData;
+using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpdatedEvent;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Reject;
 
@@ -134,6 +135,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
             Assert.Equal(requestMetadata.NpqEvidenceFileName, actualEvent.RequestData?.NpqEvidenceFileName);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.NpqTrnRequestRejecting, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
         });
 
         // redirect

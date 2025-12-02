@@ -7,6 +7,9 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 using Xunit.Sdk;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
+using PersonCreatedEvent = TeachingRecordSystem.Core.Events.PersonCreatedEvent;
+using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.PersonDetailsUpdatedEvent;
+using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpdatedEvent;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
@@ -519,6 +522,12 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.NpqTrnRequestApproving, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonDetailsUpdatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
+        });
     }
 
     [Theory]
@@ -722,6 +731,12 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.NpqTrnRequestApproving, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonCreatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
+        });
     }
 
     private string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)

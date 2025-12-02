@@ -332,6 +332,30 @@ public partial class TrnRequestServiceTests : ServiceTestBase
     }
 
     [Fact]
+    public async Task RejectTrnRequestAsync_SetsStatusToRejected()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest, processContext));
+
+        // Assert
+        Assert.Equal(TrnRequestStatus.Rejected, trnRequest.Status);
+
+        Events.AssertEventsPublished(e =>
+        {
+            var trnRequestUpdatedEvent = Assert.IsType<TrnRequestUpdatedEvent>(e);
+            Assert.Equal(TrnRequestStatus.Rejected, trnRequestUpdatedEvent.TrnRequest.Status);
+            Assert.Equal(TrnRequestUpdatedChanges.Status, trnRequestUpdatedEvent.Changes);
+        });
+    }
+
+    [Fact]
     public async Task GetTrnRequestAsync_RequestDoesNotExist_ReturnsNull()
     {
         // Arrange

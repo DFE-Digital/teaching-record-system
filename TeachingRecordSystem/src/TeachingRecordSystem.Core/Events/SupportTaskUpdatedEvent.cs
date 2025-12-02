@@ -9,6 +9,7 @@ public record SupportTaskUpdatedEvent : IEvent
     public required EventModels.SupportTask SupportTask { get; init; }
     public required EventModels.SupportTask OldSupportTask { get; init; }
     public required string? Comments { get; init; }
+    public required string? RejectionReason { get; init; }
 }
 
 [Flags]

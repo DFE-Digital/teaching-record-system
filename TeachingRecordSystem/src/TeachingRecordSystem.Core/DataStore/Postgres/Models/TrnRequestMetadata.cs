@@ -43,6 +43,11 @@ public class TrnRequestMetadata
         Status = TrnRequestStatus.Pending;
     }
 
+    public void SetRejected()
+    {
+        Status = TrnRequestStatus.Rejected;
+    }
+
     public void SetResolvedPerson(Guid personId, TrnRequestStatus requestStatus = TrnRequestStatus.Completed)
     {
         ResolvedPersonId = personId;

@@ -79,5 +79,85 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
 
             await dbContext.SaveChangesAsync();
         }
+        else if (processContext.ProcessType is ProcessType.NpqTrnRequestApproving)
+        {
+            var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
+            var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
+
+            var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
+
+            var changes = LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.Status;
+            EventModels.PersonDetails? oldPersonAttributes;
+
+            if (personDetailsUpdatedEvent is { })
+            {
+                changes |=
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.PersonFirstName : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.PersonMiddleName : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.PersonLastName : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber : 0) |
+                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender : 0);
+
+                oldPersonAttributes = personDetailsUpdatedEvent.OldPersonDetails;
+            }
+            else
+            {
+                oldPersonAttributes = null;
+            }
+
+            var resolvedReason = processContext.Events.OfType<PersonCreatedEvent>().Any() ?
+                LegacyEvents.NpqTrnRequestResolvedReason.RecordCreated :
+                LegacyEvents.NpqTrnRequestResolvedReason.RecordMerged;
+
+            var legacyEvent = new LegacyEvents.NpqTrnRequestSupportTaskResolvedEvent()
+            {
+                PersonId = resolvedPerson.PersonId,
+                SupportTask = @event.SupportTask,
+                OldSupportTask = @event.OldSupportTask,
+                RequestData = trnRequestUpdatedEvent.TrnRequest,
+                Changes = changes,
+                PersonAttributes = new EventModels.PersonDetails
+                {
+                    FirstName = resolvedPerson.FirstName,
+                    MiddleName = resolvedPerson.MiddleName,
+                    LastName = resolvedPerson.LastName,
+                    DateOfBirth = resolvedPerson.DateOfBirth,
+                    EmailAddress = resolvedPerson.EmailAddress,
+                    NationalInsuranceNumber = resolvedPerson.NationalInsuranceNumber,
+                    Gender = resolvedPerson.Gender
+                },
+                OldPersonAttributes = oldPersonAttributes,
+                Comments = @event.Comments,
+                EventId = @event.EventId,
+                CreatedUtc = processContext.Now,
+                RaisedBy = processContext.UserId,
+                ChangeReason = resolvedReason
+            };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
+        else if (processContext.ProcessType is ProcessType.NpqTrnRequestRejecting)
+        {
+            var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
+
+            var @legacyEvent = new LegacyEvents.NpqTrnRequestSupportTaskRejectedEvent
+            {
+                EventId = @event.EventId,
+                CreatedUtc = processContext.Now,
+                RaisedBy = processContext.UserId,
+                SupportTask = @event.SupportTask,
+                OldSupportTask = @event.OldSupportTask,
+                RequestData = trnRequestUpdatedEvent.TrnRequest,
+                RejectionReason = @event.RejectionReason
+            };
+
+            dbContext.AddEventWithoutBroadcast(@legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
     }
 }
