@@ -1,4 +1,5 @@
 using Xunit;
+using Xunit.Sdk;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -45,5 +46,22 @@ public class EventCapture : IEventHandler
         public IReadOnlyCollection<IEvent> Events => _events.AsReadOnly();
 
         internal void AddEvent(IEvent @event) => _events.Add(@event);
+
+        public void AssertProcessHasEvent<TEvent>(Action<TEvent> inspector) where TEvent : IEvent
+        {
+            var events = _events.OfType<TEvent>().ToArray();
+
+            if (events.Length == 0)
+            {
+                throw new XunitException($"No {typeof(TEvent).Name} events found on process.");
+            }
+
+            if (events.Length > 1)
+            {
+                throw new XunitException($"Multiple {typeof(TEvent).Name} events found on process.");
+            }
+
+            inspector(events[0]);
+        }
     }
 }

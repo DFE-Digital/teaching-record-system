@@ -8,7 +8,6 @@ public class TrnRequestMetadata
     public required DateTime CreatedOn { get; init; }
     public required bool? IdentityVerified { get; init; }
     public required string? EmailAddress { get; init; }
-    public string? WorkEmailAddress { get; init; }
     public required string? OneLoginUserSubject { get; init; }
     public required string? FirstName { get; init; }
     public required string? MiddleName { get; init; }
@@ -34,9 +33,9 @@ public class TrnRequestMetadata
     public string? NpqApplicationId { get; init; }
     public string? NpqName { get; init; }
     public string? NpqTrainingProvider { get; init; }
-
     public Guid? NpqEvidenceFileId { get; init; }
     public string? NpqEvidenceFileName { get; init; }
+    public string? WorkEmailAddress { get; init; }
 
     public void Reset()
     {

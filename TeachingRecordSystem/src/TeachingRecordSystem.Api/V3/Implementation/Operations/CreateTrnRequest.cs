@@ -146,7 +146,7 @@ public class CreateTrnRequestHandler(
 
         dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
-        await trnRequestService.TryEnsureTrnTokenAsync(trnRequestMetadata, trn);
+        await trnRequestService.TryEnsureTrnTokenAsync(trnRequestMetadata, trn!);
 
         await dbContext.SaveChangesAsync();
 
