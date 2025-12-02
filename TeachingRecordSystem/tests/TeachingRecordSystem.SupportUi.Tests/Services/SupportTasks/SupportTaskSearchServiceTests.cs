@@ -11,7 +11,7 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = task.CreatedOn.ToString("d/M/yyyy");
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
@@ -28,7 +28,7 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = task.TrnRequestMetadata!.EmailAddress;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
@@ -45,7 +45,7 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = $"{task.TrnRequestMetadata!.FirstName} {task.TrnRequestMetadata.LastName}";
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
@@ -62,7 +62,7 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
@@ -79,7 +79,7 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -103,8 +103,8 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Alice").WithLastName("Zephyr"));
-        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Bob").WithLastName("Yellow"));
+        var (task1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Alice").WithLastName("Zephyr"));
+        var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Bob").WithLastName("Yellow"));
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Name, SortDirection.Ascending);
@@ -123,8 +123,8 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Alice").WithLastName("Zephyr"));
-        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Bob").WithLastName("Yellow"));
+        var (task1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Alice").WithLastName("Zephyr"));
+        var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Bob").WithLastName("Yellow"));
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Name, SortDirection.Descending);
@@ -143,8 +143,8 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("alice@example.com"));
-        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("bob@example.com"));
+        var (task1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("alice@example.com"));
+        var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("bob@example.com"));
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Email, SortDirection.Ascending);
@@ -163,8 +163,8 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("alice@example.com"));
-        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("bob@example.com"));
+        var (task1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("alice@example.com"));
+        var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("bob@example.com"));
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Email, SortDirection.Descending);
@@ -183,9 +183,9 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
         Clock.Advance();
-        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
@@ -204,9 +204,9 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
         Clock.Advance();
-        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Descending);
@@ -226,8 +226,8 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
         // Arrange
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
-        var taskForUser1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
-        var taskForUser2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
+        var (taskForUser1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        var (taskForUser2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Source, SortDirection.Ascending);
@@ -247,8 +247,8 @@ public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTest
         // Arrange
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
-        var taskForUser1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
-        var taskForUser2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
+        var (taskForUser1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        var (taskForUser2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
 
         var search = string.Empty;
         var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Source, SortDirection.Descending);

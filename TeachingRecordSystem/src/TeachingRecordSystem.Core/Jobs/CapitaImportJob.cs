@@ -181,7 +181,6 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                         if (potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || potentialMatches.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
                         {
                             trnRequestMetadata.PotentialDuplicate = true;
-                            trnRequestMetadata.Matches = new TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] };
 
                             dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 

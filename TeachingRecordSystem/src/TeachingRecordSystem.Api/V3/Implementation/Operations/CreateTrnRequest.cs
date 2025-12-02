@@ -144,26 +144,13 @@ public class CreateTrnRequestHandler(
         trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches;
         trnRequestMetadata.TrnToken = trnToken;
 
-        trnRequestMetadata.Matches = new PostgresModels.TrnRequestMatches()
-        {
-            MatchedPersons = matchResult.Outcome switch
-            {
-                TrnRequestMatchResultOutcome.PotentialMatches =>
-                    matchResult.PotentialMatchesPersonIds
-                        .Select(id => new PostgresModels.TrnRequestMatchedPerson() { PersonId = id })
-                        .ToList(),
-                TrnRequestMatchResultOutcome.DefiniteMatch => [new PostgresModels.TrnRequestMatchedPerson() { PersonId = matchResult.PersonId }],
-                _ => []
-            }
-        };
-
         dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
         await trnRequestService.TryEnsureTrnTokenAsync(trnRequestMetadata, trn);
 
         await dbContext.SaveChangesAsync();
 
-        var status = trnRequestMetadata.Status!.Value;
+        var status = trnRequestMetadata.Status;
 
         return new TrnRequestInfo()
         {
@@ -181,7 +168,7 @@ public class CreateTrnRequestHandler(
 #pragma warning restore TRS0001
             Trn = status is TrnRequestStatus.Completed ? trn : null,
             Status = status,
-            PotentialDuplicate = trnRequestMetadata.PotentialDuplicate!.Value,
+            PotentialDuplicate = trnRequestMetadata.PotentialDuplicate,
             AccessYourTeachingQualificationsLink = status is TrnRequestStatus.Completed ? aytqLink : null
         };
     }

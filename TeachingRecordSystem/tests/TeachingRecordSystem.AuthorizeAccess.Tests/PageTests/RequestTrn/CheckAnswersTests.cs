@@ -614,7 +614,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         await AssertSupportTaskCreatedAsync();
-        await AssertMetadataExpectedAsync(state, true, [person1.PersonId, person2.PersonId]);
+        await AssertMetadataExpectedAsync(state, expectedPotentialDuplicate: true);
     }
 
     [Fact]
@@ -641,15 +641,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         await AssertSupportTaskCreatedAsync();
-        await AssertMetadataExpectedAsync(state, true, [person.PersonId]);
+        await AssertMetadataExpectedAsync(state, expectedPotentialDuplicate: false);
     }
 
     [Fact]
     public async Task Post_CreatesEvent()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
         var state = CreateNewState();
 
         state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
@@ -666,21 +664,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         await AssertEventCreatedAsync();
     }
 
-    private Task AssertMetadataExpectedAsync(RequestTrnJourneyState request, bool expectedPotentialDuplicate, List<Guid>? potentialDuplicates = null) =>
+    private Task AssertMetadataExpectedAsync(RequestTrnJourneyState request, bool expectedPotentialDuplicate) =>
         base.WithDbContext(async dbContext =>
     {
-        if (expectedPotentialDuplicate && potentialDuplicates is null)
-        {
-            throw new ArgumentException("Define the list of expected potential duplicates");
-        }
-
         var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
 
         var metadata = await dbContext.TrnRequestMetadata
             .SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId);
         Assert.NotNull(metadata);
-
-        var expectedEmailAddress = request.PersonalEmail;
 
         var expectedName = new[] { request.FirstName, request.MiddleName, request.LastName }
             .Where(part => !string.IsNullOrEmpty(part));
@@ -714,15 +705,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         Assert.NotNull(metadata.NpqEvidenceFileId);
         Assert.NotNull(metadata.NpqEvidenceFileName);
         Assert.Equal(request.WorkEmail, metadata.WorkEmailAddress);
-
-        if (expectedPotentialDuplicate)
-        {
-            Assert.Equivalent(potentialDuplicates!.Select(x => new PostgresModels.TrnRequestMatchedPerson() { PersonId = x }), metadata.Matches!.MatchedPersons);
-        }
-        else
-        {
-            Assert.Equivalent(new List<PostgresModels.TrnRequestMatchedPerson>().AsReadOnly(), metadata.Matches!.MatchedPersons);
-        }
     });
 
     private Task AssertSupportTaskCreatedAsync() =>

@@ -299,7 +299,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             NpqEvidenceFileName = null,
             NpqName = null,
             NpqTrainingProvider = null,
-            NpqWorkingInEducationalSetting = null
+            NpqWorkingInEducationalSetting = null,
+            Status = TrnRequestStatus.Completed
         };
 
         var updatedEvent = new ApiTrnRequestSupportTaskUpdatedEvent

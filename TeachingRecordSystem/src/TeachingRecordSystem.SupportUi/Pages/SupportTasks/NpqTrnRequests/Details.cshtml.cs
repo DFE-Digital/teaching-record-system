@@ -41,7 +41,7 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator) : PageModel
 
         if (CreateRecord)
         {
-            return (SupportTask!.TrnRequestMetadata!.PotentialDuplicate ?? false) ?
+            return SupportTask!.TrnRequestMetadata!.PotentialDuplicate ?
                Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.Index(SupportTaskReference)) :
                Redirect(linkGenerator.SupportTasks.NpqTrnRequests.NoMatches.Index(SupportTaskReference));
         }

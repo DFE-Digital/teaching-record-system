@@ -857,11 +857,11 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         foreach (var personId in personIds)
         {
-            var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserId, t => t
+            var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserId, t => t
                 .WithCreatedOn(DateTime.Parse("1 Jan 2000"))
                 .WithResolvedPersonId(personId));
 
-            var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
+            var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
                 .WithCreatedOn(DateTime.Parse("1 Jan 2000")));
 
             await DbFixture.WithDbContextAsync(async dbContext =>
@@ -933,8 +933,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
                 City = null,
                 Postcode = null,
                 Country = null,
-                TrnToken = null,
-                Matches = new TrnRequestMatches() { MatchedPersons = [] }
+                TrnToken = null
             };
 
             var metadata2 = new TrnRequestMetadata
@@ -961,8 +960,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
                 City = null,
                 Postcode = null,
                 Country = null,
-                TrnToken = null,
-                Matches = new TrnRequestMatches() { MatchedPersons = [] }
+                TrnToken = null
             };
 
             metadata1.SetResolvedPerson(personId, TrnRequestStatus.Completed);
@@ -1022,10 +1020,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         foreach (var personId in personIds)
         {
-            var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserId, t => t
+            var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserId, t => t
                .WithMatchedPersons(personId));
 
-            var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
+            var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
                 .WithMatchedPersons(personId));
 
             supportTasks.Add(supportTask1);

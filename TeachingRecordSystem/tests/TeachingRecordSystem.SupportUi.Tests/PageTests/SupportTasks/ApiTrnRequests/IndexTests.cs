@@ -30,7 +30,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/api-trn-requests/");
 
@@ -66,7 +66,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var firstName = TestData.GenerateFirstName();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithFirstName(firstName));
 
@@ -88,7 +88,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var middleName = TestData.GenerateMiddleName();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithMiddleName(middleName));
 
@@ -110,7 +110,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var lastName = TestData.GenerateLastName();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithLastName(lastName));
 
@@ -133,7 +133,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var firstName = TestData.GenerateFirstName();
         var lastName = TestData.GenerateFirstName();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithFirstName(firstName).WithLastName(lastName));
 
@@ -155,7 +155,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var emailAddress = TestData.GenerateUniqueEmail();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             configure: t => t.WithEmailAddress(emailAddress));
 
@@ -179,7 +179,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = supportTask.CreatedOn.ToString(dateFormat);
 
@@ -199,11 +199,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
 
@@ -228,11 +228,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithFirstName("Zavier"));
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithFirstName("Aaron"));
 
@@ -257,11 +257,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithFirstName("Zavier"));
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithFirstName("Aaron"));
 
@@ -286,11 +286,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithEmailAddress("zavier@example.com"));
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithEmailAddress("aaron@example.com"));
 
@@ -315,11 +315,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithEmailAddress("zavier@example.com"));
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithEmailAddress("aaron@example.com"));
 
@@ -344,11 +344,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
 
@@ -373,11 +373,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
 
@@ -403,9 +403,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -429,9 +429,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
 
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        var (supportTask1, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
 
-        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
+        var (supportTask2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

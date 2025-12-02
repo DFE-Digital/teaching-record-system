@@ -29,7 +29,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
@@ -53,7 +53,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .WithMiddleName(TestData.GenerateMiddleName())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
@@ -63,7 +63,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var requestMetadata = supportTask.TrnRequestMetadata;
         Assert.NotNull(requestMetadata);
-        var comments = Faker.Lorem.Paragraph();
+        Faker.Lorem.Paragraph();
 
         EventObserver.Clear();
 

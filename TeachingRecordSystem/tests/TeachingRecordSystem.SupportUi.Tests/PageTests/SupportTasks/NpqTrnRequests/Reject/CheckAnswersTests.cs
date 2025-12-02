@@ -16,7 +16,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
@@ -49,7 +49,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
@@ -80,7 +80,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
-        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+        var (supportTask, _, _) = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
         var state = new RejectNpqTrnRequestState

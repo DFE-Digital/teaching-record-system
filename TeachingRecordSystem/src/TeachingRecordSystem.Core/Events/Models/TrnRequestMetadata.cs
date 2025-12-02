@@ -1,4 +1,4 @@
-using Dapper;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeachingRecordSystem.Core.Events.Models;
 
@@ -28,16 +28,15 @@ public record TrnRequestMetadata
     public required string? Country { get; init; }
     public required string? TrnToken { get; set; }
     public required Guid? ResolvedPersonId { get; set; }
-    public required TrnRequestMatches? Matches { get; set; }
+    public TrnRequestMatches? Matches { get; set; }
     public required bool? NpqWorkingInEducationalSetting { get; init; }
     public required string? NpqApplicationId { get; init; }
     public required string? NpqName { get; init; }
     public required string? NpqTrainingProvider { get; init; }
     public required Guid? NpqEvidenceFileId { get; init; }
     public required string? NpqEvidenceFileName { get; init; }
-
-    // TODO Make this required and non-nullable when we've migrated fully to new event system
-    public TrnRequestStatus? Status { get; init; }
+    [DisallowNull]
+    public required TrnRequestStatus? Status { get; init; }
 
     public static TrnRequestMetadata FromModel(DataStore.Postgres.Models.TrnRequestMetadata model) =>
         new()
@@ -66,18 +65,7 @@ public record TrnRequestMetadata
             Country = model.Country,
             TrnToken = model.TrnToken,
             ResolvedPersonId = model.ResolvedPersonId,
-            Status = model.Status ?? (model.ResolvedPersonId.HasValue ? TrnRequestStatus.Completed : TrnRequestStatus.Pending),
-            Matches = model.Matches is not null && model.Matches.MatchedPersons is not null ?
-                new TrnRequestMatches()
-                {
-                    MatchedPersons = model.Matches.MatchedPersons
-                        .Select(m => new TrnRequestMatchedPerson()
-                        {
-                            PersonId = m.PersonId
-                        })
-                        .AsList()
-                } :
-                null,
+            Status = model.Status,
             NpqApplicationId = model.NpqApplicationId,
             NpqEvidenceFileId = model.NpqEvidenceFileId,
             NpqEvidenceFileName = model.NpqEvidenceFileName,

@@ -26,7 +26,7 @@ public partial class TestData
         private Option<string> _requestId;
         private Option<string?> _emailAddress;
         private Option<DateTime?> _createdOn;
-        private Option<TrnRequestMatchedPerson[]> _matchedPersons;
+        private Option<Guid[]> _matchedPersonIds;
         private string? _fileName;
         private long _integrationTransactionId;
         private Option<SupportTaskStatus> _status;
@@ -75,7 +75,7 @@ public partial class TestData
 
         public CreateTeacherPensionsPotentialDuplicateTaskBuilder WithMatchedPersons(params Guid[] personIds)
         {
-            _matchedPersons = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
+            _matchedPersonIds = Option.Some(personIds);
             return this;
         }
 
@@ -109,14 +109,14 @@ public partial class TestData
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
             var gender = _gender.ValueOr(testData.GenerateGender());
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
-            var matchedPersons = _matchedPersons.ValueOrDefault();
+            var matchedPersons = _matchedPersonIds.ValueOrDefault();
             var integrationTransactionId = _integrationTransactionId;
             var fileName = _fileName ?? string.Empty;
 
             var trnRequestMetadata = new TrnRequestMetadata()
             {
                 ApplicationUserId = userId,
-                RequestId = Guid.NewGuid().ToString(),
+                RequestId = trnRequestId,
                 CreatedOn = testData.Clock.UtcNow,
                 IdentityVerified = null,
                 OneLoginUserSubject = null,
@@ -125,15 +125,10 @@ public partial class TestData
                 MiddleName = middleName,
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
-                EmailAddress = null,
+                EmailAddress = emailAddress,
                 NationalInsuranceNumber = nationalInsuranceNumber,
                 Gender = gender,
-                PotentialDuplicate = true,
-                Matches = new TrnRequestMatches()
-                {
-                    MatchedPersons = matchedPersons
-
-                }
+                PotentialDuplicate = true
             };
             var supportTask = SupportTask.Create(
                 SupportTaskType.TeacherPensionsPotentialDuplicate,
@@ -162,7 +157,6 @@ public partial class TestData
                 return supportTask;
             });
         }
-
     }
 }
 

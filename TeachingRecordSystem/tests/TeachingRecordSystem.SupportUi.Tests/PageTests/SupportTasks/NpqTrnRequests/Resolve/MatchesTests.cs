@@ -17,15 +17,15 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 MatchOutcome = TrnRequestMatchResultOutcome.PotentialMatches,
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true
             });
 
@@ -69,7 +69,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithStatus(SupportTaskStatus.Closed));
 
@@ -87,12 +87,12 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
             .WithMiddleName(TestData.GenerateMiddleName())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
             .WithGender(TestData.GenerateGender()));
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -124,9 +124,9 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber()
             .WithGender(TestData.GenerateGender()));
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure => configure.WithMatchedPersons(matchedPerson.PersonId));
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure => configure.WithMatchedPersons(matchedPerson.PersonId));
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, useFactory: false);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds, useFactory: false);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -159,7 +159,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             .WithGender(false)
             .WithMiddleName(""));
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
         {
             configure.WithMiddleName("John");
             configure.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
@@ -168,7 +168,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             configure.WithMatchedPersons(matchedPerson.PersonId);
         });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, useFactory: false);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds, useFactory: false);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -204,7 +204,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             .WithGender(false)
             .WithMiddleName(""));
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
         {
             configure.WithMiddleName(null);
             configure.WithNationalInsuranceNumber(null);
@@ -212,7 +212,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             configure.WithMatchedPersons(matchedPerson.PersonId);
         });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, useFactory: false);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds, useFactory: false);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -244,7 +244,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var initialMatchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId, t => t
                 .WithFirstName(initialMatchedPerson.FirstName)
                 .WithLastName(initialMatchedPerson.LastName)
@@ -258,7 +258,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             .WithDateOfBirth(initialMatchedPerson.DateOfBirth)
             .WithNationalInsuranceNumber(initialMatchedPerson.NationalInsuranceNumber!));
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -296,7 +296,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             p.WithNationalInsuranceNumber(nationalInsuranceNumber);
         });
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
@@ -310,7 +310,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
             );
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -345,7 +345,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             p.WithEmailAddress(emailAddress);
         });
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
@@ -357,7 +357,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
             );
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -380,7 +380,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithEmailAddress("something+test@education.gov.uk"));
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
         {
             configure.WithMiddleName("John");
             configure.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
@@ -388,7 +388,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             configure.WithMatchedPersons(matchedPerson.PersonId);
         });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, useFactory: false);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds, useFactory: false);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -411,9 +411,9 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithAlert().WithEmailAddress());
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -436,9 +436,9 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithQts().WithEmailAddress());
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -461,9 +461,9 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts().WithEmailAddress());
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -485,15 +485,15 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var firstMatchId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId;
+        var firstMatchId = matchedPersonIds[0];
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 MatchOutcome = TrnRequestMatchResultOutcome.PotentialMatches,
                 PersonId = firstMatchId
             });
@@ -518,13 +518,13 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 MatchOutcome = TrnRequestMatchResultOutcome.PotentialMatches,
                 PersonId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel
             });
@@ -562,7 +562,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
@@ -596,7 +596,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                         : TestData.GenerateChangedGender(matchedPerson.Gender!)));
 
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, useFactory: false);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds, useFactory: false);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -623,13 +623,13 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithStatus(SupportTaskStatus.Closed));
 
-        var personId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId;
+        var personId = matchedPersonIds[0];
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -650,12 +650,12 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var unmatchedPerson = await TestData.CreatePersonAsync();
         var personId = unmatchedPerson.PersonId;
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -676,9 +676,9 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -699,11 +699,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var personId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId;
+        var personId = matchedPersonIds[0];
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -730,11 +730,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var personId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel;
 
-        var journeyInstance = await CreateJourneyInstance(supportTask);
+        var journeyInstance = await CreateJourneyInstance(supportTask, matchedPersonIds);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -761,7 +761,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var selectedPersonId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel;
 
@@ -769,8 +769,8 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                MatchedPersonIds = matchedPersonIds,
+                PersonId = matchedPersonIds[0],
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
@@ -802,7 +802,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var selectedPersonId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel;
 
@@ -810,7 +810,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = selectedPersonId,
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = PersonAttributeSource.ExistingRecord,
@@ -843,7 +843,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var selectedPersonId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel;
 
@@ -851,7 +851,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                MatchedPersonIds = matchedPersonIds,
                 PersonId = selectedPersonId,
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = PersonAttributeSource.ExistingRecord,
@@ -898,13 +898,16 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         }
     }
 
-    private async Task<JourneyInstance<ResolveNpqTrnRequestState>> CreateJourneyInstance(SupportTask supportTask, bool useFactory = true)
+    private async Task<JourneyInstance<ResolveNpqTrnRequestState>> CreateJourneyInstance(
+        SupportTask supportTask,
+        Guid[] matchedPersonIds,
+        bool useFactory = true)
     {
         var state = useFactory
             ? await CreateJourneyStateWithFactory<ResolveNpqTrnRequestStateFactory, ResolveNpqTrnRequestState>(factory => factory.CreateAsync(supportTask))
             : new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly()
+                MatchedPersonIds = matchedPersonIds
             };
 
         return await CreateJourneyInstance(supportTask.SupportTaskReference, state);

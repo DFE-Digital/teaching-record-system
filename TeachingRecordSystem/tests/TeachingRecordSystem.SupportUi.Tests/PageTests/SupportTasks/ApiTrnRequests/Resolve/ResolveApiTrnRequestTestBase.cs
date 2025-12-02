@@ -8,7 +8,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
@@ -31,7 +31,6 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         var matchedPerson = await TestData.CreatePersonAsync(p =>
         {
             p
-
                 .WithNationalInsuranceNumber()
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
                 .WithGender(TestData.GenerateGender());
@@ -42,7 +41,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
             }
         });
 
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUserId,
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)

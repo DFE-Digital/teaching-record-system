@@ -986,7 +986,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
         Assert.True(trnRequest.PotentialDuplicate);
-        Assert.Contains(trnRequest.Matches?.MatchedPersons!, p => p.PersonId == existingPerson.PersonId);
     }
 
     [Fact]
@@ -1043,7 +1042,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
         Assert.True(trnRequest.PotentialDuplicate);
-        Assert.Contains(trnRequest.Matches?.MatchedPersons!, p => p.PersonId == existingPerson.PersonId);
     }
 
     [Fact]
@@ -1190,7 +1188,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
         Assert.True(trnRequest.PotentialDuplicate);
-        Assert.Contains(trnRequest.Matches?.MatchedPersons!, p => p.PersonId == existingPerson.PersonId);
     }
 
     [Fact]
@@ -1250,7 +1247,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
         Assert.True(trnRequest.PotentialDuplicate);
-        Assert.Empty(trnRequest.Matches?.MatchedPersons!);
     }
 
     [Fact]
@@ -1308,7 +1304,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
         Assert.True(trnRequest.PotentialDuplicate);
-        Assert.Empty(trnRequest.Matches?.MatchedPersons!);
     }
 
     [Fact]
@@ -1365,7 +1360,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
         Assert.True(trnRequest.PotentialDuplicate);
-        Assert.Contains(trnRequest.Matches?.MatchedPersons!, p => p.PersonId == existingPerson.PersonId);
     }
 
     [Fact]
