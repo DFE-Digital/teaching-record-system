@@ -46,14 +46,14 @@ public class ResolveTeacherPensionsPotentialDuplicateStateFactory(TrnRequestServ
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.TeacherPensionsPotentialDuplicate);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var matchResult = await trnRequestService.MatchPersonsAsync(requestData);
+        var matchResult = await trnRequestService.MatchPersonsAsync(requestData, excludePersonIds: supportTask.PersonId!.Value);
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
             MatchedPersonIds = matchResult.Outcome switch
             {
                 MatchPersonsResultOutcome.DefiniteMatch => [matchResult.PersonId],
-                MatchPersonsResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds.Where(x => x != supportTask.PersonId).ToArray(),
+                MatchPersonsResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds,
                 _ => []
             }
         };

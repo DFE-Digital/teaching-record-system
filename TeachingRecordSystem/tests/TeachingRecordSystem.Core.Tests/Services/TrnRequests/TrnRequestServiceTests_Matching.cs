@@ -50,6 +50,58 @@ public partial class TrnRequestServiceTests
         Assert.Contains(person.PersonId, result.PotentialMatchesPersonIds);
     }
 
+    [Fact]
+    public async Task MatchPersonsAsync_WithOneMatchOnNinoAndDobAndOtherMatchesOnDifferentFields_ReturnDefiniteMatch()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+
+        var person1 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber)));
+
+        var requestData = new TrnRequestMetadata()
+        {
+            ApplicationUserId = applicationUser.UserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            EmailAddress = null,
+            OneLoginUserSubject = null,
+            FirstName = lastName,
+            MiddleName = middleName,
+            LastName = firstName,
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            Name = [lastName, firstName, middleName],
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
+
+        // Act
+        var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
+
+        // Assert
+        Assert.Equal(MatchPersonsResultOutcome.DefiniteMatch, result.Outcome);
+        Assert.Equal(person1.PersonId, result.PersonId);
+    }
+
     [Theory]
     [MemberData(nameof(GetMatchFromTrnRequestData))]
     [MemberData(nameof(GetMatchFromTrnRequestDataWithMissingNino))]

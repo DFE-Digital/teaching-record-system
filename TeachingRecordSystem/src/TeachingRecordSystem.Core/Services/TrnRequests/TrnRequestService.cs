@@ -282,27 +282,40 @@ public class TrnRequestService(
         return true;
     }
 
-    public async Task<MatchPersonsResult> MatchPersonsAsync(TrnRequestMetadata request)
+    public async Task<MatchPersonsResult> MatchPersonsAsync(TrnRequestMetadata request, params Guid[] excludePersonIds)
     {
-        var results = await GetMatchesFromTrnRequestAsync(request);
+        var results = (await GetMatchesFromTrnRequestAsync(request)).ToList();
+        results.RemoveAll(r => excludePersonIds.Contains(r.person_id));
 
-        return (request, results) switch
+        if (results.Count == 0)
         {
-#pragma warning disable format
-            ({NationalInsuranceNumber: var nino}, [{
+            return MatchPersonsResult.NoMatches();
+        }
+
+        var matchedOnDobAndNino = results.Where(r => r is { date_of_birth_matches: true, national_insurance_number_matches: true }).ToArray();
+
+        if (matchedOnDobAndNino is [var singleDobAndNinoMatch])
+        {
+            return MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.person_id, singleDobAndNinoMatch.trn);
+        }
+
+        var matchedOnNameDateOfBirthEmailAndGender = results
+            .Where(r => r is
+            {
                 first_name_matches: true,
                 last_name_matches: true,
                 date_of_birth_matches: true,
                 email_address_matches: true,
                 gender_matches: true
-            } singleMatch]) when String.IsNullOrEmpty(nino) =>
-                MatchPersonsResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
-            (_, [{ date_of_birth_matches: true, national_insurance_number_matches: true } singleMatch]) =>
-                MatchPersonsResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
-#pragma warning restore format
-            (_, []) => MatchPersonsResult.NoMatches(),
-            _ => MatchPersonsResult.PotentialMatches(results.Select(r => r.person_id))
-        };
+            })
+            .ToArray();
+
+        if (matchedOnNameDateOfBirthEmailAndGender is [var singleNameDobEmailGenderMatch] && string.IsNullOrEmpty(request.NationalInsuranceNumber))
+        {
+            return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.person_id, singleNameDobEmailGenderMatch.trn);
+        }
+
+        return MatchPersonsResult.PotentialMatches(results.Select(r => r.person_id));
     }
 
     public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedPersonMatchesAsync(TrnRequestMetadata request)
