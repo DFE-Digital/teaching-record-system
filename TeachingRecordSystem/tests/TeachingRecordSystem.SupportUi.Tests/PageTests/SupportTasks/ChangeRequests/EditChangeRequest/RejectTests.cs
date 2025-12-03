@@ -277,7 +277,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
 
         EventObserver.AssertEventsSaved(e =>
         {
-            SupportTaskUpdatedEvent? actualEvent;
+            LegacyEvents.SupportTaskUpdatedEvent? actualEvent;
             if (isNameChange)
             {
                 actualEvent = Assert.IsType<ChangeNameRequestSupportTaskCancelledEvent>(e);
