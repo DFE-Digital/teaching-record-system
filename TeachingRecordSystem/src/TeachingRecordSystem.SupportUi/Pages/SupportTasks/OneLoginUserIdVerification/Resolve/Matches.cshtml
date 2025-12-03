@@ -6,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link asp-page="/SupportTasks/OneLoginUserIdVerification/Resolve/Index">Back</govuk-back-link> @* TODO CML *@
+    <govuk-back-link asp-page=@LinkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveDetails(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)>Back</govuk-back-link>
 }
 
 <form action="" method="post">
@@ -23,23 +23,23 @@
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Name</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.Email</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Email</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value> @* CML TODO *@
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value> @* CML TODO *@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>National insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.NationalInsuranceNumber</govuk-summary-list-row-value> @* CML TODO *@
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value> @* CML TODO *@
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>
@@ -47,23 +47,23 @@
             @foreach (var match in Model.SuggestedMatches!)
             {
                 <govuk-summary-card data-testid="match">
-                    <govuk-summary-card-title>Record TODO</govuk-summary-card-title>
+                    <govuk-summary-card-title>Record @match.Identifier</govuk-summary-card-title>
                     <govuk-summary-list>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@(match.FirstName + " " + match.LastName)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(StringHelper.JoinNonEmpty(' ', match.FirstName, match.LastName) != Model.Name)">@($"{match.FirstName} {match.LastName}")</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@match.EmailAddress</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(match.EmailAddress != Model.Email)">@match.EmailAddress</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@match.DateOfBirth!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(match.DateOfBirth != Model.DateOfBirth)">@match.DateOfBirth!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@match.Trn</govuk-summary-list-row-value> @* CML TODO *@
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(match.Trn != Model.Trn)">@match.Trn</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
@@ -75,6 +75,22 @@
         </div>
     </div>
 
-    
-
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <govuk-radios for="PersonId">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login account?</h2></govuk-radios-fieldset-legend>
+                    @foreach (var match in Model.SuggestedMatches)
+                    {
+                        <govuk-radios-item value="@match.PersonId">Connect it to Record @match.Identifier</govuk-radios-item>
+                    }
+                    <govuk-radios-item value="none">Do not connect it to a record</govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            <div class="govuk-grid-column-two-thirds-from-desktop">
+                <button type="submit" class="govuk-button" data-testid="continue-button">Continue</button>
+                <button type="submit" action="cancel" class="govuk-button govuk-button--secondary" data-testid="cancel-button">Cancel</button>
+            </div>
+        </div>
+    </div>
 </form>

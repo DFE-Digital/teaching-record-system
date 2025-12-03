@@ -69,7 +69,9 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         await CreateSupportTasksWithOneLoginUsersAsync();
         var supportTask = SupportTasks![0];
-        var oneLoginRequestData = supportTask.Data as OneLoginUserIdVerificationData;
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
+        var person = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
+
         var journeyState = new ResolveOneLoginUserIdVerificationState
         {
             CanIdentityBeVerified = true
@@ -90,41 +92,12 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', oneLoginRequestData!.StatedFirstName, oneLoginRequestData.StatedLastName), requestDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(oneLoginRequestData.StatedDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTaskData!.StatedFirstName, supportTaskData.StatedLastName), requestDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(supportTaskData.StatedDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(OneLoginUsers![0].EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
-        Assert.Equal(oneLoginRequestData.StatedNationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
-        Assert.Equal(oneLoginRequestData.StatedTrn, requestDetails.GetSummaryListValueByKey("TRN"));
+        Assert.Equal(supportTaskData.StatedNationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(supportTaskData.StatedTrn, requestDetails.GetSummaryListValueByKey("TRN"));
     }
-
-    //[Fact]
-    //public async Task Get_ValidRequest_ShowsDetailsOfMatchedRecords()
-    //{
-    //    // Arrange
-    //    await CreateSupportTasksWithOneLoginUsersAsync();
-    //    var supportTask = SupportTasks![0];
-    //    var oneLoginRequestData = supportTask.Data as OneLoginUserIdVerificationData;
-    //    var journeyInstance = await CreateJourneyInstance(supportTask);
-
-    //    var request = new HttpRequestMessage(
-    //        HttpMethod.Get,
-    //        $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
-
-    //    // Assert
-    //    var doc = await response.GetDocumentAsync();
-    //    var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
-    //    Assert.NotNull(firstMatchDetails);
-    //    Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-    //    Assert.Equal(matchedPerson.MiddleName, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
-    //    Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
-    //    Assert.Equal(matchedPerson.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
-    //    Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueByKey("Email address"));
-    //    Assert.Equal(matchedPerson.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
-    //    Assert.Equal(matchedPerson.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));
-    //}
 
     [Fact]
     public async Task Get_MatchedRecords_NullableFieldsEmptyInRecordButPopulatedInRequest_ShowsHighlightedNotProvided()
@@ -152,6 +125,52 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             journeyState,
             new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+
+        // match on NI number appears first
+        var nextMatchDetails = doc.GetAllElementsByTestId("match")[0];
+        Assert.NotNull(nextMatchDetails);
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', person2.FirstName, person2.LastName), nextMatchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(person2.NationalInsuranceNumber, nextMatchDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), nextMatchDetails.GetSummaryListValueByKey("Date of birth"));
+        AssertMatchRowHasExpectedHighlight(nextMatchDetails, "Name", true);
+        AssertMatchRowHasExpectedHighlight(nextMatchDetails, "Date of birth", true);
+
+        // match on surname and DOB appears second
+        var firstMatchDetails = doc.GetAllElementsByTestId("match")[1];
+        Assert.NotNull(firstMatchDetails);
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', person1.FirstName, person1.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("National Insurance number"));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "National Insurance number", true);
+    }
+
+    [Fact]
+    public async Task Get_MatchedRecords_NullableFieldsEmptyInRecordAndEmptyInRequest_ShowsNotProvidedNotHighlighted()
+    {
+        // Arrange
+        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject);
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
+
+        // Person who matches on last name & DOB
+        var person1 = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
+
+        var journeyState = new ResolveOneLoginUserIdVerificationState
+        {
+            CanIdentityBeVerified = true
+        };
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ResolveOneLoginUserIdVerification,
+            journeyState,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -162,164 +181,89 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await response.GetDocumentAsync();
+
+        // match on surname and DOB appears second
         var firstMatchDetails = doc.GetAllElementsByTestId("match")[0];
         Assert.NotNull(firstMatchDetails);
         Assert.Equal(StringHelper.JoinNonEmpty(' ', person1.FirstName, person1.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("National Insurance number"));
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "National Insurance number", true);
-
-        var nextMatchDetails = doc.GetAllElementsByTestId("match")[1];
-        Assert.NotNull(nextMatchDetails);
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', person2.FirstName, person2.LastName), nextMatchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(person2.NationalInsuranceNumber, nextMatchDetails.GetSummaryListValueByKey("National Insurance number"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, nextMatchDetails.GetSummaryListValueByKey("Date of birth"));
-        AssertMatchRowHasExpectedHighlight(nextMatchDetails, "Name", true);
-        AssertMatchRowHasExpectedHighlight(nextMatchDetails, "Date of birth", true);
     }
 
-    //[Fact]
-    //public async Task Get_MatchedRecords_NullableFieldsEmptyInRecordAndEmptyInRequest_ShowsNotProvidedNotHighlighted()
-    //{
-    //    // Arrange
-    //    //var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers![0].Subject);
-    //    var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers![0].Subject, options => 
-    //    {
-    //        options.WithStatedNationalInsuranceNumber(null);
-    //    });
-    //    var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
-    //    var matchingPerson = await TestData.CreatePersonAsync(p => p
-    //        .WithNationalInsuranceNumber(false)
-    //        .WithFirstName(supportTaskData!.StatedFirstName)
-    //        .WithLastName(supportTaskData.StatedLastName)
-    //        .WithMiddleName(""));
+    [Fact]
+    public async Task Get_WithDefiniteMatch_ShowsExpectedMergeOptions()
+    {
+        // Arrange
+        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject, options =>
+        {
+            options.WithStatedNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
+        });
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
 
-    //    var journeyState = new ResolveOneLoginUserIdVerificationState
-    //    {
-    //        CanIdentityBeVerified = true
-    //    };
-    //    var journeyInstance = await CreateJourneyInstance(
-    //        JourneyNames.ResolveOneLoginUserIdVerification,
-    //        journeyState,
-    //        new KeyValuePair<string, object>("supportTaskReference", SupportTasks![0].SupportTaskReference));
+        // Person who matches on last name & DOB
+        var person1 = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
 
+        // Person who matches on NINO
+        var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(supportTaskData!.StatedNationalInsuranceNumber!));
 
-    //    var request = new HttpRequestMessage(
-    //        HttpMethod.Get,
-    //        $"/support-tasks/one-login-user-id-verification/{SupportTasks![0].SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var journeyState = new ResolveOneLoginUserIdVerificationState
+        {
+            CanIdentityBeVerified = true
+        };
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ResolveOneLoginUserIdVerification,
+            journeyState,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-    //    // Assert
-    //    var doc = await response.GetDocumentAsync();
-    //    var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
-    //    Assert.NotNull(firstMatchDetails);
-    //    Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-    //    Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
-    //    Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
-    //    Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
+        // Act
+        var response = await HttpClient.SendAsync(request);
 
-    //    AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
-    //    AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", false);
-    //}
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var radioInputs = doc.QuerySelectorAll("input[type='radio']");
+        Assert.Equal(3, radioInputs.Length);
+        Assert.Equal("Connect it to Record A", radioInputs[0].NextElementSibling?.TextContent.Trim());
+        Assert.Equal("Connect it to Record B", radioInputs[1].NextElementSibling?.TextContent.Trim());
+        Assert.Equal("Do not connect it to a record", radioInputs[2].NextElementSibling?.TextContent.Trim());
+    }
 
-    //[Fact]
-    //public async Task Get_WithDefiniteMatch_ShowsMergeRecordButton()
-    //{
-    //    // Arrange
-    //    var applicationUser = await TestData.CreateApplicationUserAsync();
-    //    var firstName = TestData.GenerateFirstName();
-    //    var middleName = TestData.GenerateMiddleName();
-    //    var lastName = TestData.GenerateLastName();
-    //    var dateOfBirth = TestData.GenerateDateOfBirth();
-    //    var emailAddress = TestData.GenerateUniqueEmail();
-    //    var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+    [Fact]
+    public async Task Get_WithNoMatches_RedirectsToNoMatchesPage()
+    {
+        // Arrange
+        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject, options =>
+        {
+            options.WithStatedNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
+        });
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
 
-    //    var matchedPerson = await TestData.CreatePersonAsync(p =>
-    //    {
-    //        p.WithFirstName(firstName);
-    //        p.WithMiddleName(middleName);
-    //        p.WithLastName(lastName);
-    //        p.WithDateOfBirth(dateOfBirth);
-    //        p.WithEmailAddress(emailAddress);
-    //        p.WithNationalInsuranceNumber(nationalInsuranceNumber);
-    //    });
+        var person1 = await TestData.CreatePersonAsync();
 
-    //    var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-    //        applicationUser.UserId,
-    //        t => t
-    //            .WithMatchedPersons(matchedPerson.PersonId)
-    //            .WithStatus(SupportTaskStatus.Open)
-    //            .WithFirstName(firstName)
-    //            .WithMiddleName(middleName)
-    //            .WithLastName(lastName)
-    //            .WithDateOfBirth(dateOfBirth)
-    //            .WithGender(matchedPerson.Gender)
-    //            .WithEmailAddress(emailAddress)
-    //            .WithNationalInsuranceNumber(nationalInsuranceNumber)
-    //        );
+        var journeyState = new ResolveOneLoginUserIdVerificationState
+        {
+            CanIdentityBeVerified = true
+        };
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ResolveOneLoginUserIdVerification,
+            journeyState,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
-    //    var journeyInstance = await CreateJourneyInstance(supportTask);
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-    //    var request = new HttpRequestMessage(
-    //        HttpMethod.Get,
-    //        $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+        // Act
+        var response = await HttpClient.SendAsync(request);
 
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
-
-    //    // Assert
-    //    var doc = await response.GetDocumentAsync();
-    //    Assert.NotEmpty(doc.GetAllElementsByTestId("merge-record-button"));
-    //}
-
-    //[Fact]
-    //public async Task Get_WithNoMatches_RedirectsToNoMatchesPage()
-    //{
-    //    // Arrange
-    //    var applicationUser = await TestData.CreateApplicationUserAsync();
-    //    var firstName = TestData.GenerateFirstName();
-    //    var middleName = TestData.GenerateMiddleName();
-    //    var lastName = TestData.GenerateLastName();
-    //    var dateOfBirth = TestData.GenerateDateOfBirth();
-    //    var emailAddress = TestData.GenerateUniqueEmail();
-    //    var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-
-    //    var matchedPerson = await TestData.CreatePersonAsync(p =>
-    //    {
-    //        p.WithFirstName(firstName);
-    //        p.WithMiddleName(middleName);
-    //        p.WithLastName(lastName);
-    //        p.WithDateOfBirth(dateOfBirth);
-    //        p.WithEmailAddress(emailAddress);
-    //    });
-
-    //    var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-    //        applicationUser.UserId,
-    //        t => t
-    //            .WithMatchedPersons(matchedPerson.PersonId)
-    //            .WithStatus(SupportTaskStatus.Open)
-    //            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
-    //            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
-    //            .WithLastName(TestData.GenerateChangedLastName(lastName))
-    //            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
-    //            .WithEmailAddress(TestData.GenerateUniqueEmail())
-    //        );
-
-    //    var journeyInstance = await CreateJourneyInstance(supportTask);
-
-    //    var request = new HttpRequestMessage(
-    //        HttpMethod.Get,
-    //        $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
-
-    //    // Assert
-    //    var doc = await response.GetDocumentAsync();
-
-    //    // CML TODO: assert redirect
-    //}
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
 
     private void AssertMatchRowHasExpectedHighlight(IElement matchDetails, string summaryListKey, bool expectHighlight)
     {

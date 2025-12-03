@@ -43,7 +43,7 @@
                     @foreach (var result in Model.Results!)
                     {
                         <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                            <th scope="row" class="govuk-table__header" data-testid="name"><a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Details(result.SupportTaskReference)">@result.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-testid="name"><a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveDetails(result.SupportTaskReference)">@result.Name</a></th>
                             <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                             <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
                         </tr>
