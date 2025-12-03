@@ -113,7 +113,7 @@ public class TrnRequestServiceTests : ServiceTestBase
         var result = await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
 
         // Assert
-        Assert.False(result.PotentialDuplicate);
+        Assert.False(result.TrnRequest.PotentialDuplicate);
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class TrnRequestServiceTests : ServiceTestBase
         var result = await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
 
         // Assert
-        Assert.True(result.PotentialDuplicate);
+        Assert.True(result.TrnRequest.PotentialDuplicate);
     }
 
     [Fact]
@@ -163,7 +163,7 @@ public class TrnRequestServiceTests : ServiceTestBase
         var result = await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
 
         // Assert
-        Assert.False(result.PotentialDuplicate);
+        Assert.False(result.TrnRequest.PotentialDuplicate);
     }
 
     [Fact]
@@ -359,8 +359,8 @@ public class TrnRequestServiceTests : ServiceTestBase
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(applicationUser.UserId, result.ApplicationUserId);
-        Assert.Equal(trnRequest.RequestId, result.RequestId);
+        Assert.Equal(applicationUser.UserId, result.TrnRequest.ApplicationUserId);
+        Assert.Equal(trnRequest.RequestId, result.TrnRequest.RequestId);
     }
 
     [Fact]
@@ -385,7 +385,7 @@ public class TrnRequestServiceTests : ServiceTestBase
         var result = await WithServiceAsync(s => s.GetTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId));
 
         // Assert
-        Assert.NotNull(result?.TrnToken);
+        Assert.NotNull(result?.TrnRequest.TrnToken);
     }
 
     [Theory]

@@ -7,7 +7,7 @@ public record CreateTrnRequestOptions
     public required Guid ApplicationUserId { get; init; }
     public required string RequestId { get; init; }
     public required CreateTrnRequestOptionsOneLoginUserInfo? OneLoginUserInfo { get; init; }
-    public required string EmailAddress { get; init; }
+    public required string? EmailAddress { get; init; }
     public required string? FirstName { get; init; }
     public required string? MiddleName { get; init; }
     public required string? LastName { get; init; }

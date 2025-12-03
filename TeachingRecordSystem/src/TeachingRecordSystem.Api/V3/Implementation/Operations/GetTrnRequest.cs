@@ -1,42 +1,29 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using TrnRequestInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.TrnRequestInfo;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 public record GetTrnRequestCommand(string RequestId) : ICommand<TrnRequestInfo>;
 
-public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider) :
+public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider) :
     ICommandHandler<GetTrnRequestCommand, TrnRequestInfo>
 {
     public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(GetTrnRequestCommand command)
     {
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        var requestData = await dbContext.TrnRequestMetadata
-            .SingleOrDefaultAsync(m => m.ApplicationUserId == currentApplicationUserId && m.RequestId == command.RequestId);
+        var trnRequestInfo = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId);
 
-        if (requestData is null)
+        if (trnRequestInfo is null)
         {
             return ApiError.TrnRequestDoesNotExist(command.RequestId);
         }
 
-        var resolvedPersonTrn = requestData.ResolvedPersonId is Guid resolvedPersonId ?
-            await dbContext.Persons
-                .IgnoreQueryFilters()
-                .Where(p => p.PersonId == resolvedPersonId)
-                .Select(p => p.Trn)
-                .SingleAsync() :
-            null;
-
-        var status = requestData.Status;
-        var trn = status == TrnRequestStatus.Completed ? resolvedPersonTrn : null;
-
-        if (await trnRequestService.TryEnsureTrnTokenAsync(requestData, resolvedPersonTrn!))
-        {
-            await dbContext.SaveChangesAsync();
-        }
+        var trnRequest = trnRequestInfo.TrnRequest;
+        var status = trnRequest.Status;
+        var trn = status == TrnRequestStatus.Completed ? trnRequestInfo.ResolvedPersonTrn : null;
 
         return new TrnRequestInfo()
         {
@@ -45,17 +32,17 @@ public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnR
             Person = new TrnRequestInfoPerson()
 #pragma warning restore TRS0001
             {
-                FirstName = requestData.FirstName!,
-                LastName = requestData.LastName!,
-                MiddleName = requestData.MiddleName,
-                EmailAddress = requestData.EmailAddress,
-                NationalInsuranceNumber = requestData.NationalInsuranceNumber,
-                DateOfBirth = requestData.DateOfBirth
+                FirstName = trnRequest.FirstName!,
+                LastName = trnRequest.LastName!,
+                MiddleName = trnRequest.MiddleName,
+                EmailAddress = trnRequest.EmailAddress,
+                NationalInsuranceNumber = trnRequest.NationalInsuranceNumber,
+                DateOfBirth = trnRequest.DateOfBirth
             },
             Trn = trn,
             Status = status,
-            PotentialDuplicate = requestData.PotentialDuplicate,
-            AccessYourTeachingQualificationsLink = requestData is { TrnToken: string trnToken, Status: TrnRequestStatus.Completed } ?
+            PotentialDuplicate = trnRequest.PotentialDuplicate,
+            AccessYourTeachingQualificationsLink = trnRequest is { TrnToken: string trnToken, Status: TrnRequestStatus.Completed } ?
                 trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) :
                 null
         };
