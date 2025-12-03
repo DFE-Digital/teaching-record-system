@@ -1,5 +1,6 @@
 @page "/support-tasks/npq-trn-requests/{supportTaskReference}/resolve/matches/{handler?}"
 @using TeachingRecordSystem.Core.Services.PersonMatching
+@using TeachingRecordSystem.Core.Services.TrnRequests
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.MatchesModel
 @{
     ViewBag.Title = "Compare potential duplicate records";
@@ -21,13 +22,13 @@
     </div>
     <div class="govuk-grid-row">
         <div class=@(showDuplicatesSideBySide ? "govuk-grid-column-full-from-desktop" : "govuk-grid-column-two-thirds-from-desktop")>
-            @if (Model.MatchOutcome == TrnRequestMatchResultOutcome.DefiniteMatch)
+            @if (Model.MatchOutcome == MatchPersonsResultOutcome.DefiniteMatch)
             {
                 <govuk-inset-text class="govuk-!-margin-top-0">
                     This request matches an existing record. To complete the task, you need to merge the request with the record.
                 </govuk-inset-text>
             }
-            else if (Model.MatchOutcome == TrnRequestMatchResultOutcome.NoMatches)
+            else if (Model.MatchOutcome == MatchPersonsResultOutcome.NoMatches)
             {
                 <govuk-inset-text class="govuk-!-margin-top-0">
                     This record is no longer flagged as a potential duplicate. You can now create a new record.
@@ -38,7 +39,7 @@
                 <govuk-inset-text class="govuk-!-margin-top-0">
                     Differences are <highlight>highlighted</highlight> on the existing records
                 </govuk-inset-text>
-            }            
+            }
 
             <div class="trs-potential-duplicates @(showDuplicatesSideBySide ? "trs-potential-duplicates--side-by-side" : "")">
                 <govuk-summary-card data-testid="request" class="trs-potential-duplicates__item">
@@ -99,7 +100,7 @@
                     </govuk-summary-list>
                 </govuk-summary-card>
 
-                @if (!showDuplicatesSideBySide && Model.MatchOutcome == TrnRequestMatchResultOutcome.PotentialMatches)
+                @if (!showDuplicatesSideBySide && Model.MatchOutcome == MatchPersonsResultOutcome.PotentialMatches)
                 {
                     <h2 class="govuk-heading-m">Potential matches</h2>
                 }
@@ -210,7 +211,7 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
-            @if (Model.MatchOutcome == TrnRequestMatchResultOutcome.PotentialMatches)
+            @if (Model.MatchOutcome == MatchPersonsResultOutcome.PotentialMatches)
             {
                 <govuk-radios for="PersonId">
                     <govuk-radios-fieldset>
@@ -232,15 +233,15 @@
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>
-            }            
+            }
 
             <div class="govuk-button-group">
-                @if (Model.MatchOutcome == TrnRequestMatchResultOutcome.DefiniteMatch)
+                @if (Model.MatchOutcome == MatchPersonsResultOutcome.DefiniteMatch)
                 {
                     <input type="hidden" asp-for="PersonId" value="@Model.PotentialDuplicates[0].PersonId" />
                     <govuk-button type="submit" data-testid="merge-record-button">Merge this request with Record A</govuk-button>
                 }
-                else if (Model.MatchOutcome == TrnRequestMatchResultOutcome.NoMatches)
+                else if (Model.MatchOutcome == MatchPersonsResultOutcome.NoMatches)
                 {
                     <input type="hidden" asp-for="PersonId" value="@ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel" />
                     <govuk-button type="submit" data-testid="create-new-record-button">Create a record from this request</govuk-button>

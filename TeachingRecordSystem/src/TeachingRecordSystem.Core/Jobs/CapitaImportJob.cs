@@ -9,11 +9,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
+public class CapitaImportJob(
+    [FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient,
+    ILogger<CapitaImportJob> logger,
+    TrsDbContext dbContext,
+    IClock clock,
+    TrnRequestService trnRequestService,
+    IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 4 * * *";
     public const string StorageContainer = "capita-integrations";
@@ -175,10 +181,10 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
                         await dbContext.AddEventAndBroadcastAsync(createdEvent);
                         personId = newPerson.PersonId;
 
-                        var potentialMatches = await personMatchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
+                        var potentialMatches = await trnRequestService.MatchPersonsAsync(trnRequestMetadata);
 
                         //create task
-                        if (potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || potentialMatches.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
+                        if (potentialMatches.Outcome is MatchPersonsResultOutcome.PotentialMatches or MatchPersonsResultOutcome.DefiniteMatch)
                         {
                             trnRequestMetadata.PotentialDuplicate = true;
 

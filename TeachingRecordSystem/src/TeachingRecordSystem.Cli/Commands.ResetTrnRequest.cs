@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Cli;
 
@@ -73,14 +74,14 @@ public partial class Commands
                     return 1;
                 }
 
-                var personMatchingService = scope.ServiceProvider.GetRequiredService<IPersonMatchingService>();
+                var trnRequestService = scope.ServiceProvider.GetRequiredService<TrnRequestService>();
 
                 var now = clock.UtcNow;
 
-                var matchResult = await personMatchingService.MatchFromTrnRequestAsync(request);
+                var matchResult = await trnRequestService.MatchPersonsAsync(request);
 
                 // We only handle PotentialMatches for now
-                if (matchResult.Outcome is not TrnRequestMatchResultOutcome.PotentialMatches)
+                if (matchResult.Outcome is not MatchPersonsResultOutcome.PotentialMatches)
                 {
                     throw new NotImplementedException();
                 }

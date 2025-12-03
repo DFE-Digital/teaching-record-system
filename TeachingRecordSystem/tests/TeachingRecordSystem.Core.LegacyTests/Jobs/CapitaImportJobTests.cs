@@ -12,7 +12,10 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -1843,11 +1846,24 @@ public class CapitaImportJobFixture : IAsyncLifetime
             .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
-        var matchingService = new PersonMatchingService(dbFixture.DbContextFactory.CreateDbContext());
+        var dbContext = dbFixture.DbContextFactory.CreateDbContext();
+        var eventPublisher = Mock.Of<IEventPublisher>();
+        var trnRequestService = new TrnRequestService(
+            dbContext,
+            eventPublisher,
+            new SupportTaskService(dbContext, eventPublisher),
+            Mock.Of<IGetAnIdentityApiClient>(),
+            Mock.Of<ITrnGenerator>(),
+            Options.Create(new AccessYourTeachingQualificationsOptions
+            {
+                BaseAddress = "https://example.com",
+            }),
+            Options.Create(new TrnRequestOptions()));
+
         var user = new CapitaTpsUserOption() { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId };
         var option = Options.Create(user);
 
-        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, dataLakeServiceClientMock.Object, Logger.Object, Clock, matchingService!, option);
+        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, dataLakeServiceClientMock.Object, Logger.Object, Clock, trnRequestService, option);
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,

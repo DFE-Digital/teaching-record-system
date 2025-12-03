@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
 
@@ -33,7 +33,7 @@ public class ResolveTeacherPensionsPotentialDuplicateState : IRegisterJourney
     public EvidenceUploadModel Evidence { get; set; } = new();
 }
 
-public class ResolveTeacherPensionsPotentialDuplicateStateFactory(IPersonMatchingService personMatchingService) : IJourneyStateFactory<ResolveTeacherPensionsPotentialDuplicateState>
+public class ResolveTeacherPensionsPotentialDuplicateStateFactory(TrnRequestService trnRequestService) : IJourneyStateFactory<ResolveTeacherPensionsPotentialDuplicateState>
 {
     public Task<ResolveTeacherPensionsPotentialDuplicateState> CreateAsync(CreateJourneyStateContext context)
     {
@@ -46,14 +46,14 @@ public class ResolveTeacherPensionsPotentialDuplicateStateFactory(IPersonMatchin
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.TeacherPensionsPotentialDuplicate);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var matchResult = await personMatchingService.MatchFromTrnRequestAsync(requestData);
+        var matchResult = await trnRequestService.MatchPersonsAsync(requestData);
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
             MatchedPersonIds = matchResult.Outcome switch
             {
-                TrnRequestMatchResultOutcome.DefiniteMatch => [matchResult.PersonId],
-                TrnRequestMatchResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds.Where(x => x != supportTask.PersonId).ToArray(),
+                MatchPersonsResultOutcome.DefiniteMatch => [matchResult.PersonId],
+                MatchPersonsResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds.Where(x => x != supportTask.PersonId).ToArray(),
                 _ => []
             }
         };

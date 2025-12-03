@@ -1,260 +1,247 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
-namespace TeachingRecordSystem.Core.Tests.Services.PersonMatching;
+namespace TeachingRecordSystem.Core.Tests.Services.TrnRequests;
 
-public partial class PersonMatchingServiceTests
+public partial class TrnRequestServiceTests
 {
     [Fact]
-    public Task MatchFromTrnRequestAsync_WithOutOfOrderNames_ReturnsMatch() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+    public async Task MatchPersonsAsync_WithOutOfOrderNames_ReturnsMatch()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var emailAddress = TestData.GenerateUniqueEmail();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithNationalInsuranceNumber(nationalInsuranceNumber)
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmailAddress(emailAddress));
+
+        var requestData = new TrnRequestMetadata()
         {
-            // Arrange
-            var applicationUser = await TestData.CreateApplicationUserAsync();
-            var firstName = TestData.GenerateFirstName();
-            var middleName = TestData.GenerateMiddleName();
-            var lastName = TestData.GenerateLastName();
-            var dateOfBirth = TestData.GenerateDateOfBirth();
-            var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-            var emailAddress = TestData.GenerateUniqueEmail();
+            ApplicationUserId = applicationUser.UserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            EmailAddress = null,
+            OneLoginUserSubject = null,
+            FirstName = lastName,
+            MiddleName = middleName,
+            LastName = firstName,
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            Name = [lastName, firstName, middleName],
+            DateOfBirth = TestData.GenerateChangedDateOfBirth(dateOfBirth),
+            NationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber)
+        };
 
-            var person = await TestData.CreatePersonAsync(p => p
-                .WithNationalInsuranceNumber(nationalInsuranceNumber)
-                .WithFirstName(firstName)
-                .WithMiddleName(middleName)
-                .WithLastName(lastName)
-                .WithDateOfBirth(dateOfBirth)
-                .WithEmailAddress(emailAddress));
+        // Act
+        var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
 
-            var requestData = new TrnRequestMetadata()
-            {
-                ApplicationUserId = applicationUser.UserId,
-                RequestId = Guid.NewGuid().ToString(),
-                CreatedOn = Clock.UtcNow,
-                IdentityVerified = null,
-                EmailAddress = null,
-                OneLoginUserSubject = null,
-                FirstName = lastName,
-                MiddleName = middleName,
-                LastName = firstName,
-                PreviousFirstName = null,
-                PreviousLastName = null,
-                Name = [lastName, firstName, middleName],
-                DateOfBirth = TestData.GenerateChangedDateOfBirth(dateOfBirth),
-                NationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber)
-            };
-
-            var service = new PersonMatchingService(dbContext);
-
-            // Act
-            var result = await service.MatchFromTrnRequestAsync(requestData);
-
-            // Assert
-            Assert.Contains(person.PersonId, result.PotentialMatchesPersonIds);
-        });
+        // Assert
+        Assert.Contains(person.PersonId, result.PotentialMatchesPersonIds);
+    }
 
     [Theory]
     [MemberData(nameof(GetMatchFromTrnRequestData))]
     [MemberData(nameof(GetMatchFromTrnRequestDataWithMissingNino))]
-    public Task MatchFromTrnRequestAsync_ReturnsExpectedResult(
-            TrnRequest.EmailAddressArgumentOption emailAddressOption,
-            TrnRequest.FirstNameArgumentOption firstNameOption,
-            TrnRequest.MiddleNameArgumentOption middleNameOption,
-            TrnRequest.LastNameArgumentOption lastNameOption,
-            TrnRequest.DateOfBirthArgumentOption dateOfBirthOption,
-            TrnRequest.NationalInsuranceNumberArgumentOption nationalInsuranceNumberOption,
-            TrnRequest.GenderArgumentOption genderOption,
-            TrnRequestMatchResultOutcome expectedOutcome) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+    public async Task MatchPersonsAsync_ReturnsExpectedResult(
+        TrnRequest.EmailAddressArgumentOption emailAddressOption,
+        TrnRequest.FirstNameArgumentOption firstNameOption,
+        TrnRequest.MiddleNameArgumentOption middleNameOption,
+        TrnRequest.LastNameArgumentOption lastNameOption,
+        TrnRequest.DateOfBirthArgumentOption dateOfBirthOption,
+        TrnRequest.NationalInsuranceNumberArgumentOption nationalInsuranceNumberOption,
+        TrnRequest.GenderArgumentOption genderOption,
+        MatchPersonsResultOutcome expectedOutcome)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var personFirstName = TestData.GenerateFirstName();
+
+        var alias = firstNameOption == TrnRequest.FirstNameArgumentOption.MatchesAlias ? TestData.GenerateChangedFirstName(personFirstName) : null;
+        if (alias is not null)
         {
-            // Arrange
-            var applicationUser = await TestData.CreateApplicationUserAsync();
-
-            var personFirstName = TestData.GenerateFirstName();
-
-            var alias = firstNameOption == TrnRequest.FirstNameArgumentOption.MatchesAlias ? TestData.GenerateChangedFirstName(personFirstName) : null;
-            if (alias is not null)
+            await WithDbContextAsync(async dbContext =>
             {
-                dbContext.NameSynonyms.Add(new NameSynonyms()
-                {
-                    Name = personFirstName,
-                    Synonyms = [alias]
-                });
-                dbContext.NameSynonyms.Add(new NameSynonyms()
-                {
-                    Name = alias,
-                    Synonyms = [personFirstName]
-                });
+                dbContext.NameSynonyms.Add(new NameSynonyms { Name = personFirstName, Synonyms = [alias] });
+                dbContext.NameSynonyms.Add(new NameSynonyms { Name = alias, Synonyms = [personFirstName] });
                 await dbContext.SaveChangesAsync();
-            }
+            });
+        }
 
-            var personMiddleName = TestData.GenerateChangedMiddleName([personFirstName, alias]);
+        var personMiddleName = TestData.GenerateChangedMiddleName([personFirstName, alias]);
 
-            var person = await TestData.CreatePersonAsync(p => p
-                .WithNationalInsuranceNumber()
-                .WithFirstName(personFirstName)
-                .WithMiddleName(personMiddleName)
-                .WithEmailAddress(TestData.GenerateUniqueEmail())
-                .WithGender());
-            var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-            var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
-            var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithNationalInsuranceNumber()
+            .WithFirstName(personFirstName)
+            .WithMiddleName(personMiddleName)
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
+            .WithGender());
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
+        var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
+        var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
 
-            var emailAddress = emailAddressOption switch
-            {
-                TrnRequest.EmailAddressArgumentOption.Matches => person.EmailAddress!,
-                _ => TestData.GenerateUniqueEmail()
-            };
+        var emailAddress = emailAddressOption switch
+        {
+            TrnRequest.EmailAddressArgumentOption.Matches => person.EmailAddress!,
+            _ => TestData.GenerateUniqueEmail()
+        };
 
-            var firstName = firstNameOption switch
-            {
-                TrnRequest.FirstNameArgumentOption.Matches => person.FirstName,
-                TrnRequest.FirstNameArgumentOption.MatchesAlias => alias!,
-                _ => TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName])
-            };
+        var firstName = firstNameOption switch
+        {
+            TrnRequest.FirstNameArgumentOption.Matches => person.FirstName,
+            TrnRequest.FirstNameArgumentOption.MatchesAlias => alias!,
+            _ => TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName])
+        };
 
-            var middleName = middleNameOption switch
-            {
-                TrnRequest.MiddleNameArgumentOption.Matches => person.MiddleName,
-                _ => TestData.GenerateChangedMiddleName([person.FirstName, alias, person.MiddleName, person.LastName])
-            };
+        var middleName = middleNameOption switch
+        {
+            TrnRequest.MiddleNameArgumentOption.Matches => person.MiddleName,
+            _ => TestData.GenerateChangedMiddleName([person.FirstName, alias, person.MiddleName, person.LastName])
+        };
 
-            var lastName = lastNameOption switch
-            {
-                TrnRequest.LastNameArgumentOption.Matches => person.LastName,
-                _ => TestData.GenerateChangedLastName([person.FirstName, alias, person.MiddleName, person.LastName])
-            };
+        var lastName = lastNameOption switch
+        {
+            TrnRequest.LastNameArgumentOption.Matches => person.LastName,
+            _ => TestData.GenerateChangedLastName([person.FirstName, alias, person.MiddleName, person.LastName])
+        };
 
-            var dateOfBirth = dateOfBirthOption switch
-            {
-                TrnRequest.DateOfBirthArgumentOption.Matches => person.DateOfBirth,
-                _ => TestData.GenerateChangedDateOfBirth(person.DateOfBirth)
-            };
+        var dateOfBirth = dateOfBirthOption switch
+        {
+            TrnRequest.DateOfBirthArgumentOption.Matches => person.DateOfBirth,
+            _ => TestData.GenerateChangedDateOfBirth(person.DateOfBirth)
+        };
 
-            var nationalInsuranceNumber = nationalInsuranceNumberOption switch
-            {
-                TrnRequest.NationalInsuranceNumberArgumentOption.Null => null,
-                TrnRequest.NationalInsuranceNumberArgumentOption.Empty => string.Empty,
-                TrnRequest.NationalInsuranceNumberArgumentOption.MatchesPersonNino => person.NationalInsuranceNumber!,
-                TrnRequest.NationalInsuranceNumberArgumentOption.MatchesEmploymentNino => personEmployment.NationalInsuranceNumber!,
-                _ => TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!)
-            };
+        var nationalInsuranceNumber = nationalInsuranceNumberOption switch
+        {
+            TrnRequest.NationalInsuranceNumberArgumentOption.Null => null,
+            TrnRequest.NationalInsuranceNumberArgumentOption.Empty => string.Empty,
+            TrnRequest.NationalInsuranceNumberArgumentOption.MatchesPersonNino => person.NationalInsuranceNumber!,
+            TrnRequest.NationalInsuranceNumberArgumentOption.MatchesEmploymentNino => personEmployment.NationalInsuranceNumber!,
+            _ => TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!)
+        };
 
-            var gender = genderOption switch
-            {
-                TrnRequest.GenderArgumentOption.Matches => person.Gender,
-                _ => TestData.GenerateChangedGender(person.Gender)
-            };
+        var gender = genderOption switch
+        {
+            TrnRequest.GenderArgumentOption.Matches => person.Gender,
+            _ => TestData.GenerateChangedGender(person.Gender)
+        };
 
-            var requestData = new TrnRequestMetadata()
-            {
-                ApplicationUserId = applicationUser.UserId,
-                RequestId = Guid.NewGuid().ToString(),
-                CreatedOn = Clock.UtcNow,
-                IdentityVerified = null,
-                EmailAddress = emailAddress,
-                OneLoginUserSubject = null,
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                PreviousFirstName = null,
-                PreviousLastName = null,
-                Name = [firstName, middleName, lastName],
-                DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber,
-                Gender = gender
-            };
+        var requestData = new TrnRequestMetadata()
+        {
+            ApplicationUserId = applicationUser.UserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            EmailAddress = emailAddress,
+            OneLoginUserSubject = null,
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            Name = [firstName, middleName, lastName],
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber,
+            Gender = gender
+        };
 
-            var service = new PersonMatchingService(dbContext);
+        // Act
+        var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
 
-            // Act
-            var result = await service.MatchFromTrnRequestAsync(requestData);
+        // Assert
+        if (expectedOutcome != result.Outcome)
+        {
+            var outputHelper = TestContext.Current.TestOutputHelper!;
+            var pad = new[] { person.EmailAddress, person.FirstName, person.MiddleName, person.LastName, person.DateOfBirth.ToShortDateString(), person.NationalInsuranceNumber, person.Gender.ToString() }
+                .Max(s => s?.Length ?? 0);
+            outputHelper.WriteLine($"                         {"Record".PadRight(pad)} Request");
+            outputHelper.WriteLine($"EmailAddress:            {(person.EmailAddress ?? "").PadRight(pad)} {emailAddress}");
+            outputHelper.WriteLine($"FirstName:               {(person.FirstName ?? "").PadRight(pad)} {firstName}");
+            outputHelper.WriteLine($"MiddleName:              {(person.MiddleName ?? "").PadRight(pad)} {middleName}");
+            outputHelper.WriteLine($"LastName:                {(person.LastName ?? "").PadRight(pad)} {lastName}");
+            outputHelper.WriteLine($"DateOfBirth:             {(person.DateOfBirth.ToShortDateString() ?? "").PadRight(pad)} {dateOfBirth}");
+            outputHelper.WriteLine($"NationalInsuranceNumber: {(person.NationalInsuranceNumber ?? "").PadRight(pad)} {nationalInsuranceNumber}");
+            outputHelper.WriteLine($"Gender:                  {(person.Gender?.ToString() ?? "").PadRight(pad)} {gender}");
+        }
 
-            // Assert
-            if (expectedOutcome != result.Outcome)
-            {
-                var pad = new[] { person.EmailAddress, person.FirstName, person.MiddleName, person.LastName, person.DateOfBirth.ToShortDateString(), person.NationalInsuranceNumber, person.Gender.ToString() }
-                    .Max(s => s?.Length ?? 0);
-                OutputHelper.WriteLine($"                         {"Record".PadRight(pad)} Request");
-                OutputHelper.WriteLine($"EmailAddress:            {(person.EmailAddress ?? "").PadRight(pad)} {emailAddress}");
-                OutputHelper.WriteLine($"FirstName:               {(person.FirstName ?? "").PadRight(pad)} {firstName}");
-                OutputHelper.WriteLine($"MiddleName:              {(person.MiddleName ?? "").PadRight(pad)} {middleName}");
-                OutputHelper.WriteLine($"LastName:                {(person.LastName ?? "").PadRight(pad)} {lastName}");
-                OutputHelper.WriteLine($"DateOfBirth:             {(person.DateOfBirth.ToShortDateString() ?? "").PadRight(pad)} {dateOfBirth}");
-                OutputHelper.WriteLine($"NationalInsuranceNumber: {(person.NationalInsuranceNumber ?? "").PadRight(pad)} {nationalInsuranceNumber}");
-                OutputHelper.WriteLine($"Gender:                  {(person.Gender?.ToString() ?? "").PadRight(pad)} {gender}");
-            }
+        Assert.Equal(expectedOutcome, result.Outcome);
 
-            Assert.Equal(expectedOutcome, result.Outcome);
-
-            if (expectedOutcome == TrnRequestMatchResultOutcome.DefiniteMatch)
-            {
-                Assert.Equal(person.PersonId, result.PersonId);
-            }
-        });
+        if (expectedOutcome == MatchPersonsResultOutcome.DefiniteMatch)
+        {
+            Assert.Equal(person.PersonId, result.PersonId);
+        }
+    }
 
     [Fact]
-    public Task GetSuggestedMatchesFromTrnRequestAsync() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+    public async Task GetSuggestedPersonMatchesAsync()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var emailAddress = TestData.GenerateUniqueEmail();
+
+        // Person matching on NINO, first name and last name
+        var person1 = await TestData.CreatePersonAsync(p => p
+            .WithNationalInsuranceNumber(nationalInsuranceNumber)
+            .WithFirstName(firstName)
+            .WithLastName(lastName));
+
+        // Person matching on first name, last name, DOB and email
+        var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(firstName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmailAddress(emailAddress));
+
+        // Person matching on first name, middle name and last name
+        var person3 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName));
+
+        var requestData = new TrnRequestMetadata()
         {
-            // Arrange
-            var applicationUser = await TestData.CreateApplicationUserAsync();
-            var firstName = TestData.GenerateFirstName();
-            var middleName = TestData.GenerateMiddleName();
-            var lastName = TestData.GenerateLastName();
-            var dateOfBirth = TestData.GenerateDateOfBirth();
-            var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-            var emailAddress = TestData.GenerateUniqueEmail();
+            ApplicationUserId = applicationUser.UserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            EmailAddress = emailAddress,
+            OneLoginUserSubject = null,
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            Name = [firstName, middleName, lastName],
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
 
-            // Person matching on NINO, first name and last name
-            var person1 = await TestData.CreatePersonAsync(p => p
-                .WithNationalInsuranceNumber(nationalInsuranceNumber)
-                .WithFirstName(firstName)
-                .WithLastName(lastName));
+        // Act
+        var result = await WithServiceAsync(s => s.GetSuggestedPersonMatchesAsync(requestData));
 
-            // Person matching on first name, last name, DOB and email
-            var person2 = await TestData.CreatePersonAsync(p => p
-                .WithFirstName(firstName)
-                .WithLastName(lastName)
-                .WithDateOfBirth(dateOfBirth)
-                .WithEmailAddress(emailAddress));
-
-            // Person matching on first name, middle name and last name
-            var person3 = await TestData.CreatePersonAsync(p => p
-                .WithFirstName(firstName)
-                .WithMiddleName(middleName)
-                .WithLastName(lastName));
-
-            var requestData = new TrnRequestMetadata()
-            {
-                ApplicationUserId = applicationUser.UserId,
-                RequestId = Guid.NewGuid().ToString(),
-                CreatedOn = Clock.UtcNow,
-                IdentityVerified = null,
-                EmailAddress = emailAddress,
-                OneLoginUserSubject = null,
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                PreviousFirstName = null,
-                PreviousLastName = null,
-                Name = [firstName, middleName, lastName],
-                DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber
-            };
-
-            var service = new PersonMatchingService(dbContext);
-
-            // Act
-            var result = await service.GetSuggestedMatchesFromTrnRequestAsync(requestData);
-
-            // Assert
-            Assert.Collection(
-                result,
-                r => Assert.Equal(person1.PersonId, r.PersonId),
-                r => Assert.Equal(person2.PersonId, r.PersonId),
-                r => Assert.Equal(person3.PersonId, r.PersonId));
-        });
+        // Assert
+        Assert.Collection(
+            result,
+            r => Assert.Equal(person1.PersonId, r.PersonId),
+            r => Assert.Equal(person2.PersonId, r.PersonId),
+            r => Assert.Equal(person3.PersonId, r.PersonId));
+    }
 
     public static TrnRequestTheoryData GetMatchFromTrnRequestData()
     {
@@ -263,12 +250,12 @@ public partial class PersonMatchingServiceTests
         // Definite matches
 
         data.AddCase(
-            TrnRequestMatchResultOutcome.DefiniteMatch,
+            MatchPersonsResultOutcome.DefiniteMatch,
             dateOfBirth: TrnRequest.DateOfBirthArgumentOption.Matches,
             nationalInsuranceNumber: TrnRequest.NationalInsuranceNumberArgumentOption.MatchesPersonNino);
 
         data.AddCase(
-            TrnRequestMatchResultOutcome.DefiniteMatch,
+            MatchPersonsResultOutcome.DefiniteMatch,
             dateOfBirth: TrnRequest.DateOfBirthArgumentOption.Matches,
             nationalInsuranceNumber: TrnRequest.NationalInsuranceNumberArgumentOption.MatchesEmploymentNino);
 
@@ -297,7 +284,7 @@ public partial class PersonMatchingServiceTests
             }
 
             data.AddCase(
-                TrnRequestMatchResultOutcome.PotentialMatches,
+                MatchPersonsResultOutcome.PotentialMatches,
                 matchedAttrs.Contains("EmailAddress") ? TrnRequest.EmailAddressArgumentOption.Matches : TrnRequest.EmailAddressArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("FirstName") ? TrnRequest.FirstNameArgumentOption.Matches : matchedAttrs.Contains("FirstNameAlias") ? TrnRequest.FirstNameArgumentOption.MatchesAlias : TrnRequest.FirstNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("MiddleName") ? TrnRequest.MiddleNameArgumentOption.Matches : TrnRequest.MiddleNameArgumentOption.DoesNotMatch,
@@ -342,7 +329,7 @@ public partial class PersonMatchingServiceTests
             }
 
             data.AddCase(
-                TrnRequestMatchResultOutcome.NoMatches,
+                MatchPersonsResultOutcome.NoMatches,
                 matchedAttrs.Contains("EmailAddress") ? TrnRequest.EmailAddressArgumentOption.Matches : TrnRequest.EmailAddressArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("FirstName") ? TrnRequest.FirstNameArgumentOption.Matches
                     : matchedAttrs.Contains("FirstNameAlias") ? TrnRequest.FirstNameArgumentOption.MatchesAlias : TrnRequest.FirstNameArgumentOption.DoesNotMatch,
@@ -364,7 +351,7 @@ public partial class PersonMatchingServiceTests
         // Definite matches
 
         data.AddCase(
-            TrnRequestMatchResultOutcome.DefiniteMatch,
+            MatchPersonsResultOutcome.DefiniteMatch,
             firstName: TrnRequest.FirstNameArgumentOption.Matches,
             lastName: TrnRequest.LastNameArgumentOption.Matches,
             dateOfBirth: TrnRequest.DateOfBirthArgumentOption.Matches,
@@ -373,7 +360,7 @@ public partial class PersonMatchingServiceTests
             nationalInsuranceNumber: TrnRequest.NationalInsuranceNumberArgumentOption.Null);
 
         data.AddCase(
-            TrnRequestMatchResultOutcome.DefiniteMatch,
+            MatchPersonsResultOutcome.DefiniteMatch,
             firstName: TrnRequest.FirstNameArgumentOption.Matches,
             lastName: TrnRequest.LastNameArgumentOption.Matches,
             dateOfBirth: TrnRequest.DateOfBirthArgumentOption.Matches,
@@ -411,7 +398,7 @@ public partial class PersonMatchingServiceTests
             }
 
             data.AddCase(
-                TrnRequestMatchResultOutcome.PotentialMatches,
+                MatchPersonsResultOutcome.PotentialMatches,
                 matchedAttrs.Contains("EmailAddress") ? TrnRequest.EmailAddressArgumentOption.Matches : TrnRequest.EmailAddressArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("FirstName") ? TrnRequest.FirstNameArgumentOption.Matches : matchedAttrs.Contains("FirstNameAlias") ? TrnRequest.FirstNameArgumentOption.MatchesAlias : TrnRequest.FirstNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("MiddleName") ? TrnRequest.MiddleNameArgumentOption.Matches : TrnRequest.MiddleNameArgumentOption.DoesNotMatch,
@@ -421,7 +408,7 @@ public partial class PersonMatchingServiceTests
                 TrnRequest.NationalInsuranceNumberArgumentOption.Null);
 
             data.AddCase(
-                TrnRequestMatchResultOutcome.PotentialMatches,
+                MatchPersonsResultOutcome.PotentialMatches,
                 matchedAttrs.Contains("EmailAddress") ? TrnRequest.EmailAddressArgumentOption.Matches : TrnRequest.EmailAddressArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("FirstName") ? TrnRequest.FirstNameArgumentOption.Matches : matchedAttrs.Contains("FirstNameAlias") ? TrnRequest.FirstNameArgumentOption.MatchesAlias : TrnRequest.FirstNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("MiddleName") ? TrnRequest.MiddleNameArgumentOption.Matches : TrnRequest.MiddleNameArgumentOption.DoesNotMatch,
@@ -463,7 +450,7 @@ public partial class PersonMatchingServiceTests
             }
 
             data.AddCase(
-                TrnRequestMatchResultOutcome.NoMatches,
+                MatchPersonsResultOutcome.NoMatches,
                 matchedAttrs.Contains("EmailAddress") ? TrnRequest.EmailAddressArgumentOption.Matches : TrnRequest.EmailAddressArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("FirstName") ? TrnRequest.FirstNameArgumentOption.Matches
                     : matchedAttrs.Contains("FirstNameAlias") ? TrnRequest.FirstNameArgumentOption.MatchesAlias : TrnRequest.FirstNameArgumentOption.DoesNotMatch,
@@ -474,7 +461,7 @@ public partial class PersonMatchingServiceTests
                 TrnRequest.NationalInsuranceNumberArgumentOption.Null);
 
             data.AddCase(
-                TrnRequestMatchResultOutcome.NoMatches,
+                MatchPersonsResultOutcome.NoMatches,
                 matchedAttrs.Contains("EmailAddress") ? TrnRequest.EmailAddressArgumentOption.Matches : TrnRequest.EmailAddressArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("FirstName") ? TrnRequest.FirstNameArgumentOption.Matches
                     : matchedAttrs.Contains("FirstNameAlias") ? TrnRequest.FirstNameArgumentOption.MatchesAlias : TrnRequest.FirstNameArgumentOption.DoesNotMatch,
@@ -496,10 +483,10 @@ public partial class PersonMatchingServiceTests
         TrnRequest.DateOfBirthArgumentOption,
         TrnRequest.NationalInsuranceNumberArgumentOption,
         TrnRequest.GenderArgumentOption,
-        TrnRequestMatchResultOutcome>
+        MatchPersonsResultOutcome>
     {
         public void AddCase(
-            TrnRequestMatchResultOutcome expectedOutcome,
+            MatchPersonsResultOutcome expectedOutcome,
             TrnRequest.EmailAddressArgumentOption emailAddress = TrnRequest.EmailAddressArgumentOption.DoesNotMatch,
             TrnRequest.FirstNameArgumentOption firstName = TrnRequest.FirstNameArgumentOption.DoesNotMatch,
             TrnRequest.MiddleNameArgumentOption middleName = TrnRequest.MiddleNameArgumentOption.DoesNotMatch,
@@ -605,4 +592,3 @@ public partial class PersonMatchingServiceTests
         }
     }
 }
-
