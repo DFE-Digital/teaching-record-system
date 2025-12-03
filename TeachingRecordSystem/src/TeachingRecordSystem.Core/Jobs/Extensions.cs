@@ -148,15 +148,9 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(CapitaExportAmendJob.JobSchedule));
 
-            recurringJobManager.AddOrUpdate<AllocateTrnToPersonJob>(
-                $"{nameof(AllocateTrnToPersonJob)} (dry-run)",
-                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("AllocateTrnToPersonJob (dry-run)");
 
-            recurringJobManager.AddOrUpdate<AllocateTrnToPersonJob>(
-                nameof(AllocateTrnToPersonJob),
-                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("AllocateTrnToPersonJob");
 
             recurringJobManager.AddOrUpdate<CapitaImportJob>(
                 nameof(CapitaImportJob),
@@ -188,10 +182,7 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<AllocateTrnsToOverseasNpqApplicantsJob>(
-                nameof(AllocateTrnsToOverseasNpqApplicantsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("AllocateTrnsToOverseasNpqApplicantsJob");
 
             recurringJobManager.AddOrUpdate<BackfillCapitaImportWarningStatusesJob>(
                 $"{nameof(BackfillCapitaImportWarningStatusesJob)} (dry-run)",
