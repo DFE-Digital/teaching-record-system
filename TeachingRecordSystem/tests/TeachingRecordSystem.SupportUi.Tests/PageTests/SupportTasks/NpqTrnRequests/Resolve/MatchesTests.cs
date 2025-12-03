@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 
@@ -24,7 +24,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = matchedPersonIds,
-                MatchOutcome = TrnRequestMatchResultOutcome.PotentialMatches,
+                MatchOutcome = MatchPersonsResultOutcome.PotentialMatches,
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true
             });
@@ -494,7 +494,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = matchedPersonIds,
-                MatchOutcome = TrnRequestMatchResultOutcome.PotentialMatches,
+                MatchOutcome = MatchPersonsResultOutcome.PotentialMatches,
                 PersonId = firstMatchId
             });
 
@@ -525,7 +525,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = matchedPersonIds,
-                MatchOutcome = TrnRequestMatchResultOutcome.PotentialMatches,
+                MatchOutcome = MatchPersonsResultOutcome.PotentialMatches,
                 PersonId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel
             });
 

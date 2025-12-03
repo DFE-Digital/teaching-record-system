@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 public class CheckAnswersModel(
     AuthorizeAccessLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    IPersonMatchingService matchingService,
+    TrnRequestService trnRequestService,
     IFileService fileService,
     IClock clock) : PageModel
 {
@@ -130,8 +130,8 @@ public class CheckAnswersModel(
         };
 
         // look for potential matches
-        var matchResult = await matchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
-        trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches;
+        var matchResult = await trnRequestService.MatchPersonsAsync(trnRequestMetadata);
+        trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches;
 
         dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 

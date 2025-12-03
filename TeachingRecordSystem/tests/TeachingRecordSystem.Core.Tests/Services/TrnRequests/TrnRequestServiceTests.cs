@@ -9,7 +9,7 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 namespace TeachingRecordSystem.Core.Tests.Services.TrnRequests;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
-public class TrnRequestServiceTests : ServiceTestBase
+public partial class TrnRequestServiceTests : ServiceTestBase
 {
     public TrnRequestServiceTests(ServiceFixture fixture) : base(fixture)
     {

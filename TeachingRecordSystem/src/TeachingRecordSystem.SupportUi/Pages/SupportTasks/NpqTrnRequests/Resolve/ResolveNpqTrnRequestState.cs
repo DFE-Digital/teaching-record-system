@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
@@ -16,7 +16,7 @@ public class ResolveNpqTrnRequestState : IRegisterJourney
         appendUniqueKey: true);
 
     public required IReadOnlyCollection<Guid> MatchedPersonIds { get; init; }
-    public TrnRequestMatchResultOutcome MatchOutcome { get; set; }
+    public MatchPersonsResultOutcome MatchOutcome { get; set; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? DateOfBirthSource { get; set; }
@@ -26,7 +26,7 @@ public class ResolveNpqTrnRequestState : IRegisterJourney
     public string? Comments { get; set; }
 }
 
-public class ResolveNpqTrnRequestStateFactory(IPersonMatchingService personMatchingService) : IJourneyStateFactory<ResolveNpqTrnRequestState>
+public class ResolveNpqTrnRequestStateFactory(TrnRequestService trnRequestService) : IJourneyStateFactory<ResolveNpqTrnRequestState>
 {
     public Task<ResolveNpqTrnRequestState> CreateAsync(CreateJourneyStateContext context)
     {
@@ -39,15 +39,15 @@ public class ResolveNpqTrnRequestStateFactory(IPersonMatchingService personMatch
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.NpqTrnRequest);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var matchResult = await personMatchingService.MatchFromTrnRequestAsync(requestData);
+        var matchResult = await trnRequestService.MatchPersonsAsync(requestData);
 
         var state = new ResolveNpqTrnRequestState
         {
             MatchOutcome = matchResult.Outcome,
             MatchedPersonIds = matchResult.Outcome switch
             {
-                TrnRequestMatchResultOutcome.DefiniteMatch => [matchResult.PersonId],
-                TrnRequestMatchResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds,
+                MatchPersonsResultOutcome.DefiniteMatch => [matchResult.PersonId],
+                MatchPersonsResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds,
                 _ => []
             }
         };

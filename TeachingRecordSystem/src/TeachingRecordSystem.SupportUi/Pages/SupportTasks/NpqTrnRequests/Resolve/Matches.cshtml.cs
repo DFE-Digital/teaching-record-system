@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
@@ -15,7 +15,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 {
     public TrnRequestMetadata? RequestData { get; set; }
 
-    public TrnRequestMatchResultOutcome MatchOutcome { get; set; }
+    public MatchPersonsResultOutcome MatchOutcome { get; set; }
 
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
