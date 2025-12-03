@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
@@ -65,5 +66,52 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             processContext);
 
         return DeleteSupportTaskResult.Ok;
+    }
+
+    public async Task<UpdateSupportTaskResult> UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
+        where TData : ISupportTaskData, IEquatable<TData>
+    {
+        var supportTask = await dbContext.SupportTasks.FindAsync(options.SupportTaskReference);
+
+        if (supportTask is null)
+        {
+            return UpdateSupportTaskResult.NotFound;
+        }
+
+        if (supportTask.SupportTaskType.GetDataType() != typeof(TData))
+        {
+            throw new InvalidOperationException(
+                $"{typeof(TData).Name} is not valid for the specified support task's type.");
+        }
+
+        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
+
+        supportTask.Status = options.Status;
+        supportTask.Data = options.UpdateData(supportTask.GetData<TData>());
+
+        var changes = SupportTaskUpdatedEventChanges.None |
+            (supportTask.Status != oldSupportTaskEventModel.Status ? SupportTaskUpdatedEventChanges.Status : 0) |
+            (!supportTask.GetData<TData>().Equals(oldSupportTaskEventModel.Data) ? SupportTaskUpdatedEventChanges.Data : 0);
+
+        if (changes is not SupportTaskUpdatedEventChanges.None)
+        {
+            supportTask.UpdatedOn = processContext.Now;
+
+            await dbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(
+                new SupportTaskUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    SupportTaskReference = options.SupportTaskReference,
+                    Changes = changes,
+                    OldSupportTask = oldSupportTaskEventModel,
+                    SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                    Comments = options.Comments
+                },
+                processContext);
+        }
+
+        return UpdateSupportTaskResult.Ok;
     }
 }

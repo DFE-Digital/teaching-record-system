@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -165,5 +166,150 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Assert.Equal(supportTask.SupportTaskReference, supportTaskDeletedEvent.SupportTaskReference);
             Assert.Equal(reasonDetail, supportTaskDeletedEvent.ReasonDetail);
         });
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_TaskDoesNotExist_ReturnsNotFoundAndDoesNotPublishEvent()
+    {
+        // Arrange
+        var supportTaskReference = "ABC-123";
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTaskReference,
+            UpdateData = data => data,
+            Status = SupportTaskStatus.Closed,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
+            service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.Equal(UpdateSupportTaskResult.NotFound, result);
+        Events.AssertNoEventsPublished();
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_ValidRequestWithChangeOfData_UpdatesTaskAndPublishesEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
+
+        var outcome = SupportRequestOutcome.Approved;
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data with { ChangeRequestOutcome = outcome },
+            Status = SupportTaskStatus.Closed,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
+            service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.Equal(UpdateSupportTaskResult.Ok, result);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(options.Status, dbSupportTask.Status);
+            Assert.Equal(outcome, ((ChangeNameRequestData)dbSupportTask.Data).ChangeRequestOutcome);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+            Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
+            Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+            Assert.Equal(options.Comments, supportTaskUpdatedEvent.Comments);
+            Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data, supportTaskUpdatedEvent.Changes);
+        });
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_ValidRequestWithoutChangeOfData_UpdatesTaskAndPublishesEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data,
+            Status = SupportTaskStatus.Closed,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
+            service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.Equal(UpdateSupportTaskResult.Ok, result);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(options.Status, dbSupportTask.Status);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+            Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
+            Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+            Assert.Equal(options.Comments, supportTaskUpdatedEvent.Comments);
+            Assert.Equal(SupportTaskUpdatedEventChanges.Status, supportTaskUpdatedEvent.Changes);
+        });
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_ValidRequestWithNoChanges_DoesNotPublishEventOrSetUpdatedOn()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Clock.Advance();
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data,
+            Status = supportTask.Status,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
+            service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.Equal(UpdateSupportTaskResult.Ok, result);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(options.Status, dbSupportTask.Status);
+            Assert.Equal(supportTask.CreatedOn, supportTask.UpdatedOn);
+        });
+
+        Events.AssertNoEventsPublished();
     }
 }
