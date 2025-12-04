@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions;
 
@@ -144,7 +145,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var user = await TestData.CreateUserAsync();
         var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
         var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.CreatedOn}&sortDirection={SortDirection.Descending}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn}&sortDirection={SortDirection.Descending}");
         var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
                        person1.PersonId,
                        user.UserId,
@@ -197,7 +198,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var user = await TestData.CreateUserAsync();
         var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
         var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.Name}&sortDirection={SortDirection.Ascending}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeachersPensionsPotentialDuplicatesSortByOption.Name}&sortDirection={SortDirection.Ascending}");
         var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
                        person1.PersonId,
                        user.UserId,
@@ -252,7 +253,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
         var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
         var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.Filename}&sortDirection={SortDirection.Descending}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeachersPensionsPotentialDuplicatesSortByOption.Filename}&sortDirection={SortDirection.Descending}");
         var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
                        person1.PersonId,
                        user.UserId,
@@ -307,7 +308,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
         var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
         var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.Filename}&sortDirection={SortDirection.Ascending}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeachersPensionsPotentialDuplicatesSortByOption.Filename}&sortDirection={SortDirection.Ascending}");
         var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
                        person1.PersonId,
                        user.UserId,
@@ -362,7 +363,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
         var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
         var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.InterfaceId}&sortDirection={SortDirection.Descending}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId}&sortDirection={SortDirection.Descending}");
         var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
                        person1.PersonId,
                        user.UserId,
@@ -417,7 +418,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
         var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
         var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.InterfaceId}&sortDirection={SortDirection.Ascending}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId}&sortDirection={SortDirection.Ascending}");
         var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
                        person1.PersonId,
                        user.UserId,

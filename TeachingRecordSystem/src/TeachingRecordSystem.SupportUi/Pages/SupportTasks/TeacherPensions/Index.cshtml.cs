@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
 
-public class IndexModel(TrsDbContext dbContext) : PageModel
+public class IndexModel(SupportTaskSearchService supportTaskSearchService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int TasksPerPage = 20;
 
@@ -16,73 +15,30 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
 
     [BindProperty(SupportsGet = true)]
     [FromQuery]
-    public TeacherPensionsSortOptions? SortBy { get; set; }
+    public TeachersPensionsPotentialDuplicatesSortByOption? SortBy { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
-    public List<Result>? Results { get; set; }
+    public int? TotalTaskCount { get; set; }
+
+    public ResultPage<TeachersPensionsPotentialDuplicatesSearchResultItem>? Results { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
-        var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
-        var sortBy = SortBy ??= TeacherPensionsSortOptions.CreatedOn;
+        var searchOptions = new TeachersPensionsPotentialDuplicatesSearchOptions(SortBy, SortDirection);
+        var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        var tasks = await dbContext.SupportTasks
-            .Include(t => t.Person)
-            .Include(t => t.TrnRequestMetadata)
-            .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && t.Status == SupportTaskStatus.Open)
-            .ToListAsync();
+        var result = await supportTaskSearchService.SearchTeachersPensionsPotentialDuplicatesAsync(searchOptions, paginationOptions);
+        TotalTaskCount = result.TotalTaskCount;
+        Results = result.SearchResults;
 
-        var unorderedResults = tasks.Select(t =>
-        {
-            var data = t.Data as TeacherPensionsPotentialDuplicateData;
-            return new Result
-            (
-                t.SupportTaskReference,
-                data!.FileName,
-                data!.IntegrationTransactionId,
-                $"{t.Person!.FirstName} {t.Person!.LastName}",
-                DateOnly.FromDateTime(t.CreatedOn)
-            );
-        }).ToList();
-
-        Results = (sortBy, sortDirection) switch
-        {
-            (TeacherPensionsSortOptions.CreatedOn, SupportUi.SortDirection.Ascending)
-                => unorderedResults.OrderBy(r => r.CreatedOn).ToList(),
-            (TeacherPensionsSortOptions.CreatedOn, SupportUi.SortDirection.Descending)
-                => unorderedResults.OrderByDescending(r => r.CreatedOn).ToList(),
-
-            (TeacherPensionsSortOptions.Name, SupportUi.SortDirection.Ascending)
-                => unorderedResults.OrderBy(r => r.Name, StringComparer.OrdinalIgnoreCase).ToList(),
-            (TeacherPensionsSortOptions.Name, SupportUi.SortDirection.Descending)
-                => unorderedResults.OrderByDescending(r => r.Name, StringComparer.OrdinalIgnoreCase).ToList(),
-
-            (TeacherPensionsSortOptions.Filename, SupportUi.SortDirection.Ascending)
-                => unorderedResults.OrderBy(r => r.Filename, StringComparer.OrdinalIgnoreCase).ToList(),
-            (TeacherPensionsSortOptions.Filename, SupportUi.SortDirection.Descending)
-                => unorderedResults.OrderByDescending(r => r.Filename, StringComparer.OrdinalIgnoreCase).ToList(),
-
-            (TeacherPensionsSortOptions.InterfaceId, SupportUi.SortDirection.Ascending)
-                => unorderedResults.OrderBy(r => r.IntergrationTransactionId).ToList(),
-            (TeacherPensionsSortOptions.InterfaceId, SupportUi.SortDirection.Descending)
-                => unorderedResults.OrderByDescending(r => r.IntergrationTransactionId).ToList(),
-
-            _ => Results
-        };
+        Pagination = PaginationViewModel.Create(
+            Results,
+            pageNumber => linkGenerator.SupportTasks.TeacherPensions.Index(SortBy, SortDirection, pageNumber));
 
         return Page();
     }
-
-    public record Result(
-        string SupportTaskReference,
-        string Filename,
-        long IntergrationTransactionId,
-        string Name,
-        DateOnly CreatedOn
-     );
 }
