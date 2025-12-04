@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Optional;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
@@ -39,7 +40,7 @@ public class Index(SupportTaskSearchService supportTaskSearchService, SupportUiL
 
     public async Task OnGetAsync()
     {
-        var searchOptions = new TrnRequestManualChecksSearchOptions(Search, SortBy, SortDirection, FormSubmitted, Sources);
+        var searchOptions = new TrnRequestManualChecksSearchOptions(Search, SortBy, SortDirection, FormSubmitted ? Sources : null);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
         var result = await supportTaskSearchService.SearchTrnRequestManualChecksAsync(searchOptions, paginationOptions);
