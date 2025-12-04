@@ -276,7 +276,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             state.SetTrn(true, trn);
         });
 
-        EventPublisher.Clear();
+        LegacyEventPublisher.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -305,7 +305,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(trnToken.Trn, data.TrnTokenTrn);
         Assert.Equal(applicationUser.UserId, data.ClientApplicationUserId);
 
-        EventPublisher.AssertEventsSaved(e =>
+        LegacyEventPublisher.AssertEventsSaved(e =>
         {
             var supportTaskCreatedEvent = Assert.IsType<LegacyEvents.SupportTaskCreatedEvent>(e);
             Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
@@ -324,6 +324,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(trn, eventData.StatedTrn);
             Assert.Equal(trnToken.Trn, eventData.TrnTokenTrn);
             Assert.Equal(applicationUser.UserId, eventData.ClientApplicationUserId);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ConnectOneLoginUserSupportTaskCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvent<SupportTaskCreatedEvent>();
         });
     }
 }

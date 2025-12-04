@@ -17,5 +17,6 @@ public enum ProcessType
     ChangeOfNameRequestCreating = 13,
     ApiTrnRequestCreating = 14,
     NpqTrnRequestTaskCreating = 15,
-    ApiTrnRequestResolving = 16
+    ApiTrnRequestResolving = 16,
+    ConnectOneLoginUserSupportTaskCreating = 17
 }

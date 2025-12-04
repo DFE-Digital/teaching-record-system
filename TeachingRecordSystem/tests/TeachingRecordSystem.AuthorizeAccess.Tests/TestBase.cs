@@ -30,7 +30,9 @@ public abstract class TestBase
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    protected CaptureEventObserver EventPublisher => _testServices.LegacyEventObserver;
+    protected EventCapture Events => _testServices.Events;
+
+    protected CaptureEventObserver LegacyEventPublisher => _testServices.LegacyEventObserver;
 
     protected TestableClock Clock => _testServices.Clock;
 
