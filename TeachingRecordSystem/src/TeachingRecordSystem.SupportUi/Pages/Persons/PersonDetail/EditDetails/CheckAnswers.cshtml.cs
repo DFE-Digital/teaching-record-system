@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
@@ -96,7 +95,7 @@ public class CheckAnswersModel(
             now);
 
         var updatedEvent = updateResult.Changes != 0 ?
-            new PersonDetailsUpdatedEvent
+            new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
@@ -109,12 +108,12 @@ public class CheckAnswersModel(
                 DetailsChangeReason = OtherDetailsChangeReason?.GetDisplayName(),
                 DetailsChangeReasonDetail = OtherDetailsChangeReasonDetail,
                 DetailsChangeEvidenceFile = OtherDetailsChangeEvidenceFile?.ToEventModel(),
-                Changes = (PersonDetailsUpdatedEventChanges)updateResult.Changes
+                Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)updateResult.Changes
             } :
             null;
 
         if (updatedEvent is not null &&
-            updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) &&
+            updatedEvent.Changes.HasAnyFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.NameChange) &&
             NameChangeReason is EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership or EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
         {
             DbContext.PreviousNames.Add(new PreviousName

@@ -69,7 +69,7 @@ public class ChangeHistoryModel(
             nameof(DqtInductionReactivatedEvent),
             nameof(DqtContactInductionStatusChangedEvent),
             nameof(PersonInductionUpdatedEvent),
-            nameof(PersonDetailsUpdatedEvent),
+            nameof(LegacyEvents.PersonDetailsUpdatedEvent),
             nameof(LegacyEvents.PersonCreatedEvent),
             nameof(RouteToProfessionalStatusCreatedEvent),
             nameof(RouteToProfessionalStatusUpdatedEvent),

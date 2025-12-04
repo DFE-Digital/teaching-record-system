@@ -12,6 +12,7 @@ public record TrnRequestUpdatedEvent : IEvent
     public required string? ReasonDetails { get; init; }
 }
 
+[Flags]
 public enum TrnRequestUpdatedChanges
 {
     None = 0,

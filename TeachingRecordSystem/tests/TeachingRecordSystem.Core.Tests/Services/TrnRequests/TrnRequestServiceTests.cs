@@ -326,7 +326,9 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
         });
 
-        Events.AssertEventsPublished(e => Assert.IsType<PersonCreatedEvent>(e));
+        Events.AssertEventsPublished(
+            e => Assert.IsType<PersonCreatedEvent>(e),
+            e => Assert.IsType<TrnRequestUpdatedEvent>(e));
     }
 
     [Fact]

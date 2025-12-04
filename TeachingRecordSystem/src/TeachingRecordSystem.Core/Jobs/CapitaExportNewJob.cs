@@ -265,7 +265,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
 
         if (string.IsNullOrEmpty(previousName))
         {
-            throw new Exception($"Previous name not found in {nameof(PersonDetailsUpdatedEvent)} events.");
+            throw new Exception($"Previous name not found in {nameof(LegacyEvents.PersonDetailsUpdatedEvent)} events.");
         }
 
         var gender = " ";

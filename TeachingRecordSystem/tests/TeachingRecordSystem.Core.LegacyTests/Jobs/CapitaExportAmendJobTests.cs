@@ -137,7 +137,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         });
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
         var dobChangedEvent = trsPerson.UpdateDetails(person.FirstName, person.MiddleName, person.LastName, updatedDateOfBirth, null, null, person.Gender, Clock.UtcNow.AddHours(-1));
-        var personUpdatedEvent = new PersonDetailsUpdatedEvent
+        var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddHours(-1),
@@ -150,7 +150,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeReason = null,
             DetailsChangeReasonDetail = null,
             DetailsChangeEvidenceFile = null,
-            Changes = (PersonDetailsUpdatedEventChanges)dobChangedEvent.Changes
+            Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)dobChangedEvent.Changes
         };
         dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
@@ -240,7 +240,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         });
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
         var changeEvent = trsPerson.UpdateDetails(person.FirstName, person.MiddleName, person.LastName, person.DateOfBirth, null, updatedNationalInsuranceNumber, person.Gender, Clock.UtcNow.AddHours(-1));
-        var personUpdatedEvent = new PersonDetailsUpdatedEvent
+        var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddHours(-1),
@@ -253,7 +253,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeReason = null,
             DetailsChangeReasonDetail = null,
             DetailsChangeEvidenceFile = null,
-            Changes = (PersonDetailsUpdatedEventChanges)changeEvent.Changes
+            Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)changeEvent.Changes
         };
         dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
@@ -343,7 +343,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         });
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
         var changeEvent = trsPerson.UpdateDetails(person.FirstName, person.MiddleName, person.LastName, updatedDateOfBirth, null, updatedNationalInsuranceNumber, person.Gender, Clock.UtcNow.AddHours(-1));
-        var personUpdatedEvent = new PersonDetailsUpdatedEvent
+        var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -356,7 +356,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeReason = null,
             DetailsChangeReasonDetail = null,
             DetailsChangeEvidenceFile = null,
-            Changes = (PersonDetailsUpdatedEventChanges)changeEvent.Changes
+            Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)changeEvent.Changes
         };
         dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();

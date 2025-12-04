@@ -67,11 +67,11 @@ public class TrnRequestService(
             if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
             {
                 trn = matchResult.Trn;
-                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, matchResult.Trn), processContext);
+                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), processContext);
             }
             else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
             {
-                trn = await CompleteTrnRequestWithNewRecordAsync(trnRequest, processContext);
+                trn = await CompleteTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: false, processContext);
             }
             else
             {
@@ -90,8 +90,23 @@ public class TrnRequestService(
         return new TrnRequestInfo(trnRequest, trn);
     }
 
-    public async Task CompleteTrnRequestWithMatchedPersonAsync(TrnRequestMetadata trnRequest, (Guid PersonId, string Trn) person, ProcessContext processContext)
+    public Task CompleteTrnRequestWithMatchedPersonAsync(TrnRequestMetadata trnRequest, (Guid PersonId, string Trn) person, ProcessContext processContext) =>
+        CompleteTrnRequestWithMatchedPersonAsync(trnRequest, person, publishTrnRequestUpdatedEvent: true, processContext);
+
+    private async Task CompleteTrnRequestWithMatchedPersonAsync(
+        TrnRequestMetadata trnRequest,
+        (Guid PersonId, string Trn) person,
+        bool publishTrnRequestUpdatedEvent,
+        ProcessContext processContext)
     {
+        if (trnRequest.ResolvedPersonId is not null)
+        {
+            throw new InvalidOperationException("TRN request has already been resolved.");
+        }
+        Debug.Assert(trnRequest.Status is not TrnRequestStatus.Completed);
+
+        var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
+
         var furtherChecksNeeded = await RequiresFurtherChecksNeededSupportTaskAsync(person.PersonId, trnRequest.ApplicationUserId);
 
         var status = furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed;
@@ -114,12 +129,43 @@ public class TrnRequestService(
                 },
                 processContext);
         }
+
+        if (publishTrnRequestUpdatedEvent)
+        {
+            await eventPublisher.PublishEventAsync(
+                new TrnRequestUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    SourceApplicationUserId = trnRequest.ApplicationUserId,
+                    RequestId = trnRequest.RequestId,
+                    Changes = TrnRequestUpdatedChanges.Status | TrnRequestUpdatedChanges.ResolvedPersonId,
+                    TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
+                    OldTrnRequest = oldTrnRequestEventModel,
+                    ReasonDetails = null
+                },
+                processContext);
+        }
     }
 
-    public async Task<string> CompleteTrnRequestWithNewRecordAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public Task<string> CompleteTrnRequestWithNewRecordAsync(TrnRequestMetadata trnRequest, ProcessContext processContext) =>
+        CompleteTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: true, processContext);
+
+    private async Task<string> CompleteTrnRequestWithNewRecordAsync(
+        TrnRequestMetadata trnRequest,
+        bool publishTrnRequestUpdatedEvent,
+        ProcessContext processContext)
     {
+        if (trnRequest.ResolvedPersonId is not null)
+        {
+            throw new InvalidOperationException("TRN request has already been resolved.");
+        }
+        Debug.Assert(trnRequest.Status is not TrnRequestStatus.Completed);
+
+        var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
+
         var trn = await trnGenerator.GenerateTrnAsync();
 
+        // TODO Use PersonService when we have one
         var (person, _) = Person.Create(
             trn,
             trnRequest.FirstName!,
@@ -156,6 +202,22 @@ public class TrnRequestService(
                 TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequest)
             },
             processContext);
+
+        if (publishTrnRequestUpdatedEvent)
+        {
+            await eventPublisher.PublishEventAsync(
+                new TrnRequestUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    SourceApplicationUserId = trnRequest.ApplicationUserId,
+                    RequestId = trnRequest.RequestId,
+                    Changes = TrnRequestUpdatedChanges.Status | TrnRequestUpdatedChanges.ResolvedPersonId,
+                    TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
+                    OldTrnRequest = oldTrnRequestEventModel,
+                    ReasonDetails = null
+                },
+                processContext);
+        }
 
         return trn;
     }
@@ -225,6 +287,72 @@ public class TrnRequestService(
             now,
             (trnRequest.ApplicationUserId, trnRequest.RequestId));
 
+    public async Task UpdatePersonFromTrnRequestAsync(
+        Person person,
+        TrnRequestMetadata trnRequest,
+        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
+        ProcessContext processContext)
+    {
+        var oldPersonDetailsEventModel = EventModels.PersonDetails.FromModel(person);
+
+        // TODO Use PersonService when we have one
+        var updateResult = person.UpdateDetails(
+            firstName: attributesToUpdate.Contains(PersonMatchedAttribute.FirstName)
+                ? Option.Some(trnRequest.FirstName!)
+                : Option.None<string>(),
+            middleName: attributesToUpdate.Contains(PersonMatchedAttribute.MiddleName)
+                ? Option.Some(trnRequest.MiddleName ?? string.Empty)
+                : Option.None<string>(),
+            lastName: attributesToUpdate.Contains(PersonMatchedAttribute.LastName)
+                ? Option.Some(trnRequest.LastName!)
+                : Option.None<string>(),
+            dateOfBirth: attributesToUpdate.Contains(PersonMatchedAttribute.DateOfBirth)
+                ? Option.Some<DateOnly?>(trnRequest.DateOfBirth)
+                : Option.None<DateOnly?>(),
+            emailAddress: attributesToUpdate.Contains(PersonMatchedAttribute.EmailAddress)
+                ? Option.Some(trnRequest.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null)
+                : Option.None<EmailAddress?>(),
+            nationalInsuranceNumber: attributesToUpdate.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
+                ? Option.Some(trnRequest.NationalInsuranceNumber is string nationalInsuranceNumber
+                    ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
+                    : null)
+                : Option.None<NationalInsuranceNumber?>(),
+            gender: attributesToUpdate.Contains(PersonMatchedAttribute.Gender)
+                ? Option.Some(trnRequest.Gender)
+                : Option.None<Gender?>(),
+            processContext.Now);
+
+        await dbContext.SaveChangesAsync();
+
+        if (updateResult.Changes != 0)
+        {
+            var changes = PersonDetailsUpdatedEventChanges.None |
+                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.FirstName) ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
+                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.MiddleName) ? PersonDetailsUpdatedEventChanges.MiddleName : 0) |
+                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.LastName) ? PersonDetailsUpdatedEventChanges.LastName : 0) |
+                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.DateOfBirth) ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
+                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.EmailAddress) ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
+                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.NationalInsuranceNumber) ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
+                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.Gender) ? PersonDetailsUpdatedEventChanges.Gender : 0);
+
+            await eventPublisher.PublishEventAsync(
+                new PersonDetailsUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    PersonId = person.PersonId,
+                    PersonDetails = EventModels.PersonDetails.FromModel(person),
+                    OldPersonDetails = oldPersonDetailsEventModel,
+                    NameChangeReason = null,
+                    NameChangeEvidenceFile = null,
+                    DetailsChangeReason = null,
+                    DetailsChangeReasonDetail = null,
+                    DetailsChangeEvidenceFile = null,
+                    Changes = changes
+                },
+                processContext);
+        }
+    }
+
     // TODO Remove this
     public UpdatePersonDetailsResult UpdatePersonFromTrnRequest(
         Person person,
@@ -261,8 +389,7 @@ public class TrnRequestService(
             now);
     }
 
-    // TODO Make this private
-    public async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)
+    private async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)
     {
         var response = await idApiClient.CreateTrnTokenAsync(new CreateTrnTokenRequest() { Email = emailAddress, Trn = trn });
         return response.TrnToken;

@@ -24,8 +24,7 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
 
-        var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processId);
-        var processContext = new ProcessContext(process, clock.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, processId, clock.UtcNow);
 
         var personId = processContext.PersonIds.Single();
 
