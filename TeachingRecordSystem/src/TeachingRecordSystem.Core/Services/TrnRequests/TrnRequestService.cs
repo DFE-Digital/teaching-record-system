@@ -67,11 +67,11 @@ public class TrnRequestService(
             if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
             {
                 trn = matchResult.Trn;
-                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), publishTrnRequestUpdatedEvent: false, processContext);
+                await ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), publishTrnRequestUpdatedEvent: false, processContext);
             }
             else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
             {
-                trn = await CompleteTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: false, processContext);
+                trn = await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: false, processContext);
             }
             else
             {
@@ -90,23 +90,23 @@ public class TrnRequestService(
         return new TrnRequestInfo(trnRequest, trn);
     }
 
-    public Task CompleteTrnRequestWithMatchedPersonAsync(
+    public Task ResolveTrnRequestWithMatchedPersonAsync(
             TrnRequestMetadata trnRequest,
             (Guid PersonId, string Trn) person,
             ProcessContext processContext) =>
-        CompleteTrnRequestWithMatchedPersonAsync(
+        ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
             (person.PersonId, person.Trn),
             publishTrnRequestUpdatedEvent: true,
             processContext);
 
-    public async Task CompleteTrnRequestWithMatchedPersonAsync(
+    public async Task ResolveTrnRequestWithMatchedPersonAsync(
         TrnRequestMetadata trnRequest,
         Person person,
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
         ProcessContext processContext)
     {
-        await CompleteTrnRequestWithMatchedPersonAsync(
+        await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
             (person.PersonId, person.Trn!),
             publishTrnRequestUpdatedEvent: true,
@@ -115,7 +115,7 @@ public class TrnRequestService(
         await UpdatePersonFromTrnRequestAsync(person, trnRequest, attributesToUpdate, processContext);
     }
 
-    private async Task CompleteTrnRequestWithMatchedPersonAsync(
+    private async Task ResolveTrnRequestWithMatchedPersonAsync(
         TrnRequestMetadata trnRequest,
         (Guid PersonId, string Trn) person,
         bool publishTrnRequestUpdatedEvent,
@@ -166,10 +166,10 @@ public class TrnRequestService(
         }
     }
 
-    public Task<string> CompleteTrnRequestWithNewRecordAsync(TrnRequestMetadata trnRequest, ProcessContext processContext) =>
-        CompleteTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: true, processContext);
+    public Task<string> ResolveTrnRequestWithNewRecordAsync(TrnRequestMetadata trnRequest, ProcessContext processContext) =>
+        ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: true, processContext);
 
-    private async Task<string> CompleteTrnRequestWithNewRecordAsync(
+    private async Task<string> ResolveTrnRequestWithNewRecordAsync(
         TrnRequestMetadata trnRequest,
         bool publishTrnRequestUpdatedEvent,
         ProcessContext processContext)
@@ -250,6 +250,36 @@ public class TrnRequestService(
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
         trnRequest.SetRejected();
+
+        await eventPublisher.PublishEventAsync(
+            new TrnRequestUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SourceApplicationUserId = trnRequest.ApplicationUserId,
+                RequestId = trnRequest.RequestId,
+                Changes = TrnRequestUpdatedChanges.Status,
+                TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
+                OldTrnRequest = oldTrnRequestEventModel,
+                ReasonDetails = null
+            },
+            processContext);
+    }
+
+    public async Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    {
+        if (trnRequest.Status is not TrnRequestStatus.Pending)
+        {
+            throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be completed.");
+        }
+
+        if (trnRequest.ResolvedPersonId is null)
+        {
+            throw new InvalidOperationException("Only resolved requests can be completed.");
+        }
+
+        var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
+
+        trnRequest.SetCompleted();
 
         await eventPublisher.PublishEventAsync(
             new TrnRequestUpdatedEvent

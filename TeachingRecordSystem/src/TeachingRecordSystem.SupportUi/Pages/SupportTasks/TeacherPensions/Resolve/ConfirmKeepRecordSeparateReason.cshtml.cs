@@ -31,7 +31,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
         var state = JourneyInstance!.State;
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         var now = clock.UtcNow;
-        requestData.SetResolvedPerson(supportTask.PersonId!.Value!);
+        requestData.SetResolvedPerson(supportTask.PersonId!.Value, TrnRequestStatus.Completed);
 
         // Conditionally override the value in Reason.
         // if KeepSeparateReason is AnotherReason - the event will contain the reason provided from the user
