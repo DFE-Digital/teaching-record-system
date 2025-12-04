@@ -67,9 +67,8 @@ public class TrnRequestService(
         {
             if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
             {
-                // TODO Amend matchResult to include TRN so we don't have to re-query DB
-                trn = await dbContext.Persons.Where(p => p.PersonId == matchResult.PersonId).Select(p => p.Trn!).SingleAsync();
-                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), processContext);
+                trn = matchResult.Trn;
+                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, matchResult.Trn), processContext);
             }
             else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
             {
