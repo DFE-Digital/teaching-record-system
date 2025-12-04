@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
@@ -14,13 +13,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = task.CreatedOn.ToString("d/M/yyyy");
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
+        Assert.Collection(result.SearchResults, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
     }
 
     [Fact]
@@ -31,13 +31,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = task.TrnRequestMetadata!.EmailAddress;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
+        Assert.Collection(result.SearchResults, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
     }
 
     [Fact]
@@ -48,13 +49,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = $"{task.TrnRequestMetadata!.FirstName} {task.TrnRequestMetadata.LastName}";
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
+        Assert.Collection(result.SearchResults, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
     }
 
     [Fact]
@@ -65,13 +67,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
+        Assert.Collection(result.SearchResults, r => Assert.Equal(task.SupportTaskReference, r.SupportTaskReference));
     }
 
     [Fact]
@@ -89,13 +92,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         });
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Empty(results);
+        Assert.Empty(result.SearchResults);
     }
 
     [Fact]
@@ -107,13 +111,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Bob").WithLastName("Yellow"));
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Name, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.Name, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results,
+        Assert.Collection(result.SearchResults,
             r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference),
             r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference));
     }
@@ -127,13 +132,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithFirstName("Bob").WithLastName("Yellow"));
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Name, SortDirection.Descending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.Name, SortDirection.Descending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results,
+        Assert.Collection(result.SearchResults,
             r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference),
             r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference));
     }
@@ -147,13 +153,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("bob@example.com"));
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Email, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.Email, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results,
+        Assert.Collection(result.SearchResults,
             r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference),
             r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference));
     }
@@ -167,13 +174,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, r => r.WithEmailAddress("bob@example.com"));
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Email, SortDirection.Descending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.Email, SortDirection.Descending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results,
+        Assert.Collection(result.SearchResults,
             r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference),
             r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference));
     }
@@ -188,13 +196,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results,
+        Assert.Collection(result.SearchResults,
             r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference),
             r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference));
     }
@@ -209,13 +218,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (task2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Descending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.RequestedOn, SortDirection.Descending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results,
+        Assert.Collection(result.SearchResults,
             r => Assert.Equal(task2.SupportTaskReference, r.SupportTaskReference),
             r => Assert.Equal(task1.SupportTaskReference, r.SupportTaskReference));
     }
@@ -230,13 +240,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (taskForUser2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Source, SortDirection.Ascending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.Source, SortDirection.Ascending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results,
+        Assert.Collection(result.SearchResults,
             r => Assert.Equal(taskForUser1.SupportTaskReference, r.SupportTaskReference),
             r => Assert.Equal(taskForUser2.SupportTaskReference, r.SupportTaskReference));
     }
@@ -251,13 +262,14 @@ public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : Ser
         var (taskForUser2, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
 
         var search = string.Empty;
-        var options = new SearchApiTrnRequestsOptions(search, ApiTrnRequestsSortByOption.Source, SortDirection.Descending);
+        var searchOptions = new ApiTrnRequestsSearchOptions(search, ApiTrnRequestsSortByOption.Source, SortDirection.Descending);
+        var paginationOptions = new PaginationOptions(1, 10);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchApiTrnRequests(options).ToArrayAsync());
+        var result = await WithServiceAsync<SupportTaskSearchService, ApiTrnRequestsSearchResult>(service => service.SearchApiTrnRequestsAsync(searchOptions, paginationOptions));
 
         // Assert
-        Assert.Collection(results,
+        Assert.Collection(result.SearchResults,
             r => Assert.Equal(taskForUser2.SupportTaskReference, r.SupportTaskReference),
             r => Assert.Equal(taskForUser1.SupportTaskReference, r.SupportTaskReference));
     }

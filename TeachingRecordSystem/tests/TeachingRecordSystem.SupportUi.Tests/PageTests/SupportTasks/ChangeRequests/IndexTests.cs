@@ -25,6 +25,42 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
+    }
+
+    [Theory]
+    [InlineData(SupportTaskType.ChangeNameRequest)]
+    [InlineData(SupportTaskType.ChangeDateOfBirthRequest)]
+    public async Task Get_WithChangeRequest_ButNotMatchingSearchCriteria_ShowsNoResultsMessage(SupportTaskType supportTaskType)
+    {
+        // Arrange
+        var createPersonResult = await TestData.CreatePersonAsync();
+        SupportTask supportTask;
+
+        if (supportTaskType == SupportTaskType.ChangeNameRequest)
+        {
+            supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+                createPersonResult.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+        }
+        else
+        {
+            supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+                createPersonResult.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?Search=XXX");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Empty(doc.GetElementsByTagName("table"));
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.NotNull(doc.GetElementByTestId("no-results-message"));
     }
 
     [Theory]
@@ -56,6 +92,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
 
         var resultRow = doc.GetElementByTestId("results")
             ?.GetElementsByTagName("tbody")
@@ -93,7 +132,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetElementsByTagName("table"));
-        Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.NotNull(doc.GetElementByTestId("no-results-message"));
     }
 
     [Fact]

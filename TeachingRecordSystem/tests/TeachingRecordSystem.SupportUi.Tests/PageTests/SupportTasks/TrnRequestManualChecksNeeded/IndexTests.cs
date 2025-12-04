@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequestManualChecksNeeded;
 
@@ -168,7 +168,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.Name}&sortDirection={SortDirection.Ascending}");
+            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksSortByOption.Name}&sortDirection={SortDirection.Ascending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -191,7 +191,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.Name}&sortDirection={SortDirection.Descending}");
+            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksSortByOption.Name}&sortDirection={SortDirection.Descending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -214,7 +214,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateOfBirth}&sortDirection={SortDirection.Ascending}");
+            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksSortByOption.DateOfBirth}&sortDirection={SortDirection.Ascending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -237,7 +237,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateOfBirth}&sortDirection={SortDirection.Descending}");
+            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksSortByOption.DateOfBirth}&sortDirection={SortDirection.Descending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -262,7 +262,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateCreated}&sortDirection={SortDirection.Ascending}");
+            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksSortByOption.DateCreated}&sortDirection={SortDirection.Ascending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -287,7 +287,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateCreated}&sortDirection={SortDirection.Descending}");
+            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksSortByOption.DateCreated}&sortDirection={SortDirection.Descending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -313,7 +313,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.Source}&sortDirection={SortDirection.Ascending}");
+            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksSortByOption.Source}&sortDirection={SortDirection.Ascending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -339,7 +339,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.Source}&sortDirection={SortDirection.Descending}");
+            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksSortByOption.Source}&sortDirection={SortDirection.Descending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

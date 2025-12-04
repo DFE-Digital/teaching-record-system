@@ -1,9 +1,5 @@
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
+//namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
 
-public enum TeacherPensionsSortOptions
-{
-    Name,
-    CreatedOn,
-    Filename,
-    InterfaceId
-}
+//public enum TeacherPensionsSortOptions
+//{
+//}

@@ -1,12 +1,11 @@
-using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests;
 
-public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
+public class IndexModel(SupportTaskSearchService supportTaskSearchService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int TasksPerPage = 20;
 
@@ -27,11 +26,13 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [BindProperty(SupportsGet = true)]
     public SupportTaskType[]? ChangeRequestTypes { get; set; }
 
+    public int? TotalRequestCount { get; set; }
+
     public int? NameChangeRequestCount { get; set; }
 
     public int? DateOfBirthChangeRequestCount { get; set; }
 
-    public ResultPage<Result>? Results { get; set; }
+    public ResultPage<ChangeRequestsSearchResultItem>? Results { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }
 
@@ -40,75 +41,19 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public async Task<IActionResult> OnGetAsync()
     {
-        var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
-        var sortBy = SortBy ??= ChangeRequestsSortByOption.RequestedOn;
-        var tasks = dbContext.SupportTasks
-            .Include(t => t.Person)
-            .Where(t => (t.SupportTaskType == SupportTaskType.ChangeNameRequest || t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest)
-                        && t.Status == SupportTaskStatus.Open);
+        var searchOptions = new ChangeRequestsSearchOptions(Search, SortBy, SortDirection, FormSubmitted, ChangeRequestTypes);
+        var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        NameChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeNameRequest);
-        DateOfBirthChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest);
-
-        if (FormSubmitted || ChangeRequestTypes?.Length > 0)
-        {
-            ChangeRequestTypes ??= [];
-            tasks = tasks.Where(t => ChangeRequestTypes.Contains(t.SupportTaskType));
-        }
-
-        Search = Search?.Trim() ?? string.Empty;
-
-        var nameParts = Search
-            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(n => n.ToLower(CultureInfo.InvariantCulture))
-            .ToArray();
-
-        if (nameParts.Length > 0)
-        {
-            tasks = tasks.Where(t =>
-                 nameParts.All(n => EF.Property<string[]>(t.Person!, "names").Contains(n)));
-        }
-
-        if (sortBy == ChangeRequestsSortByOption.Name)
-        {
-            tasks = tasks
-                .OrderBy(sortDirection, t => t.Person!.FirstName)
-                .ThenBy(sortDirection, t => t.Person!.MiddleName)
-                .ThenBy(sortDirection, t => t.Person!.LastName);
-        }
-        else if (sortBy == ChangeRequestsSortByOption.RequestedOn)
-        {
-            tasks = tasks.OrderBy(sortDirection, t => t.CreatedOn);
-        }
-        else if (sortBy == ChangeRequestsSortByOption.ChangeType)
-        {
-            tasks = tasks.OrderBy(sortDirection, t => t.SupportTaskType);
-        }
-
-        Results = await tasks
-            .Select(t => new Result(
-                t.SupportTaskReference,
-                t.Person!.FirstName,
-                t.Person.MiddleName,
-                t.Person.LastName,
-                StringHelper.JoinNonEmpty(' ', t.Person.FirstName, t.Person.MiddleName, t.Person.LastName),
-                t.CreatedOn,
-                t.SupportTaskType))
-            .GetPageAsync(PageNumber, TasksPerPage);
+        var result = await supportTaskSearchService.SearchChangeRequestsAsync(searchOptions, paginationOptions);
+        TotalRequestCount = result.TotalRequestCount;
+        NameChangeRequestCount = result.NameChangeRequestCount;
+        DateOfBirthChangeRequestCount = result.DateOfBirthChangeRequestCount;
+        Results = result.SearchResults;
 
         Pagination = PaginationViewModel.Create(
             Results,
-            pageNumber => linkGenerator.SupportTasks.ChangeRequests.Index(sortBy: SortBy.Value, sortDirection: SortDirection.Value, pageNumber: pageNumber));
+            pageNumber => linkGenerator.SupportTasks.ChangeRequests.Index(sortBy: SortBy, sortDirection: SortDirection, pageNumber: pageNumber));
 
         return Page();
     }
-
-    public record Result(
-        string SupportTaskReference,
-        string FirstName,
-        string MiddleName,
-        string LastName,
-        string Name,
-        DateTime CreatedOn,
-        SupportTaskType SupportTaskType);
 }

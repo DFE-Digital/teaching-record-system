@@ -21,8 +21,33 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
         Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
+    }
+
+    [Fact]
+    public async Task Get_WithTask_ButNotMatchingSearchCriteria_ShowsNoResultsMessage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var firstName = TestData.GenerateFirstName();
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            configure: t => t.WithFirstName(firstName));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/api-trn-requests/?Search=XXX");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Empty(doc.GetElementsByTagName("table"));
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.NotNull(doc.GetElementByTestId("no-results-message"));
     }
 
     [Fact]
@@ -39,6 +64,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
 
         var resultRow = doc.GetElementByTestId("results")
             ?.GetElementsByTagName("tbody")

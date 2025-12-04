@@ -1,6 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests;
 
@@ -21,8 +21,33 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
         Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
+    }
+
+    [Fact]
+    public async Task Get_WithTask_ButNotMatchingSearchCriteria_ShowsNoResultsMessage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
+        var firstName = TestData.GenerateFirstName();
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            configure: t => t.WithFirstName(firstName));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/npq-trn-requests/?Search=XXX");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Empty(doc.GetElementsByTagName("table"));
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.NotNull(doc.GetElementByTestId("no-results-message"));
     }
 
     [Fact]
@@ -39,6 +64,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
 
         var resultRow = doc.GetElementByTestId("results")
             ?.GetElementsByTagName("tbody")
@@ -238,7 +266,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={SortByOption.Name}&sortDirection={SortDirection.Ascending}");
+            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.Name}&sortDirection={SortDirection.Ascending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -267,7 +295,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={SortByOption.Name}&sortDirection={SortDirection.Descending}");
+            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.Name}&sortDirection={SortDirection.Descending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -296,7 +324,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={SortByOption.Email}&sortDirection={SortDirection.Ascending}");
+            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.Email}&sortDirection={SortDirection.Ascending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -325,7 +353,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={SortByOption.Email}&sortDirection={SortDirection.Descending}");
+            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.Email}&sortDirection={SortDirection.Descending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -354,7 +382,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={SortByOption.RequestedOn}&sortDirection={SortDirection.Ascending}");
+            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.RequestedOn}&sortDirection={SortDirection.Ascending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -383,7 +411,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={SortByOption.RequestedOn}&sortDirection={SortDirection.Descending}");
+            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.RequestedOn}&sortDirection={SortDirection.Descending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -418,7 +446,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={SortByOption.PotentialDuplicate}&sortDirection={SortDirection.Ascending}");
+            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.PotentialDuplicate}&sortDirection={SortDirection.Ascending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -452,7 +480,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={SortByOption.PotentialDuplicate}&sortDirection={SortDirection.Descending}");
+            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.PotentialDuplicate}&sortDirection={SortDirection.Descending}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

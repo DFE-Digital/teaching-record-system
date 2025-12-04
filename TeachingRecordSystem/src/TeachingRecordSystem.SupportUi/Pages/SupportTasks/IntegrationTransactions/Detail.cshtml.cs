@@ -62,7 +62,7 @@ public class DetailModel(TrsDbContext context) : PageModel
             _ => r => r.Status
         };
 
-        var sortedRecords = records.OrderBy(sortDirection, sortExpr);
+        var sortedRecords = records.OrderBy(sortExpr, sortDirection);
 
         IntegrationTransaction = new ItDetailResult(
             IntegrationTransactionId: integrationTransaction.IntegrationTransactionId,
