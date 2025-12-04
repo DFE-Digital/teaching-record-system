@@ -1194,7 +1194,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     }
 
     [Fact]
-    public async Task Import_MatchesExistingPersonOnNinoAndDobAndGender_CreatesPersonAndCreatesPotentialDuplicateSupportTask_ReportsDuplicate()
+    public async Task Import_MatchesExistingPersonOnNinoAndDobAndGender_CreatesPersonAndCreatesSupportTask()
     {
         // Arrange
         var existingPerson = await TestData.CreatePersonAsync(p => p
@@ -1249,11 +1249,11 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var task = await AssertSingleSupportTaskAsync(SupportTaskType.TeacherPensionsPotentialDuplicate, newPerson.PersonId);
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
-        Assert.True(trnRequest.PotentialDuplicate);
+        Assert.False(trnRequest.PotentialDuplicate);  // Definite match is *not* a PotentialDuplicate
     }
 
     [Fact]
-    public async Task Import_MatchesExistingPersonOnNinoAndDob_CreatesPersonAndCreatesPotentialDuplicateSupportTask_ReportsDuplicate()
+    public async Task Import_MatchesExistingPersonOnNinoAndDob_CreatesPersonAndCreatesSupportTask()
     {
         // Arrange
         var existingPerson = await TestData.CreatePersonAsync(p => p
@@ -1306,7 +1306,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var task = await AssertSingleSupportTaskAsync(SupportTaskType.TeacherPensionsPotentialDuplicate, newPerson.PersonId);
 
         var trnRequest = await AssertSingleTrnRequestMetadataAsync(task.TrnRequestId);
-        Assert.True(trnRequest.PotentialDuplicate);
+        Assert.False(trnRequest.PotentialDuplicate);  // Definite match is *not* a PotentialDuplicate
     }
 
     [Fact]

@@ -3,6 +3,8 @@ using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using PostgresModels = TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using SupportTaskCreatedEvent = TeachingRecordSystem.Core.Events.SupportTaskCreatedEvent;
+
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
 [Collection(nameof(DisableParallelization))]
@@ -662,6 +664,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         await AssertEventCreatedAsync();
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.NpqTrnRequestTaskCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
+        });
     }
 
     private Task AssertMetadataExpectedAsync(RequestTrnJourneyState request, bool expectedPotentialDuplicate) =>

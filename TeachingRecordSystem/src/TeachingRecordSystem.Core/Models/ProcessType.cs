@@ -15,5 +15,6 @@ public enum ProcessType
     NoteCreating = 11,
     ChangeOfDateOfBirthRequestCreating = 12,
     ChangeOfNameRequestCreating = 13,
-    ApiTrnRequestCreating = 14
+    ApiTrnRequestCreating = 14,
+    NpqTrnRequestTaskCreating = 15
 }

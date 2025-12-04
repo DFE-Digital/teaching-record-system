@@ -56,7 +56,6 @@ public class TrnRequestService(
         };
 
         var matchResult = await MatchPersonsAsync(trnRequest);
-        trnRequest.PotentialDuplicate = matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches;
 
         dbContext.TrnRequestMetadata.Add(trnRequest);
 
@@ -284,6 +283,8 @@ public class TrnRequestService(
 
     public async Task<MatchPersonsResult> MatchPersonsAsync(TrnRequestMetadata request, params Guid[] excludePersonIds)
     {
+        request.PotentialDuplicate = false;
+
         var results = (await GetMatchesFromTrnRequestAsync(request)).ToList();
         results.RemoveAll(r => excludePersonIds.Contains(r.person_id));
 
@@ -315,6 +316,7 @@ public class TrnRequestService(
             return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.person_id, singleNameDobEmailGenderMatch.trn);
         }
 
+        request.PotentialDuplicate = true;
         return MatchPersonsResult.PotentialMatches(results.Select(r => r.person_id));
     }
 

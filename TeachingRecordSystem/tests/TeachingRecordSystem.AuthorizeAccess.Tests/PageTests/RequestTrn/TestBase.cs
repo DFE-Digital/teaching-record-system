@@ -24,7 +24,9 @@ public abstract class TestBase : IDisposable
 
     public HostFixture HostFixture { get; }
 
-    public CaptureEventObserver EventObserver => _testServices.EventObserver;
+    public EventCapture Events => _testServices.Events;
+
+    public CaptureEventObserver LegacyEventObserver => _testServices.LegacyEventObserver;
 
     public TestableClock Clock => _testServices.Clock;
 

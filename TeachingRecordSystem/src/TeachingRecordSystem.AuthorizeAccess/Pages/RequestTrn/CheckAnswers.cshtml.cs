@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
@@ -15,14 +16,14 @@ public class CheckAnswersModel(
     AuthorizeAccessLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
+    SupportTaskService supportTaskService,
+    IEventPublisher eventPublisher,
     IFileService fileService,
     IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
-
-    public RequestTrnJourneyState? JourneyState { get; set; }
 
     public string? WorkEmail { get; set; }
 
@@ -34,8 +35,8 @@ public class CheckAnswersModel(
     public string? PreviousMiddleName { get; set; }
     public string? PreviousLastName { get; set; }
 
-    public string? Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
-    public string? PreviousName => StringHelper.JoinNonEmpty(' ', PreviousFirstName, PreviousMiddleName, PreviousLastName);
+    public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+    public string PreviousName => StringHelper.JoinNonEmpty(' ', PreviousFirstName, PreviousMiddleName, PreviousLastName);
 
     public DateOnly? DateOfBirth { get; set; }
 
@@ -98,10 +99,12 @@ public class CheckAnswersModel(
         var state = JourneyInstance!.State;
         var requestId = Guid.NewGuid().ToString();
 
-        var trnRequestMetadata = new TrnRequestMetadata
+        var processContext = new ProcessContext(ProcessType.NpqTrnRequestTaskCreating, clock.UtcNow, ApplicationUser.NpqApplicationUserGuid);
+
+        var trnRequest = new TrnRequestMetadata
         {
             OneLoginUserSubject = null,
-            CreatedOn = clock.UtcNow,
+            CreatedOn = processContext.Now,
             RequestId = requestId,
             IdentityVerified = false,
             ApplicationUserId = ApplicationUser.NpqApplicationUserGuid,
@@ -129,26 +132,30 @@ public class CheckAnswersModel(
             NpqWorkingInEducationalSetting = state.WorkingInSchoolOrEducationalSetting
         };
 
-        // look for potential matches
-        var matchResult = await trnRequestService.MatchPersonsAsync(trnRequestMetadata);
-        trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches;
+        // Required to assign the PotentialDuplicate property on the TRN request
+        await trnRequestService.MatchPersonsAsync(trnRequest);
 
-        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+        dbContext.TrnRequestMetadata.Add(trnRequest);
+        await dbContext.SaveChangesAsync();
 
-        var supportTask = SupportTask.Create(
-            supportTaskType: SupportTaskType.NpqTrnRequest,
-            data: new NpqTrnRequestData(),
-            personId: null,
-            oneLoginUserSubject: null,
-            trnRequestApplicationUserId: ApplicationUser.NpqApplicationUserGuid,
-            trnRequestId: requestId,
-            createdBy: ApplicationUser.NpqApplicationUserGuid,
-            now: clock.UtcNow,
-            out var createdEvent
-            );
-        dbContext.SupportTasks.Add(supportTask);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
-        dbContext.SaveChanges();
+        await eventPublisher.PublishEventAsync(
+            new TrnRequestCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest)
+            },
+            processContext);
+
+        await supportTaskService.CreateSupportTaskAsync(
+            new CreateSupportTaskOptions
+            {
+                SupportTaskType = SupportTaskType.NpqTrnRequest,
+                Data = new NpqTrnRequestData(),
+                PersonId = null,
+                OneLoginUserSubject = null,
+                TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
+            },
+            processContext);
 
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
 
