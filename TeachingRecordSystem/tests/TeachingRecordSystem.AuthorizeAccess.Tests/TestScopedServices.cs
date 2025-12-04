@@ -11,7 +11,8 @@ public class TestScopedServices
     public TestScopedServices()
     {
         Clock = new();
-        EventObserver = new();
+        Events = new();
+        LegacyEventObserver = new();
         GetAnIdentityApiClient = new();
         BlobStorageFileService = new();
     }
@@ -20,7 +21,9 @@ public class TestScopedServices
         services
             .AddSingleton<IClock>(new ForwardToTestScopedClock())
             .AddSingleton<IEventObserver>(new ForwardToTestScopedEventObserver())
-            .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object);
+            .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
+            .AddTestScoped(tss => tss.Events)
+            .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>());
 
     public static TestScopedServices GetCurrent() =>
         _current.Value ?? throw new InvalidOperationException("No current instance has been set.");
@@ -37,7 +40,9 @@ public class TestScopedServices
 
     public TestableClock Clock { get; }
 
-    public CaptureEventObserver EventObserver { get; }
+    public EventCapture Events { get; }
+
+    public CaptureEventObserver LegacyEventObserver { get; }
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 
@@ -50,7 +55,7 @@ public class TestScopedServices
 
     private class ForwardToTestScopedEventObserver : IEventObserver
     {
-        public void OnEventCreated(LegacyEvents.EventBase @event) => GetCurrent().EventObserver.OnEventCreated(@event);
+        public void OnEventCreated(LegacyEvents.EventBase @event) => GetCurrent().LegacyEventObserver.OnEventCreated(@event);
     }
 }
 

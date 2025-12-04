@@ -186,8 +186,6 @@ public class CapitaImportJob(
                         //create task
                         if (potentialMatches.Outcome is MatchPersonsResultOutcome.PotentialMatches or MatchPersonsResultOutcome.DefiniteMatch)
                         {
-                            trnRequestMetadata.PotentialDuplicate = true;
-
                             dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
                             potentialDuplicate = true;
