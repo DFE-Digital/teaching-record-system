@@ -138,7 +138,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? ChangeRequestsSortByOption.RequestedOn;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
-        var changeRequestTypes = searchOptions.ChangeRequestTypes ?? [];
+        var changeRequestTypes = searchOptions.ChangeRequestTypes ?? [SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest];
 
         var tasks = dbContext.SupportTasks
             .Include(t => t.Person)
@@ -148,10 +148,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var nameChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeNameRequest);
         var dateOfBirthChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest);
 
-        if (searchOptions.FormSubmitted || changeRequestTypes.Length > 0)
-        {
-            tasks = tasks.Where(t => changeRequestTypes.Contains(t.SupportTaskType));
-        }
+        tasks = tasks.Where(t => changeRequestTypes.Contains(t.SupportTaskType));
 
         if (SearchTextIsName(search, out var nameParts))
         {
@@ -198,7 +195,6 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? TrnRequestManualChecksSortByOption.DateCreated;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
-        var sources = searchOptions.Sources ?? [];
 
         var baseQuery = dbContext.SupportTasks
             .Include(t => t.TrnRequestMetadata)
@@ -213,6 +209,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         var totalTaskCount = groupedBySource.Sum(g => g.Count);
 
+        var sources = searchOptions.Sources ?? groupedBySource.Select(g => g.UserId).ToArray();
         var facets = new Dictionary<SupportTaskSearchFacet, IReadOnlyDictionary<object, int>>
         {
             [SupportTaskSearchFacet.Sources] = groupedBySource.ToDictionary(object (g) => new SupportTaskSource(g.UserId, g.UserName), g => g.Count)
@@ -221,14 +218,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var tasks = baseQuery.Join(dbContext.Persons, t =>
             t.TrnRequestMetadata!.ResolvedPersonId, p => p.PersonId, (t, p) => new { Task = t, Person = p });
 
-        if (searchOptions.FormSubmitted || searchOptions.Sources?.Length > 0)
-        {
-            tasks = tasks.Where(t => sources.Contains(t.Task.TrnRequestMetadata!.ApplicationUserId));
-        }
-        else
-        {
-            sources = groupedBySource.Select(g => g.UserId).ToArray();
-        }
+        tasks = tasks.Where(t => sources.Contains(t.Task.TrnRequestMetadata!.ApplicationUserId));
 
         if (SearchTextIsName(search, out var nameParts))
         {

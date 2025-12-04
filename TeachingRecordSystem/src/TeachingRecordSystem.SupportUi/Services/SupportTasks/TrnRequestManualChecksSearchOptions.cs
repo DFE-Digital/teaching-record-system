@@ -4,7 +4,6 @@ public record TrnRequestManualChecksSearchOptions(
     string? Search,
     TrnRequestManualChecksSortByOption? SortBy,
     SortDirection? SortDirection,
-    bool FormSubmitted,
     Guid[]? Sources);
 
 public enum TrnRequestManualChecksSortByOption

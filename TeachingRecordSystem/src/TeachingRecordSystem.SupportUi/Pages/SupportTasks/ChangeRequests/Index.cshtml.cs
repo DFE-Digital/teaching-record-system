@@ -41,7 +41,7 @@ public class IndexModel(SupportTaskSearchService supportTaskSearchService, Suppo
 
     public async Task<IActionResult> OnGetAsync()
     {
-        var searchOptions = new ChangeRequestsSearchOptions(Search, SortBy, SortDirection, FormSubmitted, ChangeRequestTypes);
+        var searchOptions = new ChangeRequestsSearchOptions(Search, SortBy, SortDirection, FormSubmitted ? ChangeRequestTypes : null);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
         var result = await supportTaskSearchService.SearchChangeRequestsAsync(searchOptions, paginationOptions);

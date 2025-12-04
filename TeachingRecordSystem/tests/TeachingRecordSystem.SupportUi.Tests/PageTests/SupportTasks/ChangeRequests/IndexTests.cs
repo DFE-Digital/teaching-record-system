@@ -179,7 +179,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var changeRequestTypesQueryParam = string.Join("&", supportTaskTypes.Select(t => $"changeRequestTypes={t}"));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?{changeRequestTypesQueryParam}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?_f=true&{changeRequestTypesQueryParam}");
         // Act
         var response = await HttpClient.SendAsync(request);
         // Assert
