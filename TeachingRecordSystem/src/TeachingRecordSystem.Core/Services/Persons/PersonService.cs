@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Services.Persons;
@@ -7,32 +8,8 @@ namespace TeachingRecordSystem.Core.Services.Persons;
 public class PersonService(
     TrsDbContext dbContext,
     IClock clock,
-    ITrnGenerator trnGenerator,
-    IEventPublisher eventPublisher)
+    ITrnGenerator trnGenerator)
 {
-    public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
-    {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleAsync(p => p.PersonId == options.DeactivatingPersonId);
-
-        if (deactivatingPerson.Status is PersonStatus.Deactivated)
-        {
-            throw new InvalidOperationException("Cannot merge a person that is already deactivated.");
-        }
-
-        deactivatingPerson.Status = PersonStatus.Deactivated;
-        deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
-        await dbContext.SaveChangesAsync();
-
-        await eventPublisher.PublishEventAsync(
-            new PersonDeactivatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                PersonId = options.DeactivatingPersonId,
-                MergedWithPersonId = options.RetainedPersonId
-            },
-            processContext);
-    }
-
     public async Task<string?> GetTrnFromPersonIdAsync(Guid personId)
     {
         return (await dbContext.Persons.SingleAsync(q => q.PersonId == personId)).Trn;
@@ -56,10 +33,20 @@ public class PersonService(
 
         var trn = await trnGenerator.GenerateTrnAsync();
 
-        var (person, personAttributes) = Person.Create(
-            trn,
-            request.PersonDetails,
-            now);
+        var person = new Person
+        {
+            PersonId = Guid.NewGuid(),
+            Trn = trn,
+            FirstName = request.PersonDetails.FirstName,
+            MiddleName = request.PersonDetails.MiddleName,
+            LastName = request.PersonDetails.LastName,
+            DateOfBirth = request.PersonDetails.DateOfBirth,
+            EmailAddress = (string?)request.PersonDetails.EmailAddress,
+            NationalInsuranceNumber = (string?)request.PersonDetails.NationalInsuranceNumber,
+            Gender = request.PersonDetails.Gender,
+            CreatedOn = now,
+            UpdatedOn = now
+        };
 
         var createdEvent = new LegacyEvents.PersonCreatedEvent
         {
@@ -67,7 +54,7 @@ public class PersonService(
             CreatedUtc = now,
             RaisedBy = request.UserId,
             PersonId = person.PersonId,
-            PersonAttributes = personAttributes,
+            PersonAttributes = request.PersonDetails.ToEventModel(),
             CreateReason = request.Justification.Reason.GetDisplayName(),
             CreateReasonDetail = request.Justification.ReasonDetail,
             EvidenceFile = request.Justification.Evidence?.ToEventModel(),
@@ -87,25 +74,50 @@ public class PersonService(
 
         var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == request.PersonId);
 
-        var updateResult = person!.UpdateDetails(
-            request.PersonDetails,
-            now);
+        if (person is null)
+        {
+            throw new TrsPersonNotFoundException($"Person with ID {request.PersonId} not found.");
+        }
 
-        var updatedEvent = updateResult.Changes != 0 ?
+        var oldAttributes = EventModels.PersonDetails.FromModel(person);
+
+        person.FirstName = request.PersonDetails.FirstName;
+        person.MiddleName = request.PersonDetails.MiddleName;
+        person.LastName = request.PersonDetails.LastName;
+        person.DateOfBirth = request.PersonDetails.DateOfBirth;
+        person.EmailAddress = (string?)request.PersonDetails.EmailAddress;
+        person.NationalInsuranceNumber = (string?)request.PersonDetails.NationalInsuranceNumber;
+        person.Gender = request.PersonDetails.Gender;
+
+        var changes = 0 |
+            (person.FirstName != oldAttributes.FirstName ? LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName : 0) |
+            (person.MiddleName != oldAttributes.MiddleName ? LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName : 0) |
+            (person.LastName != oldAttributes.LastName ? LegacyEvents.PersonDetailsUpdatedEventChanges.LastName : 0) |
+            (person.DateOfBirth != oldAttributes.DateOfBirth ? LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
+            (person.EmailAddress != oldAttributes.EmailAddress ? LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
+            (person.NationalInsuranceNumber != oldAttributes.NationalInsuranceNumber ? LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
+            (person.Gender != oldAttributes.Gender ? LegacyEvents.PersonDetailsUpdatedEventChanges.Gender : 0);
+
+        if (changes != 0)
+        {
+            person.UpdatedOn = now;
+        }
+
+        var updatedEvent = changes != 0 ?
             new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
                 RaisedBy = request.UserId,
                 PersonId = request.PersonId,
-                PersonAttributes = updateResult.PersonAttributes,
-                OldPersonAttributes = updateResult.OldPersonAttributes,
+                PersonAttributes = request.PersonDetails.ToEventModel(),
+                OldPersonAttributes = oldAttributes,
                 NameChangeReason = request.NameChangeJustification?.Reason.GetDisplayName(),
                 NameChangeEvidenceFile = request.NameChangeJustification?.Evidence?.ToEventModel(),
                 DetailsChangeReason = request.DetailsChangeJustification?.Reason.GetDisplayName(),
                 DetailsChangeReasonDetail = request.DetailsChangeJustification?.ReasonDetail,
                 DetailsChangeEvidenceFile = request.DetailsChangeJustification?.Evidence?.ToEventModel(),
-                Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)updateResult.Changes
+                Changes = changes
             } :
             null;
 
@@ -140,20 +152,34 @@ public class PersonService(
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(p => p.PersonId == request.PersonId);
 
-        person!.SetStatus(
-            request.TargetStatus,
-            request.TargetStatus == PersonStatus.Deactivated
+        if (person is null)
+        {
+            throw new TrsPersonNotFoundException($"Person with ID {request.PersonId} not found.");
+        }
+
+        var oldStatus = person.Status;
+        person.Status = request.TargetStatus;
+        person.UpdatedOn = now;
+
+        var @event = new PersonStatusUpdatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = request.UserId,
+            PersonId = request.PersonId,
+            Status = person.Status,
+            OldStatus = oldStatus,
+            Reason = request.TargetStatus == PersonStatus.Deactivated
                 ? request.DeactivateJustification!.Reason.GetDisplayName()
                 : request.ReactivateJustification!.Reason.GetDisplayName(),
-            request.TargetStatus == PersonStatus.Deactivated
+            ReasonDetail = request.TargetStatus == PersonStatus.Deactivated
                 ? request.DeactivateJustification!.ReasonDetail
                 : request.ReactivateJustification!.ReasonDetail,
-            request.TargetStatus == PersonStatus.Deactivated
+            EvidenceFile = request.TargetStatus == PersonStatus.Deactivated
                 ? request.DeactivateJustification!.Evidence?.ToEventModel()
                 : request.ReactivateJustification!.Evidence?.ToEventModel(),
-            request.UserId,
-            now,
-            out var @event);
+            DateOfDeath = null
+        };
 
         if (@event is not null)
         {
