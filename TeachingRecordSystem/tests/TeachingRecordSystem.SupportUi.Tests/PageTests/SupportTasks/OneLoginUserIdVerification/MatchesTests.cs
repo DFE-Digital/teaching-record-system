@@ -242,7 +242,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
         var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
 
-        var person1 = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
 
         var journeyState = new ResolveOneLoginUserIdVerificationState
         {
@@ -263,6 +263,188 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_TaskIsClosed_ReturnsNotFound()
+    {
+        // Arrange
+        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject, options =>
+        {
+            options.WithStatus(SupportTaskStatus.Closed);
+        });
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
+
+        // Person who matches on last name & DOB
+        var person = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
+
+        var journeyState = new ResolveOneLoginUserIdVerificationState
+        {
+            CanIdentityBeVerified = true
+        };
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ResolveOneLoginUserIdVerification,
+            journeyState,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "MatchedPersonId", person.PersonId } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_SubmittedPersonIdIsNotValid_ReturnsBadRequest()
+    {
+        // Arrange
+        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject);
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
+
+        // Person who matches on last name & DOB
+        var person = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
+
+        var journeyState = new ResolveOneLoginUserIdVerificationState
+        {
+            CanIdentityBeVerified = true
+        };
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ResolveOneLoginUserIdVerification,
+            journeyState,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "MatchedPersonId", Guid.NewGuid() } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_NoChosenOption_ReturnsError()
+    {
+        // Arrange
+        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject);
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
+
+        // Person who matches on last name & DOB
+        var person = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
+
+        var journeyState = new ResolveOneLoginUserIdVerificationState
+        {
+            CanIdentityBeVerified = true
+        };
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ResolveOneLoginUserIdVerification,
+            journeyState,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "MatchedPersonId", "Select what you want to do with this GOV.UK One Login account");
+    }
+
+    [Fact]
+    public async Task Post_ValidPersonIdChosen_UpdatesStateAndRedirects()
+    {
+        // Arrange
+        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject);
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
+
+        // Person who matches on last name & DOB
+        var person = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
+
+        var journeyState = new ResolveOneLoginUserIdVerificationState
+        {
+            CanIdentityBeVerified = true
+        };
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ResolveOneLoginUserIdVerification,
+            journeyState,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "MatchedPersonId", person.PersonId } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/confirm-connect?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(person.PersonId, journeyInstance.State.MatchedPersonId);
+    }
+
+    [Fact]
+    public async Task Post_DoNotConnectToRecordChosen_UpdatesStateAndRedirects()
+    {
+        // Arrange
+        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject);
+        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
+
+        // Person who matches on last name & DOB
+        var person = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
+
+        var journeyState = new ResolveOneLoginUserIdVerificationState
+        {
+            CanIdentityBeVerified = true
+        };
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ResolveOneLoginUserIdVerification,
+            journeyState,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "MatchedPersonId", ResolveOneLoginUserIdVerificationState.DoNotConnectARecordPersonIdSentinel } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(ResolveOneLoginUserIdVerificationState.DoNotConnectARecordPersonIdSentinel, journeyInstance.State.MatchedPersonId);
     }
 
     private void AssertMatchRowHasExpectedHighlight(IElement matchDetails, string summaryListKey, bool expectHighlight)

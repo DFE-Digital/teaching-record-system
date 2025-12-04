@@ -16,4 +16,13 @@ public class OneLoginUserIdVerificationLinkGenerator(LinkGenerator linkGenerator
 
     public string ResolveMatchesCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Matches", handler: "Cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string ResolveConfirmConnect(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+       linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/ConfirmConnect", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string ResolveConfirmConnectCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+       linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/ConfirmConnect", "cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string ResolveNotConnecting(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+   linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/NotConnecting", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 }

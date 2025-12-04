@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
 {
+    public static Guid DoNotConnectARecordPersonIdSentinel => Guid.Empty;
+
     public static JourneyDescriptor Journey { get; } = new(
         JourneyNames.ResolveOneLoginUserIdVerification,
         typeof(ResolveOneLoginUserIdVerificationState),
@@ -15,12 +16,9 @@ public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
 
     public bool? CanIdentityBeVerified { get; set; }
 
-    //public required IReadOnlyCollection<Guid> MatchedPersonIds { get; init; }
-    //public TrnRequestMatchResultOutcome MatchOutcome { get; set; }
-    public Guid? PersonId { get; set; }
-    public bool PersonAttributeSourcesSet { get; set; }
+    public Guid? MatchedPersonId { get; set; }
 
-    public class ResolveOneLoginUserIdVerificationStateFactory(IPersonMatchingService personMatchingService) : IJourneyStateFactory<ResolveOneLoginUserIdVerificationState>
+    public class ResolveOneLoginUserIdVerificationStateFactory() : IJourneyStateFactory<ResolveOneLoginUserIdVerificationState>
     {
         public Task<ResolveOneLoginUserIdVerificationState> CreateAsync(CreateJourneyStateContext context)
         {

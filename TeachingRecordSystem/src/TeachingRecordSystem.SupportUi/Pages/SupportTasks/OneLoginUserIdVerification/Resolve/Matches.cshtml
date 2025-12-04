@@ -77,14 +77,14 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
-            <govuk-radios for="PersonId">
+            <govuk-radios for="MatchedPersonId">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login account?</h2></govuk-radios-fieldset-legend>
                     @foreach (var match in Model.SuggestedMatches)
                     {
                         <govuk-radios-item value="@match.PersonId">Connect it to Record @match.Identifier</govuk-radios-item>
                     }
-                    <govuk-radios-item value="none">Do not connect it to a record</govuk-radios-item>
+                    <govuk-radios-item value="@ResolveOneLoginUserIdVerificationState.DoNotConnectARecordPersonIdSentinel">Do not connect it to a record</govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
             <div class="govuk-grid-column-two-thirds-from-desktop">
