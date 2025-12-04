@@ -2,16 +2,15 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Npgsql;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContext, IClock clock) : PageModel
+public class CheckAnswersModel(SignInJourneyHelper helper, SupportTaskService supportTaskService, IClock clock) : PageModel
 {
     public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
 
@@ -34,50 +33,32 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
         var subject = JourneyInstance!.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
         var email = JourneyInstance!.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
 
-        var supportTask = new SupportTask()
-        {
-            SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
-            CreatedOn = clock.UtcNow,
-            UpdatedOn = clock.UtcNow,
-            SupportTaskType = SupportTaskType.ConnectOneLoginUser,
-            Status = SupportTaskStatus.Open,
-            Data = new ConnectOneLoginUserData()
+        var processContext = new ProcessContext(
+            ProcessType.ConnectOneLoginUserSupportTaskCreating,
+            clock.UtcNow,
+            SystemUser.SystemUserId);
+
+        await supportTaskService.CreateSupportTaskAsync(
+            new CreateSupportTaskOptions
             {
-                Verified = true,
+                SupportTaskType = SupportTaskType.ConnectOneLoginUser,
+                Data = new ConnectOneLoginUserData
+                {
+                    Verified = true,
+                    OneLoginUserSubject = subject,
+                    OneLoginUserEmail = email,
+                    VerifiedNames = JourneyInstance.State.VerifiedNames,
+                    VerifiedDatesOfBirth = JourneyInstance.State.VerifiedDatesOfBirth,
+                    StatedNationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber,
+                    StatedTrn = JourneyInstance.State.Trn,
+                    ClientApplicationUserId = JourneyInstance.State.ClientApplicationUserId,
+                    TrnTokenTrn = JourneyInstance.State.TrnTokenTrn
+                },
+                PersonId = null,
                 OneLoginUserSubject = subject,
-                OneLoginUserEmail = email,
-                VerifiedNames = JourneyInstance.State.VerifiedNames,
-                VerifiedDatesOfBirth = JourneyInstance.State.VerifiedDatesOfBirth,
-                StatedNationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber,
-                StatedTrn = JourneyInstance.State.Trn,
-                ClientApplicationUserId = JourneyInstance.State.ClientApplicationUserId,
-                TrnTokenTrn = JourneyInstance.State.TrnTokenTrn
+                TrnRequest = null
             },
-            OneLoginUserSubject = subject
-        };
-        dbContext.SupportTasks.Add(supportTask);
-
-        await dbContext.AddEventAndBroadcastAsync(new LegacyEvents.SupportTaskCreatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
-            RaisedBy = SystemUser.SystemUserId,
-            SupportTask = EventModels.SupportTask.FromModel(supportTask)
-        });
-
-        while (true)
-        {
-            try
-            {
-                await dbContext.SaveChangesAsync();
-                break;
-            }
-            catch (Exception ex) when (ex.InnerException is PostgresException postgresException && postgresException.SqlState == PostgresErrorCodes.UniqueViolation)
-            {
-                supportTask.SupportTaskReference = SupportTask.GenerateSupportTaskReference();
-                continue;
-            }
-        }
+            processContext);
 
         await JourneyInstance.UpdateStateAsync(state => state.HasPendingSupportRequest = true);
 
