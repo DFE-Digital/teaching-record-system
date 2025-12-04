@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
@@ -17,6 +18,8 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     TrnRequestService trnRequestService,
+    PersonService personService,
+    SupportTaskService supportTaskService,
     EvidenceUploadManager evidenceController,
     IClock clock,
     PersonChangeableAttributesService changedService) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
@@ -60,7 +63,6 @@ public class CheckAnswersModel(
     public bool IsDateOfBirthChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.DateOfBirth) == true;
 
     public bool IsNationalInsuranceNumberChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.NationalInsuranceNumber) == true;
-
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
@@ -109,15 +111,14 @@ public class CheckAnswersModel(
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
 
         ResolvableAttributes = changedService.GetResolvableAttributes(
-             new List<ResolvedAttribute>
-             {
-                 new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
-                 new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
-             });
+        [
+            new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
+            new ResolvedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
+            new ResolvedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
+            new ResolvedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
+            new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+            new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource)
+        ]);
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
@@ -129,82 +130,49 @@ public class CheckAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var requestData = supportTask.TrnRequestMetadata!;
-        var state = JourneyInstance!.State;
+        var trnRequest = supportTask.TrnRequestMetadata!;
 
-        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
-        TeacherPensionsPotentialDuplicateAttributes? selectedPersonAttributes;
-        EventModels.PersonDetails? oldPersonAttributes;
-        var now = clock.UtcNow;
+        var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, clock.UtcNow, User.GetUserId());
 
-        var existingContactId = state.PersonId!.Value;
-        requestData.SetResolvedPerson(existingContactId, TrnRequestStatus.Completed);
-
-        selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
-        var attributesToUpdate = GetAttributesToUpdate();
-        oldPersonAttributes = new EventModels.PersonDetails()
-        {
-            FirstName = selectedPersonAttributes.FirstName,
-            MiddleName = selectedPersonAttributes.MiddleName,
-            LastName = selectedPersonAttributes.LastName,
-            DateOfBirth = selectedPersonAttributes.DateOfBirth,
-            EmailAddress = null,
-            NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber,
-            Gender = selectedPersonAttributes.Gender
-        };
-
+        var existingPersonId = JourneyInstance!.State.PersonId!.Value;
         var teacherPensionPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);
-        var existingPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == requestData.ResolvedPersonId);
-        var result = trnRequestService.UpdatePersonFromTrnRequest(existingPerson, requestData, attributesToUpdate, now);
+        var existingPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
+
+        var attributesToUpdate = GetAttributesToUpdate();
+        var selectedPersonAttributes = await GetPersonAttributesAsync(existingPersonId);
         var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
-        supportTask.Status = SupportTaskStatus.Closed;
-        supportTask.UpdatedOn = now;
-        DbContext.Attach(supportTask);
 
-        supportTask.UpdateData<TeacherPensionsPotentialDuplicateData>(data => data with
-        {
-            ResolvedAttributes = resolvedPersonAttributes,
-            SelectedPersonAttributes = selectedPersonAttributes
-        });
+        await personService.MergePersonsAsync(
+            new MergePersonsOptions(teacherPensionPerson.PersonId, existingPersonId),
+            processContext);
 
-        var changes = TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.Status |
-            (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonDateOfBirth : 0) |
-            (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber : 0) |
-            (state.GenderSource is PersonAttributeSource.TrnRequest ? TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonGender : 0) |
-            (state.FirstNameSource is PersonAttributeSource.TrnRequest ? TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonFirstName : 0) |
-            (state.MiddleNameSource is PersonAttributeSource.TrnRequest ? TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonMiddleName : 0) |
-            (state.LastNameSource is PersonAttributeSource.TrnRequest ? TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonLastName : 0);
+        await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
+            trnRequest,
+            existingPerson,
+            attributesToUpdate,
+            processContext);
 
-        var @event = new TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent()
-        {
-            PersonId = existingPerson.PersonId!,
-            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
-            ChangeReason = TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordMerged,
-            Changes = changes,
-            PersonAttributes = EventModels.PersonDetails.FromModel(existingPerson!),
-            OldPersonAttributes = oldPersonAttributes,
-            SupportTask = EventModels.SupportTask.FromModel(supportTask),
-            OldSupportTask = oldSupportTaskEventModel,
-            Comments = MergeComments,
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId(),
-            EvidenceFileId = state.Evidence.UploadedEvidenceFile?.FileId,
-            EvidenceFileName = state.Evidence.UploadedEvidenceFile?.FileName,
-            EvidenceFileSizeDescription = state.Evidence.UploadedEvidenceFile?.FileSizeDescription,
-            SecondaryPersonTrn = teacherPensionPerson.Trn
-        };
+        await supportTaskService.UpdateSupportTaskAsync(
+            new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
+            {
+                SupportTaskReference = SupportTaskReference,
+                UpdateData = data => data with
+                {
+                    ResolvedAttributes = resolvedPersonAttributes,
+                    SelectedPersonAttributes = selectedPersonAttributes
+                },
+                Status = SupportTaskStatus.Closed,
+                Comments = MergeComments
+            },
+            processContext);
 
-        teacherPensionPerson.Status = PersonStatus.Deactivated;
-        await DbContext.AddEventAndBroadcastAsync(@event);
-        await DbContext.SaveChangesAsync();
         TempData.SetFlashSuccess(
-            $"Teachers’ Pensions duplicate task completed",
+            "Teachers’ Pensions duplicate task completed",
             buildMessageHtml: b =>
             {
                 var link = new TagBuilder("a");
                 link.AddCssClass("govuk-link");
-                link.MergeAttribute("href", linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value));
+                link.MergeAttribute("href", linkGenerator.Persons.PersonDetail.Index(trnRequest.ResolvedPersonId!.Value));
                 link.InnerHtml.Append($"View record.");
                 var span = new TagBuilder("span");
                 span.InnerHtml.Append($"Record updated for {FirstName} {LastName}. ");

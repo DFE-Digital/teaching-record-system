@@ -1,11 +1,27 @@
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
+using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.PersonDetailsUpdatedEvent;
+using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpdatedEvent;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions.Resolve;
 
-public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswers : TestBase
 {
+    public CheckAnswers(HostFixture hostFixture) : base(hostFixture)
+    {
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
+            {
+                Email = req.Email,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Trn = req.Trn,
+                TrnToken = Guid.NewGuid().ToString()
+            });
+    }
+
     [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
@@ -241,6 +257,12 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.True(actualEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonLastName));
             Assert.True(actualEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonDateOfBirth));
             Assert.True(actualEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber));
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonDetailsUpdatedEvent, PersonDeactivatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);

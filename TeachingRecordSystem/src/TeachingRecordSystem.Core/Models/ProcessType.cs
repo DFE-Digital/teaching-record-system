@@ -21,5 +21,7 @@ public enum ProcessType
     ConnectOneLoginUserSupportTaskCreating = 17,
     NpqTrnRequestApproving = 18,
     NpqTrnRequestRejecting = 19,
-    TrnRequestManualChecksNeededTaskCompleting = 20
+    TrnRequestManualChecksNeededTaskCompleting = 20,
+    TeacherPensionsDuplicateSupportTaskResolvingWithMerge = 21,
+    TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge = 22
 }

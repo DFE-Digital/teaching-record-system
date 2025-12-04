@@ -342,24 +342,6 @@ public class TrnRequestService(
         return true;
     }
 
-    // TODO Remove this
-    public CreatePersonResult CreatePersonFromTrnRequest(TrnRequestMetadata trnRequest, string trn, DateTime now) =>
-        Person.Create(
-            trn,
-            trnRequest.FirstName!,
-            trnRequest.MiddleName ?? string.Empty,
-            trnRequest.LastName!,
-            trnRequest.DateOfBirth,
-            trnRequest.EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
-                ? EmailAddress.Parse(emailAddress)
-                : null,
-            trnRequest.NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
-                ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
-                : null,
-            trnRequest.Gender,
-            now,
-            (trnRequest.ApplicationUserId, trnRequest.RequestId));
-
     private async Task UpdatePersonFromTrnRequestAsync(
         Person person,
         TrnRequestMetadata trnRequest,
@@ -424,42 +406,6 @@ public class TrnRequestService(
                 },
                 processContext);
         }
-    }
-
-    // TODO Remove this
-    public UpdatePersonDetailsResult UpdatePersonFromTrnRequest(
-        Person person,
-        TrnRequestMetadata trnRequest,
-        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
-        DateTime now)
-    {
-        Debug.Assert(person.PersonId == trnRequest.ResolvedPersonId);
-
-        return person.UpdateDetails(
-            firstName: attributesToUpdate.Contains(PersonMatchedAttribute.FirstName)
-                ? Option.Some(trnRequest.FirstName!)
-                : Option.None<string>(),
-            middleName: attributesToUpdate.Contains(PersonMatchedAttribute.MiddleName)
-                ? Option.Some(trnRequest.MiddleName ?? string.Empty)
-                : Option.None<string>(),
-            lastName: attributesToUpdate.Contains(PersonMatchedAttribute.LastName)
-                ? Option.Some(trnRequest.LastName!)
-                : Option.None<string>(),
-            dateOfBirth: attributesToUpdate.Contains(PersonMatchedAttribute.DateOfBirth)
-                ? Option.Some<DateOnly?>(trnRequest.DateOfBirth)
-                : Option.None<DateOnly?>(),
-            emailAddress: attributesToUpdate.Contains(PersonMatchedAttribute.EmailAddress)
-                ? Option.Some(trnRequest.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null)
-                : Option.None<EmailAddress?>(),
-            nationalInsuranceNumber: attributesToUpdate.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
-                ? Option.Some(trnRequest.NationalInsuranceNumber is string nationalInsuranceNumber
-                    ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
-                    : null)
-                : Option.None<NationalInsuranceNumber?>(),
-            gender: attributesToUpdate.Contains(PersonMatchedAttribute.Gender)
-                ? Option.Some(trnRequest.Gender)
-                : Option.None<Gender?>(),
-            now);
     }
 
     private async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)
