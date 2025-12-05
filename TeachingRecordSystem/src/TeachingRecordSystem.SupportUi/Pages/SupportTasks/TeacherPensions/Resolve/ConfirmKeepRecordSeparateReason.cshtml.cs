@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
@@ -10,11 +11,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class ConfirmKeepRecordSeparateReasonModel(
     TrsDbContext dbContext,
+    TrnRequestService trnRequestService,
+    SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
     IClock clock) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? Reason { get; set; }
+
     public KeepingRecordSeparateReason? KeepSeparateReason { get; set; }
 
     public void OnGet()
@@ -25,14 +29,6 @@ public class ConfirmKeepRecordSeparateReasonModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var person = await DbContext.Persons.SingleAsync(x => x.PersonId == supportTask.PersonId);
-        var requestData = supportTask.TrnRequestMetadata!;
-        var state = JourneyInstance!.State;
-        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
-        var now = clock.UtcNow;
-        requestData.SetResolvedPerson(supportTask.PersonId!.Value, TrnRequestStatus.Completed);
-
         // Conditionally override the value in Reason.
         // if KeepSeparateReason is AnotherReason - the event will contain the reason provided from the user
         // if RecordDoesNotMatch, override reason using the display name from the enum
@@ -45,35 +41,27 @@ public class ConfirmKeepRecordSeparateReasonModel(
             Reason = JourneyInstance!.State.Reason;
         }
 
-        supportTask.UpdateData<TeacherPensionsPotentialDuplicateData>(data => data with
-        {
-            ResolvedAttributes = null,
-            SelectedPersonAttributes = null //do we need to set the person attributes
-        });
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var trnRequest = supportTask.TrnRequestMetadata!;
 
-        //create event
-        var @event = new TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent()
-        {
-            PersonId = supportTask.PersonId.Value!,
-            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
-            ChangeReason = TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordKept,
-            Changes = TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.None,
-            PersonAttributes = EventModels.PersonDetails.FromModel(person!),
-            OldPersonAttributes = EventModels.PersonDetails.FromModel(person!),
-            SupportTask = EventModels.SupportTask.FromModel(supportTask),
-            OldSupportTask = oldSupportTaskEventModel,
-            Comments = Reason,
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId()
-        };
+        var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, clock.UtcNow, User.GetUserId());
 
-        await DbContext.AddEventAndBroadcastAsync(@event);
-        await DbContext.SaveChangesAsync();
+        var person = await DbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);
+        await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (person.PersonId, person.Trn!), processContext);
 
-        supportTask.Status = SupportTaskStatus.Closed;
-        supportTask.UpdatedOn = now;
-        await DbContext.SaveChangesAsync();
+        await supportTaskService.UpdateSupportTaskAsync(
+            new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
+            {
+                SupportTaskReference = SupportTaskReference,
+                UpdateData = data => data with
+                {
+                    ResolvedAttributes = null,
+                    SelectedPersonAttributes = null
+                },
+                Status = SupportTaskStatus.Closed,
+                Comments = Reason
+            },
+            processContext);
 
         TempData.SetFlashSuccess(
             "Teachers’ Pensions duplicate task completed",

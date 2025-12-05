@@ -16,14 +16,14 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
         GetAnIdentityApiClientMock
-                 .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-                 .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
-                 {
-                     Email = req.Email,
-                     ExpiresUtc = Clock.UtcNow.AddDays(1),
-                     Trn = req.Trn,
-                     TrnToken = Guid.NewGuid().ToString()
-                 });
+             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+             .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
+             {
+                 Email = req.Email,
+                 ExpiresUtc = Clock.UtcNow.AddDays(1),
+                 Trn = req.Trn,
+                 TrnToken = Guid.NewGuid().ToString()
+             });
     }
 
     [Fact]

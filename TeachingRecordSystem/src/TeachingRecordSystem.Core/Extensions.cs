@@ -15,6 +15,7 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -107,7 +108,8 @@ public static class Extensions
             .AddSupportTaskService()
             .AddSingleton<PersonInfoCache>()
             .AddTrnGeneration()
-            .AddNoteService();
+            .AddNoteService()
+            .AddPersonService();
 
         return services;
     }
