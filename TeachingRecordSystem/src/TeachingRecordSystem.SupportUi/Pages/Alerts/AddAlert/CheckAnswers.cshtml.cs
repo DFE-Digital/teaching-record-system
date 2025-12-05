@@ -19,9 +19,6 @@ public class CheckAnswersModel(
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
     public string? PersonName { get; set; }
 
     public Guid AlertTypeId { get; set; }
@@ -45,16 +42,10 @@ public class CheckAnswersModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Reason(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        AlertTypeId = JourneyInstance.State.AlertTypeId!.Value;
+        AlertTypeId = JourneyInstance!.State.AlertTypeId!.Value;
         AlertTypeName = JourneyInstance.State.AlertTypeName;
         Details = JourneyInstance.State.Details;
         Link = JourneyInstance.State.Link;

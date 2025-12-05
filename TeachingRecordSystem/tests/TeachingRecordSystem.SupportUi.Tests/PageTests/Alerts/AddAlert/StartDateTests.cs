@@ -2,8 +2,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
 {
-    private const string PreviousStep = JourneySteps.Link;
-    private const string ThisStep = JourneySteps.StartDate;
+    private const string PreviousStep = JourneyStepNames.Link;
+    private const string ThisStep = JourneyStepNames.StartDate;
 
     async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
@@ -45,11 +45,11 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
     }
 
     [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToLinkPage()
+    public async Task Get_MissingDataInJourneyState_RedirectsToStartPage()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneyStepNames.Details, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -58,7 +58,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(GetStepUrl(PreviousStep, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -132,11 +132,11 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
     }
 
     [Fact]
-    public async Task Post_WithMissingDataInJourneyState_RedirectsToLinkPage()
+    public async Task Post_WithMissingDataInJourneyState_Redirects()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForIncompleteStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -145,7 +145,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(GetStepUrl(PreviousStep, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/reason?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(GetStepUrl(JourneyStepNames.Reason, person.PersonId, journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(startDate, journeyInstance.State.StartDate);
@@ -215,7 +215,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?handler=cancel&personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
