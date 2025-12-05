@@ -10,4 +10,5 @@ public class SuggestedMatchViewModel
     public string? LastName { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public string? NationalInsuranceNumber { get; set; }
+    public IReadOnlyCollection<PersonMatchedAttribute>? MatchedAttributes { get; set; }
 }

@@ -11,13 +11,13 @@
 
 <form action="" method="post">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">Record management</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
         </div>
     </div>
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <govuk-summary-card data-testid="request">
                 <govuk-summary-card-title>Request details</govuk-summary-card-title>
                 <govuk-summary-list>
@@ -76,7 +76,7 @@
     </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <govuk-radios for="MatchedPersonId">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login account?</h2></govuk-radios-fieldset-legend>
@@ -87,7 +87,7 @@
                     <govuk-radios-item value="@ResolveOneLoginUserIdVerificationState.DoNotConnectARecordPersonIdSentinel">Do not connect it to a record</govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
-            <div class="govuk-grid-column-two-thirds-from-desktop">
+            <div class="govuk-grid-column-two-thirds">
                 <button type="submit" class="govuk-button" data-testid="continue-button">Continue</button>
                 <button type="submit" action="cancel" class="govuk-button govuk-button--secondary" data-testid="cancel-button">Cancel</button>
             </div>
