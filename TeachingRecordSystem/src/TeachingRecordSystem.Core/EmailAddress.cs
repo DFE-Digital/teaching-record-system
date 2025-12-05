@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TeachingRecordSystem.Core;
@@ -194,5 +195,16 @@ public class EmailAddressConverter : ValueConverter<EmailAddress, string>
     public EmailAddressConverter()
         : base(v => v.ToString(), v => EmailAddress.Parse(v))
     {
+    }
+}
+
+public static class EmailValidationExtensions
+{
+    public static IRuleBuilderOptions<T, string?> EmailAddress<T>(
+        this IRuleBuilder<T, string?> ruleBuilder)
+    {
+        return ruleBuilder
+            .Must(v => v is null || Core.EmailAddress.TryParse(v, out _))
+            .WithMessage("Email address is not valid.");
     }
 }

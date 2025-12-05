@@ -422,6 +422,12 @@ public class TrnRequestService(
             return false;
         }
 
+        // We've had some invalid emails creep in that the TRN token API will reject
+        if (!EmailAddress.TryParse(trnRequest.EmailAddress, out _))
+        {
+            return false;
+        }
+
         trnRequest.TrnToken = await CreateTrnTokenAsync(resolvedPersonTrn, trnRequest.EmailAddress);
         return true;
     }
