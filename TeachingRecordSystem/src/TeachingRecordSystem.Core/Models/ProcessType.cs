@@ -18,5 +18,7 @@ public enum ProcessType
     ApiTrnRequestCreating = 14,
     NpqTrnRequestTaskCreating = 15,
     ApiTrnRequestResolving = 16,
-    ConnectOneLoginUserSupportTaskCreating = 17
+    ConnectOneLoginUserSupportTaskCreating = 17,
+    NpqTrnRequestApproving = 18,
+    NpqTrnRequestRejecting = 19
 }

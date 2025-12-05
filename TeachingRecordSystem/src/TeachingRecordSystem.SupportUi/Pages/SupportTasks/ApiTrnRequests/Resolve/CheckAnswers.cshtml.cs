@@ -68,7 +68,7 @@ public class CheckAnswers(
     public async Task<IActionResult> OnPostAsync()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var requestData = supportTask.TrnRequestMetadata!;
+        var trnRequest = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
 
         ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
@@ -77,7 +77,7 @@ public class CheckAnswers(
 
         if (CreatingNewRecord)
         {
-            await trnRequestService.CompleteTrnRequestWithNewRecordAsync(requestData, processContext);
+            await trnRequestService.CompleteTrnRequestWithNewRecordAsync(trnRequest, processContext);
 
             selectedPersonAttributes = null;
         }
@@ -90,15 +90,14 @@ public class CheckAnswers(
             selectedPersonAttributes = GetPersonAttributes(selectedPerson);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            await trnRequestService.UpdatePersonFromTrnRequestAsync(selectedPerson, requestData, attributesToUpdate, processContext);
-
             await trnRequestService.CompleteTrnRequestWithMatchedPersonAsync(
-                requestData,
-                (selectedPerson.PersonId, selectedPerson.Trn!),
+                trnRequest,
+                selectedPerson,
+                attributesToUpdate,
                 processContext);
         }
 
-        Debug.Assert(requestData.ResolvedPersonId is not null);
+        Debug.Assert(trnRequest.ResolvedPersonId is not null);
 
         var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
@@ -112,13 +111,14 @@ public class CheckAnswers(
                     SelectedPersonAttributes = selectedPersonAttributes
                 },
                 Status = SupportTaskStatus.Closed,
-                Comments = state.Comments
+                Comments = state.Comments,
+                RejectionReason = null
             },
             processContext);
 
         TempData.SetFlashSuccess(
             $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value)));
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(trnRequest.ResolvedPersonId!.Value)));
 
         return Redirect(linkGenerator.SupportTasks.ApiTrnRequests.Index());
     }
@@ -134,17 +134,6 @@ public class CheckAnswers(
     {
         var requestData = GetRequestData();
         var state = JourneyInstance!.State;
-        ResolvableAttributes = changedService.GetResolvableAttributes(
-             new List<ResolvedAttribute>
-             {
-                new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
-                new ResolvedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
-                new ResolvedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
-                new ResolvedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
-                new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
-                new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
-                new ResolvedAttribute(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
-             });
 
         if (state.PersonId is not Guid personId)
         {
@@ -202,6 +191,17 @@ public class CheckAnswers(
 
         Comments = state.Comments;
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
+
+        ResolvableAttributes = changedService.GetResolvableAttributes(
+        [
+            new ResolvedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
+            new ResolvedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
+            new ResolvedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
+            new ResolvedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
+            new ResolvedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+            new ResolvedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
+            new ResolvedAttribute(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
+        ]);
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

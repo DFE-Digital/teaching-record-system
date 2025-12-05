@@ -107,7 +107,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                     Changes = changes,
                     OldSupportTask = oldSupportTaskEventModel,
                     SupportTask = EventModels.SupportTask.FromModel(supportTask),
-                    Comments = options.Comments
+                    Comments = options.Comments,
+                    RejectionReason = options.RejectionReason
                 },
                 processContext);
         }

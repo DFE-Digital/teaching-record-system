@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 
 [Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
+    TrnRequestService trnRequestService,
+    SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
     IClock clock) : PageModel
 {
@@ -34,29 +35,22 @@ public class CheckAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
+        var trnRequest = supportTask.TrnRequestMetadata!;
 
-        supportTask.Status = SupportTaskStatus.Closed;
-        supportTask.UpdatedOn = clock.UtcNow;
-        supportTask.UpdateData<NpqTrnRequestData>(data => data with
-        {
-            SupportRequestOutcome = SupportRequestOutcome.Rejected
-        });
+        var processContext = new ProcessContext(ProcessType.NpqTrnRequestRejecting, clock.UtcNow, User.GetUserId());
 
-        var @event = new NpqTrnRequestSupportTaskRejectedEvent()
-        {
-            RequestData = EventModels.TrnRequestMetadata.FromModel(supportTask.TrnRequestMetadata!),
-            SupportTask = EventModels.SupportTask.FromModel(supportTask),
-            OldSupportTask = oldSupportTaskEventModel,
-            RejectionReason = JourneyInstance!.State.RejectionReason!.GetDisplayName(),
-            EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
-            RaisedBy = User.GetUserId()
-        };
+        await trnRequestService.RejectTrnRequestAsync(trnRequest, processContext);
 
-        await dbContext.AddEventAndBroadcastAsync(@event);
-
-        await dbContext.SaveChangesAsync();
+        await supportTaskService.UpdateSupportTaskAsync(
+            new UpdateSupportTaskOptions<NpqTrnRequestData>
+            {
+                SupportTaskReference = SupportTaskReference,
+                UpdateData = data => data with { SupportRequestOutcome = SupportRequestOutcome.Rejected },
+                Status = SupportTaskStatus.Closed,
+                Comments = null,
+                RejectionReason = JourneyInstance!.State.RejectionReason!.GetDisplayName()
+            },
+            processContext);
 
         TempData.SetFlashSuccess(
             $"TRN request for {PersonName} rejected");

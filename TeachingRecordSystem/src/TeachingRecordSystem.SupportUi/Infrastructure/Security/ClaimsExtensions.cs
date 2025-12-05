@@ -11,11 +11,6 @@ public static class ClaimsExtensions
             .Append(new Claim(CustomClaims.UserId, user.UserId.ToString()))
             .Append(new Claim(ClaimTypes.Name, user.Name));
 
-        if (user.DqtUserId is Guid dqtUserId)
-        {
-            claims = claims.Append(new Claim(CustomClaims.DqtUserId, dqtUserId.ToString()));
-        }
-
         return claims;
     }
 

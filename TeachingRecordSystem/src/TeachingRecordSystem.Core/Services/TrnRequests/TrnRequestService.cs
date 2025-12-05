@@ -67,7 +67,7 @@ public class TrnRequestService(
             if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
             {
                 trn = matchResult.Trn;
-                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), processContext);
+                await CompleteTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), publishTrnRequestUpdatedEvent: false, processContext);
             }
             else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
             {
@@ -90,8 +90,30 @@ public class TrnRequestService(
         return new TrnRequestInfo(trnRequest, trn);
     }
 
-    public Task CompleteTrnRequestWithMatchedPersonAsync(TrnRequestMetadata trnRequest, (Guid PersonId, string Trn) person, ProcessContext processContext) =>
-        CompleteTrnRequestWithMatchedPersonAsync(trnRequest, person, publishTrnRequestUpdatedEvent: true, processContext);
+    public Task CompleteTrnRequestWithMatchedPersonAsync(
+            TrnRequestMetadata trnRequest,
+            (Guid PersonId, string Trn) person,
+            ProcessContext processContext) =>
+        CompleteTrnRequestWithMatchedPersonAsync(
+            trnRequest,
+            (person.PersonId, person.Trn),
+            publishTrnRequestUpdatedEvent: true,
+            processContext);
+
+    public async Task CompleteTrnRequestWithMatchedPersonAsync(
+        TrnRequestMetadata trnRequest,
+        Person person,
+        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
+        ProcessContext processContext)
+    {
+        await CompleteTrnRequestWithMatchedPersonAsync(
+            trnRequest,
+            (person.PersonId, person.Trn!),
+            publishTrnRequestUpdatedEvent: true,
+            processContext);
+
+        await UpdatePersonFromTrnRequestAsync(person, trnRequest, attributesToUpdate, processContext);
+    }
 
     private async Task CompleteTrnRequestWithMatchedPersonAsync(
         TrnRequestMetadata trnRequest,
@@ -99,11 +121,10 @@ public class TrnRequestService(
         bool publishTrnRequestUpdatedEvent,
         ProcessContext processContext)
     {
-        if (trnRequest.ResolvedPersonId is not null)
+        if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
-            throw new InvalidOperationException("TRN request has already been resolved.");
+            throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be completed.");
         }
-        Debug.Assert(trnRequest.Status is not TrnRequestStatus.Completed);
 
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
@@ -111,9 +132,7 @@ public class TrnRequestService(
 
         var status = furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed;
         trnRequest.SetResolvedPerson(person.PersonId, status);
-
-        await TryEnsureTrnTokenAsync(trnRequest, person.Trn);
-
+        await TryEnsureTrnTokenAsync(trnRequest, person.Trn!);
         await dbContext.SaveChangesAsync();
 
         if (furtherChecksNeeded)
@@ -155,11 +174,10 @@ public class TrnRequestService(
         bool publishTrnRequestUpdatedEvent,
         ProcessContext processContext)
     {
-        if (trnRequest.ResolvedPersonId is not null)
+        if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
-            throw new InvalidOperationException("TRN request has already been resolved.");
+            throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be completed.");
         }
-        Debug.Assert(trnRequest.Status is not TrnRequestStatus.Completed);
 
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
@@ -220,6 +238,31 @@ public class TrnRequestService(
         }
 
         return trn;
+    }
+
+    public async Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    {
+        if (trnRequest.Status is not TrnRequestStatus.Pending)
+        {
+            throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be rejected.");
+        }
+
+        var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
+
+        trnRequest.SetRejected();
+
+        await eventPublisher.PublishEventAsync(
+            new TrnRequestUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SourceApplicationUserId = trnRequest.ApplicationUserId,
+                RequestId = trnRequest.RequestId,
+                Changes = TrnRequestUpdatedChanges.Status,
+                TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
+                OldTrnRequest = oldTrnRequestEventModel,
+                ReasonDetails = null
+            },
+            processContext);
     }
 
     public async Task<TrnRequestInfo?> GetTrnRequestAsync(Guid applicationUserId, string requestId)
@@ -287,7 +330,7 @@ public class TrnRequestService(
             now,
             (trnRequest.ApplicationUserId, trnRequest.RequestId));
 
-    public async Task UpdatePersonFromTrnRequestAsync(
+    private async Task UpdatePersonFromTrnRequestAsync(
         Person person,
         TrnRequestMetadata trnRequest,
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
