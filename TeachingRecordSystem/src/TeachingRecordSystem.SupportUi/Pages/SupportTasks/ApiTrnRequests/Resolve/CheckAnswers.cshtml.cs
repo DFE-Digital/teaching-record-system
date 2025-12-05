@@ -77,7 +77,7 @@ public class CheckAnswers(
 
         if (CreatingNewRecord)
         {
-            await trnRequestService.CompleteTrnRequestWithNewRecordAsync(trnRequest, processContext);
+            await trnRequestService.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext);
 
             selectedPersonAttributes = null;
         }
@@ -90,7 +90,7 @@ public class CheckAnswers(
             selectedPersonAttributes = GetPersonAttributes(selectedPerson);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            await trnRequestService.CompleteTrnRequestWithMatchedPersonAsync(
+            await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
                 trnRequest,
                 selectedPerson,
                 attributesToUpdate,

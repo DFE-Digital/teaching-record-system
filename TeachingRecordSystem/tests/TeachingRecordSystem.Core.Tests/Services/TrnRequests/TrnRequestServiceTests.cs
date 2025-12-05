@@ -243,7 +243,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
     }
 
     [Fact]
-    public async Task CompleteTrnRequestWithMatchedPersonAsync_FurtherChecksNotRequired_AssignsResolvedPersonAndTrnTokenAndSetsStatusToCompleted()
+    public async Task ResolveTrnRequestWithMatchedPersonAsync_FurtherChecksNotRequired_AssignsResolvedPersonAndTrnTokenAndSetsStatusToCompleted()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -253,7 +253,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.CompleteTrnRequestWithMatchedPersonAsync(
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
             (matchedPerson.PersonId, matchedPerson.Trn!),
             processContext));
@@ -265,7 +265,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
     }
 
     [Fact]
-    public async Task CompleteTrnRequestWithMatchedPersonAsync_FurtherChecksRequired_AssignsResolvedPersonAndCreatesFurtherChecksTask()
+    public async Task ResolveTrnRequestWithMatchedPersonAsync_FurtherChecksRequired_AssignsResolvedPersonAndCreatesFurtherChecksTask()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -276,7 +276,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.CompleteTrnRequestWithMatchedPersonAsync(
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
             (matchedPerson.PersonId, matchedPerson.Trn!),
             processContext));
@@ -296,7 +296,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
     }
 
     [Fact]
-    public async Task CompleteTrnRequestWithNewRecordAsync_AddsNewPersonToDbCreatesEventAndSetsStatusToCompleted()
+    public async Task ResolveTrnRequestWithNewRecordAsync_AddsNewPersonToDbCreatesEventAndSetsStatusToCompleted()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -306,7 +306,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.CompleteTrnRequestWithNewRecordAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -332,6 +332,48 @@ public partial class TrnRequestServiceTests : ServiceTestBase
     }
 
     [Fact]
+    public async Task RejectTrnRequestAsync_TaskIsAlreadyRejected_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
+        trnRequest.SetRejected();
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(async () =>
+        {
+            await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest, processContext));
+        });
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task RejectTrnRequestAsync_TaskIsCompleted_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
+        trnRequest.SetResolvedPerson(matchingPerson.PersonId, TrnRequestStatus.Completed);
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(async () =>
+        {
+            await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest, processContext));
+        });
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
     public async Task RejectTrnRequestAsync_SetsStatusToRejected()
     {
         // Arrange
@@ -351,6 +393,73 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         {
             var trnRequestUpdatedEvent = Assert.IsType<TrnRequestUpdatedEvent>(e);
             Assert.Equal(TrnRequestStatus.Rejected, trnRequestUpdatedEvent.TrnRequest.Status);
+            Assert.Equal(TrnRequestUpdatedChanges.Status, trnRequestUpdatedEvent.Changes);
+        });
+    }
+
+    [Fact]
+    public async Task CompleteResolvedTrnRequestAsync_TaskIsRejected_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
+        trnRequest.SetRejected();
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(async () =>
+        {
+            await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest, processContext));
+        });
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task CompleteResolvedTrnRequestAsync_TaskIsAlreadyCompleted_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
+        trnRequest.SetResolvedPerson(matchingPerson.PersonId, TrnRequestStatus.Completed);
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(async () =>
+        {
+            await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest, processContext));
+        });
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task CompleteResolvedTrnRequestAsync_SetsStatusToCompleted()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
+        trnRequest.SetResolvedPerson(matchingPerson.PersonId, TrnRequestStatus.Pending);
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest, processContext));
+
+        // Assert
+        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+
+        Events.AssertEventsPublished(e =>
+        {
+            var trnRequestUpdatedEvent = Assert.IsType<TrnRequestUpdatedEvent>(e);
+            Assert.Equal(TrnRequestStatus.Completed, trnRequestUpdatedEvent.TrnRequest.Status);
             Assert.Equal(TrnRequestUpdatedChanges.Status, trnRequestUpdatedEvent.Changes);
         });
     }

@@ -138,7 +138,7 @@ public class CheckAnswersModel(
         var now = clock.UtcNow;
 
         var existingContactId = state.PersonId!.Value;
-        requestData.SetResolvedPerson(existingContactId);
+        requestData.SetResolvedPerson(existingContactId, TrnRequestStatus.Completed);
 
         selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
         var attributesToUpdate = GetAttributesToUpdate();

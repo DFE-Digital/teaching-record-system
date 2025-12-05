@@ -559,7 +559,7 @@ public partial class TestData
                         TrnToken = _trnToken,
                         PotentialDuplicate = false
                     };
-                    trnRequestMetadata.SetResolvedPerson(PersonId);
+                    trnRequestMetadata.SetResolvedPerson(PersonId, TrnRequestStatus.Completed);
 
                     newPerson.SourceApplicationUserId = trnRequestMetadata.ApplicationUserId;
                     newPerson.SourceTrnRequestId = trnRequestMetadata.RequestId;

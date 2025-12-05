@@ -63,7 +63,7 @@ public class CheckAnswersModel(
 
         dbContext.Add(person);
 
-        requestData.SetResolvedPerson(person.PersonId);
+        requestData.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
 
         var personAttributes = new NpqTrnRequestDataPersonAttributes()
         {

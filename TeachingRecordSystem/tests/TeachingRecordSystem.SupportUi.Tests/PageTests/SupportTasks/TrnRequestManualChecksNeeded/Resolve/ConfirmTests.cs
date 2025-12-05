@@ -79,6 +79,12 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(TrnRequestStatus.Completed, updatedSupportTask.TrnRequestMetadata!.Status);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.TrnRequestManualChecksNeededTaskCompleting, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
+        });
     }
 
     private async Task<SupportTask> CreateSupportTaskAsync(SupportTaskStatus status = SupportTaskStatus.Open)

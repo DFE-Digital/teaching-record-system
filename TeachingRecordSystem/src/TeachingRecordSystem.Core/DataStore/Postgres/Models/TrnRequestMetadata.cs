@@ -48,7 +48,7 @@ public class TrnRequestMetadata
         Status = TrnRequestStatus.Rejected;
     }
 
-    public void SetResolvedPerson(Guid personId, TrnRequestStatus requestStatus = TrnRequestStatus.Completed)
+    public void SetResolvedPerson(Guid personId, TrnRequestStatus requestStatus)
     {
         ResolvedPersonId = personId;
         Status = requestStatus;
