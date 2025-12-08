@@ -67,7 +67,7 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
         Trn = oneLoginUserIdVerificationRequestData.StatedTrn;
 
         Email = dbContext.OneLoginUsers
-            .Where(u => u.Subject == oneLoginUserIdVerificationRequestData.OneLoginUserSubject)? // CML TODO ?
+            .Where(u => u.Subject == oneLoginUserIdVerificationRequestData.OneLoginUserSubject)?
             .FirstOrDefault()?
             .EmailAddress;
 

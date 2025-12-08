@@ -2,14 +2,14 @@
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.Matches
 
 @{
-        ViewData["Title"] = "Check if this GOV.UK One Login account matches an existing record";
+        ViewBag.Title = "Check if this GOV.UK One Login account matches an existing record";
 }
 
 @section BeforeContent {
     <govuk-back-link asp-page=@LinkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveDetails(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)>Back</govuk-back-link>
 }
 
-<form action="" method="post">
+<form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">Record management</span>

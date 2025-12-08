@@ -166,7 +166,6 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             .OrderByDescending(t => t.Score)
             .ThenBy(t => t.Result.trn)
             .Select(t => t.Result)
-            //.Select(r => Enum.Parse<PersonMatchedAttribute>(r.matched_attr_keys))
             .Select(r => new SuggestedMatchWithMatchedAttributes(
                 r.person_id,
                 r.trn,

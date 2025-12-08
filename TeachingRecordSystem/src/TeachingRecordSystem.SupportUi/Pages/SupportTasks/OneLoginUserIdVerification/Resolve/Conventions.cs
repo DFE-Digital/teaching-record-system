@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 public class Conventions : IConfigureFolderConventions
 {
@@ -13,11 +13,6 @@ public class Conventions : IConfigureFolderConventions
             {
                 var relativePath = model.RelativePath;
 
-                // Exclude this specific file
-                if (relativePath.EndsWith("OneLoginUserIdVerification/Index.cshtml", StringComparison.OrdinalIgnoreCase))
-                {
-                    return;
-                }
                 model.Filters.Add(new CheckSupportTaskExistsFilterFactory(openOnly: true, SupportTaskType.OneLoginUserIdVerification));
             });
     }
