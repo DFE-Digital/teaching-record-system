@@ -19,6 +19,7 @@ using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Webhooks;
+using TeachingRecordSystem.WebCommon.Filters;
 using TeachingRecordSystem.WebCommon.Infrastructure.Redis;
 
 namespace TeachingRecordSystem.Api;
@@ -67,6 +68,7 @@ public static class Extensions
                 options.Conventions.Add(new ApiVersionConvention(configuration));
                 options.Conventions.Add(new AuthorizationPolicyConvention());
                 options.Conventions.Add(new BackFillVersionedEndpointsConvention());
+                options.Filters.Add(new NoCachePageFilter());
 
                 options.OutputFormatters.RemoveType<StringOutputFormatter>();
             })
