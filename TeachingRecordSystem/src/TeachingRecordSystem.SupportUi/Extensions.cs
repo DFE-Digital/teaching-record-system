@@ -139,6 +139,8 @@ public static class Extensions
         services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
         {
             options.Cookie.Name = "trs-auth";
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 
             options.Events.OnSigningOut = ctx =>
             {
