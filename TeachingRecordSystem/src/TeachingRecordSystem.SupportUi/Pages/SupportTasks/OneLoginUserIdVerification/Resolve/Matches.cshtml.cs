@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 
@@ -27,15 +26,13 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
     public string? NationalInsuranceNumber { get; set; }
     public string? Trn { get; set; }
 
-    public IReadOnlyCollection<SuggestedMatchViewModel>? SuggestedMatches { get; set; }
+    public IList<SuggestedMatchViewModel>? SuggestedMatches { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public IActionResult OnGet()
     {
-        return Page();
-        // CML TODO put in
-        //return SuggestedMatches.Count == 0
-        //    ? Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveNoMatches(SupportTaskReference, JourneyInstance!.InstanceId))
-        //    : Page();
+        return SuggestedMatches == null || SuggestedMatches.Count == 0
+            ? Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveNoMatches(SupportTaskReference, JourneyInstance!.InstanceId))
+            : Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -75,14 +72,14 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
             .EmailAddress;
 
         var request = new GetSuggestedOneLoginUserMatchesRequest(
-            Names: new List<string[]> { PersonSearchAttribute.SplitName(Name!) }, // CML TODO use something else
-            DatesOfBirth: new List<DateOnly> { DateOfBirth },
+            Names: [Name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)],
+            DatesOfBirth: [DateOfBirth],
             NationalInsuranceNumber: NationalInsuranceNumber,
             Trn: Trn,
             null
         );
 
-        SuggestedMatches = (await matchingService.GetSuggestedOneLoginUserMatchesAsync(request))
+        SuggestedMatches = (await matchingService.GetSuggestedOneLoginUserMatchesWithMatchedAttributesInfoAsync(request))
             .Select((match, idx) => new SuggestedMatchViewModel
             {
                 Identifier = (char)('A' + idx),
@@ -92,7 +89,13 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 FirstName = match.FirstName,
                 LastName = match.LastName,
                 DateOfBirth = match.DateOfBirth,
-                NationalInsuranceNumber = match.NationalInsuranceNumber
+                NationalInsuranceNumber = match.NationalInsuranceNumber,
+                PreviousNames = dbContext.Persons
+                    .Include(p => p.PreviousNames)
+                    .Where(p => p.PersonId == match.PersonId)?.SingleOrDefault()?
+                    .PreviousNames?.Select(n => $"{n.FirstName} {n.LastName}")
+                    .ToList(),
+                MatchedAttributes = match.MatchedAttributes
             }).ToList();
 
         await base.OnPageHandlerExecutionAsync(context, next);

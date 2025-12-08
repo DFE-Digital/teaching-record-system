@@ -2,13 +2,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerifi
 
 public class SuggestedMatchViewModel
 {
-    public char Identifier { get; set; }
-    public Guid? PersonId { get; set; }
-    public string? Trn { get; set; }
-    public string? EmailAddress { get; set; }
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-    public DateOnly? DateOfBirth { get; set; }
-    public string? NationalInsuranceNumber { get; set; }
-    public IReadOnlyCollection<PersonMatchedAttribute>? MatchedAttributes { get; set; }
+    public required char Identifier { get; init; }
+    public required Guid PersonId { get; init; }
+    public required string? Trn { get; init; }
+    public required string? EmailAddress { get; init; }
+    public required string? FirstName { get; init; }
+    public required string? LastName { get; init; }
+    public required DateOnly? DateOfBirth { get; init; }
+    public required string? NationalInsuranceNumber { get; init; }
+    public required IReadOnlyCollection<string>? PreviousNames { get; init; } = [];
+    public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
 }

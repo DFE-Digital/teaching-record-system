@@ -82,6 +82,21 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
     public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedOneLoginUserMatchesAsync(GetSuggestedOneLoginUserMatchesRequest request)
     {
+        return (await GetSuggestedOneLoginUserMatchesWithMatchedAttributesInfoAsync(request))
+           .Select(r => new SuggestedMatch(
+               r.PersonId,
+               r.Trn,
+               r.EmailAddress,
+               r.FirstName,
+               r.MiddleName,
+               r.LastName,
+               r.DateOfBirth,
+               r.NationalInsuranceNumber))
+           .ToArray();
+    }
+
+    public async Task<IReadOnlyCollection<SuggestedMatchWithMatchedAttributes>> GetSuggestedOneLoginUserMatchesWithMatchedAttributesInfoAsync(GetSuggestedOneLoginUserMatchesRequest request)
+    {
         // Return any record that matches on last name and DOB OR NINO OR TRN.
         // Results should be ordered such that matches on TRN are returned before matches on NINO with matches on last name + DOB last.
 
@@ -151,7 +166,8 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             .OrderByDescending(t => t.Score)
             .ThenBy(t => t.Result.trn)
             .Select(t => t.Result)
-            .Select(r => new SuggestedMatch(
+            //.Select(r => Enum.Parse<PersonMatchedAttribute>(r.matched_attr_keys))
+            .Select(r => new SuggestedMatchWithMatchedAttributes(
                 r.person_id,
                 r.trn,
                 r.email_address,
@@ -159,7 +175,8 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 r.middle_name,
                 r.last_name,
                 r.date_of_birth,
-                r.national_insurance_number))
+                r.national_insurance_number,
+                r.matched_attr_keys.Select(m => Enum.Parse<PersonMatchedAttribute>(m)).ToArray()))
             .AsReadOnly();
     }
 

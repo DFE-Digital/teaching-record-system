@@ -35,11 +35,11 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value> @* CML TODO *@
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>National insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value> @* CML TODO *@
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>
@@ -51,23 +51,37 @@
                     <govuk-summary-list>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(StringHelper.JoinNonEmpty(' ', match.FirstName, match.LastName) != Model.Name)">@($"{match.FirstName} {match.LastName}")</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!(match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName) && match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName)))">@($"{match.FirstName} {match.LastName}")</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>
+                                @if (match.PreviousNames is not null && match.PreviousNames.Any())
+                                {
+                                    <ul class ="govuk-list">
+                                        @foreach (var previousName in match.PreviousNames)
+                                        {
+                                            <li>@previousName</li>
+                                        }
+                                    </ul>
+                                }
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(match.EmailAddress != Model.Email)">@match.EmailAddress</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress))">@match.EmailAddress</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(match.DateOfBirth != Model.DateOfBirth)">@match.DateOfBirth!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth))">@match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(match.Trn != Model.Trn)">@match.Trn</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.Trn))">@match.Trn</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(match.NationalInsuranceNumber != Model.NationalInsuranceNumber)">@match.NationalInsuranceNumber</govuk-summary-list-row-value> @* CML TODO *@
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber))">@match.NationalInsuranceNumber</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     </govuk-summary-list>
                 </govuk-summary-card>

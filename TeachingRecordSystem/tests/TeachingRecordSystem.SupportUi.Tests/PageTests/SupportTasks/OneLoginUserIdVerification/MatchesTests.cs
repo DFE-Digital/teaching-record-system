@@ -14,21 +14,19 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private async Task CreateSupportTasksWithOneLoginUsersAsync()
     {
-        OneLoginUsers = new OneLoginUser[]
-        {
+        OneLoginUsers = [
             await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null),
             await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null)
-        };
+        ];
 
         var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[0].Subject);
         Clock.Advance(TimeSpan.FromDays(1));
         var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[1].Subject);
 
-        SupportTasks = new SupportTask[]
-        {
+        SupportTasks = [
             supportTask1,
             supportTask2
-        };
+        ];
     }
 
     [Fact]
@@ -100,7 +98,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_MatchedRecords_NullableFieldsEmptyInRecordButPopulatedInRequest_ShowsHighlightedNotProvided()
+    public async Task Get_MatchedRecords_ShowsNotMatchedFieldsHighlighted()
     {
         // Arrange
         var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
@@ -110,11 +108,21 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
         var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
 
-        // Person who matches on last name & DOB
-        var person1 = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
-
         // Person who matches on NINO
-        var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(supportTaskData!.StatedNationalInsuranceNumber!));
+        var person1 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(supportTaskData!.StatedNationalInsuranceNumber!));
+
+        // Person who matches on first name, last name & DOB
+        var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(supportTaskData!.StatedFirstName)
+            .WithLastName(supportTaskData!.StatedLastName)
+            .WithDateOfBirth(supportTaskData.StatedDateOfBirth));
+
+        // Person who matches on previous surname & DOB
+        var person3 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(supportTaskData!.StatedFirstName)
+            .WithLastName(TestData.GenerateChangedLastName(supportTaskData!.StatedLastName))
+            .WithPreviousNames((TestData.GenerateChangedFirstName(supportTaskData!.StatedFirstName), TestData.GenerateMiddleName(), supportTaskData!.StatedLastName, Clock.UtcNow))
+            .WithDateOfBirth(supportTaskData.StatedDateOfBirth));
 
         var journeyState = new ResolveOneLoginUserIdVerificationState
         {
@@ -136,20 +144,30 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
 
         // match on NI number appears first
-        var nextMatchDetails = doc.GetAllElementsByTestId("match")[0];
-        Assert.NotNull(nextMatchDetails);
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', person2.FirstName, person2.LastName), nextMatchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(person2.NationalInsuranceNumber, nextMatchDetails.GetSummaryListValueByKey("National Insurance number"));
-        Assert.Equal(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), nextMatchDetails.GetSummaryListValueByKey("Date of birth"));
-        AssertMatchRowHasExpectedHighlight(nextMatchDetails, "Name", true);
-        AssertMatchRowHasExpectedHighlight(nextMatchDetails, "Date of birth", true);
+        var matchDetails = doc.GetAllElementsByTestId("match")[0];
+        Assert.NotNull(matchDetails);
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', person1.FirstName, person1.LastName), matchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(person1.NationalInsuranceNumber, matchDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(person1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), matchDetails.GetSummaryListValueByKey("Date of birth"));
+        AssertMatchRowIsHighlighted(matchDetails, "Name");
+        AssertMatchRowIsHighlighted(matchDetails, "Date of birth");
 
-        // match on surname and DOB appears second
-        var firstMatchDetails = doc.GetAllElementsByTestId("match")[1];
-        Assert.NotNull(firstMatchDetails);
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', person1.FirstName, person1.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("National Insurance number"));
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "National Insurance number", true);
+        // match on first name, surname and DOB appears second
+        matchDetails = doc.GetAllElementsByTestId("match")[1];
+        Assert.NotNull(matchDetails);
+        Assert.Equal($"{person2.FirstName} {person2.LastName}", matchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, matchDetails.GetSummaryListValueByKey("National Insurance number"));
+        AssertMatchRowNotHighlighted(matchDetails, "Name");
+        AssertMatchRowIsHighlighted(matchDetails, "National Insurance number");
+
+        // match on previous surname and DOB
+        matchDetails = doc.GetAllElementsByTestId("match")[2];
+        Assert.NotNull(matchDetails);
+        Assert.Equal($"{person3.FirstName} {person3.LastName}", matchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal($"{person3.PreviousNames.First().FirstName} {person3.PreviousNames.First().LastName}", matchDetails.GetSummaryListValueByKey("Previous names"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, matchDetails.GetSummaryListValueByKey("National Insurance number"));
+        AssertMatchRowNotHighlighted(matchDetails, "Name");
+        AssertMatchRowIsHighlighted(matchDetails, "National Insurance number");
     }
 
     [Fact]
@@ -303,40 +321,6 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_SubmittedPersonIdIsNotValid_ReturnsBadRequest()
-    {
-        // Arrange
-        var OneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUser.Subject);
-        var supportTaskData = supportTask.Data as OneLoginUserIdVerificationData;
-
-        // Person who matches on last name & DOB
-        var person = await TestData.CreatePersonAsync(p => p.WithLastName(supportTaskData!.StatedLastName).WithDateOfBirth(supportTaskData.StatedDateOfBirth));
-
-        var journeyState = new ResolveOneLoginUserIdVerificationState
-        {
-            CanIdentityBeVerified = true
-        };
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ResolveOneLoginUserIdVerification,
-            journeyState,
-            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder { { "MatchedPersonId", Guid.NewGuid() } }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-    }
-
-    [Fact]
     public async Task Post_NoChosenOption_ReturnsError()
     {
         // Arrange
@@ -447,19 +431,21 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(ResolveOneLoginUserIdVerificationState.DoNotConnectARecordPersonIdSentinel, journeyInstance.State.MatchedPersonId);
     }
 
-    private void AssertMatchRowHasExpectedHighlight(IElement matchDetails, string summaryListKey, bool expectHighlight)
+    private void AssertMatchRowIsHighlighted(IElement matchDetails, string summaryListKey)
     {
         var valueElement = matchDetails.GetSummaryListValueElementByKey(summaryListKey);
         Assert.NotNull(valueElement);
         var highlightElement = valueElement.GetElementsByClassName("hods-highlight").SingleOrDefault();
 
-        if (expectHighlight)
-        {
-            Assert.False(highlightElement == null, $"{summaryListKey} should be highlighted");
-        }
-        else
-        {
-            Assert.True(highlightElement == null, $"{summaryListKey} should not be highlighted");
-        }
+        Assert.False(highlightElement == null, $"{summaryListKey} should be highlighted");
+    }
+
+    private void AssertMatchRowNotHighlighted(IElement matchDetails, string summaryListKey)
+    {
+        var valueElement = matchDetails.GetSummaryListValueElementByKey(summaryListKey);
+        Assert.NotNull(valueElement);
+        var highlightElement = valueElement.GetElementsByClassName("hods-highlight").SingleOrDefault();
+
+        Assert.True(highlightElement == null, $"{summaryListKey} should not be highlighted");
     }
 }

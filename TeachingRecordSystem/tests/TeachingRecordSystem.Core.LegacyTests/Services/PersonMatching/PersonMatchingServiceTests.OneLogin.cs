@@ -152,10 +152,8 @@ public partial class PersonMatchingServiceTests
             Assert.NotNull(result);
         });
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public Task GetSuggestedOneLoginUserMatchesAsync_ReturnsExpectedResults(bool usePersonNino) =>
+    [Fact]
+    public Task GetSuggestedOneLoginUserMatchesAsync_ReturnsExpectedResults() =>
         DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
@@ -165,13 +163,16 @@ public partial class PersonMatchingServiceTests
             var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
             var alternativeNationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber);
 
-            // Person who matches on last name & DOB
-            var person1 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            // Person who matches on first name, last name & DOB
+            var person1 = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
-            // Person who matches on NINO
-            var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
+            // Person who matches on person NINO
+            var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+            // Person who matches on employment NINO
+            var person2b = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(alternativeNationalInsuranceNumber));
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-            var personEmployment = await TestData.CreateTpsEmploymentAsync(person2, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
+            var personEmployment = await TestData.CreateTpsEmploymentAsync(person2b, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), nationalInsuranceNumber);
 
             // Person who matches on TRN
             var person3 = await TestData.CreatePersonAsync();
@@ -180,6 +181,11 @@ public partial class PersonMatchingServiceTests
             // Person who matches on last name, DOB & TRN
             var person4 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
             var trnTokenHintTrn = person4.Trn!;
+
+            // person who matches on previous last name and DOB
+            var person5 = await TestData.CreatePersonAsync(p => p.WithFirstName(TestData.GenerateChangedFirstName(firstName)).WithLastName(TestData.GenerateChangedLastName(lastName))
+                .WithDateOfBirth(dateOfBirth)
+                .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), lastName, Clock.UtcNow)));
 
             string[][] names = [[firstName, lastName]];
             DateOnly[] datesOfBirth = [dateOfBirth];
@@ -195,7 +201,9 @@ public partial class PersonMatchingServiceTests
                 r => Assert.Equal(person4.PersonId, r.PersonId),
                 r => Assert.Equal(person3.PersonId, r.PersonId),
                 r => Assert.Equal(person2.PersonId, r.PersonId),
-                r => Assert.Equal(person1.PersonId, r.PersonId));
+                r => Assert.Equal(person2b.PersonId, r.PersonId),
+                r => Assert.Equal(person1.PersonId, r.PersonId),
+                r => Assert.Equal(person5.PersonId, r.PersonId));
         });
 
     private static readonly PersonMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =
