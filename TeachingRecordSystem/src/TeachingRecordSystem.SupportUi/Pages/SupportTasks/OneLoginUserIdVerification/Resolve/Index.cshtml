@@ -1,4 +1,4 @@
-@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve"
+@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.IndexModel
 @{
     ViewBag.Title = "GOV.UK One Login - identity verification";
@@ -37,7 +37,7 @@
                     <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>National insurance number</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>

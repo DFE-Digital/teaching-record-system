@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
@@ -12,7 +13,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerifi
 public class IndexModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
-    IFileService fileService) : PageModel
+    IFileService fileService,
+    IPersonMatchingService personMatchingService) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
@@ -28,6 +30,7 @@ public class IndexModel(
     [BindProperty]
     public bool? CanIdentityBeVerified { get; set; }
 
+    public OneLoginUserIdVerificationData? RequestData { get; set; }
     public string? Name { get; set; }
     public string? EmailAddress { get; set; }
     public DateOnly DateOfBirth { get; set; }
@@ -46,8 +49,20 @@ public class IndexModel(
 
         await JourneyInstance!.UpdateStateAsync(state => state.CanIdentityBeVerified = CanIdentityBeVerified);
 
-        return Redirect(CanIdentityBeVerified == true ?
-            linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId) :
+        var names = new string[] { RequestData!.StatedFirstName, RequestData.StatedLastName }.GetNonEmptyValues();        
+        var matches = await personMatchingService.GetSuggestedOneLoginUserMatchesAsync(new(
+            Names: [names],
+            DatesOfBirth: [RequestData.StatedDateOfBirth],
+            NationalInsuranceNumber: RequestData.StatedNationalInsuranceNumber,
+            Trn: RequestData.StatedTrn,
+            TrnTokenTrnHint: null));
+
+        return Redirect(CanIdentityBeVerified == true
+            ?
+            (matches!.Count > 0 ?
+                linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId) :
+                linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.NoMatches(SupportTaskReference!, JourneyInstance!.InstanceId))
+            :
             linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Reject(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
@@ -55,7 +70,7 @@ public class IndexModel(
     {
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.Index());
+        return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());
     }
 
     public async Task<IActionResult> OnGetEvidenceAsync()
@@ -68,6 +83,7 @@ public class IndexModel(
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
+        RequestData = data;
         var oneLoginUser = await dbContext.OneLoginUsers
             .SingleOrDefaultAsync(u => u.Subject == data.OneLoginUserSubject);
 
