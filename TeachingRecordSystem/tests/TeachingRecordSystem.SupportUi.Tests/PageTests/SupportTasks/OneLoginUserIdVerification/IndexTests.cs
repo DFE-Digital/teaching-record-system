@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserIdVerification;
@@ -8,15 +9,33 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUs
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    private OneLoginUser[]? OneLoginUsers { get; set; }
+    private SupportTask[]? SupportTasks { get; set; }
+
+    private async Task CreateSupportTasksWithOneLoginUsersAsync()
+    {
+        OneLoginUsers = new OneLoginUser[]
+        {
+            await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null),
+            await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null)
+        };
+
+        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[0].Subject);
+        Clock.Advance(TimeSpan.FromDays(1));
+        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[1].Subject);
+
+        SupportTasks = new SupportTask[]
+        {
+            supportTask1,
+            supportTask2
+        };
+    }
+
     [Fact]
     public async Task Get_ShowsListOfOpenTasksWithOldestFirst()
     {
         // Arrange
-        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
-        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
-        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
-        Clock.Advance(TimeSpan.FromDays(1));
-        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
+        await CreateSupportTasksWithOneLoginUsersAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 
@@ -33,15 +52,15 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.NotNull(resultRows);
         var topRow = resultRows[0];
-        AssertRowHasContent(topRow, "name", $"{((OneLoginUserIdVerificationData)supportTask1.Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)supportTask1.Data)!.StatedLastName}");
-        AssertRowHasContent(topRow, "email", oneLoginUser1.EmailAddress!);
-        AssertRowHasContent(topRow, "requested-on", supportTask1.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
-        AssertRowHasContent(topRow, "requested-on", supportTask1.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(topRow, "name", $"{((OneLoginUserIdVerificationData)SupportTasks![0].Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)SupportTasks[0].Data)!.StatedLastName}");
+        AssertRowHasContent(topRow, "email", OneLoginUsers![0].EmailAddress!);
+        AssertRowHasContent(topRow, "requested-on", SupportTasks[0].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(topRow, "requested-on", SupportTasks[0].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
 
         var nextRow = resultRows[1];
-        AssertRowHasContent(nextRow, "name", $"{((OneLoginUserIdVerificationData)supportTask2.Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)supportTask2.Data)!.StatedLastName}");
-        AssertRowHasContent(nextRow, "email", oneLoginUser2.EmailAddress!);
-        AssertRowHasContent(nextRow, "requested-on", supportTask2.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(nextRow, "name", $"{((OneLoginUserIdVerificationData)SupportTasks[1].Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)SupportTasks[1].Data)!.StatedLastName}");
+        AssertRowHasContent(nextRow, "email", OneLoginUsers[1].EmailAddress!);
+        AssertRowHasContent(nextRow, "requested-on", SupportTasks[1].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
 
         void AssertRowHasContent(IElement row, string testId, string expectedText)
         {
@@ -55,8 +74,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_TaskListItemLinksToSupportTask()
     {
         // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+        await CreateSupportTasksWithOneLoginUsersAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 
@@ -74,7 +92,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.NotNull(resultRow);
         var nameLink = resultRow.GetElementByTestId("name")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
-        Assert.Contains($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve", nameLink!.Href);
+        Assert.Contains($"/support-tasks/one-login-user-id-verification/{SupportTasks![0].SupportTaskReference}/resolve", nameLink!.Href);
     }
 
     [Fact]

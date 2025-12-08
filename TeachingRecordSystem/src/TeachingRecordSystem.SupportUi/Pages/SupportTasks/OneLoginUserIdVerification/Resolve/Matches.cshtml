@@ -1,2 +1,110 @@
-@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/matches"
+@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/matches/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.Matches
+
+@{
+        ViewBag.Title = "Check if this GOV.UK One Login account matches an existing record";
+}
+
+@section BeforeContent {
+    <govuk-back-link asp-page=@LinkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveDetails(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)>Back</govuk-back-link>
+}
+
+<form method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Record management</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <govuk-summary-card data-testid="request">
+                <govuk-summary-card-title>Request details</govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Name</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Email</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+            <govuk-inset-text>Details that do not match are <govuk-tag class="govuk-tag--orange">highlighted</govuk-tag> in the existing record</govuk-inset-text>
+            @foreach (var match in Model.SuggestedMatches!)
+            {
+                <govuk-summary-card data-testid="match">
+                    <govuk-summary-card-title>Record @match.Identifier</govuk-summary-card-title>
+                    <govuk-summary-list>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!(match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName) && match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName)))">@($"{match.FirstName} {match.LastName}")</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>
+                                @if (match.PreviousNames is not null && match.PreviousNames.Any())
+                                {
+                                    <ul class ="govuk-list">
+                                        @foreach (var previousName in match.PreviousNames)
+                                        {
+                                            <li>@previousName</li>
+                                        }
+                                    </ul>
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress))">@match.EmailAddress</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth))">@match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.Trn))">@match.Trn</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber))">@match.NationalInsuranceNumber</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    </govuk-summary-list>
+                </govuk-summary-card>
+            }
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <govuk-radios for="MatchedPersonId">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login account?</h2></govuk-radios-fieldset-legend>
+                    @foreach (var match in Model.SuggestedMatches)
+                    {
+                        <govuk-radios-item value="@match.PersonId">Connect it to Record @match.Identifier</govuk-radios-item>
+                    }
+                    <govuk-radios-item value="@ResolveOneLoginUserIdVerificationState.DoNotConnectARecordPersonIdSentinel">Do not connect it to a record</govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            <div class="govuk-grid-column-two-thirds">
+                <button type="submit" class="govuk-button" data-testid="continue-button">Continue</button>
+                <button type="submit" action="cancel" class="govuk-button govuk-button--secondary" data-testid="cancel-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+</form>

@@ -999,4 +999,8 @@
     <_ContentIncludedByDefault Remove="Pages\LegacyUsers\Index.cshtml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\SupportTasks\OneLoginUserIdVerification\Resolve\Conventions\" />
+  </ItemGroup>
+
 </Project>
