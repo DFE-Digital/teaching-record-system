@@ -1,2 +1,80 @@
-@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve"
-@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.Index
+@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.IndexModel
+@{
+    ViewBag.Title = "GOV.UK One Login - identity verification";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index()"/>
+}
+
+<form action="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">Record management</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <h2 class="govuk-heading-m">Request details</h2>
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="name">@Model.Name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="date-of-birth">@Model.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="email">@Model.EmailAddress</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Proof of identity</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        <a href="@Model.Evidence!.FileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="view-larger-@Model.Evidence!.FileId">View larger (opens in new tab)</a>
+                        <div class="govuk-!-margin-top-2">
+                        @if (Model.Evidence!.MimeType == "application/pdf")
+                        {
+                            <object data="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Evidence(Model.SupportTaskReference!)" type="application/pdf" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="pdf-@Model.Evidence!.FileId">
+                            </object>
+                        }
+                        else
+                        {
+                            <img src="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Evidence(Model.SupportTaskReference!)" alt="@Model.Evidence.FileName" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="image-@Model.Evidence!.FileId" />
+                        }
+                        </div>
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <govuk-radios for="CanIdentityBeVerified" data-testid="reason-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--m" is-page-heading="false">Can you verify this person’s identity?</govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@true">
+                        Yes, find a matching record
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No, reject this request
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+        </div>
+    </div>
+
+    <div class="govuk-button-group">
+        <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+        <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Cancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+    </div>
+</form>

@@ -2,8 +2,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerifi
 
 public class ResolveOneLoginUserIdVerificationLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(string supportTaskReference) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Index", routeValues: new { supportTaskReference });
+    public string Index(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Index", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string Evidence(string supportTaskReference) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Index", handler: "Evidence", routeValues: new { supportTaskReference });
+
+    public string Cancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Index", handler: "Cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
     public string ConfirmConnect(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, string? returnUrl = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/ConfirmConnect", routeValues: new { supportTaskReference, returnUrl }, journeyInstanceId: journeyInstanceId);
