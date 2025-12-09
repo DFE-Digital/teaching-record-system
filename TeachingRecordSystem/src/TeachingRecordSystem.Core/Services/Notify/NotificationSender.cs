@@ -23,6 +23,20 @@ public class NotificationSender : INotificationSender
         }
     }
 
+    public async Task<string> RenderEmailTemplateAsync(string templateId, IReadOnlyDictionary<string, string> personalization)
+    {
+        var template = (await _notificationClient.GetTemplateByIdAsync(templateId)) ??
+            throw new ArgumentException($"Template with ID '{templateId}' not found.", nameof(templateId));
+
+        var rendered = template.body;
+        foreach (var (key, value) in personalization)
+        {
+            rendered = rendered.Replace($"(({key}))", value);
+        }
+
+        return rendered;
+    }
+
     public async Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization)
     {
         NotificationClient client = _notificationClient;
@@ -60,27 +74,6 @@ public class NotificationSender : INotificationSender
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed sending email to {Email}.", to);
-
-            throw;
-        }
-    }
-
-    public async Task SendSmsAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization)
-    {
-        NotificationClient client = _notificationClient;
-
-        try
-        {
-            await client.SendSmsAsync(
-                to,
-                templateId,
-                personalisation: personalization.ToDictionary(kvp => kvp.Key, kvp => (dynamic)kvp.Value));
-
-            _logger.LogInformation("Successfully sent verification SMS to {MobileNumber}.", to);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed sending verification SMS to {MobileNumber}.", to);
 
             throw;
         }

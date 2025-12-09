@@ -35,7 +35,7 @@ public static class Extensions
             services.AddGias(configuration);
         }
 
-        if (environment.IsProduction())
+        if (environment.IsProduction() || environment.IsDevelopment())
         {
             services.AddNotifyNotificationSender(configuration);
         }
