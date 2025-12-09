@@ -1,85 +1,99 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
-public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IPersonMatchingService matchingService) : PageModel
+public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<ResolveOneLoginUserIdVerificationState>? JourneyInstance { get; set; }
+    private readonly InlineValidator<Matches> _validator = new()
+    {
+        v => v.RuleFor(m => m.MatchedPersonId)
+            .NotNull().WithMessage("Select what you want to do with this GOV.UK One Login account")
+    };
+
+    public JourneyInstance<ResolveOneLoginUserIdVerificationState> JourneyInstance { get; set; } = null!;
 
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select what you want to do with this GOV.UK One Login account")]
     public Guid? MatchedPersonId { get; set; }
 
     public string? Name { get; set; }
-    public string? Email { get; set; }
+    public string? EmailAddress { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public string? Trn { get; set; }
 
-    public IList<SuggestedMatchViewModel>? SuggestedMatches { get; set; }
+    public IReadOnlyCollection<SuggestedMatchViewModel>? SuggestedMatches { get; set; }
 
-    public IActionResult OnGet()
+    public void OnGet()
     {
-        return SuggestedMatches == null || SuggestedMatches.Count == 0
-            ? Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveNoMatches(SupportTaskReference, JourneyInstance!.InstanceId))
-            : Page();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(bool cancel)
     {
-        if (!ModelState.IsValid)
+        if (cancel)
         {
-            return this.PageWithErrors();
+            await JourneyInstance.DeleteAsync();
+
+            return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());
         }
-        await JourneyInstance!.UpdateStateAsync(state => state.MatchedPersonId = MatchedPersonId);
 
-        return MatchedPersonId != ResolveOneLoginUserIdVerificationState.DoNotConnectARecordPersonIdSentinel ?
-            Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveConfirmConnect(SupportTaskReference, JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveNotConnecting(SupportTaskReference, JourneyInstance!.InstanceId));
-    }
+        await _validator.ValidateAndThrowAsync(this);
 
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
+        await JourneyInstance.UpdateStateAsync(state => state.MatchedPersonId = MatchedPersonId);
 
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());
+        return MatchedPersonId != ResolveOneLoginUserIdVerificationState.NotMatchedPersonIdSentinel ?
+            Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.ConfirmConnect(SupportTaskReference, JourneyInstance.InstanceId)) :
+            Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.NotConnecting(SupportTaskReference, JourneyInstance.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        if (JourneyInstance.State.Verified is not true)
+        {
+            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(SupportTaskReference, JourneyInstance.InstanceId));
+            return;
+        }
+
+        if (JourneyInstance.State.MatchedPersons.Count == 0)
+        {
+            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.NoMatches(SupportTaskReference, JourneyInstance.InstanceId));
+            return;
+        }
+
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var oneLoginUser = supportTask.OneLoginUser!;
+        var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var oneLoginUserIdVerificationRequestData = (OneLoginUserIdVerificationData)supportTask.Data;
+        Name = $"{data.StatedFirstName} {data.StatedLastName}";
+        DateOfBirth = data.StatedDateOfBirth;
+        NationalInsuranceNumber = data.StatedNationalInsuranceNumber;
+        Trn = data.StatedTrn;
+        EmailAddress = oneLoginUser.EmailAddress;
 
-        Name = StringHelper.JoinNonEmpty(' ', oneLoginUserIdVerificationRequestData.StatedFirstName, oneLoginUserIdVerificationRequestData.StatedLastName);
-        DateOfBirth = oneLoginUserIdVerificationRequestData.StatedDateOfBirth;
-        NationalInsuranceNumber = oneLoginUserIdVerificationRequestData.StatedNationalInsuranceNumber;
-        Trn = oneLoginUserIdVerificationRequestData.StatedTrn;
-
-        Email = dbContext.OneLoginUsers
-            .Where(u => u.Subject == oneLoginUserIdVerificationRequestData.OneLoginUserSubject)?
-            .FirstOrDefault()?
-            .EmailAddress;
-
-        var request = new GetSuggestedOneLoginUserMatchesRequest(
-            Names: [Name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)],
-            DatesOfBirth: [DateOfBirth],
-            NationalInsuranceNumber: NationalInsuranceNumber,
-            Trn: Trn,
-            null
-        );
-
-        SuggestedMatches = (await matchingService.GetSuggestedOneLoginUserMatchesWithMatchedAttributesInfoAsync(request))
+        var matchedPersonIds = JourneyInstance.State.MatchedPersons.Select(m => m.PersonId).ToArray();
+        SuggestedMatches = (await dbContext.Persons
+            .Include(p => p.PreviousNames)
+            .Where(p => matchedPersonIds.Contains(p.PersonId))
+            .Select(p => new
+            {
+                p.PersonId,
+                p.Trn,
+                p.EmailAddress,
+                p.FirstName,
+                p.LastName,
+                p.DateOfBirth,
+                p.NationalInsuranceNumber,
+                p.PreviousNames
+            })
+            .ToArrayAsync())
+            .OrderBy(p => Array.IndexOf(matchedPersonIds, p.PersonId))  // Ensure we maintain the order of matches
             .Select((match, idx) => new SuggestedMatchViewModel
             {
                 Identifier = (char)('A' + idx),
@@ -90,13 +104,10 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 LastName = match.LastName,
                 DateOfBirth = match.DateOfBirth,
                 NationalInsuranceNumber = match.NationalInsuranceNumber,
-                PreviousNames = dbContext.Persons
-                    .Include(p => p.PreviousNames)
-                    .Where(p => p.PersonId == match.PersonId)?.SingleOrDefault()?
-                    .PreviousNames?.Select(n => $"{n.FirstName} {n.LastName}")
-                    .ToList(),
-                MatchedAttributes = match.MatchedAttributes
-            }).ToList();
+                PreviousNames = match.PreviousNames!.Select(n => $"{n.FirstName} {n.LastName}").ToArray(),
+                MatchedAttributes = JourneyInstance.State.MatchedPersons.Single(m => m.PersonId == match.PersonId).MatchedAttributes
+            })
+            .ToArray();
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

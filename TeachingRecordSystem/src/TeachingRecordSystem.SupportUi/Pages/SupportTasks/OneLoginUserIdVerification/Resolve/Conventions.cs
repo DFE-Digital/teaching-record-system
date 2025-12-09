@@ -11,8 +11,6 @@ public class Conventions : IConfigureFolderConventions
             this.GetFolderPathFromNamespace(),
             model =>
             {
-                var relativePath = model.RelativePath;
-
                 model.Filters.Add(new CheckSupportTaskExistsFilterFactory(openOnly: true, SupportTaskType.OneLoginUserIdVerification));
             });
     }

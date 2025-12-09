@@ -68,6 +68,7 @@ public class EventCapture : IEventHandler
             Action<T1>? inspector1 = null)
             where T1 : IEvent
         {
+            Assert.Equal(1, _events.Count);
             AssertProcessHasEvent(inspector1);
         }
 
@@ -77,6 +78,7 @@ public class EventCapture : IEventHandler
             where T1 : IEvent
             where T2 : IEvent
         {
+            Assert.Equal(2, _events.Count);
             AssertProcessHasEvent(inspector1);
             AssertProcessHasEvent(inspector2);
         }
@@ -89,6 +91,7 @@ public class EventCapture : IEventHandler
             where T2 : IEvent
             where T3 : IEvent
         {
+            Assert.Equal(3, _events.Count);
             AssertProcessHasEvent(inspector1);
             AssertProcessHasEvent(inspector2);
             AssertProcessHasEvent(inspector3);
@@ -104,6 +107,7 @@ public class EventCapture : IEventHandler
             where T3 : IEvent
             where T4 : IEvent
         {
+            Assert.Equal(4, _events.Count);
             AssertProcessHasEvent(inspector1);
             AssertProcessHasEvent(inspector2);
             AssertProcessHasEvent(inspector3);

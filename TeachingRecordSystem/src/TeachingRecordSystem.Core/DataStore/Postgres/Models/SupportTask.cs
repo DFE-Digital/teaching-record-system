@@ -15,6 +15,7 @@ public class SupportTask
     public required SupportTaskType SupportTaskType { get; init; }
     public required SupportTaskStatus Status { get; set; }
     public string? OneLoginUserSubject { get; init; }
+    public OneLoginUser? OneLoginUser { get; }
     public Guid? PersonId { get; init; }
     public Person? Person { get; }
     public Guid? TrnRequestApplicationUserId { get; init; }

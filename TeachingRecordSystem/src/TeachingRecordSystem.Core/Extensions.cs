@@ -14,6 +14,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -109,7 +110,8 @@ public static class Extensions
             .AddSingleton<PersonInfoCache>()
             .AddTrnGeneration()
             .AddNoteService()
-            .AddPersonService();
+            .AddPersonService()
+            .AddOneLoginService();
 
         return services;
     }

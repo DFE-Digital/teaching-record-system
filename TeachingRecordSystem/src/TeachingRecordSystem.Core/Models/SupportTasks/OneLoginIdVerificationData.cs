@@ -14,4 +14,12 @@ public record OneLoginUserIdVerificationData : ISupportTaskData
     public required Guid ClientApplicationUserId { get; init; }
     public bool? Verified { get; init; }
     public Guid? PersonId { get; init; }
+    public OneLoginUserIdVerificationOutcome Outcome { get; init; }
+}
+
+public enum OneLoginUserIdVerificationOutcome
+{
+    NotVerified = 0,
+    VerifiedOnly = 1,
+    VerifiedAndConnected = 2
 }

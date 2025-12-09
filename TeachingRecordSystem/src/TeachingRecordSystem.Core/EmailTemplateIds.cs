@@ -16,4 +16,5 @@ public static class EmailTemplateIds
     public const string GetAnIdentityChangeOfNameRejectedEmailConfirmation = "0461b297-b032-45d8-8ed5-ba75ec0467a9";
     public const string TrnGeneratedForNpq = "986a82fe-0ae7-43af-9198-231cb281b571";
     public const string TraineeTrnRecipient = "eaee1db2-9fd9-460d-87d1-4c4f0204f3e4";
+    public const string OneLoginCannotFindRecord = "5ff8337f-1861-4c1c-a126-16cfd2c63548";
 }

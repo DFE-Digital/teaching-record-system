@@ -1,12 +1,11 @@
-@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/matches/{handler?}"
+@page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/matches"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.Matches
-
 @{
-        ViewBag.Title = "Check if this GOV.UK One Login account matches an existing record";
+    ViewBag.Title = "Check if this GOV.UK One Login account matches an existing record";
 }
 
 @section BeforeContent {
-    <govuk-back-link asp-page=@LinkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveDetails(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)>Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" />
 }
 
 <form method="post">
@@ -14,10 +13,7 @@
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">Record management</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-        </div>
-    </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
+
             <govuk-summary-card data-testid="request">
                 <govuk-summary-card-title>Request details</govuk-summary-card-title>
                 <govuk-summary-list>
@@ -27,7 +23,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.Email</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
@@ -38,12 +34,16 @@
                         <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>
-            <govuk-inset-text>Details that do not match are <govuk-tag class="govuk-tag--orange">highlighted</govuk-tag> in the existing record</govuk-inset-text>
+
+            <govuk-inset-text>
+                Details that do not match are <highlight>highlighted</highlight> in the existing record
+            </govuk-inset-text>
+
             @foreach (var match in Model.SuggestedMatches!)
             {
                 <govuk-summary-card data-testid="match">
@@ -86,24 +86,25 @@
                     </govuk-summary-list>
                 </govuk-summary-card>
             }
-        </div>
-    </div>
 
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
             <govuk-radios for="MatchedPersonId">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login account?</h2></govuk-radios-fieldset-legend>
+                    <govuk-radios-fieldset-legend>
+                        <h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login account?</h2>
+                    </govuk-radios-fieldset-legend>
                     @foreach (var match in Model.SuggestedMatches)
                     {
                         <govuk-radios-item value="@match.PersonId">Connect it to Record @match.Identifier</govuk-radios-item>
                     }
-                    <govuk-radios-item value="@ResolveOneLoginUserIdVerificationState.DoNotConnectARecordPersonIdSentinel">Do not connect it to a record</govuk-radios-item>
+                    <govuk-radios-item value="@ResolveOneLoginUserIdVerificationState.NotMatchedPersonIdSentinel">
+                        Do not connect it to a record
+                    </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
-            <div class="govuk-grid-column-two-thirds">
-                <button type="submit" class="govuk-button" data-testid="continue-button">Continue</button>
-                <button type="submit" action="cancel" class="govuk-button govuk-button--secondary" data-testid="cancel-button">Cancel</button>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+                <govuk-button type="submit" action="cancel" data-testid="cancel-button" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>

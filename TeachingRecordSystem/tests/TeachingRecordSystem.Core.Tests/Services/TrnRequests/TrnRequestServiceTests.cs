@@ -759,7 +759,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             TryResolve = tryResolve,
             ApplicationUserId = applicationUserId,
             RequestId = Guid.NewGuid().ToString(),
-            OneLoginUserInfo = new(Guid.NewGuid().ToString(), true),
+            OneLoginUserInfo = null,
             EmailAddress = TestData.GenerateUniqueEmail(),
             FirstName = TestData.GenerateFirstName(),
             MiddleName = TestData.GenerateMiddleName(),

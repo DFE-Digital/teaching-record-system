@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerificati
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerificationTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_SupportTaskDoesNotExist_ReturnsNotFound()
@@ -23,8 +23,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         await WithDbContextAsync(dbContext => dbContext.SupportTasks
@@ -46,30 +45,25 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_RendersExpectedContent(bool evidenceIsPdf)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-        var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
             oneLoginUser.Subject,
-            b => b
-                .WithStatedNationalInsuranceNumber(statedNationalInsuranceNumber)
-                .WithEvidenceFileName(evidenceIsPdf ? "evidence.pdf" : "evidence.jpg"));
+            b => b.WithEvidenceFileName(evidenceIsPdf ? "evidence.pdf" : "evidence.jpg"));
         var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve");
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?ffiid=", response.Headers.Location?.OriginalString);
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Get, response.Headers.Location!.OriginalString);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        Assert.Equal(StatusCodes.Status200OK, (int)redirectResponse.StatusCode);
-
-        var doc = await AssertEx.HtmlResponseAsync(redirectResponse);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal($"{requestData.StatedFirstName} {requestData.StatedLastName}", doc.GetSummaryListValueByKey("Name"));
         Assert.Equal(requestData.StatedDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
@@ -90,22 +84,17 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task Get_WhereStateIsPopulated_SetsInputFields(bool canIdentityBeVerified)
+    public async Task Get_WhereStateIsPopulated_SetsInputFields(bool verified)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-        var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-        var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
-            new ResolveOneLoginUserIdVerificationState
-            {
-                CanIdentityBeVerified = canIdentityBeVerified
-            });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask, state => state.Verified = verified);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -114,7 +103,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await AssertEx.HtmlResponseAsync(response);
-        AssertCheckedRadioOption("CanIdentityBeVerified", canIdentityBeVerified.ToString());
+        AssertCheckedRadioOption("Verified", verified.ToString());
 
         void AssertCheckedRadioOption(string name, string expectedCheckedValue)
         {
@@ -164,45 +153,41 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenNoCanIdentityBeVerifiedOptionIsSelected_ReturnsError()
+    public async Task Post_WhenNoVerifiedOptionIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-        var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-        var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
-            new ResolveOneLoginUserIdVerificationState());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "CanIdentityBeVerified", "Select yes if you can verify this person’s identity");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Verified", "Select yes if you can verify this person’s identity");
     }
 
     [Fact]
-    public async Task Post_CanIdentityBeVerifiedIsFalse_UpdatesStateAndRedirectsToRejectPage()
+    public async Task Post_VerifiedIsFalse_UpdatesStateAndRedirectsToRejectPage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-        var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-        var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
-            new ResolveOneLoginUserIdVerificationState());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "CanIdentityBeVerified", "False" }
+                { "Verified", "False" }
             }
         };
 
@@ -214,33 +199,23 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/reject?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.False(journeyInstance.State.CanIdentityBeVerified);
+        Assert.False(journeyInstance.State.Verified);
     }
 
     [Fact]
-    public async Task Post_CanIdentityBeVerifiedIsTrueAndNoMatches_UpdatesStateAndRedirectsToNoMatchesPage()
+    public async Task Post_VerifiedIsTrueAndNoMatches_UpdatesStateAndRedirectsToNoMatchesPage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-        var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
-            oneLoginUser.Subject,
-            b => b
-                .WithStatedFirstName(TestData.GenerateChangedFirstName(person.FirstName))
-                .WithStatedLastName(TestData.GenerateChangedLastName(person.LastName))
-                .WithStatedDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth))
-        );
-        var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
-            new ResolveOneLoginUserIdVerificationState());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask, state => state.MatchedPersons = []);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "CanIdentityBeVerified", "True" }
+                { "Verified", "True" }
             }
         };
 
@@ -252,33 +227,43 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.CanIdentityBeVerified);
+        Assert.True(journeyInstance.State.Verified);
     }
 
     [Fact]
-    public async Task Post_CanIdentityBeVerifiedIsTrueAndMatches_UpdatesStateAndRedirectsToMatchesPage()
+    public async Task Post_VerifiedIsTrueAndMatches_UpdatesStateAndRedirectsToMatchesPage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-        var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var matchedPerson = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
-            oneLoginUser.Subject,
-            b => b
-                .WithStatedFirstName(person.FirstName)
-                .WithStatedLastName(person.LastName)
-                .WithStatedDateOfBirth(person.DateOfBirth)
-        );
-        var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
-            new ResolveOneLoginUserIdVerificationState());
+            oneLoginUser.Subject, t => t
+                .WithStatedFirstName(matchedPerson.FirstName)
+                .WithStatedLastName(matchedPerson.LastName)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedTrn(matchedPerson.Trn!));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask,
+            state => state.MatchedPersons =
+            [
+                new ResolveOneLoginUserIdVerificationStateMatch(
+                    matchedPerson.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.DateOfBirth,
+                        PersonMatchedAttribute.Trn
+                    ])
+            ]);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "CanIdentityBeVerified", "True" }
+                { "Verified", "True" }
             }
         };
 
@@ -290,23 +275,25 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.CanIdentityBeVerified);
+        Assert.True(journeyInstance.State.Verified);
     }
 
     [Fact]
-    public async Task Post_Cancel_DeletesJourneyAndRedirects()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToListPage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-        var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-        var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
-            new ResolveOneLoginUserIdVerificationState());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Cancel", "True" }
+            }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -318,12 +305,4 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
     }
-
-    private Task<JourneyInstance<ResolveOneLoginUserIdVerificationState>> CreateJourneyInstanceAsync(
-            string supportTaskReference,
-            ResolveOneLoginUserIdVerificationState state) =>
-        CreateJourneyInstance(
-            JourneyNames.ResolveOneLoginUserIdVerification,
-            state,
-            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 }

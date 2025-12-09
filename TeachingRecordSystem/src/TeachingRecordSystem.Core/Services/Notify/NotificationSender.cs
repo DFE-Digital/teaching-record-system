@@ -29,6 +29,7 @@ public class NotificationSender : INotificationSender
             throw new ArgumentException($"Template with ID '{templateId}' not found.", nameof(templateId));
 
         var rendered = template.body;
+
         foreach (var (key, value) in personalization)
         {
             rendered = rendered.Replace($"(({key}))", value);
