@@ -49,7 +49,7 @@ public class IndexModel(
 
         await JourneyInstance!.UpdateStateAsync(state => state.CanIdentityBeVerified = CanIdentityBeVerified);
 
-        var names = new string[] { RequestData!.StatedFirstName, RequestData.StatedLastName }.GetNonEmptyValues();        
+        var names = new string[] { RequestData!.StatedFirstName, RequestData.StatedLastName }.GetNonEmptyValues();
         var matches = await personMatchingService.GetSuggestedOneLoginUserMatchesAsync(new(
             Names: [names],
             DatesOfBirth: [RequestData.StatedDateOfBirth],

@@ -96,7 +96,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
         var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);            
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
         var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
@@ -176,7 +176,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             supportTask.SupportTaskReference,
             new ResolveOneLoginUserIdVerificationState());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}");        
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -203,7 +203,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContentBuilder
             {
                 { "CanIdentityBeVerified", "False" }
-            }                
+            }
         };
 
         // Act
