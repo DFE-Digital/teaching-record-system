@@ -11,15 +11,25 @@ public class Index(TrsDbContext dbContext) : PageModel
     [FromQuery]
     public string? Search { get; set; }
 
-    public IReadOnlyCollection<Result>? Results { get; set; }
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public SortDirection? SortDirection { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public SortByOption? SortBy { get; set; }
+
+    public IReadOnlyCollection<Result>? Results { get; set; } = [];
 
     public async Task OnGetAsync()
     {
+        var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
+
         var tasks = dbContext.SupportTasks
             .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
-            .OrderBy(t => t.CreatedOn);
+            .OrderBy(t => t.SupportTaskReference);
 
-        Results = await tasks
+        var results = (await tasks
             .Select(t => new
             {
                 t,
@@ -36,7 +46,18 @@ public class Index(TrsDbContext dbContext) : PageModel
                     item.Data!.StatedLastName,
                     user.EmailAddress,
                     item.t.CreatedOn))
-            .ToArrayAsync();
+            .ToListAsync()).AsQueryable(); // CML TODO
+
+        results = SortBy switch
+        {
+            SortByOption.ReferenceId => results.OrderBy(sortDirection, r => r.SupportTaskReference),
+            SortByOption.Name => results.OrderBy(sortDirection, r => r.FirstName).ThenBy(sortDirection, r => r.LastName),
+            SortByOption.Email => results.OrderBy(sortDirection, r => r.EmailAddress),
+            SortByOption.DateCreated => results.OrderBy(sortDirection, r => r.CreatedOn),
+            _ => results
+        };
+
+        Results = results?.ToList();
     }
 
     public record Result(

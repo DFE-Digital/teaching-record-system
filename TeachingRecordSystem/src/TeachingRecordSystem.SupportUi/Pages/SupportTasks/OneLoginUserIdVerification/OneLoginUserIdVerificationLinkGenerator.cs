@@ -7,5 +7,8 @@ public class OneLoginUserIdVerificationLinkGenerator(LinkGenerator linkGenerator
     public string Index() =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Index");
 
+    public string Index(SortByOption sortByOption, SortDirection sortDirection) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Index", routeValues: new { sortByOption, sortDirection });
+
     public ResolveOneLoginUserIdVerificationLinkGenerator Resolve { get; } = new(linkGenerator);
 }
