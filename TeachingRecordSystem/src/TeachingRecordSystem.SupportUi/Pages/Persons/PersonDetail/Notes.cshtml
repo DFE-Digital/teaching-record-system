@@ -53,7 +53,7 @@ else
                         {
                             var downloadUrl = await FileService.GetFileUrlAsync(fileId, TimeSpan.FromMinutes(15));
                             <div class="govuk-heading-s govuk-!-margin-bottom-0">Attached file</div>
-                            <a href=@downloadUrl target="_blank" class="govuk-link">
+                            <a href="@LinkGenerator.Files.File(note.OriginalFileName!, downloadUrl)" target="_blank" class="govuk-link">
                                 <span data-testid="@note.NoteId-note-file-name">@note.OriginalFileName</span> (opens in a new tab)
                             </a>
                         }
