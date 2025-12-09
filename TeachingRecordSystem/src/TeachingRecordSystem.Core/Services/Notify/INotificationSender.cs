@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Core.Services.Notify;
 
 public interface INotificationSender
 {
-    Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization);
+    Task<string> RenderEmailTemplateAsync(string templateId, IReadOnlyDictionary<string, string> personalization);
 
-    Task SendSmsAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization);
+    Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization);
 }
