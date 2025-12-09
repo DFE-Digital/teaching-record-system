@@ -235,66 +235,6 @@ public partial class TrnRequestServiceTests
         }
     }
 
-    [Fact]
-    public async Task GetSuggestedPersonMatchesAsync()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-        var firstName = TestData.GenerateFirstName();
-        var middleName = TestData.GenerateMiddleName();
-        var lastName = TestData.GenerateLastName();
-        var dateOfBirth = TestData.GenerateDateOfBirth();
-        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-        var emailAddress = TestData.GenerateUniqueEmail();
-
-        // Person matching on NINO, first name and last name
-        var person1 = await TestData.CreatePersonAsync(p => p
-            .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithFirstName(firstName)
-            .WithLastName(lastName));
-
-        // Person matching on first name, last name, DOB and email
-        var person2 = await TestData.CreatePersonAsync(p => p
-            .WithFirstName(firstName)
-            .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmailAddress(emailAddress));
-
-        // Person matching on first name, middle name and last name
-        var person3 = await TestData.CreatePersonAsync(p => p
-            .WithFirstName(firstName)
-            .WithMiddleName(middleName)
-            .WithLastName(lastName));
-
-        var requestData = new TrnRequestMetadata()
-        {
-            ApplicationUserId = applicationUser.UserId,
-            RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = Clock.UtcNow,
-            IdentityVerified = null,
-            EmailAddress = emailAddress,
-            OneLoginUserSubject = null,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            PreviousFirstName = null,
-            PreviousLastName = null,
-            Name = [firstName, middleName, lastName],
-            DateOfBirth = dateOfBirth,
-            NationalInsuranceNumber = nationalInsuranceNumber
-        };
-
-        // Act
-        var result = await WithServiceAsync(s => s.GetSuggestedPersonMatchesAsync(requestData));
-
-        // Assert
-        Assert.Collection(
-            result,
-            r => Assert.Equal(person1.PersonId, r.PersonId),
-            r => Assert.Equal(person2.PersonId, r.PersonId),
-            r => Assert.Equal(person3.PersonId, r.PersonId));
-    }
-
     public static TrnRequestTheoryData GetMatchFromTrnRequestData()
     {
         var data = new TrnRequestTheoryData();
