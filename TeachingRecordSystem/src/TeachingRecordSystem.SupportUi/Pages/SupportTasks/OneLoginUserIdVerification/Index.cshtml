@@ -14,7 +14,9 @@
         <span class="govuk-caption-l">Record management</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
     </div>
+</div>
 
+<div class="govuk-grid-row">
     <div class="govuk-grid-column-full" data-testid="results">
         @if (Model.Results!.Count() == 0)
         {
@@ -43,7 +45,11 @@
                     @foreach (var result in Model.Results!)
                     {
                         <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                            <th scope="row" class="govuk-table__header" data-testid="name"><a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.ResolveDetails(result.SupportTaskReference)">@result.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-testid="name">
+                                <a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
+                                    @result.Name
+                                </a>
+                            </th>
                             <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                             <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
                         </tr>

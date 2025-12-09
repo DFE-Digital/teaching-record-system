@@ -26,7 +26,7 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
 
         var processContext = await ProcessContext.FromDbAsync(dbContext, processId, clock.UtcNow);
 
-        var personId = processContext.PersonIds.Single();
+        Guid? personId = processContext.PersonIds.Count != 0 ? processContext.PersonIds.Single() : null;
 
         var email = await GetEmailByIdAsync(emailId);
         await SendEmailAsync(email);

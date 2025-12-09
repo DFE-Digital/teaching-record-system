@@ -20,15 +20,24 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
         var currentSupportTaskQuery = dbContext.SupportTasks
             .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update");  // https://github.com/dotnet/efcore/issues/26042
 
-        if (supportTaskTypes.Contains(SupportTaskType.ApiTrnRequest)
-            || supportTaskTypes.Contains(SupportTaskType.TrnRequestManualChecksNeeded)
-            || supportTaskTypes.Contains(SupportTaskType.NpqTrnRequest)
-            || supportTaskTypes.Contains(SupportTaskType.TeacherPensionsPotentialDuplicate)
-            || supportTaskTypes.Contains(SupportTaskType.OneLoginUserIdVerification))
+        if (supportTaskTypes
+             .Intersect([
+                 SupportTaskType.ApiTrnRequest,
+                 SupportTaskType.TrnRequestManualChecksNeeded,
+                 SupportTaskType.NpqTrnRequest,
+                 SupportTaskType.TeacherPensionsPotentialDuplicate
+            ])
+            .Any())
         {
             currentSupportTaskQuery = currentSupportTaskQuery
                 .Include(t => t.TrnRequestMetadata)
                 .ThenInclude(m => m!.ApplicationUser);
+        }
+
+        if (supportTaskTypes.Intersect([SupportTaskType.ConnectOneLoginUser, SupportTaskType.OneLoginUserIdVerification]).Any())
+        {
+            currentSupportTaskQuery = currentSupportTaskQuery
+                .Include(t => t.OneLoginUser);
         }
 
         var currentSupportTask = await currentSupportTaskQuery.SingleOrDefaultAsync();

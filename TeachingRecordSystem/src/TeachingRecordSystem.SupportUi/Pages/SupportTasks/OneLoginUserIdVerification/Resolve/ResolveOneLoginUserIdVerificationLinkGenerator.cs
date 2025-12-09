@@ -8,9 +8,6 @@ public class ResolveOneLoginUserIdVerificationLinkGenerator(LinkGenerator linkGe
     public string Evidence(string supportTaskReference) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Index", handler: "Evidence", routeValues: new { supportTaskReference });
 
-    public string Cancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Index", handler: "Cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
-
     public string ConfirmConnect(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, string? returnUrl = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/ConfirmConnect", routeValues: new { supportTaskReference, returnUrl }, journeyInstanceId: journeyInstanceId);
 

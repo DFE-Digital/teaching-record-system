@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
+using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
@@ -119,6 +120,15 @@ public static class Extensions
             services
                 .AddAzureAdAuthentication(configuration)
                 .AddIdentityApi(configuration);
+        }
+
+        if (environment.IsProduction() || environment.IsDevelopment())
+        {
+            services.AddNotifyNotificationSender(configuration);
+        }
+        else
+        {
+            services.AddSingleton<INotificationSender, NoopNotificationSender>();
         }
 
         return services;

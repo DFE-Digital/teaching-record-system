@@ -2,23 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.StaticFiles;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(
-    TrsDbContext dbContext,
-    SupportUiLinkGenerator linkGenerator,
-    IFileService fileService,
-    IPersonMatchingService personMatchingService) : PageModel
+public class IndexModel(IFileService fileService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
-        v => v.RuleFor(m => m.CanIdentityBeVerified)
+        v => v.RuleFor(m => m.Verified)
             .NotNull().WithMessage("Select yes if you can verify this person’s identity")
     };
 
@@ -28,9 +22,8 @@ public class IndexModel(
     public required string? SupportTaskReference { get; set; }
 
     [BindProperty]
-    public bool? CanIdentityBeVerified { get; set; }
+    public bool? Verified { get; set; }
 
-    public OneLoginUserIdVerificationData? RequestData { get; set; }
     public string? Name { get; set; }
     public string? EmailAddress { get; set; }
     public DateOnly DateOfBirth { get; set; }
@@ -40,37 +33,27 @@ public class IndexModel(
 
     public void OnGet()
     {
-        CanIdentityBeVerified = JourneyInstance?.State.CanIdentityBeVerified;
+        Verified = JourneyInstance?.State.Verified;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(bool cancel)
     {
+        if (cancel)
+        {
+            await JourneyInstance!.DeleteAsync();
+
+            return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state => state.CanIdentityBeVerified = CanIdentityBeVerified);
+        await JourneyInstance!.UpdateStateAsync(state => state.Verified = Verified);
 
-        var names = new string[] { RequestData!.StatedFirstName, RequestData.StatedLastName }.GetNonEmptyValues();
-        var matches = await personMatchingService.GetSuggestedOneLoginUserMatchesAsync(new(
-            Names: [names],
-            DatesOfBirth: [RequestData.StatedDateOfBirth],
-            NationalInsuranceNumber: RequestData.StatedNationalInsuranceNumber,
-            Trn: RequestData.StatedTrn,
-            TrnTokenTrnHint: null));
-
-        return Redirect(CanIdentityBeVerified == true
-            ?
-            (matches!.Count > 0 ?
-                linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId) :
-                linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.NoMatches(SupportTaskReference!, JourneyInstance!.InstanceId))
-            :
-            linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Reject(SupportTaskReference!, JourneyInstance!.InstanceId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());
+        return Redirect(Verified is false ?
+            linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Reject(SupportTaskReference!, JourneyInstance!.InstanceId) :
+            JourneyInstance.State.MatchedPersons.Count > 0 ?
+            linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId) :
+            linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.NoMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnGetEvidenceAsync()
@@ -82,17 +65,14 @@ public class IndexModel(
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var oneLoginUser = supportTask.OneLoginUser!;
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
-        RequestData = data;
-        var oneLoginUser = await dbContext.OneLoginUsers
-            .SingleOrDefaultAsync(u => u.Subject == data.OneLoginUserSubject);
 
-        Name = StringHelper.JoinNonEmpty(' ', data.StatedFirstName, data.StatedLastName);
+        Name = data.StatedFirstName + " " + data.StatedLastName;
         DateOfBirth = data.StatedDateOfBirth;
         NationalInsuranceNumber = data.StatedNationalInsuranceNumber;
         Trn = data.StatedTrn;
-
-        EmailAddress = oneLoginUser!.EmailAddress;
+        EmailAddress = oneLoginUser.EmailAddress;
 
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
         if (!fileExtensionContentTypeProvider.TryGetContentType(data.EvidenceFileName, out var evidenceFileMimeType))

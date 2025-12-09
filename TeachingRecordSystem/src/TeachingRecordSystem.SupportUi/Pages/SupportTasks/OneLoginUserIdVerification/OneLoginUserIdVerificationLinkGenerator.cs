@@ -7,26 +7,5 @@ public class OneLoginUserIdVerificationLinkGenerator(LinkGenerator linkGenerator
     public string Index() =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Index");
 
-    public ResolveOneLoginUserIdVerificationLinkGenerator Resolve => new(linkGenerator);
-
-    public string ResolveDetails(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Index", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
-
-    public string ResolveNoMatches(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/NoMatches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
-
-    public string ResolveMatches(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
-
-    public string ResolveMatchesCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Matches", handler: "Cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
-
-    public string ResolveConfirmConnect(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-       linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/ConfirmConnect", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
-
-    public string ResolveConfirmConnectCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-       linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/ConfirmConnect", "cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
-
-    public string ResolveNotConnecting(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-   linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/NotConnecting", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+    public ResolveOneLoginUserIdVerificationLinkGenerator Resolve { get; } = new(linkGenerator);
 }

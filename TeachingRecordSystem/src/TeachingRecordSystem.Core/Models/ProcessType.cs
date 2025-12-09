@@ -23,5 +23,6 @@ public enum ProcessType
     NpqTrnRequestRejecting = 19,
     TrnRequestManualChecksNeededTaskCompleting = 20,
     TeacherPensionsDuplicateSupportTaskResolvingWithMerge = 21,
-    TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge = 22
+    TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge = 22,
+    OneLoginUserIdVerificationSupportTaskCompleting = 23
 }

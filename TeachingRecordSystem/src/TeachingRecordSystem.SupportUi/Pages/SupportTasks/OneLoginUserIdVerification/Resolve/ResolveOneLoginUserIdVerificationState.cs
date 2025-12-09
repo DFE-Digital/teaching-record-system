@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
 {
-    public static Guid DoNotConnectARecordPersonIdSentinel => Guid.Empty;
+    public static Guid NotMatchedPersonIdSentinel => Guid.Empty;
 
     public static JourneyDescriptor Journey { get; } = new(
         JourneyNames.ResolveOneLoginUserIdVerification,
@@ -14,28 +15,41 @@ public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
         ["supportTaskReference"],
         appendUniqueKey: true);
 
-    public bool? CanIdentityBeVerified { get; set; }
+    public required IReadOnlyCollection<ResolveOneLoginUserIdVerificationStateMatch> MatchedPersons { get; set; }
+
+    public bool? Verified { get; set; }
 
     public Guid? MatchedPersonId { get; set; }
+}
 
-    public class ResolveOneLoginUserIdVerificationStateFactory() : IJourneyStateFactory<ResolveOneLoginUserIdVerificationState>
+public class ResolveOneLoginUserIdVerificationStateFactory(IPersonMatchingService personMatchingService) :
+    IJourneyStateFactory<ResolveOneLoginUserIdVerificationState>
+{
+    public Task<ResolveOneLoginUserIdVerificationState> CreateAsync(CreateJourneyStateContext context)
     {
-        public Task<ResolveOneLoginUserIdVerificationState> CreateAsync(CreateJourneyStateContext context)
+        var supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        return CreateAsync(supportTask);
+    }
+
+    public async Task<ResolveOneLoginUserIdVerificationState> CreateAsync(SupportTask supportTask)
+    {
+        Debug.Assert(supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification);
+        var requestData = supportTask.Data as OneLoginUserIdVerificationData;
+
+        var matchResult = await personMatchingService.GetSuggestedOneLoginUserMatchesWithMatchedAttributesInfoAsync(new(
+            Names: [[requestData!.StatedFirstName, requestData.StatedLastName]],
+            DatesOfBirth: [requestData.StatedDateOfBirth],
+            NationalInsuranceNumber: requestData.StatedNationalInsuranceNumber,
+            Trn: requestData.StatedTrn,
+            TrnTokenTrnHint: null));
+
+        var state = new ResolveOneLoginUserIdVerificationState
         {
-            var supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-            return CreateAsync(supportTask);
-        }
+            MatchedPersons = matchResult.Select(m => new ResolveOneLoginUserIdVerificationStateMatch(m.PersonId, m.MatchedAttributes)).ToArray()
+        };
 
-        public async Task<ResolveOneLoginUserIdVerificationState> CreateAsync(SupportTask supportTask)
-        {
-            Debug.Assert(supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification);
-            var requestData = supportTask.Data as OneLoginUserIdVerificationData;
-
-            var state = new ResolveOneLoginUserIdVerificationState
-            {
-
-            };
-            return state;
-        }
+        return state;
     }
 }
+
+public record ResolveOneLoginUserIdVerificationStateMatch(Guid PersonId, IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes);
