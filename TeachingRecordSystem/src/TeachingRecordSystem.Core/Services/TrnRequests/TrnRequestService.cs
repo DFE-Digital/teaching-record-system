@@ -8,7 +8,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 
@@ -468,38 +467,22 @@ public class TrnRequestService(
         }
 
         request.PotentialDuplicate = true;
-        return MatchPersonsResult.PotentialMatches(results.Select(r => r.person_id));
-    }
 
-    public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedPersonMatchesAsync(TrnRequestMetadata request)
-    {
-        var results = await GetMatchesFromTrnRequestAsync(request);
+        return MatchPersonsResult.PotentialMatches(
+            results
+                .Select(r =>
+                {
+                    var score = (r.date_of_birth_matches ? 1 : 0) +
+                        (r.first_name_matches ? 1 : 0) +
+                        (r.middle_name_matches ? 1 : 0) +
+                        (r.last_name_matches ? 1 : 0) +
+                        (r.email_address_matches ? 5 : 0) +
+                        (r.national_insurance_number_matches ? 10 : 0);
 
-        return results
-            .Select(r =>
-            {
-                var score = (r.date_of_birth_matches ? 1 : 0) +
-                    (r.first_name_matches ? 1 : 0) +
-                    (r.middle_name_matches ? 1 : 0) +
-                    (r.last_name_matches ? 1 : 0) +
-                    (r.email_address_matches ? 5 : 0) +
-                    (r.national_insurance_number_matches ? 10 : 0);
-
-                return (Result: r, Score: score);
-            })
-            .OrderByDescending(t => t.Score)
-            .ThenBy(t => t.Result.trn)
-            .Select(t => t.Result)
-            .Select(r => new SuggestedMatch(
-                r.person_id,
-                r.trn,
-                r.email_address,
-                r.first_name,
-                r.middle_name,
-                r.last_name,
-                r.date_of_birth,
-                r.national_insurance_number))
-            .AsReadOnly();
+                    return (r.person_id, score);
+                })
+                .OrderByDescending(r => r.score)
+                .Select(r => r.person_id));
     }
 
     private async Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
