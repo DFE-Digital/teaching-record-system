@@ -147,7 +147,13 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserI
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents</*EmailSentEvent, */SupportTaskUpdatedEvent>();
+            p.AssertProcessHasEvents<EmailSentEvent, SupportTaskUpdatedEvent>(
+                e =>
+                {
+                    Assert.Equal(EmailTemplateIds.OneLoginRecordMatched, e.Email.TemplateId);
+                    Assert.Equal(oneLoginUser.EmailAddress, e.Email.EmailAddress);
+                },
+                _ => { });
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
