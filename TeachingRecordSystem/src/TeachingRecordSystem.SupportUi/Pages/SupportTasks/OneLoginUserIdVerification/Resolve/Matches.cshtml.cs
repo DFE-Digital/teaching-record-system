@@ -104,7 +104,10 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 LastName = match.LastName,
                 DateOfBirth = match.DateOfBirth,
                 NationalInsuranceNumber = match.NationalInsuranceNumber,
-                PreviousNames = match.PreviousNames!.Select(n => $"{n.FirstName} {n.LastName}").ToArray(),
+                PreviousNames = match.PreviousNames!
+                    .OrderBy(n => n.CreatedOn)
+                    .Select(n => $"{n.FirstName} {n.MiddleName} {n.LastName}")
+                    .ToArray(),
                 MatchedAttributes = JourneyInstance.State.MatchedPersons.Single(m => m.PersonId == match.PersonId).MatchedAttributes
             })
             .ToArray();

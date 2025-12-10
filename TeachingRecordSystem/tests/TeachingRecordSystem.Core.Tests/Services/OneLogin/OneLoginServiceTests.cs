@@ -66,6 +66,66 @@ public class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestBase(fixt
         });
     }
 
+    [Fact]
+    public async Task SetUserMatchedAsync_UserIsNotVerified_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        var options = new SetUserMatchedOptions
+        {
+            OneLoginUserSubject = oneLoginUser.Subject,
+            MatchedPersonId = Guid.NewGuid(),
+            MatchRoute = OneLoginUserMatchRoute.Support,
+            MatchedAttributes = []
+        };
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.SetUserMatchedAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task SetUserMatchedAsync_SetsMatchedPropertiesOnUser()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+        var matchedPerson = await TestData.CreatePersonAsync();
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        var options = new SetUserMatchedOptions
+        {
+            OneLoginUserSubject = oneLoginUser.Subject,
+            MatchedPersonId = matchedPerson.PersonId,
+            MatchRoute = OneLoginUserMatchRoute.Support,
+            MatchedAttributes = [
+                KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName)
+            ]
+        };
+
+        // Act
+        await WithServiceAsync(s => s.SetUserMatchedAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);
+            Assert.Equal(options.MatchedPersonId, updatedUser.PersonId);
+            Assert.Equal(options.MatchRoute, updatedUser.MatchRoute);
+            Assert.NotNull(updatedUser.MatchedAttributes);
+            Assert.Collection(
+                updatedUser.MatchedAttributes,
+                a => Assert.Equal(KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName), a),
+                a => Assert.Equal(KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName), a));
+        });
+    }
+
     private Task WithServiceAsync(Func<OneLoginService, Task> action, params object[] arguments) =>
         WithServiceAsync<OneLoginService>(action, GetServiceDependencies(arguments));
 

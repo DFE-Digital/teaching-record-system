@@ -34,7 +34,7 @@
                         <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>NI number</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
@@ -53,20 +53,15 @@
                             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback highlight="@(!(match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName) && match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName)))">@($"{match.FirstName} {match.LastName}")</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>
-                                @if (match.PreviousNames is not null && match.PreviousNames.Any())
-                                {
-                                    <ul class ="govuk-list">
-                                        @foreach (var previousName in match.PreviousNames)
-                                        {
-                                            <li>@previousName</li>
-                                        }
-                                    </ul>
-                                }
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        @if (match.PreviousNames!.Count > 0)
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value>
+                                    <list-text-items text-items="@match.PreviousNames"></list-text-items>
+                                </govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress))">@match.EmailAddress</govuk-summary-list-row-value>
@@ -80,7 +75,7 @@
                             <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.Trn))">@match.Trn</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>NI number</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber))">@match.NationalInsuranceNumber</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     </govuk-summary-list>

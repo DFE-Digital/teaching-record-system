@@ -95,6 +95,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVeri
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             var updatedSupportTaskData = updatedSupportTask.GetData<OneLoginUserIdVerificationData>();
+            Assert.True(updatedSupportTaskData.Verified);
             Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedOnly, updatedSupportTaskData.Outcome);
 
             var updatedOneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);

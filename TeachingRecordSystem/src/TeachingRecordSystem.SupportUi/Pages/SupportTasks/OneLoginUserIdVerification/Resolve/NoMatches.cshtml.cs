@@ -60,6 +60,7 @@ public class NoMatches(
                 SupportTaskReference = SupportTaskReference,
                 UpdateData = data => data with
                 {
+                    Verified = true,
                     Outcome = OneLoginUserIdVerificationOutcome.VerifiedOnly
                 },
                 Status = SupportTaskStatus.Closed

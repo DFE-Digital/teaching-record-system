@@ -6,14 +6,15 @@ namespace TeachingRecordSystem.SupportUi.TagHelpers;
 
 public class ListTextItemsTagHelper : TagHelper
 {
-    public string[]? TextItems { get; set; } = [];
+    public IReadOnlyCollection<string>? TextItems { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        if (TextItems != null && TextItems.Length != 0)
+        if (TextItems?.Count > 0)
         {
             output.TagName = "ul";
             output.AddClass("govuk-list", HtmlEncoder.Default);
+            output.AddClass("govuk-!-margin-bottom-0", HtmlEncoder.Default);
 
             foreach (var item in TextItems!)
             {
