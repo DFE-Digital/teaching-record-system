@@ -60,7 +60,7 @@ public partial class TestData
 
             if (personId is not null)
             {
-                user.SetMatched(personId.Value, OneLoginUserMatchRoute.Automatic, matchedAttributes: null);
+                user.SetMatched(Clock.UtcNow, personId.Value, OneLoginUserMatchRoute.Automatic, matchedAttributes: null);
 
                 if (hasSignedInBefore)
                 {

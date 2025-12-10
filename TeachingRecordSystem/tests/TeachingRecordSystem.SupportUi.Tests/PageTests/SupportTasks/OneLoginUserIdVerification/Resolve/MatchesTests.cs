@@ -101,7 +101,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         Assert.Equal($"{supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}", requestDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(supportTaskData.StatedDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(oneLoginUser.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
-        Assert.Equal(supportTaskData.StatedNationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(supportTaskData.StatedNationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(supportTaskData.StatedTrn, requestDetails.GetSummaryListValueByKey("TRN"));
     }
 
@@ -166,7 +166,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var matchDetails = doc.GetAllElementsByTestId("match")[0];
         Assert.NotNull(matchDetails);
         Assert.Equal($"{matchedPerson1.FirstName} {matchedPerson1.LastName}", matchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(matchedPerson1.NationalInsuranceNumber, matchDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(matchedPerson1.NationalInsuranceNumber, matchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(matchedPerson1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), matchDetails.GetSummaryListValueByKey("Date of birth"));
         AssertMatchRowIsHighlighted(matchDetails, "Name");
         AssertMatchRowIsHighlighted(matchDetails, "Date of birth");
@@ -175,18 +175,18 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         matchDetails = doc.GetAllElementsByTestId("match")[1];
         Assert.NotNull(matchDetails);
         Assert.Equal($"{matchedPerson2.FirstName} {matchedPerson2.LastName}", matchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, matchDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, matchDetails.GetSummaryListValueByKey("NI number"));
         AssertMatchRowNotHighlighted(matchDetails, "Name");
-        AssertMatchRowIsHighlighted(matchDetails, "National Insurance number");
+        AssertMatchRowIsHighlighted(matchDetails, "NI number");
 
         // match on previous surname and DOB
         matchDetails = doc.GetAllElementsByTestId("match")[2];
         Assert.NotNull(matchDetails);
         Assert.Equal($"{matchedPerson3.FirstName} {matchedPerson3.LastName}", matchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal($"{matchedPerson3.PreviousNames.First().FirstName} {matchedPerson3.PreviousNames.First().LastName}", matchDetails.GetSummaryListValueByKey("Previous names"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, matchDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal($"{matchedPerson3.PreviousNames.First().FirstName} {matchedPerson3.PreviousNames.First().MiddleName} {matchedPerson3.PreviousNames.First().LastName}", matchDetails.GetSummaryListValueByKey("Previous names"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, matchDetails.GetSummaryListValueByKey("NI number"));
         AssertMatchRowNotHighlighted(matchDetails, "Name");
-        AssertMatchRowIsHighlighted(matchDetails, "National Insurance number");
+        AssertMatchRowIsHighlighted(matchDetails, "NI number");
     }
 
     [Fact]
@@ -225,7 +225,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var firstMatchDetails = doc.GetAllElementsByTestId("match")[0];
         Assert.NotNull(firstMatchDetails);
         Assert.Equal($"{matchedPerson.FirstName} {matchedPerson.LastName}", firstMatchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
     }
 
     [Fact]

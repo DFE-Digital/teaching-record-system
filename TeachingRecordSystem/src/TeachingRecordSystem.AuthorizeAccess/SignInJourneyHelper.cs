@@ -178,7 +178,7 @@ public class SignInJourneyHelper(
             {
                 oneLoginUser.FirstSignIn = clock.UtcNow;
                 oneLoginUser.LastSignIn = clock.UtcNow;
-                oneLoginUser.SetMatched(result.PersonId, result.MatchRoute.Value, result.MatchedAttributes!.ToArray());
+                oneLoginUser.SetMatched(clock.UtcNow, result.PersonId, result.MatchRoute.Value, result.MatchedAttributes!.ToArray());
                 trn = result.Trn;
             }
         }
@@ -321,7 +321,7 @@ public class SignInJourneyHelper(
             var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == subject);
             oneLoginUser.FirstSignIn = clock.UtcNow;
             oneLoginUser.LastSignIn = clock.UtcNow;
-            oneLoginUser.SetMatched(matchedPersonId, OneLoginUserMatchRoute.Interactive, matchedAttributes.ToArray());
+            oneLoginUser.SetMatched(clock.UtcNow, matchedPersonId, OneLoginUserMatchRoute.Interactive, matchedAttributes.ToArray());
             await dbContext.SaveChangesAsync();
 
             await journeyInstance.UpdateStateAsync(state => Complete(state, matchedTrn));
@@ -366,6 +366,7 @@ public class SignInJourneyHelper(
             verifiedDatesOfBirth: [trnRequestMetadata.DateOfBirth]);
 
         oneLoginUser.SetMatched(
+            clock.UtcNow,
             trnRequestMetadata.ResolvedPersonId!.Value,
             route: OneLoginUserMatchRoute.TrnRequest,
             matchedAttributes: null);

@@ -34,9 +34,7 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task SetUserVerifiedAsync(
-        SetUserVerifiedOptions options,
-        ProcessContext processContext)
+    public async Task SetUserVerifiedAsync(SetUserVerifiedOptions options, ProcessContext processContext)
     {
         var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject);
 
@@ -57,14 +55,22 @@ public class OneLoginService(
         // TODO Emit an event when we've figured out what they should look like
     }
 
+    public async Task SetUserMatchedAsync(SetUserMatchedOptions options, ProcessContext processContext)
+    {
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject);
+
+        if (user.VerifiedOn is null)
+        {
+            throw new InvalidOperationException("User must be verified.");
+        }
+
+        user.SetMatched(processContext.Now, options.MatchedPersonId, options.MatchRoute, options.MatchedAttributes);
+
+        await dbContext.SaveChangesAsync();
+
+        // TODO Emit an event when we've figured out what they should look like
+    }
+
     private static IReadOnlyDictionary<string, string> GetOneLoginCannotFindRecordEmailPersonalization(string personName) =>
         new Dictionary<string, string> { ["name"] = personName };
-}
-
-public record SetUserVerifiedOptions
-{
-    public required string OneLoginUserSubject { get; init; }
-    public required OneLoginUserVerificationRoute VerificationRoute { get; init; }
-    public required DateOnly[] VerifiedDatesOfBirth { get; init; }
-    public required string[][] VerifiedNames { get; init; }
 }

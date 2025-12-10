@@ -17,6 +17,7 @@ public class OneLoginUser
     public string[][]? VerifiedNames { get; private set; }
     public DateOnly[]? VerifiedDatesOfBirth { get; private set; }
     public string? LastCoreIdentityVc { get; set; }
+    public DateTime? MatchedOn { get; private set; }
     public OneLoginUserMatchRoute? MatchRoute { get; private set; }
     public KeyValuePair<PersonMatchedAttribute, string>[]? MatchedAttributes { get; private set; }
     public Guid? VerifiedByApplicationUserId { get; private set; }
@@ -50,15 +51,17 @@ public class OneLoginUser
     }
 
     public void SetMatched(
+        DateTime matchedOn,
         Guid personId,
         OneLoginUserMatchRoute route,
-        KeyValuePair<PersonMatchedAttribute, string>[]? matchedAttributes)
+        IEnumerable<KeyValuePair<PersonMatchedAttribute, string>>? matchedAttributes)
     {
         Debug.Assert(VerifiedOn is not null);
 
+        MatchedOn = matchedOn;
         PersonId = personId;
         MatchRoute = route;
-        MatchedAttributes = matchedAttributes;
+        MatchedAttributes = matchedAttributes?.ToArray();
     }
 
     public void ClearVerifiedInfo()

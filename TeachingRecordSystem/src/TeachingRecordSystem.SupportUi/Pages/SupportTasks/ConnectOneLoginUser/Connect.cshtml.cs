@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ConnectOneLoginUser;
 
-public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personMatchingService, SupportUiLinkGenerator linkGenerator) : PageModel
+public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personMatchingService, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -42,6 +42,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
 
         var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == data.OneLoginUserSubject);
         oneLoginUser.SetMatched(
+            clock.UtcNow,
             PersonDetail!.PersonId,
             OneLoginUserMatchRoute.Support,
             matchedAttributes);
