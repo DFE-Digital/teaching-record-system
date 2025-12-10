@@ -32,7 +32,8 @@ public class Index(TrsDbContext dbContext) : PageModel
         var results = (await tasks
             .Select(t => new
             {
-                t,
+                t.SupportTaskReference,
+                t.CreatedOn,
                 Data = t.Data as OneLoginUserIdVerificationData
             })
             .Where(item => item.Data != null)
@@ -41,12 +42,12 @@ public class Index(TrsDbContext dbContext) : PageModel
                 y => y.Data!.OneLoginUserSubject,
                 user => user.Subject,
                 (item, user) => new Result(
-                    item.t.SupportTaskReference,
+                    item.SupportTaskReference,
                     item.Data!.StatedFirstName,
                     item.Data!.StatedLastName,
                     user.EmailAddress,
-                    item.t.CreatedOn))
-            .ToListAsync()).AsQueryable(); // CML TODO
+                    item.CreatedOn))
+            .ToListAsync()).AsQueryable();
 
         results = SortBy switch
         {

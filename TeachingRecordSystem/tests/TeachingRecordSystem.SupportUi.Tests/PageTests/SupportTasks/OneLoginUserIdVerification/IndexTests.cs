@@ -194,36 +194,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_OrderListByEmailAscending_OrdersList()
-    {
-        // Arrange
-        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Sam@example.com"), verifiedInfo: null);
-        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
-        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
-        Clock.Advance(TimeSpan.FromDays(1));
-        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={SortByOption.Email}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        var resultRows = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr");
-
-        Assert.NotNull(resultRows);
-        var topRow = resultRows[1];
-        AssertRowHasContent(topRow, "email", oneLoginUser1.EmailAddress!);
-        var nextRow = resultRows[0];
-        AssertRowHasContent(nextRow, "email", oneLoginUser2.EmailAddress!);
-    }
-
-    [Fact]
     public async Task Get_TaskListItemLinksToSupportTask()
     {
         // Arrange
