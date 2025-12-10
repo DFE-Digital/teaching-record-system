@@ -15,21 +15,19 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private async Task CreateSupportTasksWithOneLoginUsersAsync()
     {
-        OneLoginUsers = new OneLoginUser[]
-        {
+        OneLoginUsers = [
             await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null),
             await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null)
-        };
+        ];
 
         var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[0].Subject);
         Clock.Advance(TimeSpan.FromDays(1));
         var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[1].Subject);
 
-        SupportTasks = new SupportTask[]
-        {
+        SupportTasks = [
             supportTask1,
             supportTask2
-        };
+        ];
     }
 
     [Fact]
@@ -42,16 +40,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Clock.Advance(TimeSpan.FromDays(1));
         var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
         var expectedResultsOrderedByReference = (new[] { supportTask1, supportTask2 })
-            .Join(new[] { oneLoginUser1, oneLoginUser2 },
+            .Join([oneLoginUser1, oneLoginUser2],
                 task => ((OneLoginUserIdVerificationData)task.Data).OneLoginUserSubject,
                 user => user.Subject,
                 (task, user) => new
                 {
-                    SupportTaskReference = task.SupportTaskReference,
-                    StatedFirstName = ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
-                    StatedLastName = ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
-                    CreatedOn = task.CreatedOn,
-                    EmailAddress = user.EmailAddress
+                    task.SupportTaskReference,
+                    ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
+                    ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
+                    task.CreatedOn,
+                    user.EmailAddress
                 })
             .OrderBy(r => r.SupportTaskReference)
             .ToArray();
@@ -83,13 +81,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertRowHasContent(nextRow, "name", $"{expectedNextResult.StatedFirstName} {expectedNextResult.StatedLastName}");
         AssertRowHasContent(nextRow, "email", expectedNextResult.EmailAddress!);
         AssertRowHasContent(nextRow, "requested-on", expectedNextResult.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
-
-        void AssertRowHasContent(IElement row, string testId, string expectedText)
-        {
-            var column = row.GetElementByTestId(testId);
-            Assert.NotNull(column);
-            Assert.Equal(expectedText, column.TrimmedText());
-        }
     }
 
     [Theory]
@@ -148,16 +139,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithStatedLastName("Smith"));
 
         var expectedResults = (new[] { supportTask1, supportTask2 })
-            .Join(new[] { oneLoginUser1, oneLoginUser2 },
+            .Join([oneLoginUser1, oneLoginUser2],
                 task => ((OneLoginUserIdVerificationData)task.Data).OneLoginUserSubject,
                 user => user.Subject,
                 (task, user) => new
                 {
-                    SupportTaskReference = task.SupportTaskReference,
-                    StatedFirstName = ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
-                    StatedLastName = ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
-                    CreatedOn = task.CreatedOn,
-                    EmailAddress = user.EmailAddress
+                    task.SupportTaskReference,
+                    ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
+                    ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
+                    task.CreatedOn,
+                    user.EmailAddress
                 });
 
         var expectedResultsOrderedByReference = sortBy switch
@@ -235,7 +226,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(resultSection.GetElementByTestId("no-tasks-message"));
     }
 
-    private void AssertRowHasContent(IElement row, string testId, string expectedText)
+    private static void AssertRowHasContent(IElement row, string testId, string expectedText)
     {
         var column = row.GetElementByTestId(testId);
         Assert.NotNull(column);

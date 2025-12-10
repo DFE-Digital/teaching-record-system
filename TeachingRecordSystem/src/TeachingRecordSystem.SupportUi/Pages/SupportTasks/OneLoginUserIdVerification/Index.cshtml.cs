@@ -46,7 +46,7 @@ public class Index(TrsDbContext dbContext) : PageModel
                     item.SupportTaskReference,
                     FirstName = item.Data!.StatedFirstName,
                     LastName = item.Data!.StatedLastName,
-                    EmailAddress = user.EmailAddress,
+                    user.EmailAddress,
                     item.CreatedOn
                 });
         query = SortBy switch
