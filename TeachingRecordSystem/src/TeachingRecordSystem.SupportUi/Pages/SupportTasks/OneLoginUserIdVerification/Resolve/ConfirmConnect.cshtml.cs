@@ -92,6 +92,8 @@ public class ConfirmConnect(
             },
             processContext);
 
+        await oneLoginService.EnqueueRecordMatchedEmailAsync(_supportTask.OneLoginUser!.EmailAddress!, MatchedPersonName!, processContext);
+
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
             {

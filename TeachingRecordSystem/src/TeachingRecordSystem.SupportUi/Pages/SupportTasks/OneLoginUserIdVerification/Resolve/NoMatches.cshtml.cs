@@ -52,7 +52,7 @@ public class NoMatches(
             },
             processContext);
 
-        await oneLoginService.EnqueueRecordNotFoundEmailAsync(_supportTask.OneLoginUserSubject!, Name!, processContext);
+        await oneLoginService.EnqueueRecordNotFoundEmailAsync(_supportTask.OneLoginUser!.EmailAddress!, Name!, processContext);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>

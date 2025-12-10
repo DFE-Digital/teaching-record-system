@@ -34,6 +34,27 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
+    public async Task EnqueueRecordMatchedEmailAsync(string emailAddress, string personName, ProcessContext processContext)
+    {
+        var personalization = new Dictionary<string, string>
+        {
+            ["name"] = personName
+        };
+
+        var email = new Email
+        {
+            EmailId = Guid.NewGuid(),
+            TemplateId = EmailTemplateIds.OneLoginRecordMatched,
+            EmailAddress = emailAddress,
+            Personalization = personalization
+        };
+
+        dbContext.Emails.Add(email);
+        await dbContext.SaveChangesAsync();
+
+        await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
+    }
+
     public async Task SetUserVerifiedAsync(SetUserVerifiedOptions options, ProcessContext processContext)
     {
         var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject);
