@@ -1,6 +1,5 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequestManualChecksNeeded;
@@ -12,7 +11,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {
         // Arrange
-        await CreateSupportTaskAsync(status: SupportTaskStatus.Closed);
+        await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(status: SupportTaskStatus.Closed);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/manual-checks-needed");
 
@@ -28,7 +27,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithTask_ShowsExpectedDataInResultsTable()
     {
         // Arrange
-        var supportTask = await CreateSupportTaskAsync();
+        var supportTask = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/manual-checks-needed");
 
@@ -63,7 +62,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var firstName = TestData.GenerateFirstName();
-        var supportTask = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName(firstName));
+        var supportTask = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName(firstName));
 
         var search = firstName;
 
@@ -82,7 +81,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var middleName = TestData.GenerateMiddleName();
-        var supportTask = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithMiddleName(middleName));
+        var supportTask = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithMiddleName(middleName));
 
         var search = middleName;
 
@@ -101,7 +100,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var lastName = TestData.GenerateLastName();
-        var supportTask = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithLastName(lastName));
+        var supportTask = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithLastName(lastName));
 
         var search = lastName;
 
@@ -121,7 +120,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var firstName = TestData.GenerateFirstName();
         var lastName = TestData.GenerateFirstName();
-        var supportTask = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName(firstName).WithLastName(lastName));
+        var supportTask = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName(firstName).WithLastName(lastName));
 
         var search = $"{firstName} {lastName}";
 
@@ -139,9 +138,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoSortParametersSpecified_ShowsRequestsOrderedByCreatedOnAscending()
     {
         // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 
-        var supportTask2 = await CreateSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -162,9 +161,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SortByNameAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Zavier"));
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Zavier"));
 
-        var supportTask2 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Aaron"));
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Aaron"));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -185,9 +184,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SortByNameDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Zavier"));
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Zavier"));
 
-        var supportTask2 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Aaron"));
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Aaron"));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -208,9 +207,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SortByDateOfBirthAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2025, 1, 1)));
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2025, 1, 1)));
 
-        var supportTask2 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2023, 10, 10)));
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2023, 10, 10)));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -231,9 +230,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SortByDateOfBirthDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2025, 1, 1)));
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2025, 1, 1)));
 
-        var supportTask2 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2023, 10, 10)));
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2023, 10, 10)));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -256,9 +255,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await CreateSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 
-        var supportTask2 = await CreateSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -281,9 +280,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask1 = await CreateSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 
-        var supportTask2 = await CreateSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -307,9 +306,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
 
-        var supportTask1 = await CreateSupportTaskAsync(applicationUser1.UserId);
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId);
 
-        var supportTask2 = await CreateSupportTaskAsync(applicationUser2.UserId);
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -333,9 +332,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
 
-        var supportTask1 = await CreateSupportTaskAsync(applicationUser1.UserId);
+        var supportTask1 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId);
 
-        var supportTask2 = await CreateSupportTaskAsync(applicationUser2.UserId);
+        var supportTask2 = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -362,7 +361,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Create enough tasks to create 3 pages
         var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
                 .ToAsyncEnumerable()
-                .SelectAwait(async _ => await CreateSupportTaskAsync()));
+                .SelectAwait(async _ => await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync()));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -387,36 +386,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         GetResultRows(doc)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .ToArray();
-
-    private async Task<SupportTask> CreateSupportTaskAsync(
-        Guid? applicationUserId = null,
-        SupportTaskStatus status = SupportTaskStatus.Open,
-        DateTime? createdOn = null,
-        Action<TestData.CreateApiTrnRequestSupportTaskBuilder>? configureApiTrnRequest = null)
-    {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmailAddress(TestData.GenerateUniqueEmail()).WithAlert().WithQts().WithEyts());
-
-        if (applicationUserId is null)
-        {
-            var applicationUser = await TestData.CreateApplicationUserAsync();
-            applicationUserId = applicationUser.UserId;
-        }
-
-        var (apiSupportTask, _, _) = await TestData.CreateResolvedApiTrnRequestSupportTaskAsync(
-            applicationUserId.Value,
-            matchedPerson.Person,
-            t =>
-            {
-                t.WithTrnRequestStatus(TrnRequestStatus.Pending);
-                configureApiTrnRequest?.Invoke(t);
-            });
-
-        return await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-            applicationUserId.Value,
-            apiSupportTask.TrnRequestMetadata!.RequestId,
-            status,
-            createdOn);
-    }
 }
 
 file static class Extensions

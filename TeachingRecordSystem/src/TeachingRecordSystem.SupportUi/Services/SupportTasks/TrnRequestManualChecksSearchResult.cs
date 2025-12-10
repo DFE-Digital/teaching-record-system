@@ -15,5 +15,5 @@ public record TrnRequestManualChecksSearchResultItem(
     string LastName,
     DateOnly DateOfBirth,
     DateTime CreatedOn,
-    string SourceApplicationName);
+    string SourceApplicationName) : ISupportTaskSearchResult;
 

@@ -14,4 +14,4 @@ public record NpqTrnRequestsSearchResultItem(
     string? EmailAddress,
     DateTime CreatedOn,
     string SourceApplicationName,
-    bool? PotentialDuplicate);
+    bool? PotentialDuplicate) : ISupportTaskSearchResult;

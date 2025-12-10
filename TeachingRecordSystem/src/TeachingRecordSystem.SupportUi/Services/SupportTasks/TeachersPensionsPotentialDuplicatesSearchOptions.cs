@@ -1,8 +1,8 @@
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 public record TeachersPensionsPotentialDuplicatesSearchOptions(
-    TeachersPensionsPotentialDuplicatesSortByOption? SortBy,
-    SortDirection? SortDirection);
+    TeachersPensionsPotentialDuplicatesSortByOption? SortBy = null,
+    SortDirection? SortDirection = null);
 
 public enum TeachersPensionsPotentialDuplicatesSortByOption
 {

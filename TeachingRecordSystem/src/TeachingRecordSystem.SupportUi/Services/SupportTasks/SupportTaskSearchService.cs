@@ -283,8 +283,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.SupportTaskReference,
                 data!.FileName,
                 data!.IntegrationTransactionId,
-                $"{t.Person!.FirstName} {t.Person!.LastName}",
-                DateOnly.FromDateTime(t.CreatedOn)
+                StringHelper.JoinNonEmpty(' ', t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName),
+                t.CreatedOn
             );
         }).AsQueryable();
 
@@ -333,7 +333,9 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         DateOnly date;
 
         var isDate = DateOnly.TryParseExact(searchText, UiDefaults.DateOnlyDisplayFormat, out date) ||
-            DateOnly.TryParseExact(searchText, "d/M/yyyy", out date);
+            DateOnly.TryParseExact(searchText, "d/M/yyyy", out date) ||
+            DateOnly.TryParseExact(searchText, "d MMM yyyy", out date) ||
+            DateOnly.TryParseExact(searchText, "d MMMM yyyy", out date);
 
         minDate = date.ToDateTime(new TimeOnly(0, 0, 0), DateTimeKind.Utc);
         maxDate = minDate.AddDays(1);

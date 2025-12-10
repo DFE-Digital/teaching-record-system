@@ -1,10 +1,10 @@
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 public record TrnRequestManualChecksSearchOptions(
-    string? Search,
-    TrnRequestManualChecksSortByOption? SortBy,
-    SortDirection? SortDirection,
-    Guid[]? Sources);
+    string? Search = null,
+    TrnRequestManualChecksSortByOption? SortBy = null,
+    SortDirection? SortDirection = null,
+    Guid[]? Sources = null);
 
 public enum TrnRequestManualChecksSortByOption
 {
