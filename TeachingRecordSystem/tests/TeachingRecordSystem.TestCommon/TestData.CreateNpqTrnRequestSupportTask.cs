@@ -8,13 +8,21 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<CreateNpqTrnRequestSupportTaskResult> CreateNpqTrnRequestSupportTaskAsync(
-        Guid applicationUserId,
+    public async Task<CreateNpqTrnRequestSupportTaskResult> CreateNpqTrnRequestSupportTaskAsync(
+        Guid? applicationUserId = null,
         Action<CreateNpqTrnRequestSupportTaskBuilder>? configure = null)
     {
-        var builder = new CreateNpqTrnRequestSupportTaskBuilder(applicationUserId);
+        if (applicationUserId is null)
+        {
+            var applicationUser = await CreateApplicationUserAsync("NPQ");
+            applicationUserId = applicationUser.UserId;
+        }
+
+        var builder = new CreateNpqTrnRequestSupportTaskBuilder(applicationUserId!.Value);
         configure?.Invoke(builder);
-        return builder.ExecuteAsync(this);
+        var task = await builder.ExecuteAsync(this);
+
+        return task;
     }
 
     public Task<CreateNpqTrnRequestSupportTaskResult> CreateNpqTrnRequestSupportTaskAsync(
@@ -291,5 +299,6 @@ public partial class TestData
         }
     }
 
-    public record CreateNpqTrnRequestSupportTaskResult(SupportTask SupportTask, TrnRequestMetadata TrnRequest, Guid[] MatchedPersonIds);
+    public record CreateNpqTrnRequestSupportTaskResult(SupportTask SupportTask, TrnRequestMetadata TrnRequest, Guid[] MatchedPersonIds)
+        : ISupportTaskCreateResult;
 }

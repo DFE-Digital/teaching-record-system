@@ -13,4 +13,4 @@ public record ApiTrnRequestsSearchResultItem(
     string LastName,
     string? EmailAddress,
     DateTime CreatedOn,
-    string SourceApplicationName);
+    string SourceApplicationName) : ISupportTaskSearchResult;

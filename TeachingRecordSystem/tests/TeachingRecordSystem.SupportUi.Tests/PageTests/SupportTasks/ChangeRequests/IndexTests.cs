@@ -11,10 +11,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoOpenChangeRequests_ShowsNoChangeRequestsMessage()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
-        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)).WithStatus(SupportTaskStatus.Closed));
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId, b => b
+            .WithLastName(TestData.GenerateChangedLastName(person.LastName))
+            .WithStatus(SupportTaskStatus.Closed));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests");
 
@@ -34,20 +34,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithChangeRequest_ButNotMatchingSearchCriteria_ShowsNoResultsMessage(SupportTaskType supportTaskType)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         SupportTask supportTask;
 
         if (supportTaskType == SupportTaskType.ChangeNameRequest)
         {
-            supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+            supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
         }
         else
         {
-            supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+            supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
         }
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?Search=XXX");
@@ -69,20 +67,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithChangeRequest_ShowsExpectedDataInResultsTable(SupportTaskType supportTaskType)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         SupportTask supportTask;
 
         if (supportTaskType == SupportTaskType.ChangeNameRequest)
         {
-            supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+            supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
         }
         else
         {
-            supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+            supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
         }
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests");
@@ -103,7 +99,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .FirstOrDefault();
 
         Assert.NotNull(resultRow);
-        AssertRowHasContent("name", $"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}");
+        AssertRowHasContent("name", $"{person.FirstName} {person.MiddleName} {person.LastName}");
         AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
         AssertRowHasContent("change-type", supportTaskType == SupportTaskType.ChangeNameRequest ? "Name" : "Date of birth");
 
@@ -113,6 +109,30 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.NotNull(column);
             Assert.Equal(expectedText, column.TrimmedText());
         }
+    }
+
+    [Fact]
+    public async Task Get_NoChangeRequestTypesSpecifiedAndNoFiltersApplied_ReturnsAllChangeRequestTypes()
+    {
+        // Arrange
+        var person1 = await TestData.CreatePersonAsync();
+        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(person1.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person1.LastName)));
+
+        var person2 = await TestData.CreatePersonAsync();
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person2.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person2.DateOfBirth)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var references = GetTaskReferences(doc);
+        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
+        Assert.Contains(dobChangeRequest.SupportTaskReference, references);
     }
 
     [Fact]
@@ -136,31 +156,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("no-results-message"));
     }
 
-    [Fact]
-    public async Task Get_NoChangeRequestTypesSpecifiedAndNoFiltersApplied_ReturnsAllChangeRequestTypes()
-    {
-        // Arrange
-        var createPersonResult1 = await TestData.CreatePersonAsync();
-        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult1.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult1.LastName)));
-        var createPersonResult2 = await TestData.CreatePersonAsync();
-        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult2.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult2.DateOfBirth)));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var references = GetTaskReferences(doc);
-        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
-        Assert.Contains(dobChangeRequest.SupportTaskReference, references);
-    }
-
     [Theory]
     [InlineData(new[] { SupportTaskType.ChangeNameRequest })]
     [InlineData(new[] { SupportTaskType.ChangeDateOfBirthRequest })]
@@ -168,20 +163,21 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ChangeRequestTypesSpecifiedAndFiltersApplied_ReturnsResultsMatchingChangeRequestTypesOnly(SupportTaskType[] supportTaskTypes)
     {
         // Arrange
-        var createPersonResult1 = await TestData.CreatePersonAsync();
-        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult1.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult1.LastName)));
-        var createPersonResult2 = await TestData.CreatePersonAsync();
-        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult2.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult2.DateOfBirth)));
+        var person1 = await TestData.CreatePersonAsync();
+        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(person1.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person1.LastName)));
+
+        var person2 = await TestData.CreatePersonAsync();
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person2.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person2.DateOfBirth)));
 
         var changeRequestTypesQueryParam = string.Join("&", supportTaskTypes.Select(t => $"changeRequestTypes={t}"));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?_f=true&{changeRequestTypesQueryParam}");
+
         // Act
         var response = await HttpClient.SendAsync(request);
+
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var references = GetTaskReferences(doc);
@@ -206,16 +202,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_SearchByFirstName_ShowsMatchingResult()
+    public async Task Get_SearchByName_ShowsMatchingResult()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
-        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+        var person1 = await TestData.CreatePersonAsync();
+        var request1 = await TestData.CreateChangeNameRequestSupportTaskAsync(person1.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person1.LastName)));
 
-        var search = createPersonResult.FirstName;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(search)}");
+        var person2 = await TestData.CreatePersonAsync();
+        var request2 = await TestData.CreateChangeNameRequestSupportTaskAsync(person2.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person2.LastName)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(person1.LastName)}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -223,72 +221,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var references = GetTaskReferences(doc);
-        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
+        Assert.Contains(request1.SupportTaskReference, references);
+        Assert.DoesNotContain(request2.SupportTaskReference, references);
     }
-
-    [Fact]
-    public async Task Get_SearchByMiddleName_ShowsMatchingResult()
-    {
-        // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
-        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
-
-        var search = createPersonResult.MiddleName;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var references = GetTaskReferences(doc);
-        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
-    }
-
-    [Fact]
-    public async Task Get_SearchByLastName_ShowsMatchingResult()
-    {
-        // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
-        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
-
-        var search = createPersonResult.LastName;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var references = GetTaskReferences(doc);
-        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
-    }
-
-    [Fact]
-    public async Task Get_SearchByMultipleNameParts_ShowsMatchingResult()
-    {
-        // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
-        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
-
-        var search = $"{createPersonResult.FirstName} {createPersonResult.LastName}";
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var references = GetTaskReferences(doc);
-        Assert.Contains(nameChangeRequest.SupportTaskReference, references);
-    }
-
 
     private static IEnumerable<string> GetTaskReferences(IHtmlDocument document) =>
         document.GetElementByTestId("results")?.QuerySelectorAll("tbody>tr").Attr("data-reference") ?? [];

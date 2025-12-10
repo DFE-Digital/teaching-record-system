@@ -1,9 +1,9 @@
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 public record ApiTrnRequestsSearchOptions(
-    string? Search,
-    ApiTrnRequestsSortByOption? SortBy,
-    SortDirection? SortDirection);
+    string? Search = null,
+    ApiTrnRequestsSortByOption? SortBy = null,
+    SortDirection? SortDirection = null);
 
 public enum ApiTrnRequestsSortByOption
 {

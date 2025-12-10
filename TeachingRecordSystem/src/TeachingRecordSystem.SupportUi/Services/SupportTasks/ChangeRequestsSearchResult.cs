@@ -15,4 +15,4 @@ public record ChangeRequestsSearchResultItem(
     string LastName,
     string Name,
     DateTime CreatedOn,
-    SupportTaskType SupportTaskType);
+    SupportTaskType SupportTaskType) : ISupportTaskSearchResult;
