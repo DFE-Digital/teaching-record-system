@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ConnectOneLoginUser;
 
-public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMatchingService, SupportUiLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, OneLoginService oneLoginService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public const string NoneOfTheAboveTrnSentinel = "0000000";
 
@@ -62,7 +62,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var data = (ConnectOneLoginUserData)supportTask.Data;
 
-        var suggestedMatches = await personMatchingService.GetSuggestedOneLoginUserMatchesAsync(new(
+        var suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
             data.VerifiedNames!,
             data.VerifiedDatesOfBirth!,
             data.StatedNationalInsuranceNumber,

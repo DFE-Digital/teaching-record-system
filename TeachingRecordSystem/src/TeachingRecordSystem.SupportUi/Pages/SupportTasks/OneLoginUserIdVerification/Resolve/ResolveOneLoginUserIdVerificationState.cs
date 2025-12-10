@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
@@ -22,7 +22,8 @@ public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
     public Guid? MatchedPersonId { get; set; }
 }
 
-public class ResolveOneLoginUserIdVerificationStateFactory(IPersonMatchingService personMatchingService) :
+[UsedImplicitly]
+public class ResolveOneLoginUserIdVerificationStateFactory(OneLoginService oneLoginService) :
     IJourneyStateFactory<ResolveOneLoginUserIdVerificationState>
 {
     public Task<ResolveOneLoginUserIdVerificationState> CreateAsync(CreateJourneyStateContext context)
@@ -36,7 +37,7 @@ public class ResolveOneLoginUserIdVerificationStateFactory(IPersonMatchingServic
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification);
         var requestData = supportTask.Data as OneLoginUserIdVerificationData;
 
-        var matchResult = await personMatchingService.GetSuggestedOneLoginUserMatchesWithMatchedAttributesInfoAsync(new(
+        var matchResult = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
             Names: [[requestData!.StatedFirstName, requestData.StatedLastName]],
             DatesOfBirth: [requestData.StatedDateOfBirth],
             NationalInsuranceNumber: requestData.StatedNationalInsuranceNumber,

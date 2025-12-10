@@ -18,7 +18,7 @@ public abstract class TestBase
     {
         HostFixture = hostFixture;
 
-        _testServices = TestScopedServices.Reset();
+        _testServices = TestScopedServices.Reset(hostFixture.Services);
 
         HttpClient = hostFixture.CreateClient(new()
         {

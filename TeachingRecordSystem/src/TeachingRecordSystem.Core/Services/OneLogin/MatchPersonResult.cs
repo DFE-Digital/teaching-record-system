@@ -1,6 +1,6 @@
-namespace TeachingRecordSystem.Core.Services.PersonMatching;
+namespace TeachingRecordSystem.Core.Services.OneLogin;
 
-public record OneLoginUserMatchResult(
+public record MatchPersonResult(
     Guid PersonId,
     string Trn,
     IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>> MatchedAttributes);

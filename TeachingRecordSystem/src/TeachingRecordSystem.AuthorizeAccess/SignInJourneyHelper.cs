@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.WebCommon.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
@@ -18,7 +18,7 @@ namespace TeachingRecordSystem.AuthorizeAccess;
 
 public class SignInJourneyHelper(
     TrsDbContext dbContext,
-    IPersonMatchingService personMatchingService,
+    OneLoginService oneLoginService,
     IdDbContext idDbContext,
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
@@ -312,7 +312,7 @@ public class SignInJourneyHelper(
         var nationalInsuranceNumber = state.NationalInsuranceNumber;
         var trn = state.Trn;
 
-        var matchResult = await personMatchingService.MatchOneLoginUserAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
+        var matchResult = await oneLoginService.MatchPersonAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
 
         if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {

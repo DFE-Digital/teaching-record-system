@@ -15,7 +15,6 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
@@ -36,7 +35,7 @@ public static class Extensions
             .AddJsonFile($"appsettings.aks_{deployedEnvironmentName}_shared.json");
     }
 
-    public static IServiceCollection AddBackgroundWorkScheduler(this IServiceCollection services, IHostEnvironment environment)
+    public static IServiceCollection AddBackgroundJobScheduler(this IServiceCollection services, IHostEnvironment environment)
     {
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
@@ -97,14 +96,13 @@ public static class Extensions
             .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
             .AddDatabase(configuration)
             .AddHangfire(environment)
-            .AddBackgroundWorkScheduler(environment)
+            .AddBackgroundJobScheduler(environment)
             .AddWebhookMessageFactory()
             .AddSingleton<ReferenceDataCache>()
             .AddBlobStorage(configuration, environment)
             .AddFileService()
             .AddNameSynonyms()
             .AddTrnRequestService(configuration)
-            .AddPersonMatching()
             .AddEventPublisher()
             .AddSupportTaskService()
             .AddSingleton<PersonInfoCache>()

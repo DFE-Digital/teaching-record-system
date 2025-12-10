@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Cli;
@@ -43,7 +42,6 @@ public partial class Commands
                     .AddClock()
                     .AddDatabase(connectionString)
                     .AddEventPublisher()
-                    .AddPersonMatching()
                     .BuildServiceProvider();
 
                 using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
