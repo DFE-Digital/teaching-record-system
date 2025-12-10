@@ -19,7 +19,7 @@ public class Index(TrsDbContext dbContext) : PageModel
     [FromQuery]
     public SortByOption? SortBy { get; set; }
 
-    public IReadOnlyCollection<Result>? Results { get; set; } = [];
+    public IReadOnlyCollection<Result>? Results { get; set; }
 
     public async Task OnGetAsync()
     {
@@ -29,7 +29,7 @@ public class Index(TrsDbContext dbContext) : PageModel
             .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
             .OrderBy(t => t.SupportTaskReference);
 
-        var results = (await tasks
+        var query = tasks
             .Select(t => new
             {
                 t.SupportTaskReference,
@@ -41,24 +41,26 @@ public class Index(TrsDbContext dbContext) : PageModel
                 dbContext.OneLoginUsers,
                 y => y.Data!.OneLoginUserSubject,
                 user => user.Subject,
-                (item, user) => new Result(
+                (item, user) => new
+                {
                     item.SupportTaskReference,
-                    item.Data!.StatedFirstName,
-                    item.Data!.StatedLastName,
-                    user.EmailAddress,
-                    item.CreatedOn))
-            .ToListAsync()).AsQueryable();
-
-        results = SortBy switch
+                    FirstName = item.Data!.StatedFirstName,
+                    LastName = item.Data!.StatedLastName,
+                    EmailAddress = user.EmailAddress,
+                    item.CreatedOn
+                });
+        query = SortBy switch
         {
-            SortByOption.ReferenceId => results.OrderBy(sortDirection, r => r.SupportTaskReference),
-            SortByOption.Name => results.OrderBy(sortDirection, r => r.FirstName).ThenBy(sortDirection, r => r.LastName),
-            SortByOption.Email => results.OrderBy(sortDirection, r => r.EmailAddress),
-            SortByOption.DateCreated => results.OrderBy(sortDirection, r => r.CreatedOn),
-            _ => results
+            SortByOption.ReferenceId => query.OrderBy(sortDirection, r => r.SupportTaskReference),
+            SortByOption.Name => query.OrderBy(sortDirection, r => r.FirstName).ThenBy(sortDirection, r => r.LastName),
+            SortByOption.Email => query.OrderBy(sortDirection, r => r.EmailAddress),
+            SortByOption.DateCreated => query.OrderBy(sortDirection, r => r.CreatedOn),
+            _ => query
         };
 
-        Results = results?.ToList();
+        Results = (await query.ToListAsync())
+            .Select(r => new Result(r.SupportTaskReference, r.FirstName, r.LastName, r.EmailAddress, r.CreatedOn))
+            .ToList();
     }
 
     public record Result(
