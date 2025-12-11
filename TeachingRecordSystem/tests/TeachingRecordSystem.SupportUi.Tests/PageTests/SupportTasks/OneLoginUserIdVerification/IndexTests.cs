@@ -1,7 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
@@ -10,26 +9,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUs
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private OneLoginUser[]? OneLoginUsers { get; set; }
-    private SupportTask[]? SupportTasks { get; set; }
-
-    private async Task CreateSupportTasksWithOneLoginUsersAsync()
-    {
-        OneLoginUsers = [
-            await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null),
-            await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null)
-        ];
-
-        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[0].Subject);
-        Clock.Advance(TimeSpan.FromDays(1));
-        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[1].Subject);
-
-        SupportTasks = [
-            supportTask1,
-            supportTask2
-        ];
-    }
-
     [Fact]
     public async Task Get_ShowsListOfOpenTasksInTaskIdOrder()
     {
@@ -194,7 +173,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_TaskListItemLinksToSupportTask()
     {
         // Arrange
-        await CreateSupportTasksWithOneLoginUsersAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 
@@ -212,7 +192,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.NotNull(resultRow);
         var nameLink = resultRow.GetElementByTestId("name")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
-        Assert.Contains($"/support-tasks/one-login-user-id-verification/{SupportTasks![0].SupportTaskReference}/resolve", nameLink!.Href);
+        Assert.Contains($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve", nameLink!.Href);
     }
 
     [Fact]
