@@ -1,5 +1,6 @@
 using System.Globalization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
@@ -306,8 +307,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             SearchResults = searchResults
         };
     }
-    
-    
+
+
     public IQueryable<SupportTask> SearchOneLoginIdVerificationSupportTasks(SearchOneLoginUserIdVerificationSupportTasksOptions options)
     {
         var query = dbContext.SupportTasks
@@ -316,12 +317,12 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         query = options.SortBy switch
         {
-            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => query.OrderBy(options.SortDirection, r => r.SupportTaskReference),
+            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => query.OrderBy(r => r.SupportTaskReference, options.SortDirection),
             OneLoginIdVerificationSupportTasksSortByOption.Name => query
-                .OrderBy(options.SortDirection, r => (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName)
-                .ThenBy(options.SortDirection, r => (r.Data as OneLoginUserIdVerificationData)!.StatedLastName),
-            OneLoginIdVerificationSupportTasksSortByOption.Email => query.OrderBy(options.SortDirection, r => r.OneLoginUser!.EmailAddress),
-            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => query.OrderBy(options.SortDirection, r => r.CreatedOn),
+                .OrderBy(r => (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName, options.SortDirection)
+                .ThenBy(r => (r.Data as OneLoginUserIdVerificationData)!.StatedLastName, options.SortDirection),
+            OneLoginIdVerificationSupportTasksSortByOption.Email => query.OrderBy(r => r.OneLoginUser!.EmailAddress, options.SortDirection),
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => query.OrderBy(r => r.CreatedOn, options.SortDirection),
             _ => query
         };
 
