@@ -7,20 +7,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 
 public partial class SupportTaskSearchServiceTests
 {
-    private IList<SupportTask> SupportTasks { get; set; }
-    private IList<OneLoginUser> OneLoginUsers { get; set; }
-
-    private async Task CreateSupportTasks()
-    {
-        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
-        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
-        OneLoginUsers = [oneLoginUser1, oneLoginUser2];
-        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
-        Clock.Advance(TimeSpan.FromDays(1));
-        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
-        SupportTasks = [supportTask1, supportTask2];
-    }
-
     [Theory]
     [InlineData(OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference, SortDirection.Ascending)]
     [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Ascending)]
@@ -33,12 +19,18 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchOneLoginIdVerificationSupportTasks_ReturnsOrderedResults(OneLoginIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection)
     {
         // Arrange
-        await CreateSupportTasks();
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var oneLoginUsers = new OneLoginUser[] { oneLoginUser1, oneLoginUser2 };
+        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
+        Clock.Advance(TimeSpan.FromDays(1));
+        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
+        var supportTasks = new SupportTask[] { supportTask1, supportTask2 };
 
         var options = new SearchOneLoginUserIdVerificationSupportTasksOptions(sortBy, sortDirection);
 
-        var expectedResults = SupportTasks
-            .Join(OneLoginUsers,
+        var expectedResults = supportTasks
+            .Join(oneLoginUsers,
                 task => ((OneLoginUserIdVerificationData)task.Data).OneLoginUserSubject,
                 user => user.Subject,
                 (task, user) => new
