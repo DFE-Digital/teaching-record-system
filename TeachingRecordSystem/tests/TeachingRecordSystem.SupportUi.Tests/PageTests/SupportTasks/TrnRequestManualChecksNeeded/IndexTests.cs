@@ -123,15 +123,17 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var tasks = new SupportTaskLookup
         {
-            ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId, configureApiTrnRequest: t => t
-                .WithFirstName("Zavier")
-                .WithDateOfBirth(new(2025, 1, 1))
-                .WithCreatedOn(new DateTime(2025, 1, 1))),
+            ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId,
+                createdOn: new DateTime(2025, 1, 1),
+                configureApiTrnRequest: t => t
+                    .WithFirstName("Zavier")
+                    .WithDateOfBirth(new(2025, 1, 1))),
 
-            ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId, configureApiTrnRequest: t => t
-                .WithFirstName("Aaron")
-                .WithDateOfBirth(new(2023, 10, 10))
-                .WithCreatedOn(new DateTime(2023, 10, 10)))
+            ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId,
+                createdOn: new DateTime(2023, 10, 10),
+                configureApiTrnRequest: t => t
+                    .WithFirstName("Aaron")
+                    .WithDateOfBirth(new(2023, 10, 10)))
         };
 
         var request = new HttpRequestMessage(HttpMethod.Get,
@@ -168,11 +170,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
-    private static IElement[] GetResultRows(IHtmlDocument document) =>
+    private static IElement[] GetResultRows(IHtmlDocument document)
+    {
+        var r =
         document
-            .GetElementByTestId("results")?
+            .GetElementByTestId("results");
+
+        return r?
             .GetElementsByClassName("govuk-table__row")
             .ToArray() ?? [];
+    }
 
     private static string[] GetResultTaskReferences(IHtmlDocument document) =>
         GetResultRows(document)
