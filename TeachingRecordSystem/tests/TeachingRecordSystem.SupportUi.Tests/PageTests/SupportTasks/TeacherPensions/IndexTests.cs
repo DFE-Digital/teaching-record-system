@@ -20,9 +20,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
     }
 
     [Fact]
@@ -127,21 +127,19 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
-    private static IElement[] GetResultRows(IHtmlDocument doc) =>
-        doc
-            .GetElementsByTagName("tbody")
-            .Single()
+    private static IElement[] GetResultRows(IHtmlDocument document) =>
+        document
+            .GetElementByTestId("results")!
             .GetElementsByClassName("govuk-table__row")
             .ToArray();
 
-    private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
-        GetResultRows(doc)
+    private static string[] GetResultTaskReferences(IHtmlDocument document) =>
+        GetResultRows(document)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .ToArray();
 
-    private static string[] GetResultTaskKeys(IHtmlDocument doc, SupportTaskLookup tasks) =>
-        GetResultRows(doc)
-            .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
+    private static string[] GetResultTaskKeys(IHtmlDocument document, SupportTaskLookup tasks) =>
+        GetResultTaskReferences(document)
             .Select(tasks.GetKeyFor)
             .ToArray();
 }

@@ -21,9 +21,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
     }
 
     [Theory]
@@ -44,9 +44,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.Null(doc.GetElementByTestId("no-tasks-message"));
         Assert.NotNull(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
     }
 
     [Theory]
@@ -121,9 +121,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Empty(doc.GetElementsByTagName("table"));
+
         Assert.Null(doc.GetElementByTestId("no-tasks-message"));
         Assert.NotNull(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
     }
 
     [Theory]
@@ -213,13 +214,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(pageSize, GetTaskReferences(doc).Length);
     }
 
-    private static IElement[] GetResultRows(IHtmlDocument doc) =>
-        doc
-            .GetElementsByTagName("tbody")
-            .Single()
+    private static IElement[] GetResultRows(IHtmlDocument document) =>
+        document
+            .GetElementByTestId("results")?
             .GetElementsByClassName("govuk-table__row")
-            .ToArray();
+            .ToArray() ?? [];
 
     private static string[] GetTaskReferences(IHtmlDocument document) =>
-        document.GetElementByTestId("results")?.QuerySelectorAll("tbody>tr").Attr("data-reference").ToArray() ?? [];
+        document
+            .GetElementByTestId("results")?
+            .QuerySelectorAll("tbody > tr")
+            .Attr("data-reference")
+            .ToArray() ?? [];
 }

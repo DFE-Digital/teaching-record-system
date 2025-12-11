@@ -137,9 +137,35 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
     }
 
-    public async Task SearchTrnRequestManualChecksAsync_Source_()
+    [Theory]
+    [InlineData(new[] { "A application" }, new[] { "ST1", "ST3" })]
+    [InlineData(new[] { "B application" }, new[] { "ST2", "ST4" })]
+    [InlineData(new[] { "A application", "B application" }, new[] { "ST1", "ST2", "ST3", "ST4" })]
+    public async Task SearchTrnRequestManualChecksAsync_SearchBySource_ReturnsOnlyTasksWithGivenSource(string[] sourceNames, string[] expectedTaskKeys)
     {
-        Assert.Fail("TODO");
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var sources = new[] { applicationUser1, applicationUser2 };
+        var allSourceIds = sources.Select(s => s.UserId).ToArray();
+
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId, createdOn: new DateTime(2025, 1, 20)),
+            ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId, createdOn: new DateTime(2025, 1, 21)),
+            ["ST3"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId, createdOn: new DateTime(2025, 1, 22)),
+            ["ST4"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId, createdOn: new DateTime(2025, 1, 23)),
+        };
+
+        // Act
+        var sourceIds = sourceNames.Select(n => sources.First(s => s.Name == n).UserId);
+        var result = await SearchTrnRequestManualChecksAsync(new(Sources: sourceIds), new());
+
+        // Assert
+        Assert.Equal(2, result.TotalTaskCount);
+        Assert.Equal(2, result.SearchResults.TotalItemCount);
+        Assert.Equal(allSourceIds, result.Sources);
+        Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
     }
 
     [Theory]

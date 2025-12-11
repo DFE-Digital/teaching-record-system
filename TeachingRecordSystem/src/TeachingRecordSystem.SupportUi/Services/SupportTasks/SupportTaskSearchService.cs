@@ -7,6 +7,8 @@ namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 public class SupportTaskSearchService(TrsDbContext dbContext)
 {
+    private static readonly SupportTaskType[] AllChangeRequestTypes = [SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest];
+
     public async Task<ApiTrnRequestsSearchResult> SearchApiTrnRequestsAsync(ApiTrnRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
@@ -136,10 +138,19 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
     public async Task<ChangeRequestsSearchResult> SearchChangeRequestsAsync(ChangeRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
     {
+
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? ChangeRequestsSortByOption.RequestedOn;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
-        var changeRequestTypes = searchOptions.ChangeRequestTypes ?? [SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest];
+        var changeRequestTypes = searchOptions.ChangeRequestTypes ?? AllChangeRequestTypes;
+
+        foreach (var t in changeRequestTypes)
+        {
+            if (!AllChangeRequestTypes.Contains(t))
+            {
+                throw new ArgumentOutOfRangeException($"Support task type {t} is not a Change Request task type.");
+            }
+        }
 
         var tasks = dbContext.SupportTasks
             .Include(t => t.Person)

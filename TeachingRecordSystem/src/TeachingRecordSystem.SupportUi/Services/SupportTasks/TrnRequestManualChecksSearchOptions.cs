@@ -4,7 +4,7 @@ public record TrnRequestManualChecksSearchOptions(
     string? Search = null,
     TrnRequestManualChecksSortByOption? SortBy = null,
     SortDirection? SortDirection = null,
-    Guid[]? Sources = null);
+    IEnumerable<Guid>? Sources = null);
 
 public enum TrnRequestManualChecksSortByOption
 {

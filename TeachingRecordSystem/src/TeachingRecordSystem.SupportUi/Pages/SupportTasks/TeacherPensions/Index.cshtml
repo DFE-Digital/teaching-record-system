@@ -14,48 +14,49 @@
 
     @if (Model.TotalTaskCount == 0)
     {
-    <div class="govuk-grid-column-two-thirds" data-testid="no-tasks-message">
-        <p class="govuk-body-l govuk-!-font-weight-bold">There are no outstanding tasks</p>
-    </div>
+        <div class="govuk-grid-column-two-thirds" data-testid="no-tasks-message">
+            <p class="govuk-body-l govuk-!-font-weight-bold">There are no outstanding tasks</p>
+        </div>
     }
     else
     {
-        <div class="govuk-grid-column-full-from-desktop" data-testid="results">
-            <table class="govuk-table">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                            sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.Name ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.Name, direction))">
-                            Name
-                        </th>
-                        <th scope="col" class="govuk-table__header"
-                            sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn, direction))">
-                            Date created
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
-                            sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.Filename ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.Filename, direction))">
-                            File name
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
-                            sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId, direction))">
-                            Interface ID
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @if (Model.Results!.TotalItemCount == 0)
-                    {
-                        <tr class="govuk-table__row" data-testid="no-results-message">
-                            <td class="govuk-table__cell" colspan="4">No potential duplicates</td>
+        <div class="govuk-grid-column-full-from-desktop">
+            @if (Model.Results!.TotalItemCount == 0)
+            {
+                <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
+                    No matching requests found
+                </p>
+                <p class="govuk-body-m">Try searching again with different details.</p>
+            }
+            else
+            {
+                <table class="govuk-table" data-testid="results">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.Name ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.Name, direction))">
+                                Name
+                            </th>
+                            <th scope="col" class="govuk-table__header"
+                                sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn, direction))">
+                                Date created
+                            </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.Filename ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.Filename, direction))">
+                                File name
+                            </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId, direction))">
+                                Interface ID
+                            </th>
                         </tr>
-                    }
-                    else
-                    {
-                        foreach (var result in Model.Results)
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        @foreach (var result in Model.Results)
                         {
                             <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                                 <td scope="row" class="govuk-table__cell" data-testid="name">
@@ -68,9 +69,9 @@
                                 <td class="govuk-table__cell" data-testid="integration-transaction-id">@result.IntegrationTransactionId</td>
                             </tr>
                         }
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            }
         </div>
     }
 </div>
