@@ -12,8 +12,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-        await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t.WithStatus(SupportTaskStatus.Closed));
+        await TestData.CreateApiTrnRequestSupportTaskAsync(configure: t => t.WithStatus(SupportTaskStatus.Closed));
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/api-trn-requests/");
 
@@ -32,11 +31,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithTask_ButNotMatchingSearchCriteria_ShowsNoResultsMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-        var firstName = TestData.GenerateFirstName();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            configure: t => t.WithFirstName(firstName));
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/api-trn-requests/?Search=XXX");
 
@@ -69,13 +64,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
 
-        var resultRow = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr")
-            .FirstOrDefault();
-
+        var resultRow = GetResultRows(doc).FirstOrDefault();
         Assert.NotNull(resultRow);
+
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
         AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
@@ -99,7 +90,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_Search_ShowsMatchingResult(string search, string[] taskKeys)
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateApiTrnRequestSupportTaskAsync(
                 configure: t => t.WithFirstName("Jim").WithLastName("Smith")
@@ -135,7 +126,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
 
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId, t => t
                 .WithFirstName("Zavier")
@@ -194,7 +185,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .ToArray();
 
-    private static string[] GetResultTaskKeys(IHtmlDocument doc, TaskLookup tasks) =>
+    private static string[] GetResultTaskKeys(IHtmlDocument doc, SupportTaskLookup tasks) =>
         GetResultRows(doc)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .Select(tasks.GetKeyFor)

@@ -12,6 +12,9 @@ public partial class TestData
     {
         var person = await CreatePersonAsync(configurePerson);
 
+        configure ??= b => { };
+        configure = b => configure(b.WithLastName(GenerateChangedLastName(person.LastName)));
+
         return await CreateChangeNameRequestSupportTaskAsync(person.PersonId, configure);
     }
 

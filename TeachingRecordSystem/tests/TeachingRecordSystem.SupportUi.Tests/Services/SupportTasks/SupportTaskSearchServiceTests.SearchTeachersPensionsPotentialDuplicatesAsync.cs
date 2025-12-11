@@ -9,7 +9,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTeachersPensionsPotentialDuplicatesAsync_ReturnsOpenTeachersPensionsPotentialDuplicatesSupportTasks()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(),
             ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(),
@@ -35,7 +35,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTeachersPensionsPotentialDuplicatesAsync_ResultFields()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
                 fileName: "zzzzzz.csv",
@@ -78,7 +78,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTeachersPensionsPotentialDuplicatesAsync_SortByName_SortsByPersonFirstNameThenMiddleNameThenLastName(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(configurePerson: p => p.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
             ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(configurePerson: p => p.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
@@ -106,7 +106,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTeachersPensionsPotentialDuplicatesAsync_SortByFilename_SortsByIntegrationTransactionFilename(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(fileName: "aaaaaa.csv"),
             ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(fileName: "zzzzzz.csv"),
@@ -128,7 +128,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTeachersPensionsPotentialDuplicatesAsync_SortByInterfaceId_SortsByIntegrationTransactionId(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(integrationTransactionId: 1),
             ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(integrationTransactionId: 2),
@@ -150,7 +150,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTeachersPensionsPotentialDuplicatesAsync_SortByCreatedOn_SortsByCreatedOn(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(createdOn: new DateTime(2025, 1, 20, 12, 30, 0)),
             ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(createdOn: new DateTime(2025, 1, 20, 8, 10, 0)),
@@ -179,7 +179,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTeachersPensionsPotentialDuplicatesAsync_Pagination(int? pageNumber, string[] expectedTaskKeys)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(createdOn: new DateTime(2025, 1, 20)),
             ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(createdOn: new DateTime(2025, 1, 21)),
@@ -201,7 +201,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTeachersPensionsPotentialDuplicatesAsync_SortByAndPagination()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(configurePerson: p => p.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")), // 3
             ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(configurePerson: p => p.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),  // 2

@@ -9,7 +9,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchChangeRequestsAsync_ReturnsOpenChangeRequestSupportTasks()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(),
             ["ST2"] = await TestData.CreateChangeNameRequestSupportTaskAsync(),
@@ -35,7 +35,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchChangeRequestsAsync_ResultFields()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
                 configure: r => r
@@ -88,7 +88,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchChangeRequestsAsync_SearchTextIsEmpty_ReturnsAllTasks()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(),
             ["ST2"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(),
@@ -113,7 +113,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchChangeRequestsAsync_SearchTextIsNeitherADateNorAnEmailAddress_ReturnsTasksWithTrnRequestNamePartsMatchingAnyPartOfSearchString(string searchText, string[] expectedTaskKeys)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20)),
                 configurePerson: p => p.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
@@ -138,13 +138,19 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
     }
 
+    [Fact]
+    public async Task SearchChangeRequestsAsync_SearchBySupportTaskType()
+    {
+        Assert.Fail("TODO");
+    }
+
     [Theory]
     [InlineData(SortDirection.Ascending)]
     [InlineData(SortDirection.Descending)]
     public async Task SearchChangeRequestsAsync_SortByName_SortsByTrnRequestMetadataFirstNameThenMiddleNameThenLastName(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20)),
                 configurePerson: p => p.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
@@ -178,7 +184,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchChangeRequestsAsync_SortByRequestedOn_SortsByCreatedOn(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20, 12, 30, 0))),
             ["ST2"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20, 8, 10, 0))),
@@ -202,7 +208,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchChangeRequestsAsync_SortByChangeType_SortsBySupportTaskType(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(),
             ["ST2"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(),
@@ -229,7 +235,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchChangeRequestsAsync_Pagination(int? pageNumber, string[] expectedTaskKeys)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 20))),
             ["ST2"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 21))),
@@ -251,7 +257,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchChangeRequestsAsync_SearchTextSortByAndPagination()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(configurePerson: p => p.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
             ["ST2"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(configurePerson: p => p.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),

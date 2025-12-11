@@ -9,7 +9,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_ReturnsOpenNpqTrnRequestSupportTasks()
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(),
@@ -38,7 +38,7 @@ public partial class SupportTaskSearchServiceTests
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
 
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser1.UserId, r => r
                 .WithCreatedOn(new DateTime(2025, 1, 20))
@@ -89,7 +89,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SearchTextIsEmpty_ReturnsAllTasks()
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(),
@@ -110,7 +110,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SearchTextIsDate_ReturnsTasksCreatedOnDate(string searchText)
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 20))),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 20))),
@@ -147,7 +147,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SearchTextIsEmailAddress_ReturnsTaskWithMatchingTrnRequestEmailAddress()
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithEmailAddress("alice@example.com")),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithEmailAddress("bob@example.com")),
@@ -188,7 +188,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SearchTextIsNeitherADateNorAnEmailAddress_ReturnsTasksWithTrnRequestNamePartsMatchingAnyPartOfSearchString(string searchText, string[] expectedTaskKeys)
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 20)).WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 21)).WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
@@ -213,7 +213,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SortByName_SortsByTrnRequestMetadataFirstNameThenMiddleNameThenLastName(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
@@ -241,7 +241,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SortByEmail_SortsByTrnRequestMetadataEmailAddress(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithEmailAddress("alice@example.com")),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithEmailAddress("bob@example.com")),
@@ -263,7 +263,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SortByRequestedOn_SortsByCreatedOn(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 20, 12, 30, 0))),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 20, 8, 10, 0))),
@@ -287,7 +287,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SortByPotentialDuplicate_SortsByPotentialDuplicate(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: t => t.WithMatches(false)),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: t => t.WithMatches(true)),
@@ -314,7 +314,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_Pagination(int? pageNumber, string[] expectedTaskKeys)
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 20))),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 21))),
@@ -336,7 +336,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchNpqTrnRequestsAsync_SearchTextSortByAndPagination()
     {
         // Arrange
-        var tasks = TaskLookup.Create(new()
+        var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: t => t.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
             ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(configure: t => t.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),

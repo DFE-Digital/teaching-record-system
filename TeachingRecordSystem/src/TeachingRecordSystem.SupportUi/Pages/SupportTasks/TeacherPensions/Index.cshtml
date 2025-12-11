@@ -47,9 +47,9 @@
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                    @if (Model.Results!.Count == 0)
+                    @if (Model.Results!.TotalItemCount == 0)
                     {
-                        <tr class="govuk-table__row" data-testid="no-tasks-message">
+                        <tr class="govuk-table__row" data-testid="no-results-message">
                             <td class="govuk-table__cell" colspan="4">No potential duplicates</td>
                         </tr>
                     }
