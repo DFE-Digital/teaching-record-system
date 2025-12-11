@@ -22,9 +22,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
     }
 
     [Fact]
@@ -41,9 +41,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.Null(doc.GetElementByTestId("no-tasks-message"));
         Assert.NotNull(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
     }
 
     [Fact]
@@ -95,7 +95,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 configureApiTrnRequest: t => t.WithFirstName("Bob").WithLastName("Jones")),
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/?Search={Uri.EscapeDataString(search)}");
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/manual-checks-needed/?Search={Uri.EscapeDataString(search)}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -153,11 +154,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Create enough tasks to create 3 pages
         var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync()));
+            .ToAsyncEnumerable()
+            .SelectAwait(async _ => await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync()));
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
+        var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/manual-checks-needed?pageNumber={page}");
 
         // Act
@@ -168,21 +168,19 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
-    private static IElement[] GetResultRows(IHtmlDocument doc) =>
-        doc
-            .GetElementsByTagName("tbody")
-            .Single()
+    private static IElement[] GetResultRows(IHtmlDocument document) =>
+        document
+            .GetElementByTestId("results")?
             .GetElementsByClassName("govuk-table__row")
-            .ToArray();
+            .ToArray() ?? [];
 
-    private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
-        GetResultRows(doc)
+    private static string[] GetResultTaskReferences(IHtmlDocument document) =>
+        GetResultRows(document)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .ToArray();
 
-    private static string[] GetResultTaskKeys(IHtmlDocument doc, SupportTaskLookup tasks) =>
-        GetResultRows(doc)
-            .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
+    private static string[] GetResultTaskKeys(IHtmlDocument document, SupportTaskLookup tasks) =>
+        GetResultTaskReferences(document)
             .Select(tasks.GetKeyFor)
             .ToArray();
 }

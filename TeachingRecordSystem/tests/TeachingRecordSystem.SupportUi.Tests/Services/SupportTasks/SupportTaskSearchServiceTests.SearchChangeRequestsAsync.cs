@@ -138,10 +138,39 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
     }
 
-    [Fact]
-    public async Task SearchChangeRequestsAsync_SearchBySupportTaskType()
+    [Theory]
+    [InlineData(new[] { SupportTaskType.ChangeNameRequest }, new[] { "ST1" })]
+    [InlineData(new[] { SupportTaskType.ChangeDateOfBirthRequest }, new[] { "ST2" })]
+    [InlineData(new[] { SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest }, new[] { "ST1", "ST2" })]
+    public async Task SearchChangeRequestsAsync_SearchByChangeRequestType_ReturnsOnlyTasksOfGivenSupportType(SupportTaskType[] supportTaskTypes, string[] expectedTaskKeys)
     {
-        Assert.Fail("TODO");
+        // Arrange
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(),
+            ["ST2"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync()
+        };
+
+        // Act
+        var result = await SearchChangeRequestsAsync(new(ChangeRequestTypes: supportTaskTypes), new());
+
+        // Assert
+        Assert.Equal(2, result.TotalRequestCount);
+        Assert.Equal(expectedTaskKeys.Length, result.SearchResults.TotalItemCount);
+        Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Theory]
+    [InlineData(SupportTaskType.ApiTrnRequest)]
+    [InlineData(SupportTaskType.ConnectOneLoginUser)]
+    [InlineData(SupportTaskType.NpqTrnRequest)]
+    [InlineData(SupportTaskType.OneLoginUserIdVerification)]
+    [InlineData(SupportTaskType.TeacherPensionsPotentialDuplicate)]
+    [InlineData(SupportTaskType.TrnRequestManualChecksNeeded)]
+    public async Task SearchChangeRequestsAsync_SearchByNonChangeRequestType_Throws(SupportTaskType supportTaskType)
+    {
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
+            await SearchChangeRequestsAsync(new(ChangeRequestTypes: [supportTaskType]), new()));
     }
 
     [Theory]

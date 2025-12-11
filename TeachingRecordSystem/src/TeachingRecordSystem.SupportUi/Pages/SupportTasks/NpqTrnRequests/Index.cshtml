@@ -41,7 +41,7 @@
             </form>
         </div>
 
-        <div class="govuk-grid-column-full" data-testid="results">
+        <div class="govuk-grid-column-full">
             @if (Model.Results!.TotalItemCount == 0)
             {
                 <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
@@ -51,30 +51,30 @@
             }
             else
             {
-                <table class="govuk-table">
+                <table class="govuk-table" data-testid="results">
                     <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                            sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.Name ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.Name, direction))">
-                            Name
-                        </th>
-                        <th scope="col" class="govuk-table__header"
-                            sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.Email ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.Email, direction))">
-                            Email
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
-                            sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.RequestedOn, direction))">
-                            Requested on
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
-                            sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.PotentialDuplicate ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.PotentialDuplicate, direction))">
-                            Potential duplicate
-                        </th>
-                    </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.Name ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.Name, direction))">
+                                Name
+                            </th>
+                            <th scope="col" class="govuk-table__header"
+                                sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.Email ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.Email, direction))">
+                                Email
+                            </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.RequestedOn, direction))">
+                                Requested on
+                            </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.PotentialDuplicate ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.PotentialDuplicate, direction))">
+                                Potential duplicate
+                            </th>
+                        </tr>
                     </thead>
                     <tbody class="govuk-table__body">
                     @foreach (var result in Model.Results)
