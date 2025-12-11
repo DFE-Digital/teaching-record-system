@@ -151,22 +151,22 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                     user.EmailAddress
                 });
 
-        var expectedResultsOrdered = sortBy switch
+        var expectedResultsOrdered = (sortBy switch
         {
             OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.SupportTaskReference)
-                : expectedResults.OrderByDescending(s => s.SupportTaskReference)).ToArray(),
+                : expectedResults.OrderByDescending(s => s.SupportTaskReference)),
             OneLoginIdVerificationSupportTasksSortByOption.Name => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName)
-                : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName)).ToArray(),
+                : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName)),
             OneLoginIdVerificationSupportTasksSortByOption.Email => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.EmailAddress)
-                : expectedResults.OrderByDescending(s => s.EmailAddress)).ToArray(),
+                : expectedResults.OrderByDescending(s => s.EmailAddress)),
             OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.CreatedOn)
-                : expectedResults.OrderByDescending(s => s.CreatedOn)).ToArray(),
-            _ => expectedResults.ToArray()
-        };
+                : expectedResults.OrderByDescending(s => s.CreatedOn)),
+            _ => expectedResults
+        }).ToArray();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={sortBy}&sortDirection={sortDirection}");
 

@@ -54,22 +54,22 @@ public partial class SupportTaskSearchServiceTests
         var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchOneLoginIdVerificationSupportTasks(options).ToArrayAsync());
 
         // Assert
-        var expectedResultsOrdered = sortBy switch
+        var expectedResultsOrdered = (sortBy switch
         {
             OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => sortDirection == SortDirection.Ascending
-                ? expectedResults.OrderBy(s => s.SupportTaskReference).ToArray()
-                : expectedResults.OrderByDescending(s => s.SupportTaskReference).ToArray(),
+                ? expectedResults.OrderBy(s => s.SupportTaskReference)
+                : expectedResults.OrderByDescending(s => s.SupportTaskReference),
             OneLoginIdVerificationSupportTasksSortByOption.Name => sortDirection == SortDirection.Ascending
-                ? expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName).ToArray()
-                : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName).ToArray(),
+                ? expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName)
+                : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName),
             OneLoginIdVerificationSupportTasksSortByOption.Email => sortDirection == SortDirection.Ascending
-                ? expectedResults.OrderBy(s => s.EmailAddress).ToArray()
-                : expectedResults.OrderByDescending(s => s.EmailAddress).ToArray(),
+                ? expectedResults.OrderBy(s => s.EmailAddress)
+                : expectedResults.OrderByDescending(s => s.EmailAddress),
             OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => sortDirection == SortDirection.Ascending
-                ? expectedResults.OrderBy(s => s.CreatedOn).ToArray()
-                : expectedResults.OrderByDescending(s => s.CreatedOn).ToArray(),
-            _ => expectedResults.ToArray()
-        };
+                ? expectedResults.OrderBy(s => s.CreatedOn)
+                : expectedResults.OrderByDescending(s => s.CreatedOn),
+            _ => expectedResults
+        }).ToArray();
 
         Assert.Equal(expectedResultsOrdered.Length, results.Length);
         Assert.Equal(expectedResultsOrdered.Select(r => r.SupportTaskReference), results.Select(r => r.SupportTaskReference));

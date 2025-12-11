@@ -29,14 +29,14 @@ public class Index(SupportTaskSearchService searchService) : PageModel
             SortBy ??= OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference,
             sortDirection));
 
-        Results = (await query.ToListAsync())
+        Results = await query
             .Select(r => new Result(
                 r.SupportTaskReference,
                 (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName,
                 (r.Data as OneLoginUserIdVerificationData)!.StatedLastName,
                 r.OneLoginUser!.EmailAddress,
                 r.CreatedOn))
-            .ToList();
+            .ToListAsync();
     }
 
     public record Result(
