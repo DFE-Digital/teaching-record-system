@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 namespace TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 
 [Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
-public class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
+public partial class SupportTaskSearchServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
     public async Task SearchApiTrnRequests_TextIsDate_ReturnsTasksCreatedOnDate()

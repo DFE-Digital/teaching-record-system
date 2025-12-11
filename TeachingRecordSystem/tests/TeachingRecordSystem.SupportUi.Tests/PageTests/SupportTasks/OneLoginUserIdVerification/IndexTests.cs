@@ -1,41 +1,37 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserIdVerification;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private OneLoginUser[]? OneLoginUsers { get; set; }
-    private SupportTask[]? SupportTasks { get; set; }
-
-    private async Task CreateSupportTasksWithOneLoginUsersAsync()
-    {
-        OneLoginUsers = new OneLoginUser[]
-        {
-            await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null),
-            await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null)
-        };
-
-        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[0].Subject);
-        Clock.Advance(TimeSpan.FromDays(1));
-        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(OneLoginUsers[1].Subject);
-
-        SupportTasks = new SupportTask[]
-        {
-            supportTask1,
-            supportTask2
-        };
-    }
-
     [Fact]
-    public async Task Get_ShowsListOfOpenTasksWithOldestFirst()
+    public async Task Get_ShowsListOfOpenTasksInTaskIdOrder()
     {
         // Arrange
-        await CreateSupportTasksWithOneLoginUsersAsync();
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
+        Clock.Advance(TimeSpan.FromDays(1));
+        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
+        var expectedResultsOrderedByReference = (new[] { supportTask1, supportTask2 })
+            .Join([oneLoginUser1, oneLoginUser2],
+                task => ((OneLoginUserIdVerificationData)task.Data).OneLoginUserSubject,
+                user => user.Subject,
+                (task, user) => new
+                {
+                    task.SupportTaskReference,
+                    ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
+                    ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
+                    task.CreatedOn,
+                    user.EmailAddress
+                })
+            .OrderBy(r => r.SupportTaskReference)
+            .ToArray();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 
@@ -52,29 +48,133 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.NotNull(resultRows);
         var topRow = resultRows[0];
-        AssertRowHasContent(topRow, "name", $"{((OneLoginUserIdVerificationData)SupportTasks![0].Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)SupportTasks[0].Data)!.StatedLastName}");
-        AssertRowHasContent(topRow, "email", OneLoginUsers![0].EmailAddress!);
-        AssertRowHasContent(topRow, "requested-on", SupportTasks[0].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
-        AssertRowHasContent(topRow, "requested-on", SupportTasks[0].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        var expectedFirstResult = expectedResultsOrderedByReference[0];
+        AssertRowHasContent(topRow, "taskId", expectedFirstResult.SupportTaskReference);
+        AssertRowHasContent(topRow, "name", $"{expectedFirstResult.StatedFirstName} {expectedFirstResult.StatedLastName}");
+        AssertRowHasContent(topRow, "email", expectedFirstResult.EmailAddress!);
+        AssertRowHasContent(topRow, "requested-on", expectedFirstResult.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
 
         var nextRow = resultRows[1];
-        AssertRowHasContent(nextRow, "name", $"{((OneLoginUserIdVerificationData)SupportTasks[1].Data)!.StatedFirstName} {((OneLoginUserIdVerificationData)SupportTasks[1].Data)!.StatedLastName}");
-        AssertRowHasContent(nextRow, "email", OneLoginUsers[1].EmailAddress!);
-        AssertRowHasContent(nextRow, "requested-on", SupportTasks[1].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        var expectedNextResult = expectedResultsOrderedByReference[1];
+        AssertRowHasContent(nextRow, "taskId", expectedNextResult.SupportTaskReference);
+        AssertRowHasContent(nextRow, "name", $"{expectedNextResult.StatedFirstName} {expectedNextResult.StatedLastName}");
+        AssertRowHasContent(nextRow, "email", expectedNextResult.EmailAddress!);
+        AssertRowHasContent(nextRow, "requested-on", expectedNextResult.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+    }
 
-        void AssertRowHasContent(IElement row, string testId, string expectedText)
+    [Theory]
+    [InlineData(SortDirection.Ascending)]
+    [InlineData(SortDirection.Descending)]
+    public async Task Get_OrderListByReferenceId_OrdersList(SortDirection sortDirection)
+    {
+        // Arrange
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
+        Clock.Advance(TimeSpan.FromDays(1));
+        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
+        var supportTasks = new[] { supportTask1, supportTask2 };
+        var expectedResultsOrderedByReference = supportTasks.OrderBy(s => s.SupportTaskReference).ToArray();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference}&sortDirection={sortDirection}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var resultRows = doc.GetElementByTestId("results")
+            ?.GetElementsByTagName("tbody")
+            .FirstOrDefault()
+            ?.GetElementsByTagName("tr");
+
+        Assert.NotNull(resultRows);
+        var topRow = resultRows[0];
+        var expectedFirstResult = expectedResultsOrderedByReference[sortDirection == SortDirection.Ascending ? 0 : 1];
+        var expectedNextResult = expectedResultsOrderedByReference[sortDirection == SortDirection.Ascending ? 1 : 0];
+        AssertRowHasContent(resultRows[0], "taskId", expectedFirstResult.SupportTaskReference);
+        AssertRowHasContent(resultRows[1], "taskId", expectedNextResult.SupportTaskReference);
+    }
+
+    [Theory]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Descending)]
+    public async Task Get_OrderListByOption_OrdersList(OneLoginIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection)
+    {
+        // Arrange
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Sam@example.com"), verifiedInfo: null);
+        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject, options => options
+            .WithStatedFirstName("Aaron")
+            .WithStatedLastName("Aerosmith"));
+        Clock.Advance(TimeSpan.FromDays(1));
+        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject, options => options
+            .WithStatedFirstName("Sam")
+            .WithStatedLastName("Smith"));
+
+        var expectedResults = (new[] { supportTask1, supportTask2 })
+            .Join([oneLoginUser1, oneLoginUser2],
+                task => ((OneLoginUserIdVerificationData)task.Data).OneLoginUserSubject,
+                user => user.Subject,
+                (task, user) => new
+                {
+                    task.SupportTaskReference,
+                    ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
+                    ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
+                    task.CreatedOn,
+                    user.EmailAddress
+                });
+
+        var expectedResultsOrdered = (sortBy switch
         {
-            var column = row.GetElementByTestId(testId);
-            Assert.NotNull(column);
-            Assert.Equal(expectedText, column.TrimmedText());
-        }
+            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => (sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.SupportTaskReference)
+                : expectedResults.OrderByDescending(s => s.SupportTaskReference)),
+            OneLoginIdVerificationSupportTasksSortByOption.Name => (sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName)
+                : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName)),
+            OneLoginIdVerificationSupportTasksSortByOption.Email => (sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.EmailAddress)
+                : expectedResults.OrderByDescending(s => s.EmailAddress)),
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => (sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.CreatedOn)
+                : expectedResults.OrderByDescending(s => s.CreatedOn)),
+            _ => expectedResults
+        }).ToArray();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={sortBy}&sortDirection={sortDirection}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var resultRows = doc.GetElementByTestId("results")
+            ?.GetElementsByTagName("tbody")
+            .FirstOrDefault()
+            ?.GetElementsByTagName("tr");
+
+        Assert.NotNull(resultRows);
+        AssertRowHasContent(resultRows[0], "taskId", expectedResultsOrdered[0].SupportTaskReference);
+        AssertRowHasContent(resultRows[1], "taskId", expectedResultsOrdered[1].SupportTaskReference);
+        AssertRowHasContent(resultRows[0], "requested-on", expectedResultsOrdered[0].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(resultRows[0], "name", $"{expectedResultsOrdered[0].StatedFirstName} {expectedResultsOrdered[0].StatedLastName}");
+        AssertRowHasContent(resultRows[1], "name", $"{expectedResultsOrdered[1].StatedFirstName} {expectedResultsOrdered[1].StatedLastName}");
     }
 
     [Fact]
     public async Task Get_TaskListItemLinksToSupportTask()
     {
         // Arrange
-        await CreateSupportTasksWithOneLoginUsersAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification");
 
@@ -92,7 +192,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.NotNull(resultRow);
         var nameLink = resultRow.GetElementByTestId("name")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
-        Assert.Contains($"/support-tasks/one-login-user-id-verification/{SupportTasks![0].SupportTaskReference}/resolve", nameLink!.Href);
+        Assert.Contains($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve", nameLink!.Href);
     }
 
     [Fact]
@@ -110,5 +210,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var resultSection = doc.GetElementByTestId("results");
         Assert.NotNull(resultSection);
         Assert.NotNull(resultSection.GetElementByTestId("no-tasks-message"));
+    }
+
+    private static void AssertRowHasContent(IElement row, string testId, string expectedText)
+    {
+        var column = row.GetElementByTestId(testId);
+        Assert.NotNull(column);
+        Assert.Equal(expectedText, column.TrimmedText());
     }
 }

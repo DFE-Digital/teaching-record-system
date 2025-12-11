@@ -1,6 +1,7 @@
 using System.Globalization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
@@ -67,5 +68,25 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             DateOnly.TryParseExact(search, "d/M/yyyy", out date);
 
         bool SearchTextIsEmailAddress() => search.Contains('@');
+    }
+
+    public IQueryable<SupportTask> SearchOneLoginIdVerificationSupportTasks(SearchOneLoginUserIdVerificationSupportTasksOptions options)
+    {
+        var query = dbContext.SupportTasks
+            .Include(t => t.OneLoginUser)
+            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open);
+
+        query = options.SortBy switch
+        {
+            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => query.OrderBy(options.SortDirection, r => r.SupportTaskReference),
+            OneLoginIdVerificationSupportTasksSortByOption.Name => query
+                .OrderBy(options.SortDirection, r => (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName)
+                .ThenBy(options.SortDirection, r => (r.Data as OneLoginUserIdVerificationData)!.StatedLastName),
+            OneLoginIdVerificationSupportTasksSortByOption.Email => query.OrderBy(options.SortDirection, r => r.OneLoginUser!.EmailAddress),
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => query.OrderBy(options.SortDirection, r => r.CreatedOn),
+            _ => query
+        };
+
+        return query;
     }
 }

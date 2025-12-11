@@ -1,42 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification;
 
-public class Index(TrsDbContext dbContext) : PageModel
+public class Index(SupportTaskSearchService searchService) : PageModel
 {
     [BindProperty(SupportsGet = true)]
     [FromQuery]
     public string? Search { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public SortDirection? SortDirection { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public OneLoginIdVerificationSupportTasksSortByOption? SortBy { get; set; }
+
     public IReadOnlyCollection<Result>? Results { get; set; }
 
     public async Task OnGetAsync()
     {
-        var tasks = dbContext.SupportTasks
-            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
-            .OrderBy(t => t.CreatedOn);
+        var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
 
-        Results = await tasks
-            .Select(t => new
-            {
-                t,
-                Data = t.Data as OneLoginUserIdVerificationData
-            })
-            .Where(item => item.Data != null)
-            .Join(
-                dbContext.OneLoginUsers,
-                y => y.Data!.OneLoginUserSubject,
-                user => user.Subject,
-                (item, user) => new Result(
-                    item.t.SupportTaskReference,
-                    item.Data!.StatedFirstName,
-                    item.Data!.StatedLastName,
-                    user.EmailAddress,
-                    item.t.CreatedOn))
-            .ToArrayAsync();
+        var query = searchService.SearchOneLoginIdVerificationSupportTasks(new SearchOneLoginUserIdVerificationSupportTasksOptions(
+            SortBy ??= OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference,
+            sortDirection));
+
+        Results = await query
+            .Select(r => new Result(
+                r.SupportTaskReference,
+                (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName,
+                (r.Data as OneLoginUserIdVerificationData)!.StatedLastName,
+                r.OneLoginUser!.EmailAddress,
+                r.CreatedOn))
+            .ToListAsync();
     }
 
     public record Result(
