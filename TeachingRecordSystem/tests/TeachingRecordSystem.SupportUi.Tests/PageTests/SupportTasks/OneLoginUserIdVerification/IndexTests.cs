@@ -3,7 +3,7 @@ using AngleSharp.Html.Dom;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserIdVerification;
 
@@ -97,7 +97,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var supportTasks = new[] { supportTask1, supportTask2 };
         var expectedResultsOrderedByReference = supportTasks.OrderBy(s => s.SupportTaskReference).ToArray();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={SortByOption.ReferenceId}&sortDirection={sortDirection}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={OneLoginIdVerificationRequestsSortByOption.ReferenceId}&sortDirection={sortDirection}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -119,13 +119,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(SortByOption.Name, SortDirection.Ascending)]
-    [InlineData(SortByOption.Name, SortDirection.Descending)]
-    [InlineData(SortByOption.DateCreated, SortDirection.Ascending)]
-    [InlineData(SortByOption.DateCreated, SortDirection.Descending)]
-    [InlineData(SortByOption.Email, SortDirection.Ascending)]
-    [InlineData(SortByOption.Email, SortDirection.Descending)]
-    public async Task Get_OrderListByOption_OrdersList(SortByOption sortBy, SortDirection sortDirection)
+    [InlineData(OneLoginIdVerificationRequestsSortByOption.Name, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationRequestsSortByOption.Name, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationRequestsSortByOption.RequestedOn, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationRequestsSortByOption.RequestedOn, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationRequestsSortByOption.Email, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationRequestsSortByOption.Email, SortDirection.Descending)]
+    public async Task Get_OrderListByOption_OrdersList(OneLoginIdVerificationRequestsSortByOption sortBy, SortDirection sortDirection)
     {
         // Arrange
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
@@ -151,12 +151,20 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                     user.EmailAddress
                 });
 
-        var expectedResultsOrderedByReference = sortBy switch
+        var expectedResultsOrdered = sortBy switch
         {
-            SortByOption.ReferenceId => expectedResults.OrderBy(s => s.SupportTaskReference).ToArray(),
-            SortByOption.Name => expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName).ToArray(),
-            SortByOption.Email => expectedResults.OrderBy(s => s.EmailAddress).ToArray(),
-            SortByOption.DateCreated => expectedResults.OrderBy(s => s.CreatedOn).ToArray(),
+            OneLoginIdVerificationRequestsSortByOption.ReferenceId => (sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.SupportTaskReference)
+                : expectedResults.OrderByDescending(s => s.SupportTaskReference)).ToArray(),
+            OneLoginIdVerificationRequestsSortByOption.Name => (sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName)
+                : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName)).ToArray(),
+            OneLoginIdVerificationRequestsSortByOption.Email => (sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.EmailAddress)
+                : expectedResults.OrderByDescending(s => s.EmailAddress)).ToArray(),
+            OneLoginIdVerificationRequestsSortByOption.RequestedOn => (sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.CreatedOn)
+                : expectedResults.OrderByDescending(s => s.CreatedOn)).ToArray(),
             _ => expectedResults.ToArray()
         };
 
@@ -174,14 +182,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             ?.GetElementsByTagName("tr");
 
         Assert.NotNull(resultRows);
-        var expectedFirstResult = expectedResultsOrderedByReference[sortDirection == SortDirection.Ascending ? 0 : 1];
-        var expectedNextResult = expectedResultsOrderedByReference[sortDirection == SortDirection.Ascending ? 1 : 0];
-        AssertRowHasContent(resultRows[0], "taskId", expectedFirstResult.SupportTaskReference);
-        AssertRowHasContent(resultRows[1], "taskId", expectedNextResult.SupportTaskReference);
-        AssertRowHasContent(resultRows[0], "requested-on", expectedFirstResult.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
-        AssertRowHasContent(resultRows[1], "requested-on", expectedNextResult.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
-        AssertRowHasContent(resultRows[0], "name", $"{expectedFirstResult.StatedFirstName} {expectedFirstResult.StatedLastName}");
-        AssertRowHasContent(resultRows[1], "name", $"{expectedNextResult.StatedFirstName} {expectedNextResult.StatedLastName}");
+        AssertRowHasContent(resultRows[0], "taskId", expectedResultsOrdered[0].SupportTaskReference);
+        AssertRowHasContent(resultRows[1], "taskId", expectedResultsOrdered[1].SupportTaskReference);
+        AssertRowHasContent(resultRows[0], "requested-on", expectedResultsOrdered[0].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(resultRows[0], "name", $"{expectedResultsOrdered[0].StatedFirstName} {expectedResultsOrdered[0].StatedLastName}");
+        AssertRowHasContent(resultRows[1], "name", $"{expectedResultsOrdered[1].StatedFirstName} {expectedResultsOrdered[1].StatedLastName}");
     }
 
     [Fact]

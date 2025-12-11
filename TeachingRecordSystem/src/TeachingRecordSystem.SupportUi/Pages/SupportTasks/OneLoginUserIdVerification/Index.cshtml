@@ -1,4 +1,5 @@
 @page "/support-tasks/one-login-user-id-verification/"
+@using TeachingRecordSystem.SupportUi.Services.SupportTasks
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Index
 
 @{
@@ -32,23 +33,23 @@
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                                sort-direction="@(Model.SortBy == SortByOption.ReferenceId ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(SortByOption.ReferenceId, direction))">
+                                sort-direction="@(Model.SortBy == OneLoginIdVerificationRequestsSortByOption.ReferenceId ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(OneLoginIdVerificationRequestsSortByOption.ReferenceId, direction))">
                                 Task ID
                             </th>
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                                sort-direction="@(Model.SortBy == SortByOption.Name ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(SortByOption.Name, direction))">
+                                sort-direction="@(Model.SortBy == OneLoginIdVerificationRequestsSortByOption.Name ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(OneLoginIdVerificationRequestsSortByOption.Name, direction))">
                                 Name
                             </th>
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                                sort-direction="@(Model.SortBy == SortByOption.DateCreated ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(SortByOption.DateCreated, direction))">
+                                sort-direction="@(Model.SortBy == OneLoginIdVerificationRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(OneLoginIdVerificationRequestsSortByOption.RequestedOn, direction))">
                                 Requested on
                             </th>
                             <th scope="col" class="govuk-table__header"
-                                sort-direction="@(Model.SortBy == SortByOption.Email ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(SortByOption.Email, direction))">
+                                sort-direction="@(Model.SortBy == OneLoginIdVerificationRequestsSortByOption.Email ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(OneLoginIdVerificationRequestsSortByOption.Email, direction))">
                                 Email address
                             </th>
                         </tr>
