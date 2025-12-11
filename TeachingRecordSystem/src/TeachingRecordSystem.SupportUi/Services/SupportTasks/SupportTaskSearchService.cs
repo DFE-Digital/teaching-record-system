@@ -269,8 +269,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         return new()
         {
             TotalTaskCount = totalTaskCount,
-            Sources = sources,
-            Facets = facets,
+            Sources = sources.AsReadOnly(),
+            Facets = facets.AsReadOnly(),
             SearchResults = searchResults
         };
     }
