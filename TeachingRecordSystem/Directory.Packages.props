@@ -39,7 +39,7 @@
     <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
     <PackageVersion Include="JustEat.HttpClientInterception" Version="5.1.2" />
     <PackageVersion Include="LinqKit" Version="1.2.5" />
-    <PackageVersion Include="MediatR" Version="12.2.0" />
+    <PackageVersion Include="MediatR" Version="14.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.10" />
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.10" />
