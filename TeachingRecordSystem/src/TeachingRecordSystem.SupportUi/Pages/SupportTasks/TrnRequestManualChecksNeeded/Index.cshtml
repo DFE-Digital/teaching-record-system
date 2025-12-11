@@ -29,7 +29,7 @@
                 You’ll need to do further checks outside this service before completing each request.
             </p>
         </div>
-        <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+        <div class="govuk-grid-column-full-from-desktop">
             <filter-layout>
                 <filter-layout-filter>
                     <filter>
@@ -74,7 +74,7 @@
                     }
                     else
                     {
-                        <table class="govuk-table" data-testid="results">
+                        <table class="govuk-table">
                             <thead class="govuk-table__head">
                                 <tr class="govuk-table__row">
                                     <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
@@ -99,7 +99,7 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="govuk-table__body">
+                            <tbody class="govuk-table__body" data-testid="results">
                                     @foreach (var result in Model.Results)
                                     {
                                         <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
