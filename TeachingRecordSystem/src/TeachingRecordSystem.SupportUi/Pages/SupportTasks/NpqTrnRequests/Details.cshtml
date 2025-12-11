@@ -31,10 +31,6 @@
                         <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.NationalInsuranceNumber</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Working in school or educational setting</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@(Model.NpqWorkingInEducationalSetting.HasValue ? Model.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
