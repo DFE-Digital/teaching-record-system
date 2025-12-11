@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ConnectOneLoginUser;
 
-public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personMatchingService, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
+public class ConnectModel(TrsDbContext dbContext, OneLoginService oneLoginService, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -35,7 +35,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
         });
         _supportTask.Status = SupportTaskStatus.Closed;
 
-        var matchedAttributes = (await personMatchingService.GetMatchedAttributesAsync(
+        var matchedAttributes = (await oneLoginService.GetMatchedAttributesAsync(
                 new(data.VerifiedNames!, data.VerifiedDatesOfBirth!, data.StatedNationalInsuranceNumber, data.StatedTrn, data.TrnTokenTrn),
                 PersonDetail!.PersonId))
             .ToArray();

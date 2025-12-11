@@ -1,210 +1,229 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.PersonMatching;
 
-namespace TeachingRecordSystem.Core.Tests.Services.PersonMatching;
+namespace TeachingRecordSystem.Core.Tests.Services.OneLogin;
 
-public partial class PersonMatchingServiceTests
+public partial class OneLoginServiceTests
 {
     [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task GetMatchedAttributesAsync_ReturnsExpectedResults(bool usePersonNino)
+    {
+        // Arrange
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var alternativeNationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber);
+
+        var person = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
+        var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
+
+        string[][] names = [[firstName, lastName]];
+        DateOnly[] datesOfBirth = [dateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(s => s.GetMatchedAttributesAsync(new(names, datesOfBirth, nationalInsuranceNumber, person.Trn!, TrnTokenTrnHint: null), person.PersonId));
+
+        // Assert
+        Assert.Collection(
+            result,
+            m => AssertAttributeMatch(PersonMatchedAttribute.LastName, lastName, m),
+            m => AssertAttributeMatch(PersonMatchedAttribute.DateOfBirth, dateOfBirth.ToString("yyyy-MM-dd"), m),
+            m => AssertAttributeMatch(PersonMatchedAttribute.NationalInsuranceNumber, nationalInsuranceNumber, m),
+            m => AssertAttributeMatch(PersonMatchedAttribute.Trn, person.Trn!, m),
+            m => AssertAttributeMatch(PersonMatchedAttribute.FirstName, firstName, m));
+
+        static void AssertAttributeMatch(PersonMatchedAttribute expectedAttribute, string expectedValue, KeyValuePair<PersonMatchedAttribute, string> actual)
+        {
+            Assert.Equal(expectedAttribute, actual.Key);
+            Assert.Equal(expectedValue, actual.Value);
+        }
+    }
+
+    [Theory]
     [MemberData(nameof(MatchOneLoginUserData))]
-    public Task MatchOneLoginUserAsync_ReturnsExpectedResult(
-            OneLogin.NameArgumentOption nameOption,
-            OneLogin.DateOfBirthArgumentOption dateOfBirthOption,
-            OneLogin.NationalInsuranceNumberArgumentOption nationalInsuranceNumberOption,
-            OneLogin.TrnArgumentOption trnOption,
-            bool expectMatch,
-            IEnumerable<PersonMatchedAttribute>? expectedMatchedAttributes) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
-        {
-            // Arrange
-            var firstName = TestData.GenerateFirstName();
+    public async Task MatchPersonAsync_ReturnsExpectedResult(
+        OneLogin.NameArgumentOption nameOption,
+        OneLogin.DateOfBirthArgumentOption dateOfBirthOption,
+        OneLogin.NationalInsuranceNumberArgumentOption nationalInsuranceNumberOption,
+        OneLogin.TrnArgumentOption trnOption,
+        bool expectMatch,
+        IEnumerable<PersonMatchedAttribute>? expectedMatchedAttributes)
+    {
+        // Arrange
+        var firstName = TestData.GenerateFirstName();
 
-            var alias = nameOption == OneLogin.NameArgumentOption.MatchesAlias ? TestData.GenerateChangedFirstName(firstName) : null;
-            if (alias is not null)
+        var alias = nameOption == OneLogin.NameArgumentOption.MatchesAlias ? TestData.GenerateChangedFirstName(firstName) : null;
+        if (alias is not null)
+        {
+            await WithDbContextAsync(async dbContext =>
             {
-                dbContext.NameSynonyms.Add(new NameSynonyms()
-                {
-                    Name = firstName,
-                    Synonyms = [alias]
-                });
-                dbContext.NameSynonyms.Add(new NameSynonyms()
-                {
-                    Name = alias,
-                    Synonyms = [firstName]
-                });
+                dbContext.NameSynonyms.Add(new NameSynonyms { Name = firstName, Synonyms = [alias] });
+                dbContext.NameSynonyms.Add(new NameSynonyms { Name = alias, Synonyms = [firstName] });
                 await dbContext.SaveChangesAsync();
-            }
-
-            var middleName = TestData.GenerateChangedMiddleName([firstName, alias]);
-
-            var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithMiddleName(middleName));
-            var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-            var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
-            var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
-
-            string[][] names = nameOption switch
-            {
-                OneLogin.NameArgumentOption.NoFullName => [[person.FirstName]],
-                OneLogin.NameArgumentOption.MatchesPersonName => [[person.FirstName, person.LastName]],
-                OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName => [[person.FirstName, person.LastName], [TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName]), person.LastName]],
-                OneLogin.NameArgumentOption.MatchesAlias => [[alias!, person.LastName]],
-                OneLogin.NameArgumentOption.SpecifiedButDifferentFirstName => [[TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName]), person.LastName]],
-                OneLogin.NameArgumentOption.SpecifiedButDifferentLastName => [[person.FirstName, TestData.GenerateChangedLastName([person.FirstName, alias, person.MiddleName, person.LastName])]],
-                _ => []
-            };
-
-            DateOnly[] datesOfBirth = dateOfBirthOption switch
-            {
-                OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth => [person.DateOfBirth],
-                OneLogin.DateOfBirthArgumentOption.MultipleSpecifiedAndOneMatchesPersonDateOfBirth => [person.DateOfBirth, TestData.GenerateChangedDateOfBirth(person.DateOfBirth)],
-                OneLogin.DateOfBirthArgumentOption.SpecifiedButDifferent => [TestData.GenerateChangedDateOfBirth(person.DateOfBirth)],
-                _ => []
-            };
-
-            var nationalInsuranceNumber = nationalInsuranceNumberOption switch
-            {
-                OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino => person.NationalInsuranceNumber!,
-                OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino => personEmployment.NationalInsuranceNumber!,
-                OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedButDifferent => TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!),
-                _ => null
-            };
-
-            var trn = trnOption switch
-            {
-                OneLogin.TrnArgumentOption.SpecifiedAndMatches => person.Trn!,
-                OneLogin.TrnArgumentOption.SpecifiedButDifferent => await TestData.GenerateTrnAsync(),
-                _ => null
-            };
-
-            var service = new PersonMatchingService(dbContext);
-
-            // Act
-            var result = await service.MatchOneLoginUserAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn));
-
-            // Assert
-            if (expectMatch)
-            {
-                Assert.NotNull(result);
-                Assert.Equal(person.PersonId, result.PersonId);
-                Assert.Equal(person.Trn, result.Trn);
-                Assert.Equal(expectedMatchedAttributes?.Order(), result.MatchedAttributes.Select(kvp => kvp.Key).Distinct().Order());
-            }
-            else
-            {
-                Assert.Null(result);
-            }
-        });
-
-    [Fact]
-    public Task MatchOneLoginUserAsync_WithMultipleMatchingResults_ReturnsNull() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
-        {
-            // Arrange
-            var firstName = TestData.GenerateFirstName();
-            var lastName = TestData.GenerateLastName();
-            var dateOfBirth = TestData.GenerateDateOfBirth();
-
-            var person1 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-            var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-
-            string[][] names = [[firstName, lastName]];
-            DateOnly[] datesOfBirth = [dateOfBirth];
-            var nationalInsuranceNumber = person1.NationalInsuranceNumber!;
-            var trn = person2.Trn!;
-
-            var service = new PersonMatchingService(dbContext);
-
-            // Act
-            var result = await service.MatchOneLoginUserAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn));
-
-            // Assert
-            Assert.Null(result);
-        });
-
-    [Fact]
-    public Task MatchOneLoginUserAsync_WithMultipleMatchingNames_ReturnsResult() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
-        {
-            // Arrange
-            var firstName = Guid.NewGuid().ToString();  // Deliberately weird first name to avoid unique constraint violations in NameSynonyms below
-
-            var alias = TestData.GenerateFirstName();
-            dbContext.NameSynonyms.Add(new NameSynonyms()
-            {
-                Name = firstName,
-                Synonyms = [alias]
             });
-            await dbContext.SaveChangesAsync();
+        }
 
-            var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName));
+        var middleName = TestData.GenerateChangedMiddleName([firstName, alias]);
 
-            string[][] names = [[person.FirstName, person.LastName], [alias, person.LastName]];
-            DateOnly[] datesOfBirth = [person.DateOfBirth];
-            var nationalInsuranceNumber = person.NationalInsuranceNumber!;
-            var trn = person.Trn!;
+        var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithMiddleName(middleName));
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
+        var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
+        var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
 
-            var service = new PersonMatchingService(dbContext);
+        string[][] names = nameOption switch
+        {
+            OneLogin.NameArgumentOption.NoFullName => [[person.FirstName]],
+            OneLogin.NameArgumentOption.MatchesPersonName => [[person.FirstName, person.LastName]],
+            OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName => [[person.FirstName, person.LastName], [TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName]), person.LastName]],
+            OneLogin.NameArgumentOption.MatchesAlias => [[alias!, person.LastName]],
+            OneLogin.NameArgumentOption.SpecifiedButDifferentFirstName => [[TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName]), person.LastName]],
+            OneLogin.NameArgumentOption.SpecifiedButDifferentLastName => [[person.FirstName, TestData.GenerateChangedLastName([person.FirstName, alias, person.MiddleName, person.LastName])]],
+            _ => []
+        };
 
-            // Act
-            var result = await service.MatchOneLoginUserAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn));
+        DateOnly[] datesOfBirth = dateOfBirthOption switch
+        {
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth => [person.DateOfBirth],
+            OneLogin.DateOfBirthArgumentOption.MultipleSpecifiedAndOneMatchesPersonDateOfBirth => [person.DateOfBirth, TestData.GenerateChangedDateOfBirth(person.DateOfBirth)],
+            OneLogin.DateOfBirthArgumentOption.SpecifiedButDifferent => [TestData.GenerateChangedDateOfBirth(person.DateOfBirth)],
+            _ => []
+        };
 
-            // Assert
+        var nationalInsuranceNumber = nationalInsuranceNumberOption switch
+        {
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino => person.NationalInsuranceNumber!,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino => personEmployment.NationalInsuranceNumber!,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedButDifferent => TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!),
+            _ => null
+        };
+
+        var trn = trnOption switch
+        {
+            OneLogin.TrnArgumentOption.SpecifiedAndMatches => person.Trn!,
+            OneLogin.TrnArgumentOption.SpecifiedButDifferent => await TestData.GenerateTrnAsync(),
+            _ => null
+        };
+
+        // Act
+        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn)));
+
+        // Assert
+        if (expectMatch)
+        {
             Assert.NotNull(result);
-        });
+            Assert.Equal(person.PersonId, result.PersonId);
+            Assert.Equal(person.Trn, result.Trn);
+            Assert.Equal(expectedMatchedAttributes?.Order(), result.MatchedAttributes.Select(kvp => kvp.Key).Distinct().Order());
+        }
+        else
+        {
+            Assert.Null(result);
+        }
+    }
 
     [Fact]
-    public Task GetSuggestedOneLoginUserMatchesAsync_ReturnsExpectedResults() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+    public async Task MatchPersonAsync_WithMultipleMatchingResults_ReturnsNull()
+    {
+        // Arrange
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+
+        var person1 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+
+        string[][] names = [[firstName, lastName]];
+        DateOnly[] datesOfBirth = [dateOfBirth];
+        var nationalInsuranceNumber = person1.NationalInsuranceNumber!;
+        var trn = person2.Trn!;
+
+        // Act
+        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn)));
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task MatchPersonAsync_WithMultipleMatchingNames_ReturnsResult()
+    {
+        // Arrange
+        var firstName = Guid.NewGuid().ToString();  // Deliberately weird first name to avoid unique constraint violations in NameSynonyms below
+
+        var alias = TestData.GenerateFirstName();
+        await WithDbContextAsync(async dbContext =>
         {
-            // Arrange
-            var firstName = TestData.GenerateFirstName();
-            var lastName = TestData.GenerateLastName();
-            var dateOfBirth = TestData.GenerateDateOfBirth();
-            var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-            var alternativeNationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber);
-
-            // Person who matches on first name, last name & DOB
-            var person1 = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-
-            // Person who matches on person NINO
-            var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(nationalInsuranceNumber));
-
-            // Person who matches on employment NINO
-            var person2b = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(alternativeNationalInsuranceNumber));
-            var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-            var personEmployment = await TestData.CreateTpsEmploymentAsync(person2b, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), nationalInsuranceNumber);
-
-            // Person who matches on TRN
-            var person3 = await TestData.CreatePersonAsync();
-            var trn = person3.Trn!;
-
-            // Person who matches on last name, DOB & TRN
-            var person4 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-            var trnTokenHintTrn = person4.Trn!;
-
-            // person who matches on previous last name and DOB
-            var person5 = await TestData.CreatePersonAsync(p => p.WithFirstName(TestData.GenerateChangedFirstName(firstName)).WithLastName(TestData.GenerateChangedLastName(lastName))
-                .WithDateOfBirth(dateOfBirth)
-                .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), lastName, Clock.UtcNow)));
-
-            string[][] names = [[firstName, lastName]];
-            DateOnly[] datesOfBirth = [dateOfBirth];
-
-            var service = new PersonMatchingService(dbContext);
-
-            // Act
-            var result = await service.GetSuggestedOneLoginUserMatchesAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, trnTokenHintTrn));
-
-            // Assert
-            Assert.Collection(
-                result,
-                r => Assert.Equal(person4.PersonId, r.PersonId),
-                r => Assert.Equal(person3.PersonId, r.PersonId),
-                r => Assert.Equal(person2.PersonId, r.PersonId),
-                r => Assert.Equal(person2b.PersonId, r.PersonId),
-                r => Assert.Equal(person1.PersonId, r.PersonId),
-                r => Assert.Equal(person5.PersonId, r.PersonId));
+            dbContext.NameSynonyms.Add(new NameSynonyms { Name = firstName, Synonyms = [alias] });
+            await dbContext.SaveChangesAsync();
         });
+
+        var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName));
+
+        string[][] names = [[person.FirstName, person.LastName], [alias, person.LastName]];
+        DateOnly[] datesOfBirth = [person.DateOfBirth];
+        var nationalInsuranceNumber = person.NationalInsuranceNumber!;
+        var trn = person.Trn!;
+
+        // Act
+        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn)));
+
+        // Assert
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public async Task GetSuggestedPersonMatchesAsync_ReturnsExpectedResults()
+    {
+        // Arrange
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var alternativeNationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber);
+
+        // Person who matches on first name, last name & DOB
+        var person1 = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+
+        // Person who matches on person NINO
+        var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        // Person who matches on employment NINO
+        var person2b = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(alternativeNationalInsuranceNumber));
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
+        var personEmployment = await TestData.CreateTpsEmploymentAsync(person2b, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), nationalInsuranceNumber);
+
+        // Person who matches on TRN
+        var person3 = await TestData.CreatePersonAsync();
+        var trn = person3.Trn!;
+
+        // Person who matches on last name, DOB & TRN
+        var person4 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var trnTokenHintTrn = person4.Trn!;
+
+        // person who matches on previous last name and DOB
+        var person5 = await TestData.CreatePersonAsync(p => p.WithFirstName(TestData.GenerateChangedFirstName(firstName)).WithLastName(TestData.GenerateChangedLastName(lastName))
+            .WithDateOfBirth(dateOfBirth)
+            .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), lastName, Clock.UtcNow)));
+
+        string[][] names = [[firstName, lastName]];
+        DateOnly[] datesOfBirth = [dateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(s => s.GetSuggestedPersonMatchesAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, trnTokenHintTrn)));
+
+        // Assert
+        Assert.Collection(
+            result,
+            r => Assert.Equal(person4.PersonId, r.PersonId),
+            r => Assert.Equal(person3.PersonId, r.PersonId),
+            r => Assert.Equal(person2.PersonId, r.PersonId),
+            r => Assert.Equal(person2b.PersonId, r.PersonId),
+            r => Assert.Equal(person1.PersonId, r.PersonId),
+            r => Assert.Equal(person5.PersonId, r.PersonId));
+    }
 
     private static readonly PersonMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =
     [

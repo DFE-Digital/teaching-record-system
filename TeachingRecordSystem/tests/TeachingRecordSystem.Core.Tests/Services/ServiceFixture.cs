@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Tests.Services;
 
@@ -16,7 +16,7 @@ public class ServiceFixture : ServiceProviderFixture
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
             .AddEventPublisher()
-            .AddPersonMatching()
+            .AddOneLoginService()
             .AddSupportTaskService();
 
         TestScopedServices.ConfigureServices(services);

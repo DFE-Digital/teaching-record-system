@@ -70,7 +70,8 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton(DbHelper.Instance)
                     .AddSingleton<TestData>()
                     .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
-                    .AddSingleton(GetMockFileService());
+                    .AddSingleton(GetMockFileService())
+                    .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>();
 
                 TestScopedServices.ConfigureServices(services);
 
@@ -118,5 +119,21 @@ public class HostFixture : InitializeDbFixture
                 pageApplicationModel.Filters.Remove(autoValidateAttribute);
             }
         }
+    }
+
+    private class ExecuteScheduledJobsStartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) =>
+            app =>
+            {
+                app.Use(async (_, next) =>
+                {
+                    await next();
+
+                    await TestScopedServices.GetCurrent().BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+                });
+
+                next(app);
+            };
     }
 }

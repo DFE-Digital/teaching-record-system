@@ -9,8 +9,10 @@ using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
@@ -93,7 +95,8 @@ public sealed class HostFixture : InitializeDbFixture
                         .AddSingleton<OneLoginCurrentUserProvider>()
                         .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                         .AddSingleton(GetMockFileService())
-                        .AddSingleton(Mock.Of<IGetAnIdentityApiClient>());
+                        .AddSingleton(Mock.Of<IGetAnIdentityApiClient>())
+                        .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
 
                     IFileService GetMockFileService()
                     {

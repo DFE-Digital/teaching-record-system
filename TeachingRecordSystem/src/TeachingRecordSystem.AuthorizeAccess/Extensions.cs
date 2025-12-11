@@ -21,6 +21,7 @@ using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
+using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.Filters;
 using TeachingRecordSystem.WebCommon.FormFlow;
@@ -180,6 +181,15 @@ public static class Extensions
                 .AddSingleton(sp => (OneLoginAuthenticationSchemeProvider)sp.GetRequiredService<IAuthenticationSchemeProvider>())
                 .AddSingleton<IConfigureOptions<OneLoginOptions>>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>())
                 .AddSingleton<IHostedService>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>());
+        }
+
+        if (environment.IsProduction() || environment.IsDevelopment())
+        {
+            services.AddNotifyNotificationSender(configuration);
+        }
+        else
+        {
+            services.AddSingleton<INotificationSender, NoopNotificationSender>();
         }
 
         return services;

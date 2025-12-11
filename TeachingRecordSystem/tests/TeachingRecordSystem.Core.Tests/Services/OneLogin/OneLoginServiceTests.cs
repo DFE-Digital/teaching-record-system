@@ -5,7 +5,8 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.Core.Tests.Services.OneLogin;
 
-public class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
+public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
     public async Task SetUserVerifiedAsync_UserIsAlreadyVerified_ThrowsInvalidOperationException()

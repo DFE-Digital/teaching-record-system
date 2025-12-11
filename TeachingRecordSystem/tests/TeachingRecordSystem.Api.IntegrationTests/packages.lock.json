@@ -12,6 +12,12 @@
           "Azure.Storage.Common": "12.25.0"
         }
       },
+      "JetBrains.Annotations": {
+        "type": "Direct",
+        "requested": "[2025.2.4, )",
+        "resolved": "2025.2.4",
+        "contentHash": "TwbgxAkXxY+vNEhNVx/QXjJ4vqxmepOjsgRvvImQPbHkHMMb4W+ahL3laMsxXKtNT7iMy+E1B3xkqao2hf1n3A=="
+      },
       "JustEat.HttpClientInterception": {
         "type": "Direct",
         "requested": "[5.1.2, )",
@@ -2087,6 +2093,7 @@
         "dependencies": {
           "AutoMapper": "[13.0.1, )",
           "FluentValidation.AspNetCore": "[11.3.1, )",
+          "JetBrains.Annotations": "[2025.2.4, )",
           "MediatR": "[12.2.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[9.0.10, )",
           "Moq": "[4.20.72, )",
@@ -2116,6 +2123,7 @@
           "Hangfire.NetCore": "[1.8.22, )",
           "Hangfire.PostgreSql": "[1.20.12, )",
           "IdentityModel": "[6.2.0, )",
+          "JetBrains.Annotations": "[2025.2.4, )",
           "Microsoft.Data.SqlClient": "[6.1.3, )",
           "Microsoft.EntityFrameworkCore.Relational": "[9.0.10, )",
           "Microsoft.Extensions.Azure": "[1.13.0, )",
@@ -2155,6 +2163,7 @@
         "type": "Project",
         "dependencies": {
           "Faker.Net": "[2.0.163, )",
+          "JetBrains.Annotations": "[2025.2.4, )",
           "Moq": "[4.20.72, )",
           "Respawn": "[6.2.1, )",
           "System.Linq.Async": "[6.0.3, )",
@@ -2165,6 +2174,7 @@
       "teachingrecordsystem.testcommon.xunit3": {
         "type": "Project",
         "dependencies": {
+          "JetBrains.Annotations": "[2025.2.4, )",
           "TeachingRecordSystem.TestCommon": "[1.0.0, )",
           "xunit.v3.extensibility.core": "[3.2.0, )"
         }
@@ -2176,6 +2186,7 @@
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
           "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.1, )",
           "Hangfire.AspNetCore": "[1.8.22, )",
+          "JetBrains.Annotations": "[2025.2.4, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[9.0.10, )",
           "Microsoft.Extensions.Caching.StackExchangeRedis": "[9.0.10, )",
           "Sentry.AspNetCore": "[5.16.2, )",
