@@ -69,7 +69,7 @@ public class CreateTrnRequestHandler(
                     SupportTaskType = SupportTaskType.ApiTrnRequest,
                     Data = new ApiTrnRequestData(),
                     PersonId = null,
-                    OneLoginUserSubject = command.OneLoginUserSubject,
+                    OneLoginUserSubject = null,  // This must be null as we likely won't have an entry in the one_login_users table yet
                     TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
                 },
                 processContext);

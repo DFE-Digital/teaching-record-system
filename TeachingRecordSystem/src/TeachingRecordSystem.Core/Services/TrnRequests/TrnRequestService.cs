@@ -142,7 +142,7 @@ public class TrnRequestService(
                     SupportTaskType = SupportTaskType.TrnRequestManualChecksNeeded,
                     Data = new TrnRequestManualChecksNeededData(),
                     PersonId = person.PersonId,
-                    OneLoginUserSubject = trnRequest.OneLoginUserSubject,
+                    OneLoginUserSubject = null,
                     TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
                 },
                 processContext);
