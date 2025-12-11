@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
+using TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests;
 
@@ -68,13 +69,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
 
-        var resultRow = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr")
-            .FirstOrDefault();
-
+        var resultRow = GetResultRows(doc).FirstOrDefault();
         Assert.NotNull(resultRow);
+
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
         AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat));
@@ -88,17 +85,26 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Fact]
-    public async Task Get_SearchByFirstName_ShowsMatchingResult()
+    [Theory]
+    [InlineData("Smith", new[] { "ST1" })]
+    [InlineData("Jim", new[] { "ST1" })]
+    [InlineData("Jim Smith", new[] { "ST1" })]
+    [InlineData("bob.jones@email.com", new[] { "ST2" })]
+    [InlineData("1 Jan 2025", new[] { "ST1" })]
+    [InlineData("10/10/2023", new[] { "ST2" })]
+    public async Task Get_Search_ShowsMatchingResult(string search, string[] taskKeys)
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-        var firstName = TestData.GenerateFirstName();
-        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            configure: t => t.WithFirstName(firstName));
+        var tasks = SupportTaskLookup.Create(new()
+        {
+            ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+                configure: t => t.WithFirstName("Jim").WithLastName("Smith")
+                    .WithCreatedOn(new DateTime(2025, 1, 1))),
 
-        var search = firstName;
+            ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+                configure: t => t.WithEmailAddress("bob.jones@email.com")
+                .WithCreatedOn(new DateTime(2023, 10, 10))),
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/?Search={Uri.EscapeDataString(search)}");
 
@@ -107,390 +113,48 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
-    }
-
-    [Fact]
-    public async Task Get_SearchByMiddleName_ShowsMatchingResult()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-        var middleName = TestData.GenerateMiddleName();
-        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            configure: t => t.WithMiddleName(middleName));
-
-        var search = middleName;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/?Search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
-    }
-
-    [Fact]
-    public async Task Get_SearchByLastName_ShowsMatchingResult()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-        var lastName = TestData.GenerateLastName();
-        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            configure: t => t.WithLastName(lastName));
-
-        var search = lastName;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/?Search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
-    }
-
-    [Fact]
-    public async Task Get_SearchByMultipleNameParts_ShowsMatchingResult()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-        var firstName = TestData.GenerateFirstName();
-        var lastName = TestData.GenerateFirstName();
-        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            configure: t => t.WithFirstName(firstName).WithLastName(lastName));
-
-        var search = $"{firstName} {lastName}";
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/?Search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
-    }
-
-    [Fact]
-    public async Task Get_SearchByEmailAddress_ShowsMatchingResult()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-        var emailAddress = TestData.GenerateUniqueEmail();
-        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            configure: t => t.WithEmailAddress(emailAddress));
-
-        var search = emailAddress;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/?Search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
+        Assert.Equal(taskKeys, GetResultTaskKeys(doc, tasks));
     }
 
     [Theory]
-    [InlineData("d/M/yyyy")]
-    [InlineData("dd/MM/yyyy")]
-    [InlineData(UiDefaults.DateOnlyDisplayFormat)]
-    public async Task Get_SearchByRequestDate_ShowsMatchingResult(string dateFormat)
+    [InlineData(NpqTrnRequestsSortByOption.Name, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(NpqTrnRequestsSortByOption.Name, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(NpqTrnRequestsSortByOption.Email, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(NpqTrnRequestsSortByOption.Email, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(NpqTrnRequestsSortByOption.RequestedOn, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(NpqTrnRequestsSortByOption.RequestedOn, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(NpqTrnRequestsSortByOption.PotentialDuplicate, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(NpqTrnRequestsSortByOption.PotentialDuplicate, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    public async Task Get_SortBy_ShowsRequestsInCorrectOrder(NpqTrnRequestsSortByOption sortBy, SortDirection sortDirection, string[] taskKeys)
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-        var (supportTask, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
 
-        var search = supportTask.CreatedOn.ToString(dateFormat);
+        var tasks = SupportTaskLookup.Create(new()
+        {
+            ["ST1"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser2.UserId, t => t
+                .WithFirstName("Zavier")
+                .WithEmailAddress("zavier@example.com")
+                .WithCreatedOn(new DateTime(2025, 1, 1))
+                .WithMatches(true)),
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/?Search={Uri.EscapeDataString(search)}");
+            ["ST2"] = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser1.UserId, t => t
+                .WithFirstName("Aaron")
+                .WithEmailAddress("aaron@example.com")
+                .WithCreatedOn(new DateTime(2023, 10, 10))
+                .WithMatches(false)),
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/?sortBy={sortBy}&sortDirection={sortDirection}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
-    }
-
-    [Fact]
-    public async Task Get_NoSortParametersSpecified_ShowsRequestsOrderedByRequestedOnAscending()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByNameAscending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithFirstName("Zavier"));
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithFirstName("Aaron"));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.Name}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByNameDescending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithFirstName("Zavier"));
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithFirstName("Aaron"));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.Name}&sortDirection={SortDirection.Descending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByEmailAscending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithEmailAddress("zavier@example.com"));
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithEmailAddress("aaron@example.com"));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.Email}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByEmailDescending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithEmailAddress("zavier@example.com"));
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithEmailAddress("aaron@example.com"));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.Email}&sortDirection={SortDirection.Descending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByRequestedOnAscending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.RequestedOn}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByRequestedOnDescending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.RequestedOn}&sortDirection={SortDirection.Descending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByPotentialDuplicateAscending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t =>
-            {
-                t.WithMatches(true);
-            });
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t =>
-            {
-                t.WithMatches(false);
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.PotentialDuplicate}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByPotentialDuplicateDescending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
-
-        var (supportTask1, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t =>
-            {
-                t.WithMatches(true);
-            });
-
-        var (supportTask2, _, _) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t =>
-            {
-                t.WithMatches(false);
-            });
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/?sortBy={NpqTrnRequestsSortByOption.PotentialDuplicate}&sortDirection={SortDirection.Descending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result));
+        Assert.Equal(taskKeys, GetResultTaskKeys(doc, tasks));
     }
 
     [Fact]
@@ -529,6 +193,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
         GetResultRows(doc)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
+            .ToArray();
+
+    private static string[] GetResultTaskKeys(IHtmlDocument doc, SupportTaskLookup tasks) =>
+        GetResultRows(doc)
+            .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
+            .Select(tasks.GetKeyFor)
             .ToArray();
 }
 

@@ -1,6 +1,5 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ChangeRequests;
 
@@ -11,10 +10,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoOpenChangeRequests_ShowsNoChangeRequestsMessage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId, b => b
-            .WithLastName(TestData.GenerateChangedLastName(person.LastName))
-            .WithStatus(SupportTaskStatus.Closed));
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            configure: b => b.WithStatus(SupportTaskStatus.Closed));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests");
 
@@ -23,6 +20,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
         Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
@@ -34,19 +32,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithChangeRequest_ButNotMatchingSearchCriteria_ShowsNoResultsMessage(SupportTaskType supportTaskType)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        SupportTask supportTask;
-
-        if (supportTaskType == SupportTaskType.ChangeNameRequest)
-        {
-            supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
-        }
-        else
-        {
-            supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
-        }
+        var supportTask = supportTaskType == SupportTaskType.ChangeNameRequest
+            ? await TestData.CreateChangeNameRequestSupportTaskAsync()
+            : await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?Search=XXX");
 
@@ -68,18 +56,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        SupportTask supportTask;
+        var supportTask = supportTaskType == SupportTaskType.ChangeNameRequest
+            ? await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)))
 
-        if (supportTaskType == SupportTaskType.ChangeNameRequest)
-        {
-            supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
-        }
-        else
-        {
-            supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId,
+            : await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId,
                 b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
-        }
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests");
 
@@ -92,13 +74,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
 
-        var resultRow = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr")
-            .FirstOrDefault();
-
+        var resultRow = GetResultRows(doc).FirstOrDefault();
         Assert.NotNull(resultRow);
+
         AssertRowHasContent("name", $"{person.FirstName} {person.MiddleName} {person.LastName}");
         AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
         AssertRowHasContent("change-type", supportTaskType == SupportTaskType.ChangeNameRequest ? "Name" : "Date of birth");
@@ -115,13 +93,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoChangeRequestTypesSpecifiedAndNoFiltersApplied_ReturnsAllChangeRequestTypes()
     {
         // Arrange
-        var person1 = await TestData.CreatePersonAsync();
-        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(person1.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(person1.LastName)));
-
-        var person2 = await TestData.CreatePersonAsync();
-        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person2.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person2.DateOfBirth)));
+        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests");
 
@@ -139,10 +112,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoChangeRequestTypesSpecifiedAndFiltersApplied_ReturnsNoResults()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
-        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests?_f=true");
 
@@ -163,13 +133,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ChangeRequestTypesSpecifiedAndFiltersApplied_ReturnsResultsMatchingChangeRequestTypesOnly(SupportTaskType[] supportTaskTypes)
     {
         // Arrange
-        var person1 = await TestData.CreatePersonAsync();
-        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync(person1.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(person1.LastName)));
-
-        var person2 = await TestData.CreatePersonAsync();
-        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person2.PersonId,
-            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person2.DateOfBirth)));
+        var nameChangeRequest = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync();
 
         var changeRequestTypesQueryParam = string.Join("&", supportTaskTypes.Select(t => $"changeRequestTypes={t}"));
 
@@ -225,6 +190,36 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.DoesNotContain(request2.SupportTaskReference, references);
     }
 
-    private static IEnumerable<string> GetTaskReferences(IHtmlDocument document) =>
-        document.GetElementByTestId("results")?.QuerySelectorAll("tbody>tr").Attr("data-reference") ?? [];
+    [Fact]
+    public async Task Get_ShowsPageOfResults()
+    {
+        // Arrange
+        var pageSize = 20;
+        var page = 2;
+
+        // Create enough tasks to create 3 pages
+        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
+                .ToAsyncEnumerable()
+                .SelectAwait(async _ => await TestData.CreateChangeNameRequestSupportTaskAsync()));
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/change-requests/?pageNumber={page}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(pageSize, GetTaskReferences(doc).Length);
+    }
+
+    private static IElement[] GetResultRows(IHtmlDocument doc) =>
+        doc
+            .GetElementsByTagName("tbody")
+            .Single()
+            .GetElementsByClassName("govuk-table__row")
+            .ToArray();
+
+    private static string[] GetTaskReferences(IHtmlDocument document) =>
+        document.GetElementByTestId("results")?.QuerySelectorAll("tbody>tr").Attr("data-reference").ToArray() ?? [];
 }

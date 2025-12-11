@@ -9,7 +9,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_ReturnsOpenTrnRequestManualChecksNeededSupportTasks()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(),
@@ -38,7 +38,7 @@ public partial class SupportTaskSearchServiceTests
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
 
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId,
                 createdOn: new DateTime(2025, 1, 20),
@@ -87,7 +87,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_SearchTextIsEmpty_ReturnsAllTasks()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 20)),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 21)),
@@ -112,7 +112,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_SearchTextIsNeitherADateNorAnEmailAddress_ReturnsTasksWithTrnRequestNamePartsMatchingAnyPartOfSearchString(string searchText, string[] expectedTaskKeys)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 20),
                 configureApiTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
@@ -148,7 +148,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_SortByName_SortsByTrnRequestMetadataFirstNameThenMiddleNameThenLastName(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
                 configureApiTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
@@ -182,7 +182,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_SortByEmail_SortsByTrnRequestMetadataEmailAddress(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: r => r.WithDateOfBirth(new DateOnly(1990, 1, 10))),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: r => r.WithDateOfBirth(new DateOnly(1990, 1, 11))),
@@ -204,7 +204,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_SortByDateCreated_SortsByCreatedOn(SortDirection sortDirection)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 20, 12, 30, 0)),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 20, 8, 10, 0)),
@@ -231,7 +231,7 @@ public partial class SupportTaskSearchServiceTests
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
 
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId),
@@ -258,7 +258,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_Pagination(int? pageNumber, string[] expectedTaskKeys)
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 20)),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 21)),
@@ -280,7 +280,7 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_SearchTextSortByAndPagination()
     {
         // Arrange
-        var tasks = new TaskLookup
+        var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
                 configureApiTrnRequest: t => t.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),

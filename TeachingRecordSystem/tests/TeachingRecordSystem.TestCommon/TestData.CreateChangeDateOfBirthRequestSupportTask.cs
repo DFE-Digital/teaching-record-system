@@ -12,6 +12,9 @@ public partial class TestData
     {
         var person = await CreatePersonAsync(configurePerson);
 
+        configure ??= b => { };
+        configure = b => configure(b.WithDateOfBirth(GenerateChangedDateOfBirth(person.DateOfBirth)));
+
         return await CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId, configure);
     }
 

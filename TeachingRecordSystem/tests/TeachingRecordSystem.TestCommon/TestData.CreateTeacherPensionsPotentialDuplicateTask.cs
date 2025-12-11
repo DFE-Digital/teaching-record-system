@@ -5,7 +5,12 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.TestCommon;
 public partial class TestData
 {
-    public async Task<SupportTask> CreateTeacherPensionsPotentialDuplicateTaskAsync(Guid? applicationUserId = null, string fileName = "filename.csv", long integrationTransactionId = 1, DateTime? createdOn = null, Action<CreatePersonBuilder>? configurePerson = null)
+    public async Task<SupportTask> CreateTeacherPensionsPotentialDuplicateTaskAsync(
+        Guid? applicationUserId = null,
+        string fileName = "filename.csv",
+        long integrationTransactionId = 1,
+        DateTime? createdOn = null,
+        Action<CreatePersonBuilder>? configurePerson = null)
     {
         configurePerson ??= p => { };
 
