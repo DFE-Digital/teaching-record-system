@@ -44,7 +44,7 @@ public class Index(SupportTaskSearchService supportTaskSearchService, SupportUiL
 
         var result = await supportTaskSearchService.SearchTrnRequestManualChecksAsync(searchOptions, paginationOptions);
         TotalTaskCount = result.TotalTaskCount;
-        Sources = result.Sources;
+        Sources = result.Sources.ToArray();
         Facets = result.Facets;
         Results = result.SearchResults;
 

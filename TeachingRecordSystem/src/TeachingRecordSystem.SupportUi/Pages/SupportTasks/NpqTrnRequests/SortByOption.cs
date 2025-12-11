@@ -1,1 +1,0 @@
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
