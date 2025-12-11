@@ -97,7 +97,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var supportTasks = new[] { supportTask1, supportTask2 };
         var expectedResultsOrderedByReference = supportTasks.OrderBy(s => s.SupportTaskReference).ToArray();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={OneLoginIdVerificationRequestsSortByOption.ReferenceId}&sortDirection={sortDirection}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={OneLoginIdVerificationRequestsSortByOption.SupportTaskReference}&sortDirection={sortDirection}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -153,7 +153,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var expectedResultsOrdered = sortBy switch
         {
-            OneLoginIdVerificationRequestsSortByOption.ReferenceId => (sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationRequestsSortByOption.SupportTaskReference => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.SupportTaskReference)
                 : expectedResults.OrderByDescending(s => s.SupportTaskReference)).ToArray(),
             OneLoginIdVerificationRequestsSortByOption.Name => (sortDirection == SortDirection.Ascending

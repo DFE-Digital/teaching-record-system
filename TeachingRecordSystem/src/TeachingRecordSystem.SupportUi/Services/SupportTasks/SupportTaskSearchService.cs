@@ -78,7 +78,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         query = options.SortBy switch
         {
-            OneLoginIdVerificationRequestsSortByOption.ReferenceId => query.OrderBy(options.SortDirection, r => r.SupportTaskReference),
+            OneLoginIdVerificationRequestsSortByOption.SupportTaskReference => query.OrderBy(options.SortDirection, r => r.SupportTaskReference),
             OneLoginIdVerificationRequestsSortByOption.Name => query
                 .OrderBy(options.SortDirection, r => (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName)
                 .ThenBy(options.SortDirection, r => (r.Data as OneLoginUserIdVerificationData)!.StatedLastName),

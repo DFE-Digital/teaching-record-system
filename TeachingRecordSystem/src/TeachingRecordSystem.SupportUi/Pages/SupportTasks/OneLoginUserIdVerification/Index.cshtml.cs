@@ -25,41 +25,8 @@ public class Index(SupportTaskSearchService searchService) : PageModel
     {
         var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
 
-        //var tasks = dbContext.SupportTasks
-        //    .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
-        //    .OrderBy(t => t.SupportTaskReference);
-
-        //var query = tasks
-        //    .Select(t => new
-        //    {
-        //        t.SupportTaskReference,
-        //        t.CreatedOn,
-        //        Data = t.Data as OneLoginUserIdVerificationData
-        //    })
-        //    .Where(item => item.Data != null)
-        //    .Join(
-        //        dbContext.OneLoginUsers,
-        //        y => y.Data!.OneLoginUserSubject,
-        //        user => user.Subject,
-        //        (item, user) => new
-        //        {
-        //            item.SupportTaskReference,
-        //            FirstName = item.Data!.StatedFirstName,
-        //            LastName = item.Data!.StatedLastName,
-        //            user.EmailAddress,
-        //            item.CreatedOn
-        //        });
-        //query = SortBy switch
-        //{
-        //    OneLoginIdVerificationRequestsOptions.ReferenceId => query.OrderBy(sortDirection, r => r.SupportTaskReference),
-        //    OneLoginIdVerificationRequestsOptions.Name => query.OrderBy(sortDirection, r => r.FirstName).ThenBy(sortDirection, r => r.LastName),
-        //    OneLoginIdVerificationRequestsOptions.Email => query.OrderBy(sortDirection, r => r.EmailAddress),
-        //    OneLoginIdVerificationRequestsOptions.DateCreated => query.OrderBy(sortDirection, r => r.CreatedOn),
-        //    _ => query
-        //};
-
         var query = searchService.SearchOneLoginIdVerificationSupportTasks(new SearchOneLoginUserIdVerificationRequestsOptions(
-            SortBy ??= OneLoginIdVerificationRequestsSortByOption.ReferenceId,
+            SortBy ??= OneLoginIdVerificationRequestsSortByOption.SupportTaskReference,
             sortDirection));
 
         Results = (await query.ToListAsync())

@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 public enum OneLoginIdVerificationRequestsSortByOption
 {
-    ReferenceId,
+    SupportTaskReference,
     Name,
     Email,
     RequestedOn

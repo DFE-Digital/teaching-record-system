@@ -22,11 +22,11 @@ public partial class SupportTaskSearchServiceTests
     }
 
     [Theory]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.ReferenceId, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationRequestsSortByOption.SupportTaskReference, SortDirection.Ascending)]
     [InlineData(OneLoginIdVerificationRequestsSortByOption.Email, SortDirection.Ascending)]
     [InlineData(OneLoginIdVerificationRequestsSortByOption.Name, SortDirection.Ascending)]
     [InlineData(OneLoginIdVerificationRequestsSortByOption.RequestedOn, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.ReferenceId, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationRequestsSortByOption.SupportTaskReference, SortDirection.Descending)]
     [InlineData(OneLoginIdVerificationRequestsSortByOption.Email, SortDirection.Descending)]
     [InlineData(OneLoginIdVerificationRequestsSortByOption.Name, SortDirection.Descending)]
     [InlineData(OneLoginIdVerificationRequestsSortByOption.RequestedOn, SortDirection.Descending)]
@@ -56,7 +56,7 @@ public partial class SupportTaskSearchServiceTests
         // Assert
         var expectedResultsOrdered = sortBy switch
         {
-            OneLoginIdVerificationRequestsSortByOption.ReferenceId => sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationRequestsSortByOption.SupportTaskReference => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.SupportTaskReference).ToArray()
                 : expectedResults.OrderByDescending(s => s.SupportTaskReference).ToArray(),
             OneLoginIdVerificationRequestsSortByOption.Name => sortDirection == SortDirection.Ascending
