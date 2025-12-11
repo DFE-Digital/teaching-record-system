@@ -37,7 +37,7 @@ public class TeacherPensionsSupportTasks(HostFixture hostFixture) : TestBase(hos
         await page.GoToTeacherPensionsSupportTasks();
         await page.AssertOnTeachersPensionsSupportTasksPageAsync();
 
-        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.LastName}")}");
+        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.MiddleName} {person.LastName}")}");
         await page.AssertOnTeachersPensionsSupportTaskMatchesPageAsync(supportTask.SupportTaskReference);
 
         await page.CheckAsync("label:text-is('Keep it as a separate record')");
@@ -86,7 +86,7 @@ public class TeacherPensionsSupportTasks(HostFixture hostFixture) : TestBase(hos
         await page.GoToTeacherPensionsSupportTasks();
         await page.AssertOnTeachersPensionsSupportTasksPageAsync();
 
-        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.LastName}")}");
+        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.MiddleName} {person.LastName}")}");
         await page.AssertOnTeachersPensionsSupportTaskMatchesPageAsync(supportTask.SupportTaskReference);
 
         await page.CheckAsync("label:text-is('Keep it as a separate record')");
@@ -134,7 +134,7 @@ public class TeacherPensionsSupportTasks(HostFixture hostFixture) : TestBase(hos
         await page.GoToTeacherPensionsSupportTasks();
         await page.AssertOnTeachersPensionsSupportTasksPageAsync();
 
-        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.LastName}")}");
+        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.MiddleName} {person.LastName}")}");
         await page.AssertOnTeachersPensionsSupportTaskMatchesPageAsync(supportTask.SupportTaskReference);
 
         await page.CheckAsync("label:text-is('Merge it with Record A')");
@@ -184,7 +184,7 @@ public class TeacherPensionsSupportTasks(HostFixture hostFixture) : TestBase(hos
         await page.GoToTeacherPensionsSupportTasks();
         await page.AssertOnTeachersPensionsSupportTasksPageAsync();
 
-        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.LastName}")}");
+        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.MiddleName} {person.LastName}")}");
         await page.AssertOnTeachersPensionsSupportTaskMatchesPageAsync(supportTask.SupportTaskReference);
 
         await page.CheckAsync("label:text-is('Merge it with Record A')");
