@@ -97,7 +97,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var supportTasks = new[] { supportTask1, supportTask2 };
         var expectedResultsOrderedByReference = supportTasks.OrderBy(s => s.SupportTaskReference).ToArray();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={OneLoginIdVerificationRequestsSortByOption.SupportTaskReference}&sortDirection={sortDirection}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?sortBy={OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference}&sortDirection={sortDirection}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -119,13 +119,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.Name, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.Name, SortDirection.Descending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.RequestedOn, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.RequestedOn, SortDirection.Descending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.Email, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.Email, SortDirection.Descending)]
-    public async Task Get_OrderListByOption_OrdersList(OneLoginIdVerificationRequestsSortByOption sortBy, SortDirection sortDirection)
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Descending)]
+    public async Task Get_OrderListByOption_OrdersList(OneLoginIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection)
     {
         // Arrange
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
@@ -153,16 +153,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var expectedResultsOrdered = sortBy switch
         {
-            OneLoginIdVerificationRequestsSortByOption.SupportTaskReference => (sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.SupportTaskReference)
                 : expectedResults.OrderByDescending(s => s.SupportTaskReference)).ToArray(),
-            OneLoginIdVerificationRequestsSortByOption.Name => (sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationSupportTasksSortByOption.Name => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName)
                 : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName)).ToArray(),
-            OneLoginIdVerificationRequestsSortByOption.Email => (sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationSupportTasksSortByOption.Email => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.EmailAddress)
                 : expectedResults.OrderByDescending(s => s.EmailAddress)).ToArray(),
-            OneLoginIdVerificationRequestsSortByOption.RequestedOn => (sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => (sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.CreatedOn)
                 : expectedResults.OrderByDescending(s => s.CreatedOn)).ToArray(),
             _ => expectedResults.ToArray()

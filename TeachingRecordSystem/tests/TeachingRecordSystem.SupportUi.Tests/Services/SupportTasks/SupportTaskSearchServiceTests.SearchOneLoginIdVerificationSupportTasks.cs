@@ -22,20 +22,20 @@ public partial class SupportTaskSearchServiceTests
     }
 
     [Theory]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.SupportTaskReference, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.Email, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.Name, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.RequestedOn, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.SupportTaskReference, SortDirection.Descending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.Email, SortDirection.Descending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.Name, SortDirection.Descending)]
-    [InlineData(OneLoginIdVerificationRequestsSortByOption.RequestedOn, SortDirection.Descending)]
-    public async Task SearchOneLoginIdVerificationSupportTasks_ReturnsOrderedResults(OneLoginIdVerificationRequestsSortByOption sortBy, SortDirection sortDirection)
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Descending)]
+    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
+    public async Task SearchOneLoginIdVerificationSupportTasks_ReturnsOrderedResults(OneLoginIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection)
     {
         // Arrange
         await CreateSupportTasks();
 
-        var options = new SearchOneLoginUserIdVerificationRequestsOptions(sortBy, sortDirection);
+        var options = new SearchOneLoginUserIdVerificationSupportTasksOptions(sortBy, sortDirection);
 
         var expectedResults = SupportTasks
             .Join(OneLoginUsers,
@@ -56,16 +56,16 @@ public partial class SupportTaskSearchServiceTests
         // Assert
         var expectedResultsOrdered = sortBy switch
         {
-            OneLoginIdVerificationRequestsSortByOption.SupportTaskReference => sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.SupportTaskReference).ToArray()
                 : expectedResults.OrderByDescending(s => s.SupportTaskReference).ToArray(),
-            OneLoginIdVerificationRequestsSortByOption.Name => sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationSupportTasksSortByOption.Name => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName).ToArray()
                 : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName).ToArray(),
-            OneLoginIdVerificationRequestsSortByOption.Email => sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationSupportTasksSortByOption.Email => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.EmailAddress).ToArray()
                 : expectedResults.OrderByDescending(s => s.EmailAddress).ToArray(),
-            OneLoginIdVerificationRequestsSortByOption.RequestedOn => sortDirection == SortDirection.Ascending
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.CreatedOn).ToArray()
                 : expectedResults.OrderByDescending(s => s.CreatedOn).ToArray(),
             _ => expectedResults.ToArray()

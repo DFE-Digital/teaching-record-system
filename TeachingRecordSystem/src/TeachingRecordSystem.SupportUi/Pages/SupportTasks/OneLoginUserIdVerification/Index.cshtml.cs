@@ -17,7 +17,7 @@ public class Index(SupportTaskSearchService searchService) : PageModel
 
     [BindProperty(SupportsGet = true)]
     [FromQuery]
-    public OneLoginIdVerificationRequestsSortByOption? SortBy { get; set; }
+    public OneLoginIdVerificationSupportTasksSortByOption? SortBy { get; set; }
 
     public IReadOnlyCollection<Result>? Results { get; set; }
 
@@ -25,8 +25,8 @@ public class Index(SupportTaskSearchService searchService) : PageModel
     {
         var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
 
-        var query = searchService.SearchOneLoginIdVerificationSupportTasks(new SearchOneLoginUserIdVerificationRequestsOptions(
-            SortBy ??= OneLoginIdVerificationRequestsSortByOption.SupportTaskReference,
+        var query = searchService.SearchOneLoginIdVerificationSupportTasks(new SearchOneLoginUserIdVerificationSupportTasksOptions(
+            SortBy ??= OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference,
             sortDirection));
 
         Results = (await query.ToListAsync())

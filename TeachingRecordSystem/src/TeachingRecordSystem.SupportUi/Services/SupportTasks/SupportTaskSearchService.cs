@@ -70,7 +70,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         bool SearchTextIsEmailAddress() => search.Contains('@');
     }
 
-    public IQueryable<SupportTask> SearchOneLoginIdVerificationSupportTasks(SearchOneLoginUserIdVerificationRequestsOptions options)
+    public IQueryable<SupportTask> SearchOneLoginIdVerificationSupportTasks(SearchOneLoginUserIdVerificationSupportTasksOptions options)
     {
         var query = dbContext.SupportTasks
             .Include(t => t.OneLoginUser)
@@ -78,12 +78,12 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         query = options.SortBy switch
         {
-            OneLoginIdVerificationRequestsSortByOption.SupportTaskReference => query.OrderBy(options.SortDirection, r => r.SupportTaskReference),
-            OneLoginIdVerificationRequestsSortByOption.Name => query
+            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => query.OrderBy(options.SortDirection, r => r.SupportTaskReference),
+            OneLoginIdVerificationSupportTasksSortByOption.Name => query
                 .OrderBy(options.SortDirection, r => (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName)
                 .ThenBy(options.SortDirection, r => (r.Data as OneLoginUserIdVerificationData)!.StatedLastName),
-            OneLoginIdVerificationRequestsSortByOption.Email => query.OrderBy(options.SortDirection, r => r.OneLoginUser!.EmailAddress),
-            OneLoginIdVerificationRequestsSortByOption.RequestedOn => query.OrderBy(options.SortDirection, r => r.CreatedOn),
+            OneLoginIdVerificationSupportTasksSortByOption.Email => query.OrderBy(options.SortDirection, r => r.OneLoginUser!.EmailAddress),
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => query.OrderBy(options.SortDirection, r => r.CreatedOn),
             _ => query
         };
 
