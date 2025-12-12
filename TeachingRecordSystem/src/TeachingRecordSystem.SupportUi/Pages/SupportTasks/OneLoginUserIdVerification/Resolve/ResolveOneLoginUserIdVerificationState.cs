@@ -20,6 +20,10 @@ public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
     public bool? Verified { get; set; }
 
     public Guid? MatchedPersonId { get; set; }
+
+    public OneLoginIdVerificationRejectReason? RejectReason { get; set; }
+
+    public string? RejectionAdditionalDetails { get; set; }
 }
 
 [UsedImplicitly]
