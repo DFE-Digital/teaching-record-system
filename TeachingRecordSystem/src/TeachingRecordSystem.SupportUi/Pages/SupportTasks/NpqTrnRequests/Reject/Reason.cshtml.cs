@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,6 +8,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Rejec
 [Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance]
 public class ReasonModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private readonly InlineValidator<ReasonModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.RejectionReason)
+            .NotNull().WithMessage("Select a reason for rejecting this request")
+    };
+
     public string PersonName => StringHelper.JoinNonEmpty(' ', RequestData!.Name);
 
     public TrnRequestMetadata? RequestData { get; set; }
@@ -22,7 +27,6 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator) : PageModel
     public bool FromCheckAnswers { get; init; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason for rejecting this request")]
     public RejectionReasonOption? RejectionReason { get; set; }
 
     public void OnGet()
@@ -32,10 +36,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

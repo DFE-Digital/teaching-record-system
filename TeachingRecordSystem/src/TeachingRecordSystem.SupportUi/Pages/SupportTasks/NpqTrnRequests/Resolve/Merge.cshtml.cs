@@ -9,6 +9,18 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resol
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
 public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
+    private readonly InlineValidator<MergeModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.DateOfBirthSource)
+            .NotNull().When(m => m.DateOfBirth!.Different).WithMessage("Select a date of birth"),
+        v => v.RuleFor(m => m.EmailAddressSource)
+            .NotNull().When(m => m.EmailAddress!.Different).WithMessage("Select an email"),
+        v => v.RuleFor(m => m.NationalInsuranceNumberSource)
+            .NotNull().When(m => m.NationalInsuranceNumber!.Different).WithMessage("Select a National Insurance number"),
+        v => v.RuleFor(m => m.GenderSource)
+            .NotNull().When(m => m.Gender!.Different).WithMessage("Select a gender")
+    };
+
     public string? PersonName { get; set; }
 
     public string? SourceApplicationUserName { get; set; }
@@ -48,30 +60,7 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (DateOfBirth!.Different && DateOfBirthSource is null)
-        {
-            ModelState.AddModelError(nameof(DateOfBirthSource), "Select a date of birth");
-        }
-
-        if (EmailAddress!.Different && EmailAddressSource is null)
-        {
-            ModelState.AddModelError(nameof(EmailAddressSource), "Select an email");
-        }
-
-        if (NationalInsuranceNumber!.Different && NationalInsuranceNumberSource is null)
-        {
-            ModelState.AddModelError(nameof(NationalInsuranceNumberSource), "Select a National Insurance number");
-        }
-
-        if (Gender!.Different && GenderSource is null)
-        {
-            ModelState.AddModelError(nameof(GenderSource), "Select a gender");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
