@@ -33,7 +33,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
-        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details";
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details?createRecord=True";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

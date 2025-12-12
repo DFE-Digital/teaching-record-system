@@ -9,7 +9,7 @@
 @section BeforeContent {
     <govuk-back-link href="@(Model.FromCheckAnswers ?
         LinkGenerator.SupportTasks.NpqTrnRequests.Resolve.CheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId) :
-        LinkGenerator.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference))" />
+        LinkGenerator.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference, createRecord: true))" />
 }
 
 <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">

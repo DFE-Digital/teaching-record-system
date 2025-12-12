@@ -16,10 +16,10 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator) : PageModel
     public JourneyInstance<RejectNpqTrnRequestState>? JourneyInstance { get; set; }
 
     [FromRoute]
-    public string SupportTaskReference { get; set; } = null!;
+    public string SupportTaskReference { get; init; } = null!;
 
     [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    public bool FromCheckAnswers { get; init; }
 
     [BindProperty]
     [Required(ErrorMessage = "Select a reason for rejecting this request")]
