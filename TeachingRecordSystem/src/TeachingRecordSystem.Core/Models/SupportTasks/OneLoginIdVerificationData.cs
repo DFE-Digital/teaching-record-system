@@ -15,6 +15,8 @@ public record OneLoginUserIdVerificationData : ISupportTaskData
     public bool? Verified { get; init; }
     public Guid? PersonId { get; init; }
     public OneLoginUserIdVerificationOutcome Outcome { get; init; }
+    public OneLoginIdVerificationRejectReason? RejectReason { get; init; }
+    public string? RejectionAdditionalDetails { get; init; }
 }
 
 public enum OneLoginUserIdVerificationOutcome
