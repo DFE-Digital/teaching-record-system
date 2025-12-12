@@ -169,7 +169,7 @@ jobs:
 
       - name: Restore cached packages
         id: cache-packages-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             ~/.nuget/packages
@@ -181,7 +181,7 @@ jobs:
 
       - name: Cache restored packages
         id: cache-packages-save
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             ~/.nuget/packages

@@ -40,7 +40,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get cached packages
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             ~/.nuget/packages
