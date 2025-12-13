@@ -7,7 +7,7 @@
 @section BeforeContent {
     <govuk-back-link href="@(Model.FromCheckAnswers ?
         LinkGenerator.SupportTasks.NpqTrnRequests.Reject.CheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId) :
-        LinkGenerator.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference))" />
+        LinkGenerator.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference, createRecord: false))" />
 }
 
 <div class="govuk-grid-row">

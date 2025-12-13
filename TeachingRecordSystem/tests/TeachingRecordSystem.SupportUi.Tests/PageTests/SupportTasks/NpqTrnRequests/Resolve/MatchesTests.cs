@@ -44,7 +44,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         }
         else
         {
-            Assert.Equal($"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/{expectedBackLink}", doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+            Assert.Equal($"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/{expectedBackLink}?createRecord=True", doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
         }
 
     }

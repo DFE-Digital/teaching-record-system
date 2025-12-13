@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "Check details before creating record";
 
-    var backLink = LinkGenerator.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference!);
+    var backLink = LinkGenerator.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference!, createRecord: true);
     var confirmButtonLabel = "Confirm and create record";
 }
 

@@ -27,7 +27,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
             state,
             new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
-        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details";
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details?createRecord=False";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
