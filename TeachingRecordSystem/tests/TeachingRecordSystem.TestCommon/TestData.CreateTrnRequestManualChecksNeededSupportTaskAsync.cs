@@ -5,6 +5,36 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
+    public async Task<SupportTask> CreateTrnRequestManualChecksNeededSupportTaskAsync(
+        Guid? applicationUserId = null,
+        SupportTaskStatus status = SupportTaskStatus.Open,
+        DateTime? createdOn = null,
+        Action<CreateApiTrnRequestSupportTaskBuilder>? configureApiTrnRequest = null)
+    {
+        var matchedPerson = await CreatePersonAsync(p => p.WithEmailAddress(GenerateUniqueEmail()).WithAlert().WithQts().WithEyts());
+
+        if (applicationUserId is null)
+        {
+            var applicationUser = await CreateApplicationUserAsync();
+            applicationUserId = applicationUser.UserId;
+        }
+
+        (var apiSupportTask, _, _) = await CreateResolvedApiTrnRequestSupportTaskAsync(
+            applicationUserId.Value,
+            matchedPerson.Person,
+            t =>
+            {
+                t.WithTrnRequestStatus(TrnRequestStatus.Pending);
+                configureApiTrnRequest?.Invoke(t);
+            });
+
+        return await CreateTrnRequestManualChecksNeededSupportTaskAsync(
+            applicationUserId.Value,
+            apiSupportTask.TrnRequestMetadata!.RequestId,
+            status,
+            createdOn);
+    }
+
     public Task<SupportTask> CreateTrnRequestManualChecksNeededSupportTaskAsync(
         Guid trnRequestApplicationUserId,
         string trnRequestId,
@@ -21,7 +51,7 @@ public partial class TestData
                 trnRequestApplicationUserId,
                 trnRequestId,
                 SystemUser.SystemUserId,
-                createdOn ?? Clock.UtcNow,
+                (createdOn ?? Clock.UtcNow).ToUniversalTime(),
                 out var createdEvent);
             task.Status = status;
 

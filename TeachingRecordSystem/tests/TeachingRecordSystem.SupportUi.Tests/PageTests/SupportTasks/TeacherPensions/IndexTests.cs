@@ -1,29 +1,17 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
+using TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private static IElement[] GetResultRows(IHtmlDocument doc) =>
-        doc
-            .GetElementsByTagName("tbody")
-            .Single()
-            .GetElementsByClassName("govuk-table__row")
-            .ToArray();
-
-    private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
-        GetResultRows(doc)
-            .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
-            .ToArray();
-
     [Fact]
-    public async Task Get_NoPotentialDuplicateTasks_ReturnsNoResults()
+    public async Task Get_NoTasks_ShowsNoTasksMessage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/teacher-pensions?_f=1");
 
         // Act
@@ -31,433 +19,127 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
     }
 
     [Fact]
     public async Task Get_WithSupportTask_RendersResults()
     {
         // Arrange
-        var fileName = "SomeFileName.txt";
-        long integrationTransactionId = 1;
+        await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            fileName: "SomeFileName.txt",
+            integrationTransactionId: 1,
+            createdOn: Clock.UtcNow,
+            configurePerson: p => p.WithFirstName("John").WithMiddleName("Maynard").WithLastName("Smith").WithNationalInsuranceNumber());
 
-        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
-        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
-        var duplicatePerson2 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/teacher-pensions?_f=1");
-        var user = await TestData.CreateUserAsync();
-        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(duplicatePerson1.PersonId, duplicatePerson2.PersonId);
-                           s.WithLastName(person.LastName);
-                           s.WithFirstName(person.FirstName);
-                           s.WithMiddleName(person.MiddleName);
-                           s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
-                           s.WithGender(person.Gender);
-                           s.WithDateOfBirth(person.DateOfBirth);
-                           s.WithSupportTaskData(fileName, integrationTransactionId);
-                           s.WithCreatedOn(Clock.UtcNow);
-                       });
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var row = doc.GetElementByTestId($"task:{supportTask.SupportTaskReference}");
-        Assert.NotNull(row);
-        var nameContent = row.GetElementByTestId("name");
-        var fileNameContent = row.GetElementByTestId("filename");
-        var interfaceIdContent = row.GetElementByTestId("integration-transaction-id");
-        var createdOnContent = row.GetElementByTestId("created-on");
-        Assert.NotNull(nameContent);
-        Assert.NotNull(fileNameContent);
-        Assert.NotNull(interfaceIdContent);
-        Assert.NotNull(createdOnContent);
-        Assert.Contains($"{person!.FirstName!} {person!.LastName!}", nameContent.TextContent);
-        Assert.Equal(fileName!, fileNameContent.TextContent);
-        Assert.Equal(integrationTransactionId.ToString(), interfaceIdContent.TextContent);
-        Assert.Equal($"{Clock.UtcNow.ToString("dd MMM yyyy")}", createdOnContent.TextContent);
+
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
+
+        var resultRow = GetResultRows(doc).FirstOrDefault();
+        Assert.NotNull(resultRow);
+
+        AssertRowHasContent("name", "John Maynard Smith");
+        AssertRowHasContent("filename", "SomeFileName.txt");
+        AssertRowHasContent("integration-transaction-id", "1");
+        AssertRowHasContent("created-on", Clock.UtcNow.ToString("dd MMM yyyy"));
+
+        void AssertRowHasContent(string testId, string expectedText)
+        {
+            var column = resultRow.GetElementByTestId(testId);
+            Assert.NotNull(column);
+            Assert.Equal(expectedText, column.TrimmedText());
+        }
     }
 
-
-    [Fact]
-    public async Task Get_NoSortParametersSpecified_ShowsTasksOrderedByCreatedOnAscending()
+    [Theory]
+    [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.Name, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.Name, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.Filename, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.Filename, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    public async Task Get_SortBy_ShowsRequestsInCorrectOrder(TeachersPensionsPotentialDuplicatesSortByOption sortBy, SortDirection sortDirection, string[] taskKeys)
     {
         // Arrange
-        var person1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
-        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
-        var user = await TestData.CreateUserAsync();
-        var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
-        var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/teacher-pensions?_f=1");
-        var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person1Duplicate.PersonId);
-                           s.WithLastName(person1.LastName);
-                           s.WithFirstName(person1.FirstName);
-                           s.WithMiddleName(person1.MiddleName);
-                           s.WithNationalInsuranceNumber(person1.NationalInsuranceNumber);
-                           s.WithGender(person1.Gender);
-                           s.WithDateOfBirth(person1.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow);
-                       });
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+                createdOn: new DateTime(2025, 1, 1),
+                fileName: "zzzzzz.csv",
+                integrationTransactionId: 100,
+                configurePerson: p => p
+                    .WithFirstName("Zavier")
+                    .WithDateOfBirth(new(2025, 1, 1))),
 
-        var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person2.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person2Duplicate.PersonId);
-                           s.WithLastName(person2.LastName);
-                           s.WithFirstName(person2.FirstName);
-                           s.WithMiddleName(person2.MiddleName);
-                           s.WithNationalInsuranceNumber(person2.NationalInsuranceNumber);
-                           s.WithGender(person2.Gender);
-                           s.WithDateOfBirth(person2.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow.AddDays(-10));
-                       });
+            ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+                createdOn: new DateTime(2023, 10, 10),
+                fileName: "aaaaa.txt",
+                integrationTransactionId: 2,
+                configurePerson: p => p
+                    .WithFirstName("Aaron")
+                    .WithDateOfBirth(new(2023, 10, 10)))
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/teacher-pensions/?sortBy={sortBy}&sortDirection={sortDirection}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-                result1 => Assert.Equal(supportTask2.SupportTaskReference, result1),
-                result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
+        Assert.Equal(taskKeys, GetResultTaskKeys(doc, tasks));
     }
 
     [Fact]
-    public async Task Get_WithCreatedOnDescending_ShowsTasksOrderedByCreatedOnDescending()
+    public async Task Get_ShowsPageOfResults()
     {
         // Arrange
-        var person1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
-        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
-        var user = await TestData.CreateUserAsync();
-        var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
-        var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.CreatedOn}&sortDirection={SortDirection.Descending}");
-        var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person1Duplicate.PersonId);
-                           s.WithLastName(person1.LastName);
-                           s.WithFirstName(person1.FirstName);
-                           s.WithMiddleName(person1.MiddleName);
-                           s.WithNationalInsuranceNumber(person1.NationalInsuranceNumber);
-                           s.WithGender(person1.Gender);
-                           s.WithDateOfBirth(person1.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow.AddDays(-10));
-                       });
+        var pageSize = 20;
+        var page = 2;
 
-        var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person2.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person2Duplicate.PersonId);
-                           s.WithLastName(person2.LastName);
-                           s.WithFirstName(person2.FirstName);
-                           s.WithMiddleName(person2.MiddleName);
-                           s.WithNationalInsuranceNumber(person2.NationalInsuranceNumber);
-                           s.WithGender(person2.Gender);
-                           s.WithDateOfBirth(person2.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow);
-                       });
+        // Create enough tasks to create 3 pages
+        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
+                .ToAsyncEnumerable()
+                .SelectAwait(async _ => await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync()));
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/teacher-pensions/?pageNumber={page}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-                result1 => Assert.Equal(supportTask2.SupportTaskReference, result1),
-                result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
+        Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
-    [Fact]
-    public async Task Get_WithNameSortOrder_ShowsTasksOrderedByNameOnAscending()
-    {
-        // Arrange
-        var person1FirstName = "Alan";
-        var person2FirstName = "Terry";
-        var person1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person1FirstName));
-        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
-        var user = await TestData.CreateUserAsync();
-        var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
-        var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.Name}&sortDirection={SortDirection.Ascending}");
-        var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person1Duplicate.PersonId);
-                           s.WithLastName(person1.LastName);
-                           s.WithFirstName(person1.FirstName);
-                           s.WithMiddleName(person1.MiddleName);
-                           s.WithNationalInsuranceNumber(person1.NationalInsuranceNumber);
-                           s.WithGender(person1.Gender);
-                           s.WithDateOfBirth(person1.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow);
-                       });
+    private static IElement[] GetResultRows(IHtmlDocument document) =>
+        document
+            .GetElementByTestId("results")!
+            .GetElementsByClassName("govuk-table__row")
+            .ToArray();
 
-        Clock.Advance();
+    private static string[] GetResultTaskReferences(IHtmlDocument document) =>
+        GetResultRows(document)
+            .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
+            .ToArray();
 
-        var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person2.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person2Duplicate.PersonId);
-                           s.WithLastName(person2.LastName);
-                           s.WithFirstName(person2.FirstName);
-                           s.WithMiddleName(person2.MiddleName);
-                           s.WithNationalInsuranceNumber(person2.NationalInsuranceNumber);
-                           s.WithGender(person2.Gender);
-                           s.WithDateOfBirth(person2.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow.AddDays(-10));
-                       });
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-                result1 => Assert.Equal(supportTask1.SupportTaskReference, result1),
-                result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
-    }
-
-    [Fact]
-    public async Task Get_WithFilenameSortOrder_ShowsTasksOrderedByFilenameDescending()
-    {
-        // Arrange
-        var person1FirstName = "Alan";
-        var person2FirstName = "Terry";
-        var user = await TestData.CreateUserAsync();
-        var person1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person1FirstName));
-        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
-        var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
-        var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.Filename}&sortDirection={SortDirection.Descending}");
-        var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person1Duplicate.PersonId);
-                           s.WithLastName(person1.LastName);
-                           s.WithFirstName(person1.FirstName);
-                           s.WithMiddleName(person1.MiddleName);
-                           s.WithNationalInsuranceNumber(person1.NationalInsuranceNumber);
-                           s.WithGender(person1.Gender);
-                           s.WithDateOfBirth(person1.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow);
-                           s.WithSupportTaskData("zzzzzz.csv", 0);
-                       });
-
-        var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person2.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person2Duplicate.PersonId);
-                           s.WithLastName(person2.LastName);
-                           s.WithFirstName(person2.FirstName);
-                           s.WithMiddleName(person2.MiddleName);
-                           s.WithNationalInsuranceNumber(person2.NationalInsuranceNumber);
-                           s.WithGender(person2.Gender);
-                           s.WithDateOfBirth(person2.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow.AddDays(-10));
-                           s.WithSupportTaskData("aaaaa.txt", 0);
-                       });
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-                result1 => Assert.Equal(supportTask1.SupportTaskReference, result1),
-                result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
-    }
-
-    [Fact]
-    public async Task Get_WithFilenameSortOrder_ShowsTasksOrderedByFilenamAscending()
-    {
-        // Arrange
-        var person1FirstName = "Alan";
-        var person2FirstName = "Terry";
-        var user = await TestData.CreateUserAsync();
-        var person1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person1FirstName));
-        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
-        var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
-        var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.Filename}&sortDirection={SortDirection.Ascending}");
-        var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person1Duplicate.PersonId);
-                           s.WithLastName(person1.LastName);
-                           s.WithFirstName(person1.FirstName);
-                           s.WithMiddleName(person1.MiddleName);
-                           s.WithNationalInsuranceNumber(person1.NationalInsuranceNumber);
-                           s.WithGender(person1.Gender);
-                           s.WithDateOfBirth(person1.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow);
-                           s.WithSupportTaskData("zzzzzz.csv", 0);
-                       });
-
-        var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person2.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person2Duplicate.PersonId);
-                           s.WithLastName(person2.LastName);
-                           s.WithFirstName(person2.FirstName);
-                           s.WithMiddleName(person2.MiddleName);
-                           s.WithNationalInsuranceNumber(person2.NationalInsuranceNumber);
-                           s.WithGender(person2.Gender);
-                           s.WithDateOfBirth(person2.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow.AddDays(-10));
-                           s.WithSupportTaskData("aaaaa.txt", 0);
-                       });
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-                result1 => Assert.Equal(supportTask2.SupportTaskReference, result1),
-                result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
-    }
-
-    [Fact]
-    public async Task Get_WithInterfaceIdSortOrder_ShowsTasksOrderedByInterfaceIdDescending()
-    {
-        // Arrange
-        var person1FirstName = "Alan";
-        var person2FirstName = "Terry";
-        var user = await TestData.CreateUserAsync();
-        var person1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person1FirstName));
-        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
-        var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
-        var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.InterfaceId}&sortDirection={SortDirection.Descending}");
-        var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person1Duplicate.PersonId);
-                           s.WithLastName(person1.LastName);
-                           s.WithFirstName(person1.FirstName);
-                           s.WithMiddleName(person1.MiddleName);
-                           s.WithNationalInsuranceNumber(person1.NationalInsuranceNumber);
-                           s.WithGender(person1.Gender);
-                           s.WithDateOfBirth(person1.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow);
-                           s.WithSupportTaskData("zzzzzz.csv", 100);
-                       });
-
-        var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person2.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person2Duplicate.PersonId);
-                           s.WithLastName(person2.LastName);
-                           s.WithFirstName(person2.FirstName);
-                           s.WithMiddleName(person2.MiddleName);
-                           s.WithNationalInsuranceNumber(person2.NationalInsuranceNumber);
-                           s.WithGender(person2.Gender);
-                           s.WithDateOfBirth(person2.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow.AddDays(-10));
-                           s.WithSupportTaskData("aaaaa.txt", 2);
-                       });
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-                result1 => Assert.Equal(supportTask1.SupportTaskReference, result1),
-                result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
-    }
-
-    [Fact]
-    public async Task Get_WithInterfaceIdSortOrder_ShowsTasksOrderedByInterfaceIdAscending()
-    {
-        // Arrange
-        var person1FirstName = "Alan";
-        var person2FirstName = "Terry";
-        var user = await TestData.CreateUserAsync();
-        var person1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person1FirstName));
-        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithFirstName(person2FirstName));
-        var person1Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person1.FirstName).WithLastName(person1.LastName).WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
-        var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.InterfaceId}&sortDirection={SortDirection.Ascending}");
-        var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person1Duplicate.PersonId);
-                           s.WithLastName(person1.LastName);
-                           s.WithFirstName(person1.FirstName);
-                           s.WithMiddleName(person1.MiddleName);
-                           s.WithNationalInsuranceNumber(person1.NationalInsuranceNumber);
-                           s.WithGender(person1.Gender);
-                           s.WithDateOfBirth(person1.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow);
-                           s.WithSupportTaskData("zzzzzz.csv", 100);
-                       });
-
-        var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person2.PersonId,
-                       user.UserId,
-                       s =>
-                       {
-                           s.WithMatchedPersons(person2Duplicate.PersonId);
-                           s.WithLastName(person2.LastName);
-                           s.WithFirstName(person2.FirstName);
-                           s.WithMiddleName(person2.MiddleName);
-                           s.WithNationalInsuranceNumber(person2.NationalInsuranceNumber);
-                           s.WithGender(person2.Gender);
-                           s.WithDateOfBirth(person2.DateOfBirth);
-                           s.WithCreatedOn(Clock.UtcNow.AddDays(-10));
-                           s.WithSupportTaskData("aaaaa.txt", 2);
-                       });
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-                result1 => Assert.Equal(supportTask2.SupportTaskReference, result1),
-                result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
-    }
+    private static string[] GetResultTaskKeys(IHtmlDocument document, SupportTaskLookup tasks) =>
+        GetResultTaskReferences(document)
+            .Select(tasks.GetKeyFor)
+            .ToArray();
 }

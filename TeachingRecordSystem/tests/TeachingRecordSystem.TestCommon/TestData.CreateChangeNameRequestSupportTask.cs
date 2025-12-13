@@ -6,6 +6,18 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
+    public async Task<SupportTask> CreateChangeNameRequestSupportTaskAsync(
+       Action<CreateChangeNameRequestSupportTaskBuilder>? configure = null,
+       Action<CreatePersonBuilder>? configurePerson = null)
+    {
+        var person = await CreatePersonAsync(configurePerson);
+
+        configure ??= b => { };
+        configure = b => configure(b.WithLastName(GenerateChangedLastName(person.LastName)));
+
+        return await CreateChangeNameRequestSupportTaskAsync(person.PersonId, configure);
+    }
+
     public Task<SupportTask> CreateChangeNameRequestSupportTaskAsync(
         Guid personId,
         Action<CreateChangeNameRequestSupportTaskBuilder>? configure = null)
@@ -99,7 +111,7 @@ public partial class TestData
             var evidenceFileName = _evidenceFileName.ValueOr("evidence-file.jpg");
             var emailAddress = _hasEmailAddress ? _emailAddress.ValueOr(testData.GenerateUniqueEmail) : null;
             var status = _status.ValueOr(SupportTaskStatus.Open);
-            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow).ToUniversalTime();
 
             var data = new ChangeNameRequestData
             {

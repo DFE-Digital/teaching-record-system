@@ -5,6 +5,43 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.TestCommon;
 public partial class TestData
 {
+    public async Task<SupportTask> CreateTeacherPensionsPotentialDuplicateTaskAsync(
+        Guid? applicationUserId = null,
+        string fileName = "filename.csv",
+        long integrationTransactionId = 1,
+        DateTime? createdOn = null,
+        Action<CreatePersonBuilder>? configurePerson = null)
+    {
+        configurePerson ??= p => { };
+
+        if (applicationUserId is null)
+        {
+            var applicationUser = await CreateApplicationUserAsync();
+            applicationUserId = applicationUser.UserId;
+        }
+
+        var person = await CreatePersonAsync(x => configurePerson(x));
+        var duplicatePerson1 = await CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
+        var user = await CreateUserAsync();
+        var supportTask = await CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            user.UserId,
+            s =>
+            {
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
+                s.WithLastName(person.LastName);
+                s.WithFirstName(person.FirstName);
+                s.WithMiddleName(person.MiddleName);
+                s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
+                s.WithGender(person.Gender);
+                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithSupportTaskData(fileName, integrationTransactionId);
+                s.WithCreatedOn((createdOn ?? Clock.UtcNow).ToUniversalTime());
+            });
+
+        return supportTask;
+    }
+
     public Task<SupportTask> CreateTeacherPensionsPotentialDuplicateTaskAsync(
        Guid personId,
        Guid userId,

@@ -1,4 +1,5 @@
 @page "/support-tasks/change-requests"
+@using TeachingRecordSystem.SupportUi.Services.SupportTasks
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.IndexModel
 @{
     ViewBag.Title = "Name and date of birth change requests";
@@ -13,86 +14,96 @@
         <span class="govuk-caption-l">Record management</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
     </div>
-    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
-        <filter-layout>
-            <filter-layout-filter>
-                <filter>
-                    <input type="hidden" asp-for="@Model.SortBy" />
-                    <input type="hidden" asp-for="@Model.SortDirection" />
-                    @* This flag is so we can track when the filters have been applied vs a fresh page load *@
-                    <input type="hidden" name="_f" value="true" />
 
-                    <filter-options>
-                        <govuk-input for="Search" label-class="govuk-label--s" spellcheck="false" type="search" />
+    @if (Model.TotalRequestCount == 0)
+    {
+        <div class="govuk-grid-column-two-thirds" data-testid="no-tasks-message">
+            <p class="govuk-body-l govuk-!-font-weight-bold">There are no outstanding tasks</p>
+        </div>
+    }
+    else
+    {
+        <div class="govuk-grid-column-full-from-desktop">
+            <filter-layout>
+                <filter-layout-filter>
+                    <filter>
+                        <input type="hidden" asp-for="@Model.SortBy" />
+                        <input type="hidden" asp-for="@Model.SortDirection" />
+                        @* This flag is so we can track when the filters have been applied vs a fresh page load *@
+                        <input type="hidden" name="_f" value="true" />
 
-                        <govuk-checkboxes for="ChangeRequestTypes" class="govuk-checkboxes--small">
-                            <govuk-checkboxes-fieldset>
-                                <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">
-                                    Type of request
-                                </govuk-checkboxes-fieldset-legend>
-                                <govuk-checkboxes-item value="@SupportTaskType.ChangeDateOfBirthRequest">
-                                    Date of birth (@Model.DateOfBirthChangeRequestCount)
-                                </govuk-checkboxes-item>
-                                <govuk-checkboxes-item value="@SupportTaskType.ChangeNameRequest">
-                                    Name (@Model.NameChangeRequestCount)
-                                </govuk-checkboxes-item>
-                            </govuk-checkboxes-fieldset>
-                        </govuk-checkboxes>
+                        <filter-options>
+                            <govuk-input for="Search" label-class="govuk-label--s" spellcheck="false" type="search" />
 
-                        <div class="govuk-button-group">
-                            <govuk-button type="submit">Apply filters</govuk-button>
-                            <a class="govuk-link govuk-link--no-visited-state" href="@LinkGenerator.SupportTasks.ChangeRequests.Index()">Clear filters</a>
-                        </div>
-                    </filter-options>
-                </filter>
-            </filter-layout-filter>
-            <filter-layout-content>
-                @if (Model.Results!.Count == 0)
-                {
-                    <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-tasks-message">
-                        No matching requests found
-                    </p>
-                    <p class="govuk-body-m">Try searching again with different details.</p>
-                }
-                else
-                {
-                    <table class="govuk-table">
-                        <thead class="govuk-table__head">
-                            <tr class="govuk-table__row">
-                                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                                    sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.Name ? Model.SortDirection : null)"
-                                    link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.Name, sortDirection: direction))">
-                                    Name
-                                </th>
-                                <th scope="col" class="govuk-table__header trs-!-width-150"
-                                    sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
-                                    link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.RequestedOn, sortDirection: direction))">
-                                    Requested on
-                                </th>
-                                <th scope="col" class="govuk-table__header trs-!-width-150"
-                                    sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.ChangeType ? Model.SortDirection : null)"
-                                    link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.ChangeType, sortDirection: direction))">
-                                    Type
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="govuk-table__body">
-                            @foreach (var result in Model.Results)
-                            {
-                                <tr class="govuk-table__row" data-reference="@result.SupportTaskReference">
-                                    <th scope="row" class="govuk-table__header" data-testid="name">
-                                        <a href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Index(result.SupportTaskReference)" class="govuk-link">@result.Name</a>
+                            <govuk-checkboxes for="ChangeRequestTypes" class="govuk-checkboxes--small">
+                                <govuk-checkboxes-fieldset>
+                                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">
+                                        Type of request
+                                    </govuk-checkboxes-fieldset-legend>
+                                    <govuk-checkboxes-item value="@SupportTaskType.ChangeDateOfBirthRequest" checked="true">
+                                        Date of birth (@Model.DateOfBirthChangeRequestCount)
+                                    </govuk-checkboxes-item>
+                                    <govuk-checkboxes-item value="@SupportTaskType.ChangeNameRequest" checked="true">
+                                        Name (@Model.NameChangeRequestCount)
+                                    </govuk-checkboxes-item>
+                                </govuk-checkboxes-fieldset>
+                            </govuk-checkboxes>
+
+                            <div class="govuk-button-group">
+                                <govuk-button type="submit">Apply filters</govuk-button>
+                                <a class="govuk-link govuk-link--no-visited-state" href="@LinkGenerator.SupportTasks.ChangeRequests.Index()">Clear filters</a>
+                            </div>
+                        </filter-options>
+                    </filter>
+                </filter-layout-filter>
+                <filter-layout-content>
+                    @if (Model.Results!.TotalItemCount == 0)
+                    {
+                        <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
+                            No matching requests found
+                        </p>
+                        <p class="govuk-body-m">Try searching again with different details.</p>
+                    }
+                    else
+                    {
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                        sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.Name ? Model.SortDirection : null)"
+                                        link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.Name, sortDirection: direction))">
+                                        Name
                                     </th>
-                                    <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
-                                    <td class="govuk-table__cell" data-testid="change-type">@(result.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest ? "Date of birth" : "Name")</td>
+                                    <th scope="col" class="govuk-table__header trs-!-width-150"
+                                        sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
+                                        link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.RequestedOn, sortDirection: direction))">
+                                        Requested on
+                                    </th>
+                                    <th scope="col" class="govuk-table__header trs-!-width-150"
+                                        sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.ChangeType ? Model.SortDirection : null)"
+                                        link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.ChangeType, sortDirection: direction))">
+                                        Type
+                                    </th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </filter-layout-content>
-        </filter-layout>
+                            </thead>
+                            <tbody class="govuk-table__body" data-testid="results">
+                                @foreach (var result in Model.Results)
+                                {
+                                    <tr class="govuk-table__row" data-reference="@result.SupportTaskReference">
+                                        <th scope="row" class="govuk-table__header" data-testid="name">
+                                            <a href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Index(result.SupportTaskReference)" class="govuk-link">@result.Name</a>
+                                        </th>
+                                        <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                                        <td class="govuk-table__cell" data-testid="change-type">@(result.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest ? "Date of birth" : "Name")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </filter-layout-content>
+            </filter-layout>
 
-        <partial name="_Pagination" model=@Model.Pagination />
-    </div>
+            <partial name="_Pagination" model=@Model.Pagination />
+        </div>
+    }
 </div>

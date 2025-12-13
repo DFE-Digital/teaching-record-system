@@ -1,4 +1,5 @@
 @page "/support-tasks/npq-trn-requests"
+@using TeachingRecordSystem.SupportUi.Services.SupportTasks
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Index
 @{
     ViewBag.Title = "NPQ TRN requests";
@@ -12,78 +13,89 @@
     <div class="govuk-grid-column-two-thirds">
         <span class="govuk-caption-l">TRN requests</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-
-        <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" method="get" asp-antiforgery="false">
-            <div class="govuk-!-margin-bottom-4">
-                <govuk-input for="Search" type="search" autocomplete="off">
-                    <govuk-input-label>
-                        <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
-                    </govuk-input-label>
-                    <govuk-input-hint>
-                        Enter a name, email address or request date, for example 31/3/2025
-                    </govuk-input-hint>
-                    <govuk-input-after-input>
-                        <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                    </govuk-input-after-input>
-                </govuk-input>
-            </div>
-        </form>
     </div>
 
-    <div class="govuk-grid-column-full" data-testid="results">
-        @if (Model.Results!.Count == 0)
-        {
-            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-tasks-message">
-                No matching requests found
-            </p>
-            <p class="govuk-body-m">Try searching again with different details</p>
-        }
-        else
-        {
-            <table class="govuk-table">
-                <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                        sort-direction="@(Model.SortBy == SortByOption.Name ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Name, direction))">
-                        Name
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == SortByOption.Email ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Email, direction))">
-                        Email
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-150"
-                        sort-direction="@(Model.SortBy == SortByOption.RequestedOn ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.RequestedOn, direction))">
-                        Requested on
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-150"
-                        sort-direction="@(Model.SortBy == SortByOption.PotentialDuplicate ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.PotentialDuplicate, direction))">
-                        Potential duplicate
-                    </th>
-                </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                @foreach (var result in Model.Results)
-                {
-                    (var tagValue, var tagColor) = result.PotentialDuplicate is true ? ("Yes", TagColor.Yellow) : ("No", TagColor.Green);
-                    <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                        <th scope="row" class="govuk-table__header" data-testid="name">
-                            <a href="@LinkGenerator.SupportTasks.NpqTrnRequests.Details(result.SupportTaskReference)" class="govuk-link">
-                                @result.FirstName @result.MiddleName @result.LastName
-                            </a>
-                        </th>
-                        <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
-                        <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</td>
-                        <td class="govuk-table__cell" data-testid="potential-duplicate"><tag color="@tagColor">@tagValue</tag></td>
-                    </tr>
-                }
-                </tbody>
-            </table>
+    @if (Model.TotalTaskCount == 0)
+    {
+        <div class="govuk-grid-column-two-thirds" data-testid="no-tasks-message">
+            <p class="govuk-body-l govuk-!-font-weight-bold">There are no outstanding tasks</p>
+        </div>
+    }
+    else
+    {
+        <div class="govuk-grid-column-two-thirds">
+            <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" method="get" asp-antiforgery="false">
+                <div class="govuk-!-margin-bottom-4">
+                    <govuk-input for="Search" type="search" autocomplete="off">
+                        <govuk-input-label>
+                            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
+                        </govuk-input-label>
+                        <govuk-input-hint>
+                            Enter a name, email address or request date, for example 31/3/2025
+                        </govuk-input-hint>
+                        <govuk-input-after-input>
+                            <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                        </govuk-input-after-input>
+                    </govuk-input>
+                </div>
+            </form>
+        </div>
 
-            <partial name="_Pagination" model=@Model.Pagination/>
-        }
-    </div>
+        <div class="govuk-grid-column-full">
+            @if (Model.Results!.TotalItemCount == 0)
+            {
+                <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
+                    No matching requests found
+                </p>
+                <p class="govuk-body-m">Try searching again with different details</p>
+            }
+            else
+            {
+                <table class="govuk-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.Name ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.Name, direction))">
+                                Name
+                            </th>
+                            <th scope="col" class="govuk-table__header"
+                                sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.Email ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.Email, direction))">
+                                Email
+                            </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.RequestedOn, direction))">
+                                Requested on
+                            </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == NpqTrnRequestsSortByOption.PotentialDuplicate ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, NpqTrnRequestsSortByOption.PotentialDuplicate, direction))">
+                                Potential duplicate
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body" data-testid="results">
+                    @foreach (var result in Model.Results)
+                    {
+                        (var tagValue, var tagColor) = result.PotentialDuplicate is true ? ("Yes", TagColor.Yellow) : ("No", TagColor.Green);
+                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                            <th scope="row" class="govuk-table__header" data-testid="name">
+                                <a href="@LinkGenerator.SupportTasks.NpqTrnRequests.Details(result.SupportTaskReference)" class="govuk-link">
+                                    @result.FirstName @result.MiddleName @result.LastName
+                                </a>
+                            </th>
+                            <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</td>
+                            <td class="govuk-table__cell" data-testid="potential-duplicate"><tag color="@tagColor">@tagValue</tag></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+
+                <partial name="_Pagination" model=@Model.Pagination/>
+            }
+        </div>
+    }
 </div>
