@@ -10,7 +10,7 @@ public static class LinkGeneratorExtensions
 
         if (journeyInstanceId?.UniqueKey is string journeyInstanceUniqueKey)
         {
-            url = QueryHelpers.AddQueryString(url, WebCommon.FormFlow.Constants.UniqueKeyQueryParameterName, journeyInstanceUniqueKey);
+            url = QueryHelpers.AddQueryString(url, Constants.UniqueKeyQueryParameterName, journeyInstanceUniqueKey);
         }
 
         return url;
