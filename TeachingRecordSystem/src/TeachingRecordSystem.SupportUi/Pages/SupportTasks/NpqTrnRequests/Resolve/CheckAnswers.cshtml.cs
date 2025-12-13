@@ -2,6 +2,9 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -17,7 +20,8 @@ public class CheckAnswersModel(
     SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
     IClock clock,
-    PersonChangeableAttributesService changedService) : ResolveNpqTrnRequestPageModel(dbContext)
+    PersonChangeableAttributesService changedService,
+    IBackgroundJobScheduler backgroundJobScheduler) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public string? SourceApplicationUserName { get; set; }
 
@@ -67,9 +71,10 @@ public class CheckAnswersModel(
 
         var processContext = new ProcessContext(ProcessType.NpqTrnRequestApproving, clock.UtcNow, User.GetUserId());
 
+        string? newTrn = null;
         if (CreatingNewRecord)
         {
-            await trnRequestService.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext);
+            newTrn = await trnRequestService.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext);
 
             selectedPersonAttributes = null;
         }
@@ -109,8 +114,33 @@ public class CheckAnswersModel(
             },
             processContext);
 
+        if (CreatingNewRecord)
+        {
+            if (!string.IsNullOrEmpty(trnRequest.EmailAddress))
+            {
+                var email = new Email
+                {
+                    EmailId = Guid.NewGuid(),
+                    TemplateId = EmailTemplateIds.TrnGeneratedForNpq,
+                    EmailAddress = trnRequest.EmailAddress,
+                    Personalization = new Dictionary<string, string>
+                    {
+                        { "first name", trnRequest.FirstName! },
+                        { "last name", trnRequest.LastName! },
+                        { "trn", newTrn! }
+                    },
+                };
+
+                await DbContext.Emails.AddAsync(email);
+                await DbContext.SaveChangesAsync();
+                await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
+            }
+        }
+
+        var emailMessage = CreatingNewRecord ? " and the user has been notified by email" : "";
+
         TempData.SetFlashSuccess(
-            $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed",
+            $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed{emailMessage}",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(trnRequest.ResolvedPersonId!.Value)));
 
         await JourneyInstance!.CompleteAsync();
