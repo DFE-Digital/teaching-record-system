@@ -48,7 +48,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventAndRedirects()
+    public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventSendsEmailAndRedirects()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -136,6 +136,21 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
             Assert.Equal(requestMetadata.NpqEvidenceFileName, actualEvent.RequestData?.NpqEvidenceFileName);
+        },
+        e2 =>
+        {
+            var actualEvent = Assert.IsType<LegacyEvents.EmailSentEvent>(e2);
+        });
+
+        // email is sent
+        await WithDbContextAsync(async dbContext =>
+        {
+            var email = await dbContext.Emails
+                .Where(e => e.EmailAddress == requestMetadata.EmailAddress)
+                .SingleOrDefaultAsync();
+            Assert.NotNull(email);
+            Assert.NotNull(email.SentOn);
+            Assert.Equal(EmailTemplateIds.TrnGeneratedForNpq, email.TemplateId);
         });
     }
 
@@ -161,7 +176,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
         Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);
         Assert.Equal(SupportTaskStatus.Closed, @event.SupportTask.Status);
-        Assert.Equal(NpqTrnRequestSupportTaskResolvedEventChanges.None, @event.Changes);
+        Assert.Equal(NpqTrnRequestSupportTaskResolvedEventChanges.Status, @event.Changes);
     }
 
     private void AssertPersonAttributesMatch(
