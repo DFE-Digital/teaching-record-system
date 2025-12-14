@@ -22,6 +22,12 @@ public abstract class CommonJourneyPage(
     [FromRoute]
     public Guid PersonId { get; set; }
     public string? PersonName { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public string? Trn { get; set; }
+    public Gender? Gender { get; set; }
+    public string? NationalInsuranceNumber { get; set; }
+    public string? EmailAddress { get; set; }
+    public PersonStatus? Status { get; set; }
 
     [FromRoute]
     public PersonStatus TargetStatus { get; set; }
@@ -51,6 +57,8 @@ public abstract class CommonJourneyPage(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+        Status = personInfo.Status;
+
 
         Person = await DbContext.Persons
             .IgnoreQueryFilters()
@@ -61,6 +69,12 @@ public abstract class CommonJourneyPage(
             context.Result = NotFound();
             return;
         }
+
+        NationalInsuranceNumber = Person.NationalInsuranceNumber;
+        Trn = Person.Trn;
+        Gender = Person.Gender;
+        DateOfBirth = Person.DateOfBirth;
+        EmailAddress = Person.EmailAddress;
 
         if (Person.Status == TargetStatus)
         {

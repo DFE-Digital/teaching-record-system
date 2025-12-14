@@ -218,6 +218,20 @@ public static class PageExtensions
         }
     }
 
+    public static async Task SelectProvideAdditionalInformationAsync(this IPage page, string testId, Enum provideAdditionalInformation, string? details = null)
+    {
+        var section = page.GetByTestId(testId);
+        var option = section.Locator($".govuk-radios__item:has(input[type='radio'][value='{provideAdditionalInformation}'])");
+        var radioButton = option.Locator("input");
+        await radioButton.ClickAsync();
+
+        if (details != null)
+        {
+            var reason = option.Locator($":scope + .govuk-radios__conditional textarea");
+            await reason.FillAsync(details);
+        }
+    }
+
     public static async Task SelectUploadEvidenceAsync(this IPage page, bool uploadFile, string? evidenceFileName = null)
     {
         var radioButton = page.GetByTestId("upload-evidence-options").Locator($"input[type='radio'][value='{uploadFile}']");

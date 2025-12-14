@@ -27,11 +27,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, reasonDetail);
+            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, reasonDetail);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, reasonDetail);
+            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, reasonDetail);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -151,11 +151,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, changeReasonDetails);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, changeReasonDetails);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, changeReasonDetails);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, changeReasonDetails);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -219,7 +219,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
     [Theory]
     [MemberData(nameof(GetAllStatuses))]
-    public async Task Post_AnotherReason_NoDetailAdded_ReturnsError(PersonStatus targetStatus)
+    public async Task Post_ProvideAdditionalInformation_NoDetailAdded_ReturnsError(PersonStatus targetStatus)
     {
         // Arrange
         var person = await CreatePersonToBecomeStatus(targetStatus);
@@ -235,11 +235,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -279,11 +279,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.ProblemWithTheRecord);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.ProblemWithTheRecord, ProvideMoreInformationOption.No);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake, ProvideMoreInformationOption.No);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -316,11 +316,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.ProblemWithTheRecord);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.ProblemWithTheRecord, ProvideMoreInformationOption.No);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake, ProvideMoreInformationOption.No);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -354,11 +354,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -407,11 +407,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -460,11 +460,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -501,11 +501,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, detail: null);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, detail: null);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -540,11 +540,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.RecordHolderDied);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.RecordHolderDied, ProvideMoreInformationOption.No);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake, ProvideMoreInformationOption.No);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -582,11 +582,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.RecordHolderDied);
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.RecordHolderDied, ProvideMoreInformationOption.No);
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake);
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake, ProvideMoreInformationOption.No);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -622,11 +622,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(DeactivateReasonOption.RecordHolderDied, "Unneccessary detail");
+            contentBuilder.WithDeactivateReason(DeactivateReasonOption.RecordHolderDied, ProvideMoreInformationOption.No, "Unneccessary detail");
         }
         else
         {
-            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake, "Unneccessary detail");
+            contentBuilder.WithReactivateReason(ReactivateReasonOption.DeactivatedByMistake, ProvideMoreInformationOption.No, "Unneccessary detail");
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
