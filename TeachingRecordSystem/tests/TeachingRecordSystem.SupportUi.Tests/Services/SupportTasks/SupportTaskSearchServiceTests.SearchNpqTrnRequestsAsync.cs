@@ -107,6 +107,10 @@ public partial class SupportTaskSearchServiceTests
     [Theory]
     [InlineData("20/01/2025")]
     [InlineData("20/1/2025")]
+    [InlineData("20 Jan 2025")]
+    [InlineData("20 January 2025")]
+    [InlineData("20 jan 2025")]
+    [InlineData("20 january 2025")]
     public async Task SearchNpqTrnRequestsAsync_SearchTextIsDate_ReturnsTasksCreatedOnDate(string searchText)
     {
         // Arrange
@@ -128,7 +132,8 @@ public partial class SupportTaskSearchServiceTests
 
     [Theory]
     [InlineData("1/20/2025")]
-    [InlineData("20 Jan 2025")]
+    [InlineData("20th Jan 2025")]
+    [InlineData("20th January 2025")]
     public async Task SearchNpqTrnRequestsAsync_SearchTextIsDateButInvalidFormat_DoesNotMatch(string searchText)
     {
         // Arrange

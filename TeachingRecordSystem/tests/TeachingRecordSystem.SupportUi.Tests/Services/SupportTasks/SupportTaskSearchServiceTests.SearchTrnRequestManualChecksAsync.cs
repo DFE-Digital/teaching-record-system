@@ -158,13 +158,13 @@ public partial class SupportTaskSearchServiceTests
         };
 
         // Act
-        var sourceIds = sourceNames.Select(n => sources.First(s => s.Name == n).UserId);
+        var sourceIds = sourceNames.Select(n => sources.First(s => s.Name == n).UserId).ToArray();
         var result = await SearchTrnRequestManualChecksAsync(new(Sources: sourceIds), new());
 
         // Assert
-        Assert.Equal(2, result.TotalTaskCount);
-        Assert.Equal(2, result.SearchResults.TotalItemCount);
-        Assert.Equal(allSourceIds, result.Sources);
+        Assert.Equal(4, result.TotalTaskCount);
+        Assert.Equal(expectedTaskKeys.Length, result.SearchResults.TotalItemCount);
+        Assert.Equal(sourceIds, result.Sources);
         Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
     }
 
