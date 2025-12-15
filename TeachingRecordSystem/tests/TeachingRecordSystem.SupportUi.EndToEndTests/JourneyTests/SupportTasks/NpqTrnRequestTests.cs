@@ -141,10 +141,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync("Yes"); // select create new record (as opposed to reject request)
         await page.ClickContinueButtonAsync();
 
-        await page.AssertOnMatchesPageAsync(supportTaskReference);
-        await page.ClickButtonAsync("Create a record from this request");
-
-        await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
+        await page.AssertOnNoMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and create record");
 
         await page.AssertOnListPageAsync();

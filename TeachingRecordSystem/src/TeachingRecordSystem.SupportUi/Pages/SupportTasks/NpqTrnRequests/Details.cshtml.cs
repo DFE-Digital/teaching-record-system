@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
-public class DetailsModel(SupportUiLinkGenerator linkGenerator) : PageModel
+public class DetailsModel(TrnRequestService trnRequestService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<DetailsModel> _validator = new()
     {
@@ -42,7 +43,9 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator) : PageModel
 
         if (CreateRecord!.Value)
         {
-            return SupportTask!.TrnRequestMetadata!.PotentialDuplicate ?
+            var matchResult = await trnRequestService.MatchPersonsAsync(SupportTask!.TrnRequestMetadata!);
+
+            return matchResult.Outcome is not MatchPersonsResultOutcome.NoMatches ?
                Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.Index(SupportTaskReference)) :
                Redirect(linkGenerator.SupportTasks.NpqTrnRequests.NoMatches.Index(SupportTaskReference));
         }
