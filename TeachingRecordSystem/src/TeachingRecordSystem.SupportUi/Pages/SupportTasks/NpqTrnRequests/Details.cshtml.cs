@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,6 +8,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
 public class DetailsModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private readonly InlineValidator<DetailsModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.CreateRecord)
+            .NotNull().WithMessage("Select yes if you want to create a record from this request")
+    };
+
     public string PersonName => string.Join(" ", SupportTask!.TrnRequestMetadata!.Name);
 
     public SupportTask? SupportTask { get; set; }
@@ -24,22 +29,18 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator) : PageModel
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
-    [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to create a record from this request")]
-    public bool CreateRecord { get; set; }
+    [BindProperty(SupportsGet = true)]
+    public bool? CreateRecord { get; set; }
 
     public void OnGet()
     {
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (ModelState.IsValid == false)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
-        if (CreateRecord)
+        if (CreateRecord!.Value)
         {
             return SupportTask!.TrnRequestMetadata!.PotentialDuplicate ?
                Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.Index(SupportTaskReference)) :
@@ -56,7 +57,7 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator) : PageModel
         return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var supportTaskFeature = context.HttpContext.GetCurrentSupportTaskFeature();
         SupportTask = supportTaskFeature.SupportTask;
@@ -68,7 +69,5 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator) : PageModel
         NpqTrainingProvider = metadata?.NpqTrainingProvider;
         NpqEvidenceFile = (metadata?.NpqEvidenceFileId, metadata?.NpqEvidenceFileName) is (Guid fileId, string fileName)
             ? new(fileId, fileName) : null;
-
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

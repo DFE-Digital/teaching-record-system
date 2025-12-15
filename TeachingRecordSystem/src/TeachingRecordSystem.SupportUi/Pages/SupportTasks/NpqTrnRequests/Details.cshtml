@@ -31,6 +31,10 @@
                         <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.EmailAddress</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Working in school or educational setting</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@(Model.NpqWorkingInEducationalSetting.HasValue ? Model.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
@@ -59,8 +63,8 @@
                     <govuk-radios-fieldset-legend is-page-heading="false" class="govuk-fieldset__legend--m">
                         <h2 class="govuk-fieldset__heading">Create a record from this request?</h2>
                     </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value=true>Yes</govuk-radios-item>
-                    <govuk-radios-item value=false>No, reject this request</govuk-radios-item>
+                    <govuk-radios-item value="True">Yes</govuk-radios-item>
+                    <govuk-radios-item value="False">No, reject this request</govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
             <div class="govuk-button-group">

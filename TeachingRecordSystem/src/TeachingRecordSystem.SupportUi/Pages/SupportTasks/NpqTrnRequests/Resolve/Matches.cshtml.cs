@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,6 +12,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resol
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
 public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
+    private readonly InlineValidator<MatchesModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.PersonId)
+            .NotNull().WithMessage("Select a record")
+    };
+
     public TrnRequestMetadata? RequestData { get; set; }
 
     public MatchPersonsResultOutcome MatchOutcome { get; set; }
@@ -24,7 +29,6 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a record")]
     public Guid? PersonId { get; set; }
 
     public void OnGet()
@@ -41,10 +45,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
             return BadRequest();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
