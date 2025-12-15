@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
@@ -9,9 +8,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 [Journey(JourneyNames.AddPerson), RequireJourneyInstance]
 public class ReasonModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
     EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    : CommonJourneyPage(linkGenerator, evidenceUploadManager)
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]

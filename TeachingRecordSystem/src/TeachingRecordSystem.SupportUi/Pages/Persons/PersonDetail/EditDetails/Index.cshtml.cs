@@ -1,19 +1,19 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 [Journey(JourneyNames.EditDetails), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(
-    TrsDbContext dbContext,
+    PersonService personService,
     IClock clock,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
     private Person? _person;
 
@@ -154,7 +154,7 @@ public class IndexModel(
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        _person = await DbContext.Persons.SingleOrDefaultAsync(u => u.PersonId == PersonId);
+        _person = await PersonService.GetPersonAsync(PersonId);
 
         if (_person is null)
         {

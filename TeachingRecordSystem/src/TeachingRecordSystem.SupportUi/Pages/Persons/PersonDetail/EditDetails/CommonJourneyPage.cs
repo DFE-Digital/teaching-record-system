@@ -1,19 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 public abstract class CommonJourneyPage(
-    TrsDbContext dbContext,
+    PersonService personService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<EditDetailsState>? JourneyInstance { get; set; }
 
-    protected TrsDbContext DbContext { get; } = dbContext;
+    protected PersonService PersonService { get; } = personService;
     protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
     protected EvidenceUploadManager EvidenceUploadManager { get; } = evidenceUploadManager;
 
@@ -58,7 +58,14 @@ public abstract class CommonJourneyPage(
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        var person = await PersonService.GetPersonAsync(PersonId);
+
+        if (person is null)
+        {
+            context.Result = NotFound();
+            return;
+        }
+
         JourneyInstance!.State.EnsureInitialized(person);
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();

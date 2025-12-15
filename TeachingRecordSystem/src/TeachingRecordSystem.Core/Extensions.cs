@@ -172,7 +172,7 @@ public static class Extensions
             "hangfire-schema-prepared");
 
         // Try to skip schema preparation in development to speed up startup
-        if (environment.IsDevelopment() && File.Exists(schemaPreparedMarkerFile))
+        if (environment.IsDevelopment() && System.IO.File.Exists(schemaPreparedMarkerFile))
         {
             prepareSchemaIfNecessary = false;
         }
@@ -191,10 +191,10 @@ public static class Extensions
                     }));
         }
 
-        if (environment.IsDevelopment() && !File.Exists(schemaPreparedMarkerFile))
+        if (environment.IsDevelopment() && !System.IO.File.Exists(schemaPreparedMarkerFile))
         {
             Directory.CreateDirectory(Directory.GetParent(schemaPreparedMarkerFile)!.FullName);
-            File.WriteAllText(schemaPreparedMarkerFile, string.Empty);
+            System.IO.File.WriteAllText(schemaPreparedMarkerFile, string.Empty);
         }
 
         return services;

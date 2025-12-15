@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -8,11 +7,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 [Journey(JourneyNames.AddPerson), ActivatesJourney, RequireJourneyInstance]
 public class PersonalDetailsModel(
-    TrsDbContext dbContext,
     IClock clock,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    : CommonJourneyPage(linkGenerator, evidenceUploadManager)
 {
     [BindProperty]
     [Required(ErrorMessage = "Enter the person\u2019s first name")]

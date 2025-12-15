@@ -1,6 +1,6 @@
 using AngleSharp.Dom;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEvent;
 using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEventChanges;
 

@@ -1,19 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 public abstract class CommonJourneyPage(
-    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<AddPersonState>? JourneyInstance { get; set; }
 
-    protected TrsDbContext DbContext { get; } = dbContext;
     protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
     protected EvidenceUploadManager EvidenceUploadManager { get; } = evidenceUploadManager;
 
