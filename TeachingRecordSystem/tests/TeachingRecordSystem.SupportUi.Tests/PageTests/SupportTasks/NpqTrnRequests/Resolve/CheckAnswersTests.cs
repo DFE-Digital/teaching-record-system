@@ -750,7 +750,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.NpqTrnRequestApproving, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<PersonCreatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
+            p.AssertProcessHasEvents<PersonCreatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent, Core.Events.EmailSentEvent>();
         });
     }
 
