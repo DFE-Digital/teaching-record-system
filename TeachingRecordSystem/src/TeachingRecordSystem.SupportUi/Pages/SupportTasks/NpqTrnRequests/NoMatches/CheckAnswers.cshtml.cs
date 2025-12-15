@@ -3,17 +3,21 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NoMatches;
 
 public class CheckAnswersModel(
     TrsDbContext dbContext,
-    ITrnGenerator trnGenerator,
+    TrnRequestService trnRequestService,
+    SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
-    IClock clock) : PageModel
+    IClock clock,
+    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
 {
     public string? SourceApplicationUserName { get; set; }
     public Guid? SourceApplicationUserId { get; set; }
@@ -45,25 +49,9 @@ public class CheckAnswersModel(
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
+        var processContext = new ProcessContext(ProcessType.NpqTrnRequestApproving, clock.UtcNow, User.GetUserId());
 
-        var trn = await trnGenerator.GenerateTrnAsync();
-
-        var (person, _) = Person.Create(
-            trn,
-            requestData.FirstName ?? string.Empty,
-            requestData.MiddleName ?? string.Empty,
-            requestData.LastName ?? string.Empty,
-            requestData.DateOfBirth,
-            requestData.EmailAddress is not null ? Core.EmailAddress.Parse(requestData.EmailAddress) : null,
-            requestData.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(requestData.NationalInsuranceNumber) : null,
-            requestData.Gender,
-            clock.UtcNow,
-            sourceTrnRequest: (requestData.ApplicationUserId, requestData.RequestId));
-
-        dbContext.Add(person);
-
-        requestData.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
+        var newTrn = await trnRequestService.ResolveTrnRequestWithNewRecordAsync(requestData, processContext);
 
         var personAttributes = new NpqTrnRequestDataPersonAttributes()
         {
@@ -76,36 +64,44 @@ public class CheckAnswersModel(
             Gender = requestData.Gender
         };
 
-        supportTask.Status = SupportTaskStatus.Closed;
-        supportTask.UpdatedOn = clock.UtcNow;
-        supportTask.UpdateData<NpqTrnRequestData>(data => data with
-        {
-            SupportRequestOutcome = SupportRequestOutcome.Approved,
-            ResolvedAttributes = personAttributes,
-            SelectedPersonAttributes = null
-        });
+        await supportTaskService.UpdateSupportTaskAsync(
+            new UpdateSupportTaskOptions<NpqTrnRequestData>
+            {
+                SupportTaskReference = SupportTaskReference!,
+                UpdateData = data => data with
+                {
+                    SupportRequestOutcome = SupportRequestOutcome.Approved,
+                    ResolvedAttributes = personAttributes,
+                    SelectedPersonAttributes = null
+                },
+                Status = SupportTaskStatus.Closed,
+                Comments = null,
+                RejectionReason = null
+            },
+            processContext);
 
-        var @event = new NpqTrnRequestSupportTaskResolvedEvent()
+        if (!string.IsNullOrEmpty(requestData.EmailAddress))
         {
-            PersonId = requestData.ResolvedPersonId!.Value,
-            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
-            ChangeReason = NpqTrnRequestResolvedReason.RecordCreated,
-            Changes = 0,
-            PersonAttributes = EventModels.PersonDetails.FromModel(person),
-            OldPersonAttributes = null,
-            SupportTask = EventModels.SupportTask.FromModel(supportTask),
-            OldSupportTask = oldSupportTaskEventModel,
-            Comments = null,
-            EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
-            RaisedBy = User.GetUserId()
-        };
+            var email = new Email
+            {
+                EmailId = Guid.NewGuid(),
+                TemplateId = EmailTemplateIds.TrnGeneratedForNpq,
+                EmailAddress = requestData.EmailAddress,
+                Personalization = new Dictionary<string, string>
+                    {
+                        { "first name", requestData.FirstName! },
+                        { "last name", requestData.LastName! },
+                        { "trn", newTrn! }
+                    },
+            };
 
-        await dbContext.AddEventAndBroadcastAsync(@event);
-        await dbContext.SaveChangesAsync();
+            await dbContext.Emails.AddAsync(email);
+            await dbContext.SaveChangesAsync();
+            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
+        }
 
         TempData.SetFlashSuccess(
-            $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed",
+            $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed and the user has been notified by email",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value)));
 
         return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());

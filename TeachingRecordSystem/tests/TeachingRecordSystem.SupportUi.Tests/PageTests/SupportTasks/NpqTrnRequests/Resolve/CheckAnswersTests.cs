@@ -631,7 +631,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects()
+    public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventSendsEmailCompletesJourneyAndRedirects()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -727,6 +727,21 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData.NpqEvidenceFileId);
             Assert.Equal(requestMetadata.NpqEvidenceFileName, actualEvent.RequestData.NpqEvidenceFileName);
+        },
+        e2 =>
+        {
+            var actualEvent = Assert.IsType<LegacyEvents.EmailSentEvent>(e2);
+        });
+
+        // email is sent
+        await WithDbContextAsync(async dbContext =>
+        {
+            var email = await dbContext.Emails
+                .Where(e => e.EmailAddress == requestMetadata.EmailAddress)
+                .SingleOrDefaultAsync();
+            Assert.NotNull(email);
+            Assert.NotNull(email.SentOn);
+            Assert.Equal(EmailTemplateIds.TrnGeneratedForNpq, email.TemplateId);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -735,7 +750,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.NpqTrnRequestApproving, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<PersonCreatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent>();
+            p.AssertProcessHasEvents<PersonCreatedEvent, TrnRequestUpdatedEvent, SupportTaskUpdatedEvent, Core.Events.EmailSentEvent>();
         });
     }
 
