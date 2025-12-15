@@ -7,13 +7,21 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<CreateApiTrnRequestSupportTaskResult> CreateApiTrnRequestSupportTaskAsync(
-        Guid applicationUserId,
+    public async Task<CreateApiTrnRequestSupportTaskResult> CreateApiTrnRequestSupportTaskAsync(
+        Guid? applicationUserId = null,
         Action<CreateApiTrnRequestSupportTaskBuilder>? configure = null)
     {
-        var builder = new CreateApiTrnRequestSupportTaskBuilder(applicationUserId);
+        if (applicationUserId is null)
+        {
+            var applicationUser = await CreateApplicationUserAsync();
+            applicationUserId = applicationUser.UserId;
+        }
+
+        var builder = new CreateApiTrnRequestSupportTaskBuilder(applicationUserId!.Value);
         configure?.Invoke(builder);
-        return builder.ExecuteAsync(this);
+        var task = await builder.ExecuteAsync(this);
+
+        return task;
     }
 
     public Task<CreateApiTrnRequestSupportTaskResult> CreateApiTrnRequestSupportTaskAsync(
@@ -285,5 +293,11 @@ public partial class TestData
         }
     }
 
-    public record CreateApiTrnRequestSupportTaskResult(SupportTask SupportTask, TrnRequestMetadata TrnRequest, Guid[] MatchedPersonIds);
+    public record CreateApiTrnRequestSupportTaskResult(SupportTask SupportTask, TrnRequestMetadata TrnRequest, Guid[] MatchedPersonIds)
+        : ISupportTaskCreateResult;
+
+    public interface ISupportTaskCreateResult
+    {
+        SupportTask SupportTask { get; }
+    }
 }

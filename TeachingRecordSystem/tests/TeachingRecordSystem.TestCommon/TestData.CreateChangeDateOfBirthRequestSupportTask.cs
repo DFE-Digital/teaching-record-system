@@ -6,12 +6,25 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
+    public async Task<SupportTask> CreateChangeDateOfBirthRequestSupportTaskAsync(
+       Action<CreateChangeDateOfBirthRequestSupportTaskBuilder>? configure = null,
+       Action<CreatePersonBuilder>? configurePerson = null)
+    {
+        var person = await CreatePersonAsync(configurePerson);
+
+        configure ??= b => { };
+        Action<CreateChangeDateOfBirthRequestSupportTaskBuilder> configureWithDob = b =>
+            configure(b.WithDateOfBirth(GenerateChangedDateOfBirth(person.DateOfBirth)));
+
+        return await CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId, configureWithDob);
+    }
+
     public Task<SupportTask> CreateChangeDateOfBirthRequestSupportTaskAsync(
        Guid personId,
-       Action<CreateChangeDateOfBirthRequestSupportTaskBuilder>? configure = null)
+       Action<CreateChangeDateOfBirthRequestSupportTaskBuilder>? configureRequest = null)
     {
         var builder = new CreateChangeDateOfBirthRequestSupportTaskBuilder(personId);
-        configure?.Invoke(builder);
+        configureRequest?.Invoke(builder);
         return builder.ExecuteAsync(this);
     }
 
@@ -65,6 +78,7 @@ public partial class TestData
             _status = Option.Some(status);
             return this;
         }
+
         public CreateChangeDateOfBirthRequestSupportTaskBuilder WithCreatedOn(DateTime createdOn)
         {
             _createdOn = Option.Some(createdOn);
@@ -78,7 +92,7 @@ public partial class TestData
             var evidenceFileName = _evidenceFileName.ValueOr("evidence-file.jpg");
             var emailAddress = _hasEmailAddress ? _emailAddress.ValueOr(testData.GenerateUniqueEmail) : null;
             var status = _status.ValueOr(SupportTaskStatus.Open);
-            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow).ToUniversalTime();
 
             var data = new ChangeDateOfBirthRequestData()
             {

@@ -29,43 +29,43 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         var sortBy = SortBy ??= IntegrationTransactionSortByOption.CreatedOn;
 
         var query = dbContext.IntegrationTransactions.AsQueryable();
+        var totalIntegrationTransactionCount = await query.CountAsync();
 
         if (sortBy == IntegrationTransactionSortByOption.CreatedOn)
         {
-            query = query.OrderBy(sortDirection, t => t.CreatedDate!).ThenBy(x => x.ImportStatus);
-
+            query = query.OrderBy(t => t.CreatedDate!, sortDirection).ThenBy(x => x.ImportStatus);
         }
         else if (sortBy == IntegrationTransactionSortByOption.Duplicates)
         {
-            query = query.OrderBy(sortDirection, t => t.DuplicateCount!);
+            query = query.OrderBy(t => t.DuplicateCount!, sortDirection);
         }
         else if (sortBy == IntegrationTransactionSortByOption.Failures)
         {
-            query = query.OrderBy(sortDirection, t => t.FailureCount!);
+            query = query.OrderBy(t => t.FailureCount!, sortDirection);
         }
         else if (sortBy == IntegrationTransactionSortByOption.ImportStatus)
         {
-            query = query.OrderBy(sortDirection, t => t.ImportStatus!);
+            query = query.OrderBy(t => t.ImportStatus!, sortDirection);
         }
         else if (sortBy == IntegrationTransactionSortByOption.IntegrationTransactionId)
         {
-            query = query.OrderBy(sortDirection, t => t.IntegrationTransactionId!);
+            query = query.OrderBy(t => t.IntegrationTransactionId!, sortDirection);
         }
         else if (sortBy == IntegrationTransactionSortByOption.InterfaceType)
         {
-            query = query.OrderBy(sortDirection, t => t.InterfaceType!);
+            query = query.OrderBy(t => t.InterfaceType!, sortDirection);
         }
         else if (sortBy == IntegrationTransactionSortByOption.Total)
         {
-            query = query.OrderBy(sortDirection, t => t.TotalCount!);
+            query = query.OrderBy(t => t.TotalCount!, sortDirection);
         }
         else if (sortBy == IntegrationTransactionSortByOption.Successes)
         {
-            query = query.OrderBy(sortDirection, t => t.SuccessCount!);
+            query = query.OrderBy(t => t.SuccessCount!, sortDirection);
         }
         else if (sortBy == IntegrationTransactionSortByOption.Warnings)
         {
-            query = query.OrderBy(sortDirection, t => t.WarningCount!);
+            query = query.OrderBy(t => t.WarningCount!, sortDirection);
         }
 
         Results = await query
@@ -81,7 +81,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 x.FailureCount,
                 x.DuplicateCount
             ))
-            .GetPageAsync(PageNumber, IntegrationTransactionsPerPage);
+            .GetPageAsync(PageNumber, IntegrationTransactionsPerPage, totalIntegrationTransactionCount);
 
         Pagination = PaginationViewModel.Create(
             Results,

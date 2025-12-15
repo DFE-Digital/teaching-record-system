@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
+using TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequestManualChecksNeeded;
 
@@ -12,7 +12,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {
         // Arrange
-        await CreateSupportTaskAsync(status: SupportTaskStatus.Closed);
+        await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(status: SupportTaskStatus.Closed);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/manual-checks-needed");
 
@@ -21,14 +21,36 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
+    }
+
+    [Fact]
+    public async Task Get_WithSupportTask_ButNotMatchingSearchCriteria_ShowsNoResultsMessage()
+    {
+        // Arrange
+        await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/manual-checks-needed/?Search=XXX");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.NotNull(doc.GetElementByTestId("no-results-message"));
+        Assert.Null(doc.GetElementByTestId("results"));
     }
 
     [Fact]
     public async Task Get_WithTask_ShowsExpectedDataInResultsTable()
     {
         // Arrange
-        var supportTask = await CreateSupportTaskAsync();
+        var supportTask = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/manual-checks-needed");
 
@@ -38,13 +60,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultRow = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr")
-            .FirstOrDefault();
+        Assert.Null(doc.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("no-results-message"));
 
+        var resultRow = GetResultRows(doc).FirstOrDefault();
         Assert.NotNull(resultRow);
+
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("created-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
         AssertRowHasContent("date-of-birth", supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
@@ -58,298 +79,72 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Fact]
-    public async Task Get_SearchByFirstName_ShowsMatchingResult()
+    [Theory]
+    [InlineData("Smith", new[] { "ST1" })]
+    [InlineData("Jim", new[] { "ST1" })]
+    [InlineData("Jim Smith", new[] { "ST1" })]
+    public async Task Get_Search_ShowsMatchingResult(string search, string[] taskKeys)
     {
         // Arrange
-        var firstName = TestData.GenerateFirstName();
-        var supportTask = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName(firstName));
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
+                configureApiTrnRequest: t => t.WithFirstName("Jim").WithLastName("Smith")),
 
-        var search = firstName;
+            ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
+                configureApiTrnRequest: t => t.WithFirstName("Bob").WithLastName("Jones")),
+        };
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed?Search={Uri.EscapeDataString(search)}");
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/manual-checks-needed/?Search={Uri.EscapeDataString(search)}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
+        Assert.Equal(taskKeys, GetResultTaskKeys(doc, tasks));
     }
 
-    [Fact]
-    public async Task Get_SearchByMiddleName_ShowsMatchingResult()
-    {
-        // Arrange
-        var middleName = TestData.GenerateMiddleName();
-        var supportTask = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithMiddleName(middleName));
-
-        var search = middleName;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed?Search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
-    }
-
-    [Fact]
-    public async Task Get_SearchByLastName_ShowsMatchingResult()
-    {
-        // Arrange
-        var lastName = TestData.GenerateLastName();
-        var supportTask = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithLastName(lastName));
-
-        var search = lastName;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed?Search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
-    }
-
-    [Fact]
-    public async Task Get_SearchByMultipleNameParts_ShowsMatchingResult()
-    {
-        // Arrange
-        var firstName = TestData.GenerateFirstName();
-        var lastName = TestData.GenerateFirstName();
-        var supportTask = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName(firstName).WithLastName(lastName));
-
-        var search = $"{firstName} {lastName}";
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed?Search={Uri.EscapeDataString(search)}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
-    }
-
-    [Fact]
-    public async Task Get_NoSortParametersSpecified_ShowsRequestsOrderedByCreatedOnAscending()
-    {
-        // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-
-        var supportTask2 = await CreateSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByNameAscending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Zavier"));
-
-        var supportTask2 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Aaron"));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.Name}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByNameDescending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Zavier"));
-
-        var supportTask2 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithFirstName("Aaron"));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.Name}&sortDirection={SortDirection.Descending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByDateOfBirthAscending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2025, 1, 1)));
-
-        var supportTask2 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2023, 10, 10)));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateOfBirth}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByDateOfBirthDescending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var supportTask1 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2025, 1, 1)));
-
-        var supportTask2 = await CreateSupportTaskAsync(configureApiTrnRequest: t => t.WithDateOfBirth(new(2023, 10, 10)));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateOfBirth}&sortDirection={SortDirection.Descending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByCreatedOnAscending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var supportTask1 = await CreateSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-
-        var supportTask2 = await CreateSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateCreated}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortByCreatedOnDescending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var supportTask1 = await CreateSupportTaskAsync(createdOn: new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-
-        var supportTask2 = await CreateSupportTaskAsync(createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.DateCreated}&sortDirection={SortDirection.Descending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortBySourceAscending_ShowsRequestsInCorrectOrder()
+    [Theory]
+    [InlineData(TrnRequestManualChecksSortByOption.Name, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(TrnRequestManualChecksSortByOption.Name, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(TrnRequestManualChecksSortByOption.DateOfBirth, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(TrnRequestManualChecksSortByOption.DateOfBirth, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(TrnRequestManualChecksSortByOption.DateCreated, SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(TrnRequestManualChecksSortByOption.DateCreated, SortDirection.Descending, new[] { "ST1", "ST2" })]
+    [InlineData(TrnRequestManualChecksSortByOption.Source, SortDirection.Ascending, new[] { "ST1", "ST2" })]
+    [InlineData(TrnRequestManualChecksSortByOption.Source, SortDirection.Descending, new[] { "ST2", "ST1" })]
+    public async Task Get_SortBy_ShowsRequestsInCorrectOrder(TrnRequestManualChecksSortByOption sortBy, SortDirection sortDirection, string[] taskKeys)
     {
         // Arrange
         var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
         var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
 
-        var supportTask1 = await CreateSupportTaskAsync(applicationUser1.UserId);
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId,
+                createdOn: new DateTime(2025, 1, 1),
+                configureApiTrnRequest: t => t
+                    .WithFirstName("Zavier")
+                    .WithDateOfBirth(new(2025, 1, 1))),
 
-        var supportTask2 = await CreateSupportTaskAsync(applicationUser2.UserId);
+            ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId,
+                createdOn: new DateTime(2023, 10, 10),
+                configureApiTrnRequest: t => t
+                    .WithFirstName("Aaron")
+                    .WithDateOfBirth(new(2023, 10, 10)))
+        };
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.Source}&sortDirection={SortDirection.Ascending}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result));
-    }
-
-    [Fact]
-    public async Task Get_SortBySourceDescending_ShowsRequestsInCorrectOrder()
-    {
-        // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
-
-        var supportTask1 = await CreateSupportTaskAsync(applicationUser1.UserId);
-
-        var supportTask2 = await CreateSupportTaskAsync(applicationUser2.UserId);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/manual-checks-needed?sortBy={TrnRequestManualChecksNeededSortByOption.Source}&sortDirection={SortDirection.Descending}");
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/manual-checks-needed/?sortBy={sortBy}&sortDirection={sortDirection}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Collection(
-            GetResultTaskReferences(doc),
-            result => Assert.Equal(supportTask1.SupportTaskReference, result),
-            result => Assert.Equal(supportTask2.SupportTaskReference, result));
+        Assert.Equal(taskKeys, GetResultTaskKeys(doc, tasks));
     }
 
     [Fact]
@@ -361,11 +156,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Create enough tasks to create 3 pages
         var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await CreateSupportTaskAsync()));
+            .ToAsyncEnumerable()
+            .SelectAwait(async _ => await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync()));
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
+        var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/manual-checks-needed?pageNumber={page}");
 
         // Act
@@ -376,47 +170,26 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
-    private static IElement[] GetResultRows(IHtmlDocument doc) =>
-        doc
-            .GetElementsByTagName("tbody")
-            .Single()
-            .GetElementsByClassName("govuk-table__row")
-            .ToArray();
+    private static IElement[] GetResultRows(IHtmlDocument document)
+    {
+        var r =
+        document
+            .GetElementByTestId("results");
 
-    private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
-        GetResultRows(doc)
+        return r?
+            .GetElementsByClassName("govuk-table__row")
+            .ToArray() ?? [];
+    }
+
+    private static string[] GetResultTaskReferences(IHtmlDocument document) =>
+        GetResultRows(document)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .ToArray();
 
-    private async Task<SupportTask> CreateSupportTaskAsync(
-        Guid? applicationUserId = null,
-        SupportTaskStatus status = SupportTaskStatus.Open,
-        DateTime? createdOn = null,
-        Action<TestData.CreateApiTrnRequestSupportTaskBuilder>? configureApiTrnRequest = null)
-    {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmailAddress(TestData.GenerateUniqueEmail()).WithAlert().WithQts().WithEyts());
-
-        if (applicationUserId is null)
-        {
-            var applicationUser = await TestData.CreateApplicationUserAsync();
-            applicationUserId = applicationUser.UserId;
-        }
-
-        var (apiSupportTask, _, _) = await TestData.CreateResolvedApiTrnRequestSupportTaskAsync(
-            applicationUserId.Value,
-            matchedPerson.Person,
-            t =>
-            {
-                t.WithTrnRequestStatus(TrnRequestStatus.Pending);
-                configureApiTrnRequest?.Invoke(t);
-            });
-
-        return await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-            applicationUserId.Value,
-            apiSupportTask.TrnRequestMetadata!.RequestId,
-            status,
-            createdOn);
-    }
+    private static string[] GetResultTaskKeys(IHtmlDocument document, SupportTaskLookup tasks) =>
+        GetResultTaskReferences(document)
+            .Select(tasks.GetKeyFor)
+            .ToArray();
 }
 
 file static class Extensions
