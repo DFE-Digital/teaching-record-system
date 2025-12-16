@@ -12,6 +12,7 @@ using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.InductionExemptions;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.OneLogin;
@@ -109,6 +110,7 @@ public static class Extensions
             .AddTrnGeneration()
             .AddNoteService()
             .AddPersonService()
+            .AddInductionExemptionService()
             .AddOneLoginService();
 
         return services;
