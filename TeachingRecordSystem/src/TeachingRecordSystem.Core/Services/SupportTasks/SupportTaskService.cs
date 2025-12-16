@@ -71,7 +71,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
     public async Task<UpdateSupportTaskResult> UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
         where TData : ISupportTaskData, IEquatable<TData>
     {
-        var supportTask = await dbContext.SupportTasks.FindAsync(options.SupportTaskReference);
+        var supportTask = options.SupportTask.Value as SupportTask ?? await dbContext.SupportTasks.FindAsync(options.SupportTask.AsT1);
 
         if (supportTask is null)
         {
@@ -83,6 +83,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             throw new InvalidOperationException(
                 $"{typeof(TData).Name} is not valid for the specified support task's type.");
         }
+
+        dbContext.Attach(supportTask);
 
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
 
@@ -103,7 +105,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 new SupportTaskUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    SupportTaskReference = options.SupportTaskReference,
+                    SupportTaskReference = supportTask.SupportTaskReference,
                     Changes = changes,
                     OldSupportTask = oldSupportTaskEventModel,
                     SupportTask = EventModels.SupportTask.FromModel(supportTask),

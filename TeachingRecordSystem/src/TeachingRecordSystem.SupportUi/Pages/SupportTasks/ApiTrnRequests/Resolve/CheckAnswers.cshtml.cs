@@ -104,7 +104,7 @@ public class CheckAnswers(
         await supportTaskService.UpdateSupportTaskAsync<ApiTrnRequestData>(
             new()
             {
-                SupportTaskReference = supportTask.SupportTaskReference,
+                SupportTask = supportTask.SupportTaskReference,
                 UpdateData = data => data with
                 {
                     ResolvedAttributes = resolvedPersonAttributes,

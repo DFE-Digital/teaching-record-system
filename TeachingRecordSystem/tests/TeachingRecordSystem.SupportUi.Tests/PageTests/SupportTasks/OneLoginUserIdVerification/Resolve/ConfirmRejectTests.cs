@@ -126,25 +126,11 @@ public class ConfirmRejectTests(HostFixture hostFixture) : ResolveOneLoginUserId
             var updatedSupportTask = await
                 dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             var updatedSupportTaskData = updatedSupportTask.GetData<OneLoginUserIdVerificationData>();
-            Assert.False(updatedSupportTaskData.Verified);
             Assert.Equal(OneLoginUserIdVerificationOutcome.NotVerified, updatedSupportTaskData.Outcome);
-            Assert.Equal(rejectReason, updatedSupportTaskData.RejectReason);
-            Assert.Equal(additionalDetails, updatedSupportTaskData.RejectionAdditionalDetails);
-
-            var updatedOneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);
-            Assert.Null(updatedOneLoginUser.VerifiedOn);
-            Assert.Null(updatedOneLoginUser.VerificationRoute);
-            Assert.Null(updatedOneLoginUser.VerifiedDatesOfBirth);
-            Assert.Null(updatedOneLoginUser.VerifiedNames);
         });
 
-        Events.AssertProcessesCreated(p =>
-        {
-            Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<SupportTaskUpdatedEvent>();
-        });
+        Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType));
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();

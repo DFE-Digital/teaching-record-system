@@ -3,17 +3,14 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
 public class ConfirmConnect(
+    OneLoginUserIdVerificationSupportTaskService supportTaskService,
     TrsDbContext dbContext,
-    SupportTaskService supportTaskService,
-    OneLoginService oneLoginService,
     IClock clock,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
@@ -55,56 +52,16 @@ public class ConfirmConnect(
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-        var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
-
-        var matchedAttributes = JourneyInstance.State.MatchedPersons
+        var matchedAttributeTypes = JourneyInstance.State.MatchedPersons
             .Single(m => m.PersonId == MatchedPersonId)
-            .MatchedAttributes
-            .Select(a => KeyValuePair.Create(a, a switch
-            {
-                PersonMatchedAttribute.FirstName => data.StatedFirstName,
-                PersonMatchedAttribute.LastName => data.StatedLastName,
-                PersonMatchedAttribute.FullName => $"{data.StatedFirstName} {data.StatedLastName}",
-                PersonMatchedAttribute.DateOfBirth => data.StatedDateOfBirth.ToString("yyyy-MM-dd"),
-                PersonMatchedAttribute.NationalInsuranceNumber => data.StatedNationalInsuranceNumber,
-                PersonMatchedAttribute.Trn => data.StatedTrn,
-                PersonMatchedAttribute.EmailAddress => _supportTask.OneLoginUserSubject!,
-                _ => throw new NotSupportedException($"Unknown {nameof(PersonMatchedAttribute)}: '{a}'.")
-            }));
+            .MatchedAttributes;
 
-        await oneLoginService.SetUserVerifiedAsync(
-            new SetUserVerifiedOptions
+        await supportTaskService.ResolveSupportTaskAsync(
+            new VerifiedAndConnectedOutcomeOptions
             {
-                OneLoginUserSubject = _supportTask.OneLoginUserSubject!,
-                VerificationRoute = OneLoginUserVerificationRoute.Support,
-                VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
-            },
-            processContext);
-
-        await oneLoginService.SetUserMatchedAsync(
-            new SetUserMatchedOptions
-            {
-                OneLoginUserSubject = _supportTask.OneLoginUserSubject!,
+                SupportTask = _supportTask!,
                 MatchedPersonId = MatchedPersonId,
-                MatchRoute = OneLoginUserMatchRoute.Support,
-                MatchedAttributes = matchedAttributes!
-            },
-            processContext);
-
-        await oneLoginService.EnqueueRecordMatchedEmailAsync(_supportTask.OneLoginUser!.EmailAddress!, MatchedPersonName!, processContext);
-
-        await supportTaskService.UpdateSupportTaskAsync(
-            new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
-            {
-                SupportTaskReference = SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    Verified = true,
-                    PersonId = MatchedPersonId,
-                    Outcome = OneLoginUserIdVerificationOutcome.VerifiedAndConnected
-                },
-                Status = SupportTaskStatus.Closed
+                MatchedAttributeTypes = matchedAttributeTypes
             },
             processContext);
 

@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
-public class ConfirmNotConnecting(SupportTaskService supportTaskService, OneLoginService oneLoginService, IClock clock, SupportUiLinkGenerator linkGenerator) :
-    PageModel
+public class ConfirmNotConnecting(
+    OneLoginUserIdVerificationSupportTaskService supportTaskService,
+    IClock clock,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -40,35 +41,18 @@ public class ConfirmNotConnecting(SupportTaskService supportTaskService, OneLogi
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-        var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
-
-        await oneLoginService.SetUserVerifiedAsync(
-            new SetUserVerifiedOptions
+        await supportTaskService.ResolveSupportTaskAsync(
+            new VerifiedOnlyWithMatchesOutcomeOptions
             {
-                OneLoginUserSubject = _supportTask.OneLoginUserSubject!,
-                VerificationRoute = OneLoginUserVerificationRoute.Support,
-                VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
-            },
-            processContext);
-
-        await supportTaskService.UpdateSupportTaskAsync(
-            new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
-            {
-                SupportTaskReference = SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    Verified = true,
-                    Outcome = OneLoginUserIdVerificationOutcome.VerifiedOnly,
-                    NotConnectingReason = JourneyInstance.State.NotConnectingReason,
-                    NotConnectingAdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails
-                },
-                Status = SupportTaskStatus.Closed
+                SupportTask = _supportTask!,
+                NotConnectingReason = JourneyInstance.State.NotConnectingReason!.Value,
+                NotConnectingAdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails
             },
             processContext);
 
         await JourneyInstance.DeleteAsync();
 
+        var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
         TempData.SetFlashSuccess(
             "GOV.UK One Login account not connected to a record",
             $"Request closed for {data.StatedFirstName} {data.StatedLastName}.");

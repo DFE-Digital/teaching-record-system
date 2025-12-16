@@ -52,7 +52,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
             {
-                SupportTaskReference = SupportTaskReference,
+                SupportTask = SupportTaskReference,
                 UpdateData = data => data with
                 {
                     ResolvedAttributes = null,
