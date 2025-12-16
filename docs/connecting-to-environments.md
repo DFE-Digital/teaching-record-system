@@ -154,9 +154,9 @@ trs-tps-sandbox-worker-599fb4c7cc-pbltb                           1/1       Runn
 
 ## Connecting to pentest environment (for disaster recovery)
 
-s189-teacher-services-cloud-test
-s189t01-tsc-pt-rg
-s189t01-tsc-platform-test-aks
+Pentest pods are in `s189-teacher-services-cloud-test`, resource group `s189t01-tsc-pt-rg`, `s189t01-tsc-platform-test-aks` cluster.
+
+Namespace: `development`
 
 ```shell
 > az account set --subscription s189-teacher-services-cloud-test
