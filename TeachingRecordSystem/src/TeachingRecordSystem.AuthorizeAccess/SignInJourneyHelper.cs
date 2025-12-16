@@ -389,10 +389,11 @@ public class SignInJourneyHelper(
                 new Claim(ClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
                 new Claim(ClaimTypes.Trn, trn),
                 new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
-                new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken)
+                new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken),
+                new Claim(ClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
             ],
             authenticationType: "Authorize access to a teaching record",
-            nameType: "sub",
+            nameType: ClaimTypes.Subject,
             roleType: null);
 
         var principal = new ClaimsPrincipal(teachingRecordIdentity);

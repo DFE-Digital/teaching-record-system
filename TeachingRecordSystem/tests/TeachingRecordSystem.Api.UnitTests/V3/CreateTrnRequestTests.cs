@@ -28,7 +28,7 @@ public class CreateTrnRequestTests : OperationTestBase
     {
         // Arrange
         var command = CreateCommand();
-        var applicationUserId = CurrentUserProvider.GetCurrentApplicationUser().UserId;
+        var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
 
         await TestData.CreatePersonAsync(p => p
             .WithFirstName(command.FirstName)
@@ -63,7 +63,7 @@ public class CreateTrnRequestTests : OperationTestBase
         var metadata = await WithDbContextAsync(dbContext =>
             dbContext.TrnRequestMetadata
                 .SingleAsync(m =>
-                    m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId));
+                    m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUserId() && m.RequestId == command.RequestId));
         Assert.Equal(expectedNormalizedInsuranceNumber, metadata.NationalInsuranceNumber);
     }
 
@@ -159,7 +159,7 @@ public class CreateTrnRequestTests : OperationTestBase
         var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
         Assert.Empty(persons);
 
-        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUserId(), command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
 
@@ -205,7 +205,7 @@ public class CreateTrnRequestTests : OperationTestBase
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
 
-        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUserId(), command.RequestId);
 
         Events.AssertProcessesCreated(p =>
         {
@@ -248,7 +248,7 @@ public class CreateTrnRequestTests : OperationTestBase
             dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
         Assert.Empty(persons);
 
-        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUserId(), command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
 
@@ -289,7 +289,7 @@ public class CreateTrnRequestTests : OperationTestBase
             dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
         Assert.Empty(persons);
 
-        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUserId(), command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
 
@@ -338,7 +338,7 @@ public class CreateTrnRequestTests : OperationTestBase
             dbContext.Persons.Where(p => p.PersonId != matchedPerson1.PersonId && p.PersonId != matchedPerson2.PersonId).ToArrayAsync());
         Assert.Empty(persons);
 
-        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUserId(), command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
 
@@ -392,7 +392,7 @@ public class CreateTrnRequestTests : OperationTestBase
         var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
         Assert.Empty(persons);
 
-        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUserId(), command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
 
@@ -409,7 +409,7 @@ public class CreateTrnRequestTests : OperationTestBase
     {
         // Arrange
         TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [
-            CurrentUserProvider.GetCurrentApplicationUser().UserId
+            CurrentUserProvider.GetCurrentApplicationUserId()
         ];
 
         var dateOfBirth = new DateOnly(1990, 01, 01);
@@ -440,13 +440,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await WithDbContextAsync(async dbContext =>
         {
             var metadata = await dbContext.TrnRequestMetadata
-                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
+                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUserId() && m.RequestId == command.RequestId);
             Assert.Equal(TrnRequestStatus.Completed, metadata.Status);
             Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
 
             var supportTasks = await dbContext.SupportTasks
                 .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
-                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
+                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUserId() &&
                     t.TrnRequestMetadata!.RequestId == command.RequestId)
                 .ToArrayAsync();
 
@@ -466,7 +466,7 @@ public class CreateTrnRequestTests : OperationTestBase
     {
         // Arrange
         TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [
-            CurrentUserProvider.GetCurrentApplicationUser().UserId
+            CurrentUserProvider.GetCurrentApplicationUserId()
         ];
 
         var dateOfBirth = new DateOnly(1990, 01, 01);
@@ -497,13 +497,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await WithDbContextAsync(async dbContext =>
         {
             var metadata = await dbContext.TrnRequestMetadata
-                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
+                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUserId() && m.RequestId == command.RequestId);
             Assert.Equal(TrnRequestStatus.Pending, metadata.Status);
             Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
 
             var supportTasks = await dbContext.SupportTasks
                 .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
-                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
+                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUserId() &&
                     t.TrnRequestMetadata!.RequestId == command.RequestId)
                 .ToArrayAsync();
 
@@ -541,7 +541,7 @@ public class CreateTrnRequestTests : OperationTestBase
         Assert.NotNull(person.Trn);
         AssertPersonMatchesCommand(command, person, expectTrn: true);
 
-        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUserId(), command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
 
@@ -587,13 +587,13 @@ public class CreateTrnRequestTests : OperationTestBase
         await WithDbContextAsync(async dbContext =>
         {
             var metadata = await dbContext.TrnRequestMetadata
-                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
+                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUserId() && m.RequestId == command.RequestId);
             Assert.Equal(TrnRequestStatus.Completed, metadata.Status);
             Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
 
             var supportTasks = await dbContext.SupportTasks
                 .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
-                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
+                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUserId() &&
                     t.TrnRequestMetadata!.RequestId == command.RequestId)
                 .ToArrayAsync();
 
@@ -709,7 +709,7 @@ public class CreateTrnRequestTests : OperationTestBase
             dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
         Assert.Empty(persons);
 
-        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUserId(), command.RequestId);
 
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
 
@@ -770,7 +770,7 @@ public class CreateTrnRequestTests : OperationTestBase
     private Task AssertMetadataMatchesCommandAsync(CreateTrnRequestCommand command, bool expectedPotentialDuplicate) =>
         WithDbContextAsync(async dbContext =>
         {
-            var applicationUserId = CurrentUserProvider.GetCurrentApplicationUser().UserId;
+            var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
 
             var metadata = await dbContext.TrnRequestMetadata
                 .SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId && m.RequestId == command.RequestId);

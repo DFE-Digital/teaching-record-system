@@ -75,7 +75,7 @@ public class CreateNameChangeRequestHandler(
             ChangeRequestOutcome = null
         };
 
-        var (userId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var userId = currentUserProvider.GetCurrentApplicationUserId();
 
         var processContext = new ProcessContext(ProcessType.ChangeOfNameRequestCreating, clock.UtcNow, userId);
 

@@ -191,6 +191,10 @@ public class OAuth2Controller(
                 yield return Destinations.IdentityToken;
                 yield break;
 
+            case ClaimTypes.TrsUserId:
+                yield return Destinations.AccessToken;
+                yield break;
+
             default:
                 yield break;
         }

@@ -23,7 +23,7 @@ public class SetDeceasedHandler(
             return ApiError.PersonNotFound(command.Trn);
         }
 
-        var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
         person.Status = PersonStatus.Deactivated;
         person.DateOfDeath = command.DateOfDeath;

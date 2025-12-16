@@ -75,7 +75,7 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
         {
             var process = t.ProcessContext;
             Assert.Equal(ProcessType.ChangeOfNameRequestCreating, process.ProcessType);
-            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, process.Process.UserId);
+            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), process.Process.UserId);
 
             Assert.Collection(
                 t.Events,

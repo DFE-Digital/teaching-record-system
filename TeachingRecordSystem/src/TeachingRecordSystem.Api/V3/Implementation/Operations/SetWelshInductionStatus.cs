@@ -29,7 +29,7 @@ public class SetWelshInductionStatusHandler(
             return ApiError.PersonDoesNotHaveQts(command.Trn);
         }
 
-        var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
         person.TrySetWelshInductionStatus(
             command.Passed,

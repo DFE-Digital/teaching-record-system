@@ -12,7 +12,7 @@ public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentU
 {
     public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(GetTrnRequestCommand command)
     {
-        var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
 
         var trnRequestInfo = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId);
 
