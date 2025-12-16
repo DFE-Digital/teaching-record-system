@@ -74,7 +74,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
         {
             var process = t.ProcessContext;
             Assert.Equal(ProcessType.ChangeOfDateOfBirthRequestCreating, process.ProcessType);
-            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, process.Process.UserId);
+            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), process.Process.UserId);
 
             Assert.Collection(
                 t.Events,

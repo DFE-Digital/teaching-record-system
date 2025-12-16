@@ -31,7 +31,7 @@ public class CreateTrnRequestHandler(
 {
     public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(CreateTrnRequestCommand command)
     {
-        var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
 
         var existingRequest = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId);
         if (existingRequest is not null)

@@ -36,7 +36,7 @@ public class SetQtlsHandler(
         }
 
         var existingQualification = qtlsQualifications.SingleOrDefault();
-        var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
         if (command.QtsDate is not null)
         {

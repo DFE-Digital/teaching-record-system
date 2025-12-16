@@ -145,7 +145,7 @@ public class SetRouteToProfessionalStatusHandler(
             degreeTypeId = degreeType.DegreeTypeId;
         }
 
-        var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
         var route = await dbContext.RouteToProfessionalStatuses.SingleOrDefaultAsync(r =>
             r.PersonId == person.PersonId &&

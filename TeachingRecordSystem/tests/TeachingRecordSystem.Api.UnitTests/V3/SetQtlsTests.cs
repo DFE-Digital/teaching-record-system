@@ -63,7 +63,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
             Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
-            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, deletedEvent.RaisedBy);
+            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), deletedEvent.RaisedBy);
         });
     }
 
@@ -98,7 +98,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             var createdEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
             Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
             Assert.Equal(person.PersonId, createdEvent.PersonId);
-            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, createdEvent.RaisedBy);
+            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), createdEvent.RaisedBy);
         });
     }
 
@@ -151,7 +151,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             var updatedEvent = Assert.IsType<RouteToProfessionalStatusUpdatedEvent>(e);
             Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, updatedEvent.PersonId);
-            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, updatedEvent.RaisedBy);
+            Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), updatedEvent.RaisedBy);
             Assert.True(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom));
         });
     }

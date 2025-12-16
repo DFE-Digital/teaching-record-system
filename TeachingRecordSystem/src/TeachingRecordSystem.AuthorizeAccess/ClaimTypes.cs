@@ -8,4 +8,5 @@ public static class ClaimTypes
     public const string OneLoginIdToken = "onelogin_id";
     public const string OneLoginVerifiedNames = "onelogin_verified_names";
     public const string OneLoginVerifiedBirthDates = "onelogin_verified_birthdates";
+    public const string TrsUserId = "trs_user_id";
 }

@@ -45,7 +45,7 @@ public class OperationTestFixture : ServiceProviderFixture
         var testData = Services.GetRequiredService<TestData>();
         var applicationUser = await testData.CreateApplicationUserAsync();
         _currentUserProviderMock
-            .Setup(mock => mock.GetCurrentApplicationUser())
-            .Returns((applicationUser.UserId, applicationUser.Name));
+            .Setup(mock => mock.GetCurrentApplicationUserId())
+            .Returns(applicationUser.UserId);
     }
 }

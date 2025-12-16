@@ -4,40 +4,49 @@ namespace TeachingRecordSystem.Api.Infrastructure.Security;
 
 public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContextAccessor) : ICurrentUserProvider
 {
-    public static bool TryGetCurrentApplicationUserFromHttpContext(HttpContext httpContext, out (Guid UserId, string Name) user)
+    public static bool TryGetCurrentApplicationUserFromHttpContext(HttpContext httpContext, out Guid userId)
     {
         var principal = httpContext.User;
 
-        // Look for ID access tokens and map those to the ID application user defined in configuration
-        if (principal.HasClaim(c => c.Type == "trn") && principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("dqt:read")))
+        // If there's a TRN claim then it's either an access token from ID or from Teacher Auth (i.e. AuthorizeAccess).
+        if (principal.HasClaim(c => c.Type == "trn"))
         {
-            var idApplicationUserId = httpContext.RequestServices.GetRequiredService<IConfiguration>().GetValue<Guid>("GetAnIdentityApplicationUserId");
-            user = (idApplicationUserId, "Get an identity");
-            return true;
+            if (principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("dqt:read")))
+            {
+                // ID access token
+                var idApplicationUserId = httpContext.RequestServices.GetRequiredService<IConfiguration>().GetValue<Guid>("GetAnIdentityApplicationUserId");
+                userId = idApplicationUserId;
+                return true;
+            }
+
+            if (principal.FindFirstValue("trs_user_id") is string trsUserId)
+            {
+                // Teacher Auth access token
+                userId = Guid.Parse(trsUserId);
+                return true;
+            }
         }
 
         var userIdStr = principal.FindFirstValue("sub");
-        var name = principal.FindFirstValue(ClaimTypes.Name);
 
-        if (userIdStr is null || !Guid.TryParse(userIdStr, out var userId) || name is null)
+        if (userIdStr is null || !Guid.TryParse(userIdStr, out userId))
         {
-            user = default;
+            userId = default;
             return false;
         }
 
-        user = (UserId: userId, Name: name);
         return true;
     }
 
-    public (Guid UserId, string Name) GetCurrentApplicationUser()
+    public Guid GetCurrentApplicationUserId()
     {
         var httpContext = httpContextAccessor.HttpContext ?? throw new Exception("No HttpContext.");
 
-        if (!TryGetCurrentApplicationUserFromHttpContext(httpContext, out var user))
+        if (!TryGetCurrentApplicationUserFromHttpContext(httpContext, out var userId))
         {
             throw new Exception("No current user.");
         }
 
-        return user;
+        return userId;
     }
 }

@@ -71,7 +71,7 @@ public class CreateDateOfBirthChangeRequestHandler(
             ChangeRequestOutcome = null
         };
 
-        var (userId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var userId = currentUserProvider.GetCurrentApplicationUserId();
 
         var processContext = new ProcessContext(ProcessType.ChangeOfDateOfBirthRequestCreating, clock.UtcNow, userId);
 

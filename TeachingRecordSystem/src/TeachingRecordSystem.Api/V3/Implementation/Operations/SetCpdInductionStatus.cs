@@ -62,7 +62,7 @@ public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserPr
             return ApiError.StaleRequest(cpdInductionCpdModifiedOn);
         }
 
-        var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
         person.SetCpdInductionStatus(
             command.Status,

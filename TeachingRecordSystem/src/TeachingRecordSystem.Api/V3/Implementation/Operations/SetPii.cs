@@ -32,7 +32,7 @@ public class SetPiiHandler(
             return ApiError.PersonNotFound(command.Trn);
         }
 
-        var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
         if (!person.AllowDetailsUpdatesFromSourceApplication ||
             person.SourceApplicationUserId != currentUserId)
         {

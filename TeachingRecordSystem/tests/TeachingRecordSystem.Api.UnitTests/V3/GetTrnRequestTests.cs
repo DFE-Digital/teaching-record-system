@@ -38,7 +38,7 @@ public class GetTrnRequestTests : OperationTestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
-        var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
+        var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
 
         await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUserId,
@@ -61,7 +61,7 @@ public class GetTrnRequestTests : OperationTestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
-        var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
+        var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrnRequest(applicationUserId, requestId)
