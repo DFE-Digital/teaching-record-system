@@ -17,6 +17,8 @@ public record OneLoginUserIdVerificationData : ISupportTaskData
     public OneLoginUserIdVerificationOutcome Outcome { get; init; }
     public OneLoginIdVerificationRejectReason? RejectReason { get; init; }
     public string? RejectionAdditionalDetails { get; init; }
+    public OneLoginIdVerificationNotConnectingReason? NotConnectingReason { get; init; }
+    public string? NotConnectingAdditionalDetails { get; init; }
 }
 
 public enum OneLoginUserIdVerificationOutcome
