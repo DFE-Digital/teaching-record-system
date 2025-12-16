@@ -8,8 +8,32 @@ namespace TeachingRecordSystem.Core.Services.Persons;
 public class PersonService(
     TrsDbContext dbContext,
     IClock clock,
-    ITrnGenerator trnGenerator)
+    ITrnGenerator trnGenerator,
+    IEventPublisher eventPublisher)
 {
+    public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
+    {
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleAsync(p => p.PersonId == options.DeactivatingPersonId);
+
+        if (deactivatingPerson.Status is PersonStatus.Deactivated)
+        {
+            throw new InvalidOperationException("Cannot merge a person that is already deactivated.");
+        }
+
+        deactivatingPerson.Status = PersonStatus.Deactivated;
+        deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(
+            new PersonDeactivatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = options.DeactivatingPersonId,
+                MergedWithPersonId = options.RetainedPersonId
+            },
+            processContext);
+    }
+
     public async Task<string?> GetTrnFromPersonIdAsync(Guid personId)
     {
         return (await dbContext.Persons.SingleAsync(q => q.PersonId == personId)).Trn;
@@ -27,7 +51,7 @@ public class PersonService(
         return await persons.SingleOrDefaultAsync(p => p.PersonId == personId);
     }
 
-    public async Task<Guid> CreatePersonAsync(CreatePersonRequest request)
+    public async Task<Guid> CreatePersonAsync(CreatePersonOptions options)
     {
         var now = clock.UtcNow;
 
@@ -37,13 +61,13 @@ public class PersonService(
         {
             PersonId = Guid.NewGuid(),
             Trn = trn,
-            FirstName = request.PersonDetails.FirstName,
-            MiddleName = request.PersonDetails.MiddleName,
-            LastName = request.PersonDetails.LastName,
-            DateOfBirth = request.PersonDetails.DateOfBirth,
-            EmailAddress = (string?)request.PersonDetails.EmailAddress,
-            NationalInsuranceNumber = (string?)request.PersonDetails.NationalInsuranceNumber,
-            Gender = request.PersonDetails.Gender,
+            FirstName = options.PersonDetails.FirstName,
+            MiddleName = options.PersonDetails.MiddleName,
+            LastName = options.PersonDetails.LastName,
+            DateOfBirth = options.PersonDetails.DateOfBirth,
+            EmailAddress = (string?)options.PersonDetails.EmailAddress,
+            NationalInsuranceNumber = (string?)options.PersonDetails.NationalInsuranceNumber,
+            Gender = options.PersonDetails.Gender,
             CreatedOn = now,
             UpdatedOn = now
         };
@@ -52,12 +76,12 @@ public class PersonService(
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
-            RaisedBy = request.UserId,
+            RaisedBy = options.UserId,
             PersonId = person.PersonId,
-            PersonAttributes = request.PersonDetails.ToEventModel(),
-            CreateReason = request.Justification.Reason.GetDisplayName(),
-            CreateReasonDetail = request.Justification.ReasonDetail,
-            EvidenceFile = request.Justification.Evidence?.ToEventModel(),
+            PersonAttributes = options.PersonDetails.ToEventModel(),
+            CreateReason = options.Justification.Reason.GetDisplayName(),
+            CreateReasonDetail = options.Justification.ReasonDetail,
+            EvidenceFile = options.Justification.Evidence?.ToEventModel(),
             TrnRequestMetadata = null
         };
 
@@ -68,26 +92,26 @@ public class PersonService(
         return person.PersonId;
     }
 
-    public async Task UpdatePersonAsync(UpdatePersonRequest request)
+    public async Task UpdatePersonAsync(UpdatePersonOptions options)
     {
         var now = clock.UtcNow;
 
-        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == request.PersonId);
+        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
 
         if (person is null)
         {
-            throw new TrsPersonNotFoundException($"Person with ID {request.PersonId} not found.");
+            throw new TrsPersonNotFoundException($"Person with ID {options.PersonId} not found.");
         }
 
         var oldAttributes = EventModels.PersonDetails.FromModel(person);
 
-        person.FirstName = request.PersonDetails.FirstName;
-        person.MiddleName = request.PersonDetails.MiddleName;
-        person.LastName = request.PersonDetails.LastName;
-        person.DateOfBirth = request.PersonDetails.DateOfBirth;
-        person.EmailAddress = (string?)request.PersonDetails.EmailAddress;
-        person.NationalInsuranceNumber = (string?)request.PersonDetails.NationalInsuranceNumber;
-        person.Gender = request.PersonDetails.Gender;
+        person.FirstName = options.PersonDetails.FirstName;
+        person.MiddleName = options.PersonDetails.MiddleName;
+        person.LastName = options.PersonDetails.LastName;
+        person.DateOfBirth = options.PersonDetails.DateOfBirth;
+        person.EmailAddress = (string?)options.PersonDetails.EmailAddress;
+        person.NationalInsuranceNumber = (string?)options.PersonDetails.NationalInsuranceNumber;
+        person.Gender = options.PersonDetails.Gender;
 
         var changes = 0 |
             (person.FirstName != oldAttributes.FirstName ? LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName : 0) |
@@ -108,27 +132,27 @@ public class PersonService(
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
-                RaisedBy = request.UserId,
-                PersonId = request.PersonId,
-                PersonAttributes = request.PersonDetails.ToEventModel(),
+                RaisedBy = options.UserId,
+                PersonId = options.PersonId,
+                PersonAttributes = options.PersonDetails.ToEventModel(),
                 OldPersonAttributes = oldAttributes,
-                NameChangeReason = request.NameChangeJustification?.Reason.GetDisplayName(),
-                NameChangeEvidenceFile = request.NameChangeJustification?.Evidence?.ToEventModel(),
-                DetailsChangeReason = request.DetailsChangeJustification?.Reason.GetDisplayName(),
-                DetailsChangeReasonDetail = request.DetailsChangeJustification?.ReasonDetail,
-                DetailsChangeEvidenceFile = request.DetailsChangeJustification?.Evidence?.ToEventModel(),
+                NameChangeReason = options.NameChangeJustification?.Reason.GetDisplayName(),
+                NameChangeEvidenceFile = options.NameChangeJustification?.Evidence?.ToEventModel(),
+                DetailsChangeReason = options.DetailsChangeJustification?.Reason.GetDisplayName(),
+                DetailsChangeReasonDetail = options.DetailsChangeJustification?.ReasonDetail,
+                DetailsChangeEvidenceFile = options.DetailsChangeJustification?.Evidence?.ToEventModel(),
                 Changes = changes
             } :
             null;
 
         if (updatedEvent is not null &&
             updatedEvent.Changes.HasAnyFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.NameChange) &&
-            request.NameChangeJustification?.Reason is PersonNameChangeReason.MarriageOrCivilPartnership or PersonNameChangeReason.DeedPollOrOtherLegalProcess)
+            options.NameChangeJustification?.Reason is PersonNameChangeReason.MarriageOrCivilPartnership or PersonNameChangeReason.DeedPollOrOtherLegalProcess)
         {
             dbContext.PreviousNames.Add(new PreviousName
             {
                 PreviousNameId = Guid.NewGuid(),
-                PersonId = request.PersonId,
+                PersonId = options.PersonId,
                 FirstName = updatedEvent.OldPersonAttributes.FirstName,
                 MiddleName = updatedEvent.OldPersonAttributes.MiddleName,
                 LastName = updatedEvent.OldPersonAttributes.LastName,
@@ -144,40 +168,40 @@ public class PersonService(
         }
     }
 
-    public async Task SetPersonStatusAsync(SetPersonStatusRequest request)
+    public async Task SetPersonStatusAsync(SetPersonStatusOptions options)
     {
         var now = clock.UtcNow;
 
         var person = await dbContext.Persons
             .IgnoreQueryFilters()
-            .SingleOrDefaultAsync(p => p.PersonId == request.PersonId);
+            .SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
 
         if (person is null)
         {
-            throw new TrsPersonNotFoundException($"Person with ID {request.PersonId} not found.");
+            throw new TrsPersonNotFoundException($"Person with ID {options.PersonId} not found.");
         }
 
         var oldStatus = person.Status;
-        person.Status = request.TargetStatus;
+        person.Status = options.TargetStatus;
         person.UpdatedOn = now;
 
         var @event = new PersonStatusUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
-            RaisedBy = request.UserId,
-            PersonId = request.PersonId,
+            RaisedBy = options.UserId,
+            PersonId = options.PersonId,
             Status = person.Status,
             OldStatus = oldStatus,
-            Reason = request.TargetStatus == PersonStatus.Deactivated
-                ? request.DeactivateJustification!.Reason.GetDisplayName()
-                : request.ReactivateJustification!.Reason.GetDisplayName(),
-            ReasonDetail = request.TargetStatus == PersonStatus.Deactivated
-                ? request.DeactivateJustification!.ReasonDetail
-                : request.ReactivateJustification!.ReasonDetail,
-            EvidenceFile = request.TargetStatus == PersonStatus.Deactivated
-                ? request.DeactivateJustification!.Evidence?.ToEventModel()
-                : request.ReactivateJustification!.Evidence?.ToEventModel(),
+            Reason = options.TargetStatus == PersonStatus.Deactivated
+                ? options.DeactivateJustification!.Reason.GetDisplayName()
+                : options.ReactivateJustification!.Reason.GetDisplayName(),
+            ReasonDetail = options.TargetStatus == PersonStatus.Deactivated
+                ? options.DeactivateJustification!.ReasonDetail
+                : options.ReactivateJustification!.ReasonDetail,
+            EvidenceFile = options.TargetStatus == PersonStatus.Deactivated
+                ? options.DeactivateJustification!.Evidence?.ToEventModel()
+                : options.ReactivateJustification!.Evidence?.ToEventModel(),
             DateOfDeath = null
         };
 
@@ -188,19 +212,19 @@ public class PersonService(
         }
     }
 
-    public async Task SetPersonInductionStatusAsync(SetPersonInductionStatusRequest request)
+    public async Task SetPersonInductionStatusAsync(SetPersonInductionStatusOptions options)
     {
-        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == request.PersonId);
+        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == options.PersonId);
 
         person.SetInductionStatus(
-            request.InductionStatus,
-            request.StartDate,
-            request.CompletedDate,
-            request.ExemptionReasonIds ?? [],
-            request.Justification.Reason.GetDisplayName(),
-            request.Justification.ReasonDetail,
-            request.Justification.Evidence?.ToEventModel(),
-            request.UserId,
+            options.InductionStatus,
+            options.StartDate,
+            options.CompletedDate,
+            options.ExemptionReasonIds ?? [],
+            options.Justification.Reason.GetDisplayName(),
+            options.Justification.ReasonDetail,
+            options.Justification.Evidence?.ToEventModel(),
+            options.UserId,
             clock.UtcNow,
             out var updatedEvent);
 

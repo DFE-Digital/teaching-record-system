@@ -150,7 +150,6 @@ public class EditDetailsStateBuilder
             OriginalEmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(OriginalEmailAddress),
             OriginalNationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(OriginalNationalInsuranceNumber),
             OriginalGender = OriginalGender,
-
             NameChangeReason = NameChangeReason,
             NameChangeEvidence = new()
             {

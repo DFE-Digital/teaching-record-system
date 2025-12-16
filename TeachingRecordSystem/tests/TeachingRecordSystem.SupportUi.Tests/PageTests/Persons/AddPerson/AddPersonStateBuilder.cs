@@ -93,7 +93,6 @@ public class AddPersonStateBuilder
             EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue(EmailAddress),
             NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
             Gender = Gender,
-
             Reason = Reason,
             ReasonDetail = ReasonDetail,
             Evidence = new()

@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events.Models;
-
 namespace TeachingRecordSystem.Core.Events.Legacy;
 
 public record PersonsMergedEvent : EventBase, IEventWithPersonId, IEventWithPersonAttributes, IEventWithSecondaryPersonId
