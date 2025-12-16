@@ -24,6 +24,10 @@ public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
     public OneLoginIdVerificationRejectReason? RejectReason { get; set; }
 
     public string? RejectionAdditionalDetails { get; set; }
+
+    public OneLoginIdVerificationNotConnectingReason? NotConnectingReason { get; set; }
+
+    public string? NotConnectingAdditionalDetails { get; set; }
 }
 
 [UsedImplicitly]

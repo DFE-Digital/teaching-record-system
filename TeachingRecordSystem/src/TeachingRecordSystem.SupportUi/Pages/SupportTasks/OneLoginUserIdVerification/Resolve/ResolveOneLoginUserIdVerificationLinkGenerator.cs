@@ -23,8 +23,8 @@ public class ResolveOneLoginUserIdVerificationLinkGenerator(LinkGenerator linkGe
     public string NotConnecting(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/NotConnecting", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string NotConnectingReason(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/NotConnectingReason", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string ConfirmNotConnecting(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/ConfirmNotConnecting", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string Reject(string supportTaskReference, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Resolve/Reject", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
