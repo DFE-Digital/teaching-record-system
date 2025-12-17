@@ -52,7 +52,7 @@ app.UseCsp(csp =>
 
     csp.AllowStyles
         .FromSelf()
-        .AllowUnsafeInline();
+        .AddNonce();
 
     // Ensure ASP.NET Core's auto refresh works
     // See https://github.com/dotnet/aspnetcore/issues/33068
