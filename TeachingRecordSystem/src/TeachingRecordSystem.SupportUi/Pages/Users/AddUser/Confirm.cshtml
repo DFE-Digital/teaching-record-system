@@ -2,7 +2,6 @@
 @using TeachingRecordSystem.Core;
 @using TeachingRecordSystem.Core.Legacy
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
-
 @model TeachingRecordSystem.SupportUi.Pages.Users.AddUser.ConfirmModel
 @{
     ViewBag.Title = "Add a user";
@@ -16,8 +15,6 @@
 @{
     var compId = "trs-" + Guid.NewGuid().ToString("N");
 }
-
-@* Attach dynamic style to radios component by id *@
 @section Styles {
     <style asp-add-nonce="true">
         [id="@compId"] {

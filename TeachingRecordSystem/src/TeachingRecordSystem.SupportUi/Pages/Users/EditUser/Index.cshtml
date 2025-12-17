@@ -1,7 +1,6 @@
 @page "/users/{userId}/{handler?}"
 @using TeachingRecordSystem.Core
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
-
 @model TeachingRecordSystem.SupportUi.Pages.Users.EditUser.IndexModel
 @{
     ViewBag.Title = $"Change {Model.Name}\u2019s role";
@@ -15,8 +14,6 @@
 @{
     var compId = "trs-" + Guid.NewGuid().ToString("N");
 }
-
-@* Attach dynamic style to radios component by id *@
 @section Styles {
 <style asp-add-nonce="true">
     [id="@compId"] {
