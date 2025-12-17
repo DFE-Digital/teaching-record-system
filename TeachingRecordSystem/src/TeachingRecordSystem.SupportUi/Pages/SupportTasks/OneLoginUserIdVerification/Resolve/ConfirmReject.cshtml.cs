@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
-public class ConfirmRejectModel(OneLoginUserIdVerificationSupportTaskService supportTaskService, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
+public class ConfirmReject(OneLoginUserIdVerificationSupportTaskService supportTaskService, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
 

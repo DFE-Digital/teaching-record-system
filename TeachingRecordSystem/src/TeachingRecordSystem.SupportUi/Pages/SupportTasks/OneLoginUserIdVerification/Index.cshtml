@@ -19,7 +19,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full" data-testid="results">
-        @if (Model.Results!.Count() == 0)
+        @if (Model.Results!.Count == 0)
         {
             @* This needs to say "Try searching again with different details" when search functionality is added" *@
             <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-tasks-message">
@@ -58,8 +58,12 @@
                         @foreach (var result in Model.Results!)
                         {
                             <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                                <th scope="row" class="govuk-table__header" data-testid="taskId">@result.SupportTaskReference</th>
-                                <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(result.SupportTaskReference)">@result.Name</a></td>
+                                <th scope="row" class="govuk-table__header" data-testid="taskId">
+                                    <a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(result.SupportTaskReference)">
+                                        @result.SupportTaskReference
+                                    </a>
+                                </th>
+                                <td class="govuk-table__cell" data-testid="name">@result.Name</td>
                                 <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                                 <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
                             </tr>

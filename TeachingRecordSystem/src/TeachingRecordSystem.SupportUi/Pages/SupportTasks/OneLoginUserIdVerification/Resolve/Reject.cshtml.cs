@@ -6,9 +6,9 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
-public class RejectModel(SupportUiLinkGenerator linkGenerator) : PageModel
+public class Reject(SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    private readonly InlineValidator<RejectModel> _validator = new()
+    private readonly InlineValidator<Reject> _validator = new()
     {
         v => v.RuleFor(m => m.Reason)
             .NotNull().WithMessage("Select a reason"),
