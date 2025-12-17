@@ -169,7 +169,7 @@ public partial class EwcWalesImportJobTests
         var inductionStartDate = new DateOnly(2024, 05, 01);
         var inductionPassDate = new DateOnly(2024, 10, 07);
         var dob = "01/09/1977";
-        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{person.Trn!},Keri Louise Lyddon,Nicholas,{dob},{inductionStartDate.ToString()},{inductionPassDate.ToString()},,Pembrokeshire Local Authority,,Pass\r\n";
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{person.Trn},Keri Louise Lyddon,Nicholas,{dob},{inductionStartDate.ToString()},{inductionPassDate.ToString()},,Pembrokeshire Local Authority,,Pass\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -189,7 +189,7 @@ public partial class EwcWalesImportJobTests
             Assert.Collection(it.IntegrationTransactionRecords!,
                 item1 =>
                 {
-                    Assert.Contains($"For TRN {person.Trn!} Date of Birth does not match with the existing record.", item1.FailureMessage!);
+                    Assert.Contains($"For TRN {person.Trn} Date of Birth does not match with the existing record.", item1.FailureMessage!);
                     Assert.Null(item1.PersonId);
                     Assert.Equal(IntegrationTransactionRecordStatus.Failure, item1.Status);
                     Assert.NotNull(item1.RowData);

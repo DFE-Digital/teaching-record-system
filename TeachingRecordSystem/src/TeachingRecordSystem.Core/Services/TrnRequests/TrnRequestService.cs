@@ -107,7 +107,7 @@ public class TrnRequestService(
     {
         await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
-            (person.PersonId, person.Trn!),
+            (person.PersonId, person.Trn),
             publishTrnRequestUpdatedEvent: true,
             processContext);
 
@@ -131,7 +131,7 @@ public class TrnRequestService(
 
         var status = furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed;
         trnRequest.SetResolvedPerson(person.PersonId, status);
-        await TryEnsureTrnTokenAsync(trnRequest, person.Trn!);
+        await TryEnsureTrnTokenAsync(trnRequest, person.Trn);
         await dbContext.SaveChangesAsync();
 
         if (furtherChecksNeeded)
@@ -310,7 +310,7 @@ public class TrnRequestService(
             return null;
         }
 
-        if (await TryEnsureTrnTokenAsync(result.TrnRequest, result.Trn!))
+        if (await TryEnsureTrnTokenAsync(result.TrnRequest, result.Trn))
         {
             await dbContext.SaveChangesAsync();
         }
@@ -529,7 +529,7 @@ public class TrnRequestService(
                     CASE WHEN vars.gender IS NOT NULL AND p.gender = vars.gender THEN true ELSE false END gender_matches
                 FROM persons p, vars
                 WHERE
-                    p.status = 0 and p.trn IS NOT NULL AND (
+                    p.status = 0 AND (
                         (p.names && vars.first_names AND p.names && vars.middle_names AND p.names && vars.last_names) OR
                         (p.names && vars.first_names AND p.names && vars.middle_names AND p.date_of_birth = vars.date_of_birth) OR
                         (p.names && vars.middle_names AND p.names && vars.last_names AND p.date_of_birth = vars.date_of_birth) OR

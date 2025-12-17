@@ -25,7 +25,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
         var person = await TestData.CreatePersonAsync();
         var command = await CreateCommand() with
         {
-            Trn = person.Trn!,
+            Trn = person.Trn,
             EvidenceFileUrl = "https://nonexistenturl.com"
         };
 
@@ -43,7 +43,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
         var person = await TestData.CreatePersonAsync();
         var command = await CreateCommand() with
         {
-            Trn = person.Trn!
+            Trn = person.Trn
         };
 
         // Act

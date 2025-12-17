@@ -87,7 +87,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = "67/13/2025";
             return x;
         });
@@ -107,7 +107,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.QtsDate = "67/13/2025";
             return x;
         });
@@ -127,7 +127,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = "01/06/1999";
             return x;
         });
@@ -147,7 +147,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString()!;
             return x;
         });
@@ -174,7 +174,7 @@ public class QtsImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsDate = holdsDate.ToString("dd/MM/yyyy");
             return x;
@@ -202,7 +202,7 @@ public class QtsImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsDate = holdsDate.AddDays(1).ToString("dd/MM/yyyy");
             x.QtsStatus = "71";
@@ -225,7 +225,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = "InvalidOrg";
             x.QtsStatus = "67";
@@ -248,7 +248,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsStatus = "67";
             x.QtsDate = Clock.UtcNow.AddDays(1).ToString("dd/MM/yyyy");
@@ -270,7 +270,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = "InvalidOrg";
             x.QtsStatus = "67";
@@ -316,7 +316,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsStatus = qtsStatus;
             return x;
@@ -338,7 +338,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsStatus = qtsStatus;
             return x;
@@ -358,7 +358,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync(x => x.WithQts(new DateOnly(2024, 01, 01)));
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             return x;
         });
         var expectedJson = $"{row.QtsRefNo},{row.Forename},{row.Surname},{row.DateOfBirth},{row.QtsStatus},{row.QtsDate},{row.IttStartMonth},{row.IttStartYear},{row.IttEndDate},{row.ITTCourseLength},{row.IttEstabLeaCode},{row.IttEstabCode},{row.IttQualCode},{row.IttClassCode},{row.IttSubjectCode1},{row.IttSubjectCode2},{row.IttMinAgeRange},{row.IttMaxAgeRange},{row.IttMinSpAgeRange},{row.IttMaxSpAgeRange},{row.PqCourseLength},{row.PqYearOfAward},{row.Country},{row.PqEstabCode},{row.PqQualCode},{row.Honours},{row.PqClassCode},{row.PqSubjectCode1},{row.PqSubjectCode2},{row.PqSubjectCode3}";
@@ -380,7 +380,7 @@ public class QtsImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             return x;
         });
@@ -405,7 +405,7 @@ public class QtsImporterTests : IAsyncLifetime
                 .WithStatus(RouteToProfessionalStatusStatus.Holds)));
         var row = GetDefaultRow(x =>
         {
-            x.QtsRefNo = person.Trn!;
+            x.QtsRefNo = person.Trn;
             x.QtsStatus = "67";
             return x;
         });

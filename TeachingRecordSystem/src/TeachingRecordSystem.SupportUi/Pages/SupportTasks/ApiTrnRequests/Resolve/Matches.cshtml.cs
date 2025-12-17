@@ -99,7 +99,7 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 EmailAddress = p.EmailAddress,
                 NationalInsuranceNumber = p.NationalInsuranceNumber,
                 Gender = p.Gender,
-                Trn = p.Trn!,
+                Trn = p.Trn,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)

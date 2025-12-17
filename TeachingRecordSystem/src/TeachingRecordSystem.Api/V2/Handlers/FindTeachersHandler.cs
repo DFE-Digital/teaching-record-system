@@ -20,7 +20,7 @@ public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindT
         {
             Results = result.Select(p => new FindTeacherResult
             {
-                Trn = p.Trn!,
+                Trn = p.Trn,
                 EmailAddresses = !string.IsNullOrEmpty(p.EmailAddress) ? [p.EmailAddress] : [],
                 FirstName = p.FirstName,
                 MiddleName = p.MiddleName,
@@ -101,7 +101,7 @@ public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindT
 file static class Extensions
 {
     public static IQueryable<PostgresModels.Person> ApplyBaseFilters(this IQueryable<PostgresModels.Person> query) =>
-        query.Include(p => p.Alerts).Where(p => p.Trn != null && p.Status == PersonStatus.Active);
+        query.Include(p => p.Alerts).Where(p => p.Status == PersonStatus.Active);
 
     public static IEnumerable<string> ExceptEmpty(this IEnumerable<string> source) =>
         source.Where(v => !string.IsNullOrEmpty(v));

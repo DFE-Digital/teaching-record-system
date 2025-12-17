@@ -247,7 +247,7 @@ public class SignInJourneyHelper(
             var matchedDateOfBirth = verifiedDatesOfBirth.FirstOrDefault(dob => dob == getAnIdentityPerson.DateOfBirth);
             if (matchedLastName == default || matchedDateOfBirth == default)
             {
-                return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn!, MatchRoute: null, MatchedAttributes: null);
+                return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: null, MatchedAttributes: null);
             }
             var matchedAttributes = new Dictionary<PersonMatchedAttribute, string>()
             {
@@ -262,7 +262,7 @@ public class SignInJourneyHelper(
                 await idDbContext.SaveChangesAsync();
             }
 
-            return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn!, MatchRoute: matchRoute, matchedAttributes);
+            return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: matchRoute, matchedAttributes);
         }
     }
 
@@ -356,7 +356,6 @@ public class SignInJourneyHelper(
             return null;
         }
         Debug.Assert(trnRequestMetadata.ResolvedPersonId.HasValue);
-        Debug.Assert(resolvedPerson.Trn is not null);
 
         oneLoginUser.SetVerified(
             verifiedOn: trnRequestMetadata.CreatedOn,

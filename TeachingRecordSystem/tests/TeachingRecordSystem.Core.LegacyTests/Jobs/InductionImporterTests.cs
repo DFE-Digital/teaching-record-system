@@ -137,7 +137,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.ReferenceNumber = person.Trn!;
+            x.ReferenceNumber = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             x.StartDate = person1AwardedDate.AddDays(-10).ToString("dd/MM/yyyy");
             x.PassedDate = person1AwardedDate.AddDays(-8).ToString("dd/MM/yyyy");
@@ -170,7 +170,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.ReferenceNumber = person.Trn!;
+            x.ReferenceNumber = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             x.StartDate = qtsDate.AddDays(-10).ToString("dd/MM/yyyy");
             x.PassedDate = person1AwardedDate.AddDays(-8).ToString("dd/MM/yyyy");
@@ -271,7 +271,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.ReferenceNumber = person.Trn!;
+            x.ReferenceNumber = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
@@ -301,7 +301,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.ReferenceNumber = person.Trn!;
+            x.ReferenceNumber = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             x.EmployerCode = accountNumber;
             return x;
@@ -346,7 +346,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.ReferenceNumber = person.Trn!;
+            x.ReferenceNumber = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
@@ -365,7 +365,7 @@ public class InductionImporterTests : IAsyncLifetime
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
-            x.ReferenceNumber = person.Trn!;
+            x.ReferenceNumber = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
@@ -389,7 +389,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var row = GetDefaultRow(x =>
         {
-            x.ReferenceNumber = person.Trn!;
+            x.ReferenceNumber = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
@@ -415,7 +415,7 @@ public class InductionImporterTests : IAsyncLifetime
             .WithHoldsRouteToProfessionalStatus(route.RouteToProfessionalStatusTypeId, person1AwardedDate));
         var row = GetDefaultRow(x =>
         {
-            x.ReferenceNumber = person.Trn!;
+            x.ReferenceNumber = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });

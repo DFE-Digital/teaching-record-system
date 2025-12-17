@@ -30,7 +30,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
                 .Where(p => p.PersonId == person.PersonId)
                 .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
 
-        var command = new GetTrnCommand(person.Trn!);
+        var command = new GetTrnCommand(person.Trn);
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -53,7 +53,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
                     .SetProperty(p => p.Status, _ => PersonStatus.Deactivated)
                     .SetProperty(p => p.MergedWithPersonId, _ => anotherPerson.PersonId)));
 
-        var command = new GetTrnCommand(person.Trn!);
+        var command = new GetTrnCommand(person.Trn);
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -75,7 +75,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
         // Arrange
         var person = await TestData.CreatePersonAsync();
         Debug.Assert(person.Person.Status is PersonStatus.Active);
-        var command = new GetTrnCommand(person.Trn!);
+        var command = new GetTrnCommand(person.Trn);
 
         // Act
         var result = await ExecuteCommandAsync(command);

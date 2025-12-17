@@ -27,7 +27,7 @@ public class MergePersonState : IRegisterJourney
     public EvidenceUploadModel Evidence { get; set; } = new();
     public string? Comments { get; set; }
 
-    public async Task EnsureInitializedAsync(Guid personAId, Func<Task<string?>> getPersonATrn)
+    public async Task EnsureInitializedAsync(Guid personAId, Func<Task<string>> getPersonATrn)
     {
         if (Initialized)
         {

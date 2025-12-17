@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Dfe.Analytics;
 using Dfe.Analytics.AspNetCore;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -10,6 +9,7 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Controllers;
@@ -42,7 +42,7 @@ public class OAuth2Controller(
         var clientId = request.ClientId!;
         var client = await dbContext.ApplicationUsers.SingleAsync(u => u.ClientId == clientId);
 
-        if (HttpContext.GetWebRequestEvent() is Event webRequestEvent)
+        if (HttpContext.GetWebRequestEvent() is Dfe.Analytics.Event webRequestEvent)
         {
             webRequestEvent.Data[DfeAnalyticsEventDataKeys.ApplicationUserId] = [client.UserId.ToString()];
         }
@@ -150,9 +150,9 @@ public class OAuth2Controller(
             .Include(o => o.Person)
             .SingleAsync(u => u.Subject == subject);
 
-        if (oneLoginUser.Person?.Trn is string trn)
+        if (oneLoginUser.Person is Person p)
         {
-            claims.Add(ClaimTypes.Trn, trn);
+            claims.Add(ClaimTypes.Trn, p.Trn);
         }
 
         if (User.HasScope(Scopes.Email))

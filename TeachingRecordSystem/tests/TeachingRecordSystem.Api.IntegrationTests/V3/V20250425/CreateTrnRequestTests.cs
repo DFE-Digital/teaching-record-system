@@ -409,7 +409,6 @@ public class CreateTrnRequestTests : TestBase
         // Assert
         var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync());
         Assert.NotNull(person);
-        Assert.NotNull(person.Trn);
 
         var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(requestId);
 

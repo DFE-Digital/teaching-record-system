@@ -128,7 +128,7 @@ public abstract class CommonJourneyPage(
             .Where(p => personIds.Contains(p.PersonId))
             .Select(p => new PotentialDuplicate
             {
-                Trn = p.Trn!,
+                Trn = p.Trn,
                 PersonId = p.PersonId,
                 Identifier = 'X', // We'll fix this below, can't do it over an IQueryable
                 MatchedAttributes = Array.Empty<PersonMatchedAttribute>(),  // ditto

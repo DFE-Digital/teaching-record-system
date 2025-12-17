@@ -25,7 +25,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var command = new SetQtlsCommand(person.Trn!, QtsDate: null);
+        var command = new SetQtlsCommand(person.Trn, QtsDate: null);
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -42,7 +42,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         var existingQtlsDate = new DateOnly(2025, 4, 1);
         var person = await TestData.CreatePersonAsync(p => p.WithQtls(existingQtlsDate));
 
-        var command = new SetQtlsCommand(person.Trn!, QtsDate: null);
+        var command = new SetQtlsCommand(person.Trn, QtsDate: null);
 
         LegacyEventObserver.Clear();
 
@@ -74,7 +74,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         var person = await TestData.CreatePersonAsync();
 
         var qtlsDate = new DateOnly(2025, 4, 1);
-        var command = new SetQtlsCommand(person.Trn!, qtlsDate);
+        var command = new SetQtlsCommand(person.Trn, qtlsDate);
 
         LegacyEventObserver.Clear();
 
@@ -109,7 +109,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         var qtlsDate = new DateOnly(2025, 4, 1);
         var person = await TestData.CreatePersonAsync(p => p.WithQtls(qtlsDate));
 
-        var command = new SetQtlsCommand(person.Trn!, qtlsDate);
+        var command = new SetQtlsCommand(person.Trn, qtlsDate);
 
         LegacyEventObserver.Clear();
 
@@ -130,7 +130,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         var person = await TestData.CreatePersonAsync(p => p.WithQtls(existingQtsDate));
 
         var newQtlsDate = new DateOnly(2025, 4, 10);
-        var command = new SetQtlsCommand(person.Trn!, newQtlsDate);
+        var command = new SetQtlsCommand(person.Trn, newQtlsDate);
 
         LegacyEventObserver.Clear();
 
