@@ -68,7 +68,7 @@ public class ConfirmConnect(
         await JourneyInstance.DeleteAsync();
 
         TempData.SetFlashSuccess(
-            $"GOV.UK One Login account connected to {MatchedPersonName}’s record",
+            $"GOV.UK One Login connected to {MatchedPersonName}’s record",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(MatchedPersonId)));
 
         return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());

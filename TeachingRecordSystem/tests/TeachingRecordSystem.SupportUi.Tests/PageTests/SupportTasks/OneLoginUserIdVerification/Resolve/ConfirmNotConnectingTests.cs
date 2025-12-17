@@ -264,7 +264,7 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            "GOV.UK One Login account not connected to a record",
+            "GOV.UK One Login not connected to a record",
             $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}.");
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);

@@ -54,7 +54,7 @@ public class ConfirmNotConnecting(
 
         var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
         TempData.SetFlashSuccess(
-            "GOV.UK One Login account not connected to a record",
+            "GOV.UK One Login not connected to a record",
             $"Request closed for {data.StatedFirstName} {data.StatedLastName}.");
 
         return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());

@@ -12,7 +12,7 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
     private readonly InlineValidator<Matches> _validator = new()
     {
         v => v.RuleFor(m => m.MatchedPersonId)
-            .NotNull().WithMessage("Select what you want to do with this GOV.UK One Login account")
+            .NotNull().WithMessage("Select what you want to do with this GOV.UK One Login")
     };
 
     public JourneyInstance<ResolveOneLoginUserIdVerificationState> JourneyInstance { get; set; } = null!;

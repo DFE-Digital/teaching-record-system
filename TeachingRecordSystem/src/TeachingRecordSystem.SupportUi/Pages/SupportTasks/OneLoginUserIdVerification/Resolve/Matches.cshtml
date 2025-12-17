@@ -1,7 +1,7 @@
 @page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/matches"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.Matches
 @{
-    ViewBag.Title = "Check if this GOV.UK One Login account matches an existing record";
+    ViewBag.Title = "Check if this GOV.UK One Login matches an existing record";
 }
 
 @section BeforeContent {
@@ -85,7 +85,7 @@
             <govuk-radios for="MatchedPersonId">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend>
-                        <h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login account?</h2>
+                        <h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login?</h2>
                     </govuk-radios-fieldset-legend>
                     @foreach (var match in Model.SuggestedMatches)
                     {
