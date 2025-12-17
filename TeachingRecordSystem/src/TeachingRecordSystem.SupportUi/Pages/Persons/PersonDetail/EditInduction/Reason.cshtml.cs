@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -8,9 +9,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class ReasonModel(
     SupportUiLinkGenerator linkGenerator,
-    PersonService personService,
+    TrsDbContext dbContext,
     EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(personService, linkGenerator, evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]

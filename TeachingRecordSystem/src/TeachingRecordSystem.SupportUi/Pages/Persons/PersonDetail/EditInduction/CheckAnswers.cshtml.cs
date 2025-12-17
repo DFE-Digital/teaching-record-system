@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -9,10 +10,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    PersonService personService,
     ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
+    EvidenceUploadManager evidenceUploadManager,
+    IClock clock,
+    TrsDbContext dbContext)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     public InductionStatus InductionStatus { get; set; }
 
@@ -88,21 +90,25 @@ public class CheckAnswersModel(
                     fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers));
         }
 
-        await PersonService.SetPersonInductionStatusAsync(new()
+        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+
+        person.SetInductionStatus(
+            InductionStatus,
+            StartDate,
+            CompletedDate,
+            JourneyInstance!.State.ExemptionReasonIds ?? [],
+            ChangeReason.GetDisplayName(),
+            ChangeReasonDetail,
+            EvidenceFile?.ToEventModel(),
+            User.GetUserId(),
+            clock.UtcNow,
+            out var updatedEvent);
+
+        if (updatedEvent is not null)
         {
-            PersonId = PersonId,
-            InductionStatus = InductionStatus,
-            StartDate = StartDate,
-            CompletedDate = CompletedDate,
-            ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds ?? [],
-            Justification = new()
-            {
-                Reason = ChangeReason,
-                ReasonDetail = ChangeReasonDetail,
-                Evidence = EvidenceFile?.ToFile()
-            },
-            UserId = User.GetUserId()
-        });
+            await DbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await DbContext.SaveChangesAsync();
+        }
 
         await JourneyInstance!.CompleteAsync();
 

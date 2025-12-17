@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
@@ -9,10 +9,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StatusModel(
     SupportUiLinkGenerator linkGenerator,
-    PersonService personService,
+    TrsDbContext dbContext,
     IClock clock,
     EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(personService, linkGenerator, evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     private bool _inductionStatusManagedByCpd;
 
@@ -101,7 +101,7 @@ public class StatusModel(
     {
         await base.OnPageHandlerExecutingAsync(context);
 
-        var person = await PersonService.GetPersonAsync(PersonId);
+        var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == PersonId);
 
         if (person is null)
         {

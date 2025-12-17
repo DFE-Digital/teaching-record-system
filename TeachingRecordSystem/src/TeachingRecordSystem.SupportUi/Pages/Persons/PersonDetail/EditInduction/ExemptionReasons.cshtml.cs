@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.InductionExemptions;
-using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -10,10 +10,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class ExemptionReasonsModel(
     SupportUiLinkGenerator linkGenerator,
-    PersonService personService,
+    TrsDbContext dbContext,
     EvidenceUploadManager evidenceController,
     InductionExemptionService inductionExemptionService)
-    : CommonJourneyPage(personService, linkGenerator, evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     [BindProperty]
     public Guid[] ExemptionReasonIds { get; set; } = [];

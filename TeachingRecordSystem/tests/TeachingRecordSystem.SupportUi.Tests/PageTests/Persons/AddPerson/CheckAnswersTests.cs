@@ -239,6 +239,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal("other-evidence.png", actualEvent.EvidenceFile.Name);
         });
 
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonCreatedEvent>();
+        });
+
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
     }

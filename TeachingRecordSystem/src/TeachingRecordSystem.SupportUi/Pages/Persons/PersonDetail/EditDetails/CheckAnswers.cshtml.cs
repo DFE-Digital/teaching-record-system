@@ -10,7 +10,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     PersonService personService,
-    EvidenceUploadManager evidenceUploadManager)
+    EvidenceUploadManager evidenceUploadManager,
+    IClock clock)
     : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
     private Person? _person;
@@ -80,10 +81,11 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await PersonService.UpdatePersonAsync(new()
-        {
-            PersonId = PersonId,
-            PersonDetails = new()
+        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, clock.UtcNow, User.GetUserId());
+
+        await PersonService.UpdatePersonDetailsAsync(new(
+            PersonId,
+            new()
             {
                 FirstName = FirstName ?? string.Empty,
                 MiddleName = MiddleName ?? string.Empty,
@@ -93,19 +95,18 @@ public class CheckAnswersModel(
                 NationalInsuranceNumber = NationalInsuranceNumber,
                 Gender = Gender
             },
-            UserId = User.GetUserId(),
-            NameChangeJustification = NameChangeReason is PersonNameChangeReason nameChangeReason ? new()
+            NameChangeReason is PersonNameChangeReason nameChangeReason ? new()
             {
                 Reason = nameChangeReason,
                 Evidence = NameChangeEvidenceFile?.ToFile()
             } : null,
-            DetailsChangeJustification = OtherDetailsChangeReason is PersonDetailsChangeReason detailsChangeReason ? new()
+            OtherDetailsChangeReason is PersonDetailsChangeReason detailsChangeReason ? new()
             {
                 Reason = detailsChangeReason,
                 ReasonDetail = OtherDetailsChangeReasonDetail,
                 Evidence = OtherDetailsChangeEvidenceFile?.ToFile()
             } : null
-        });
+        ), processContext);
 
         await JourneyInstance!.CompleteAsync();
 

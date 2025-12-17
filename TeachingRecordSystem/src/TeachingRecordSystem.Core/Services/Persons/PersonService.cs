@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Services.Persons;
@@ -11,29 +10,6 @@ public class PersonService(
     ITrnGenerator trnGenerator,
     IEventPublisher eventPublisher)
 {
-    public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
-    {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleAsync(p => p.PersonId == options.DeactivatingPersonId);
-
-        if (deactivatingPerson.Status is PersonStatus.Deactivated)
-        {
-            throw new InvalidOperationException("Cannot merge a person that is already deactivated.");
-        }
-
-        deactivatingPerson.Status = PersonStatus.Deactivated;
-        deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
-        await dbContext.SaveChangesAsync();
-
-        await eventPublisher.PublishEventAsync(
-            new PersonDeactivatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                PersonId = options.DeactivatingPersonId,
-                MergedWithPersonId = options.RetainedPersonId
-            },
-            processContext);
-    }
-
     public async Task<string?> GetTrnFromPersonIdAsync(Guid personId)
     {
         return (await dbContext.Persons.SingleAsync(q => q.PersonId == personId)).Trn;
@@ -51,7 +27,7 @@ public class PersonService(
         return await persons.SingleOrDefaultAsync(p => p.PersonId == personId);
     }
 
-    public async Task<Guid> CreatePersonAsync(CreatePersonOptions options)
+    public async Task<Guid> CreatePersonAsync(CreatePersonOptions options, ProcessContext processContext)
     {
         var now = clock.UtcNow;
 
@@ -72,27 +48,26 @@ public class PersonService(
             UpdatedOn = now
         };
 
-        var createdEvent = new LegacyEvents.PersonCreatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = options.UserId,
-            PersonId = person.PersonId,
-            PersonAttributes = options.PersonDetails.ToEventModel(),
-            CreateReason = options.Justification.Reason.GetDisplayName(),
-            CreateReasonDetail = options.Justification.ReasonDetail,
-            EvidenceFile = options.Justification.Evidence?.ToEventModel(),
-            TrnRequestMetadata = null
-        };
-
         dbContext.Add(person);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(
+            new PersonCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Details = options.PersonDetails.ToEventModel(),
+                CreateReason = options.Justification.Reason.GetDisplayName(),
+                CreateReasonDetail = options.Justification.ReasonDetail,
+                EvidenceFile = options.Justification.Evidence?.ToEventModel(),
+                TrnRequestMetadata = null
+            },
+            processContext);
 
         return person.PersonId;
     }
 
-    public async Task UpdatePersonAsync(UpdatePersonOptions options)
+    public async Task UpdatePersonDetailsAsync(UpdatePersonDetailsOptions options, ProcessContext processContext)
     {
         var now = clock.UtcNow;
 
@@ -103,7 +78,7 @@ public class PersonService(
             throw new TrsPersonNotFoundException($"Person with ID {options.PersonId} not found.");
         }
 
-        var oldAttributes = EventModels.PersonDetails.FromModel(person);
+        var oldDetails = EventModels.PersonDetails.FromModel(person);
 
         person.FirstName = options.PersonDetails.FirstName;
         person.MiddleName = options.PersonDetails.MiddleName;
@@ -114,124 +89,145 @@ public class PersonService(
         person.Gender = options.PersonDetails.Gender;
 
         var changes = 0 |
-            (person.FirstName != oldAttributes.FirstName ? LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName : 0) |
-            (person.MiddleName != oldAttributes.MiddleName ? LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName : 0) |
-            (person.LastName != oldAttributes.LastName ? LegacyEvents.PersonDetailsUpdatedEventChanges.LastName : 0) |
-            (person.DateOfBirth != oldAttributes.DateOfBirth ? LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
-            (person.EmailAddress != oldAttributes.EmailAddress ? LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
-            (person.NationalInsuranceNumber != oldAttributes.NationalInsuranceNumber ? LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
-            (person.Gender != oldAttributes.Gender ? LegacyEvents.PersonDetailsUpdatedEventChanges.Gender : 0);
+            (person.FirstName != oldDetails.FirstName ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
+            (person.MiddleName != oldDetails.MiddleName ? PersonDetailsUpdatedEventChanges.MiddleName : 0) |
+            (person.LastName != oldDetails.LastName ? PersonDetailsUpdatedEventChanges.LastName : 0) |
+            (person.DateOfBirth != oldDetails.DateOfBirth ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
+            (person.EmailAddress != oldDetails.EmailAddress ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
+            (person.NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
+            (person.Gender != oldDetails.Gender ? PersonDetailsUpdatedEventChanges.Gender : 0);
 
-        if (changes != 0)
+        if (changes == 0)
         {
-            person.UpdatedOn = now;
+            return;
         }
 
-        var updatedEvent = changes != 0 ?
-            new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = now,
-                RaisedBy = options.UserId,
-                PersonId = options.PersonId,
-                PersonAttributes = options.PersonDetails.ToEventModel(),
-                OldPersonAttributes = oldAttributes,
-                NameChangeReason = options.NameChangeJustification?.Reason.GetDisplayName(),
-                NameChangeEvidenceFile = options.NameChangeJustification?.Evidence?.ToEventModel(),
-                DetailsChangeReason = options.DetailsChangeJustification?.Reason.GetDisplayName(),
-                DetailsChangeReasonDetail = options.DetailsChangeJustification?.ReasonDetail,
-                DetailsChangeEvidenceFile = options.DetailsChangeJustification?.Evidence?.ToEventModel(),
-                Changes = changes
-            } :
-            null;
+        person.UpdatedOn = now;
 
-        if (updatedEvent is not null &&
-            updatedEvent.Changes.HasAnyFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.NameChange) &&
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) &&
             options.NameChangeJustification?.Reason is PersonNameChangeReason.MarriageOrCivilPartnership or PersonNameChangeReason.DeedPollOrOtherLegalProcess)
         {
             dbContext.PreviousNames.Add(new PreviousName
             {
                 PreviousNameId = Guid.NewGuid(),
                 PersonId = options.PersonId,
-                FirstName = updatedEvent.OldPersonAttributes.FirstName,
-                MiddleName = updatedEvent.OldPersonAttributes.MiddleName,
-                LastName = updatedEvent.OldPersonAttributes.LastName,
+                FirstName = oldDetails.FirstName,
+                MiddleName = oldDetails.MiddleName,
+                LastName = oldDetails.LastName,
                 CreatedOn = now,
                 UpdatedOn = now
             });
         }
 
-        if (updatedEvent is not null)
-        {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        }
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(
+            new PersonDetailsUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Changes = changes,
+                OldPersonDetails = oldDetails,
+                PersonDetails = options.PersonDetails.ToEventModel(),
+                NameChangeReason = options.NameChangeJustification?.Reason.GetDisplayName(),
+                NameChangeEvidenceFile = options.NameChangeJustification?.Evidence?.ToEventModel(),
+                DetailsChangeReason = options.DetailsChangeJustification?.Reason.GetDisplayName(),
+                DetailsChangeReasonDetail = options.DetailsChangeJustification?.ReasonDetail,
+                DetailsChangeEvidenceFile = options.DetailsChangeJustification?.Evidence?.ToEventModel(),
+            },
+            processContext);
     }
 
-    public async Task SetPersonStatusAsync(SetPersonStatusOptions options)
+    public async Task DeactivatePersonAsync(DeactivatePersonOptions options, ProcessContext processContext)
     {
         var now = clock.UtcNow;
 
-        var person = await dbContext.Persons
+        var deactivatingPerson = await dbContext.Persons
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
 
-        if (person is null)
+        if (deactivatingPerson is null)
         {
             throw new TrsPersonNotFoundException($"Person with ID {options.PersonId} not found.");
         }
 
-        var oldStatus = person.Status;
-        person.Status = options.TargetStatus;
-        person.UpdatedOn = now;
+        if (deactivatingPerson.Status is PersonStatus.Deactivated)
+        {
+            throw new InvalidOperationException("Cannot deactivate a person that is already deactivated.");
+        }
 
-        var @event = new PersonStatusUpdatedEvent()
+        deactivatingPerson.Status = PersonStatus.Deactivated;
+        deactivatingPerson.UpdatedOn = now;
+
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(new PersonDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = options.UserId,
-            PersonId = options.PersonId,
-            Status = person.Status,
-            OldStatus = oldStatus,
-            Reason = options.TargetStatus == PersonStatus.Deactivated
-                ? options.DeactivateJustification!.Reason.GetDisplayName()
-                : options.ReactivateJustification!.Reason.GetDisplayName(),
-            ReasonDetail = options.TargetStatus == PersonStatus.Deactivated
-                ? options.DeactivateJustification!.ReasonDetail
-                : options.ReactivateJustification!.ReasonDetail,
-            EvidenceFile = options.TargetStatus == PersonStatus.Deactivated
-                ? options.DeactivateJustification!.Evidence?.ToEventModel()
-                : options.ReactivateJustification!.Evidence?.ToEventModel(),
-            DateOfDeath = null
-        };
-
-        if (@event is not null)
-        {
-            await dbContext.AddEventAndBroadcastAsync(@event);
-            await dbContext.SaveChangesAsync();
-        }
+            PersonId = deactivatingPerson.PersonId,
+            MergedWithPersonId = null,
+            Reason = options.Justification.Reason.GetDisplayName(),
+            ReasonDetail = options.Justification.ReasonDetail,
+            EvidenceFile = options.Justification.Evidence?.ToEventModel()
+        }, processContext);
     }
 
-    public async Task SetPersonInductionStatusAsync(SetPersonInductionStatusOptions options)
+    public async Task ReactivatePersonAsync(ReactivatePersonOptions options, ProcessContext processContext)
     {
-        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == options.PersonId);
+        var now = clock.UtcNow;
 
-        person.SetInductionStatus(
-            options.InductionStatus,
-            options.StartDate,
-            options.CompletedDate,
-            options.ExemptionReasonIds ?? [],
-            options.Justification.Reason.GetDisplayName(),
-            options.Justification.ReasonDetail,
-            options.Justification.Evidence?.ToEventModel(),
-            options.UserId,
-            clock.UtcNow,
-            out var updatedEvent);
+        var reactivatingPerson = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
 
-        if (updatedEvent is not null)
+        if (reactivatingPerson is null)
         {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
-            await dbContext.SaveChangesAsync();
+            throw new TrsPersonNotFoundException($"Person with ID {options.PersonId} not found.");
         }
+
+        if (reactivatingPerson.Status is PersonStatus.Active)
+        {
+            throw new InvalidOperationException("Cannot reactivate a person that is already active.");
+        }
+
+        reactivatingPerson.Status = PersonStatus.Active;
+        reactivatingPerson.UpdatedOn = now;
+
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(new PersonReactivatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = reactivatingPerson.PersonId,
+            Reason = options.Justification.Reason.GetDisplayName(),
+            ReasonDetail = options.Justification.ReasonDetail,
+            EvidenceFile = options.Justification.Evidence?.ToEventModel()
+        }, processContext);
+    }
+
+    public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
+    {
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleAsync(p => p.PersonId == options.DeactivatingPersonId);
+
+        if (deactivatingPerson.Status is PersonStatus.Deactivated)
+        {
+            throw new InvalidOperationException("Cannot merge a person that is already deactivated.");
+        }
+
+        deactivatingPerson.Status = PersonStatus.Deactivated;
+        deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(
+            new PersonDeactivatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = options.DeactivatingPersonId,
+                MergedWithPersonId = options.RetainedPersonId,
+                Reason = null,
+                ReasonDetail = null,
+                EvidenceFile = null
+            },
+            processContext);
     }
 }

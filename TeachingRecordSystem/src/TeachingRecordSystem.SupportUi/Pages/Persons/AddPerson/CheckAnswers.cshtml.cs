@@ -9,7 +9,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
-    PersonService personService)
+    PersonService personService,
+    IClock clock)
     : CommonJourneyPage(linkGenerator, evidenceUploadManager)
 {
     public string? FirstName { get; set; }
@@ -59,9 +60,10 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var personId = await personService.CreatePersonAsync(new()
-        {
-            PersonDetails = new()
+        var processContext = new ProcessContext(ProcessType.PersonCreating, clock.UtcNow, User.GetUserId());
+
+        var personId = await personService.CreatePersonAsync(new(
+            new()
             {
                 FirstName = FirstName ?? string.Empty,
                 MiddleName = MiddleName ?? string.Empty,
@@ -71,14 +73,12 @@ public class CheckAnswersModel(
                 NationalInsuranceNumber = NationalInsuranceNumber,
                 Gender = Gender,
             },
-            UserId = User.GetUserId(),
-            Justification = new()
+            new()
             {
                 Reason = Reason!.Value,
                 ReasonDetail = ReasonDetail,
                 Evidence = EvidenceFile?.ToFile()
-            }
-        });
+            }), processContext);
 
         await JourneyInstance!.CompleteAsync();
 

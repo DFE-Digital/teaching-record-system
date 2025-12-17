@@ -227,6 +227,20 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             Assert.Equal("evidence.pdf", actualEvent.EvidenceFile.Name);
         });
 
+        Events.AssertProcessesCreated(p =>
+        {
+            if (targetStatus == PersonStatus.Deactivated)
+            {
+                Assert.Equal(ProcessType.PersonDeactivating, p.ProcessContext.ProcessType);
+                p.AssertProcessHasEvents<PersonDeactivatedEvent>();
+            }
+            else
+            {
+                Assert.Equal(ProcessType.PersonReactivating, p.ProcessContext.ProcessType);
+                p.AssertProcessHasEvents<PersonReactivatedEvent>();
+            }
+        });
+
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
     }

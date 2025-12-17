@@ -10,7 +10,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     PersonService personService,
-    EvidenceUploadManager evidenceController)
+    EvidenceUploadManager evidenceController,
+    IClock clock)
     : CommonJourneyPage(personService, linkGenerator, evidenceController)
 {
     public PersonDeactivateReason? DeactivateReason { get; set; }
@@ -47,24 +48,34 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await PersonService.SetPersonStatusAsync(new()
+        if (TargetStatus == PersonStatus.Deactivated)
         {
-            PersonId = PersonId,
-            TargetStatus = TargetStatus,
-            DeactivateJustification = DeactivateReason is PersonDeactivateReason deactivateReason ? new()
-            {
-                Reason = deactivateReason,
-                ReasonDetail = DeactivateReasonDetail,
-                Evidence = EvidenceFile?.ToFile()
-            } : null,
-            ReactivateJustification = ReactivateReason is PersonReactivateReason reactivateReason ? new()
-            {
-                Reason = reactivateReason,
-                ReasonDetail = ReactivateReasonDetail,
-                Evidence = EvidenceFile?.ToFile()
-            } : null,
-            UserId = User.GetUserId()
-        });
+            var processContext = new ProcessContext(ProcessType.PersonDeactivating, clock.UtcNow, User.GetUserId());
+
+            await PersonService.DeactivatePersonAsync(new(
+                PersonId,
+                new()
+                {
+                    Reason = DeactivateReason!.Value,
+                    ReasonDetail = DeactivateReasonDetail,
+                    Evidence = EvidenceFile?.ToFile()
+                }
+            ), processContext);
+        }
+        else
+        {
+            var processContext = new ProcessContext(ProcessType.PersonReactivating, clock.UtcNow, User.GetUserId());
+
+            await PersonService.ReactivatePersonAsync(new(
+                PersonId,
+                new()
+                {
+                    Reason = ReactivateReason!.Value,
+                    ReasonDetail = ReactivateReasonDetail,
+                    Evidence = EvidenceFile?.ToFile()
+                }
+            ), processContext);
+        }
 
         await JourneyInstance!.CompleteAsync();
 
