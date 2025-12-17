@@ -1,6 +1,7 @@
 @page "/users/add/confirm"
 @using TeachingRecordSystem.Core;
 @using TeachingRecordSystem.Core.Legacy
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @model TeachingRecordSystem.SupportUi.Pages.Users.AddUser.ConfirmModel
 @{
     ViewBag.Title = "Add a user";
@@ -8,6 +9,14 @@
 
 @section BeforeContent {
     <govuk-back-link href="@LinkGenerator.Users.AddUser.Index()" />
+}
+
+@section Styles {
+    <style asp-add-nonce="true">
+        .govuk-radios.trs-user-roles {
+            --trs-user-permission-columns: UserPermissionTypes.All.Count;
+        }
+    </style>
 }
 
 <div class="govuk-grid-row">
@@ -23,7 +32,7 @@
                 <govuk-input-label>Name</govuk-input-label>
             </govuk-input>
 
-            <govuk-radios for="@Model.Role" radios-class="trs-user-roles" radios-style="--trs-user-permission-columns: @UserPermissionTypes.All.Count">
+            <govuk-radios for="@Model.Role" radios-class="trs-user-roles">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
                         Role

@@ -74,6 +74,10 @@
   display: inline;
 }
 
+.trs-\!-width-70 {
+  width: 70px;
+}
+
 .trs-\!-width-150 {
   width: 150px;
 }
@@ -362,6 +366,19 @@
       }
     }
   }
+}
+
+.trs-display-flex {
+  display: flex
+}
+
+.trs-float-right {
+  float: right;
+}
+
+.trs-itr-transaction-error {
+  border-left: 10px solid #d4351c;
+  background-color: #f3dbdb;
 }
 
 .trs-\!-height-full {
