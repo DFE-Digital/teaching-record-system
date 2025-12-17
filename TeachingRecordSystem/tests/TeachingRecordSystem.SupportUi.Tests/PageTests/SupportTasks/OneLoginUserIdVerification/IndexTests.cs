@@ -191,7 +191,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .FirstOrDefault();
 
         Assert.NotNull(resultRow);
-        var nameLink = resultRow.GetElementByTestId("name")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
+        var nameLink = resultRow.GetElementByTestId("taskId")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
         Assert.Contains($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve", nameLink!.Href);
     }
 

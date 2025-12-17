@@ -1,6 +1,6 @@
 @page "/support-tasks/one-login-user-id-verification/{supportTaskReference}/resolve/reject"
 @using TeachingRecordSystem.Core.Models.SupportTasks
-@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.RejectModel
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve.Reject
 @{
     ViewBag.Title = "Why are you rejecting this request?";
 }
@@ -12,10 +12,11 @@
 <form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Record management</span>
+
             <govuk-radios for="Reason">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend>
-                        <span class="govuk-caption-l">Record management</span>
                         <h1 class="govuk-fieldset__legend--l govuk-!-margin-top-0">@ViewBag.Title</h1>
                         <div class="govuk-hint">We’ll email the person with the reason you select</div>
                     </govuk-radios-fieldset-legend>
