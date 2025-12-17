@@ -134,7 +134,7 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserI
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"GOV.UK One Login account connected to {matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}’s record");
+            $"GOV.UK One Login connected to {matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}’s record");
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal("/support-tasks/one-login-user-id-verification", response.Headers.Location?.OriginalString);
