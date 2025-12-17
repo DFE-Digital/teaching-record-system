@@ -11,13 +11,9 @@
     <govuk-back-link href="@LinkGenerator.Users.AddUser.Index()" />
 }
 
-@* Attach dynamic style to radios component by id *@
-@{
-    var compId = "trs-" + Guid.NewGuid().ToString("N");
-}
 @section Styles {
     <style asp-add-nonce="true">
-        [id="@compId"] {
+        .govuk-radios.trs-user-roles {
             --trs-user-permission-columns: UserPermissionTypes.All.Count;
         }
     </style>
@@ -36,7 +32,7 @@
                 <govuk-input-label>Name</govuk-input-label>
             </govuk-input>
 
-            <govuk-radios for="@Model.Role" radios-class="trs-user-roles" id="@compId">
+            <govuk-radios for="@Model.Role" radios-class="trs-user-roles">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
                         Role
