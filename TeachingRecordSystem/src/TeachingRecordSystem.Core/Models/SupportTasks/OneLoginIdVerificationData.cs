@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
 public record OneLoginUserIdVerificationData : ISupportTaskData
@@ -24,6 +26,29 @@ public record OneLoginUserIdVerificationData : ISupportTaskData
 public enum OneLoginUserIdVerificationOutcome
 {
     NotVerified = 0,
-    VerifiedOnly = 1,
-    VerifiedAndConnected = 2
+    VerifiedOnlyWithMatches = 1,
+    VerifiedOnlyWithoutMatches = 2,
+    VerifiedAndConnected = 3
+}
+
+public enum OneLoginIdVerificationRejectReason
+{
+    [Display(Name = "The proof of identity does not match the request details")]
+    ProofDoesNotMatchRequest,
+    [Display(Name = "The proof of identity is unclear")]
+    ProofIsUnclear,
+    [Display(Name = "The proof of identity is the wrong type")]
+    ProofIsWrongType,
+    [Display(Name = "Another reason")]
+    AnotherReason
+}
+
+public enum OneLoginIdVerificationNotConnectingReason
+{
+    [Display(Name = "There is no matching record")]
+    NoMatchingRecord,
+    [Display(Name = "The details only partly match a record")]
+    DetailsOnlyPartlyMatch,
+    [Display(Name = "Another reason")]
+    AnotherReason
 }

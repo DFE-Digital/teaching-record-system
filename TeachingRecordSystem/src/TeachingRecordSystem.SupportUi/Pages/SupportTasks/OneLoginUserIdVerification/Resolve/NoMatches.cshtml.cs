@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
 public class NoMatches(
     SupportUiLinkGenerator linkGenerator,
-    SupportTaskService supportTaskService,
+    OneLoginUserIdVerificationSupportTaskService supportTaskService,
     OneLoginService oneLoginService,
     IClock clock) : PageModel
 {
@@ -41,29 +41,10 @@ public class NoMatches(
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-        var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
-        await oneLoginService.SetUserVerifiedAsync(
-            new SetUserVerifiedOptions
+        await supportTaskService.ResolveSupportTaskAsync(
+            (VerifiedOnlyWithoutMatchesOutcomeOptions)new()
             {
-                OneLoginUserSubject = _supportTask.OneLoginUserSubject!,
-                VerificationRoute = OneLoginUserVerificationRoute.Support,
-                VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
-            },
-            processContext);
-
-        await oneLoginService.EnqueueRecordNotFoundEmailAsync(_supportTask.OneLoginUser!.EmailAddress!, Name!, processContext);
-
-        await supportTaskService.UpdateSupportTaskAsync(
-            new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
-            {
-                SupportTaskReference = SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    Verified = true,
-                    Outcome = OneLoginUserIdVerificationOutcome.VerifiedOnly
-                },
-                Status = SupportTaskStatus.Closed
+                SupportTask = _supportTask!
             },
             processContext);
 

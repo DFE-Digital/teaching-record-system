@@ -104,7 +104,7 @@ public static class Extensions
             .AddNameSynonyms()
             .AddTrnRequestService(configuration)
             .AddEventPublisher()
-            .AddSupportTaskService()
+            .AddSupportTaskServices()
             .AddSingleton<PersonInfoCache>()
             .AddTrnGeneration()
             .AddNoteService()

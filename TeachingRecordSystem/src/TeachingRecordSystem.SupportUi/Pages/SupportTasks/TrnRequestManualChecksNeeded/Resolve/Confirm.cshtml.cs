@@ -27,7 +27,7 @@ public class Confirm(TrnRequestService trnRequestService, SupportTaskService sup
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<TrnRequestManualChecksNeededData>
             {
-                SupportTaskReference = SupportTaskReference!,
+                SupportTask = SupportTaskReference!,
                 UpdateData = data => data,
                 Status = SupportTaskStatus.Closed
             },

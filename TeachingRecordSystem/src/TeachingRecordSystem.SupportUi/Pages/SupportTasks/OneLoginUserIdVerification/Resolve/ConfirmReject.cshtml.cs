@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
-public class ConfirmRejectModel(SupportTaskService supportTaskService, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
+public class ConfirmRejectModel(OneLoginUserIdVerificationSupportTaskService supportTaskService, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -38,25 +38,18 @@ public class ConfirmRejectModel(SupportTaskService supportTaskService, IClock cl
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-        var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
-
-        await supportTaskService.UpdateSupportTaskAsync(
-            new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
+        await supportTaskService.ResolveSupportTaskAsync(
+            new NotVerifiedOutcomeOptions
             {
-                SupportTaskReference = SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    Verified = false,
-                    Outcome = OneLoginUserIdVerificationOutcome.NotVerified,
-                    RejectReason = JourneyInstance.State.RejectReason,
-                    RejectionAdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails
-                },
-                Status = SupportTaskStatus.Closed
+                SupportTask = _supportTask!,
+                RejectReason = JourneyInstance.State.RejectReason!.Value,
+                RejectionAdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails
             },
             processContext);
 
         await JourneyInstance.DeleteAsync();
 
+        var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
         TempData.SetFlashSuccess(
             "GOV.UK One Login verification request rejected",
             $"Request closed for {data.StatedFirstName} {data.StatedLastName}.");

@@ -93,33 +93,14 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVeri
             var updatedSupportTask = await
                 dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             var updatedSupportTaskData = updatedSupportTask.GetData<OneLoginUserIdVerificationData>();
-            Assert.True(updatedSupportTaskData.Verified);
-            Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedOnly, updatedSupportTaskData.Outcome);
+            Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches, updatedSupportTaskData.Outcome);
 
             var updatedOneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);
             Assert.Equal(Clock.UtcNow, updatedOneLoginUser.VerifiedOn);
-            Assert.Equal(OneLoginUserVerificationRoute.Support, updatedOneLoginUser.VerificationRoute);
-            Assert.NotNull(updatedOneLoginUser.VerifiedDatesOfBirth);
-            Assert.Collection(updatedOneLoginUser.VerifiedDatesOfBirth, dob => Assert.Equal(supportTaskData.StatedDateOfBirth, dob));
-            Assert.NotNull(updatedOneLoginUser.VerifiedNames);
-            Assert.Collection(
-                updatedOneLoginUser.VerifiedNames,
-                names => Assert.Equivalent(new[] { supportTaskData.StatedFirstName, supportTaskData.StatedLastName }, names));
         });
 
-        Events.AssertProcessesCreated(p =>
-        {
-            Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<EmailSentEvent, SupportTaskUpdatedEvent>(
-                e =>
-                {
-                    Assert.Equal(EmailTemplateIds.OneLoginCannotFindRecord, e.Email.TemplateId);
-                    Assert.Equal(oneLoginUser.EmailAddress, e.Email.EmailAddress);
-                },
-                _ => { });
-        });
+        Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType));
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();

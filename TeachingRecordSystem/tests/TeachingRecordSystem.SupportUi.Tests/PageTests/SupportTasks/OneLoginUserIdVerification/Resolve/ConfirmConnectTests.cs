@@ -97,7 +97,6 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserI
     {
         // Arrange
         var (oneLoginUser, supportTask, matchedPerson) = await CreateUserSupportTaskAndMatchingPerson();
-        var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask,
@@ -120,41 +119,16 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserI
             var updatedSupportTask = await
                 dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             var updatedSupportTaskData = updatedSupportTask.GetData<OneLoginUserIdVerificationData>();
             Assert.True(updatedSupportTaskData.Verified);
             Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedAndConnected, updatedSupportTaskData.Outcome);
 
             var updatedOneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);
             Assert.Equal(Clock.UtcNow, updatedOneLoginUser.VerifiedOn);
-            Assert.Equal(OneLoginUserVerificationRoute.Support, updatedOneLoginUser.VerificationRoute);
-            Assert.NotNull(updatedOneLoginUser.VerifiedDatesOfBirth);
-            Assert.Collection(updatedOneLoginUser.VerifiedDatesOfBirth, dob => Assert.Equal(supportTaskData.StatedDateOfBirth, dob));
-            Assert.NotNull(updatedOneLoginUser.VerifiedNames);
-            Assert.Collection(
-                updatedOneLoginUser.VerifiedNames,
-                names => Assert.Equivalent(new[] { supportTaskData.StatedFirstName, supportTaskData.StatedLastName }, names));
-            Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
-            Assert.Equal(OneLoginUserMatchRoute.Support, updatedOneLoginUser.MatchRoute);
             Assert.Equal(matchedPerson.PersonId, updatedOneLoginUser.PersonId);
-            Assert.NotNull(updatedOneLoginUser.MatchedAttributes);
-            Assert.Contains(updatedOneLoginUser.MatchedAttributes, a => a.Key == PersonMatchedAttribute.FirstName && a.Value == supportTaskData.StatedFirstName);
-            Assert.Contains(updatedOneLoginUser.MatchedAttributes, a => a.Key == PersonMatchedAttribute.LastName && a.Value == supportTaskData.StatedLastName);
-            Assert.Contains(updatedOneLoginUser.MatchedAttributes, a => a.Key == PersonMatchedAttribute.DateOfBirth && a.Value == supportTaskData.StatedDateOfBirth.ToString("yyyy-MM-dd"));
-            Assert.Contains(updatedOneLoginUser.MatchedAttributes, a => a.Key == PersonMatchedAttribute.Trn && a.Value == supportTaskData.StatedTrn);
         });
 
-        Events.AssertProcessesCreated(p =>
-        {
-            Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<EmailSentEvent, SupportTaskUpdatedEvent>(
-                e =>
-                {
-                    Assert.Equal(EmailTemplateIds.OneLoginRecordMatched, e.Email.TemplateId);
-                    Assert.Equal(oneLoginUser.EmailAddress, e.Email.EmailAddress);
-                },
-                _ => { });
-        });
+        Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType));
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();

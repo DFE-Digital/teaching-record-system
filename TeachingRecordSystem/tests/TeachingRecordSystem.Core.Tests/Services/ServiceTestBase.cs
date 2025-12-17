@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Core.Tests.Services;
 
@@ -11,8 +12,10 @@ public abstract class ServiceTestBase
     {
         _fixture = fixture;
 
-        TestScopedServices.Reset();
+        TestScopedServices.Reset(fixture.Services);
     }
+
+    protected DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler => TestScopedServices.GetCurrent().BackgroundJobScheduler;
 
     protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
 

@@ -141,7 +141,7 @@ public partial class TestData
                 dbContext.AddEventWithoutBroadcast(createdEvent);
                 await dbContext.SaveChangesAsync();
 
-                return supportTask;
+                return await dbContext.SupportTasks.Include(t => t.OneLoginUser).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             });
     }
 }

@@ -176,7 +176,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTaskReference = supportTaskReference,
+            SupportTask = supportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.Closed,
             Comments = Faker.Lorem.Paragraph()
@@ -205,7 +205,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTaskReference = supportTask.SupportTaskReference,
+            SupportTask = supportTask.SupportTaskReference,
             UpdateData = data => data with { ChangeRequestOutcome = outcome },
             Status = SupportTaskStatus.Closed,
             Comments = Faker.Lorem.Paragraph()
@@ -247,7 +247,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTaskReference = supportTask.SupportTaskReference,
+            SupportTask = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.Closed,
             Comments = Faker.Lorem.Paragraph()
@@ -288,7 +288,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTaskReference = supportTask.SupportTaskReference,
+            SupportTask = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = supportTask.Status,
             Comments = Faker.Lorem.Paragraph()
