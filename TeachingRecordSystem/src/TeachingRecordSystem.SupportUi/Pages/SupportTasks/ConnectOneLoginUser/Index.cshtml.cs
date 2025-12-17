@@ -77,14 +77,17 @@ public class IndexModel(TrsDbContext dbContext, OneLoginService oneLoginService,
         StatedNationalInsuranceNumber = data.StatedNationalInsuranceNumber;
         StatedTrn = data.StatedTrn;
 
-        SuggestedMatches = suggestedMatches
+        var suggestedMatchPersonIds = suggestedMatches.Select(m => m.PersonId).ToArray();
+        SuggestedMatches = await dbContext.Persons
+            .Include(p => p.PreviousNames)
+            .Where(p => suggestedMatchPersonIds.Contains(p.PersonId))
             .Select(m => new PersonDetailViewModel()
             {
                 PersonId = m.PersonId,
                 Options = PersonDetailViewModelOptions.None,
                 Trn = m.Trn,
                 Name = $"{m.FirstName} {m.MiddleName} {m.LastName}",
-                PreviousNames = [],  // TODO When we've got previous names synced to TRS
+                PreviousNames = m.PreviousNames!.Select(n => $"{n.FirstName} {n.MiddleName} {n.LastName}").ToArray(),
                 DateOfBirth = m.DateOfBirth,
                 NationalInsuranceNumber = m.NationalInsuranceNumber,
                 Gender = null,  // Not shown
@@ -92,7 +95,7 @@ public class IndexModel(TrsDbContext dbContext, OneLoginService oneLoginService,
                 CanChangeDetails = false,
                 IsActive = null  // Not shown
             })
-            .ToArray();
+            .ToArrayAsync();
 
         await base.OnPageHandlerExecutionAsync(context, next);
 

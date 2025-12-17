@@ -25,7 +25,7 @@ public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.WaitForUrlPathAsync("/support-tasks");
     }
 
-    [Fact]
+    [Fact(Skip = "Disabled until journey is rebuilt so remove option to enter arbitrary TRN")]
     public async Task ConnectOneLoginUser_WithoutSuggestions()
     {
         var person = await TestData.CreatePersonAsync();

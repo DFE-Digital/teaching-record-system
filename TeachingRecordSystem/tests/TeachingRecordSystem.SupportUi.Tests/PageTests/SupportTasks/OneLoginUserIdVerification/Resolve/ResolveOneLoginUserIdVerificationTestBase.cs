@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserIdVerification.Resolve;
@@ -26,7 +27,7 @@ public abstract class ResolveOneLoginUserIdVerificationTestBase(HostFixture host
     protected async Task<JourneyInstance<ResolveOneLoginUserIdVerificationState>> CreateJourneyInstanceAsync(
         string supportTaskReference,
         Action<ResolveOneLoginUserIdVerificationState>? configureState = null,
-        params ResolveOneLoginUserIdVerificationStateMatch[] matchedPersons)
+        params MatchPersonResult[] matchedPersons)
     {
         var state = new ResolveOneLoginUserIdVerificationState { MatchedPersons = matchedPersons };
 

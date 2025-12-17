@@ -176,12 +176,12 @@ public class OneLoginUserIdVerificationSupportTaskServiceTests(ServiceFixture fi
         {
             SupportTask = supportTask,
             MatchedPersonId = matchedPerson.PersonId,
-            MatchedAttributeTypes =
+            MatchedAttributes =
             [
-                PersonMatchedAttribute.FirstName,
-                PersonMatchedAttribute.LastName,
-                PersonMatchedAttribute.DateOfBirth,
-                PersonMatchedAttribute.Trn
+                KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
             ]
         };
 

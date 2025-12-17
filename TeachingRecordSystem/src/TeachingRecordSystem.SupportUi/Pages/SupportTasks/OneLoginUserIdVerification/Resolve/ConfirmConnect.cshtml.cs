@@ -52,16 +52,15 @@ public class ConfirmConnect(
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-        var matchedAttributeTypes = JourneyInstance.State.MatchedPersons
-            .Single(m => m.PersonId == MatchedPersonId)
-            .MatchedAttributes;
+        var matchedPerson = JourneyInstance.State.MatchedPersons
+            .Single(m => m.PersonId == MatchedPersonId);
 
         await supportTaskService.ResolveSupportTaskAsync(
             new VerifiedAndConnectedOutcomeOptions
             {
                 SupportTask = _supportTask!,
                 MatchedPersonId = MatchedPersonId,
-                MatchedAttributeTypes = matchedAttributeTypes
+                MatchedAttributes = matchedPerson.MatchedAttributes
             },
             processContext);
 

@@ -11,5 +11,5 @@ public class SuggestedMatchViewModel
     public required DateOnly? DateOfBirth { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
     public required IReadOnlyCollection<string>? PreviousNames { get; init; } = [];
-    public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
+    public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributeTypes { get; init; }
 }

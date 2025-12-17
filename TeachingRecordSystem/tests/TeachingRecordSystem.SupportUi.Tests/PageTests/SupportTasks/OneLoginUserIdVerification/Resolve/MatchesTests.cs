@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserIdVerification.Resolve;
@@ -78,13 +79,14 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson.PersonId,
+                matchedPerson.Trn,
                 [
-                    PersonMatchedAttribute.FirstName,
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth,
-                    PersonMatchedAttribute.Trn
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
         var request = new HttpRequestMessage(
@@ -132,24 +134,27 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson1.PersonId,
+                matchedPerson1.Trn,
                 [
-                    PersonMatchedAttribute.NationalInsuranceNumber
+                    KeyValuePair.Create(PersonMatchedAttribute.NationalInsuranceNumber, matchedPerson1.NationalInsuranceNumber!)
                 ]),
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson2.PersonId,
+                matchedPerson2.Trn,
                 [
-                    PersonMatchedAttribute.FirstName,
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson2.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson2.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson2.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]),
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson3.PersonId,
+                matchedPerson3.Trn,
                 [
-                    PersonMatchedAttribute.FirstName,
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson3.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson3.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson3.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]));
 
         var request = new HttpRequestMessage(
@@ -205,11 +210,12 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson.PersonId,
+                matchedPerson.Trn,
                 [
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]));
 
         var request = new HttpRequestMessage(
@@ -247,16 +253,18 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson1.PersonId,
+                matchedPerson1.Trn,
                 [
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName,  matchedPerson1.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson1.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]),
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson2.PersonId,
+                matchedPerson2.Trn,
                 [
-                    PersonMatchedAttribute.NationalInsuranceNumber
+                    KeyValuePair.Create(PersonMatchedAttribute.NationalInsuranceNumber, matchedPerson2.NationalInsuranceNumber!)
                 ]));
 
         var request = new HttpRequestMessage(
@@ -291,13 +299,14 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson.PersonId,
+                matchedPerson.Trn,
                 [
-                    PersonMatchedAttribute.FirstName,
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth,
-                    PersonMatchedAttribute.Trn
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
         var request = new HttpRequestMessage(
@@ -327,13 +336,14 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson.PersonId,
+                matchedPerson.Trn,
                 [
-                    PersonMatchedAttribute.FirstName,
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth,
-                    PersonMatchedAttribute.Trn
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
         var request = new HttpRequestMessage(
@@ -372,13 +382,14 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson.PersonId,
+                matchedPerson.Trn,
                 [
-                    PersonMatchedAttribute.FirstName,
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth,
-                    PersonMatchedAttribute.Trn
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
         var request = new HttpRequestMessage(
@@ -417,13 +428,14 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson.PersonId,
+                matchedPerson.Trn,
                 [
-                    PersonMatchedAttribute.FirstName,
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth,
-                    PersonMatchedAttribute.Trn
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
         var request = new HttpRequestMessage(

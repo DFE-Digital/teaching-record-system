@@ -126,7 +126,7 @@ public class OneLoginUserIdVerificationSupportTaskService(
                 OneLoginUserSubject = supportTask.OneLoginUserSubject!,
                 MatchedPersonId = options.MatchedPersonId,
                 MatchRoute = OneLoginUserMatchRoute.Support,
-                MatchedAttributes = GetMatchedAttributes(supportTask, data, options.MatchedAttributeTypes)
+                MatchedAttributes = options.MatchedAttributes
             },
             processContext);
 
@@ -147,29 +147,6 @@ public class OneLoginUserIdVerificationSupportTaskService(
             },
             processContext);
         Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
-    }
-
-    private static IEnumerable<KeyValuePair<PersonMatchedAttribute, string>> GetMatchedAttributes(
-        SupportTask supportTask,
-        OneLoginUserIdVerificationData data,
-        IEnumerable<PersonMatchedAttribute> matchedAttributes)
-    {
-        foreach (var attribute in matchedAttributes)
-        {
-            var value = attribute switch
-            {
-                PersonMatchedAttribute.FirstName => data.StatedFirstName,
-                PersonMatchedAttribute.LastName => data.StatedLastName,
-                PersonMatchedAttribute.FullName => $"{data.StatedFirstName} {data.StatedLastName}",
-                PersonMatchedAttribute.DateOfBirth => data.StatedDateOfBirth.ToString("yyyy-MM-dd"),
-                PersonMatchedAttribute.NationalInsuranceNumber => data.StatedNationalInsuranceNumber,
-                PersonMatchedAttribute.Trn => data.StatedTrn,
-                PersonMatchedAttribute.EmailAddress => supportTask.OneLoginUserSubject!,
-                _ => throw new NotSupportedException($"Unknown {nameof(PersonMatchedAttribute)}: '{attribute}'.")
-            };
-
-            yield return KeyValuePair.Create(attribute, value!);
-        }
     }
 
     private void ThrowIfSupportTaskIsNotOpen(SupportTask supportTask)

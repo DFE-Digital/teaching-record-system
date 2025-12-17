@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
+using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserIdVerification.Resolve;
 
@@ -44,13 +44,14 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVeri
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             state => state.Verified = true,
-            new ResolveOneLoginUserIdVerificationStateMatch(
+            new MatchPersonResult(
                 matchedPerson.PersonId,
+                matchedPerson.Trn,
                 [
-                    PersonMatchedAttribute.FirstName,
-                    PersonMatchedAttribute.LastName,
-                    PersonMatchedAttribute.DateOfBirth,
-                    PersonMatchedAttribute.Trn
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
         var request = new HttpRequestMessage(

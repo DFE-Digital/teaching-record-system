@@ -5,44 +5,6 @@ namespace TeachingRecordSystem.Core.Tests.Services.OneLogin;
 public partial class OneLoginServiceTests
 {
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task GetMatchedAttributesAsync_ReturnsExpectedResults(bool usePersonNino)
-    {
-        // Arrange
-        var firstName = TestData.GenerateFirstName();
-        var lastName = TestData.GenerateLastName();
-        var dateOfBirth = TestData.GenerateDateOfBirth();
-        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-        var alternativeNationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber);
-
-        var person = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
-        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-        var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
-
-        string[][] names = [[firstName, lastName]];
-        DateOnly[] datesOfBirth = [dateOfBirth];
-
-        // Act
-        var result = await WithServiceAsync(s => s.GetMatchedAttributesAsync(new(names, datesOfBirth, nationalInsuranceNumber, person.Trn!, TrnTokenTrnHint: null), person.PersonId));
-
-        // Assert
-        Assert.Collection(
-            result,
-            m => AssertAttributeMatch(PersonMatchedAttribute.LastName, lastName, m),
-            m => AssertAttributeMatch(PersonMatchedAttribute.DateOfBirth, dateOfBirth.ToString("yyyy-MM-dd"), m),
-            m => AssertAttributeMatch(PersonMatchedAttribute.NationalInsuranceNumber, nationalInsuranceNumber, m),
-            m => AssertAttributeMatch(PersonMatchedAttribute.Trn, person.Trn!, m),
-            m => AssertAttributeMatch(PersonMatchedAttribute.FirstName, firstName, m));
-
-        static void AssertAttributeMatch(PersonMatchedAttribute expectedAttribute, string expectedValue, KeyValuePair<PersonMatchedAttribute, string> actual)
-        {
-            Assert.Equal(expectedAttribute, actual.Key);
-            Assert.Equal(expectedValue, actual.Value);
-        }
-    }
-
-    [Theory]
     [MemberData(nameof(MatchOneLoginUserData))]
     public async Task MatchPersonAsync_ReturnsExpectedResult(
         OneLogin.NameArgumentOption nameOption,
@@ -102,13 +64,13 @@ public partial class OneLoginServiceTests
 
         var trn = trnOption switch
         {
-            OneLogin.TrnArgumentOption.SpecifiedAndMatches => person.Trn!,
+            OneLogin.TrnArgumentOption.SpecifiedAndMatches => person.Trn,
             OneLogin.TrnArgumentOption.SpecifiedButDifferent => await TestData.GenerateTrnAsync(),
             _ => null
         };
 
         // Act
-        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn)));
+        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
 
         // Assert
         if (expectMatch)
@@ -138,10 +100,10 @@ public partial class OneLoginServiceTests
         string[][] names = [[firstName, lastName]];
         DateOnly[] datesOfBirth = [dateOfBirth];
         var nationalInsuranceNumber = person1.NationalInsuranceNumber!;
-        var trn = person2.Trn!;
+        var trn = person2.Trn;
 
         // Act
-        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn)));
+        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
 
         // Assert
         Assert.Null(result);
@@ -165,10 +127,10 @@ public partial class OneLoginServiceTests
         string[][] names = [[person.FirstName, person.LastName], [alias, person.LastName]];
         DateOnly[] datesOfBirth = [person.DateOfBirth];
         var nationalInsuranceNumber = person.NationalInsuranceNumber!;
-        var trn = person.Trn!;
+        var trn = person.Trn;
 
         // Act
-        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn)));
+        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
 
         // Assert
         Assert.NotNull(result);
@@ -197,11 +159,11 @@ public partial class OneLoginServiceTests
 
         // Person who matches on TRN
         var person3 = await TestData.CreatePersonAsync();
-        var trn = person3.Trn!;
+        var trn = person3.Trn;
 
         // Person who matches on last name, DOB & TRN
         var person4 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-        var trnTokenHintTrn = person4.Trn!;
+        var trnTokenHintTrn = person4.Trn;
 
         // person who matches on previous last name and DOB
         var person5 = await TestData.CreatePersonAsync(p => p.WithFirstName(TestData.GenerateChangedFirstName(firstName)).WithLastName(TestData.GenerateChangedLastName(lastName))

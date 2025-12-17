@@ -15,7 +15,7 @@ public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
         ["supportTaskReference"],
         appendUniqueKey: true);
 
-    public required IReadOnlyCollection<ResolveOneLoginUserIdVerificationStateMatch> MatchedPersons { get; set; }
+    public required IReadOnlyCollection<MatchPersonResult> MatchedPersons { get; set; }
 
     public bool? Verified { get; set; }
 
@@ -45,20 +45,18 @@ public class ResolveOneLoginUserIdVerificationStateFactory(OneLoginService oneLo
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification);
         var requestData = supportTask.Data as OneLoginUserIdVerificationData;
 
-        var matchResult = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
+        var suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
             Names: [[requestData!.StatedFirstName, requestData.StatedLastName]],
             DatesOfBirth: [requestData.StatedDateOfBirth],
             NationalInsuranceNumber: requestData.StatedNationalInsuranceNumber,
             Trn: requestData.StatedTrn,
-            TrnTokenTrnHint: null));
+            TrnTokenTrnHint: requestData.TrnTokenTrn));
 
         var state = new ResolveOneLoginUserIdVerificationState
         {
-            MatchedPersons = matchResult.Select(m => new ResolveOneLoginUserIdVerificationStateMatch(m.PersonId, m.MatchedAttributes)).ToArray()
+            MatchedPersons = suggestedMatches
         };
 
         return state;
     }
 }
-
-public record ResolveOneLoginUserIdVerificationStateMatch(Guid PersonId, IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes);
