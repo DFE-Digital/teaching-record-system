@@ -12,6 +12,7 @@ public class SetStatusStateBuilder
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     private bool Initialized { get; set; }
+    public ProvideMoreInformationOption ProvideMoreInformation { get; set; }
 
     public SetStatusStateBuilder WithInitializedState()
     {
@@ -20,15 +21,17 @@ public class SetStatusStateBuilder
         return this;
     }
 
-    public SetStatusStateBuilder WithDeactivateReasonChoice(DeactivateReasonOption option, string? detailText = null)
+    public SetStatusStateBuilder WithDeactivateReasonChoice(DeactivateReasonOption option, ProvideMoreInformationOption provideMoreInformationOption, string? detailText = null)
     {
+        ProvideMoreInformation = provideMoreInformationOption;
         DeactivateReason = option;
         DeactivateReasonDetail = detailText;
         return this;
     }
 
-    public SetStatusStateBuilder WithReactivateReasonChoice(ReactivateReasonOption option, string? detailText = null)
+    public SetStatusStateBuilder WithReactivateReasonChoice(ReactivateReasonOption option, ProvideMoreInformationOption provideMoreInformationOption, string? detailText = null)
     {
+        ProvideMoreInformation = provideMoreInformationOption;
         ReactivateReason = option;
         ReactivateReasonDetail = detailText;
         return this;
@@ -57,6 +60,7 @@ public class SetStatusStateBuilder
             DeactivateReasonDetail = DeactivateReasonDetail,
             ReactivateReason = ReactivateReason,
             ReactivateReasonDetail = ReactivateReasonDetail,
+            ProvideMoreInformation = ProvideMoreInformation,
             Evidence = Evidence,
             Initialized = Initialized
         };

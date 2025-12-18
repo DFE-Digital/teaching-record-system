@@ -16,12 +16,28 @@ public class SetStatusState : IRegisterJourney
     public string? ReactivateReasonDetail { get; set; }
     public EvidenceUploadModel Evidence { get; set; } = new();
 
+    public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
+
     public bool Initialized { get; set; }
 
-    public bool IsComplete => (DeactivateReason is not null || ReactivateReason is not null) &&
-            (DeactivateReason != DeactivateReasonOption.AnotherReason || DeactivateReasonDetail is not null) &&
-            (ReactivateReason != ReactivateReasonOption.AnotherReason || ReactivateReasonDetail is not null) &&
-            Evidence.IsComplete;
+    public bool IsComplete =>
+        Evidence.IsComplete &&
+        (
+            (
+                DeactivateReason is not null &&
+                (
+                    ProvideMoreInformation != ProvideMoreInformationOption.Yes ||
+                    DeactivateReasonDetail is not null
+                )
+            ) ||
+            (
+                ReactivateReason is not null &&
+                (
+                    ProvideMoreInformation != ProvideMoreInformationOption.Yes ||
+                    ReactivateReasonDetail is not null
+                )
+            )
+        );
 
     public void EnsureInitialized()
     {

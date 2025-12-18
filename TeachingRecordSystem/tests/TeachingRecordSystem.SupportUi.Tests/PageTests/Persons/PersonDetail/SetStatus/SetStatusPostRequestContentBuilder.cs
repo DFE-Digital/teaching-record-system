@@ -9,18 +9,22 @@ public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
     public ReactivateReasonOption? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
     public TestEvidenceUploadModel Evidence { get; set; } = new();
+    public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
 
-    public SetStatusPostRequestContentBuilder WithDeactivateReason(DeactivateReasonOption deactivateReason, string? detail = null)
+
+    public SetStatusPostRequestContentBuilder WithDeactivateReason(DeactivateReasonOption deactivateReason, ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
     {
         DeactivateReason = deactivateReason;
         DeactivateReasonDetail = detail;
+        ProvideMoreInformation = provideAdditionalInformation;
         return this;
     }
 
-    public SetStatusPostRequestContentBuilder WithReactivateReason(ReactivateReasonOption reactivateReason, string? detail = null)
+    public SetStatusPostRequestContentBuilder WithReactivateReason(ReactivateReasonOption reactivateReason, ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
     {
         ReactivateReason = reactivateReason;
         ReactivateReasonDetail = detail;
+        ProvideMoreInformation = provideAdditionalInformation;
         return this;
     }
 

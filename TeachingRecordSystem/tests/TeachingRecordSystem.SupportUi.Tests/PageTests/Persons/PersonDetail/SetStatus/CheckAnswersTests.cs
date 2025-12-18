@@ -31,11 +31,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -51,7 +51,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("More details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Additional information", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
         var expectedFileUrl = $"http://localhost/files/evidence.pdf?fileUrl={expectedBlobStorageFileUrl}";
@@ -61,6 +61,51 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
         });
+    }
+
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
+    public async Task Get_RendersPersonInformationSummaryList(PersonStatus targetStatus)
+    {
+        // Arrange
+        var evidenceFileId = Guid.NewGuid();
+
+        var person = await CreatePersonToBecomeStatus(targetStatus, p => p
+            .WithGender(Gender.Female)
+            .WithNationalInsuranceNumber()
+            .WithEmailAddress());
+
+        var stateBuilder = new SetStatusStateBuilder()
+            .WithInitializedState()
+            .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB");
+
+        if (targetStatus == PersonStatus.Deactivated)
+        {
+            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+        }
+        else
+        {
+            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+        }
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            stateBuilder.Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, targetStatus, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertSummaryListRowValue("Name", v => Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Gender", v => Assert.Equal(person.Gender!.GetDisplayName(), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Status", v => Assert.Equal(person.Person.Status.GetDisplayName(), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("National insurance number", v => Assert.Equal(person.NationalInsuranceNumber, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Email address", v => Assert.Equal(person.EmailAddress, v.TrimmedText()));
     }
 
     [Theory]
@@ -76,11 +121,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.RecordHolderDied);
+            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.RecordHolderDied, ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.DeactivatedByMistake);
+            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.DeactivatedByMistake, ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -103,7 +148,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         {
             doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("The record was deactivated by mistake", v.TrimmedText()));
         }
-        doc.AssertSummaryListRowValue("More details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Additional information", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListRowValues("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
@@ -125,11 +170,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(

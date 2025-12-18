@@ -13,8 +13,49 @@ public class ReasonModel(
     EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
+    private readonly InlineValidator<ReasonModel> _validator = new()
+    {
+        //de-activate rules
+        v => v.RuleFor(m => m.DeactivateReason)
+            .NotEmpty()
+            .WithMessage("Select a reason")
+            .When(x=>x.TargetStatus == PersonStatus.Deactivated),
+
+        v => v.RuleFor(m => m.ProvideMoreInformation)
+            .NotNull()
+            .WithMessage("Select yes if you want to provide more information")
+            .When(x=>x.TargetStatus == PersonStatus.Deactivated),
+
+        v => v.RuleFor(m => m.DeactivateReasonDetail)
+            .NotEmpty()
+            .WithMessage("Enter a reason")
+            .When(x => x.ProvideMoreInformation == ProvideMoreInformationOption.Yes && x.TargetStatus == PersonStatus.Deactivated),
+
+        //re-activate rules
+        v => v.RuleFor(m => m.ReactivateReason)
+            .NotEmpty()
+            .WithMessage("Select a reason")
+            .When(x=>x.TargetStatus == PersonStatus.Active),
+
+        v => v.RuleFor(m => m.ProvideMoreInformation)
+            .NotNull()
+            .WithMessage("Select yes if you want to provide more information")
+            .When(x=>x.TargetStatus == PersonStatus.Active),
+
+        v => v.RuleFor(m => m.ReactivateReasonDetail)
+            .NotEmpty()
+            .WithMessage("Enter a reason")
+            .When(x => x.ProvideMoreInformation == ProvideMoreInformationOption.Yes && x.TargetStatus == PersonStatus.Active),
+
+        // Make sure to take into account evidence models validation rules.
+        v => v.RuleFor(x => x.Evidence).Evidence()
+    };
+
     [BindProperty]
     public DeactivateReasonOption? DeactivateReason { get; set; }
+
+    [BindProperty]
+    public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
 
     [BindProperty]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
@@ -41,37 +82,16 @@ public class ReasonModel(
         ReactivateReason = JourneyInstance!.State.ReactivateReason;
         ReactivateReasonDetail = JourneyInstance!.State.ReactivateReasonDetail;
         Evidence = JourneyInstance.State.Evidence;
+        ProvideMoreInformation = JourneyInstance!.State.ProvideMoreInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (TargetStatus == PersonStatus.Deactivated)
-        {
-            if (DeactivateReason is null)
-            {
-                ModelState.AddModelError(nameof(DeactivateReason), "Select a reason");
-            }
-
-            if (DeactivateReason == DeactivateReasonOption.AnotherReason && DeactivateReasonDetail is null)
-            {
-                ModelState.AddModelError(nameof(DeactivateReasonDetail), "Enter a reason");
-            }
-        }
-        else
-        {
-            if (ReactivateReason is null)
-            {
-                ModelState.AddModelError(nameof(ReactivateReason), "Select a reason");
-            }
-
-            if (ReactivateReason == ReactivateReasonOption.AnotherReason && ReactivateReasonDetail is null)
-            {
-                ModelState.AddModelError(nameof(ReactivateReasonDetail), "Enter a reason");
-            }
-        }
-
         await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+        await _validator.ValidateAndThrowAsync(this);
 
+        // This is required because EvidenceFile validation (e.g. validation extensions) needs be part
+        // of determining if this is valid - which the above does not do.
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -79,10 +99,11 @@ public class ReasonModel(
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
+            state.ProvideMoreInformation = ProvideMoreInformation;
             state.DeactivateReason = DeactivateReason;
-            state.DeactivateReasonDetail = DeactivateReason is DeactivateReasonOption.AnotherReason ? DeactivateReasonDetail : null;
+            state.DeactivateReasonDetail = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? DeactivateReasonDetail : null;
             state.ReactivateReason = ReactivateReason;
-            state.ReactivateReasonDetail = ReactivateReason is ReactivateReasonOption.AnotherReason ? ReactivateReasonDetail : null;
+            state.ReactivateReasonDetail = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? ReactivateReasonDetail : null;
             state.Evidence = Evidence;
         });
 

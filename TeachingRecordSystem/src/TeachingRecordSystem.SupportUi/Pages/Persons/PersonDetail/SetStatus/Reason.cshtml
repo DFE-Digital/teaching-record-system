@@ -15,7 +15,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-!-width-two-thirds">
         <form action=@LinkGenerator.Persons.PersonDetail.SetStatus.Reason(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId) method="post" enctype="multipart/form-data" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="set-status-caption">@caption</span>
 
@@ -34,12 +34,25 @@
                         </govuk-radios-item>
                         <govuk-radios-item value="@DeactivateReasonOption.AnotherReason">
                             @DeactivateReasonOption.AnotherReason.GetDisplayName()
+                        </govuk-radios-item>
+                    </govuk-radios-fieldset>
+                </govuk-radios>
 
+                <govuk-radios for="ProvideMoreInformation"  name="ProvideMoreInformation" data-testid="provide-more-information-options">
+                    <govuk-radios-fieldset>
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="provide-more-information-options-legend">
+                            Do you want to provide more information?
+                        </govuk-radios-fieldset-legend>
+                        <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
+                            @ProvideMoreInformationOption.Yes.GetDisplayName()
                             <govuk-radios-item-conditional data-testid="deactivate-reason-detail">
                                 <govuk-character-count for="DeactivateReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows">
                                     <govuk-character-count-label>Enter details</govuk-character-count-label>
                                 </govuk-character-count>
                             </govuk-radios-item-conditional>
+                        </govuk-radios-item>
+                        <govuk-radios-item value="@ProvideMoreInformationOption.No">
+                            @ProvideMoreInformationOption.No.GetDisplayName()
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>
@@ -54,14 +67,27 @@
                         <govuk-radios-item value="@ReactivateReasonOption.DeactivatedByMistake">
                             @ReactivateReasonOption.DeactivatedByMistake.GetDisplayName()
                         </govuk-radios-item>
-                        <govuk-radios-item value="@ReactivateReasonOption.AnotherReason">
-                            @ReactivateReasonOption.AnotherReason.GetDisplayName()
+                        <govuk-radios-item value="@DeactivateReasonOption.AnotherReason">
+                            @DeactivateReasonOption.AnotherReason.GetDisplayName()
+                        </govuk-radios-item>
+                    </govuk-radios-fieldset>
+                </govuk-radios>
 
+                <govuk-radios for="ProvideMoreInformation"  name="ProvideMoreInformation" data-testid="provide-more-information-options">
+                    <govuk-radios-fieldset>
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="provide-more-information-options-legend">
+                            Do you want to provide more information?
+                        </govuk-radios-fieldset-legend>
+                        <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
+                            @ProvideMoreInformationOption.Yes.GetDisplayName()
                             <govuk-radios-item-conditional data-testid="reactivate-reason-detail">
                                 <govuk-character-count for="ReactivateReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows">
                                     <govuk-character-count-label>Enter details</govuk-character-count-label>
                                 </govuk-character-count>
                             </govuk-radios-item-conditional>
+                        </govuk-radios-item>
+                        <govuk-radios-item value="@ProvideMoreInformationOption.No">
+                            @ProvideMoreInformationOption.No.GetDisplayName()
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>
