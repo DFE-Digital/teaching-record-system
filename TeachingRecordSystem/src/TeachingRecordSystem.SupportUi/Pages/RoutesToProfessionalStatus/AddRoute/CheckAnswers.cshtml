@@ -14,7 +14,7 @@
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <partial name="_RouteDetail" model="@Model.RouteDetail" />
-            <h2 class="govuk-heading-l">Why are you adding this route?</h2>
+            <h2 class="govuk-heading-m">Why are you adding this route?</h2>
             <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
@@ -25,11 +25,11 @@
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback="true">@Model.ChangeReasonDetail.ChangeReasonDetail</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="more details">Change</govuk-summary-list-row-action>
+                                                       visually-hidden-text="additional information">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
