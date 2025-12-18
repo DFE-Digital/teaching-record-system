@@ -35,10 +35,10 @@ public class ConnectModel(TrsDbContext dbContext, OneLoginService oneLoginServic
         });
         _supportTask.Status = SupportTaskStatus.Closed;
 
-        var matchedAttributes = (await oneLoginService.GetMatchedAttributesAsync(
-                new(data.VerifiedNames!, data.VerifiedDatesOfBirth!, data.StatedNationalInsuranceNumber, data.StatedTrn, data.TrnTokenTrn),
-                PersonDetail!.PersonId))
-            .ToArray();
+        var matchResult = (await oneLoginService.GetSuggestedPersonMatchesAsync(
+            new(data.VerifiedNames!, data.VerifiedDatesOfBirth!, data.StatedNationalInsuranceNumber, data.StatedTrn, data.TrnTokenTrn)))
+            .Single(m => m.PersonId == PersonDetail!.PersonId);
+        var matchedAttributes = matchResult.MatchedAttributes;
 
         var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == data.OneLoginUserSubject);
         oneLoginUser.SetMatched(

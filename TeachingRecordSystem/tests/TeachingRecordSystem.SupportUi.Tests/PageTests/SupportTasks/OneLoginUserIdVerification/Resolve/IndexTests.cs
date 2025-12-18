@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
+using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserIdVerification.Resolve;
 
@@ -247,13 +247,14 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifica
             supportTask,
             state => state.MatchedPersons =
             [
-                new ResolveOneLoginUserIdVerificationStateMatch(
+                new MatchPersonResult(
                     matchedPerson.PersonId,
+                    matchedPerson.Trn,
                     [
-                        PersonMatchedAttribute.FirstName,
-                        PersonMatchedAttribute.LastName,
-                        PersonMatchedAttribute.DateOfBirth,
-                        PersonMatchedAttribute.Trn
+                        KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                        KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                        KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                        KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                     ])
             ]);
 

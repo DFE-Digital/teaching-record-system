@@ -4,4 +4,5 @@ public record MatchPersonOptions(
     IEnumerable<string[]> Names,
     IEnumerable<DateOnly> DatesOfBirth,
     string? NationalInsuranceNumber,
-    string? Trn);
+    string? Trn,
+    string? TrnTokenTrnHint);

@@ -311,8 +311,9 @@ public class SignInJourneyHelper(
         var datesOfBirth = state.VerifiedDatesOfBirth;
         var nationalInsuranceNumber = state.NationalInsuranceNumber;
         var trn = state.Trn;
+        var trnTokenTrn = state.TrnTokenTrn;
 
-        var matchResult = await oneLoginService.MatchPersonAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
+        var matchResult = await oneLoginService.MatchPersonAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn, trnTokenTrn));
 
         if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {
