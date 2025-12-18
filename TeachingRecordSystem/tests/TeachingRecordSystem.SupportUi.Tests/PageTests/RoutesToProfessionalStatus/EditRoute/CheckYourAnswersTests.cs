@@ -414,7 +414,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Reason", editRouteState.ChangeReason!.GetDisplayName()!);
-        doc.AssertSummaryListRowValueContentMatches("More details", editRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
+        doc.AssertSummaryListRowValueContentMatches("Additional information", editRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
         doc.AssertSummaryListRowValueContentMatches("Evidence", "Not provided");
     }
 
