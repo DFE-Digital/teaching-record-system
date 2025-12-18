@@ -3,6 +3,7 @@ using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Persons;
 
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
@@ -61,7 +62,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Fact]
-    public async Task CreatePersonAsync_CreatesPersonAndPublishesEvent()
+    public async Task CreatePersonAsync_WithCreatePersonViaSupportUIOptions_CreatesPersonAndPublishesEvent()
     {
         // Arrange
         var personDetails = new PersonDetails()
@@ -86,31 +87,33 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             }
         };
 
-        var options = new CreatePersonOptions(personDetails, justification);
+        var options = new CreatePersonViaSupportUIOptions(personDetails, justification);
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var personId = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
+        var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var person = await dbContext.Persons.SingleAsync(p => p.PersonId == personId);
-            Assert.Equal(Clock.UtcNow, person.CreatedOn);
-            Assert.Equal(Clock.UtcNow, person.UpdatedOn);
-            Assert.Equal(personDetails.FirstName, person.FirstName);
-            Assert.Equal(personDetails.MiddleName, person.MiddleName);
-            Assert.Equal(personDetails.LastName, person.LastName);
-            Assert.Equal(personDetails.DateOfBirth, person.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), person.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), person.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, person.Gender);
+            var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
+            Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
+            Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
+            Assert.Equal(personDetails.FirstName, createdPersonRecord.FirstName);
+            Assert.Equal(personDetails.MiddleName, createdPersonRecord.MiddleName);
+            Assert.Equal(personDetails.LastName, createdPersonRecord.LastName);
+            Assert.Equal(personDetails.DateOfBirth, createdPersonRecord.DateOfBirth);
+            Assert.Equal(personDetails.EmailAddress?.ToString(), createdPersonRecord.EmailAddress);
+            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(personDetails.Gender, createdPersonRecord.Gender);
+            Assert.Null(createdPersonRecord.SourceTrnRequestId);
+            Assert.Null(createdPersonRecord.SourceApplicationUserId);
         });
 
         Events.AssertEventsPublished(e =>
         {
             var @event = Assert.IsType<PersonCreatedEvent>(e);
-            Assert.Equal(personId, @event.PersonId);
+            Assert.Equal(person.PersonId, @event.PersonId);
             Assert.Equal(personDetails.FirstName, @event.Details.FirstName);
             Assert.Equal(personDetails.MiddleName, @event.Details.MiddleName);
             Assert.Equal(personDetails.LastName, @event.Details.LastName);
@@ -122,6 +125,217 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             Assert.Equal(justification.ReasonDetail, @event.CreateReasonDetail);
             Assert.Equal(justification.Evidence.FileId, @event.EvidenceFile!.FileId);
             Assert.Equal(justification.Evidence.Name, @event.EvidenceFile.Name);
+        });
+    }
+
+    [Fact]
+    public async Task CreatePersonAsync_WithCreatePersonViaTrnRequestOptions_WhenSourceRequestDoesNotExist_Throws()
+    {
+        // Arrange
+        var personDetails = new PersonDetails()
+        {
+            FirstName = "Alfred",
+            MiddleName = "The",
+            LastName = "Great",
+            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
+            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
+            Gender = Gender.Female,
+        };
+        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
+
+        var options = new CreatePersonViaTrnRequestOptions(personDetails, sourceTrnRequest);
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.CreatePersonAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task CreatePersonAsync_WithCreatePersonViaTrnRequestOptions_SetsSourceRequestPropertiesOnPersonAndEvent()
+    {
+        // Arrange
+        var personDetails = new PersonDetails()
+        {
+            FirstName = "Alfred",
+            MiddleName = "The",
+            LastName = "Great",
+            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
+            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
+            Gender = Gender.Female,
+        };
+        var trnRequestMetadata = new TrnRequestMetadata()
+        {
+            ApplicationUserId = SystemUser.SystemUserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            OneLoginUserSubject = null,
+            Name = new[] { personDetails.FirstName, personDetails.MiddleName, personDetails.LastName }.GetNonEmptyValues(),
+            FirstName = personDetails.FirstName,
+            MiddleName = personDetails.MiddleName,
+            LastName = personDetails.LastName,
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            DateOfBirth = personDetails.DateOfBirth!.Value!,
+            EmailAddress = personDetails.EmailAddress?.ToString(),
+            NationalInsuranceNumber = personDetails.NationalInsuranceNumber.ToString(),
+            Gender = personDetails.Gender,
+        };
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var options = new CreatePersonViaTrnRequestOptions(personDetails, (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId));
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
+            Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
+            Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
+            Assert.Equal(personDetails.FirstName, createdPersonRecord.FirstName);
+            Assert.Equal(personDetails.MiddleName, createdPersonRecord.MiddleName);
+            Assert.Equal(personDetails.LastName, createdPersonRecord.LastName);
+            Assert.Equal(personDetails.DateOfBirth, createdPersonRecord.DateOfBirth);
+            Assert.Equal(personDetails.EmailAddress?.ToString(), createdPersonRecord.EmailAddress);
+            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(personDetails.Gender, createdPersonRecord.Gender);
+            Assert.Equal(trnRequestMetadata.RequestId, createdPersonRecord.SourceTrnRequestId);
+            Assert.Equal(trnRequestMetadata.ApplicationUserId, createdPersonRecord.SourceApplicationUserId);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var @event = Assert.IsType<PersonCreatedEvent>(e);
+            Assert.Equal(person.PersonId, @event.PersonId);
+            Assert.Equal(personDetails.FirstName, @event.Details.FirstName);
+            Assert.Equal(personDetails.MiddleName, @event.Details.MiddleName);
+            Assert.Equal(personDetails.LastName, @event.Details.LastName);
+            Assert.Equal(personDetails.DateOfBirth, @event.Details.DateOfBirth);
+            Assert.Equal(personDetails.EmailAddress?.ToString(), @event.Details.EmailAddress);
+            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
+            Assert.Equal(personDetails.Gender, @event.Details.Gender);
+            Assert.Null(@event.CreateReason);
+            Assert.Null(@event.CreateReasonDetail);
+            Assert.Null(@event.EvidenceFile);
+        });
+    }
+
+    [Fact]
+    public async Task CreatePersonAsync_WithCreatePersonViaTpsImportOptions_WhenSourceRequestDoesNotExist_Throws()
+    {
+        // Arrange
+        var trn = "1234567";
+        var personDetails = new PersonDetails()
+        {
+            FirstName = "Alfred",
+            MiddleName = "The",
+            LastName = "Great",
+            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
+            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
+            Gender = Gender.Female,
+        };
+        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
+
+        var options = new CreatePersonViaTpsImportOptions(trn, personDetails, sourceTrnRequest);
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.CreatePersonAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task CreatePersonAsync_WithCreatePersonViaTpsImportOptions_SetsSourceRequestPropertiesOnPersonAndEvent()
+    {
+        // Arrange
+        var trn = "1234567";
+        var personDetails = new PersonDetails()
+        {
+            FirstName = "Alfred",
+            MiddleName = "The",
+            LastName = "Great",
+            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
+            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
+            Gender = Gender.Female,
+        };
+        var trnRequestMetadata = new TrnRequestMetadata()
+        {
+            ApplicationUserId = SystemUser.SystemUserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            OneLoginUserSubject = null,
+            Name = new[] { personDetails.FirstName, personDetails.MiddleName, personDetails.LastName }.GetNonEmptyValues(),
+            FirstName = personDetails.FirstName,
+            MiddleName = personDetails.MiddleName,
+            LastName = personDetails.LastName,
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            DateOfBirth = personDetails.DateOfBirth!.Value!,
+            EmailAddress = personDetails.EmailAddress?.ToString(),
+            NationalInsuranceNumber = personDetails.NationalInsuranceNumber.ToString(),
+            Gender = personDetails.Gender,
+        };
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var options = new CreatePersonViaTpsImportOptions(trn, personDetails, (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId));
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
+            Assert.Equal(trn, createdPersonRecord.Trn);
+            Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
+            Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
+            Assert.Equal(personDetails.FirstName, createdPersonRecord.FirstName);
+            Assert.Equal(personDetails.MiddleName, createdPersonRecord.MiddleName);
+            Assert.Equal(personDetails.LastName, createdPersonRecord.LastName);
+            Assert.Equal(personDetails.DateOfBirth, createdPersonRecord.DateOfBirth);
+            Assert.Equal(personDetails.EmailAddress?.ToString(), createdPersonRecord.EmailAddress);
+            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(personDetails.Gender, createdPersonRecord.Gender);
+            Assert.Equal(trnRequestMetadata.RequestId, createdPersonRecord.SourceTrnRequestId);
+            Assert.Equal(trnRequestMetadata.ApplicationUserId, createdPersonRecord.SourceApplicationUserId);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var @event = Assert.IsType<PersonCreatedEvent>(e);
+            Assert.Equal(person.PersonId, @event.PersonId);
+            Assert.Equal(personDetails.FirstName, @event.Details.FirstName);
+            Assert.Equal(personDetails.MiddleName, @event.Details.MiddleName);
+            Assert.Equal(personDetails.LastName, @event.Details.LastName);
+            Assert.Equal(personDetails.DateOfBirth, @event.Details.DateOfBirth);
+            Assert.Equal(personDetails.EmailAddress?.ToString(), @event.Details.EmailAddress);
+            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
+            Assert.Equal(personDetails.Gender, @event.Details.Gender);
+            Assert.Null(@event.CreateReason);
+            Assert.Null(@event.CreateReasonDetail);
+            Assert.Null(@event.EvidenceFile);
         });
     }
 

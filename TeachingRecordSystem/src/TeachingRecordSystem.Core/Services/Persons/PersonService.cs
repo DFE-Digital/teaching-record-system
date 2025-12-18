@@ -27,11 +27,21 @@ public class PersonService(
         return await persons.SingleOrDefaultAsync(p => p.PersonId == personId);
     }
 
-    public async Task<Guid> CreatePersonAsync(CreatePersonOptions options, ProcessContext processContext)
+    public async Task<Person> CreatePersonAsync(CreatePersonOptions options, ProcessContext processContext)
     {
         var now = clock.UtcNow;
 
-        var trn = await trnGenerator.GenerateTrnAsync();
+        var trn = options.Trn ?? await trnGenerator.GenerateTrnAsync();
+
+        TrnRequestMetadata? sourceRequest = null;
+        if (options.SourceTrnRequest is (var applicationUserId, var requestId))
+        {
+            sourceRequest = await dbContext.TrnRequestMetadata.SingleOrDefaultAsync(r => r.ApplicationUserId == applicationUserId && r.RequestId == requestId);
+            if (sourceRequest is null)
+            {
+                throw new InvalidOperationException($"TRN request metadata {options.SourceTrnRequest} does not exist.");
+            }
+        }
 
         var person = new Person
         {
@@ -45,7 +55,10 @@ public class PersonService(
             NationalInsuranceNumber = (string?)options.PersonDetails.NationalInsuranceNumber,
             Gender = options.PersonDetails.Gender,
             CreatedOn = now,
-            UpdatedOn = now
+            UpdatedOn = now,
+            CreatedByTps = processContext.ProcessType == ProcessType.TeacherPensionsRecordImporting,
+            SourceApplicationUserId = options.SourceTrnRequest?.ApplicationUserId,
+            SourceTrnRequestId = options.SourceTrnRequest?.RequestId
         };
 
         dbContext.Add(person);
@@ -57,14 +70,16 @@ public class PersonService(
                 EventId = Guid.NewGuid(),
                 PersonId = person.PersonId,
                 Details = options.PersonDetails.ToEventModel(),
-                CreateReason = options.Justification.Reason.GetDisplayName(),
-                CreateReasonDetail = options.Justification.ReasonDetail,
-                EvidenceFile = options.Justification.Evidence?.ToEventModel(),
-                TrnRequestMetadata = null
+                CreateReason = options.Justification?.Reason.GetDisplayName(),
+                CreateReasonDetail = options.Justification?.ReasonDetail,
+                EvidenceFile = options.Justification?.Evidence?.ToEventModel(),
+                TrnRequestMetadata = sourceRequest is TrnRequestMetadata metadata
+                    ? EventModels.TrnRequestMetadata.FromModel(metadata)
+                    : null
             },
             processContext);
 
-        return person.PersonId;
+        return person;
     }
 
     public async Task UpdatePersonDetailsAsync(UpdatePersonDetailsOptions options, ProcessContext processContext)

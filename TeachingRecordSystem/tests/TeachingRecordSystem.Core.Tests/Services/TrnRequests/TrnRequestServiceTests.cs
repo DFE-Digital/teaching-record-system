@@ -789,5 +789,5 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         WithServiceAsync<TrnRequestService, TResult>(action, GetServiceDependencies(arguments));
 
     private object[] GetServiceDependencies(object[] arguments) =>
-        [GetAnIdentityApiClientMock.Object, TrnGenerator, AytqOptionsAccessor, TrnRequestOptionsAccessor, .. arguments];
+        [GetAnIdentityApiClientMock.Object, AytqOptionsAccessor, TrnRequestOptionsAccessor, .. arguments];
 }

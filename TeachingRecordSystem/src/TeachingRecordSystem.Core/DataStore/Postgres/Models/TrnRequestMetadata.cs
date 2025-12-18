@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Services.Persons;
+
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class TrnRequestMetadata
@@ -36,6 +38,21 @@ public class TrnRequestMetadata
     public Guid? NpqEvidenceFileId { get; init; }
     public string? NpqEvidenceFileName { get; init; }
     public string? WorkEmailAddress { get; init; }
+
+    public PersonDetails PersonDetails => new PersonDetails
+    {
+        FirstName = FirstName!,
+        MiddleName = MiddleName ?? string.Empty,
+        LastName = LastName!,
+        DateOfBirth = DateOfBirth,
+        EmailAddress = EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
+            ? Core.EmailAddress.Parse(emailAddress)
+            : null,
+        NationalInsuranceNumber = NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
+            ? Core.NationalInsuranceNumber.Parse(nationalInsuranceNumber)
+            : null,
+        Gender = Gender
+    };
 
     public void Reset()
     {

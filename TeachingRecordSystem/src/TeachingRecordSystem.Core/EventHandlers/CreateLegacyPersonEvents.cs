@@ -10,7 +10,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
 {
     public async Task HandleEventAsync(PersonCreatedEvent @event, ProcessContext processContext)
     {
-        if (processContext.ProcessType == ProcessType.PersonCreating)
+        if (processContext.ProcessType is ProcessType.PersonCreating or ProcessType.TeacherPensionsRecordImporting)
         {
             var legacyEvent = new LegacyEvents.PersonCreatedEvent
             {
@@ -33,7 +33,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
 
     public async Task HandleEventAsync(PersonDetailsUpdatedEvent @event, ProcessContext processContext)
     {
-        if (processContext.ProcessType == ProcessType.PersonDetailsUpdating)
+        if (processContext.ProcessType is ProcessType.PersonDetailsUpdating)
         {
             var legacyEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {
@@ -69,7 +69,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
 
     public async Task HandleEventAsync(PersonDeactivatedEvent @event, ProcessContext processContext)
     {
-        if (processContext.ProcessType == ProcessType.PersonDeactivating)
+        if (processContext.ProcessType is ProcessType.PersonDeactivating)
         {
             var legacyEvent = new LegacyEvents.PersonStatusUpdatedEvent
             {
@@ -93,7 +93,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
 
     public async Task HandleEventAsync(PersonReactivatedEvent @event, ProcessContext processContext)
     {
-        if (processContext.ProcessType == ProcessType.PersonReactivating)
+        if (processContext.ProcessType is ProcessType.PersonReactivating)
         {
             var legacyEvent = new LegacyEvents.PersonStatusUpdatedEvent
             {

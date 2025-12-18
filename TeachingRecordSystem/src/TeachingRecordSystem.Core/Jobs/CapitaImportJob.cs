@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -19,6 +20,7 @@ public class CapitaImportJob(
     TrsDbContext dbContext,
     IClock clock,
     TrnRequestService trnRequestService,
+    PersonService personService,
     IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 4 * * *";
@@ -128,27 +130,14 @@ public class CapitaImportJob(
                 }
                 else
                 {
+                    var processContext = new ProcessContext(ProcessType.TeacherPensionsRecordImporting, now, capitaUser.Value.CapitaTpsUserId);
+
 #pragma warning disable CA1806
                     NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
 #pragma warning restore CA1806
+
                     if (person is null)
                     {
-                        //create person if incoming record is not known in trs
-                        var (newPerson, personAttributes) = Person.Create(
-                            row.TRN!,
-                            new()
-                            {
-                                FirstName = row.GetFirstName()!,
-                                MiddleName = row.GetMiddleName()!,
-                                LastName = row.LastName!,
-                                DateOfBirth = row.GetDateOfBirth(),
-                                EmailAddress = null,
-                                NationalInsuranceNumber = ni,
-                                Gender = (Gender?)row.Gender,
-                            },
-                            clock.UtcNow,
-                            createdByTps: true);
-
                         var trnRequestMetadata = new TrnRequestMetadata()
                         {
                             ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
@@ -156,30 +145,29 @@ public class CapitaImportJob(
                             CreatedOn = now,
                             IdentityVerified = null,
                             OneLoginUserSubject = null,
-                            Name = new[] { newPerson.FirstName, newPerson.MiddleName, newPerson.LastName }.GetNonEmptyValues(),
-                            FirstName = newPerson.FirstName,
-                            MiddleName = newPerson.MiddleName,
-                            LastName = newPerson.LastName,
+                            Name = new[] { row.GetFirstName()!, row.GetMiddleName()!, row.LastName! }.GetNonEmptyValues(),
+                            FirstName = row.GetFirstName()!,
+                            MiddleName = row.GetMiddleName()!,
+                            LastName = row.LastName!,
                             PreviousFirstName = null,
                             PreviousLastName = row.PreviousLastName,
-                            DateOfBirth = newPerson.DateOfBirth!.Value!,
+                            DateOfBirth = row.GetDateOfBirth()!.Value,
                             EmailAddress = null,
-                            NationalInsuranceNumber = newPerson.NationalInsuranceNumber,
-                            Gender = newPerson.Gender,
+                            NationalInsuranceNumber = ni?.ToString(),
+                            Gender = (Gender?)row.Gender,
                         };
+                        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+                        await dbContext.SaveChangesAsync();
 
-                        var createdEvent = new LegacyEvents.PersonCreatedEvent
-                        {
-                            EventId = Guid.NewGuid(),
-                            CreatedUtc = now,
-                            RaisedBy = capitaUser.Value.CapitaTpsUserId,
-                            PersonId = newPerson.PersonId,
-                            PersonAttributes = personAttributes,
-                            CreateReason = null,
-                            CreateReasonDetail = null,
-                            EvidenceFile = null,
-                            TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata)
-                        };
+                        var potentialMatches = await trnRequestService.MatchPersonsAsync(trnRequestMetadata);
+
+                        //create person if incoming record is not known in trs
+                        var newPerson = await personService.CreatePersonAsync(
+                            new CreatePersonViaTpsImportOptions(
+                                row.TRN!,
+                                trnRequestMetadata.PersonDetails,
+                                (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId)),
+                            processContext);
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
@@ -190,17 +178,12 @@ public class CapitaImportJob(
                                 await dbContext.SaveChangesAsync();
                             }
                         }
-                        dbContext.Persons.Add(newPerson);
-                        await dbContext.AddEventAndBroadcastAsync(createdEvent);
-                        personId = newPerson.PersonId;
 
-                        var potentialMatches = await trnRequestService.MatchPersonsAsync(trnRequestMetadata);
+                        personId = newPerson.PersonId;
 
                         //create task
                         if (potentialMatches.Outcome is MatchPersonsResultOutcome.PotentialMatches or MatchPersonsResultOutcome.DefiniteMatch)
                         {
-                            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
-
                             potentialDuplicate = true;
                             var supportTask = SupportTask.Create(
                                 SupportTaskType.TeacherPensionsPotentialDuplicate,
@@ -219,13 +202,13 @@ public class CapitaImportJob(
 
                             dbContext.SupportTasks.Add(supportTask);
                             await dbContext.AddEventAndBroadcastAsync(supportTaskCreatedEvent);
+
                             duplicateRowCount++;
                         }
                         else
                         {
                             successCount++;
                         }
-
                     }
                     else if (person is not null)
                     {

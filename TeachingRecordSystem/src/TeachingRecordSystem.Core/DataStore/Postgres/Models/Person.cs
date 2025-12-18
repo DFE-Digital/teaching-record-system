@@ -73,34 +73,6 @@ public class Person
     public bool DqtAllowTeacherIdentitySignInWithProhibitions { get; set; }
     public DateOnly? DateOfDeath { get; set; }
 
-    public static CreatePersonResult Create(
-        string trn,
-        PersonDetails details,
-        DateTime now,
-        (Guid ApplicationUserId, string RequestId)? sourceTrnRequest = null,
-        bool createdByTps = false)
-    {
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            Trn = trn,
-            FirstName = details.FirstName,
-            MiddleName = details.MiddleName,
-            LastName = details.LastName,
-            DateOfBirth = details.DateOfBirth,
-            EmailAddress = (string?)details.EmailAddress,
-            NationalInsuranceNumber = (string?)details.NationalInsuranceNumber,
-            Gender = details.Gender,
-            CreatedOn = now,
-            UpdatedOn = now,
-            SourceApplicationUserId = sourceTrnRequest?.ApplicationUserId,
-            SourceTrnRequestId = sourceTrnRequest?.RequestId,
-            CreatedByTps = createdByTps
-        };
-
-        return new(person, EventModels.PersonDetails.FromModel(person));
-    }
-
     public UpdatePersonDetailsResult UpdateDetails(
         PersonDetails details,
         DateTime now)

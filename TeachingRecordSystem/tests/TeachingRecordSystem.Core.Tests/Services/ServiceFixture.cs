@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Tests.Services;
 
@@ -19,6 +20,7 @@ public class ServiceFixture : ServiceProviderFixture
             .AddEventPublisher()
             .AddOneLoginService()
             .AddSupportTaskService()
+            .AddPersonService()
             .AddSingleton<INotificationSender, NoopNotificationSender>()
             .AddTestTrnGeneration();
 
