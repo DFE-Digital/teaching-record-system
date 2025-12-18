@@ -23,7 +23,7 @@ public class Person
     public PersonStatus Status { get; set; }
     public Guid? MergedWithPersonId { get; set; }
     public Person? MergedWithPerson { get; }
-    public required string Trn { get; set; }
+    public string Trn { get; private set; } = null!;
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
     public required string LastName { get; set; }
@@ -71,6 +71,38 @@ public class Person
     public DateTime? DqtInductionModifiedOn { get; set; }
     public bool DqtAllowTeacherIdentitySignInWithProhibitions { get; set; }
     public DateOnly? DateOfDeath { get; set; }
+
+    public static CreatePersonResult Create(
+        string firstName,
+        string middleName,
+        string lastName,
+        DateOnly? dateOfBirth,
+        EmailAddress? emailAddress,
+        NationalInsuranceNumber? nationalInsuranceNumber,
+        Gender? gender,
+        DateTime now,
+        (Guid ApplicationUserId, string RequestId)? sourceTrnRequest = null,
+        bool createdByTps = false)
+    {
+        var person = new Person
+        {
+            PersonId = Guid.NewGuid(),
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = (string?)emailAddress,
+            NationalInsuranceNumber = (string?)nationalInsuranceNumber,
+            Gender = gender,
+            CreatedOn = now,
+            UpdatedOn = now,
+            SourceApplicationUserId = sourceTrnRequest?.ApplicationUserId,
+            SourceTrnRequestId = sourceTrnRequest?.RequestId,
+            CreatedByTps = createdByTps
+        };
+
+        return new(person, EventModels.PersonDetails.FromModel(person));
+    }
 
     public static CreatePersonResult Create(
         string trn,

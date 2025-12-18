@@ -9,7 +9,6 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.SupportTasks;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -20,7 +19,6 @@ public class TrnRequestService(
     IEventPublisher eventPublisher,
     SupportTaskService supportTaskService,
     IGetAnIdentityApiClient idApiClient,
-    ITrnGenerator trnGenerator,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
 {
@@ -180,11 +178,8 @@ public class TrnRequestService(
 
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
-        var trn = await trnGenerator.GenerateTrnAsync();
-
         // TODO Use PersonService when we have one
         var (person, _) = Person.Create(
-            trn,
             trnRequest.FirstName!,
             trnRequest.MiddleName ?? string.Empty,
             trnRequest.LastName!,
@@ -202,10 +197,9 @@ public class TrnRequestService(
         dbContext.Persons.Add(person);
 
         trnRequest.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
-
-        await TryEnsureTrnTokenAsync(trnRequest, trn);
-
         await dbContext.SaveChangesAsync();
+
+        await TryEnsureTrnTokenAsync(trnRequest, person.Trn);
 
         await eventPublisher.PublishEventAsync(
             new PersonCreatedEvent
@@ -236,10 +230,10 @@ public class TrnRequestService(
                 processContext);
         }
 
-        return trn;
+        return person.Trn;
     }
 
-    public async Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -250,7 +244,7 @@ public class TrnRequestService(
 
         trnRequest.SetRejected();
 
-        await eventPublisher.PublishEventAsync(
+        return eventPublisher.PublishEventAsync(
             new TrnRequestUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -264,7 +258,7 @@ public class TrnRequestService(
             processContext);
     }
 
-    public async Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -280,7 +274,7 @@ public class TrnRequestService(
 
         trnRequest.SetCompleted();
 
-        await eventPublisher.PublishEventAsync(
+        return eventPublisher.PublishEventAsync(
             new TrnRequestUpdatedEvent
             {
                 EventId = Guid.NewGuid(),

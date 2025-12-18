@@ -879,7 +879,6 @@ public class PersonTests
     private Person CreatePerson() => new TestablePerson()
     {
         PersonId = Guid.NewGuid(),
-        Trn = "1234567",
         FirstName = "Joe",
         MiddleName = "",
         LastName = "Bloggs",
@@ -1325,7 +1324,6 @@ public class PersonTests
             PersonId = Guid.NewGuid(),
             CreatedOn = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             UpdatedOn = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-            Trn = "1234567",
             FirstName = "Joe",
             MiddleName = "",
             LastName = "Bloggs",

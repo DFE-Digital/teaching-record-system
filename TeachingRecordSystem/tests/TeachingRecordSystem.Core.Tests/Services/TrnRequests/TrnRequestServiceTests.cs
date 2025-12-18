@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Tests.Services.TrnRequests;
@@ -24,9 +23,6 @@ public partial class TrnRequestServiceTests : ServiceTestBase
                 ExpiresUtc = Clock.UtcNow.AddDays(1)
             });
 
-        TrnGenerator = Mock.Of<ITrnGenerator>();
-        Mock.Get(TrnGenerator).Setup(mock => mock.GenerateTrnAsync()).Returns(() => TestData.GenerateTrnAsync());
-
         AytqOptionsAccessor = Options.Create(new AccessYourTeachingQualificationsOptions()
         {
             BaseAddress = "https://aytq.test/"
@@ -37,7 +33,6 @@ public partial class TrnRequestServiceTests : ServiceTestBase
 
     private Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
-    private ITrnGenerator TrnGenerator { get; }
 
     private IOptions<AccessYourTeachingQualificationsOptions> AytqOptionsAccessor { get; }
 
@@ -789,5 +784,5 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         WithServiceAsync<TrnRequestService, TResult>(action, GetServiceDependencies(arguments));
 
     private object[] GetServiceDependencies(object[] arguments) =>
-        [GetAnIdentityApiClientMock.Object, TrnGenerator, AytqOptionsAccessor, TrnRequestOptionsAccessor, .. arguments];
+        [GetAnIdentityApiClientMock.Object, AytqOptionsAccessor, TrnRequestOptionsAccessor, .. arguments];
 }

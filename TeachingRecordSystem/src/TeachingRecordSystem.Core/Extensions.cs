@@ -17,7 +17,6 @@ using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
@@ -106,7 +105,6 @@ public static class Extensions
             .AddEventPublisher()
             .AddSupportTaskServices()
             .AddSingleton<PersonInfoCache>()
-            .AddTrnGeneration()
             .AddNoteService()
             .AddPersonService()
             .AddOneLoginService();

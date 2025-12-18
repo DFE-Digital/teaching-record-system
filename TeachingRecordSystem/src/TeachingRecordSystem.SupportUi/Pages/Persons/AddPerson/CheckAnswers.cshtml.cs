@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
@@ -12,7 +11,6 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
-    ITrnGenerator trnGenerator,
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
@@ -65,10 +63,8 @@ public class CheckAnswersModel(
     {
         var now = clock.UtcNow;
 
-        var trn = await trnGenerator.GenerateTrnAsync();
 
         var (person, personAttributes) = Person.Create(
-            trn,
             FirstName ?? string.Empty,
             MiddleName ?? string.Empty,
             LastName ?? string.Empty,
