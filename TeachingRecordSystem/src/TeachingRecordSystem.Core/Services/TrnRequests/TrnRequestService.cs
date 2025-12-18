@@ -211,7 +211,7 @@ public class TrnRequestService(
         return person.Trn;
     }
 
-    public async Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -222,7 +222,7 @@ public class TrnRequestService(
 
         trnRequest.SetRejected();
 
-        await eventPublisher.PublishEventAsync(
+        return eventPublisher.PublishEventAsync(
             new TrnRequestUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -236,7 +236,7 @@ public class TrnRequestService(
             processContext);
     }
 
-    public async Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -252,7 +252,7 @@ public class TrnRequestService(
 
         trnRequest.SetCompleted();
 
-        await eventPublisher.PublishEventAsync(
+        return eventPublisher.PublishEventAsync(
             new TrnRequestUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
