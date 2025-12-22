@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
+namespace TeachingRecordSystem.Core.Services.Persons;
 
-public enum DeactivateReasonOption
+public enum PersonDeactivateReason
 {
     [Display(Name = "The record holder died")]
     RecordHolderDied,

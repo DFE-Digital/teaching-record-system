@@ -1,18 +1,19 @@
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
 public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
 {
-    public DeactivateReasonOption? DeactivateReason { get; set; }
+    public PersonDeactivateReason? DeactivateReason { get; set; }
     public string? DeactivateReasonDetail { get; set; }
-    public ReactivateReasonOption? ReactivateReason { get; set; }
+    public PersonReactivateReason? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
     public TestEvidenceUploadModel Evidence { get; set; } = new();
     public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
 
 
-    public SetStatusPostRequestContentBuilder WithDeactivateReason(DeactivateReasonOption deactivateReason, ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
+    public SetStatusPostRequestContentBuilder WithDeactivateReason(PersonDeactivateReason deactivateReason, ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
     {
         DeactivateReason = deactivateReason;
         DeactivateReasonDetail = detail;
@@ -20,7 +21,7 @@ public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public SetStatusPostRequestContentBuilder WithReactivateReason(ReactivateReasonOption reactivateReason, ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
+    public SetStatusPostRequestContentBuilder WithReactivateReason(PersonReactivateReason reactivateReason, ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
     {
         ReactivateReason = reactivateReason;
         ReactivateReasonDetail = detail;

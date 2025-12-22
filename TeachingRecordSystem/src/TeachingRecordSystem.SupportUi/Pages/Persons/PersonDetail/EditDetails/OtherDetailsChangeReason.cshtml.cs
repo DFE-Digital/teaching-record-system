@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
@@ -9,13 +9,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 [Journey(JourneyNames.EditDetails), RequireJourneyInstance]
 public class OtherDetailsChangeReasonModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
+    PersonService personService,
     EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    public EditDetailsOtherDetailsChangeReasonOption? Reason { get; set; }
+    public PersonDetailsChangeReason? Reason { get; set; }
 
     [BindProperty]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
@@ -46,7 +46,7 @@ public class OtherDetailsChangeReasonModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Reason is EditDetailsOtherDetailsChangeReasonOption.AnotherReason && ReasonDetail is null)
+        if (Reason is PersonDetailsChangeReason.AnotherReason && ReasonDetail is null)
         {
             ModelState.AddModelError(nameof(ReasonDetail), "Enter a reason");
         }
@@ -61,7 +61,7 @@ public class OtherDetailsChangeReasonModel(
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.OtherDetailsChangeReason = Reason;
-            state.OtherDetailsChangeReasonDetail = Reason is EditDetailsOtherDetailsChangeReasonOption.AnotherReason ? ReasonDetail : null;
+            state.OtherDetailsChangeReasonDetail = Reason is PersonDetailsChangeReason.AnotherReason ? ReasonDetail : null;
             state.OtherDetailsChangeEvidence = Evidence;
         });
 

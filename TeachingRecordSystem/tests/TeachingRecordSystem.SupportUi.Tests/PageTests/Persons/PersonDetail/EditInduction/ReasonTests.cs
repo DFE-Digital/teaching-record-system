@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -12,7 +13,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var inductionStatus = InductionStatus.InProgress;
-        var reasonChoice = InductionChangeReasonOption.NewInformation;
+        var reasonChoice = PersonInductionChangeReason.NewInformation;
         var reasonDetail = "A description about why the change typed into the box";
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -55,7 +56,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
-        var expectedChoices = Enum.GetValues<InductionChangeReasonOption>().Select(s => s.ToString());
+        var expectedChoices = Enum.GetValues<PersonInductionChangeReason>().Select(s => s.ToString());
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
@@ -102,7 +103,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
-        var changeReason = InductionChangeReasonOption.NewInformation;
+        var changeReason = PersonInductionChangeReason.NewInformation;
         var changeReasonDetails = "A description about why the change typed into the box";
         var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -175,7 +176,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditInductionPostRequestContentBuilder()
-                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReason(PersonInductionChangeReason.AnotherReason)
                 .WithChangeReasonDetailSelections(true, null)
                 .BuildFormUrlEncoded()
         };
@@ -191,7 +192,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
-        var changeReason = InductionChangeReasonOption.NoLongerExempt;
+        var changeReason = PersonInductionChangeReason.NoLongerExempt;
         var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -231,7 +232,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditInductionPostRequestContentBuilder()
-                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReason(PersonInductionChangeReason.AnotherReason)
                 .WithChangeReasonDetailSelections(true, "")
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .BuildMultipartFormData()
@@ -274,7 +275,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditInductionPostRequestContentBuilder()
-                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReason(PersonInductionChangeReason.AnotherReason)
                 .WithChangeReasonDetailSelections(true, "")
                 .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
@@ -316,7 +317,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditInductionPostRequestContentBuilder()
-                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReason(PersonInductionChangeReason.AnotherReason)
                 .WithChangeReasonDetailSelections(true, "")
                 .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
@@ -348,7 +349,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditInductionPostRequestContentBuilder()
-                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReason(PersonInductionChangeReason.AnotherReason)
                 .WithChangeReasonDetailSelections(true, "")
                 .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
@@ -367,7 +368,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
-        var changeReason = InductionChangeReasonOption.NewInformation;
+        var changeReason = PersonInductionChangeReason.NewInformation;
         var evidenceFileName = "evidence.pdf";
         var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -400,7 +401,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
-        var changeReason = InductionChangeReasonOption.NewInformation;
+        var changeReason = PersonInductionChangeReason.NewInformation;
         var changeReasonDetails = "A description about why the change typed into the box";
         var evidenceFileName = "evidence.pdf";
         var inductionStatus = InductionStatus.InProgress;
@@ -444,7 +445,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditInductionPostRequestContentBuilder()
-                .WithChangeReason(InductionChangeReasonOption.NewInformation)
+                .WithChangeReason(PersonInductionChangeReason.NewInformation)
                 .WithChangeReasonDetailSelections(false, "A description about why the change typed into the box")
                 .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
@@ -459,7 +460,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasNotUploaded();
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(InductionChangeReasonOption.NewInformation, journeyInstance.State.ChangeReason);
+        Assert.Equal(PersonInductionChangeReason.NewInformation, journeyInstance.State.ChangeReason);
         Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Null(journeyInstance.State.ChangeReasonDetail);
         Assert.False(journeyInstance.State.Evidence.UploadEvidence);

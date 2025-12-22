@@ -185,17 +185,20 @@ public class TrnRequestService(
         // TODO Use PersonService when we have one
         var (person, _) = Person.Create(
             trn,
-            trnRequest.FirstName!,
-            trnRequest.MiddleName ?? string.Empty,
-            trnRequest.LastName!,
-            trnRequest.DateOfBirth,
-            trnRequest.EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
-                ? EmailAddress.Parse(emailAddress)
-                : null,
-            trnRequest.NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
-                ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
-                : null,
-            trnRequest.Gender,
+            new Persons.PersonDetails
+            {
+                FirstName = trnRequest.FirstName!,
+                MiddleName = trnRequest.MiddleName ?? string.Empty,
+                LastName = trnRequest.LastName!,
+                DateOfBirth = trnRequest.DateOfBirth,
+                EmailAddress = trnRequest.EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
+                    ? EmailAddress.Parse(emailAddress)
+                    : null,
+                NationalInsuranceNumber = trnRequest.NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
+                    ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
+                    : null,
+                Gender = trnRequest.Gender
+            },
             processContext.Now,
             (trnRequest.ApplicationUserId, trnRequest.RequestId));
 

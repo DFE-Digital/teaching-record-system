@@ -19,7 +19,8 @@ public class ServiceFixture : ServiceProviderFixture
             .AddEventPublisher()
             .AddOneLoginService()
             .AddSupportTaskService()
-            .AddSingleton<INotificationSender, NoopNotificationSender>();
+            .AddSingleton<INotificationSender, NoopNotificationSender>()
+            .AddTestTrnGeneration();
 
         TestScopedServices.ConfigureServices(services);
     }

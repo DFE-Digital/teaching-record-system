@@ -173,7 +173,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             x.WithGender(gender);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
-        var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
+        var updateresult1 = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = person1.LastName,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            },
+            Clock.UtcNow);
         var nameChangeEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -367,7 +378,17 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             x.WithLastName(originalastName);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
-        var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
+        var updateresult1 = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = newLastName,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            }, Clock.UtcNow);
         var nameChangeEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -414,7 +435,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             x.WithLastName(originalastName);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
-        var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, person1.DateOfBirth, null, null, null, Clock.UtcNow);
+        var updateresult1 = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = newLastName,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            },
+            Clock.UtcNow);
         var nameChangeEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -460,7 +492,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             x.WithLastName(originalastName);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
-        var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
+        var updateresult1 = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = newLastName,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            },
+            Clock.UtcNow);
         var nameChangeEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -510,7 +553,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
 
         // first marriage
-        var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName1, person1.DateOfBirth, null, null, null, Clock.UtcNow.AddYears(-3));
+        var updateresult1 = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = updateLastName1,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            },
+            Clock.UtcNow.AddYears(-3));
         var nameChangeEvent1 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -529,7 +583,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         dbContext.AddEventWithoutBroadcast(nameChangeEvent1);
 
         // second marriage
-        var updateresult2 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName2, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow.AddYears(-1));
+        var updateresult2 = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = updateLastName2,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            },
+            Clock.UtcNow.AddYears(-1));
         var nameChangeEvent2 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -548,7 +613,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         dbContext.AddEventWithoutBroadcast(nameChangeEvent2);
 
         // third marriage
-        var updateresult3 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName3, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow.AddYears(-1));
+        var updateresult3 = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = updateLastName3,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            },
+            Clock.UtcNow.AddYears(-1));
         var nameChangeEvent3 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -718,7 +794,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             x.WithGender(Gender.Male);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
-        var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
+        var updateresult1 = trsPerson.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = updateLastName,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            },
+            Clock.UtcNow);
         var nameChangeEvent1 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -819,7 +906,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         });
         var trsPerson1 = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
         var trsPerson2 = await dbContext.Persons.FirstAsync(x => x.PersonId == person2.PersonId);
-        var updateresult1 = trsPerson1.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName1, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
+        var updateresult1 = trsPerson1.UpdateDetails(
+            new()
+            {
+                FirstName = person1.FirstName,
+                MiddleName = person1.MiddleName,
+                LastName = updateLastName1,
+                DateOfBirth = person1.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person1.Gender
+            },
+            Clock.UtcNow);
         var nameChangeEvent1 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -836,7 +934,18 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
 
-        var updateresult2 = trsPerson2.UpdateDetails(person2.FirstName, person2.MiddleName, updateLastName2, person2.DateOfBirth, null, null, person2.Gender, Clock.UtcNow);
+        var updateresult2 = trsPerson2.UpdateDetails(
+            new()
+            {
+                FirstName = person2.FirstName,
+                MiddleName = person2.MiddleName,
+                LastName = updateLastName2,
+                DateOfBirth = person2.DateOfBirth,
+                EmailAddress = null,
+                NationalInsuranceNumber = null,
+                Gender = person2.Gender
+            },
+            Clock.UtcNow);
         var nameChangeEvent2 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),

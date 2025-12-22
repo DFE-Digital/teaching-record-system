@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using static TeachingRecordSystem.TestCommon.TestData;
@@ -22,11 +23,11 @@ public class EditDetailsStateBuilder
     public string? OriginalNationalInsuranceNumber { get; set; }
     public Gender? OriginalGender { get; set; }
 
-    public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    public PersonNameChangeReason? NameChangeReason { get; set; }
     public bool? NameChangeUploadEvidence { get; set; }
     public UploadedEvidenceFile? NameChangeEvidenceFile { get; set; }
 
-    public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
+    public PersonDetailsChangeReason? OtherDetailsChangeReason { get; set; }
     public string? OtherDetailsChangeReasonDetail { get; set; }
     public bool? OtherDetailsChangeUploadEvidence { get; set; }
     public UploadedEvidenceFile? OtherDetailsChangeEvidenceFile { get; set; }
@@ -87,7 +88,7 @@ public class EditDetailsStateBuilder
         return this;
     }
 
-    public EditDetailsStateBuilder WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption option)
+    public EditDetailsStateBuilder WithNameChangeReasonChoice(PersonNameChangeReason option)
     {
         NameChangeReason = option;
         return this;
@@ -108,7 +109,7 @@ public class EditDetailsStateBuilder
         return this;
     }
 
-    public EditDetailsStateBuilder WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption option, string? detailText = null)
+    public EditDetailsStateBuilder WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason option, string? detailText = null)
     {
         OtherDetailsChangeReason = option;
         OtherDetailsChangeReasonDetail = detailText;
@@ -149,7 +150,6 @@ public class EditDetailsStateBuilder
             OriginalEmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(OriginalEmailAddress),
             OriginalNationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(OriginalNationalInsuranceNumber),
             OriginalGender = OriginalGender,
-
             NameChangeReason = NameChangeReason,
             NameChangeEvidence = new()
             {

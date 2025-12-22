@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+namespace TeachingRecordSystem.Core.Services.Persons;
 
-public enum AddPersonReasonOption
+public enum PersonCreateReason
 {
     [Display(Name = "They were awarded a mandatory qualification")]
     MandatoryQualification,

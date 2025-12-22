@@ -1,20 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 public abstract class CommonJourneyPage(
-    TrsDbContext dbContext,
+    PersonService personService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController) : PageModel
 {
     public JourneyInstance<SetStatusState>? JourneyInstance { get; set; }
 
-    protected TrsDbContext DbContext { get; } = dbContext;
+    protected PersonService PersonService { get; } = personService;
     protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
     protected EvidenceUploadManager EvidenceUploadManager { get; } = evidenceController;
     protected Person? Person { get; set; }
@@ -60,9 +60,7 @@ public abstract class CommonJourneyPage(
         Status = personInfo.Status;
 
 
-        Person = await DbContext.Persons
-            .IgnoreQueryFilters()
-            .SingleOrDefaultAsync(u => u.PersonId == PersonId);
+        Person = await PersonService.GetPersonAsync(PersonId, includeDeactivatedPersons: true);
 
         if (Person is null)
         {

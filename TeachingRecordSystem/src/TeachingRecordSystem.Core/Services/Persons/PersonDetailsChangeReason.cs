@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+namespace TeachingRecordSystem.Core.Services.Persons;
 
-public enum EditDetailsOtherDetailsChangeReasonOption
+public enum PersonDetailsChangeReason
 {
     [Display(Name = "Data loss or incomplete information")]
     IncompleteDetails,

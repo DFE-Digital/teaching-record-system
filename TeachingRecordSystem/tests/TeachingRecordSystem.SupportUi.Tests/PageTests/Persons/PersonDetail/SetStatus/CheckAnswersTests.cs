@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using static TeachingRecordSystem.TestCommon.TestData;
 
@@ -31,11 +32,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -81,11 +82,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -121,11 +122,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.RecordHolderDied, ProvideMoreInformationOption.No);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.RecordHolderDied, ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.DeactivatedByMistake, ProvideMoreInformationOption.No);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.DeactivatedByMistake, ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -170,11 +171,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -224,6 +225,20 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             Assert.Equal(ChangeReasonDetails, actualEvent.ReasonDetail);
             Assert.Equal(evidenceFileId, actualEvent.EvidenceFile!.FileId);
             Assert.Equal("evidence.pdf", actualEvent.EvidenceFile.Name);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            if (targetStatus == PersonStatus.Deactivated)
+            {
+                Assert.Equal(ProcessType.PersonDeactivating, p.ProcessContext.ProcessType);
+                p.AssertProcessHasEvents<PersonDeactivatedEvent>();
+            }
+            else
+            {
+                Assert.Equal(ProcessType.PersonReactivating, p.ProcessContext.ProcessType);
+                p.AssertProcessHasEvents<PersonReactivatedEvent>();
+            }
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

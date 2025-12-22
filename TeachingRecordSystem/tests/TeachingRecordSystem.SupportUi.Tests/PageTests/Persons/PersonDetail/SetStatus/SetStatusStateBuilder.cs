@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -5,9 +6,9 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Se
 
 public class SetStatusStateBuilder
 {
-    public DeactivateReasonOption? DeactivateReason { get; set; }
+    public PersonDeactivateReason? DeactivateReason { get; set; }
     public string? DeactivateReasonDetail { get; set; }
-    public ReactivateReasonOption? ReactivateReason { get; set; }
+    public PersonReactivateReason? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
     public EvidenceUploadModel Evidence { get; set; } = new();
 
@@ -21,17 +22,17 @@ public class SetStatusStateBuilder
         return this;
     }
 
-    public SetStatusStateBuilder WithDeactivateReasonChoice(DeactivateReasonOption option, ProvideMoreInformationOption provideMoreInformationOption, string? detailText = null)
+    public SetStatusStateBuilder WithDeactivateReasonChoice(PersonDeactivateReason option, ProvideMoreInformationOption provideAdditionalInformation, string? detailText = null)
     {
-        ProvideMoreInformation = provideMoreInformationOption;
+        ProvideMoreInformation = provideAdditionalInformation;
         DeactivateReason = option;
         DeactivateReasonDetail = detailText;
         return this;
     }
 
-    public SetStatusStateBuilder WithReactivateReasonChoice(ReactivateReasonOption option, ProvideMoreInformationOption provideMoreInformationOption, string? detailText = null)
+    public SetStatusStateBuilder WithReactivateReasonChoice(PersonReactivateReason option, ProvideMoreInformationOption provideAdditionalInformation, string? detailText = null)
     {
-        ProvideMoreInformation = provideMoreInformationOption;
+        ProvideMoreInformation = provideAdditionalInformation;
         ReactivateReason = option;
         ReactivateReasonDetail = detailText;
         return this;

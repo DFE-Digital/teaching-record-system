@@ -139,13 +139,16 @@ public class CheckAnswersModel(
         var primaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == primaryPersonId);
 
         primaryPerson.UpdateDetails(
-            firstName: newPrimaryPersonAttributes.FirstName,
-            middleName: newPrimaryPersonAttributes.MiddleName,
-            lastName: newPrimaryPersonAttributes.LastName,
-            dateOfBirth: newPrimaryPersonAttributes.DateOfBirth,
-            emailAddress: newPrimaryPersonAttributes.EmailAddress is not null ? Core.EmailAddress.Parse(newPrimaryPersonAttributes.EmailAddress) : null,
-            nationalInsuranceNumber: newPrimaryPersonAttributes.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(newPrimaryPersonAttributes.NationalInsuranceNumber) : null,
-            gender: newPrimaryPersonAttributes.Gender,
+            new()
+            {
+                FirstName = newPrimaryPersonAttributes.FirstName,
+                MiddleName = newPrimaryPersonAttributes.MiddleName,
+                LastName = newPrimaryPersonAttributes.LastName,
+                DateOfBirth = newPrimaryPersonAttributes.DateOfBirth,
+                EmailAddress = newPrimaryPersonAttributes.EmailAddress is not null ? Core.EmailAddress.Parse(newPrimaryPersonAttributes.EmailAddress) : null,
+                NationalInsuranceNumber = newPrimaryPersonAttributes.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(newPrimaryPersonAttributes.NationalInsuranceNumber) : null,
+                Gender = newPrimaryPersonAttributes.Gender,
+            },
             clock.UtcNow);
 
         var changes = PersonsMergedEventChanges.None |

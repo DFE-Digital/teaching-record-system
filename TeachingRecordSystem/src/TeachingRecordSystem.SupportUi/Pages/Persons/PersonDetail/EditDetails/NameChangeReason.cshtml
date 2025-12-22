@@ -1,4 +1,5 @@
 @page "/persons/{PersonId}/edit-details/name-change-reason"
+@using TeachingRecordSystem.Core.Services.Persons
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails.NameChangeReasonModel
 @{
     Layout = "_Layout";
@@ -19,14 +20,14 @@
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
                         Why are you changing the name on this record?
                     </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership">
-                        @EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership.GetDisplayName()
+                    <govuk-radios-item value="@PersonNameChangeReason.MarriageOrCivilPartnership">
+                        @PersonNameChangeReason.MarriageOrCivilPartnership.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess">
-                        @EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess.GetDisplayName()
+                    <govuk-radios-item value="@PersonNameChangeReason.DeedPollOrOtherLegalProcess">
+                        @PersonNameChangeReason.DeedPollOrOtherLegalProcess.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@EditDetailsNameChangeReasonOption.CorrectingAnError">
-                        @EditDetailsNameChangeReasonOption.CorrectingAnError.GetDisplayName()
+                    <govuk-radios-item value="@PersonNameChangeReason.CorrectingAnError">
+                        @PersonNameChangeReason.CorrectingAnError.GetDisplayName()
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>

@@ -1,8 +1,7 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
-using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEvent;
-using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEventChanges;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -24,7 +23,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("A", "New", "Name")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -49,7 +48,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("A", "New", "Name")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -84,9 +83,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmail("test@test.com")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithGender(Gender.Male)
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -118,9 +117,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(person)
                 .WithName("Alfred", null, "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -151,7 +150,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.DeedPollOrOtherLegalProcess)
                 .WithNameChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -193,7 +192,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -236,9 +235,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.DeedPollOrOtherLegalProcess)
                 .WithNameChangeUploadEvidenceChoice(true, evidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "other-evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -285,7 +284,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.DeedPollOrOtherLegalProcess)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -319,7 +318,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.IncompleteDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -341,15 +340,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName)]
-    [InlineData(PersonDetailsUpdatedEventChanges.MiddleName)]
-    [InlineData(PersonDetailsUpdatedEventChanges.LastName)]
-    [InlineData(PersonDetailsUpdatedEventChanges.DateOfBirth)]
-    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress)]
-    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
-    [InlineData(PersonDetailsUpdatedEventChanges.Gender)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
-    public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonDetailsUpdatedEventChanges changes)
+    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName)]
+    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName)]
+    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.LastName)]
+    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth)]
+    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress)]
+    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
+    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.Gender)]
+    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName | LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName | LegacyEvents.PersonDetailsUpdatedEventChanges.LastName | LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth | LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress | LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | LegacyEvents.PersonDetailsUpdatedEventChanges.Gender)]
+    public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(LegacyEvents.PersonDetailsUpdatedEventChanges changes)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -361,13 +360,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Other));
 
-        var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : person.FirstName;
-        var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : person.MiddleName;
-        var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Person" : person.LastName;
-        var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : person.DateOfBirth;
-        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.EmailAddress;
-        var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : person.NationalInsuranceNumber;
-        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
+        var firstName = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : person.FirstName;
+        var middleName = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : person.MiddleName;
+        var lastName = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.LastName) ? "Person" : person.LastName;
+        var dateOfBirth = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : person.DateOfBirth;
+        var emailAddress = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.EmailAddress;
+        var nationalInsuranceNumber = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
         var nameEvidenceFileId = Guid.NewGuid();
         var otherEvidenceFileId = Guid.NewGuid();
@@ -381,9 +380,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmail(emailAddress)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithGender(gender)
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
 
@@ -419,7 +418,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventObserver.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<PersonDetailsUpdatedEvent>(e);
+            var actualEvent = Assert.IsType<LegacyEvents.PersonDetailsUpdatedEvent>(e);
 
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualEvent.PersonId);
@@ -438,6 +437,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(otherEvidenceFileId, actualEvent.DetailsChangeEvidenceFile!.FileId);
             Assert.Equal("other-evidence.png", actualEvent.DetailsChangeEvidenceFile.Name);
             Assert.Equal(changes, actualEvent.Changes);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonDetailsUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonDetailsUpdatedEvent>();
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -462,7 +467,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("Alfrede", "Thee", "Greate")
-                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeReasonChoice(PersonNameChangeReason.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
@@ -497,9 +502,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)]
-    [InlineData(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)]
-    public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames(EditDetailsNameChangeReasonOption reason)
+    [InlineData(PersonNameChangeReason.DeedPollOrOtherLegalProcess)]
+    [InlineData(PersonNameChangeReason.MarriageOrCivilPartnership)]
+    public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames(PersonNameChangeReason reason)
     {
         // Arrange
         var ethelredDate = DateTime.Parse("1 Jan 1990").ToUniversalTime();

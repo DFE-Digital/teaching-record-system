@@ -1,6 +1,7 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -13,15 +14,15 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         yield return
         [
-            new EditInductionStateBuilder().WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithCompletedDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build()
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithCompletedDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(PersonInductionChangeReason.AnotherReason).Build()
         ];
         yield return
         [
-            new EditInductionStateBuilder().WithInitializedState(InductionStatus.Passed, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build()
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.Passed, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(PersonInductionChangeReason.AnotherReason).Build()
         ];
         yield return
         [
-            new EditInductionStateBuilder().WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build()
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(PersonInductionChangeReason.AnotherReason).Build()
         ];
         yield return
         [
@@ -85,7 +86,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
             .WithReasonDetailsChoice(false)
             .WithFileUploadChoice(false)
             .Build();
@@ -154,7 +155,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
             .WithReasonDetailsChoice(false)
             .WithFileUploadChoice(false)
             .Build();
@@ -229,7 +230,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
             .WithReasonDetailsChoice(false)
             .WithFileUploadChoice(false)
             .Build();
@@ -305,7 +306,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
             .WithReasonDetailsChoice(false)
             .WithFileUploadChoice(false)
             .Build();
@@ -350,7 +351,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .WithReasonDetailsChoice(false)
                 .WithFileUploadChoice(false)
                 .Build());
@@ -388,7 +389,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
             .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
             .WithFileUploadChoice(uploadFile: false)
             .Build();
@@ -411,7 +412,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Reason for changing induction details");
         Assert.NotNull(label);
         var value = label.NextElementSibling;
-        Assert.Equal(InductionChangeReasonOption.AnotherReason.GetDisplayName(), value!.TrimmedText());
+        Assert.Equal(PersonInductionChangeReason.AnotherReason.GetDisplayName(), value!.TrimmedText());
 
         var labelDetails = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Reason details");
         Assert.NotNull(labelDetails);
@@ -446,7 +447,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
                 .WithFileUploadChoice(uploadFile: false)
                 .Build());
@@ -488,7 +489,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
                 .WithFileUploadChoice(uploadFile: false)
                 .Build());
@@ -529,7 +530,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
                 .WithFileUploadChoice(uploadFile: true)
                 .Build());

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -9,10 +10,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceUploadManager,
     IClock clock,
-    EvidenceUploadManager evidenceUploadManager)
+    TrsDbContext dbContext)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     public InductionStatus InductionStatus { get; set; }
@@ -38,7 +39,7 @@ public class CheckAnswersModel(
 
     public InductionExemptionReason[] ExemptionReasons { get; set; } = [];
 
-    public InductionChangeReasonOption ChangeReason { get; set; }
+    public PersonInductionChangeReason ChangeReason { get; set; }
 
     public string? ChangeReasonDetail { get; set; }
 

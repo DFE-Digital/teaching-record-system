@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
+namespace TeachingRecordSystem.Core.Services.Persons;
 
-public enum InductionChangeReasonOption
+public enum PersonInductionChangeReason
 {
     [Display(Name = "Data loss or incomplete information")]
     IncompleteDetails,

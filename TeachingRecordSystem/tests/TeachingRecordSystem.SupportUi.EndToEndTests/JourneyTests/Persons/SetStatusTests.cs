@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
@@ -19,7 +20,7 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Deactivate record");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.SelectChangeReasonAsync("deactivate-reason-options", DeactivateReasonOption.ProblemWithTheRecord);
+        await page.SelectChangeReasonAsync("deactivate-reason-options", PersonDeactivateReason.ProblemWithTheRecord);
         await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for de-activation");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -53,7 +54,7 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Reactivate record");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
-        await page.SelectChangeReasonAsync("reactivate-reason-options", ReactivateReasonOption.DeactivatedByMistake);
+        await page.SelectChangeReasonAsync("reactivate-reason-options", PersonReactivateReason.DeactivatedByMistake);
         await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for re-activation is a mistake");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -80,7 +81,7 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Deactivate record");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.SelectChangeReasonAsync("deactivate-reason-options", DeactivateReasonOption.ProblemWithTheRecord);
+        await page.SelectChangeReasonAsync("deactivate-reason-options", PersonDeactivateReason.ProblemWithTheRecord);
         await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for de-activation");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -116,7 +117,7 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Reactivate record");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
-        await page.SelectChangeReasonAsync("reactivate-reason-options", ReactivateReasonOption.DeactivatedByMistake);
+        await page.SelectChangeReasonAsync("reactivate-reason-options", PersonReactivateReason.DeactivatedByMistake);
         await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -145,7 +146,7 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Deactivate record");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.SelectChangeReasonAsync("deactivate-reason-options", DeactivateReasonOption.ProblemWithTheRecord);
+        await page.SelectChangeReasonAsync("deactivate-reason-options", PersonDeactivateReason.ProblemWithTheRecord);
         await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for de-activation");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -182,7 +183,7 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Reactivate record");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
-        await page.SelectChangeReasonAsync("reactivate-reason-options", ReactivateReasonOption.DeactivatedByMistake);
+        await page.SelectChangeReasonAsync("reactivate-reason-options", PersonReactivateReason.DeactivatedByMistake);
         await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for re-activation is a mistake");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -211,7 +212,7 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Deactivate record");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.SelectChangeReasonAsync("deactivate-reason-options", DeactivateReasonOption.ProblemWithTheRecord);
+        await page.SelectChangeReasonAsync("deactivate-reason-options", PersonDeactivateReason.ProblemWithTheRecord);
         await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for de-activation");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -253,7 +254,7 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Reactivate record");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
-        await page.SelectChangeReasonAsync("reactivate-reason-options", ReactivateReasonOption.DeactivatedByMistake);
+        await page.SelectChangeReasonAsync("reactivate-reason-options", PersonReactivateReason.DeactivatedByMistake);
         await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();

@@ -1,5 +1,6 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -51,7 +52,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(Clock.Today.AddDays(-1))
                 .WithCompletedDate(Clock.Today)
-                .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                .WithChangeReason(PersonInductionChangeReason.IncompleteDetails)
                 .WithChangeReasonDetailSelections(false)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
@@ -89,7 +90,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithStartDate(Clock.Today.AddYears(-2))
                 .WithCompletedDate(Clock.Today)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .WithReasonDetailsChoice(true, "Details")
                 .WithFileUploadChoice(false)
                 .Build());
@@ -138,7 +139,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithStartDate(Clock.Today.AddYears(-2))
                 .WithCompletedDate(Clock.Today)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .WithReasonDetailsChoice(true, "Details")
                 .WithFileUploadChoice(true, evidenceFileId)
                 .Build());
@@ -262,7 +263,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(new DateOnly(2000, 2, 2))
                 .WithCompletedDate(new DateOnly(2002, 2, 2))
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .Build());
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -290,7 +291,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.StartDate)
                 .WithStartDate(new DateOnly(2000, 2, 2))
                 .WithCompletedDate(new DateOnly(2002, 2, 2))
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .Build());
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswersToStartDate.ToString()}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -329,7 +330,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                .WithExemptionReasonIds(exemptionReasonIds)
                .WithStartDate(startDate)
                .WithCompletedDate(completedDate)
-               .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+               .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?FromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -339,7 +340,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                .WithChangeReason(PersonInductionChangeReason.IncompleteDetails)
                 .WithChangeReasonDetailSelections(false)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
@@ -376,7 +377,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -385,7 +386,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInductionStatus(inductionStatus)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                .WithChangeReason(PersonInductionChangeReason.IncompleteDetails)
                 .WithChangeReasonDetailSelections(false)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()

@@ -6,4 +6,7 @@ public record PersonDeactivatedEvent : IEvent
     public Guid[] PersonIds => MergedWithPersonId is Guid mergedWithPersonId ? [mergedWithPersonId, PersonId] : [PersonId];
     public required Guid PersonId { get; init; }
     public required Guid? MergedWithPersonId { get; init; }
+    public required string? Reason { get; init; }
+    public required string? ReasonDetail { get; init; }
+    public required EventModels.File? EvidenceFile { get; init; }
 }

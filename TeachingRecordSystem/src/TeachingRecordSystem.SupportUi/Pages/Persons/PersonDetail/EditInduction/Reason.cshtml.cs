@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -14,7 +15,7 @@ public class ReasonModel(
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    public InductionChangeReasonOption? ChangeReason { get; set; }
+    public PersonInductionChangeReason? ChangeReason { get; set; }
 
     [BindProperty]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you’re changing the induction details")]

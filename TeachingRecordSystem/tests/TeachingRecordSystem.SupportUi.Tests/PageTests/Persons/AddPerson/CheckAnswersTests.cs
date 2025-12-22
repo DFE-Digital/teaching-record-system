@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
@@ -19,7 +20,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithUploadEvidenceChoice(false)
-                .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
@@ -50,7 +51,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmail("test@test.com")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithGender(Gender.Other)
-                .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(false)
                 .Build());
 
@@ -78,7 +79,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState()
                 .WithName("Alfred", null, "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(false)
                 .Build());
 
@@ -106,7 +107,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new AddPersonStateBuilder()
                 .WithInitializedState()
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(AddPersonReasonOption.AnotherReason, ChangeReasonDetails)
+                .WithAddPersonReasonChoice(PersonCreateReason.AnotherReason, ChangeReasonDetails)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -141,7 +142,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new AddPersonStateBuilder()
                 .WithInitializedState()
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(AddPersonReasonOption.MandatoryQualification)
+                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(false)
                 .Build());
 
@@ -181,7 +182,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmail(emailAddress)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithGender(gender)
-                .WithAddPersonReasonChoice(AddPersonReasonOption.AnotherReason, ChangeReasonDetails)
+                .WithAddPersonReasonChoice(PersonCreateReason.AnotherReason, ChangeReasonDetails)
                 .WithUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
 
@@ -236,6 +237,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(ChangeReasonDetails, actualEvent.CreateReasonDetail);
             Assert.Equal(otherEvidenceFileId, actualEvent.EvidenceFile!.FileId);
             Assert.Equal("other-evidence.png", actualEvent.EvidenceFile.Name);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonCreatedEvent>();
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

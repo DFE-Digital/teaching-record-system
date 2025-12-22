@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -13,7 +14,7 @@ public class AddPersonStateBuilder
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
 
-    public AddPersonReasonOption? Reason { get; set; }
+    public PersonCreateReason? Reason { get; set; }
     public string? ReasonDetail { get; set; }
     public bool? UploadEvidence { get; set; }
     public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
@@ -59,7 +60,7 @@ public class AddPersonStateBuilder
         return this;
     }
 
-    public AddPersonStateBuilder WithAddPersonReasonChoice(AddPersonReasonOption option, string? detailText = null)
+    public AddPersonStateBuilder WithAddPersonReasonChoice(PersonCreateReason option, string? detailText = null)
     {
         Reason = option;
         ReasonDetail = detailText;
@@ -92,7 +93,6 @@ public class AddPersonStateBuilder
             EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue(EmailAddress),
             NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
             Gender = Gender,
-
             Reason = Reason,
             ReasonDetail = ReasonDetail,
             Evidence = new()

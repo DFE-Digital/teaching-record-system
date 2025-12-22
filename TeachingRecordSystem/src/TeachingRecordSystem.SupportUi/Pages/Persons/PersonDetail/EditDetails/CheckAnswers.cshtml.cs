@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Optional;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
@@ -10,10 +9,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 [Journey(JourneyNames.EditDetails), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    IClock clock,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    PersonService personService,
+    EvidenceUploadManager evidenceUploadManager,
+    IClock clock)
+    : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
     private Person? _person;
 
@@ -24,9 +23,9 @@ public class CheckAnswersModel(
     public EmailAddress? EmailAddress { get; set; }
     public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
-    public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    public PersonNameChangeReason? NameChangeReason { get; set; }
     public UploadedEvidenceFile? NameChangeEvidenceFile { get; set; }
-    public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
+    public PersonDetailsChangeReason? OtherDetailsChangeReason { get; set; }
     public string? OtherDetailsChangeReasonDetail { get; set; }
     public UploadedEvidenceFile? OtherDetailsChangeEvidenceFile { get; set; }
 
@@ -54,7 +53,7 @@ public class CheckAnswersModel(
             return;
         }
 
-        _person = await DbContext.Persons.SingleOrDefaultAsync(u => u.PersonId == PersonId);
+        _person = await PersonService.GetPersonAsync(PersonId);
 
         if (_person is null)
         {
@@ -82,57 +81,32 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
+        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, clock.UtcNow, User.GetUserId());
 
-        var updateResult = _person!.UpdateDetails(
-            Option.Some(FirstName ?? string.Empty),
-            Option.Some(MiddleName ?? string.Empty),
-            Option.Some(LastName ?? string.Empty),
-            Option.Some(DateOfBirth),
-            Option.Some(EmailAddress),
-            Option.Some(NationalInsuranceNumber),
-            Option.Some(Gender),
-            now);
-
-        var updatedEvent = updateResult.Changes != 0 ?
-            new LegacyEvents.PersonDetailsUpdatedEvent
+        await PersonService.UpdatePersonDetailsAsync(new(
+            PersonId,
+            new()
             {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = now,
-                RaisedBy = User.GetUserId(),
-                PersonId = PersonId,
-                PersonAttributes = updateResult.PersonAttributes,
-                OldPersonAttributes = updateResult.OldPersonAttributes,
-                NameChangeReason = NameChangeReason?.GetDisplayName(),
-                NameChangeEvidenceFile = NameChangeEvidenceFile?.ToEventModel(),
-                DetailsChangeReason = OtherDetailsChangeReason?.GetDisplayName(),
-                DetailsChangeReasonDetail = OtherDetailsChangeReasonDetail,
-                DetailsChangeEvidenceFile = OtherDetailsChangeEvidenceFile?.ToEventModel(),
-                Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)updateResult.Changes
-            } :
-            null;
-
-        if (updatedEvent is not null &&
-            updatedEvent.Changes.HasAnyFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.NameChange) &&
-            NameChangeReason is EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership or EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
-        {
-            DbContext.PreviousNames.Add(new PreviousName
+                FirstName = FirstName ?? string.Empty,
+                MiddleName = MiddleName ?? string.Empty,
+                LastName = LastName ?? string.Empty,
+                DateOfBirth = DateOfBirth,
+                EmailAddress = EmailAddress,
+                NationalInsuranceNumber = NationalInsuranceNumber,
+                Gender = Gender
+            },
+            NameChangeReason is PersonNameChangeReason nameChangeReason ? new()
             {
-                PreviousNameId = Guid.NewGuid(),
-                PersonId = PersonId,
-                FirstName = updatedEvent.OldPersonAttributes.FirstName,
-                MiddleName = updatedEvent.OldPersonAttributes.MiddleName,
-                LastName = updatedEvent.OldPersonAttributes.LastName,
-                CreatedOn = now,
-                UpdatedOn = now
-            });
-        }
-
-        if (updatedEvent is not null)
-        {
-            await DbContext.AddEventAndBroadcastAsync(updatedEvent);
-            await DbContext.SaveChangesAsync();
-        }
+                Reason = nameChangeReason,
+                Evidence = NameChangeEvidenceFile?.ToFile()
+            } : null,
+            OtherDetailsChangeReason is PersonDetailsChangeReason detailsChangeReason ? new()
+            {
+                Reason = detailsChangeReason,
+                ReasonDetail = OtherDetailsChangeReasonDetail,
+                Evidence = OtherDetailsChangeEvidenceFile?.ToFile()
+            } : null
+        ), processContext);
 
         await JourneyInstance!.CompleteAsync();
 

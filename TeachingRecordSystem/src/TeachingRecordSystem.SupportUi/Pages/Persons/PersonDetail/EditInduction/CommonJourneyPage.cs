@@ -64,7 +64,18 @@ public abstract class CommonJourneyPage(
 
     protected virtual async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(DbContext, PersonId, StartPage);
+        if (!JourneyInstance!.State.Initialized)
+        {
+            var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == PersonId);
+
+            if (person is null)
+            {
+                context.Result = NotFound();
+                return;
+            }
+
+            JourneyInstance!.State.EnsureInitialized(person, StartPage);
+        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;

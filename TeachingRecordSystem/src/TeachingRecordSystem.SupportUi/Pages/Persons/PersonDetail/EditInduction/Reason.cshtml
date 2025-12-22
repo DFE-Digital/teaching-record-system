@@ -1,4 +1,5 @@
 @page "/persons/{PersonId}/edit-induction/reason"
+@using TeachingRecordSystem.Core.Services.Persons
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction.ReasonModel
 @{
     ViewBag.Title = "Change reason";
@@ -15,17 +16,17 @@
             <govuk-radios for="ChangeReason" data-testid="reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true">Why are you changing the induction details?</govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@InductionChangeReasonOption.IncompleteDetails">
-                        @InductionChangeReasonOption.IncompleteDetails.GetDisplayName()
+                    <govuk-radios-item value="@PersonInductionChangeReason.IncompleteDetails">
+                        @PersonInductionChangeReason.IncompleteDetails.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@InductionChangeReasonOption.NewInformation">
-                        @InductionChangeReasonOption.NewInformation.GetDisplayName()
+                    <govuk-radios-item value="@PersonInductionChangeReason.NewInformation">
+                        @PersonInductionChangeReason.NewInformation.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@InductionChangeReasonOption.NoLongerExempt">
-                        @InductionChangeReasonOption.NoLongerExempt.GetDisplayName()
+                    <govuk-radios-item value="@PersonInductionChangeReason.NoLongerExempt">
+                        @PersonInductionChangeReason.NoLongerExempt.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@InductionChangeReasonOption.AnotherReason">
-                        @InductionChangeReasonOption.AnotherReason.GetDisplayName()
+                    <govuk-radios-item value="@PersonInductionChangeReason.AnotherReason">
+                        @PersonInductionChangeReason.AnotherReason.GetDisplayName()
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>

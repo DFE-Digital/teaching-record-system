@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProfessionalStatus;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
@@ -39,7 +39,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -75,7 +75,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -109,7 +109,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -163,7 +163,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -218,7 +218,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -267,7 +267,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(true, TestData.GenerateLoremIpsum());
         await page.SelectUploadEvidenceAsync(true, "document.jpeg");
         await page.ClickContinueButtonAsync();
@@ -346,7 +346,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -364,7 +364,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
         await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Reason details");
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -406,7 +406,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -463,7 +463,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -548,7 +548,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();

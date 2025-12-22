@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.InductionExemptions;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -32,7 +33,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ReferenceDataExemptionsValuesNotInExemptionReasonCategories_NotShown()
     {
         // Arrange
-        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
+        var allGuidsToDisplay = InductionExemptionService.ExemptionReasonIds;
         var referenceDataExemptionReasons = await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true);
 
         referenceDataExemptionReasons.ToList().Add(new()
@@ -80,7 +81,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ShowsExemptionReasonsList()
     {
         // Arrange
-        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
+        var allGuidsToDisplay = InductionExemptionService.ExemptionReasonIds;
         var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay.Join(
@@ -119,7 +120,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_PersonHasRouteWithInductionExemption_ShowsExemptionReasonsList()
     {
         // Arrange
-        var allGuidsToDisplay = ExemptionReasonCategories.RouteFeatureExemptionReasonIds;
+        var allGuidsToDisplay = InductionExemptionService.RouteFeatureExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(RouteToProfessionalStatusType.ApplyForQtsId);
         var holdsFromDate = Clock.Today;
         var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
@@ -169,7 +170,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_PersonHasSomeSpecificRoutes_ShowsFilteredExceptionReasonsAndEditOnRouteMessage(Guid routeId)
     {
         // Arrange
-        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
+        var allGuidsToDisplay = InductionExemptionService.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
         var holdsFromDate = Clock.Today;
         var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
@@ -231,7 +232,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_PersonHasInductionExemptionFromRoute_ShowsExpectedMessageContent(Guid routeId, bool hasExemption)
     {
         // Arrange
-        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
+        var allGuidsToDisplay = InductionExemptionService.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
         var holdsFromDate = Clock.Today;
 
@@ -271,7 +272,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     [Fact]
     public async Task Get_WithExemptionReasonsSelected_ShowsExpected()
     {
-        var selectedExemptionReasonIds = ExemptionReasonCategories.ExemptionReasonIds
+        var selectedExemptionReasonIds = InductionExemptionService.ExemptionReasonIds
             .TakeRandom(2)
             .ToArray();
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -321,7 +322,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
-        var exemptionReasonIds = ExemptionReasonCategories.ExemptionReasonIds
+        var exemptionReasonIds = InductionExemptionService.ExemptionReasonIds
             .TakeRandom(2)
             .ToArray();
 

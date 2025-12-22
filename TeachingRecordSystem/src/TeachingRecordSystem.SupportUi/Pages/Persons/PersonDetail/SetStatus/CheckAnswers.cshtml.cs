@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
@@ -9,14 +9,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 [AllowDeactivatedPerson]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    IClock clock,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    PersonService personService,
+    EvidenceUploadManager evidenceController,
+    IClock clock)
+    : CommonJourneyPage(personService, linkGenerator, evidenceController)
 {
-    public DeactivateReasonOption? DeactivateReason { get; set; }
+    public PersonDeactivateReason? DeactivateReason { get; set; }
     public string? DeactivateReasonDetail { get; set; }
-    public ReactivateReasonOption? ReactivateReason { get; set; }
+    public PersonReactivateReason? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
@@ -48,25 +48,33 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
-
-        Person!.SetStatus(
-            TargetStatus,
-            TargetStatus == PersonStatus.Deactivated
-                ? DeactivateReason!.GetDisplayName()
-                : ReactivateReason!.GetDisplayName(),
-            TargetStatus == PersonStatus.Deactivated
-                ? DeactivateReasonDetail
-                : ReactivateReasonDetail,
-            EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
-            now,
-            out var @event);
-
-        if (@event is not null)
+        if (TargetStatus == PersonStatus.Deactivated)
         {
-            await DbContext.AddEventAndBroadcastAsync(@event);
-            await DbContext.SaveChangesAsync();
+            var processContext = new ProcessContext(ProcessType.PersonDeactivating, clock.UtcNow, User.GetUserId());
+
+            await PersonService.DeactivatePersonAsync(new(
+                PersonId,
+                new()
+                {
+                    Reason = DeactivateReason!.Value,
+                    ReasonDetail = DeactivateReasonDetail,
+                    Evidence = EvidenceFile?.ToFile()
+                }
+            ), processContext);
+        }
+        else
+        {
+            var processContext = new ProcessContext(ProcessType.PersonReactivating, clock.UtcNow, User.GetUserId());
+
+            await PersonService.ReactivatePersonAsync(new(
+                PersonId,
+                new()
+                {
+                    Reason = ReactivateReason!.Value,
+                    ReasonDetail = ReactivateReasonDetail,
+                    Evidence = EvidenceFile?.ToFile()
+                }
+            ), processContext);
         }
 
         await JourneyInstance!.CompleteAsync();

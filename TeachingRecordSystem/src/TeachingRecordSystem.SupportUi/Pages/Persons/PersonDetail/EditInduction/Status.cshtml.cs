@@ -101,7 +101,14 @@ public class StatusModel(
     {
         await base.OnPageHandlerExecutingAsync(context);
 
-        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == PersonId);
+
+        if (person is null)
+        {
+            context.Result = NotFound();
+            return;
+        }
+
         _inductionStatusManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
     }

@@ -35,4 +35,10 @@ public class UploadedEvidenceFile
         FileId = FileId,
         Name = FileName
     };
+
+    public Core.Services.Persons.File ToFile() => new()
+    {
+        FileId = FileId,
+        Name = FileName
+    };
 }

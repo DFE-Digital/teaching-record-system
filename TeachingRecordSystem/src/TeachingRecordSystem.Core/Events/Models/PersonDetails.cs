@@ -22,4 +22,15 @@ public record PersonDetails
         NationalInsuranceNumber = person.NationalInsuranceNumber,
         Gender = person.Gender
     };
+
+    public static PersonDetails FromModel(Services.Persons.PersonDetails person) => new()
+    {
+        FirstName = person.FirstName,
+        MiddleName = person.MiddleName,
+        LastName = person.LastName,
+        DateOfBirth = person.DateOfBirth,
+        EmailAddress = person.EmailAddress?.ToString(),
+        NationalInsuranceNumber = person.NationalInsuranceNumber?.ToString(),
+        Gender = person.Gender
+    };
 }

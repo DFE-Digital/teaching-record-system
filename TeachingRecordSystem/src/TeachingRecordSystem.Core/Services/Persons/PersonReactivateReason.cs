@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
+namespace TeachingRecordSystem.Core.Services.Persons;
 
-public enum ReactivateReasonOption
+public enum PersonReactivateReason
 {
     [Display(Name = "The record was deactivated by mistake")]
     DeactivatedByMistake,

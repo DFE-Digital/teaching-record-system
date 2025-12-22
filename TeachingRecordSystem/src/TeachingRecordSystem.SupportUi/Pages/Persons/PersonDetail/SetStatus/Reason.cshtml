@@ -1,4 +1,5 @@
 @page "/persons/{PersonId}/set-status/{TargetStatus}/reason"
+@using TeachingRecordSystem.Core.Services.Persons
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus.ReasonModel
 @{
     Layout = "_Layout";
@@ -26,14 +27,14 @@
                         <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="deactivate-reason-options-legend">
                             Why are you deactivating this record?
                         </govuk-radios-fieldset-legend>
-                        <govuk-radios-item value="@DeactivateReasonOption.RecordHolderDied">
-                            @DeactivateReasonOption.RecordHolderDied.GetDisplayName()
+                        <govuk-radios-item value="@PersonDeactivateReason.RecordHolderDied">
+                            @PersonDeactivateReason.RecordHolderDied.GetDisplayName()
                         </govuk-radios-item>
-                        <govuk-radios-item value="@DeactivateReasonOption.ProblemWithTheRecord">
-                            @DeactivateReasonOption.ProblemWithTheRecord.GetDisplayName()
+                        <govuk-radios-item value="@PersonDeactivateReason.ProblemWithTheRecord">
+                            @PersonDeactivateReason.ProblemWithTheRecord.GetDisplayName()
                         </govuk-radios-item>
-                        <govuk-radios-item value="@DeactivateReasonOption.AnotherReason">
-                            @DeactivateReasonOption.AnotherReason.GetDisplayName()
+                        <govuk-radios-item value="@PersonDeactivateReason.AnotherReason">
+                            @PersonDeactivateReason.AnotherReason.GetDisplayName()
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>
@@ -64,11 +65,11 @@
                         <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="reactivate-reason-options-legend">
                             Why are you reactivating this record?
                         </govuk-radios-fieldset-legend>
-                        <govuk-radios-item value="@ReactivateReasonOption.DeactivatedByMistake">
-                            @ReactivateReasonOption.DeactivatedByMistake.GetDisplayName()
+                        <govuk-radios-item value="@PersonReactivateReason.DeactivatedByMistake">
+                            @PersonReactivateReason.DeactivatedByMistake.GetDisplayName()
                         </govuk-radios-item>
-                        <govuk-radios-item value="@DeactivateReasonOption.AnotherReason">
-                            @DeactivateReasonOption.AnotherReason.GetDisplayName()
+                        <govuk-radios-item value="@PersonReactivateReason.AnotherReason">
+                            @PersonReactivateReason.AnotherReason.GetDisplayName()
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>

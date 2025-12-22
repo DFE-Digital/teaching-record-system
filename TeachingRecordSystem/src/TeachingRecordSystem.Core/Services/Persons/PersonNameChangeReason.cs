@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+namespace TeachingRecordSystem.Core.Services.Persons;
 
-public enum EditDetailsNameChangeReasonOption
+public enum PersonNameChangeReason
 {
     [Display(Name = "Name has changed due to marriage or civil partnership")]
     MarriageOrCivilPartnership,

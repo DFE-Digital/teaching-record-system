@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -18,7 +19,7 @@ public class EditInductionState : IRegisterJourney
     public DateOnly? StartDate { get; set; }
     public DateOnly? CompletedDate { get; set; }
     public Guid[]? ExemptionReasonIds { get; set; } = [];
-    public InductionChangeReasonOption? ChangeReason { get; set; }
+    public PersonInductionChangeReason? ChangeReason { get; set; }
     public bool? HasAdditionalReasonDetail { get; set; }
     public string? ChangeReasonDetail { get; set; }
     public EvidenceUploadModel Evidence { get; set; } = new();
@@ -35,14 +36,12 @@ public class EditInductionState : IRegisterJourney
         HasAdditionalReasonDetail.HasValue &&
         Evidence.IsComplete;
 
-    public async Task EnsureInitializedAsync(TrsDbContext dbContext, Guid personId, InductionJourneyPage startPage)
+    public void EnsureInitialized(Person person, InductionJourneyPage startPage)
     {
         if (Initialized)
         {
             return;
         }
-
-        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == personId);
 
         CurrentInductionStatus = person.InductionStatus;
         JourneyStartPage = startPage;

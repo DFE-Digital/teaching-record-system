@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -10,7 +11,7 @@ public class EditInductionStateBuilder
     private DateOnly? StartDate { get; set; }
     private DateOnly? CompletedDate { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
-    private InductionChangeReasonOption? ChangeReason { get; set; }
+    private PersonInductionChangeReason? ChangeReason { get; set; }
     private bool? HasAdditionalReasonDetail { get; set; }
     private string? AdditionalReasonDetail { get; set; }
     private EvidenceUploadModel Evidence { get; set; } = new();
@@ -54,7 +55,7 @@ public class EditInductionStateBuilder
         return this;
     }
 
-    public EditInductionStateBuilder WithReasonChoice(InductionChangeReasonOption option)
+    public EditInductionStateBuilder WithReasonChoice(PersonInductionChangeReason option)
     {
         ChangeReason = option;
         return this;

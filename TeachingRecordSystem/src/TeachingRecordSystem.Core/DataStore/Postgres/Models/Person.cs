@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Optional;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -74,13 +75,7 @@ public class Person
 
     public static CreatePersonResult Create(
         string trn,
-        string firstName,
-        string middleName,
-        string lastName,
-        DateOnly? dateOfBirth,
-        EmailAddress? emailAddress,
-        NationalInsuranceNumber? nationalInsuranceNumber,
-        Gender? gender,
+        PersonDetails details,
         DateTime now,
         (Guid ApplicationUserId, string RequestId)? sourceTrnRequest = null,
         bool createdByTps = false)
@@ -89,13 +84,13 @@ public class Person
         {
             PersonId = Guid.NewGuid(),
             Trn = trn,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            DateOfBirth = dateOfBirth,
-            EmailAddress = (string?)emailAddress,
-            NationalInsuranceNumber = (string?)nationalInsuranceNumber,
-            Gender = gender,
+            FirstName = details.FirstName,
+            MiddleName = details.MiddleName,
+            LastName = details.LastName,
+            DateOfBirth = details.DateOfBirth,
+            EmailAddress = (string?)details.EmailAddress,
+            NationalInsuranceNumber = (string?)details.NationalInsuranceNumber,
+            Gender = details.Gender,
             CreatedOn = now,
             UpdatedOn = now,
             SourceApplicationUserId = sourceTrnRequest?.ApplicationUserId,
@@ -107,23 +102,17 @@ public class Person
     }
 
     public UpdatePersonDetailsResult UpdateDetails(
-        string firstName,
-        string middleName,
-        string lastName,
-        DateOnly? dateOfBirth,
-        EmailAddress? emailAddress,
-        NationalInsuranceNumber? nationalInsuranceNumber,
-        Gender? gender,
+        PersonDetails details,
         DateTime now)
     {
         return UpdateDetails(
-            Option.Some(firstName),
-            Option.Some(middleName),
-            Option.Some(lastName),
-            Option.Some(dateOfBirth),
-            Option.Some(emailAddress),
-            Option.Some(nationalInsuranceNumber),
-            Option.Some(gender),
+            Option.Some(details.FirstName),
+            Option.Some(details.MiddleName),
+            Option.Some(details.LastName),
+            Option.Some(details.DateOfBirth),
+            Option.Some(details.EmailAddress),
+            Option.Some(details.NationalInsuranceNumber),
+            Option.Some(details.Gender),
             now);
     }
 

@@ -1,6 +1,6 @@
 using AngleSharp.Dom;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEvent;
 using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEventChanges;
 
@@ -63,7 +63,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
         var updatedLastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? lastName : oldLastName;
 
         var nameChangeReason = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange)
-            ? EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess.GetDisplayName()
+            ? PersonNameChangeReason.DeedPollOrOtherLegalProcess.GetDisplayName()
             : null;
         var nameChangeEvidenceFile = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange)
             ? new EventModels.File
@@ -74,7 +74,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             : null;
 
         var detailsChangeReason = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange)
-            ? EditDetailsOtherDetailsChangeReasonOption.AnotherReason.GetDisplayName()
+            ? PersonDetailsChangeReason.AnotherReason.GetDisplayName()
             : null;
         var detailsChangeReasonDetail = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange)
             ? "Reason detail"
