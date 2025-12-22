@@ -63,7 +63,7 @@ public class CheckAnswersModel(
         var processContext = new ProcessContext(ProcessType.PersonCreating, clock.UtcNow, User.GetUserId());
 
         var person = await personService.CreatePersonAsync(
-            new CreatePersonViaSupportUIOptions(
+            new CreatePersonViaSupportUiOptions(
                 new()
                 {
                     FirstName = FirstName ?? string.Empty,

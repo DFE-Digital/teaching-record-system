@@ -87,7 +87,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             }
         };
 
-        var options = new CreatePersonViaSupportUIOptions(personDetails, justification);
+        var options = new CreatePersonViaSupportUiOptions(personDetails, justification);
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act

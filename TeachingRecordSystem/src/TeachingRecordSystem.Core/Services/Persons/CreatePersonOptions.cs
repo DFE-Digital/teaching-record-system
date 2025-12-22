@@ -17,7 +17,7 @@ public record CreatePersonViaTpsImportOptions(
     (Guid ApplicationUserId, string RequestId)? SourceTrnRequest)
     : CreatePersonOptions(Trn, PersonDetails, SourceTrnRequest, null);
 
-public record CreatePersonViaSupportUIOptions(
+public record CreatePersonViaSupportUiOptions(
     PersonDetails PersonDetails,
     Justification<PersonCreateReason>? Justification)
     : CreatePersonOptions(null, PersonDetails, null, Justification);
