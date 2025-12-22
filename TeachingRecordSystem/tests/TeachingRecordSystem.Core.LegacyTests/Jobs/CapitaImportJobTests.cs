@@ -1841,19 +1841,25 @@ public class CapitaImportJobFixture : IAsyncLifetime
         fileSystemClientMock
             .Setup(f => f.GetFileClient(It.IsAny<string>()))
             .Returns(dataLakeFileClientMock.Object);
-
         dataLakeFileClientMock
             .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var dbContext = dbFixture.DbContextFactory.CreateDbContext();
-        var eventPublisher = Mock.Of<IEventPublisher>();
+        var eventPublisher = provider.GetRequiredService<IEventPublisher>();
+
+        var personService = new Core.Services.Persons.PersonService(
+            dbContext,
+            Clock,
+            Mock.Of<ITrnGenerator>(),
+            eventPublisher);
+
         var trnRequestService = new TrnRequestService(
             dbContext,
             eventPublisher,
             new SupportTaskService(dbContext, eventPublisher),
+            personService,
             Mock.Of<IGetAnIdentityApiClient>(),
-            Mock.Of<ITrnGenerator>(),
             Options.Create(new AccessYourTeachingQualificationsOptions
             {
                 BaseAddress = "https://example.com",
@@ -1863,7 +1869,16 @@ public class CapitaImportJobFixture : IAsyncLifetime
         var user = new CapitaTpsUserOption() { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId };
         var option = Options.Create(user);
 
-        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, dataLakeServiceClientMock.Object, Logger.Object, Clock, trnRequestService, option);
+        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(
+            provider,
+            dataLakeServiceClientMock.Object,
+            Logger.Object,
+            dbContext,
+            Clock,
+            trnRequestService,
+            personService,
+            option);
+
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,

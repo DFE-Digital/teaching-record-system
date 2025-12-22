@@ -8,8 +8,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -19,8 +19,8 @@ public class TrnRequestService(
     TrsDbContext dbContext,
     IEventPublisher eventPublisher,
     SupportTaskService supportTaskService,
+    PersonService personService,
     IGetAnIdentityApiClient idApiClient,
-    ITrnGenerator trnGenerator,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
 {
@@ -178,53 +178,22 @@ public class TrnRequestService(
             throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be completed.");
         }
 
-        var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
-
-        var trn = await trnGenerator.GenerateTrnAsync();
-
-        // TODO Use PersonService when we have one
-        var (person, _) = Person.Create(
-            trn,
-            new Persons.PersonDetails
-            {
-                FirstName = trnRequest.FirstName!,
-                MiddleName = trnRequest.MiddleName ?? string.Empty,
-                LastName = trnRequest.LastName!,
-                DateOfBirth = trnRequest.DateOfBirth,
-                EmailAddress = trnRequest.EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
-                    ? EmailAddress.Parse(emailAddress)
-                    : null,
-                NationalInsuranceNumber = trnRequest.NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
-                    ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
-                    : null,
-                Gender = trnRequest.Gender
-            },
-            processContext.Now,
-            (trnRequest.ApplicationUserId, trnRequest.RequestId));
-
-        dbContext.Persons.Add(person);
+        var person = await personService.CreatePersonAsync(
+            new CreatePersonViaTrnRequestOptions(
+                trnRequest.PersonDetails,
+                (trnRequest.ApplicationUserId, trnRequest.RequestId)),
+            processContext);
 
         trnRequest.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
 
-        await TryEnsureTrnTokenAsync(trnRequest, trn);
+        await TryEnsureTrnTokenAsync(trnRequest, person.Trn);
 
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
-            new PersonCreatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                PersonId = person.PersonId,
-                Details = EventModels.PersonDetails.FromModel(person),
-                CreateReason = null,
-                CreateReasonDetail = null,
-                EvidenceFile = null,
-                TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequest)
-            },
-            processContext);
-
         if (publishTrnRequestUpdatedEvent)
         {
+            var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
+
             await eventPublisher.PublishEventAsync(
                 new TrnRequestUpdatedEvent
                 {
@@ -239,7 +208,7 @@ public class TrnRequestService(
                 processContext);
         }
 
-        return trn;
+        return person.Trn;
     }
 
     public async Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)

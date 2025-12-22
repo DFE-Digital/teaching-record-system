@@ -62,30 +62,31 @@ public class CheckAnswersModel(
     {
         var processContext = new ProcessContext(ProcessType.PersonCreating, clock.UtcNow, User.GetUserId());
 
-        var personId = await personService.CreatePersonAsync(new(
-            new()
-            {
-                FirstName = FirstName ?? string.Empty,
-                MiddleName = MiddleName ?? string.Empty,
-                LastName = LastName ?? string.Empty,
-                DateOfBirth = DateOfBirth,
-                EmailAddress = EmailAddress,
-                NationalInsuranceNumber = NationalInsuranceNumber,
-                Gender = Gender,
-            },
-            new()
-            {
-                Reason = Reason!.Value,
-                ReasonDetail = ReasonDetail,
-                Evidence = EvidenceFile?.ToFile()
-            }), processContext);
+        var person = await personService.CreatePersonAsync(
+            new CreatePersonViaSupportUiOptions(
+                new()
+                {
+                    FirstName = FirstName ?? string.Empty,
+                    MiddleName = MiddleName ?? string.Empty,
+                    LastName = LastName ?? string.Empty,
+                    DateOfBirth = DateOfBirth,
+                    EmailAddress = EmailAddress,
+                    NationalInsuranceNumber = NationalInsuranceNumber,
+                    Gender = Gender,
+                },
+                new()
+                {
+                    Reason = Reason!.Value,
+                    ReasonDetail = ReasonDetail,
+                    Evidence = EvidenceFile?.ToFile()
+                }),
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
 
         TempData.SetFlashSuccess($"Record created for {Name}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(personId))
-            );
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(person.PersonId)));
 
-        return Redirect(LinkGenerator.Persons.PersonDetail.Index(personId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(person.PersonId));
     }
 }
