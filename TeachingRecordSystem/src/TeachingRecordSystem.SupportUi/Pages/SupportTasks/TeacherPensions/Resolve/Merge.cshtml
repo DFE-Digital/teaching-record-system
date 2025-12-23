@@ -15,6 +15,7 @@
 #pragma warning disable CS1998
     private async Task RenderChoosePersonAttribute(
         string label,
+        bool highlight,
         bool different,
         string name,
         string? leftLabel,
@@ -24,6 +25,7 @@
         var chooseAttributeModel = new ChoosePersonAttributeViewModel()
         {
             Label = label,
+            Highlight = highlight,
             Different = different,
             Name = name,
             LeftValue = PersonAttributeSource.TrnRequest,

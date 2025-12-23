@@ -6,8 +6,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddNameSynonyms(this IServiceCollection services)
     {
-        services.AddHttpClient<NameSynonymProvider>();
-        services.AddSingleton<INameSynonymProvider, NameSynonymProvider>();
+        services
+            .AddSingleton<INameSynonymProvider, NameSynonymProvider>()
+            .AddHttpClient<INameSynonymProvider, NameSynonymProvider>();
 
         return services;
     }

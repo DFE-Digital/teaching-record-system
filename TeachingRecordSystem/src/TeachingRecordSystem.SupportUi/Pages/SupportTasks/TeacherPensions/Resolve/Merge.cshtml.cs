@@ -82,22 +82,26 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         DateOfBirth = new PersonAttribute<DateOnly?>(
             personAttributes.DateOfBirth,
             requestData.DateOfBirth,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth),
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
 
         NationalInsuranceNumber = new PersonAttribute<string?>(
             personAttributes.NationalInsuranceNumber,
             requestData.NationalInsuranceNumber,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber),
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
 
         Gender = new PersonAttribute<Gender?>(
             personAttributes.Gender,
             requestData.Gender,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender),
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
 
         LastName = new PersonAttribute<string?>(
             personAttributes.LastName,
             requestData.LastName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName),
+            Highlight: (!attributeMatches.Contains(PersonMatchedAttribute.LastName || (attributeMatches.Contains(PersonMatchedAttribute.LastName && ));
 
         FirstName = new PersonAttribute<string?>(
             personAttributes.FirstName,
@@ -183,6 +187,6 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     }
 
 #pragma warning disable CA1711
-    public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different);
+    public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different, bool Highlight);
 #pragma warning restore CA1711
 }

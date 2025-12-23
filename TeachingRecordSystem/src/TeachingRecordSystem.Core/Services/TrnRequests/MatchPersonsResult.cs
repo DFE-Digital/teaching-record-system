@@ -2,43 +2,43 @@ namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
 public sealed record MatchPersonsResult
 {
-    private readonly Guid _personId;
-    private readonly string? _trn;
-    private readonly Guid[] _potentialMatchesPersonIds;
+    private readonly PotentialMatch? _singleMatch;
+    private readonly PotentialMatch[] _potentialMatches;
+    private readonly PersonMatchedAttribute[] _matchedAttributes;
 
     private MatchPersonsResult(
-        MatchPersonsResultOutcome outcome,
-        Guid personId,
-        string? trn,
-        IEnumerable<Guid> potentialMatchesPersonIds)
+        MatchPersonsResultOutcome outcome,        
+        PotentialMatch? singleMatch,
+        IEnumerable<PotentialMatch> potentialMatches,
+        IEnumerable<PersonMatchedAttribute> matchedAttributes)
     {
         Outcome = outcome;
-        _potentialMatchesPersonIds = potentialMatchesPersonIds.ToArray();
-        _personId = personId;
-        _trn = trn;
+        _singleMatch = singleMatch;
+        _potentialMatches = potentialMatches.ToArray();
+        _matchedAttributes = matchedAttributes.ToArray();
     }
 
     public static MatchPersonsResult NoMatches() =>
-        new(MatchPersonsResultOutcome.NoMatches, Guid.Empty, null, []);
+        new(MatchPersonsResultOutcome.NoMatches, null, [], []);
 
-    public static MatchPersonsResult PotentialMatches(IEnumerable<Guid> personIds) =>
-        new(MatchPersonsResultOutcome.PotentialMatches, Guid.Empty, null, personIds);
+    public static MatchPersonsResult PotentialMatches(IEnumerable<PotentialMatch> potentialMatches) =>
+        new(MatchPersonsResultOutcome.PotentialMatches, null, potentialMatches, []);
 
-    public static MatchPersonsResult DefiniteMatch(Guid personId, string trn) =>
-        new(MatchPersonsResultOutcome.DefiniteMatch, personId, trn, []);
+    public static MatchPersonsResult DefiniteMatch(PotentialMatch singleMatch, IEnumerable<PersonMatchedAttribute> matchedAttributes) =>
+        new(MatchPersonsResultOutcome.DefiniteMatch, singleMatch, [], matchedAttributes);
 
     public MatchPersonsResultOutcome Outcome { get; }
 
-    public IReadOnlyCollection<Guid> PotentialMatchesPersonIds
+    public IReadOnlyCollection<PotentialMatch> Matches
     {
         get
         {
             if (Outcome != MatchPersonsResultOutcome.PotentialMatches)
             {
-                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.PotentialMatches)} outcome has {nameof(PotentialMatchesPersonIds)}.");
+                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.PotentialMatches)} outcome has {nameof(Matches)}.");
             }
 
-            return _potentialMatchesPersonIds;
+            return _potentialMatches;
         }
     }
 
@@ -51,7 +51,7 @@ public sealed record MatchPersonsResult
                 throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} outcome has a {nameof(PersonId)}.");
             }
 
-            return _personId;
+            return _singleMatch!.PersonId;
         }
     }
 
@@ -64,7 +64,33 @@ public sealed record MatchPersonsResult
                 throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has a {nameof(Trn)}.");
             }
 
-            return _trn!;
+            return _singleMatch!.Trn;
+        }
+    }
+
+    public PotentialMatch SingleMatch
+    {
+        get
+        {
+            if (Outcome != MatchPersonsResultOutcome.DefiniteMatch)
+            {
+                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has {nameof(SingleMatch)}.");
+            }
+
+            return _singleMatch!;
+        }
+    }
+
+    public IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes
+    {
+        get
+        {
+            if (Outcome != MatchPersonsResultOutcome.DefiniteMatch)
+            {
+                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has {nameof(MatchedAttributes)}.");
+            }
+
+            return _matchedAttributes;
         }
     }
 }

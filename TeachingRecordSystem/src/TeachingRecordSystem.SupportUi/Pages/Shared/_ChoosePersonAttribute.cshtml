@@ -16,14 +16,14 @@
                 <govuk-radios-item value="@Model.LeftValue"
                                    checked="@(Model.SelectedValue?.Equals(Model.LeftValue))"
                                    disabled="@(!Model.Different)"
-                                   highlight="@(Model.Different)"
+                                   highlight="@(Model.Highlight)"
                                    use-empty-fallback>
                     @Model.LeftLabel
                 </govuk-radios-item>
                 <govuk-radios-item value="@Model.RightValue"
                                    checked="@(Model.SelectedValue?.Equals(Model.RightValue))"
                                    disabled="@(!Model.Different)"
-                                   highlight="@(Model.Different)"
+                                   highlight="@(Model.Highlight)"
                                    use-empty-fallback>
                     @Model.RightLabel
                 </govuk-radios-item>

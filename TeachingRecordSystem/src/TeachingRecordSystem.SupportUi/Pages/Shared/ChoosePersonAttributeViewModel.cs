@@ -3,6 +3,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 public record ChoosePersonAttributeViewModel
 {
     public required string Label { get; init; }
+    public required bool Highlight { get; init; }
     public required bool Different { get; init; }
     public required string Name { get; init; }
     public required object LeftValue { get; init; }
