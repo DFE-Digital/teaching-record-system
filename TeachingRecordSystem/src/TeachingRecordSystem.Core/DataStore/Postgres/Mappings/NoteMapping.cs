@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,6 +8,7 @@ public class NoteMapping : IEntityTypeConfiguration<Note>
 {
     public void Configure(EntityTypeBuilder<Note> builder)
     {
+        builder.HasAnalyticsSync();
         builder.ToTable("notes");
         builder.HasKey(x => x.NoteId);
         builder.Property(x => x.PersonId).IsRequired();

@@ -199,7 +199,7 @@ module "worker_application" {
   docker_image                 = var.docker_image
   command                      = ["/bin/ash", "-c", "cd /Apps/Worker/; dotnet TeachingRecordSystem.Worker.dll;"]
   replicas                     = var.worker_replicas
-  max_memory                   = var.worker_max_memory
+  max_memory                   = "4Gi"
   enable_logit                 = var.enable_logit
   enable_prometheus_monitoring = var.enable_prometheus_monitoring
   enable_gcp_wif               = true

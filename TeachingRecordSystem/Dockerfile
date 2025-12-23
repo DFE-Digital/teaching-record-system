@@ -39,8 +39,9 @@ RUN apk add --allow-untrusted msodbcsql18_18.0.1.1-1_amd64.apk && \
 	apk add --allow-untrusted mssql-tools18_18.0.1.1-1_amd64.apk && \
 	rm -f msodbcsql18_18.0.1.1-1_amd64.apk mssql-tools18_18.0.1.1-1_amd64.apk
 
-RUN addgroup -S appgroup -g 20001 && adduser -S appuser -G appgroup -u 10001
-
-USER 10001
+RUN apk add --no-cache dotnet9-sdk vim
+COPY src /src
+COPY Directory.Build.props /src/Directory.Build.props
+COPY Directory.Packages.props /src/Directory.Packages.props
 
 ENV PATH="${PATH}:/Apps/TrsCli"

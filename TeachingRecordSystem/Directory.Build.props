@@ -25,7 +25,7 @@
     <Content Include="$(MSBuildThisFileDirectory)appsettings.aks_*_shared.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.StartsWith('TeachingRecordSystem'))">
     <Using Include="Microsoft.EntityFrameworkCore" />
     <Using Include="MoreLinq" />
     <Using Include="TeachingRecordSystem.Core" />
@@ -37,17 +37,17 @@
     <Using Include="TeachingRecordSystem.Core.Events.Models" Alias="EventModels" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$(MSBuildProjectName.StartsWith('TeachingRecordSystem'))">
     <PackageReference Include="JetBrains.Annotations" />
     <Using Include="JetBrains.Annotations" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(IsTestProject)' != 'true'">
+  <!--<ItemGroup Condition="'$(IsTestProject)' != 'true'">
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
     <Using Include="Moq" />

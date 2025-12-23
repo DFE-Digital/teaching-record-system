@@ -158,7 +158,7 @@ variable "enable_dfe_analytics_federated_auth" {
 
 variable "run_as_non_root" {
   type        = bool
-  default     = true
+  default     = false
   description = "Whether to enforce that containers must run as non-root user"
 }
 
