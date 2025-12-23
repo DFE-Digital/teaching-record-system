@@ -70,48 +70,45 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             return;
         }
         var personAttributes = await GetPersonAttributesAsync(personId);
-
-        var attributeMatches = GetPersonAttributeMatches(
-            personAttributes.FirstName,
-            personAttributes.MiddleName,
-            personAttributes.LastName,
-            personAttributes.DateOfBirth,
-            personAttributes.NationalInsuranceNumber,
-            personAttributes.Gender);
+        var attributeMatches = JourneyInstance!.State.MatchedPersons
+            .Single(m => m.PersonId == personId)
+            .MatchedAttributes;
 
         DateOfBirth = new PersonAttribute<DateOnly?>(
             personAttributes.DateOfBirth,
             requestData.DateOfBirth,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth),
+            Different: personAttributes.DateOfBirth != requestData.DateOfBirth,
             Highlight: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
 
         NationalInsuranceNumber = new PersonAttribute<string?>(
             personAttributes.NationalInsuranceNumber,
             requestData.NationalInsuranceNumber,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber),
+            Different: personAttributes.NationalInsuranceNumber != requestData.NationalInsuranceNumber,
             Highlight: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
 
         Gender = new PersonAttribute<Gender?>(
             personAttributes.Gender,
             requestData.Gender,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender),
+            Different: personAttributes.Gender != requestData.Gender,
             Highlight: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
 
         LastName = new PersonAttribute<string?>(
             personAttributes.LastName,
             requestData.LastName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName),
-            Highlight: (!attributeMatches.Contains(PersonMatchedAttribute.LastName || (attributeMatches.Contains(PersonMatchedAttribute.LastName && ));
+            Different: personAttributes.LastName != requestData.LastName,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
 
         FirstName = new PersonAttribute<string?>(
             personAttributes.FirstName,
             requestData.FirstName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
+            Different: personAttributes.FirstName != requestData.FirstName,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
 
         Trn = new PersonAttribute<string>(
             personAttributes.Trn,
             person.Trn,
-            Different: false);
+            Different: false,
+            Highlight: false);
 
         PersonName = StringHelper.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
 

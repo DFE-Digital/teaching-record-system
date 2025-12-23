@@ -419,8 +419,8 @@ public class TrnRequestService(
 
         if (matchedOnDobAndNino is [var singleDobAndNinoMatch])
         {
-            var matchedAttributes = GetMatchedAttributes(singleDobAndNinoMatch);
-            return MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.person_id, singleDobAndNinoMatch.trn, matchedAttributes);
+            var definiteMatch = GetPotentialMatch(singleDobAndNinoMatch);
+            return MatchPersonsResult.DefiniteMatch(definiteMatch);
         }
 
         var matchedOnNameDateOfBirthEmailAndGender = results
@@ -436,8 +436,8 @@ public class TrnRequestService(
 
         if (matchedOnNameDateOfBirthEmailAndGender is [var singleNameDobEmailGenderMatch] && string.IsNullOrEmpty(request.NationalInsuranceNumber))
         {
-            var matchedAttributes = GetMatchedAttributes(singleNameDobEmailGenderMatch);
-            return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.person_id, singleNameDobEmailGenderMatch.trn, matchedAttributes);
+            var definiteMatch = GetPotentialMatch(singleNameDobEmailGenderMatch);
+            return MatchPersonsResult.DefiniteMatch(definiteMatch);
         }
 
         request.PotentialDuplicate = true;

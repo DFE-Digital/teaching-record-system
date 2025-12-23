@@ -56,7 +56,7 @@ public class ResolveApiTrnRequestStateFactory(TrnRequestService trnRequestServic
             },
             MatchedPersons = matchResult.Outcome switch
             {
-                MatchPersonsResultOutcome.DefiniteMatch => [matchResult.SingleMatch],
+                MatchPersonsResultOutcome.DefiniteMatch => [matchResult.SingleDefiniteMatch],
                 MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.ToArray(),
                 _ => []
             }

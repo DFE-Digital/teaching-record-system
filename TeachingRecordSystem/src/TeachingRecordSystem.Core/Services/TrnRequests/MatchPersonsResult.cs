@@ -2,30 +2,27 @@ namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
 public sealed record MatchPersonsResult
 {
-    private readonly PotentialMatch? _singleMatch;
+    private readonly PotentialMatch? _definiteMatch;
     private readonly PotentialMatch[] _potentialMatches;
-    private readonly PersonMatchedAttribute[] _matchedAttributes;
 
     private MatchPersonsResult(
         MatchPersonsResultOutcome outcome,        
-        PotentialMatch? singleMatch,
-        IEnumerable<PotentialMatch> potentialMatches,
-        IEnumerable<PersonMatchedAttribute> matchedAttributes)
+        PotentialMatch? definiteMatch,
+        IEnumerable<PotentialMatch> potentialMatches)
     {
         Outcome = outcome;
-        _singleMatch = singleMatch;
+        _definiteMatch = definiteMatch;
         _potentialMatches = potentialMatches.ToArray();
-        _matchedAttributes = matchedAttributes.ToArray();
     }
 
     public static MatchPersonsResult NoMatches() =>
-        new(MatchPersonsResultOutcome.NoMatches, null, [], []);
+        new(MatchPersonsResultOutcome.NoMatches, null, []);
 
     public static MatchPersonsResult PotentialMatches(IEnumerable<PotentialMatch> potentialMatches) =>
-        new(MatchPersonsResultOutcome.PotentialMatches, null, potentialMatches, []);
+        new(MatchPersonsResultOutcome.PotentialMatches, null, potentialMatches);
 
-    public static MatchPersonsResult DefiniteMatch(PotentialMatch singleMatch, IEnumerable<PersonMatchedAttribute> matchedAttributes) =>
-        new(MatchPersonsResultOutcome.DefiniteMatch, singleMatch, [], matchedAttributes);
+    public static MatchPersonsResult DefiniteMatch(PotentialMatch definiteMatch) =>
+        new(MatchPersonsResultOutcome.DefiniteMatch, definiteMatch, []);
 
     public MatchPersonsResultOutcome Outcome { get; }
 
@@ -51,7 +48,7 @@ public sealed record MatchPersonsResult
                 throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} outcome has a {nameof(PersonId)}.");
             }
 
-            return _singleMatch!.PersonId;
+            return _definiteMatch!.PersonId;
         }
     }
 
@@ -64,33 +61,20 @@ public sealed record MatchPersonsResult
                 throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has a {nameof(Trn)}.");
             }
 
-            return _singleMatch!.Trn;
+            return _definiteMatch!.Trn;
         }
     }
 
-    public PotentialMatch SingleMatch
+    public PotentialMatch SingleDefiniteMatch
     {
         get
         {
             if (Outcome != MatchPersonsResultOutcome.DefiniteMatch)
             {
-                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has {nameof(SingleMatch)}.");
+                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has {nameof(SingleDefiniteMatch)}.");
             }
 
-            return _singleMatch!;
-        }
-    }
-
-    public IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes
-    {
-        get
-        {
-            if (Outcome != MatchPersonsResultOutcome.DefiniteMatch)
-            {
-                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has {nameof(MatchedAttributes)}.");
-            }
-
-            return _matchedAttributes;
+            return _definiteMatch!;
         }
     }
 }

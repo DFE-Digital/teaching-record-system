@@ -17,6 +17,7 @@ public class ResolveTeacherPensionsPotentialDuplicateState : IRegisterJourney
         appendUniqueKey: true);
 
     public required IReadOnlyCollection<Guid> MatchedPersonIds { get; init; }
+    public required IReadOnlyCollection<PotentialMatch> MatchedPersons { get; init; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }
@@ -53,7 +54,13 @@ public class ResolveTeacherPensionsPotentialDuplicateStateFactory(TrnRequestServ
             MatchedPersonIds = matchResult.Outcome switch
             {
                 MatchPersonsResultOutcome.DefiniteMatch => [matchResult.PersonId],
-                MatchPersonsResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds,
+                MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.Select(m => m.PersonId).ToArray(),
+                _ => []
+            },
+            MatchedPersons = matchResult.Outcome switch
+            {
+                MatchPersonsResultOutcome.DefiniteMatch => [matchResult.SingleDefiniteMatch],
+                MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.ToArray(),
                 _ => []
             }
         };

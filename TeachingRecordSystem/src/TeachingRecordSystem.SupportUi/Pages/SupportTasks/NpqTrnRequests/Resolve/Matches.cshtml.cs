@@ -79,6 +79,9 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
     {
         RequestData = GetRequestData();
 
+        var matchedAttributesLookup = JourneyInstance!.State.MatchedPersons.ToDictionary(
+                mp => mp.PersonId,
+                mp => mp.MatchedAttributes);
         var matchedPersonIds = JourneyInstance!.State.MatchedPersonIds.ToArray();
         MatchOutcome = JourneyInstance.State.MatchOutcome;
 
@@ -107,14 +110,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
             .Select((r, i) => r with
             {
                 Identifier = (char)('A' + i),
-                MatchedAttributes = GetPersonAttributeMatches(
-                    r.FirstName,
-                    r.MiddleName,
-                    r.LastName,
-                    r.DateOfBirth,
-                    r.EmailAddress,
-                    r.NationalInsuranceNumber,
-                    r.Gender)
+                MatchedAttributes = matchedAttributesLookup[r.PersonId]
             })
             .ToArray();
 

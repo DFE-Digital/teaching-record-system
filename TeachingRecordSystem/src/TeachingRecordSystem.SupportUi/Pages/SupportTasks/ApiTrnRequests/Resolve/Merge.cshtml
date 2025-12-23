@@ -18,6 +18,7 @@
     private async Task RenderChoosePersonAttribute(
             string label,
             bool different,
+            bool highlight,
             string name,
             string? leftLabel,
             string? rightLabel,
@@ -27,6 +28,7 @@
         {
             Label = label,
             Different = different,
+            Highlight = highlight,
             Name = name,
             LeftValue = PersonAttributeSource.TrnRequest,
             LeftLabel = leftLabel,
@@ -62,6 +64,7 @@
                 await RenderChoosePersonAttribute(
                     "First name",
                     Model.FirstName!.Different,
+                    Model.FirstName!.Highlight,
                     Html.NameFor(m => m.FirstNameSource),
                     Model.FirstName!.TrnRequestValue,
                     Model.FirstName!.ExistingRecordValue,
@@ -70,6 +73,7 @@
                 await RenderChoosePersonAttribute(
                     "Middle name",
                     Model.MiddleName!.Different,
+                    Model.MiddleName!.Highlight,
                     Html.NameFor(m => m.MiddleNameSource),
                     Model.MiddleName!.TrnRequestValue,
                     Model.MiddleName!.ExistingRecordValue,
@@ -78,6 +82,7 @@
                 await RenderChoosePersonAttribute(
                     "Last name",
                     Model.LastName!.Different,
+                    Model.LastName!.Highlight,
                     Html.NameFor(m => m.LastNameSource),
                     Model.LastName!.TrnRequestValue,
                     Model.LastName!.ExistingRecordValue,
@@ -86,6 +91,7 @@
                 await RenderChoosePersonAttribute(
                     "Date of birth",
                     Model.DateOfBirth!.Different,
+                    Model.DateOfBirth!.Highlight,
                     Html.NameFor(m => m.DateOfBirthSource),
                     Model.DateOfBirth!.TrnRequestValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
                     Model.DateOfBirth!.ExistingRecordValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
@@ -94,6 +100,7 @@
                 await RenderChoosePersonAttribute(
                     "Email",
                     Model.EmailAddress!.Different,
+                    Model.EmailAddress!.Highlight,
                     Html.NameFor(m => m.EmailAddressSource),
                     Model.EmailAddress!.TrnRequestValue,
                     Model.EmailAddress!.ExistingRecordValue,
@@ -102,6 +109,7 @@
                 await RenderChoosePersonAttribute(
                     "National Insurance number",
                     Model.NationalInsuranceNumber!.Different,
+                    Model.NationalInsuranceNumber!.Highlight,
                     Html.NameFor(m => m.NationalInsuranceNumberSource),
                     Model.NationalInsuranceNumber!.TrnRequestValue,
                     Model.NationalInsuranceNumber!.ExistingRecordValue,
@@ -110,6 +118,7 @@
                 await RenderChoosePersonAttribute(
                     "Gender",
                     Model.Gender!.Different,
+                    Model.Gender!.Highlight,
                     Html.NameFor(m => m.GenderSource),
                     Model.Gender!.TrnRequestValue?.GetDisplayName(),
                     Model.Gender!.ExistingRecordValue?.GetDisplayName(),

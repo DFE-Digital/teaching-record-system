@@ -150,57 +150,58 @@ public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
         }
 
         var personAttributes = await GetPersonAttributesAsync(personId);
+        var attributeMatches = JourneyInstance!.State.MatchedPersons
+            .Single(m => m.PersonId == personId)
+            .MatchedAttributes;
 
-        SourceApplicationUserName = requestData.ApplicationUser!.Name;
-
-        var attributeMatches = GetPersonAttributeMatches(
-            personAttributes.FirstName,
-            personAttributes.MiddleName,
-            personAttributes.LastName,
-            personAttributes.DateOfBirth,
-            personAttributes.EmailAddress,
-            personAttributes.NationalInsuranceNumber,
-            personAttributes.Gender);
+        SourceApplicationUserName = requestData.ApplicationUser!.Name;        
 
         FirstName = new PersonAttribute<string?>(
             personAttributes.FirstName,
             requestData.FirstName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
+            Different: personAttributes.FirstName != requestData.FirstName,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
 
         MiddleName = new PersonAttribute<string?>(
             personAttributes.MiddleName,
             requestData.MiddleName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.MiddleName));
+            Different: !(personAttributes.MiddleName == requestData.MiddleName || (string.IsNullOrEmpty(personAttributes.MiddleName) && string.IsNullOrEmpty(requestData.MiddleName))),
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.MiddleName));
 
         LastName = new PersonAttribute<string?>(
             personAttributes.LastName,
             requestData.LastName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
+            Different: personAttributes.LastName != requestData.LastName,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
 
         DateOfBirth = new PersonAttribute<DateOnly?>(
             personAttributes.DateOfBirth,
             requestData.DateOfBirth,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
+            Different: personAttributes.DateOfBirth != requestData.DateOfBirth,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
 
         EmailAddress = new PersonAttribute<string?>(
             personAttributes.EmailAddress,
             requestData.EmailAddress,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.EmailAddress));
+            Different: personAttributes.EmailAddress != requestData.EmailAddress,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.EmailAddress));
 
         NationalInsuranceNumber = new PersonAttribute<string?>(
             personAttributes.NationalInsuranceNumber,
             requestData.NationalInsuranceNumber,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+            Different: personAttributes.NationalInsuranceNumber != requestData.NationalInsuranceNumber,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
 
         Gender = new PersonAttribute<Gender?>(
             personAttributes.Gender,
             requestData.Gender,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
+            Different: personAttributes.Gender != requestData.Gender,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
 #pragma warning disable CA1711
-    public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different);
+    public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different, bool Highlight);
 #pragma warning restore CA1711
 }
