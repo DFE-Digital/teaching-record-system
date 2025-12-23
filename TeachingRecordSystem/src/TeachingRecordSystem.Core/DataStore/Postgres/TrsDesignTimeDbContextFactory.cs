@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
+[UsedImplicitly]
 public class TrsDesignTimeDbContextFactory : IDesignTimeDbContextFactory<TrsDbContext>
 {
     public TrsDbContext CreateDbContext(string[] args)
@@ -11,7 +12,7 @@ public class TrsDesignTimeDbContextFactory : IDesignTimeDbContextFactory<TrsDbCo
             .AddUserSecrets<TrsDesignTimeDbContextFactory>(optional: true)  // Optional for CI
             .Build();
 
-        var connectionString = configuration.GetPostgresConnectionString();
+        var connectionString = configuration.GetConnectionString(TrsDbContext.ConnectionName);
 
         return TrsDbContext.Create(connectionString);
     }

@@ -47,7 +47,6 @@ public static class Extensions
         });
 
         services.AddDfeAnalytics()
-            .UseFederatedAksBigQueryClientProvider()
             .AddAspNetCoreIntegration(options =>
             {
                 options.UserIdClaimType = ClaimTypes.Subject;

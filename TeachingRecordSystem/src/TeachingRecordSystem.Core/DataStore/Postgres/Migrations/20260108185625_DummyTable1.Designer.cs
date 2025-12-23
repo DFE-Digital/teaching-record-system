@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,15 +14,18 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260108185625_DummyTable1")]
+    partial class DummyTable1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", b =>
                 {
@@ -300,11 +304,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("becf1725-bffe-4933-90a1-fdfe4ec3a26c")
+                            Id = new Guid("792f2e84-a0ef-4761-b8d2-a750f81febc7")
                         },
                         new
                         {
-                            Id = new Guid("7cf03897-a364-46e0-b9ff-68fb61d94325")
+                            Id = new Guid("965ce0f1-d475-4048-8449-67cdfd547ed2")
                         });
                 });
 
@@ -3283,8 +3287,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<int>("EstablishmentSourceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("establishment_source_id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnName("establishment_source_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EstablishmentSourceId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -3371,8 +3376,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.HasIndex("PersonIds", "EventName")
                         .HasDatabaseName("ix_events_person_ids")
-                        .HasAnnotation("Npgsql:CreatedConcurrently", true)
-                        .HasAnnotation("Npgsql:IndexMethod", "gin");
+                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PersonIds", "EventName"), "gin");
 
                     b.ToTable("events", (string)null);
                 });
@@ -3437,8 +3443,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasName("pk_eyts_awarded_emails_job_items");
 
                     b.HasIndex("Personalization")
-                        .HasDatabaseName("ix_eyts_awarded_emails_job_items_personalization")
-                        .HasAnnotation("Npgsql:IndexMethod", "gin");
+                        .HasDatabaseName("ix_eyts_awarded_emails_job_items_personalization");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
                     b.HasIndex("Trn")
                         .HasDatabaseName("ix_eyts_awarded_emails_job_items_trn");
@@ -3506,8 +3513,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasName("pk_induction_completed_emails_job_items");
 
                     b.HasIndex("Personalization")
-                        .HasDatabaseName("ix_induction_completed_emails_job_items_personalization")
-                        .HasAnnotation("Npgsql:IndexMethod", "gin");
+                        .HasDatabaseName("ix_induction_completed_emails_job_items_personalization");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
                     b.HasIndex("Trn")
                         .HasDatabaseName("ix_induction_completed_emails_job_items_trn");
@@ -3743,8 +3751,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<long>("IntegrationTransactionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasColumnName("integration_transaction_id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnName("integration_transaction_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("IntegrationTransactionId"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
@@ -3794,8 +3803,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<long>("IntegrationTransactionRecordId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasColumnName("integration_transaction_record_id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnName("integration_transaction_record_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("IntegrationTransactionRecordId"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
@@ -3897,8 +3907,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasName("pk_international_qts_awarded_emails_job_items");
 
                     b.HasIndex("Personalization")
-                        .HasDatabaseName("ix_international_qts_awarded_emails_job_items_personalization")
-                        .HasAnnotation("Npgsql:IndexMethod", "gin");
+                        .HasDatabaseName("ix_international_qts_awarded_emails_job_items_personalization");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
                     b.HasIndex("Trn")
                         .HasDatabaseName("ix_international_qts_awarded_emails_job_items_trn");
@@ -4056,8 +4067,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<long>("NameSynonymsId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasColumnName("name_synonyms_id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnName("name_synonyms_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("NameSynonymsId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -4487,9 +4499,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.HasIndex("Trn", "DateOfBirth", "EmailAddress", "names", "last_names", "national_insurance_numbers")
                         .HasDatabaseName("ix_persons_trn_date_of_birth_email_address_names_last_names_na")
-                        .HasAnnotation("Npgsql:CreatedConcurrently", true)
-                        .HasAnnotation("Npgsql:IndexMethod", "GIN")
-                        .HasAnnotation("Relational:Collation", new[] { "case_insensitive" });
+                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Trn", "DateOfBirth", "EmailAddress", "names", "last_names", "national_insurance_numbers"), "GIN");
+                    NpgsqlIndexBuilderExtensions.UseCollation(b.HasIndex("Trn", "DateOfBirth", "EmailAddress", "names", "last_names", "national_insurance_numbers"), new[] { "case_insensitive" });
 
                     b.ToTable("persons", (string)null);
                 });
@@ -4499,8 +4512,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<long>("PersonSearchAttributeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasColumnName("person_search_attribute_id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnName("person_search_attribute_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("PersonSearchAttributeId"));
 
                     b.Property<string>("AttributeKey")
                         .HasMaxLength(50)
@@ -4644,8 +4658,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasName("pk_processes");
 
                     b.HasIndex("PersonIds")
-                        .HasDatabaseName("ix_processes_person_ids")
-                        .HasAnnotation("Npgsql:IndexMethod", "GIN");
+                        .HasDatabaseName("ix_processes_person_ids");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PersonIds"), "GIN");
 
                     b.HasIndex("ProcessType")
                         .HasDatabaseName("ix_processes_process_type");
@@ -4693,8 +4708,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.HasIndex("PersonIds", "EventName")
                         .HasDatabaseName("ix_process_events_person_ids_event_name")
-                        .HasAnnotation("Npgsql:CreatedConcurrently", true)
-                        .HasAnnotation("Npgsql:IndexMethod", "GIN");
+                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PersonIds", "EventName"), "GIN");
 
                     b.ToTable("process_events", (string)null);
                 });
@@ -4759,8 +4775,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasName("pk_qts_awarded_emails_job_items");
 
                     b.HasIndex("Personalization")
-                        .HasDatabaseName("ix_qts_awarded_emails_job_items_personalization")
-                        .HasAnnotation("Npgsql:IndexMethod", "gin");
+                        .HasDatabaseName("ix_qts_awarded_emails_job_items_personalization");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
                     b.HasIndex("Trn")
                         .HasDatabaseName("ix_qts_awarded_emails_job_items_trn");
@@ -6819,8 +6836,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<int>("TpsEstablishmentTypeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("tps_establishment_type_id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnName("tps_establishment_type_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TpsEstablishmentTypeId"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -20195,8 +20213,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<int>("FromTrn")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("from_trn")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnName("from_trn");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FromTrn"));
 
                     b.Property<bool>("IsExhausted")
                         .HasColumnType("boolean")
@@ -20225,8 +20244,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<long>("TrnRequestId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasColumnName("trn_request_id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnName("trn_request_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TrnRequestId"));
 
                     b.Property<string>("ClientId")
                         .IsRequired()

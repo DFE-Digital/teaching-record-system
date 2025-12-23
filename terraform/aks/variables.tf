@@ -158,7 +158,7 @@ variable "enable_dfe_analytics_federated_auth" {
 
 variable "run_as_non_root" {
   type        = bool
-  default     = true
+  default     = false
   description = "Whether to enforce that containers must run as non-root user"
 }
 
@@ -172,6 +172,7 @@ locals {
     DfeAnalytics__Environment = var.environment_name
     DfeAnalytics__TableId     = module.dfe_analytics[0].bigquery_table_name
     DfeAnalytics__DatasetId   = module.dfe_analytics[0].bigquery_dataset
+    DfeAnalytics__ProjectId   = module.dfe_analytics[0].bigquery_project_id
   } : {}
 
   federated_auth_secrets = var.enable_dfe_analytics_federated_auth ? {

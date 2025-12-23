@@ -11,6 +11,7 @@ module "migrations_job_configuration" {
   config_variables = {
     ENVIRONMENT_NAME = var.environment_name
   }
+
   secret_variables = {
     CONNECTION_STRING = module.postgres.dotnet_connection_string
   }

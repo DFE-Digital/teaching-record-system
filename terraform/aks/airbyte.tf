@@ -70,7 +70,6 @@ module "airbyte" {
 
   server_url         = "https://airbyte-${var.namespace}.${module.cluster_data.ingress_domain}"
   connection_status  = var.connection_status
-  connection_streams = local.connection_streams
 
   cluster           = var.cluster
   namespace         = var.namespace
@@ -83,13 +82,14 @@ module "airbyte" {
 
   gcp_dataset_internal = "airbyte_internal"
 
-  # config_map_ref = module.application_configuration.kubernetes_config_map_name
-  # secret_ref     = module.application_configuration.kubernetes_secret_name
-  config_map_ref = module.worker_application_configuration.kubernetes_config_map_name
-  secret_ref     = module.worker_application_configuration.kubernetes_secret_name
+  config_map_ref = module.migrations_job_configuration.kubernetes_config_map_name
+  secret_ref     = module.migrations_job_configuration.kubernetes_secret_name
   cpu            = module.cluster_data.configuration_map.cpu_min
 
   use_azure = var.deploy_azure_backing_services
+
+  is_dotnet_application = true
+  dotnet_application_directory = "/Apps/TrsCli"
 }
 
 # module "streams_update_job" {
@@ -119,12 +119,11 @@ variable "airbyte_enabled" { default = false }
 
 variable "connection_status" {
   type = string
-  default = "inactive"
-  description = "Connectin status, either active or inactive"
+  default = "active"
+  description = "Connection status, either active or inactive"
 }
 
 locals {
-  connection_streams = var.airbyte_enabled ? file("config/airbyte_stream_config.json") : null
   # gcp_dataset_name   = replace("${var.service_short}_airbyte_${local.app_name_suffix}", "-", "_")
   gcp_dataset_name   = replace("${var.service_short_name}_airbyte_${local.app_name_suffix}", "-", "_")
 }
