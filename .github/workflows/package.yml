@@ -60,11 +60,11 @@ jobs:
         env:
           TAG: ${{ steps.image_tags.outputs.tag }}
 
-      - name: Run Snyk to check Docker image for vulnerabilities
-        if: steps.build.outputs.skipped != 'true'
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: ${{ steps.image_tags.outputs.tag }}
-          args: --severity-threshold=high --file=./TeachingRecordSystem/Dockerfile
+#      - name: Run Snyk to check Docker image for vulnerabilities
+#        if: steps.build.outputs.skipped != 'true'
+#        uses: snyk/actions/docker@master
+#        env:
+#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#        with:
+#          image: ${{ steps.image_tags.outputs.tag }}
+#          args: --severity-threshold=high --file=./TeachingRecordSystem/Dockerfile

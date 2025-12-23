@@ -1,10 +1,12 @@
-using System.Data.Common;
+using System.Reflection;
+using Dfe.Analytics.EFCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using OpenIddict.EntityFrameworkCore.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Infrastructure.EntityFramework;
@@ -16,6 +18,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
 public class TrsDbContext : DbContext
 {
+    public const string ConnectionName = "DefaultConnection";
+
     private readonly IServiceProvider? _serviceProvider;
 
     public TrsDbContext(DbContextOptions<TrsDbContext> options, IServiceProvider serviceProvider)
@@ -29,8 +33,8 @@ public class TrsDbContext : DbContext
     {
     }
 
-    public static TrsDbContext Create(string connectionString, int? commandTimeout = null) =>
-        new TrsDbContext(CreateOptions(connectionString, commandTimeout));
+    public static TrsDbContext Create(string? connectionString, int? commandTimeout = null) =>
+        new(CreateOptions(connectionString, commandTimeout));
 
     public DbSet<TrnRequest> TrnRequests => Set<TrnRequest>();
 
@@ -204,30 +208,23 @@ public class TrsDbContext : DbContext
                 });
             }
         }
+
+        var dummyEntity1Builder = modelBuilder.Entity<DummyEntity1>();
+        dummyEntity1Builder.IncludeInAnalyticsSync(includeAllColumns: true, hidden: false);
+        dummyEntity1Builder.HasData(
+            new DummyEntity1 { Id = new("becf1725-bffe-4933-90a1-fdfe4ec3a26c") },
+            new DummyEntity1 { Id = new("7cf03897-a364-46e0-b9ff-68fb61d94325") });
     }
 
-    private static DbContextOptions<TrsDbContext> CreateOptions(string connectionString, int? commandTimeout)
+    private static DbContextOptions<TrsDbContext> CreateOptions(string? connectionString, int? commandTimeout)
     {
         var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
         ConfigureOptions(optionsBuilder, connectionString, commandTimeout);
         return optionsBuilder.Options;
     }
+}
 
-    public static TrsDbContext Create(NpgsqlDataSource dataSource, int? commandTimeout = null)
-    {
-        var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
-        ConfigureOptions(optionsBuilder, connectionString: null, commandTimeout);
-        var dbContext = new TrsDbContext(optionsBuilder.Options);
-        dbContext.Database.SetDbConnection(dataSource.CreateConnection(), contextOwnsConnection: true);
-        return dbContext;
-    }
-
-    public static TrsDbContext Create(DbConnection connection, int? commandTimeout = null)
-    {
-        var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
-        ConfigureOptions(optionsBuilder, connectionString: null, commandTimeout);
-        var dbContext = new TrsDbContext(optionsBuilder.Options);
-        dbContext.Database.SetDbConnection(connection, contextOwnsConnection: false);
-        return dbContext;
-    }
+public class DummyEntity1
+{
+    public Guid Id { get; set; }
 }
