@@ -10,7 +10,7 @@ COPY src/TeachingRecordSystem.SupportUi/bin/Release/net9.0/publish/ Apps/Support
 COPY src/TeachingRecordSystem.Worker/bin/Release/net9.0/publish/ Apps/Worker/
 COPY src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net9.0/publish/ Apps/AuthorizeAccess/
 COPY db.sh Apps/db.sh
-WORKDIR /Apps
+#WORKDIR /Apps
 
 RUN chmod +x /Apps/db.sh
 
@@ -40,6 +40,8 @@ RUN apk add --allow-untrusted msodbcsql18_18.0.1.1-1_amd64.apk && \
 	rm -f msodbcsql18_18.0.1.1-1_amd64.apk mssql-tools18_18.0.1.1-1_amd64.apk
 
 RUN addgroup -S appgroup -g 20001 && adduser -S appuser -G appgroup -u 10001
+
+#RUN chmod +x /Apps/TrsCli/Dfe.Analytics.EFCore.shim.sh
 
 USER 10001
 

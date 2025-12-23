@@ -11,6 +11,7 @@ module "migrations_job_configuration" {
   config_variables = {
     ENVIRONMENT_NAME = var.environment_name
   }
+
   secret_variables = {
     CONNECTION_STRING = module.postgres.dotnet_connection_string
   }
@@ -18,6 +19,8 @@ module "migrations_job_configuration" {
 
 module "migrations" {
   source = "./vendor/modules/aks//aks/job_configuration"
+
+  depends_on = [module.airbyte]
 
   namespace    = var.namespace
   environment  = local.app_name_suffix
