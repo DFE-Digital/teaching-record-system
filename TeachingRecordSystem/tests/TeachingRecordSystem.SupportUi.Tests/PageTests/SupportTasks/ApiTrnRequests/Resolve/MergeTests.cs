@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
@@ -17,7 +18,9 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, personId: null);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            personId: null);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -41,7 +44,9 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var (supportTask, _, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, personId: CreateNewRecordPersonIdSentinel);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            personId: CreateNewRecordPersonIdSentinel);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -143,7 +148,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.TrnRequest,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,
@@ -183,7 +188,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.ExistingRecord,
                 MiddleNameSource = PersonAttributeSource.ExistingRecord,
@@ -222,7 +227,18 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 Comments = comments
             });
@@ -359,11 +375,16 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
+        // Deliberately create a support task with all differences to test setting all fields (even though it would not actually be a match!)
         var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
-            supportTask,
-            matchedPerson.PersonId);
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState
+            {
+                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
+                PersonId = matchedPerson.PersonId
+            });
 
         var firstNameSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
         var middleNameSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
@@ -419,7 +440,9 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         (PersonMatchedAttribute.Gender, "GenderSource")
     ];
 
-    private async Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(SupportTask supportTask, Guid? personId)
+    private async Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(
+        SupportTask supportTask,
+        Guid? personId)
     {
         var state = await CreateJourneyStateWithFactory<ResolveApiTrnRequestStateFactory, ResolveApiTrnRequestState>(
             factory => factory.CreateAsync(supportTask));

@@ -13,7 +13,6 @@ public static class Extensions
 {
     public static IServiceCollection AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        services.AddHttpClient<PopulateNameSynonymsJob>();
         services.AddTransient<QtsImporter>();
         services.AddTransient<InductionImporter>();
 

@@ -3,6 +3,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 using Xunit.Sdk;
@@ -40,7 +41,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = null
             });
 
@@ -70,7 +82,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = false
             });
@@ -103,7 +126,21 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersonIds = [matchedPerson.PersonId],
+            MatchedPersons = [new MatchPersonResult(
+                matchedPerson.PersonId,
+                    new[]
+                    {
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.FirstName ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.MiddleName ? PersonMatchedAttribute.MiddleName : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.LastName ? PersonMatchedAttribute.LastName : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.DateOfBirth ? PersonMatchedAttribute.DateOfBirth : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.EmailAddress ? PersonMatchedAttribute.EmailAddress : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.NationalInsuranceNumber ? PersonMatchedAttribute.NationalInsuranceNumber : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.Gender ? PersonMatchedAttribute.Gender : null
+                    }
+                    .Where(a => a is not null)
+                    .Select(a => a!.Value)
+                    .ToArray())],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -168,7 +205,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -196,7 +244,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true
             });
@@ -227,7 +286,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true,
                 Comments = comments
@@ -257,7 +327,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true,
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
@@ -298,7 +379,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = CreateNewRecordPersonIdSentinel,
                 PersonAttributeSourcesSet = true
             });
@@ -335,7 +427,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = null
             });
 
@@ -365,7 +468,18 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = false
             });
@@ -404,7 +518,21 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersonIds = [matchedPerson.PersonId],
+            MatchedPersons = [new MatchPersonResult(
+                matchedPerson.PersonId,
+                    new[]
+                    {
+                        attribute == PersonMatchedAttribute.FirstName ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
+                        attribute == PersonMatchedAttribute.MiddleName ? PersonMatchedAttribute.MiddleName : null,
+                        attribute == PersonMatchedAttribute.LastName ? PersonMatchedAttribute.LastName : null,
+                        attribute == PersonMatchedAttribute.DateOfBirth ? PersonMatchedAttribute.DateOfBirth : null,
+                        attribute == PersonMatchedAttribute.EmailAddress ? PersonMatchedAttribute.EmailAddress : null,
+                        attribute == PersonMatchedAttribute.NationalInsuranceNumber ? PersonMatchedAttribute.NationalInsuranceNumber : null,
+                        attribute == PersonMatchedAttribute.Gender ? PersonMatchedAttribute.Gender : null
+                    }
+                    .Where(a => a is not null)
+                    .Select(a => a!.Value)
+                    .ToArray())],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true,
             Comments = comments
@@ -544,7 +672,21 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersonIds = [matchedPerson.PersonId],
+            MatchedPersons = [new MatchPersonResult(
+                matchedPerson.PersonId,
+                    new[]
+                    {
+                        attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.FirstName ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
+                        attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.MiddleName ? PersonMatchedAttribute.MiddleName : null,
+                        attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.LastName ? PersonMatchedAttribute.LastName : null,
+                        attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.DateOfBirth ? PersonMatchedAttribute.DateOfBirth : null,
+                        attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.EmailAddress ? PersonMatchedAttribute.EmailAddress : null,
+                        attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.NationalInsuranceNumber ? PersonMatchedAttribute.NationalInsuranceNumber : null,
+                        attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.Gender ? PersonMatchedAttribute.Gender : null
+                    }
+                    .Where(a => a is not null)
+                    .Select(a => a!.Value)
+                    .ToArray())],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -587,7 +729,21 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersonIds = [matchedPerson.PersonId],
+            MatchedPersons = [new MatchPersonResult(
+                matchedPerson.PersonId,
+                new[]
+                {
+                    attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.FirstName ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
+                    attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.MiddleName ? PersonMatchedAttribute.MiddleName : null,
+                    attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.LastName ? PersonMatchedAttribute.LastName : null,
+                    attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.DateOfBirth ? PersonMatchedAttribute.DateOfBirth : null,
+                    attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.EmailAddress ? PersonMatchedAttribute.EmailAddress : null,
+                    attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.NationalInsuranceNumber ? PersonMatchedAttribute.NationalInsuranceNumber : null,
+                    attributeSourcedFromRequestData.Attribute == PersonMatchedAttribute.Gender ? PersonMatchedAttribute.Gender : null
+                }
+                .Where(a => a is not null)
+                .Select(a => a!.Value)
+                .ToArray())],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -650,7 +806,15 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                p => new MatchPersonResult(
+                    p,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.DateOfBirth
+                    ]
+                )).ToArray(),
                 PersonId = CreateNewRecordPersonIdSentinel,
                 PersonAttributeSourcesSet = true,
                 Comments = comments

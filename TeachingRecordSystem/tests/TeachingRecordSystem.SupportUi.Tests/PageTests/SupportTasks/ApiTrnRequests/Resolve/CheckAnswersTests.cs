@@ -2,6 +2,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
@@ -38,7 +39,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = null
             });
 
@@ -68,7 +80,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = false
             });
@@ -101,7 +124,21 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var state = new ResolveApiTrnRequestState
         {
-            MatchedPersonIds = [matchedPerson.PersonId],
+            MatchedPersons = [new MatchPersonResult(
+                matchedPerson.PersonId,
+                    new[]
+                    {
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.FirstName ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.MiddleName ? PersonMatchedAttribute.MiddleName : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.LastName ? PersonMatchedAttribute.LastName : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.DateOfBirth ? PersonMatchedAttribute.DateOfBirth : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.EmailAddress ? PersonMatchedAttribute.EmailAddress : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.NationalInsuranceNumber ? PersonMatchedAttribute.NationalInsuranceNumber : null,
+                        sourcedFromRequestDataAttribute.Attribute == PersonMatchedAttribute.Gender ? PersonMatchedAttribute.Gender : null
+                    }
+                    .Where(a => a is not null)
+                    .Select(a => a!.Value)
+                    .ToArray())],
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -166,7 +203,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -194,7 +242,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -222,7 +281,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true
             });
@@ -251,7 +321,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true
             });
@@ -282,7 +363,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true,
                 Comments = comments
@@ -312,7 +404,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -347,7 +450,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true,
                 DateOfBirthSource = PersonAttributeSource.TrnRequest,
@@ -387,7 +501,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = null
             });
 
@@ -417,7 +542,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = false
             });
@@ -454,7 +590,16 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(
+                    matchedPerson.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.DateOfBirth,
+                        PersonMatchedAttribute.EmailAddress,
+                        PersonMatchedAttribute.NationalInsuranceNumber,
+                        PersonMatchedAttribute.Gender
+                    ])],
                 PersonId = CreateNewRecordPersonIdSentinel,
                 Comments = comments
             });
@@ -529,7 +674,16 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(
+                    matchedPerson.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.DateOfBirth,
+                        PersonMatchedAttribute.EmailAddress,
+                        PersonMatchedAttribute.NationalInsuranceNumber,
+                        PersonMatchedAttribute.Gender
+                    ])],
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,
@@ -601,7 +755,16 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(
+                    matchedPerson.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.DateOfBirth,
+                        PersonMatchedAttribute.EmailAddress,
+                        PersonMatchedAttribute.NationalInsuranceNumber,
+                        PersonMatchedAttribute.Gender
+                    ])],
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,
@@ -646,7 +809,16 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(
+                    matchedPerson.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.DateOfBirth,
+                        PersonMatchedAttribute.EmailAddress,
+                        PersonMatchedAttribute.NationalInsuranceNumber,
+                        PersonMatchedAttribute.Gender
+                    ])],
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,
