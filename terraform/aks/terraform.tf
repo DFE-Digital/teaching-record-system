@@ -23,5 +23,10 @@ terraform {
       source  = "StatusCakeDev/statuscake"
       version = "2.2.2"
     }
+
+    airbyte = {
+      source  = "airbytehq/airbyte"
+      version = "0.10.0"
+    }
   }
 }
