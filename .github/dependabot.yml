@@ -12,6 +12,9 @@ updates:
           - 'Microsoft.EntityFrameworkCore.*'
           - 'Microsoft.Extensions.*'
           - 'System.Net.Http.Json'
+      dfe-analytics:
+        patterns:
+          - 'Dfe.Analytics.*'
       serilog:
         patterns:
           - 'Serilog.*'

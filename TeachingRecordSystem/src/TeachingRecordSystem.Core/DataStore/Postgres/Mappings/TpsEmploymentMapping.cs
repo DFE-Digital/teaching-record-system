@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
