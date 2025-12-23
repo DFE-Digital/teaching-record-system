@@ -1,9 +1,9 @@
 using TeachingRecordSystem.Cli;
 
-var configuration = new ConfigurationBuilder()
+var configuration = new ConfigurationManager();
+configuration
     .AddEnvironmentVariables()
-    .AddUserSecrets(typeof(Program).Assembly)
-    .Build();
+    .AddUserSecrets(typeof(Program).Assembly);
 
 var rootCommand = new RootCommand("Development tools for the Teaching Record System.")
 {

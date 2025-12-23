@@ -19,6 +19,8 @@ module "migrations_job_configuration" {
 module "migrations" {
   source = "./vendor/modules/aks//aks/job_configuration"
 
+  depends_on = [module.airbyte]
+
   namespace    = var.namespace
   environment  = local.app_name_suffix
   service_name = var.service_name

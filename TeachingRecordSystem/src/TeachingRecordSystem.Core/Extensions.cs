@@ -232,7 +232,8 @@ public static class Extensions
     }
 
     public static string GetPostgresConnectionString(this IConfiguration configuration) =>
-        configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
+        configuration.GetConnectionString(TrsDbContext.ConnectionName) ??
+            throw new InvalidOperationException($"Connection string '{TrsDbContext.ConnectionName}' is not configured.");
 
     private class DbDataSourceConnectionFactory(NpgsqlDataSource dataSource) : IConnectionFactory
     {
