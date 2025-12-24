@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
@@ -143,7 +144,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.TrnRequest,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,
@@ -183,7 +184,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.ExistingRecord,
                 MiddleNameSource = PersonAttributeSource.ExistingRecord,
@@ -222,7 +223,18 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 Comments = comments
             });

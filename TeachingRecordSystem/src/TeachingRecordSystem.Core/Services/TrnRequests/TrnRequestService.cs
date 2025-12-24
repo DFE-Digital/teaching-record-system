@@ -419,8 +419,8 @@ public class TrnRequestService(
 
         if (matchedOnDobAndNino is [var singleDobAndNinoMatch])
         {
-            var definiteMatch = GetPotentialMatch(singleDobAndNinoMatch);
-            return MatchPersonsResult.DefiniteMatch(definiteMatch);
+            var matchedAttributes = GetMatchedAttributes(singleDobAndNinoMatch);
+            return MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.person_id, singleDobAndNinoMatch.trn, matchedAttributes);
         }
 
         var matchedOnNameDateOfBirthEmailAndGender = results
@@ -436,8 +436,8 @@ public class TrnRequestService(
 
         if (matchedOnNameDateOfBirthEmailAndGender is [var singleNameDobEmailGenderMatch] && string.IsNullOrEmpty(request.NationalInsuranceNumber))
         {
-            var definiteMatch = GetPotentialMatch(singleNameDobEmailGenderMatch);
-            return MatchPersonsResult.DefiniteMatch(definiteMatch);
+            var matchedAttributes = GetMatchedAttributes(singleNameDobEmailGenderMatch);
+            return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.person_id, singleNameDobEmailGenderMatch.trn, matchedAttributes);
         }
 
         request.PotentialDuplicate = true;
@@ -453,7 +453,7 @@ public class TrnRequestService(
                         (r.email_address_matches ? 5 : 0) +
                         (r.national_insurance_number_matches ? 10 : 0);
 
-                    var potentialMatch = GetPotentialMatch(r);
+                    var potentialMatch = GetMatchedPerson(r);
 
                     return (potentialMatch, score);
                 })
@@ -532,20 +532,13 @@ public class TrnRequestService(
             new(name, NpgsqlDbType.Array | NpgsqlDbType.Varchar) { Value = values.ToArray() };
     }
 
-    private PotentialMatch GetPotentialMatch(TrnRequestMatchQueryResult result) =>
+    private MatchPersonResult GetMatchedPerson(TrnRequestMatchQueryResult result) =>
         new(
             PersonId: result.person_id,
-            Trn: result.trn,
-            EmailAddress: result.email_address,
-            FirstName: result.first_name,
-            MiddleName: result.middle_name,
-            LastName: result.last_name,
-            DateOfBirth: result.date_of_birth,
-            NationalInsuranceNumber: result.national_insurance_number,
             MatchedAttributes: GetMatchedAttributes(result)
         );
 
-    private PersonMatchedAttribute[] GetMatchedAttributes(TrnRequestMatchQueryResult result) =>
+    private IReadOnlyCollection<PersonMatchedAttribute> GetMatchedAttributes(TrnRequestMatchQueryResult result) =>
         new[]
         {
             result.first_name_matches ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,

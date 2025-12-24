@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
@@ -23,7 +24,18 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress,
+                            PersonMatchedAttribute.Gender
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 PersonAttributeSourcesSet = true
             });
@@ -52,7 +64,17 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress
+                        ]
+                    )).ToArray(),
                 PersonId = null
             });
 
@@ -82,7 +104,17 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress
+                        ]
+                    )).ToArray(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -186,7 +218,13 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(
+                    matchedPerson.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.MiddleName,
+                        PersonMatchedAttribute.LastName                        
+                    ])],
                 PersonId = matchedPerson.PersonId,
                 DateOfBirthSource = PersonAttributeSource.TrnRequest,
                 EmailAddressSource = PersonAttributeSource.TrnRequest,
@@ -223,7 +261,13 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = [matchedPerson.PersonId],
+                MatchedPersons = [new MatchPersonResult(
+                    matchedPerson.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.MiddleName,
+                        PersonMatchedAttribute.LastName
+                    ])],
                 PersonId = matchedPerson.PersonId,
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = PersonAttributeSource.ExistingRecord,
@@ -259,7 +303,17 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress
+                        ]
+                    )).ToArray(),
                 PersonId = matchedPersonIds[0],
                 Comments = comments
             });
@@ -288,7 +342,17 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress
+                        ]
+                    )).ToArray(),
                 PersonId = null
             });
 
@@ -321,7 +385,17 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersonIds = matchedPersonIds,
+                MatchedPersons = matchedPersonIds.Select(
+                    p => new MatchPersonResult(
+                        p,
+                        [
+                            PersonMatchedAttribute.FirstName,
+                            PersonMatchedAttribute.MiddleName,
+                            PersonMatchedAttribute.LastName,
+                            PersonMatchedAttribute.DateOfBirth,
+                            PersonMatchedAttribute.EmailAddress
+                        ]
+                    )).ToArray(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 

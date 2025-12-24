@@ -87,7 +87,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
         var matchedAttributesLookup = JourneyInstance!.State.MatchedPersons.ToDictionary(
                 mp => mp.PersonId,
                 mp => mp.MatchedAttributes);
-        var matchedPersonIds = JourneyInstance!.State.MatchedPersonIds.ToArray();
+        var matchedPersonIds = JourneyInstance!.State.MatchedPersons.Select(p => p.PersonId).ToArray();
 
         PotentialDuplicates = (await DbContext.Persons
             .Where(p => matchedPersonIds.Contains(p.PersonId))

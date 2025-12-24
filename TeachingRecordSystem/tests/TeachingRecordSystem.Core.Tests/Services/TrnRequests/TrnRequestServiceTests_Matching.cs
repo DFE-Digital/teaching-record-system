@@ -47,7 +47,7 @@ public partial class TrnRequestServiceTests
         var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
 
         // Assert
-        Assert.Contains(person.PersonId, result.PotentialMatchesPersonIds);
+        Assert.Contains(person.PersonId, result.Matches.Select(p => p.PersonId));
     }
 
     [Fact]

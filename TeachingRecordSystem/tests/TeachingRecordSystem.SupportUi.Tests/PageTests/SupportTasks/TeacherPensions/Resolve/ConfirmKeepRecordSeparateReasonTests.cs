@@ -1,6 +1,7 @@
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpdatedEvent;
@@ -27,7 +28,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
     {
         // Arrange
         var taskReference = "1234567";
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [] };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersons = [] };
         var journeyInstance = await CreateJourneyInstance(taskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/resolve/keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -67,7 +68,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersonIds = [duplicatePerson1.PersonId],
+            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
             Reason = "THIS IS A DIFFERENT RECORD",
             KeepSeparateReason = KeepingRecordSeparateReason.AnotherReason
         };
@@ -111,7 +112,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersonIds = [duplicatePerson1.PersonId],
+            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
             KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch,
             Reason = null
         };
@@ -153,7 +154,11 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch
+        };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         EventObserver.Clear();
 
@@ -236,7 +241,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersonIds = [duplicatePerson1.PersonId],
+            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
             KeepSeparateReason = KeepingRecordSeparateReason.AnotherReason,
             Reason = keepReason
         };
