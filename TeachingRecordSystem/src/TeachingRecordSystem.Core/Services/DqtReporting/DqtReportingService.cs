@@ -221,9 +221,16 @@ public class DqtReportingService : BackgroundService
             var parameterName = $"@p{parameters.Count + 1}";
             var parameter = new SqlParameter(parameterName, value);
 
-            if (value is DateTime)
+            if (value is DateTime dt)
             {
                 parameter.SqlDbType = SqlDbType.DateTime2;
+
+                // Handle infinity and -infinity DateTime values
+                // (Npgsql maps these to DateTime.MaxValue and DateTime.MinValue).
+                if (dt == DateTime.MaxValue || dt == DateTime.MinValue)
+                {
+                    parameter.Value = DBNull.Value;
+                }
             }
 
             parameters.Add(parameter);
