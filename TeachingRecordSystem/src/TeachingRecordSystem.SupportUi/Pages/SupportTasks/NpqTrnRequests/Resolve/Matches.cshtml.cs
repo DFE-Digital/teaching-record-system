@@ -5,7 +5,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
@@ -40,7 +39,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
     {
         // Validate the submitted ID
         if (PersonId is Guid personId &&
-            !PotentialDuplicates!.Any(d => d.PersonId == personId) && personId != ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel)
+            !PotentialDuplicates!.Any(d => d.PersonId == personId) && personId != ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel)
         {
             return BadRequest();
         }
