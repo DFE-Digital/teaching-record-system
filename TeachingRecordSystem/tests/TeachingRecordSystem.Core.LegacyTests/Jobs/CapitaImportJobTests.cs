@@ -1850,7 +1850,6 @@ public class CapitaImportJobFixture : IAsyncLifetime
         var personService = new Core.Services.Persons.PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             eventPublisher);
 
         var trnRequestService = new TrnRequestService(

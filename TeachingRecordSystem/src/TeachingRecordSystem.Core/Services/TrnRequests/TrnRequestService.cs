@@ -457,7 +457,7 @@ public class TrnRequestService(
                 .Select(r => r.person_id));
     }
 
-    private async Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
+    private Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
     {
         // Find all Active records with a TRN that match on:
         // - at least three of first name, middle name, last name, DOB *OR*
@@ -470,7 +470,7 @@ public class TrnRequestService(
 
         var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
-        return await dbContext.Database.SqlQueryRaw<TrnRequestMatchQueryResult>(
+        return dbContext.Database.SqlQueryRaw<TrnRequestMatchQueryResult>(
                 """
                 WITH vars AS (
                     SELECT
