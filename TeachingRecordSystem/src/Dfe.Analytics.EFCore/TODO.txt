@@ -1,4 +1,0 @@
-Airbyte setup (Terraform module)
-DB migrations
-Airbyte config update
-BQ update

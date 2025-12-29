@@ -42,7 +42,7 @@ public class OAuth2Controller(
         var clientId = request.ClientId!;
         var client = await dbContext.ApplicationUsers.SingleAsync(u => u.ClientId == clientId);
 
-        if (HttpContext.GetWebRequestEvent() is Dfe.Analytics.Event webRequestEvent)
+        if (HttpContext.GetWebRequestEvent() is Dfe.Analytics.Events.Event webRequestEvent)
         {
             webRequestEvent.Data[DfeAnalyticsEventDataKeys.ApplicationUserId] = [client.UserId.ToString()];
         }

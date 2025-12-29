@@ -12,9 +12,9 @@ string clientSecret = args[2];
 var sp = new ServiceCollection()
     .AddDatabase(connectionString)
     .AddDfeAnalyticsDeploymentTools()
-    .ConfigureAirbyteOptions(options =>
+    .ConfigureAirbyteApi(options =>
     {
-        options.ApiBaseUrl = apiBaseUrl;
+        options.BaseAddress = apiBaseUrl;
         options.ClientId = clientId;
         options.ClientSecret = clientSecret;
     })

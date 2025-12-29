@@ -103,6 +103,18 @@
           "System.Diagnostics.TraceSource": "4.3.0"
         }
       },
+      "Dfe.Analytics.Core": {
+        "type": "Transitive",
+        "resolved": "0.3.0-alpha.0.20",
+        "contentHash": "Yd0qOfm/EIAvZZ9ZHHwqklYlg2Id7sCz/M8+tbn84DkueWH2x0GeWSid8hqwoSrvY64fOqPLYEiMQU+Ou5tbwA==",
+        "dependencies": {
+          "Google.Apis.Auth": "1.71.0",
+          "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",
+          "Microsoft.Extensions.Configuration": "8.0.0",
+          "Microsoft.Extensions.Logging": "8.0.0",
+          "Microsoft.Extensions.Options": "8.0.0"
+        }
+      },
       "EntityFrameworkCore.Projectables.Abstractions": {
         "type": "Transitive",
         "resolved": "4.0.0",
@@ -140,19 +152,19 @@
       },
       "Google.Apis": {
         "type": "Transitive",
-        "resolved": "1.69.0",
-        "contentHash": "1TfjsXFejwIf7iWaE7A0FbnOEsk8FPlbdFAt1r+I8aSMQfLLdSVWCLdZz6TzuWVwoCGEuJUHTZ/FXdptdU3qWw==",
+        "resolved": "1.71.0",
+        "contentHash": "xKVk+SLZXeBPKuEKzNTg2K7ptr5ZL40+VSR8e5+yJbzTE9uRCCDPlAzT/ij3urh4usBsn5IiW5rXQI+xAc3bRQ==",
         "dependencies": {
-          "Google.Apis.Core": "1.69.0"
+          "Google.Apis.Core": "1.71.0"
         }
       },
       "Google.Apis.Auth": {
         "type": "Transitive",
-        "resolved": "1.69.0",
-        "contentHash": "ar07yxn/s41jdqQ3sMh8EAehiSvXQ9yE1MS4McmZINeSWvolnLHmIZ9Yxj4tHVIYYz0c7H/lpToVqm7C2aYx9g==",
+        "resolved": "1.71.0",
+        "contentHash": "AshxDrFfj0QQPkmGQWvWhT+iZ8Vif23hLa9mFZ6cnbwvfXmXwXOWK9bP6uWnLj+sO6otAYKm+7SMZYgwi1AdJA==",
         "dependencies": {
-          "Google.Apis": "1.69.0",
-          "Google.Apis.Core": "1.69.0",
+          "Google.Apis": "1.71.0",
+          "Google.Apis.Core": "1.71.0",
           "System.Management": "7.0.2"
         }
       },
@@ -167,8 +179,8 @@
       },
       "Google.Apis.Core": {
         "type": "Transitive",
-        "resolved": "1.69.0",
-        "contentHash": "SXUcurNUPxYMtOnawvB2Av18VrPBC9W7So9q9ikmXIXLGiv4RX7Zbu4kc+8PbwTdd8wLt54r0PBGOT5RaKoTjQ==",
+        "resolved": "1.71.0",
+        "contentHash": "tCsg4USOGBVCIrSOyLht1akZe/+ioH7+LVWix6XuxP5fFiw5kEFSBXL+Of93aK/ztJa1dQI+p03dJ+AKgViRuw==",
         "dependencies": {
           "Newtonsoft.Json": "13.0.3"
         }
@@ -2322,20 +2334,11 @@
         "resolved": "0.8.1",
         "contentHash": "19tNz33kn2EkyViFXuxfVn338UJaRmkwBphVqP2dVJIYQUQgFrgG5h061mxkRRg1Ax6r+6WOj1FxaFZ5qaWqqg=="
       },
-      "dfe.analytics.efcore": {
-        "type": "Project",
-        "dependencies": {
-          "Microsoft.Extensions.Configuration.Binder": "[9.0.0, )",
-          "Microsoft.Extensions.Hosting.Abstractions": "[9.0.0, )",
-          "Microsoft.Extensions.Http": "[9.0.0, )",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "[9.0.0, )"
-        }
-      },
       "teachingrecordsystem.authorizeaccess": {
         "type": "Project",
         "dependencies": {
           "DartSassBuilder": "[1.1.0, )",
-          "Dfe.Analytics": "[0.2.6, )",
+          "Dfe.Analytics.AspNetCore": "[0.3.0-alpha.0.20, )",
           "GovUk.Frontend.AspNetCore": "[3.4.1, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.0, )",
           "Humanizer.Core": "[2.14.1, )",
@@ -2357,7 +2360,7 @@
           "CloudNative.CloudEvents": "[2.8.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[33.1.0, )",
-          "Dfe.Analytics.EFCore": "[1.0.0, )",
+          "Dfe.Analytics.EFCore": "[0.3.0-alpha.0.20, )",
           "EFCore.NamingConventions": "[9.0.0, )",
           "EntityFrameworkCore.Projectables": "[4.0.0, )",
           "FluentValidation": "[12.1.0, )",
@@ -2553,16 +2556,25 @@
           "dbup-core": "5.0.37"
         }
       },
-      "Dfe.Analytics": {
+      "Dfe.Analytics.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[0.2.6, )",
-        "resolved": "0.2.6",
-        "contentHash": "LzoMC1m+lLQPA//S4aT2hIa2DbvqkYkk7NamkKc47ELWyLO179k0IiDC0zKgpSOlliAFIvkxul7BkqI9kSU1Ew==",
+        "requested": "[0.3.0-alpha.0.20, )",
+        "resolved": "0.3.0-alpha.0.20",
+        "contentHash": "PJwP3O2nvYqLMcvjJjJXUGVzPQIGnqyb+5yEZvdvdBv2erHgNLN8k5PfYK3jbgDIUQKSslJkTdffXPKn8T70ZQ==",
         "dependencies": {
-          "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",
-          "Microsoft.Extensions.Configuration": "8.0.0",
-          "Microsoft.Extensions.Logging": "8.0.0",
-          "Microsoft.Extensions.Options": "8.0.0"
+          "Dfe.Analytics.Core": "0.3.0-alpha.0.20"
+        }
+      },
+      "Dfe.Analytics.EFCore": {
+        "type": "CentralTransitive",
+        "requested": "[0.3.0-alpha.0.20, )",
+        "resolved": "0.3.0-alpha.0.20",
+        "contentHash": "oat9ypur3FA7oNfGpCA98/nCkmBMsDtCBKnij+qfNo9ljNOA29+oyhrYq0wRrVt3zbD4VcndGWO9bJaep6iyFg==",
+        "dependencies": {
+          "Dfe.Analytics.Core": "0.3.0-alpha.0.20",
+          "Microsoft.Extensions.Hosting.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Http": "8.0.0",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.0"
         }
       },
       "EFCore.NamingConventions": {
