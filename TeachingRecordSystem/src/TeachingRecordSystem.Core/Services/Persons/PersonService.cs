@@ -1,13 +1,11 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Services.Persons;
 
 public class PersonService(
     TrsDbContext dbContext,
     IClock clock,
-    ITrnGenerator trnGenerator,
     IEventPublisher eventPublisher)
 {
     public async Task<string?> GetTrnFromPersonIdAsync(Guid personId)
@@ -15,7 +13,7 @@ public class PersonService(
         return (await dbContext.Persons.SingleAsync(q => q.PersonId == personId)).Trn;
     }
 
-    public async Task<Person?> GetPersonAsync(Guid personId, bool includeDeactivatedPersons = false)
+    public Task<Person?> GetPersonAsync(Guid personId, bool includeDeactivatedPersons = false)
     {
         var persons = dbContext.Persons.AsQueryable();
 
@@ -24,14 +22,12 @@ public class PersonService(
             persons = persons.IgnoreQueryFilters();
         }
 
-        return await persons.SingleOrDefaultAsync(p => p.PersonId == personId);
+        return persons.SingleOrDefaultAsync(p => p.PersonId == personId);
     }
 
     public async Task<Person> CreatePersonAsync(CreatePersonOptions options, ProcessContext processContext)
     {
         var now = clock.UtcNow;
-
-        var trn = options.Trn ?? await trnGenerator.GenerateTrnAsync();
 
         TrnRequestMetadata? sourceRequest = null;
         if (options.SourceTrnRequest is (var applicationUserId, var requestId))
@@ -46,7 +42,7 @@ public class PersonService(
         var person = new Person
         {
             PersonId = Guid.NewGuid(),
-            Trn = trn,
+            Trn = options.Trn!,
             FirstName = options.PersonDetails.FirstName,
             MiddleName = options.PersonDetails.MiddleName,
             LastName = options.PersonDetails.LastName,

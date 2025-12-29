@@ -372,7 +372,6 @@ public partial class TestData
 
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData, IClock clock)
         {
-            string trn = await testData.GenerateTrnAsync();
             var statedFirstName = _firstName ?? testData.GenerateFirstName();
             var statedMiddleName = _middleName ?? testData.GenerateMiddleName();
             var firstAndMiddleNames = $"{statedFirstName} {statedMiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -398,7 +397,6 @@ public partial class TestData
                 CreatedOn = createdOn,
                 UpdatedOn = updatedOn,
                 Status = personStatus,
-                Trn = trn,
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
@@ -573,7 +571,7 @@ public partial class TestData
                 PersonId = PersonId,
                 Person = person,
                 Events = events.AsReadOnly(),
-                Trn = trn,
+                Trn = person.Trn,
                 DateOfBirth = dateOfBirth,
                 FirstName = firstName,
                 MiddleName = middleName,

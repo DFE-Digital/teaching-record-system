@@ -805,9 +805,9 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
-        await DbFixture.DbHelper.ClearDataAsync();
+        return DbFixture.DbHelper.ClearDataAsync();
     }
 
     public Task DisposeAsync() => Task.CompletedTask;

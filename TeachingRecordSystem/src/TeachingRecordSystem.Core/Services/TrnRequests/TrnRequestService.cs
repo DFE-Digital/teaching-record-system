@@ -211,7 +211,7 @@ public class TrnRequestService(
         return person.Trn;
     }
 
-    public async Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -222,7 +222,7 @@ public class TrnRequestService(
 
         trnRequest.SetRejected();
 
-        await eventPublisher.PublishEventAsync(
+        return eventPublisher.PublishEventAsync(
             new TrnRequestUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -236,7 +236,7 @@ public class TrnRequestService(
             processContext);
     }
 
-    public async Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -252,7 +252,7 @@ public class TrnRequestService(
 
         trnRequest.SetCompleted();
 
-        await eventPublisher.PublishEventAsync(
+        return eventPublisher.PublishEventAsync(
             new TrnRequestUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -457,7 +457,7 @@ public class TrnRequestService(
                 .Select(r => r.person_id));
     }
 
-    private async Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
+    private Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
     {
         // Find all Active records with a TRN that match on:
         // - at least three of first name, middle name, last name, DOB *OR*
@@ -470,7 +470,7 @@ public class TrnRequestService(
 
         var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
-        return await dbContext.Database.SqlQueryRaw<TrnRequestMatchQueryResult>(
+        return dbContext.Database.SqlQueryRaw<TrnRequestMatchQueryResult>(
                 """
                 WITH vars AS (
                     SELECT

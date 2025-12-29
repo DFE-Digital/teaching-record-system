@@ -1043,7 +1043,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 
-    public async Task InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
+    public Task InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
 
     public Task DisposeAsync() => Task.CompletedTask;
 }

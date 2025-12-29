@@ -1,9 +1,8 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class TestTrnGenerator(IDbContextFactory<TrsDbContext> dbContextFactory) : ITrnGenerator
+public class TestTrnGenerator(IDbContextFactory<TrsDbContext> dbContextFactory)
 {
     public async Task<string> GenerateTrnAsync()
     {
