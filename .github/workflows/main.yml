@@ -19,23 +19,23 @@ jobs:
     uses: ./.github/workflows/package.yml
     secrets: inherit
 
-  deploy_dev:
-    name: Deploy dev environment
-    runs-on: ubuntu-latest
-    needs: [package]
-    environment: dev
-    concurrency: deploy_dev
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: ./.github/workflows/actions/deploy-aks-environment
-        id: deploy
-        with:
-          environment_name: dev
-          docker_image: ${{ needs.package.outputs.docker_image }}
-          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+#  deploy_dev:
+#    name: Deploy dev environment
+#    runs-on: ubuntu-latest
+#    needs: [package]
+#    environment: dev
+#    concurrency: deploy_dev
+#    steps:
+#      - uses: actions/checkout@v6
+#
+#      - uses: ./.github/workflows/actions/deploy-aks-environment
+#        id: deploy
+#        with:
+#          environment_name: dev
+#          docker_image: ${{ needs.package.outputs.docker_image }}
+#          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+#          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+#          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 
   check_environments:
     name: Check environment deployments
@@ -71,7 +71,7 @@ jobs:
   deploy_preprod:
     name: Deploy pre-production environment
     runs-on: ubuntu-latest
-    needs: [package, deploy_dev, check_environments]
+    needs: [package, check_environments]
     if: needs.check_environments.outputs.deploy_preprod == 'true'
     environment: pre-production
     concurrency: deploy_pre-production
@@ -90,8 +90,8 @@ jobs:
   deploy_prod:
     name: Deploy production environment
     runs-on: ubuntu-latest
-    needs: [deploy_dev, package, deploy_preprod]
-    if: always() && (needs.deploy_preprod.result == 'success' || needs.deploy_preprod.result == 'skipped') && (needs.package.result == 'success') && (needs.deploy_dev.result == 'success')
+    needs: [package, deploy_preprod]
+    if: always() && (needs.deploy_preprod.result == 'success' || needs.deploy_preprod.result == 'skipped') && (needs.package.result == 'success')
     environment: production
     concurrency: deploy_production
     steps:
