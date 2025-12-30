@@ -1,6 +1,5 @@
 using System.Globalization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
@@ -319,25 +318,40 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-
-    public IQueryable<SupportTask> SearchOneLoginIdVerificationSupportTasks(SearchOneLoginUserIdVerificationSupportTasksOptions options)
+    public async Task<OneLoginIdVerificationSupportTasksSearchResult> SearchOneLoginIdVerificationSupportTasksAsync(SearchOneLoginUserIdVerificationSupportTasksOptions options, PaginationOptions paginationOptions)
     {
-        var query = dbContext.SupportTasks
+        var tasks = await dbContext.SupportTasks
             .Include(t => t.OneLoginUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open);
+            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
+            .ToListAsync();
 
-        query = options.SortBy switch
+        var taskCount = tasks.Count;
+
+        var results = tasks
+            .Select(r => new OneLoginIdVerificationSupportTasksSearchResultItem(
+                r.SupportTaskReference,
+                (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName,
+                (r.Data as OneLoginUserIdVerificationData)!.StatedLastName,
+                r.OneLoginUser!.EmailAddress,
+                r.CreatedOn))
+            .AsQueryable();
+
+        var orderedResults = (options.SortBy switch
         {
-            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => query.OrderBy(r => r.SupportTaskReference, options.SortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.Name => query
-                .OrderBy(r => (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName, options.SortDirection)
-                .ThenBy(r => (r.Data as OneLoginUserIdVerificationData)!.StatedLastName, options.SortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.Email => query.OrderBy(r => r.OneLoginUser!.EmailAddress, options.SortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => query.OrderBy(r => r.CreatedOn, options.SortDirection),
-            _ => query
-        };
+            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => results.OrderBy(r => r.SupportTaskReference, options.SortDirection),
+            OneLoginIdVerificationSupportTasksSortByOption.Name => results
+                .OrderBy(r => r.FirstName, options.SortDirection)
+                .ThenBy(r => r.LastName, options.SortDirection),
+            OneLoginIdVerificationSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, options.SortDirection),
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, options.SortDirection),
+            _ => results
+        }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, taskCount);
 
-        return query;
+        return new()
+        {
+            TotalTaskCount = taskCount,
+            SearchResults = orderedResults
+        };
     }
 
     private bool SearchTextIsDate(string searchText, out DateTime minDate, out DateTime maxDate)

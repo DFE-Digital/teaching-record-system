@@ -22,10 +22,13 @@ public partial class SupportTaskSearchServiceTests
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var oneLoginUsers = new OneLoginUser[] { oneLoginUser1, oneLoginUser2 };
-        var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
-        Clock.Advance(TimeSpan.FromDays(1));
-        var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
-        var supportTasks = new SupportTask[] { supportTask1, supportTask2 };
+
+        var supportTasks = new SupportTask[] {
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject, configure =>
+                configure.WithCreatedOn(new DateTime(2000,10,10,1,1,1, DateTimeKind.Utc))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject, configure =>
+                configure.WithCreatedOn(new DateTime(2000,10,11,1,1,1, DateTimeKind.Utc)))
+        };
 
         var options = new SearchOneLoginUserIdVerificationSupportTasksOptions(sortBy, sortDirection);
 
@@ -41,9 +44,11 @@ public partial class SupportTaskSearchServiceTests
                     task.CreatedOn,
                     user.EmailAddress
                 });
+        var paginationOptions = new PaginationOptions(PageNumber: 1);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, SupportTask[]>(service => service.SearchOneLoginIdVerificationSupportTasks(options).ToArrayAsync());
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+            service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
         // Assert
         var expectedResultsOrdered = (sortBy switch
@@ -63,11 +68,46 @@ public partial class SupportTaskSearchServiceTests
             _ => expectedResults
         }).ToArray();
 
-        Assert.Equal(expectedResultsOrdered.Length, results.Length);
-        Assert.Equal(expectedResultsOrdered.Select(r => r.SupportTaskReference), results.Select(r => r.SupportTaskReference));
-        Assert.Equal(expectedResultsOrdered.Select(r => r.EmailAddress), results.Select(r => r.OneLoginUser!.EmailAddress));
-        Assert.Equal(expectedResultsOrdered.Select(r => r.CreatedOn), results.Select(r => r.CreatedOn));
-        Assert.Equal(expectedResultsOrdered.Select(r => r.StatedFirstName), results.Select(r => ((OneLoginUserIdVerificationData)r.Data).StatedFirstName));
-        Assert.Equal(expectedResultsOrdered.Select(r => r.StatedLastName), results.Select(r => ((OneLoginUserIdVerificationData)r.Data).StatedLastName));
+        Assert.Equal(expectedResultsOrdered.Length, results.SearchResults.Count);
+        Assert.Equal(expectedResultsOrdered.Select(r => r.SupportTaskReference), results.SearchResults.Select(r => r.SupportTaskReference));
+        Assert.Equal(expectedResultsOrdered.Select(r => r.EmailAddress), results.SearchResults.Select(r => r.EmailAddress));
+        Assert.Equal(expectedResultsOrdered.Select(r => r.CreatedOn), results.SearchResults.Select(r => r.CreatedOn));
+        Assert.Equal(expectedResultsOrdered.Select(r => r.StatedFirstName), results.SearchResults.Select(r => r.FirstName));
+        Assert.Equal(expectedResultsOrdered.Select(r => r.StatedLastName), results.SearchResults.Select(r => r.LastName));
+    }
+
+    [Theory]
+    [InlineData(1, 2, new[] { "Alphie", "Bert" })]
+    [InlineData(2, 2, new[] { "Colin", "David" })]
+    [InlineData(3, 1, new[] { "Edward" })]
+    public async Task SearchOneLoginIdVerificationSupportTasks_ReturnsPagedResults(int pageNumber, int expectedResultCount, string[] expectedRecords)
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+
+        var supportTasksList = new List<SupportTask>
+        {
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Alphie").WithCreatedOn(new DateTime(2000,10,1,1,1,1, DateTimeKind.Utc))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Bert").WithCreatedOn(new DateTime(2000,9,1,1,2,1, DateTimeKind.Utc))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Colin").WithCreatedOn(new DateTime(2000,8,1,1,3,1, DateTimeKind.Utc))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("David").WithCreatedOn(new DateTime(2000,11,1,1,4,1, DateTimeKind.Utc))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Edward").WithCreatedOn(new DateTime(2000,10,1,1,5,1, DateTimeKind.Utc)))
+        };
+
+        var options = new SearchOneLoginUserIdVerificationSupportTasksOptions(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
+
+        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, ItemsPerPage: 2);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+            service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
+
+        Assert.Equal(expectedResultCount, results.SearchResults.Count);
+        Assert.Equal(expectedRecords, results.SearchResults.Select(r => r.FirstName));
     }
 }

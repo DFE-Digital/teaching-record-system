@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.SupportUi.Pages.Shared;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification;
 
-public class Index(SupportTaskSearchService searchService) : PageModel
+public class Index(SupportTaskSearchService searchService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private const int TasksPerPage = 10;
+
     [BindProperty(SupportsGet = true)]
     [FromQuery]
     public string? Search { get; set; }
@@ -19,33 +21,30 @@ public class Index(SupportTaskSearchService searchService) : PageModel
     [FromQuery]
     public OneLoginIdVerificationSupportTasksSortByOption? SortBy { get; set; }
 
-    public IReadOnlyCollection<Result>? Results { get; set; }
+    [BindProperty(SupportsGet = true)]
+    public int? PageNumber { get; set; }
+
+    public int? TotalTaskCount { get; set; }
+    public PaginationViewModel? Pagination { get; set; }
+
+    public ResultPage<OneLoginIdVerificationSupportTasksSearchResultItem>? Results { get; set; }
 
     public async Task OnGetAsync()
     {
         var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
+        var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        var query = searchService.SearchOneLoginIdVerificationSupportTasks(new SearchOneLoginUserIdVerificationSupportTasksOptions(
-            SortBy ??= OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference,
-            sortDirection));
+        var result = await searchService.SearchOneLoginIdVerificationSupportTasksAsync(
+            new SearchOneLoginUserIdVerificationSupportTasksOptions(
+                SortBy ??= OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference,
+                sortDirection),
+            paginationOptions);
 
-        Results = await query
-            .Select(r => new Result(
-                r.SupportTaskReference,
-                (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName,
-                (r.Data as OneLoginUserIdVerificationData)!.StatedLastName,
-                r.OneLoginUser!.EmailAddress,
-                r.CreatedOn))
-            .ToListAsync();
-    }
+        TotalTaskCount = result.TotalTaskCount;
+        Results = result.SearchResults;
 
-    public record Result(
-        string SupportTaskReference,
-        string FirstName,
-        string LastName,
-        string? EmailAddress,
-        DateTime CreatedOn)
-    {
-        public string Name => $"{FirstName} {LastName}";
+        Pagination = PaginationViewModel.Create(
+            Results,
+            pageNumber => linkGenerator.SupportTasks.OneLoginUserIdVerification.Index(SortBy, SortDirection, pageNumber));
     }
 }
