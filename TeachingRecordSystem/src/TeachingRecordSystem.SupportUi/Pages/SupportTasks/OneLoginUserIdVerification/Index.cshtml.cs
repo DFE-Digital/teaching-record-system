@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerifi
 
 public class Index(SupportTaskSearchService searchService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    private const int TasksPerPage = 10;
+    private const int TasksPerPage = 20;
 
     [BindProperty(SupportsGet = true)]
     [FromQuery]
