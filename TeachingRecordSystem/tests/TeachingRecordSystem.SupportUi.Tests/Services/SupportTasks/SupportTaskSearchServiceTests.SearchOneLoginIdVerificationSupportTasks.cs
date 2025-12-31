@@ -107,6 +107,7 @@ public partial class SupportTaskSearchServiceTests
         var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
             service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
+        // Assert
         Assert.Equal(expectedResultCount, results.SearchResults.Count);
         Assert.Equal(expectedRecords, results.SearchResults.Select(r => r.FirstName));
     }
