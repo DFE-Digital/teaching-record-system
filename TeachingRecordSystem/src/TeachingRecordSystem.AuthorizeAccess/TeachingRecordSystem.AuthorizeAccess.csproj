@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <PackageReference Include="DartSassBuilder" />
-    <PackageReference Include="Dfe.Analytics.AspNetCore" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="GovUk.OneLogin.AspNetCore" />
     <PackageReference Include="Humanizer.Core" />
@@ -32,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\dfe-analytics-dotnet\src\Dfe.Analytics.AspNetCore\Dfe.Analytics.AspNetCore.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.WebCommon\TeachingRecordSystem.WebCommon.csproj" />
   </ItemGroup>

@@ -1,0 +1,210 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.EFCore/Dfe.Analytics.EFCore.csproj": {}
+  },
+  "projects": {
+    "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.Core/Dfe.Analytics.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.Core/Dfe.Analytics.Core.csproj",
+        "projectName": "Dfe.Analytics.Core",
+        "projectPath": "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.Core/Dfe.Analytics.Core.csproj",
+        "packagesPath": "/Users/james/.nuget/packages/",
+        "outputPath": "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/james/Code/teaching-record-system/TeachingRecordSystem/NuGet.Config",
+          "/Users/james/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "/Users/james/Code/teaching-record-system/TeachingRecordSystem/lib": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "noWarn": [
+            "NU5105"
+          ],
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Google.Apis.Auth": {
+              "target": "Package",
+              "version": "[1.71.0, )"
+            },
+            "Google.Cloud.BigQuery.V2": {
+              "target": "Package",
+              "version": "[3.0.0, 4.0.0)"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Logging": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Options": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "MinVer": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[4.2.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.22, 8.0.22]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.22, 8.0.22]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/Users/james/.local/share/mise/installs/dotnet/10.0.100/sdk/10.0.100/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.EFCore/Dfe.Analytics.EFCore.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.EFCore/Dfe.Analytics.EFCore.csproj",
+        "projectName": "Dfe.Analytics.EFCore",
+        "projectPath": "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.EFCore/Dfe.Analytics.EFCore.csproj",
+        "packagesPath": "/Users/james/.nuget/packages/",
+        "outputPath": "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.EFCore/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/james/Code/teaching-record-system/TeachingRecordSystem/NuGet.Config",
+          "/Users/james/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "/Users/james/Code/teaching-record-system/TeachingRecordSystem/lib": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.Core/Dfe.Analytics.Core.csproj": {
+                "projectPath": "/Users/james/Code/teaching-record-system/dfe-analytics-dotnet/src/Dfe.Analytics.Core/Dfe.Analytics.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "noWarn": [
+            "NU5105"
+          ],
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Hosting.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "MinVer": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[4.2.0, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.22, 8.0.22]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.22, 8.0.22]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/Users/james/.local/share/mise/installs/dotnet/10.0.100/sdk/10.0.100/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

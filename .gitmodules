@@ -1,0 +1,3 @@
+[submodule "dfe-analytics-dotnet"]
+	path = TeachingRecordSystem/dfe-analytics-dotnet
+	url = https://github.com/DFE-Digital/dfe-analytics-dotnet.git

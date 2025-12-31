@@ -57,18 +57,18 @@ module "airbyte" {
   postgres_version      = var.postgres_server_version
   postgres_url          = module.postgres.url
 
-  host_name          = module.postgres.host
-  database_name      = module.postgres.name
+  host_name     = module.postgres.host
+  database_name = module.postgres.name
   # workspace_id       = data.azurerm_key_vault_secret.airbyte_workspace_id[0].value
   # client_id          = data.azurerm_key_vault_secret.airbyte_client_id[0].value
   # client_secret      = data.azurerm_key_vault_secret.airbyte_client_secret[0].value
   # repl_password      = data.azurerm_key_vault_secret.airbyte_replication_password[0].value
-  workspace_id       = module.infrastructure_secrets.map.AIRBYTE-WORKSPACE-ID
-  client_id          = module.infrastructure_secrets.map.AIRBYTE-CLIENT-ID
-  client_secret      = module.infrastructure_secrets.map.AIRBYTE-CLIENT-SECRET
-  repl_password      = module.infrastructure_secrets.map.AIRBYTE-REPLICATION-PASSWORD
+  workspace_id  = module.infrastructure_secrets.map.AIRBYTE-WORKSPACE-ID
+  client_id     = module.infrastructure_secrets.map.AIRBYTE-CLIENT-ID
+  client_secret = module.infrastructure_secrets.map.AIRBYTE-CLIENT-SECRET
+  repl_password = module.infrastructure_secrets.map.AIRBYTE-REPLICATION-PASSWORD
 
-  server_url         = "https://airbyte-${var.namespace}.${module.cluster_data.ingress_domain}"
+  server_url         = local.airbyte_server_url
   connection_status  = var.connection_status
   connection_streams = local.connection_streams
 
@@ -79,7 +79,7 @@ module "airbyte" {
   gcp_keyring       = "trs-key-ring"
   gcp_key           = "trs-key"
   # gcp_bq_sa         = data.azurerm_key_vault_secret.airbyte_bq_sa[0].value
-  gcp_bq_sa         = module.infrastructure_secrets.map.AIRBYTE-BQ-SA
+  gcp_bq_sa = module.infrastructure_secrets.map.AIRBYTE-BQ-SA
 
   gcp_dataset_internal = "airbyte_internal"
 
@@ -118,8 +118,8 @@ module "airbyte" {
 variable "airbyte_enabled" { default = false }
 
 variable "connection_status" {
-  type = string
-  default = "inactive"
+  type        = string
+  default     = "inactive"
   description = "Connectin status, either active or inactive"
 }
 
@@ -127,4 +127,5 @@ locals {
   connection_streams = var.airbyte_enabled ? file("config/airbyte_stream_config.json") : null
   # gcp_dataset_name   = replace("${var.service_short}_airbyte_${local.app_name_suffix}", "-", "_")
   gcp_dataset_name   = replace("${var.service_short_name}_airbyte_${local.app_name_suffix}", "-", "_")
+  airbyte_server_url = "https://airbyte-${var.namespace}.${module.cluster_data.ingress_domain}"
 }

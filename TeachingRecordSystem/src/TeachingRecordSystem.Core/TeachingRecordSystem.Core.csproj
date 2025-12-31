@@ -276,7 +276,6 @@
     <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" />
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="dbup-sqlserver" />
-    <PackageReference Include="Dfe.Analytics.EFCore" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="EntityFrameworkCore.Projectables" />
     <PackageReference Include="FluentValidation" />
@@ -326,6 +325,10 @@
 
   <ItemGroup>
     <Folder Include="ApiSchema\V3\V20250627\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\dfe-analytics-dotnet\src\Dfe.Analytics.EFCore\Dfe.Analytics.EFCore.csproj" />
   </ItemGroup>
 
 </Project>

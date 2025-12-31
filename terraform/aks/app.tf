@@ -8,12 +8,15 @@ module "migrations_job_configuration" {
   config_short           = var.environment_short_name
   secret_key_vault_short = "inf"
 
-  config_variables = {
-    ENVIRONMENT_NAME = var.environment_name
-  }
-  secret_variables = {
+  config_variables = merge(local.federated_auth_configmap, {
+    ENVIRONMENT_NAME         = var.environment_name,
+    AIRBYTE_CONNECTION_ID    = var.airbyte_enabled ? module.airbyte[0].airbyte_connection_id : "",
+    AIRBYTE_API_BASE_ADDRESS = var.airbyte_enabled ? local.airbyte_server_url : ""
+  })
+
+  secret_variables = merge(local.federated_auth_secrets, {
     CONNECTION_STRING = module.postgres.dotnet_connection_string
-  }
+  })
 }
 
 module "migrations" {
@@ -24,7 +27,27 @@ module "migrations" {
   service_name = var.service_name
   docker_image = var.docker_image
   commands     = ["trscli"]
-  arguments    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
+  arguments = [
+    "deploy-analytics",
+    "--connection-string",
+    "$(CONNECTION_STRING)",
+    "--airbyte-connection-id",
+    "$(AIRBYTE_CONNECTION_ID)",
+    "--airbyte-client-id",
+    "$(AIRBYTE-CLIENT-ID)",
+    "--airbyte-client-secret",
+    "$(AIRBYTE-CLIENT-SECRET)",
+    "--airbyte-api-base-address",
+    "$(AIRBYTE_API_BASE_ADDRESS)",
+    "--hidden-policy-tag-name",
+    module.airbyte[0].hidden_policy_tag_name,
+    "--project-id",
+    "$(DfeAnalytics__ProjectId)",
+    "--dataset-id",
+    local.gcp_dataset_name,
+    "--google-credentials",
+    module.airbyte[0].google_cloud_credentials
+  ]
   job_name     = "migrations"
   enable_logit = var.enable_logit
 

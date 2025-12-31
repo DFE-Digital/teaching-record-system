@@ -135,18 +135,6 @@
           "System.Diagnostics.TraceSource": "4.3.0"
         }
       },
-      "Dfe.Analytics.Core": {
-        "type": "Transitive",
-        "resolved": "0.3.0-alpha.0.20",
-        "contentHash": "Yd0qOfm/EIAvZZ9ZHHwqklYlg2Id7sCz/M8+tbn84DkueWH2x0GeWSid8hqwoSrvY64fOqPLYEiMQU+Ou5tbwA==",
-        "dependencies": {
-          "Google.Apis.Auth": "1.71.0",
-          "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",
-          "Microsoft.Extensions.Configuration": "8.0.0",
-          "Microsoft.Extensions.Logging": "8.0.0",
-          "Microsoft.Extensions.Options": "8.0.0"
-        }
-      },
       "EntityFrameworkCore.Projectables.Abstractions": {
         "type": "Transitive",
         "resolved": "4.0.0",
@@ -2275,6 +2263,25 @@
         "resolved": "0.8.1",
         "contentHash": "19tNz33kn2EkyViFXuxfVn338UJaRmkwBphVqP2dVJIYQUQgFrgG5h061mxkRRg1Ax6r+6WOj1FxaFZ5qaWqqg=="
       },
+      "dfe.analytics.core": {
+        "type": "Project",
+        "dependencies": {
+          "Google.Apis.Auth": "[1.71.0, )",
+          "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",
+          "Microsoft.Extensions.Configuration": "[8.0.0, )",
+          "Microsoft.Extensions.Logging": "[8.0.0, )",
+          "Microsoft.Extensions.Options": "[8.0.0, )"
+        }
+      },
+      "dfe.analytics.efcore": {
+        "type": "Project",
+        "dependencies": {
+          "Dfe.Analytics.Core": "[1.0.0, )",
+          "Microsoft.Extensions.Hosting.Abstractions": "[8.0.0, )",
+          "Microsoft.Extensions.Http": "[8.0.0, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[8.0.0, )"
+        }
+      },
       "teachingrecordsystem.core": {
         "type": "Project",
         "dependencies": {
@@ -2284,7 +2291,7 @@
           "CloudNative.CloudEvents": "[2.8.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[33.1.0, )",
-          "Dfe.Analytics.EFCore": "[0.3.0-alpha.0.20, )",
+          "Dfe.Analytics.EFCore": "[1.0.0, )",
           "EFCore.NamingConventions": "[9.0.0, )",
           "EntityFrameworkCore.Projectables": "[4.0.0, )",
           "FluentValidation": "[12.1.0, )",
@@ -2498,18 +2505,6 @@
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
           "Microsoft.Data.SqlClient": "5.1.1",
           "dbup-core": "5.0.37"
-        }
-      },
-      "Dfe.Analytics.EFCore": {
-        "type": "CentralTransitive",
-        "requested": "[0.3.0-alpha.0.20, )",
-        "resolved": "0.3.0-alpha.0.20",
-        "contentHash": "oat9ypur3FA7oNfGpCA98/nCkmBMsDtCBKnij+qfNo9ljNOA29+oyhrYq0wRrVt3zbD4VcndGWO9bJaep6iyFg==",
-        "dependencies": {
-          "Dfe.Analytics.Core": "0.3.0-alpha.0.20",
-          "Microsoft.Extensions.Hosting.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Http": "8.0.0",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.0"
         }
       },
       "EFCore.NamingConventions": {

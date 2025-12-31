@@ -15,7 +15,8 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateWebhookEndpointCommand(configuration),
     Commands.CreateAddTrnRangeCommand(configuration),
     Commands.CreateDeleteSupportTaskCommand(configuration),
-    Commands.CreateResetTrnRequestCommand(configuration)
+    Commands.CreateResetTrnRequestCommand(configuration),
+    Commands.CreateDeployAnalyticsCommand(configuration)
 };
 
 var parseResult = rootCommand.Parse(args);
