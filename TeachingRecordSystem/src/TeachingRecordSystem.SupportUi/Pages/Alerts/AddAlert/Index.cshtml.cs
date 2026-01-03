@@ -11,5 +11,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    public IActionResult OnGet() => Redirect(linkGenerator.Alerts.AddAlert.Type(PersonId, JourneyInstance!.InstanceId));
+    public Task<IActionResult> OnGetAsync() =>
+        JourneyInstance!.UpdateStateAndRedirectToNextStepAsync(_ => { }, linkGenerator.Alerts.AddAlert.Type(PersonId, JourneyInstance!.InstanceId));
 }

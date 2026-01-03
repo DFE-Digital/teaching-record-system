@@ -1,16 +1,16 @@
-@page "/alerts/add/type/{handler?}"
+@page "/alerts/add/type"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.TypeModel
 @{
     ViewBag.Title = Html.DisplayNameFor(m => m.AlertTypeId);
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.AddAlert.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.AddAlert.Details(Model.PersonId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@Model.JourneyInstance!.GetBackLinkUrl()">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.Alerts.AddAlert.Type(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form method="post">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
 
             <govuk-radios for="AlertTypeId" data-testid="alert-category-list">
