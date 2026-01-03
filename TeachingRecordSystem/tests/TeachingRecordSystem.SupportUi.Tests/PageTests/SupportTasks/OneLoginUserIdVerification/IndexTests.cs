@@ -41,10 +41,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultRows = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr");
+        var resultRows = doc.GetElementByTestId("results")?
+            .QuerySelectorAll("tbody > tr");
 
         Assert.NotNull(resultRows);
         var topRow = resultRows[0];
@@ -84,10 +82,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultRows = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr");
+        var resultRows = doc.GetElementByTestId("results")?
+            .QuerySelectorAll("tbody > tr");
 
         Assert.NotNull(resultRows);
         var topRow = resultRows[0];
@@ -155,10 +151,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultRows = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr");
+        var resultRows = doc.GetElementByTestId("results")?
+            .QuerySelectorAll("tbody > tr");
 
         Assert.NotNull(resultRows);
         AssertRowHasContent(resultRows[0], "taskId", expectedResultsOrdered[0].SupportTaskReference);
@@ -167,6 +161,57 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
         AssertRowHasContent(resultRows[0], "name", $"{expectedResultsOrdered[0].StatedFirstName} {expectedResultsOrdered[0].StatedLastName}");
         AssertRowHasContent(resultRows[1], "name", $"{expectedResultsOrdered[1].StatedFirstName} {expectedResultsOrdered[1].StatedLastName}");
+    }
+
+    [Theory]
+    [InlineData(1, 20)]
+    [InlineData(2, 20)]
+    [InlineData(3, 1)]
+    public async Task Get_ShowsPageOfResults(int page, int expectedNumberOfResults)
+    {
+        // Arrange
+        var pageSize = 20;
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+        // Create multiple pages
+        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, pageSize * 2 + 1)
+                .ToAsyncEnumerable()
+                .SelectAwait(async _ => await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/one-login-user-id-verification?pageNumber={page}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var resultRows = doc.GetElementByTestId("results")?
+            .QuerySelectorAll("tbody > tr");
+
+        Assert.Equal(expectedNumberOfResults, resultRows?.Length);
+    }
+
+    [Fact]
+    public async Task Get_HasPagination_ShowsPaginationControls()
+    {
+        // Arrange
+        var pageSize = 20;
+        var page = 1;
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+        // Create multiple pages
+        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
+                .ToAsyncEnumerable()
+                .SelectAwait(async _ => await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?pageNumber={page}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.QuerySelector(".govuk-pagination"));
     }
 
     [Fact]
@@ -210,6 +255,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var resultSection = doc.GetElementByTestId("results");
         Assert.NotNull(resultSection);
         Assert.NotNull(resultSection.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.QuerySelector(".govuk-pagination"));
     }
 
     private static void AssertRowHasContent(IElement row, string testId, string expectedText)

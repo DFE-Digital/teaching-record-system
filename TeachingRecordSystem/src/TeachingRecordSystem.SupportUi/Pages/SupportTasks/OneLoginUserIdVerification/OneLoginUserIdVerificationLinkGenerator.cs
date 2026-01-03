@@ -8,8 +8,8 @@ public class OneLoginUserIdVerificationLinkGenerator(LinkGenerator linkGenerator
     public string Index() =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Index");
 
-    public string Index(OneLoginIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Index", routeValues: new { sortBy, sortDirection });
+    public string Index(OneLoginIdVerificationSupportTasksSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserIdVerification/Index", routeValues: new { sortBy, sortDirection, pageNumber });
 
     public ResolveOneLoginUserIdVerificationLinkGenerator Resolve { get; } = new(linkGenerator);
 }
