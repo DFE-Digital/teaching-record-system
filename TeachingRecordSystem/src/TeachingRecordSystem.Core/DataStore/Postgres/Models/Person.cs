@@ -87,58 +87,6 @@ public class Person
         Gender = Gender
     };
 
-    //public UpdatePersonDetailsResult UpdateDetails(
-    //    PersonDetails details,
-    //    DateTime now)
-    //{
-    //    return UpdateDetails(
-    //        Option.Some(details.FirstName),
-    //        Option.Some(details.MiddleName),
-    //        Option.Some(details.LastName),
-    //        Option.Some(details.DateOfBirth),
-    //        Option.Some(details.EmailAddress),
-    //        Option.Some(details.NationalInsuranceNumber),
-    //        Option.Some(details.Gender),
-    //        now);
-    //}
-
-    //public UpdatePersonDetailsResult UpdateDetails(
-    //    Option<string> firstName,
-    //    Option<string> middleName,
-    //    Option<string> lastName,
-    //    Option<DateOnly?> dateOfBirth,
-    //    Option<EmailAddress?> emailAddress,
-    //    Option<NationalInsuranceNumber?> nationalInsuranceNumber,
-    //    Option<Gender?> gender,
-    //    DateTime now)
-    //{
-    //    var oldAttributes = EventModels.PersonDetails.FromModel(this);
-
-    //    firstName.MatchSome(v => FirstName = v);
-    //    middleName.MatchSome(v => MiddleName = v);
-    //    lastName.MatchSome(v => LastName = v);
-    //    dateOfBirth.MatchSome(v => DateOfBirth = v);
-    //    emailAddress.MatchSome(v => EmailAddress = (string?)v);
-    //    nationalInsuranceNumber.MatchSome(v => NationalInsuranceNumber = (string?)v);
-    //    gender.MatchSome(v => Gender = v);
-
-    //    var changes = 0 |
-    //        (FirstName != oldAttributes.FirstName ? PersonAttributesChanges.FirstName : 0) |
-    //        (MiddleName != oldAttributes.MiddleName ? PersonAttributesChanges.MiddleName : 0) |
-    //        (LastName != oldAttributes.LastName ? PersonAttributesChanges.LastName : 0) |
-    //        (DateOfBirth != oldAttributes.DateOfBirth ? PersonAttributesChanges.DateOfBirth : 0) |
-    //        (EmailAddress != oldAttributes.EmailAddress ? PersonAttributesChanges.EmailAddress : 0) |
-    //        (NationalInsuranceNumber != oldAttributes.NationalInsuranceNumber ? PersonAttributesChanges.NationalInsuranceNumber : 0) |
-    //        (Gender != oldAttributes.Gender ? PersonAttributesChanges.Gender : 0);
-
-    //    if (changes != 0)
-    //    {
-    //        UpdatedOn = now;
-    //    }
-
-    //    return new(changes, EventModels.PersonDetails.FromModel(this), oldAttributes);
-    //}
-
     public void SetStatus(
         PersonStatus targetStatus,
         string? reason,

@@ -218,17 +218,34 @@ public class PersonService(
         }, processContext);
     }
 
-    public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
+    public async Task DeactivatePersonViaMergeAsync(DeactivatePersonViaMergeOptions options, ProcessContext processContext)
     {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleAsync(p => p.PersonId == options.DeactivatingPersonId);
+        var now = clock.UtcNow;
+
+        var deactivatingPerson = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleAsync(p => p.PersonId == options.DeactivatingPersonId);
+
+        if (deactivatingPerson is null)
+        {
+            throw new TrsPersonNotFoundException($"Person with ID {options.DeactivatingPersonId} not found.");
+        }
 
         if (deactivatingPerson.Status is PersonStatus.Deactivated)
         {
             throw new InvalidOperationException("Cannot merge a person that is already deactivated.");
         }
 
+        var retainedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
+
+        if (retainedPerson is null)
+        {
+            throw new TrsPersonNotFoundException($"Person with ID {options.RetainedPersonId} not found.");
+        }
+
         deactivatingPerson.Status = PersonStatus.Deactivated;
         deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
+
         await dbContext.SaveChangesAsync();
 
         await eventPublisher.PublishEventAsync(
@@ -244,9 +261,23 @@ public class PersonService(
             processContext);
     }
 
-    public async Task MergePersons2Async(MergePersons2Options options, ProcessContext processContext)
+    public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
     {
         var now = clock.UtcNow;
+
+        var deactivatingPerson = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
+
+        if (deactivatingPerson is null)
+        {
+            throw new TrsPersonNotFoundException($"Person with ID {options.DeactivatingPersonId} not found.");
+        }
+
+        if (deactivatingPerson.Status is PersonStatus.Deactivated)
+        {
+            throw new InvalidOperationException("Cannot merge a person that is already deactivated.");
+        }
 
         var retainedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
 
@@ -256,13 +287,6 @@ public class PersonService(
         }
 
         var oldRetainedPersonDetails = retainedPerson.Details.ToEventModel();
-
-        var deactivatingPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
-
-        if (deactivatingPerson is null)
-        {
-            throw new TrsPersonNotFoundException($"Person with ID {options.DeactivatingPersonId} not found.");
-        }
 
         retainedPerson.FirstName = options.PersonDetails.FirstName;
         retainedPerson.MiddleName = options.PersonDetails.MiddleName;
@@ -309,8 +333,3 @@ public class PersonService(
             processContext);
     }
 }
-
-public record UpdatePersonDetailsResult(
-    PersonDetailsUpdatedEventChanges Changes,
-    PersonDetails PersonDetails,
-    PersonDetails OldPersonDetails);

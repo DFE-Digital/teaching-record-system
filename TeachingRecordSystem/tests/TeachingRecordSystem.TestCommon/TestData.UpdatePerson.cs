@@ -53,7 +53,7 @@ public partial class TestData
 
                 await testData.WithDbContextAsync(async dbContext =>
                 {
-                    var personService = new PersonService(dbContext, testData.Clock, new TestTrnGenerator(testData.DbContextFactory), new TestEventPublisher());
+                    var personService = new PersonService(dbContext, testData.Clock, new TestEventPublisher());
                     var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId.Value);
                     var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, now, SystemUser.SystemUserId);
 
@@ -72,40 +72,6 @@ public partial class TestData
                         new Justification<PersonNameChangeReason> { Reason = _updatedName.Value.NameChangeReason },
                         new Justification<PersonDetailsChangeReason> { Reason = PersonDetailsChangeReason.AnotherReason }),
                         processContext);
-
-                    //var updatedEvent = updatePersonResult.Changes != 0 ?
-                    //    new LegacyEvents.PersonDetailsUpdatedEvent
-                    //    {
-                    //        EventId = Guid.NewGuid(),
-                    //        CreatedUtc = now,
-                    //        RaisedBy = SystemUser.SystemUserId,
-                    //        PersonId = person.PersonId,
-                    //        PersonAttributes = updatePersonResult.PersonAttributes,
-                    //        OldPersonAttributes = updatePersonResult.OldPersonAttributes,
-                    //        NameChangeReason = null,
-                    //        NameChangeEvidenceFile = null,
-                    //        DetailsChangeReason = null,
-                    //        DetailsChangeReasonDetail = null,
-                    //        DetailsChangeEvidenceFile = null,
-                    //        Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)updatePersonResult.Changes
-                    //    } :
-                    //    null;
-
-                    //if (updatedEvent?.Changes.HasAnyFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.NameChange) == true)
-                    //{
-                    //    dbContext.PreviousNames.Add(new PreviousName
-                    //    {
-                    //        PreviousNameId = Guid.NewGuid(),
-                    //        PersonId = _personId.Value,
-                    //        FirstName = updatedEvent.OldPersonAttributes.FirstName,
-                    //        MiddleName = updatedEvent.OldPersonAttributes.MiddleName,
-                    //        LastName = updatedEvent.OldPersonAttributes.LastName,
-                    //        CreatedOn = now,
-                    //        UpdatedOn = now
-                    //    });
-                    //}
-
-                    //await dbContext.SaveChangesAsync();
                 });
             }
         }

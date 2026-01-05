@@ -10,7 +10,6 @@ using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -143,7 +142,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
         var updateResult = await personService.UpdatePersonDetailsAsync(new(
@@ -266,7 +264,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
         var updateResult = await personService.UpdatePersonDetailsAsync(new(
@@ -389,7 +386,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
         var updateResult = await personService.UpdatePersonDetailsAsync(new(

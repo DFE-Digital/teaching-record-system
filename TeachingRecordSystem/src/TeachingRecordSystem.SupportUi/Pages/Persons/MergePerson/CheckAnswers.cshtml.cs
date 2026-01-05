@@ -124,7 +124,7 @@ public class CheckAnswersModel(
 
         var processContext = new ProcessContext(ProcessType.PersonMerging, clock.UtcNow, User.GetUserId());
 
-        await personService.MergePersons2Async(new(
+        await personService.MergePersonsAsync(new(
             secondaryPersonId,
             primaryPersonId,
             new PersonDetails()

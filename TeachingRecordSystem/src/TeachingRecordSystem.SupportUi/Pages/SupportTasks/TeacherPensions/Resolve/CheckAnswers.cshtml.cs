@@ -142,8 +142,8 @@ public class CheckAnswersModel(
         var selectedPersonAttributes = await GetPersonAttributesAsync(existingPersonId);
         var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
-        await personService.MergePersonsAsync(
-            new MergePersonsOptions(teacherPensionPerson.PersonId, existingPersonId),
+        await personService.DeactivatePersonViaMergeAsync(
+            new DeactivatePersonViaMergeOptions(teacherPensionPerson.PersonId, existingPersonId),
             processContext);
 
         await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(

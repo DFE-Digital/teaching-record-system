@@ -36,9 +36,6 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     public async Task HandleEventAsync(PersonDetailsUpdatedEvent @event, ProcessContext processContext)
     {
         if (processContext.ProcessType is ProcessType.PersonDetailsUpdating)
-        //or ProcessType.ApiTrnRequestResolving
-        //or ProcessType.NpqTrnRequestApproving
-        //or ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge)
         {
             var legacyEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {

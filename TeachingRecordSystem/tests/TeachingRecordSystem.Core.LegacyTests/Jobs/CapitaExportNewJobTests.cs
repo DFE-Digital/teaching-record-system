@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEvent;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -177,7 +176,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
@@ -391,7 +389,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
@@ -458,9 +455,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
+        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
             new PersonDetails()
@@ -524,9 +520,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
+        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
             new PersonDetails()
@@ -594,7 +589,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddYears(-3), SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
@@ -852,7 +846,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
@@ -973,7 +966,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<ITrnGenerator>(),
             Mock.Of<IEventPublisher>());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(

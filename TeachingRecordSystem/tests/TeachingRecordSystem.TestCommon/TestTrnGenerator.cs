@@ -25,11 +25,3 @@ public class TestTrnGenerator(IDbContextFactory<TrsDbContext> dbContextFactory)
 
     private record Result(int? Value);
 }
-
-public class TestEventPublisher : IEventPublisher
-{
-    public Task PublishEventAsync(IEvent @event, ProcessContext processContext)
-    {
-        return Task.CompletedTask;
-    }
-}

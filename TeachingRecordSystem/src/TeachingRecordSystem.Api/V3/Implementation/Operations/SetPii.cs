@@ -55,19 +55,6 @@ public class SetPiiHandler(
 
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, now, currentUserId);
 
-        //var updateResult = person.UpdateDetails(
-        //    new()
-        //    {
-        //        FirstName = command.FirstName,
-        //        MiddleName = command.MiddleName ?? string.Empty,
-        //        LastName = command.LastName,
-        //        DateOfBirth = command.DateOfBirth,
-        //        EmailAddress = command.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
-        //        NationalInsuranceNumber = command.NationalInsuranceNumber is string nino ? NationalInsuranceNumber.Parse(nino) : null,
-        //        Gender = command.Gender,
-        //    },
-        //    now);
-
         await personService.UpdatePersonDetailsAsync(new(
             person.PersonId,
             new PersonDetails()
@@ -83,25 +70,6 @@ public class SetPiiHandler(
             null,
             null),
             processContext);
-
-        //var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-        //{
-        //    EventId = Guid.NewGuid(),
-        //    CreatedUtc = now,
-        //    RaisedBy = currentUserId,
-        //    PersonId = person.PersonId,
-        //    PersonAttributes = updateResult.PersonAttributes,
-        //    OldPersonAttributes = updateResult.OldPersonAttributes,
-        //    NameChangeReason = null,
-        //    NameChangeEvidenceFile = null,
-        //    DetailsChangeReason = null,
-        //    DetailsChangeReasonDetail = null,
-        //    DetailsChangeEvidenceFile = null,
-        //    Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.None
-        //};
-        //await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent);
-
-        //await dbContext.SaveChangesAsync();
 
         return new SetPiiResult();
     }
