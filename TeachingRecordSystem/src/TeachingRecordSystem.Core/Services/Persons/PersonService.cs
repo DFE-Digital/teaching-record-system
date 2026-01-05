@@ -78,7 +78,7 @@ public class PersonService(
         return person;
     }
 
-    public async Task UpdatePersonDetailsAsync(UpdatePersonDetailsOptions options, ProcessContext processContext)
+    public async Task<UpdatePersonDetailsResult> UpdatePersonDetailsAsync(UpdatePersonDetailsOptions options, ProcessContext processContext)
     {
         var now = clock.UtcNow;
 
@@ -89,28 +89,28 @@ public class PersonService(
             throw new TrsPersonNotFoundException($"Person with ID {options.PersonId} not found.");
         }
 
-        var oldDetails = EventModels.PersonDetails.FromModel(person);
+        var oldDetails = person.Details;
 
-        person.FirstName = options.PersonDetails.FirstName;
-        person.MiddleName = options.PersonDetails.MiddleName;
-        person.LastName = options.PersonDetails.LastName;
-        person.DateOfBirth = options.PersonDetails.DateOfBirth;
-        person.EmailAddress = (string?)options.PersonDetails.EmailAddress;
-        person.NationalInsuranceNumber = (string?)options.PersonDetails.NationalInsuranceNumber;
-        person.Gender = options.PersonDetails.Gender;
+        options.PersonDetails.FirstName.MatchSome(firstName => person.FirstName = firstName);
+        options.PersonDetails.MiddleName.MatchSome(middleName => person.MiddleName = middleName);
+        options.PersonDetails.LastName.MatchSome(lastName => person.LastName = lastName);
+        options.PersonDetails.DateOfBirth.MatchSome(dateOfBirth => person.DateOfBirth = dateOfBirth);
+        options.PersonDetails.EmailAddress.MatchSome(emailAddress => person.EmailAddress = (string?)emailAddress);
+        options.PersonDetails.NationalInsuranceNumber.MatchSome(nationalInsuranceNumber => person.NationalInsuranceNumber = (string?)nationalInsuranceNumber);
+        options.PersonDetails.Gender.MatchSome(gender => person.Gender = gender);
 
         var changes = 0 |
             (person.FirstName != oldDetails.FirstName ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
             (person.MiddleName != oldDetails.MiddleName ? PersonDetailsUpdatedEventChanges.MiddleName : 0) |
             (person.LastName != oldDetails.LastName ? PersonDetailsUpdatedEventChanges.LastName : 0) |
             (person.DateOfBirth != oldDetails.DateOfBirth ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
-            (person.EmailAddress != oldDetails.EmailAddress ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
-            (person.NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
+            (person.EmailAddress != oldDetails.EmailAddress?.ToString() ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
+            (person.NationalInsuranceNumber != oldDetails.NationalInsuranceNumber?.ToString() ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
             (person.Gender != oldDetails.Gender ? PersonDetailsUpdatedEventChanges.Gender : 0);
 
         if (changes == 0)
         {
-            return;
+            return new(changes, oldDetails, oldDetails);
         }
 
         person.UpdatedOn = now;
@@ -138,8 +138,8 @@ public class PersonService(
                 EventId = Guid.NewGuid(),
                 PersonId = person.PersonId,
                 Changes = changes,
-                OldPersonDetails = oldDetails,
-                PersonDetails = options.PersonDetails.ToEventModel(),
+                OldPersonDetails = oldDetails.ToEventModel(),
+                PersonDetails = person.Details.ToEventModel(),
                 NameChangeReason = options.NameChangeJustification?.Reason.GetDisplayName(),
                 NameChangeEvidenceFile = options.NameChangeJustification?.Evidence?.ToEventModel(),
                 DetailsChangeReason = options.DetailsChangeJustification?.Reason.GetDisplayName(),
@@ -147,6 +147,8 @@ public class PersonService(
                 DetailsChangeEvidenceFile = options.DetailsChangeJustification?.Evidence?.ToEventModel(),
             },
             processContext);
+
+        return new(changes, person.Details, oldDetails);
     }
 
     public async Task DeactivatePersonAsync(DeactivatePersonOptions options, ProcessContext processContext)
@@ -241,4 +243,74 @@ public class PersonService(
             },
             processContext);
     }
+
+    public async Task MergePersons2Async(MergePersons2Options options, ProcessContext processContext)
+    {
+        var now = clock.UtcNow;
+
+        var retainedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
+
+        if (retainedPerson is null)
+        {
+            throw new TrsPersonNotFoundException($"Person with ID {options.RetainedPersonId} not found.");
+        }
+
+        var oldRetainedPersonDetails = retainedPerson.Details.ToEventModel();
+
+        var deactivatingPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
+
+        if (deactivatingPerson is null)
+        {
+            throw new TrsPersonNotFoundException($"Person with ID {options.DeactivatingPersonId} not found.");
+        }
+
+        retainedPerson.FirstName = options.PersonDetails.FirstName;
+        retainedPerson.MiddleName = options.PersonDetails.MiddleName;
+        retainedPerson.LastName = options.PersonDetails.LastName;
+        retainedPerson.DateOfBirth = options.PersonDetails.DateOfBirth;
+        retainedPerson.EmailAddress = (string?)options.PersonDetails.EmailAddress;
+        retainedPerson.NationalInsuranceNumber = (string?)options.PersonDetails.NationalInsuranceNumber;
+        retainedPerson.Gender = options.PersonDetails.Gender;
+
+        var changes = 0 |
+            (retainedPerson.FirstName != oldRetainedPersonDetails.FirstName ? PersonsMergedEventChanges.FirstName : 0) |
+            (retainedPerson.MiddleName != oldRetainedPersonDetails.MiddleName ? PersonsMergedEventChanges.MiddleName : 0) |
+            (retainedPerson.LastName != oldRetainedPersonDetails.LastName ? PersonsMergedEventChanges.LastName : 0) |
+            (retainedPerson.DateOfBirth != oldRetainedPersonDetails.DateOfBirth ? PersonsMergedEventChanges.DateOfBirth : 0) |
+            (retainedPerson.EmailAddress != oldRetainedPersonDetails.EmailAddress ? PersonsMergedEventChanges.EmailAddress : 0) |
+            (retainedPerson.NationalInsuranceNumber != oldRetainedPersonDetails.NationalInsuranceNumber ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
+            (retainedPerson.Gender != oldRetainedPersonDetails.Gender ? PersonsMergedEventChanges.Gender : 0);
+
+        if (changes != 0)
+        {
+            retainedPerson.UpdatedOn = now;
+        }
+
+        deactivatingPerson.Status = PersonStatus.Deactivated;
+        deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
+
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(
+            new PersonsMergedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                RetainedPersonId = options.RetainedPersonId,
+                RetainedPersonTrn = retainedPerson.Trn,
+                DeactivatedPersonId = options.DeactivatingPersonId,
+                SecondaryPersonTrn = deactivatingPerson.Trn,
+                DeactivatedPersonStatus = deactivatingPerson.Status,
+                RetainedPersonDetails = options.PersonDetails.ToEventModel(),
+                OldRetainedPersonDetails = oldRetainedPersonDetails,
+                EvidenceFile = options.Evidence?.ToEventModel(),
+                Comments = options.Comments,
+                Changes = changes
+            },
+            processContext);
+    }
 }
+
+public record UpdatePersonDetailsResult(
+    PersonDetailsUpdatedEventChanges Changes,
+    PersonDetails PersonDetails,
+    PersonDetails OldPersonDetails);

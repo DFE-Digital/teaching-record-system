@@ -82,7 +82,7 @@ public class ChangeHistoryModel(
             nameof(DqtQtsRegistrationCreatedEvent),
             nameof(DqtQtsRegistrationUpdatedEvent),
             nameof(PersonStatusUpdatedEvent),
-            nameof(PersonsMergedEvent),
+            nameof(LegacyEvents.PersonsMergedEvent),
             nameof(TrnAllocatedEvent),
             nameof(TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)
         };

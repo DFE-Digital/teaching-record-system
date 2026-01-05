@@ -397,7 +397,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             }
             : null;
 
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails, nameChangeJustification, detailsChangeJustification);
+        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails.UpdateAll(), nameChangeJustification, detailsChangeJustification);
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -476,7 +476,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             Evidence = null
         };
 
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails, nameChangeJustification, null);
+        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails.UpdateAll(), nameChangeJustification, null);
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -533,7 +533,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             Evidence = null
         };
 
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails, nameChangeJustification, null);
+        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails.UpdateAll(), nameChangeJustification, null);
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -586,7 +586,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             Gender = personToUpdate.Gender
         };
 
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails, null, null);
+        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails.UpdateAll(), null, null);
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act

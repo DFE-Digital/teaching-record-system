@@ -6,11 +6,13 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     IEventHandler<PersonCreatedEvent>,
     IEventHandler<PersonDetailsUpdatedEvent>,
     IEventHandler<PersonDeactivatedEvent>,
-    IEventHandler<PersonReactivatedEvent>
+    IEventHandler<PersonReactivatedEvent>,
+    IEventHandler<PersonsMergedEvent>
 {
     public async Task HandleEventAsync(PersonCreatedEvent @event, ProcessContext processContext)
     {
-        if (processContext.ProcessType is ProcessType.PersonCreating or ProcessType.TeacherPensionsRecordImporting)
+        if (processContext.ProcessType is ProcessType.PersonCreating
+            or ProcessType.TeacherPensionsRecordImporting)
         {
             var legacyEvent = new LegacyEvents.PersonCreatedEvent
             {
@@ -34,6 +36,9 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     public async Task HandleEventAsync(PersonDetailsUpdatedEvent @event, ProcessContext processContext)
     {
         if (processContext.ProcessType is ProcessType.PersonDetailsUpdating)
+        //or ProcessType.ApiTrnRequestResolving
+        //or ProcessType.NpqTrnRequestApproving
+        //or ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge)
         {
             var legacyEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {
@@ -41,7 +46,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 CreatedUtc = processContext.Now,
                 RaisedBy = processContext.Process.UserId!,
                 PersonId = @event.PersonId,
-                Changes = ToLegacyChanges(@event.Changes),
+                Changes = @event.Changes.ToLegacyPersonDetailsUpdatedEventChanges(),
                 OldPersonAttributes = @event.OldPersonDetails,
                 PersonAttributes = @event.PersonDetails,
                 NameChangeReason = @event.NameChangeReason,
@@ -54,16 +59,6 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
             dbContext.AddEventWithoutBroadcast(legacyEvent);
 
             await dbContext.SaveChangesAsync();
-
-            LegacyEvents.PersonDetailsUpdatedEventChanges ToLegacyChanges(PersonDetailsUpdatedEventChanges changes) =>
-                LegacyEvents.PersonDetailsUpdatedEventChanges.None
-                | (changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName : 0)
-                | (changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName : 0)
-                | (changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? LegacyEvents.PersonDetailsUpdatedEventChanges.LastName : 0)
-                | (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth : 0)
-                | (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress : 0)
-                | (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0)
-                | (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? LegacyEvents.PersonDetailsUpdatedEventChanges.Gender : 0);
         }
     }
 
@@ -107,6 +102,33 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 Reason = @event.Reason,
                 ReasonDetail = @event.ReasonDetail,
                 EvidenceFile = @event.EvidenceFile,
+            };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    public async Task HandleEventAsync(PersonsMergedEvent @event, ProcessContext processContext)
+    {
+        if (processContext.ProcessType is ProcessType.PersonMerging)
+        {
+            var legacyEvent = new LegacyEvents.PersonsMergedEvent()
+            {
+                EventId = @event.EventId,
+                CreatedUtc = processContext.Now,
+                RaisedBy = processContext.Process.UserId!,
+                PersonId = @event.RetainedPersonId,
+                PersonTrn = @event.RetainedPersonTrn,
+                SecondaryPersonId = @event.DeactivatedPersonId,
+                SecondaryPersonTrn = @event.SecondaryPersonTrn,
+                SecondaryPersonStatus = @event.DeactivatedPersonStatus,
+                PersonAttributes = @event.RetainedPersonDetails,
+                Changes = @event.Changes.ToLegacyPersonsMergedEventChanges(),
+                OldPersonAttributes = @event.OldRetainedPersonDetails,
+                EvidenceFile = @event.EvidenceFile,
+                Comments = @event.Comments,
             };
 
             dbContext.AddEventWithoutBroadcast(legacyEvent);

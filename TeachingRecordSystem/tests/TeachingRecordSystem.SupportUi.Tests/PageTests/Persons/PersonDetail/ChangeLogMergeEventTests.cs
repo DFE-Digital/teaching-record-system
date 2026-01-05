@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
@@ -53,23 +52,23 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
     ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory]
-    [InlineData(PersonsMergedEventChanges.FirstName, false, false)]
-    [InlineData(PersonsMergedEventChanges.MiddleName, false, false)]
-    [InlineData(PersonsMergedEventChanges.LastName, false, false)]
-    [InlineData(PersonsMergedEventChanges.DateOfBirth, false, false)]
-    [InlineData(PersonsMergedEventChanges.EmailAddress, false, false)]
-    [InlineData(PersonsMergedEventChanges.EmailAddress, true, false)]
-    [InlineData(PersonsMergedEventChanges.EmailAddress, false, true)]
-    [InlineData(PersonsMergedEventChanges.NationalInsuranceNumber, false, false)]
-    [InlineData(PersonsMergedEventChanges.NationalInsuranceNumber, false, true)]
-    [InlineData(PersonsMergedEventChanges.NationalInsuranceNumber, true, false)]
-    [InlineData(PersonsMergedEventChanges.Gender, false, false)]
-    [InlineData(PersonsMergedEventChanges.Gender, false, true)]
-    [InlineData(PersonsMergedEventChanges.Gender, true, false)]
-    [InlineData(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, false, false)]
-    [InlineData(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, false, true)]
-    [InlineData(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, true, false)]
-    public async Task Person_WithPersonsMergedEvent_AsPrimaryPerson_RendersExpectedContent(PersonsMergedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.FirstName, false, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.MiddleName, false, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.LastName, false, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.DateOfBirth, false, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.EmailAddress, false, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.EmailAddress, true, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.EmailAddress, false, true)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber, false, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber, false, true)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber, true, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.Gender, false, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.Gender, false, true)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.Gender, true, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.FirstName | LegacyEvents.PersonsMergedEventChanges.MiddleName | LegacyEvents.PersonsMergedEventChanges.LastName | LegacyEvents.PersonsMergedEventChanges.DateOfBirth | LegacyEvents.PersonsMergedEventChanges.EmailAddress | LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber | LegacyEvents.PersonsMergedEventChanges.Gender, false, false)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.FirstName | LegacyEvents.PersonsMergedEventChanges.MiddleName | LegacyEvents.PersonsMergedEventChanges.LastName | LegacyEvents.PersonsMergedEventChanges.DateOfBirth | LegacyEvents.PersonsMergedEventChanges.EmailAddress | LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber | LegacyEvents.PersonsMergedEventChanges.Gender, false, true)]
+    [InlineData(LegacyEvents.PersonsMergedEventChanges.FirstName | LegacyEvents.PersonsMergedEventChanges.MiddleName | LegacyEvents.PersonsMergedEventChanges.LastName | LegacyEvents.PersonsMergedEventChanges.DateOfBirth | LegacyEvents.PersonsMergedEventChanges.EmailAddress | LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber | LegacyEvents.PersonsMergedEventChanges.Gender, true, false)]
+    public async Task Person_WithPersonsMergedEvent_AsPrimaryPerson_RendersExpectedContent(LegacyEvents.PersonsMergedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
         string? oldEmail = previousValueIsDefault ? null : _oldEmail;
@@ -80,13 +79,13 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         string? nino = newValueIsDefault ? null : _nino;
         Gender? gender = newValueIsDefault ? null : _gender;
 
-        var newFirstName = changes.HasFlag(PersonsMergedEventChanges.FirstName) ? _firstName : _oldFirstName;
-        var newMiddleName = changes.HasFlag(PersonsMergedEventChanges.MiddleName) ? _middleName : _oldMiddleName;
-        var newLastName = changes.HasFlag(PersonsMergedEventChanges.LastName) ? _lastName : _oldLastName;
-        var newDob = changes.HasFlag(PersonsMergedEventChanges.DateOfBirth) ? _dob : _oldDob;
-        var newEmail = changes.HasFlag(PersonsMergedEventChanges.EmailAddress) ? email : oldEmail;
-        var newNino = changes.HasFlag(PersonsMergedEventChanges.NationalInsuranceNumber) ? nino : oldNino;
-        var newGender = changes.HasFlag(PersonsMergedEventChanges.Gender) ? gender : oldGender;
+        var newFirstName = changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.FirstName) ? _firstName : _oldFirstName;
+        var newMiddleName = changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.MiddleName) ? _middleName : _oldMiddleName;
+        var newLastName = changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.LastName) ? _lastName : _oldLastName;
+        var newDob = changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.DateOfBirth) ? _dob : _oldDob;
+        var newEmail = changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.EmailAddress) ? email : oldEmail;
+        var newNino = changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber) ? nino : oldNino;
+        var newGender = changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.Gender) ? gender : oldGender;
 
         var comments = "Some comments";
         var evidenceFile = new EventModels.File
@@ -122,7 +121,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.NotNull(title);
         Assert.Equal($"Record merged with TRN {_secondaryPerson!.Trn}", title.TrimmedText());
 
-        if (changes.HasAnyFlag(PersonsMergedEventChanges.NameChange))
+        if (changes.HasAnyFlag(LegacyEvents.PersonsMergedEventChanges.NameChange))
         {
             doc.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
             doc.AssertSummaryListRowValue("previous-details", "Name", v => Assert.Equal($"{_oldFirstName} {_oldMiddleName} {_oldLastName}", v.TrimmedText()));
@@ -133,7 +132,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             doc.AssertSummaryListRowDoesNotExist("previous-details", "Name");
         }
 
-        if (changes.HasFlag(PersonsMergedEventChanges.DateOfBirth))
+        if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.DateOfBirth))
         {
             doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
             doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
@@ -144,7 +143,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             doc.AssertSummaryListRowDoesNotExist("previous-details", "Date of birth");
         }
 
-        if (changes.HasFlag(PersonsMergedEventChanges.EmailAddress))
+        if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.EmailAddress))
         {
             item.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
             item.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(oldEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
@@ -155,7 +154,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             item.AssertSummaryListRowDoesNotExist("previous-details", "Email address");
         }
 
-        if (changes.HasFlag(PersonsMergedEventChanges.NationalInsuranceNumber))
+        if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber))
         {
             item.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
             item.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
@@ -166,7 +165,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             item.AssertSummaryListRowDoesNotExist("previous-details", "National Insurance number");
         }
 
-        if (changes.HasFlag(PersonsMergedEventChanges.Gender))
+        if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.Gender))
         {
             item.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
             item.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
@@ -196,7 +195,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             _firstName, _oldFirstName,
             _middleName, _oldMiddleName,
             _lastName, _oldLastName,
-            PersonsMergedEventChanges.NameChange, comments, evidenceFile);
+            LegacyEvents.PersonsMergedEventChanges.NameChange, comments, evidenceFile);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{_secondaryPerson!.PersonId}/change-history");
 
@@ -228,7 +227,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             _firstName, _oldFirstName,
             _middleName, _oldMiddleName,
             _lastName, _oldLastName,
-            PersonsMergedEventChanges.NameChange, comments: null, evidenceFile: null);
+            LegacyEvents.PersonsMergedEventChanges.NameChange, comments: null, evidenceFile: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{_person!.PersonId}/change-history");
 
@@ -253,7 +252,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             _firstName, _oldFirstName,
             _middleName, _oldMiddleName,
             _lastName, _oldLastName,
-            PersonsMergedEventChanges.NameChange, comments: null, evidenceFile: null);
+            LegacyEvents.PersonsMergedEventChanges.NameChange, comments: null, evidenceFile: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{_secondaryPerson!.PersonId}/change-history");
 
@@ -274,7 +273,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         string firstName, string oldFirstName,
         string middleName, string oldMiddleName,
         string lastName, string oldLastName,
-        PersonsMergedEventChanges changes, string? comments, EventModels.File? evidenceFile)
+        LegacyEvents.PersonsMergedEventChanges changes, string? comments, EventModels.File? evidenceFile)
     {
         await CreateEvent(
             firstName, oldFirstName, middleName, oldMiddleName, lastName, oldLastName,
@@ -290,7 +289,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         string? email, string? oldEmail,
         string? nino, string? oldNino,
         Gender? gender, Gender? oldGender,
-        PersonsMergedEventChanges changes, string? comments, EventModels.File? evidenceFile)
+        LegacyEvents.PersonsMergedEventChanges changes, string? comments, EventModels.File? evidenceFile)
     {
         var details = new EventModels.PersonDetails
         {
@@ -314,7 +313,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             Gender = oldGender
         };
 
-        var mergedEvent = new PersonsMergedEvent
+        var mergedEvent = new LegacyEvents.PersonsMergedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,

@@ -171,7 +171,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
                 RequestData = trnRequestUpdatedEvent.TrnRequest,
                 ChangeReason = LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordKept,
                 Changes = LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.Status,
-                PersonAttributes = EventModels.PersonDetails.FromModel(resolvedPerson),
+                PersonAttributes = resolvedPerson.Details.ToEventModel(),
                 OldPersonAttributes = null,
                 Comments = @event.Comments,
                 EventId = @event.EventId,
@@ -193,7 +193,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
             var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
 
             var changes = LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.Status;
-            var personAttributes = EventModels.PersonDetails.FromModel(resolvedPerson);
+            var personAttributes = resolvedPerson.Details.ToEventModel();
             EventModels.PersonDetails? oldPersonAttributes;
 
             if (personDetailsUpdatedEvent is { })

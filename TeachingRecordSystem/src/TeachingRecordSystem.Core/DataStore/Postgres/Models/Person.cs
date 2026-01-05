@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Optional;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Persons;
 
@@ -73,57 +72,72 @@ public class Person
     public bool DqtAllowTeacherIdentitySignInWithProhibitions { get; set; }
     public DateOnly? DateOfDeath { get; set; }
 
-    public UpdatePersonDetailsResult UpdateDetails(
-        PersonDetails details,
-        DateTime now)
+    public PersonDetails Details => new PersonDetails
     {
-        return UpdateDetails(
-            Option.Some(details.FirstName),
-            Option.Some(details.MiddleName),
-            Option.Some(details.LastName),
-            Option.Some(details.DateOfBirth),
-            Option.Some(details.EmailAddress),
-            Option.Some(details.NationalInsuranceNumber),
-            Option.Some(details.Gender),
-            now);
-    }
+        FirstName = FirstName!,
+        MiddleName = MiddleName ?? string.Empty,
+        LastName = LastName!,
+        DateOfBirth = DateOfBirth,
+        EmailAddress = EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
+            ? Core.EmailAddress.Parse(emailAddress)
+            : null,
+        NationalInsuranceNumber = NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
+            ? Core.NationalInsuranceNumber.Parse(nationalInsuranceNumber)
+            : null,
+        Gender = Gender
+    };
 
-    public UpdatePersonDetailsResult UpdateDetails(
-        Option<string> firstName,
-        Option<string> middleName,
-        Option<string> lastName,
-        Option<DateOnly?> dateOfBirth,
-        Option<EmailAddress?> emailAddress,
-        Option<NationalInsuranceNumber?> nationalInsuranceNumber,
-        Option<Gender?> gender,
-        DateTime now)
-    {
-        var oldAttributes = EventModels.PersonDetails.FromModel(this);
+    //public UpdatePersonDetailsResult UpdateDetails(
+    //    PersonDetails details,
+    //    DateTime now)
+    //{
+    //    return UpdateDetails(
+    //        Option.Some(details.FirstName),
+    //        Option.Some(details.MiddleName),
+    //        Option.Some(details.LastName),
+    //        Option.Some(details.DateOfBirth),
+    //        Option.Some(details.EmailAddress),
+    //        Option.Some(details.NationalInsuranceNumber),
+    //        Option.Some(details.Gender),
+    //        now);
+    //}
 
-        firstName.MatchSome(v => FirstName = v);
-        middleName.MatchSome(v => MiddleName = v);
-        lastName.MatchSome(v => LastName = v);
-        dateOfBirth.MatchSome(v => DateOfBirth = v);
-        emailAddress.MatchSome(v => EmailAddress = (string?)v);
-        nationalInsuranceNumber.MatchSome(v => NationalInsuranceNumber = (string?)v);
-        gender.MatchSome(v => Gender = v);
+    //public UpdatePersonDetailsResult UpdateDetails(
+    //    Option<string> firstName,
+    //    Option<string> middleName,
+    //    Option<string> lastName,
+    //    Option<DateOnly?> dateOfBirth,
+    //    Option<EmailAddress?> emailAddress,
+    //    Option<NationalInsuranceNumber?> nationalInsuranceNumber,
+    //    Option<Gender?> gender,
+    //    DateTime now)
+    //{
+    //    var oldAttributes = EventModels.PersonDetails.FromModel(this);
 
-        var changes = 0 |
-            (FirstName != oldAttributes.FirstName ? PersonAttributesChanges.FirstName : 0) |
-            (MiddleName != oldAttributes.MiddleName ? PersonAttributesChanges.MiddleName : 0) |
-            (LastName != oldAttributes.LastName ? PersonAttributesChanges.LastName : 0) |
-            (DateOfBirth != oldAttributes.DateOfBirth ? PersonAttributesChanges.DateOfBirth : 0) |
-            (EmailAddress != oldAttributes.EmailAddress ? PersonAttributesChanges.EmailAddress : 0) |
-            (NationalInsuranceNumber != oldAttributes.NationalInsuranceNumber ? PersonAttributesChanges.NationalInsuranceNumber : 0) |
-            (Gender != oldAttributes.Gender ? PersonAttributesChanges.Gender : 0);
+    //    firstName.MatchSome(v => FirstName = v);
+    //    middleName.MatchSome(v => MiddleName = v);
+    //    lastName.MatchSome(v => LastName = v);
+    //    dateOfBirth.MatchSome(v => DateOfBirth = v);
+    //    emailAddress.MatchSome(v => EmailAddress = (string?)v);
+    //    nationalInsuranceNumber.MatchSome(v => NationalInsuranceNumber = (string?)v);
+    //    gender.MatchSome(v => Gender = v);
 
-        if (changes != 0)
-        {
-            UpdatedOn = now;
-        }
+    //    var changes = 0 |
+    //        (FirstName != oldAttributes.FirstName ? PersonAttributesChanges.FirstName : 0) |
+    //        (MiddleName != oldAttributes.MiddleName ? PersonAttributesChanges.MiddleName : 0) |
+    //        (LastName != oldAttributes.LastName ? PersonAttributesChanges.LastName : 0) |
+    //        (DateOfBirth != oldAttributes.DateOfBirth ? PersonAttributesChanges.DateOfBirth : 0) |
+    //        (EmailAddress != oldAttributes.EmailAddress ? PersonAttributesChanges.EmailAddress : 0) |
+    //        (NationalInsuranceNumber != oldAttributes.NationalInsuranceNumber ? PersonAttributesChanges.NationalInsuranceNumber : 0) |
+    //        (Gender != oldAttributes.Gender ? PersonAttributesChanges.Gender : 0);
 
-        return new(changes, EventModels.PersonDetails.FromModel(this), oldAttributes);
-    }
+    //    if (changes != 0)
+    //    {
+    //        UpdatedOn = now;
+    //    }
+
+    //    return new(changes, EventModels.PersonDetails.FromModel(this), oldAttributes);
+    //}
 
     public void SetStatus(
         PersonStatus targetStatus,

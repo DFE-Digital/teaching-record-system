@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.Core.Events.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
 
@@ -11,6 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 [Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    PersonService personService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock,
@@ -122,73 +122,67 @@ public class CheckAnswersModel(
         var primaryPersonId = state.PrimaryPersonId!.Value;
         var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId!.Value;
 
-        var primaryPersonAttributes = _potentialDuplicates!.Single(p => p.PersonId == primaryPersonId).Attributes;
+        //var primaryPersonAttributes = _potentialDuplicates!.Single(p => p.PersonId == primaryPersonId).Attributes;
 
-        var newPrimaryPersonAttributes = new PersonDetails()
-        {
-            FirstName = FirstName ?? string.Empty,
-            MiddleName = MiddleName ?? string.Empty,
-            LastName = LastName ?? string.Empty,
-            DateOfBirth = DateOfBirth,
-            EmailAddress = EmailAddress,
-            NationalInsuranceNumber = NationalInsuranceNumber,
-            Gender = Gender
-        };
+        //var newPrimaryPersonAttributes = ;
 
         // update the person
-        var primaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == primaryPersonId);
+        //var primaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == primaryPersonId);
 
-        primaryPerson.UpdateDetails(
-            new()
+        var processContext = new ProcessContext(ProcessType.PersonMerging, clock.UtcNow, User.GetUserId());
+
+        await personService.MergePersons2Async(new(
+            secondaryPersonId,
+            primaryPersonId,
+            new PersonDetails()
             {
-                FirstName = newPrimaryPersonAttributes.FirstName,
-                MiddleName = newPrimaryPersonAttributes.MiddleName,
-                LastName = newPrimaryPersonAttributes.LastName,
-                DateOfBirth = newPrimaryPersonAttributes.DateOfBirth,
-                EmailAddress = newPrimaryPersonAttributes.EmailAddress is not null ? Core.EmailAddress.Parse(newPrimaryPersonAttributes.EmailAddress) : null,
-                NationalInsuranceNumber = newPrimaryPersonAttributes.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(newPrimaryPersonAttributes.NationalInsuranceNumber) : null,
-                Gender = newPrimaryPersonAttributes.Gender,
+                FirstName = FirstName ?? string.Empty,
+                MiddleName = MiddleName ?? string.Empty,
+                LastName = LastName ?? string.Empty,
+                DateOfBirth = DateOfBirth,
+                EmailAddress = EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
+                NationalInsuranceNumber = NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
+                Gender = Gender
             },
-            clock.UtcNow);
+            EvidenceFile?.ToFile(),
+            Comments), processContext);
 
-        var changes = PersonsMergedEventChanges.None |
-            (state.FirstNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.FirstName : 0) |
-            (state.MiddleNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.MiddleName : 0) |
-            (state.LastNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.LastName : 0) |
-            (state.DateOfBirthSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.DateOfBirth : 0) |
-            (state.EmailAddressSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.EmailAddress : 0) |
-            (state.NationalInsuranceNumberSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
-            (state.GenderSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.Gender : 0);
+        //var changes = PersonsMergedEventChanges.None |
+        //    (state.FirstNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.FirstName : 0) |
+        //    (state.MiddleNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.MiddleName : 0) |
+        //    (state.LastNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.LastName : 0) |
+        //    (state.DateOfBirthSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.DateOfBirth : 0) |
+        //    (state.EmailAddressSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.EmailAddress : 0) |
+        //    (state.NationalInsuranceNumberSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
+        //    (state.GenderSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.Gender : 0);
 
-        var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
-        secondaryPerson.Status = PersonStatus.Deactivated;
-        secondaryPerson.MergedWithPersonId = primaryPersonId;
+        //var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
+        //secondaryPerson.Status = PersonStatus.Deactivated;
+        //secondaryPerson.MergedWithPersonId = primaryPersonId;
 
-        var @event = new PersonsMergedEvent()
-        {
-            PersonId = primaryPersonId,
-            PersonTrn = primaryPerson.Trn,
-            SecondaryPersonId = secondaryPersonId,
-            SecondaryPersonTrn = secondaryPerson.Trn,
-            SecondaryPersonStatus = secondaryPerson.Status,
-            PersonAttributes = newPrimaryPersonAttributes,
-            OldPersonAttributes = primaryPersonAttributes,
-            EvidenceFile = EvidenceFile?.ToEventModel(),
-            Comments = Comments,
-            Changes = changes,
-            EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
-            RaisedBy = User.GetUserId()
-        };
+        //var @event = new PersonsMergedEvent()
+        //{
+        //    PersonId = primaryPersonId,
+        //    PersonTrn = primaryPerson.Trn,
+        //    SecondaryPersonId = secondaryPersonId,
+        //    SecondaryPersonTrn = secondaryPerson.Trn,
+        //    SecondaryPersonStatus = secondaryPerson.Status,
+        //    PersonAttributes = newPrimaryPersonAttributes.ToEventModel(),
+        //    OldPersonAttributes = primaryPersonAttributes,
+        //    EvidenceFile = EvidenceFile?.ToEventModel(),
+        //    Comments = Comments,
+        //    Changes = changes,
+        //    EventId = Guid.NewGuid(),
+        //    CreatedUtc = clock.UtcNow,
+        //    RaisedBy = User.GetUserId()
+        //};
 
-        await DbContext.AddEventAndBroadcastAsync(@event);
-        await DbContext.SaveChangesAsync();
+        //await DbContext.AddEventAndBroadcastAsync(@event);
+        //await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
             $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId))
-            );
-
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId)));
 
         await JourneyInstance!.CompleteAsync();
 

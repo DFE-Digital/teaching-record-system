@@ -85,7 +85,7 @@ public class CheckAnswersModel(
 
         await PersonService.UpdatePersonDetailsAsync(new(
             PersonId,
-            new()
+            new PersonDetails()
             {
                 FirstName = FirstName ?? string.Empty,
                 MiddleName = MiddleName ?? string.Empty,
@@ -94,7 +94,7 @@ public class CheckAnswersModel(
                 EmailAddress = EmailAddress,
                 NationalInsuranceNumber = NationalInsuranceNumber,
                 Gender = Gender
-            },
+            }.UpdateAll(),
             NameChangeReason is PersonNameChangeReason nameChangeReason ? new()
             {
                 Reason = nameChangeReason,

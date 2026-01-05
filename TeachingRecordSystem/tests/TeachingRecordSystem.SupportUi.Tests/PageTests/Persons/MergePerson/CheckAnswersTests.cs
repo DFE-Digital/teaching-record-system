@@ -1,7 +1,6 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
@@ -194,7 +193,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         // event is published
         EventObserver.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<PersonsMergedEvent>(e);
+            var actualEvent = Assert.IsType<LegacyEvents.PersonsMergedEvent>(e);
             Assert.Equal(personA.PersonId, actualEvent.PersonId);
             Assert.Equal(personA.Trn, actualEvent.PersonTrn);
             Assert.Equal(personB.PersonId, actualEvent.SecondaryPersonId);
@@ -222,16 +221,16 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
 
             var expectedChange = sourcedFromSecondaryPersonAttribute.Attribute switch
             {
-                PersonMatchedAttribute.FirstName => PersonsMergedEventChanges.FirstName,
-                PersonMatchedAttribute.MiddleName => PersonsMergedEventChanges.MiddleName,
-                PersonMatchedAttribute.LastName => PersonsMergedEventChanges.LastName,
-                PersonMatchedAttribute.DateOfBirth => PersonsMergedEventChanges.DateOfBirth,
-                PersonMatchedAttribute.EmailAddress => PersonsMergedEventChanges.EmailAddress,
-                PersonMatchedAttribute.NationalInsuranceNumber => PersonsMergedEventChanges.NationalInsuranceNumber,
-                PersonMatchedAttribute.Gender => PersonsMergedEventChanges.Gender,
+                PersonMatchedAttribute.FirstName => LegacyEvents.PersonsMergedEventChanges.FirstName,
+                PersonMatchedAttribute.MiddleName => LegacyEvents.PersonsMergedEventChanges.MiddleName,
+                PersonMatchedAttribute.LastName => LegacyEvents.PersonsMergedEventChanges.LastName,
+                PersonMatchedAttribute.DateOfBirth => LegacyEvents.PersonsMergedEventChanges.DateOfBirth,
+                PersonMatchedAttribute.EmailAddress => LegacyEvents.PersonsMergedEventChanges.EmailAddress,
+                PersonMatchedAttribute.NationalInsuranceNumber => LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber,
+                PersonMatchedAttribute.Gender => LegacyEvents.PersonsMergedEventChanges.Gender,
                 PersonMatchedAttribute.FullName => throw new NotImplementedException(),
                 PersonMatchedAttribute.Trn => throw new NotImplementedException(),
-                _ => PersonsMergedEventChanges.None
+                _ => LegacyEvents.PersonsMergedEventChanges.None
             };
             Assert.Equal(expectedChange, actualEvent.Changes);
         });

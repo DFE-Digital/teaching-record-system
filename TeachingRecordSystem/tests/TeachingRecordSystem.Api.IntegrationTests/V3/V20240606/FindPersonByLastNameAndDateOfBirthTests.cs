@@ -166,7 +166,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var person2 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
         var person3 = await TestData.CreatePersonAsync(p => p.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
         var updatedLastName = TestData.GenerateChangedLastName(lastName);
-        await TestData.UpdatePersonAsync(p => p.WithPersonId(person2.PersonId).WithUpdatedName(person2.FirstName, person2.MiddleName, updatedLastName));
+        await TestData.UpdatePersonAsync(p => p.WithPersonId(person2.PersonId).WithUpdatedName(person2.FirstName, person2.MiddleName, updatedLastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

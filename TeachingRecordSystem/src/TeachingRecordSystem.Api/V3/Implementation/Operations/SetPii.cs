@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -20,7 +21,8 @@ public record SetPiiResult;
 public class SetPiiHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
-    IClock clock) :
+    IClock clock,
+    PersonService personService) :
     ICommandHandler<SetPiiCommand, SetPiiResult>
 {
     public async Task<ApiResult<SetPiiResult>> ExecuteAsync(SetPiiCommand command)
@@ -51,8 +53,24 @@ public class SetPiiHandler(
 
         var now = clock.UtcNow;
 
-        var updateResult = person.UpdateDetails(
-            new()
+        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, now, currentUserId);
+
+        //var updateResult = person.UpdateDetails(
+        //    new()
+        //    {
+        //        FirstName = command.FirstName,
+        //        MiddleName = command.MiddleName ?? string.Empty,
+        //        LastName = command.LastName,
+        //        DateOfBirth = command.DateOfBirth,
+        //        EmailAddress = command.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
+        //        NationalInsuranceNumber = command.NationalInsuranceNumber is string nino ? NationalInsuranceNumber.Parse(nino) : null,
+        //        Gender = command.Gender,
+        //    },
+        //    now);
+
+        await personService.UpdatePersonDetailsAsync(new(
+            person.PersonId,
+            new PersonDetails()
             {
                 FirstName = command.FirstName,
                 MiddleName = command.MiddleName ?? string.Empty,
@@ -61,27 +79,29 @@ public class SetPiiHandler(
                 EmailAddress = command.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
                 NationalInsuranceNumber = command.NationalInsuranceNumber is string nino ? NationalInsuranceNumber.Parse(nino) : null,
                 Gender = command.Gender,
-            },
-            now);
+            }.UpdateAll(),
+            null,
+            null),
+            processContext);
 
-        var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = currentUserId,
-            PersonId = person.PersonId,
-            PersonAttributes = updateResult.PersonAttributes,
-            OldPersonAttributes = updateResult.OldPersonAttributes,
-            NameChangeReason = null,
-            NameChangeEvidenceFile = null,
-            DetailsChangeReason = null,
-            DetailsChangeReasonDetail = null,
-            DetailsChangeEvidenceFile = null,
-            Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.None
-        };
-        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent);
+        //var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
+        //{
+        //    EventId = Guid.NewGuid(),
+        //    CreatedUtc = now,
+        //    RaisedBy = currentUserId,
+        //    PersonId = person.PersonId,
+        //    PersonAttributes = updateResult.PersonAttributes,
+        //    OldPersonAttributes = updateResult.OldPersonAttributes,
+        //    NameChangeReason = null,
+        //    NameChangeEvidenceFile = null,
+        //    DetailsChangeReason = null,
+        //    DetailsChangeReasonDetail = null,
+        //    DetailsChangeEvidenceFile = null,
+        //    Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.None
+        //};
+        //await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent);
 
-        await dbContext.SaveChangesAsync();
+        //await dbContext.SaveChangesAsync();
 
         return new SetPiiResult();
     }

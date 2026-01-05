@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-
 namespace TeachingRecordSystem.Core.Events.Models;
 
 public record PersonDetails
@@ -11,26 +9,4 @@ public record PersonDetails
     public required string? EmailAddress { get; set; }
     public required string? NationalInsuranceNumber { get; set; }
     public required Gender? Gender { get; set; }
-
-    public static PersonDetails FromModel(Person person) => new()
-    {
-        FirstName = person.FirstName,
-        MiddleName = person.MiddleName,
-        LastName = person.LastName,
-        DateOfBirth = person.DateOfBirth,
-        EmailAddress = person.EmailAddress,
-        NationalInsuranceNumber = person.NationalInsuranceNumber,
-        Gender = person.Gender
-    };
-
-    public static PersonDetails FromModel(Services.Persons.PersonDetails person) => new()
-    {
-        FirstName = person.FirstName,
-        MiddleName = person.MiddleName,
-        LastName = person.LastName,
-        DateOfBirth = person.DateOfBirth,
-        EmailAddress = person.EmailAddress?.ToString(),
-        NationalInsuranceNumber = person.NationalInsuranceNumber?.ToString(),
-        Gender = person.Gender
-    };
 }
