@@ -33,6 +33,7 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
             SupportTaskType.ChangeDateOfBirthRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference),
             SupportTaskType.ChangeNameRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference),
             SupportTaskType.TeacherPensionsPotentialDuplicate => SupportTasks.TeacherPensions.Resolve.Matches(supportTaskReference),
+            SupportTaskType.OneLoginUserIdVerification => SupportTasks.OneLoginUserIdVerification.Resolve.Matches(supportTaskReference),
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 

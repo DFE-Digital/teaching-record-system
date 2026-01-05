@@ -122,13 +122,6 @@ public class CheckAnswersModel(
         var primaryPersonId = state.PrimaryPersonId!.Value;
         var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId!.Value;
 
-        //var primaryPersonAttributes = _potentialDuplicates!.Single(p => p.PersonId == primaryPersonId).Attributes;
-
-        //var newPrimaryPersonAttributes = ;
-
-        // update the person
-        //var primaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == primaryPersonId);
-
         var processContext = new ProcessContext(ProcessType.PersonMerging, clock.UtcNow, User.GetUserId());
 
         await personService.MergePersons2Async(new(
@@ -146,39 +139,6 @@ public class CheckAnswersModel(
             },
             EvidenceFile?.ToFile(),
             Comments), processContext);
-
-        //var changes = PersonsMergedEventChanges.None |
-        //    (state.FirstNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.FirstName : 0) |
-        //    (state.MiddleNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.MiddleName : 0) |
-        //    (state.LastNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.LastName : 0) |
-        //    (state.DateOfBirthSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.DateOfBirth : 0) |
-        //    (state.EmailAddressSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.EmailAddress : 0) |
-        //    (state.NationalInsuranceNumberSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
-        //    (state.GenderSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.Gender : 0);
-
-        //var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
-        //secondaryPerson.Status = PersonStatus.Deactivated;
-        //secondaryPerson.MergedWithPersonId = primaryPersonId;
-
-        //var @event = new PersonsMergedEvent()
-        //{
-        //    PersonId = primaryPersonId,
-        //    PersonTrn = primaryPerson.Trn,
-        //    SecondaryPersonId = secondaryPersonId,
-        //    SecondaryPersonTrn = secondaryPerson.Trn,
-        //    SecondaryPersonStatus = secondaryPerson.Status,
-        //    PersonAttributes = newPrimaryPersonAttributes.ToEventModel(),
-        //    OldPersonAttributes = primaryPersonAttributes,
-        //    EvidenceFile = EvidenceFile?.ToEventModel(),
-        //    Comments = Comments,
-        //    Changes = changes,
-        //    EventId = Guid.NewGuid(),
-        //    CreatedUtc = clock.UtcNow,
-        //    RaisedBy = User.GetUserId()
-        //};
-
-        //await DbContext.AddEventAndBroadcastAsync(@event);
-        //await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
             $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
