@@ -31,14 +31,11 @@ public class Index(SupportTaskSearchService searchService, SupportUiLinkGenerato
 
     public async Task OnGetAsync()
     {
-        var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
+        var searchOptions = new OneLoginUserIdVerificationSupportTasksOptions(Search, SortBy, SortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
         var result = await searchService.SearchOneLoginIdVerificationSupportTasksAsync(
-            new SearchOneLoginUserIdVerificationSupportTasksOptions(
-                SortBy ??= OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference,
-                sortDirection),
-            paginationOptions);
+            searchOptions, paginationOptions);
 
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;

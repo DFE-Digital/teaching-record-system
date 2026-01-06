@@ -1,3 +1,0 @@
-namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
-
-public record SearchOneLoginUserIdVerificationSupportTasksOptions(OneLoginIdVerificationSupportTasksSortByOption SortBy, SortDirection SortDirection);

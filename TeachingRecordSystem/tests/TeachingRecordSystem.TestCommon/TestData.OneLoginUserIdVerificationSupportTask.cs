@@ -92,7 +92,7 @@ public partial class TestData
 
         public CreateOneLoginUserIdVerificationSupportTaskBuilder WithCreatedOn(DateTime createdOn)
         {
-            _createdOn = Option.Some(createdOn);
+            _createdOn = Option.Some(DateTime.SpecifyKind(createdOn, DateTimeKind.Utc));
             return this;
         }
 
