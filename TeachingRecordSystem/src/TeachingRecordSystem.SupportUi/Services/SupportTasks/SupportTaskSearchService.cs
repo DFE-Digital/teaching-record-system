@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -380,10 +381,10 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    private bool SearchTextIsReferenceId(string searchText, out string referenceId)
+    private bool SearchTextIsReferenceId(string searchText, [NotNullWhen(true)] out string? referenceId)
     {
-        referenceId = searchText.Contains("TRS-", StringComparison.OrdinalIgnoreCase) ? searchText : string.Empty;
-        return !string.IsNullOrEmpty(referenceId);
+        referenceId = searchText.Contains("TRS-", StringComparison.OrdinalIgnoreCase) ? searchText : null;
+        return referenceId is not null;
     }
 
     private bool SearchTextIsDate(string searchText, out DateTime minDate, out DateTime maxDate)
