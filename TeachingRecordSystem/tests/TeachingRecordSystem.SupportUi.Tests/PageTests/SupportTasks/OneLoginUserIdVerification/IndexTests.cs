@@ -230,14 +230,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultRow = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr")
-            .FirstOrDefault();
+        var resultRows = doc.GetElementByTestId("results")?
+            .QuerySelectorAll("tbody > tr");
 
-        Assert.NotNull(resultRow);
-        var nameLink = resultRow.GetElementByTestId("taskId")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
+        Assert.NotNull(resultRows);
+        var nameLink = resultRows[0].GetElementByTestId("taskId")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
         Assert.Contains($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve", nameLink!.Href);
     }
 
