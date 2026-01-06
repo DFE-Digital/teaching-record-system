@@ -1,3 +1,4 @@
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -27,8 +28,6 @@ public class PersonService(
 
     public async Task<Person> CreatePersonAsync(CreatePersonOptions options, ProcessContext processContext)
     {
-        var now = clock.UtcNow;
-
         TrnRequestMetadata? sourceRequest = null;
         if (options.SourceTrnRequest is (var applicationUserId, var requestId))
         {
@@ -39,6 +38,7 @@ public class PersonService(
             }
         }
 
+        var now = clock.UtcNow;
         var person = new Person
         {
             PersonId = Guid.NewGuid(),
@@ -80,24 +80,29 @@ public class PersonService(
 
     public async Task<UpdatePersonDetailsResult> UpdatePersonDetailsAsync(UpdatePersonDetailsOptions options, ProcessContext processContext)
     {
-        var now = clock.UtcNow;
-
-        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
+        var person = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
 
         if (person is null)
         {
             throw new TrsPersonNotFoundException($"Person with ID {options.PersonId} not found.");
         }
 
+        if (person.Status is PersonStatus.Deactivated)
+        {
+            throw new InvalidOperationException("Cannot update a person that is deactivated.");
+        }
+
         var oldDetails = person.Details;
 
-        options.PersonDetails.FirstName.MatchSome(firstName => person.FirstName = firstName);
-        options.PersonDetails.MiddleName.MatchSome(middleName => person.MiddleName = middleName);
-        options.PersonDetails.LastName.MatchSome(lastName => person.LastName = lastName);
-        options.PersonDetails.DateOfBirth.MatchSome(dateOfBirth => person.DateOfBirth = dateOfBirth);
-        options.PersonDetails.EmailAddress.MatchSome(emailAddress => person.EmailAddress = (string?)emailAddress);
-        options.PersonDetails.NationalInsuranceNumber.MatchSome(nationalInsuranceNumber => person.NationalInsuranceNumber = (string?)nationalInsuranceNumber);
-        options.PersonDetails.Gender.MatchSome(gender => person.Gender = gender);
+        (options.PersonDetails.FirstName ?? Option.None<string>()).MatchSome(firstName => person.FirstName = firstName);
+        (options.PersonDetails.MiddleName ?? Option.None<string>()).MatchSome(middleName => person.MiddleName = middleName);
+        (options.PersonDetails.LastName ?? Option.None<string>()).MatchSome(lastName => person.LastName = lastName);
+        (options.PersonDetails.DateOfBirth ?? Option.None<DateOnly?>()).MatchSome(dateOfBirth => person.DateOfBirth = dateOfBirth);
+        (options.PersonDetails.EmailAddress ?? Option.None<EmailAddress?>()).MatchSome(emailAddress => person.EmailAddress = (string?)emailAddress);
+        (options.PersonDetails.NationalInsuranceNumber ?? Option.None<NationalInsuranceNumber?>()).MatchSome(nationalInsuranceNumber => person.NationalInsuranceNumber = (string?)nationalInsuranceNumber);
+        (options.PersonDetails.Gender ?? Option.None<Gender?>()).MatchSome(gender => person.Gender = gender);
 
         var changes = 0 |
             (person.FirstName != oldDetails.FirstName ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
@@ -113,6 +118,7 @@ public class PersonService(
             return new(changes, oldDetails, oldDetails);
         }
 
+        var now = clock.UtcNow;
         person.UpdatedOn = now;
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) &&
@@ -153,8 +159,6 @@ public class PersonService(
 
     public async Task DeactivatePersonAsync(DeactivatePersonOptions options, ProcessContext processContext)
     {
-        var now = clock.UtcNow;
-
         var deactivatingPerson = await dbContext.Persons
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
@@ -170,7 +174,7 @@ public class PersonService(
         }
 
         deactivatingPerson.Status = PersonStatus.Deactivated;
-        deactivatingPerson.UpdatedOn = now;
+        deactivatingPerson.UpdatedOn = clock.UtcNow;
 
         await dbContext.SaveChangesAsync();
 
@@ -187,8 +191,6 @@ public class PersonService(
 
     public async Task ReactivatePersonAsync(ReactivatePersonOptions options, ProcessContext processContext)
     {
-        var now = clock.UtcNow;
-
         var reactivatingPerson = await dbContext.Persons
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
@@ -204,7 +206,7 @@ public class PersonService(
         }
 
         reactivatingPerson.Status = PersonStatus.Active;
-        reactivatingPerson.UpdatedOn = now;
+        reactivatingPerson.UpdatedOn = clock.UtcNow;
 
         await dbContext.SaveChangesAsync();
 
@@ -220,11 +222,9 @@ public class PersonService(
 
     public async Task DeactivatePersonViaMergeAsync(DeactivatePersonViaMergeOptions options, ProcessContext processContext)
     {
-        var now = clock.UtcNow;
-
         var deactivatingPerson = await dbContext.Persons
             .IgnoreQueryFilters()
-            .SingleAsync(p => p.PersonId == options.DeactivatingPersonId);
+            .SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
 
         if (deactivatingPerson is null)
         {
@@ -233,18 +233,26 @@ public class PersonService(
 
         if (deactivatingPerson.Status is PersonStatus.Deactivated)
         {
-            throw new InvalidOperationException("Cannot merge a person that is already deactivated.");
+            throw new InvalidOperationException("Cannot deactivate a person that is already deactivated.");
         }
 
-        var retainedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
+        var retainedPerson = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
 
         if (retainedPerson is null)
         {
             throw new TrsPersonNotFoundException($"Person with ID {options.RetainedPersonId} not found.");
         }
 
+        if (retainedPerson.Status is PersonStatus.Deactivated)
+        {
+            throw new InvalidOperationException("Cannot merge a person that is deactivated.");
+        }
+
         deactivatingPerson.Status = PersonStatus.Deactivated;
         deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
+        deactivatingPerson.UpdatedOn = clock.UtcNow;
 
         await dbContext.SaveChangesAsync();
 
@@ -263,8 +271,6 @@ public class PersonService(
 
     public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
     {
-        var now = clock.UtcNow;
-
         var deactivatingPerson = await dbContext.Persons
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
@@ -276,16 +282,24 @@ public class PersonService(
 
         if (deactivatingPerson.Status is PersonStatus.Deactivated)
         {
-            throw new InvalidOperationException("Cannot merge a person that is already deactivated.");
+            throw new InvalidOperationException("Cannot deactivate a person that is already deactivated.");
         }
 
-        var retainedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
+        var retainedPerson = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
 
         if (retainedPerson is null)
         {
             throw new TrsPersonNotFoundException($"Person with ID {options.RetainedPersonId} not found.");
         }
 
+        if (retainedPerson.Status is PersonStatus.Deactivated)
+        {
+            throw new InvalidOperationException("Cannot merge a person that is deactivated.");
+        }
+
+        var now = clock.UtcNow;
         var oldRetainedPersonDetails = retainedPerson.Details.ToEventModel();
 
         retainedPerson.FirstName = options.PersonDetails.FirstName;
@@ -312,6 +326,7 @@ public class PersonService(
 
         deactivatingPerson.Status = PersonStatus.Deactivated;
         deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
+        deactivatingPerson.UpdatedOn = now;
 
         await dbContext.SaveChangesAsync();
 
@@ -322,7 +337,7 @@ public class PersonService(
                 RetainedPersonId = options.RetainedPersonId,
                 RetainedPersonTrn = retainedPerson.Trn,
                 DeactivatedPersonId = options.DeactivatingPersonId,
-                SecondaryPersonTrn = deactivatingPerson.Trn,
+                DeactivatedPersonTrn = deactivatingPerson.Trn,
                 DeactivatedPersonStatus = deactivatingPerson.Status,
                 RetainedPersonDetails = options.PersonDetails.ToEventModel(),
                 OldRetainedPersonDetails = oldRetainedPersonDetails,

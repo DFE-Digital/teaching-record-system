@@ -148,13 +148,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             person.PersonId,
             new()
             {
-                FirstName = Option.None<string>(),
-                MiddleName = Option.None<string>(),
-                LastName = Option.None<string>(),
-                DateOfBirth = Option.Some<DateOnly?>(updatedDateOfBirth),
-                EmailAddress = Option.None<EmailAddress?>(),
-                NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
-                Gender = Option.None<Gender?>()
+                DateOfBirth = Option.Some<DateOnly?>(updatedDateOfBirth)
             },
             null,
             null),
@@ -270,13 +264,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             person.PersonId,
             new()
             {
-                FirstName = Option.None<string>(),
-                MiddleName = Option.None<string>(),
-                LastName = Option.None<string>(),
-                DateOfBirth = Option.None<DateOnly?>(),
-                EmailAddress = Option.None<EmailAddress?>(),
                 NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>(updatedNationalInsuranceNumber),
-                Gender = Option.None<Gender?>()
             },
             null,
             null),
@@ -392,13 +380,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             person.PersonId,
             new()
             {
-                FirstName = Option.None<string>(),
-                MiddleName = Option.None<string>(),
-                LastName = Option.None<string>(),
                 DateOfBirth = Option.Some<DateOnly?>(updatedDateOfBirth),
-                EmailAddress = Option.None<EmailAddress?>(),
                 NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>(updatedNationalInsuranceNumber),
-                Gender = Option.None<Gender?>()
             },
             null,
             null),

@@ -7,7 +7,7 @@ public record PersonsMergedEvent : IEvent
     public required Guid RetainedPersonId { get; init; }
     public required string RetainedPersonTrn { get; init; }
     public required Guid DeactivatedPersonId { get; init; }
-    public required string SecondaryPersonTrn { get; init; }
+    public required string DeactivatedPersonTrn { get; init; }
     public required PersonStatus DeactivatedPersonStatus { get; init; }
     public required EventModels.PersonDetails RetainedPersonDetails { get; init; }
     public required EventModels.PersonDetails OldRetainedPersonDetails { get; init; }

@@ -119,7 +119,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 PersonId = @event.RetainedPersonId,
                 PersonTrn = @event.RetainedPersonTrn,
                 SecondaryPersonId = @event.DeactivatedPersonId,
-                SecondaryPersonTrn = @event.SecondaryPersonTrn,
+                SecondaryPersonTrn = @event.DeactivatedPersonTrn,
                 SecondaryPersonStatus = @event.DeactivatedPersonStatus,
                 PersonAttributes = @event.RetainedPersonDetails,
                 Changes = @event.Changes.ToLegacyPersonsMergedEventChanges(),

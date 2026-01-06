@@ -58,9 +58,6 @@ public class AcceptModel(
                 MiddleName = ChangeType == SupportTaskType.ChangeNameRequest ? Option.Some(changeNameRequestData!.MiddleName ?? string.Empty) : Option.None<string>(),
                 LastName = ChangeType == SupportTaskType.ChangeNameRequest ? Option.Some(changeNameRequestData!.LastName ?? string.Empty) : Option.None<string>(),
                 DateOfBirth = ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? Option.Some<DateOnly?>(changeDateOfBirthRequestData!.DateOfBirth) : Option.None<DateOnly?>(),
-                EmailAddress = Option.None<EmailAddress?>(),
-                NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
-                Gender = Option.None<Gender?>()
             },
             null,
             null),

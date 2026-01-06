@@ -4,22 +4,22 @@ namespace TeachingRecordSystem.Core.Services.Persons;
 
 public record PersonDetailsToUpdate
 {
-    public required Option<string> FirstName { get; set; }
-    public required Option<string> MiddleName { get; set; }
-    public required Option<string> LastName { get; set; }
-    public required Option<DateOnly?> DateOfBirth { get; set; }
-    public required Option<EmailAddress?> EmailAddress { get; set; }
-    public required Option<NationalInsuranceNumber?> NationalInsuranceNumber { get; set; }
-    public required Option<Gender?> Gender { get; set; }
+    public Option<string>? FirstName { get; set; }
+    public Option<string>? MiddleName { get; set; }
+    public Option<string>? LastName { get; set; }
+    public Option<DateOnly?>? DateOfBirth { get; set; }
+    public Option<EmailAddress?>? EmailAddress { get; set; }
+    public Option<NationalInsuranceNumber?>? NationalInsuranceNumber { get; set; }
+    public Option<Gender?>? Gender { get; set; }
 
     public PersonDetails Resolve(PersonDetails oldPersonDetails) => new()
     {
-        FirstName = FirstName.ValueOr(oldPersonDetails.FirstName),
-        MiddleName = MiddleName.ValueOr(oldPersonDetails.MiddleName),
-        LastName = LastName.ValueOr(oldPersonDetails.LastName),
-        DateOfBirth = DateOfBirth.ValueOr(oldPersonDetails.DateOfBirth),
-        EmailAddress = EmailAddress.ValueOr(oldPersonDetails.EmailAddress),
-        NationalInsuranceNumber = NationalInsuranceNumber.ValueOr(oldPersonDetails.NationalInsuranceNumber),
-        Gender = Gender.ValueOr(oldPersonDetails.Gender),
+        FirstName = (FirstName ?? Option.None<string>()).ValueOr(oldPersonDetails.FirstName),
+        MiddleName = (MiddleName ?? Option.None<string>()).ValueOr(oldPersonDetails.MiddleName),
+        LastName = (LastName ?? Option.None<string>()).ValueOr(oldPersonDetails.LastName),
+        DateOfBirth = (DateOfBirth ?? Option.None<DateOnly?>()).ValueOr(oldPersonDetails.DateOfBirth),
+        EmailAddress = (EmailAddress ?? Option.None<EmailAddress?>()).ValueOr(oldPersonDetails.EmailAddress),
+        NationalInsuranceNumber = (NationalInsuranceNumber ?? Option.None<NationalInsuranceNumber?>()).ValueOr(oldPersonDetails.NationalInsuranceNumber),
+        Gender = (Gender ?? Option.None<Gender?>()).ValueOr(oldPersonDetails.Gender),
     };
 }
