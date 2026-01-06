@@ -113,6 +113,43 @@ public partial class SupportTaskSearchServiceTests
     }
 
     [Theory]
+    [InlineData("Smith", 1, 2, new[] { "Alphie", "Colin" })]
+    [InlineData("Smith", 2, 1, new[] { "Edward" })]
+    public async Task SearchOneLoginIdVerificationSupportTasks_SearchTerm_ReturnsPagedResults(string search, int pageNumber, int expectedResultCount, string[] expectedRecords)
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+
+        var supportTasksList = new List<SupportTask>
+        {
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Alphie").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,10,1,1,1,1))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Bert").WithCreatedOn(new DateTime(2000,9,1,1,2,1))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Colin").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,8,1,1,3,1))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("David").WithCreatedOn(new DateTime(2000,11,1,1,4,1))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Edward").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,10,1,1,5,1)))
+        };
+
+        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: search, OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
+
+        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, ItemsPerPage: 2);
+
+        // Act
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+            service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
+
+        // Assert
+        Assert.Equal(expectedResultCount, results.SearchResults.Count);
+        Assert.Equal(2, results.SearchResults.LastPage);
+        Assert.Equal(3, results.SearchResults.TotalItemCount);
+        Assert.Equal(expectedRecords, results.SearchResults.Select(r => r.FirstName));
+    }
+
+    [Theory]
     [InlineData("20/01/2025")]
     [InlineData("20/1/2025")]
     [InlineData("20 Jan 2025")]

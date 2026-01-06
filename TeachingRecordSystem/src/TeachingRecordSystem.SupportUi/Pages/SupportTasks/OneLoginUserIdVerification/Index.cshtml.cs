@@ -42,6 +42,6 @@ public class Index(SupportTaskSearchService searchService, SupportUiLinkGenerato
 
         Pagination = PaginationViewModel.Create(
             Results,
-            pageNumber => linkGenerator.SupportTasks.OneLoginUserIdVerification.Index(SortBy, SortDirection, pageNumber));
+            pageNumber => linkGenerator.SupportTasks.OneLoginUserIdVerification.Index(Search, SortBy, SortDirection, pageNumber));
     }
 }
