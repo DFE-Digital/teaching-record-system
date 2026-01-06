@@ -980,8 +980,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
                 NationalInsuranceNumber = null,
                 Gender = person1.Gender
             }.UpdateAll(),
-            null,
-            null),
+            new() { Reason = PersonNameChangeReason.DeedPollOrOtherLegalProcess },
+            new() { Reason = PersonDetailsChangeReason.AnotherReason }),
             processContext);
         var nameChangeEvent1 = new PersonDetailsUpdatedEvent
         {
@@ -1012,8 +1012,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
                 NationalInsuranceNumber = null,
                 Gender = person2.Gender
             }.UpdateAll(),
-            null,
-            null),
+            new() { Reason = PersonNameChangeReason.DeedPollOrOtherLegalProcess },
+            new() { Reason = PersonDetailsChangeReason.AnotherReason }),
             processContext2);
         var nameChangeEvent2 = new PersonDetailsUpdatedEvent
         {
