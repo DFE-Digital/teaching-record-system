@@ -15,63 +15,88 @@
         <span class="govuk-caption-l">Record management</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
     </div>
-</div>
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full" data-testid="results">
-        @if (Model.Results!.Count == 0)
-        {
-            @* This needs to say "Try searching again with different details" when search functionality is added" *@
-            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-tasks-message">
-                No tasks
+    @if (Model.TotalTaskCount == 0)
+    {
+        <div class="govuk-grid-column-two-thirds" data-testid="no-tasks-message">
+            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3">
+                There are no outstanding tasks
             </p>
-        }
-        else
-        {
-            <form action="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index()" method="get" asp-antiforgery="false">
+        </div>
+    }
+    else
+    {
+        <div class="govuk-grid-column-two-thirds">
+            <form action="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index()" method="get" asp-antiforgery="false" data-testid="search">
+                <div class="govuk-!-margin-bottom-4">
+                    <govuk-input for="Search" type="search" autocomplete="off">
+                        <govuk-input-label>
+                            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
+                        </govuk-input-label>
+                        <govuk-input-hint>
+                            Enter a task ID, name, email address or request date, for example 31/3/2025
+                        </govuk-input-hint>
+                        <govuk-input-after-input>
+                            <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                        </govuk-input-after-input>
+                    </govuk-input>
+                </div>
             </form>
-            <table class="govuk-table">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                            sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference, direction))">
-                            Task ID
-                        </th>
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                            sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.Name ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(OneLoginIdVerificationSupportTasksSortByOption.Name, direction))">
-                            Name
-                        </th>
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                            sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, direction))">
-                            Requested on
-                        </th>
-                        <th scope="col" class="govuk-table__header"
-                            sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.Email ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(OneLoginIdVerificationSupportTasksSortByOption.Email, direction))">
-                            Email address
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @foreach (var result in Model.Results!)
-                    {
-                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                            <th scope="row" class="govuk-table__header" data-testid="taskId">
-                                <a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
-                                    @result.SupportTaskReference
-                                </a>
+        </div>
+        <div class="govuk-grid-column-full">
+            @if (Model.Results!.Count == 0)
+            {
+                <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
+                    No matching requests found
+                </p>
+                <p class="govuk-body-m">Try searching again with different details.</p>
+            }
+            else
+            {
+                <table class="govuk-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference, direction))">
+                                Task ID
                             </th>
-                            <td class="govuk-table__cell" data-testid="name">@result.Name</td>
-                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
-                            <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.Name ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.Name, direction))">
+                                Name
+                            </th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, direction))">
+                                Requested on
+                            </th>
+                            <th scope="col" class="govuk-table__header"
+                                sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.Email ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.Email, direction))">
+                                Email address
+                            </th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-            <partial name="_Pagination" model=@Model.Pagination />
-        }
-    </div>
+                    </thead>
+                    <tbody class="govuk-table__body" data-testid="results">
+                        @foreach (var result in Model.Results!)
+                        {
+                            <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                                <th scope="row" class="govuk-table__header" data-testid="taskId">
+                                    <a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
+                                        @result.SupportTaskReference
+                                    </a>
+                                </th>
+                                <td class="govuk-table__cell" data-testid="name">@result.Name</td>
+                                <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                                <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <partial name="_Pagination" model=@Model.Pagination />
+            }
+        </div>
+    }
 </div>

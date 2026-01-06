@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -318,8 +319,12 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<OneLoginIdVerificationSupportTasksSearchResult> SearchOneLoginIdVerificationSupportTasksAsync(SearchOneLoginUserIdVerificationSupportTasksOptions options, PaginationOptions paginationOptions)
+    public async Task<OneLoginIdVerificationSupportTasksSearchResult> SearchOneLoginIdVerificationSupportTasksAsync(OneLoginUserIdVerificationSupportTasksOptions searchOptions, PaginationOptions paginationOptions)
     {
+        var search = searchOptions.Search?.Trim() ?? string.Empty;
+        var sortBy = searchOptions.SortBy ?? OneLoginIdVerificationSupportTasksSortByOption.RequestedOn;
+        var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
+
         var tasks = await dbContext.SupportTasks
             .Include(t => t.OneLoginUser)
             .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
@@ -336,22 +341,50 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 r.CreatedOn))
             .AsQueryable();
 
-        var orderedResults = (options.SortBy switch
+        if (SearchTextIsDate(search, out var minDate, out var maxDate))
         {
-            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => results.OrderBy(r => r.SupportTaskReference, options.SortDirection),
+            results = results.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
+        }
+        else if (SearchTextIsEmailAddress(search, out var email))
+        {
+            results = results.Where(t =>
+                t.EmailAddress != null && string.Equals(t.EmailAddress, email, StringComparison.OrdinalIgnoreCase));
+        }
+        else if (SearchTextIsReferenceId(search, out var referenceId))
+        {
+            results = results.Where(t =>
+                string.Equals(t.SupportTaskReference, referenceId, StringComparison.OrdinalIgnoreCase));
+        }
+        else if (SearchTextIsName(search, out var nameParts))
+        {
+            results = results.Where(t =>
+                nameParts.All(n => (new string[] { t.FirstName.ToLower(), t.LastName.ToLower() }).Contains(n.ToLower())));
+        }
+
+        var totalFilteredTaskCount = results.Count();
+
+        var orderedResults = (searchOptions.SortBy switch
+        {
+            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => results.OrderBy(r => r.SupportTaskReference, sortDirection),
             OneLoginIdVerificationSupportTasksSortByOption.Name => results
-                .OrderBy(r => r.FirstName, options.SortDirection)
-                .ThenBy(r => r.LastName, options.SortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, options.SortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, options.SortDirection),
+                .OrderBy(r => r.FirstName, sortDirection)
+                .ThenBy(r => r.LastName, sortDirection),
+            OneLoginIdVerificationSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, sortDirection),
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection),
             _ => results
-        }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, taskCount);
+        }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
 
         return new()
         {
             TotalTaskCount = taskCount,
             SearchResults = orderedResults
         };
+    }
+
+    private bool SearchTextIsReferenceId(string searchText, [NotNullWhen(true)] out string? referenceId)
+    {
+        referenceId = searchText.Contains("TRS-", StringComparison.OrdinalIgnoreCase) ? searchText : null;
+        return referenceId is not null;
     }
 
     private bool SearchTextIsDate(string searchText, out DateTime minDate, out DateTime maxDate)

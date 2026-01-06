@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
@@ -229,15 +230,98 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultRow = doc.GetElementByTestId("results")
-            ?.GetElementsByTagName("tbody")
-            .FirstOrDefault()
-            ?.GetElementsByTagName("tr")
-            .FirstOrDefault();
+        var resultRows = doc.GetElementByTestId("results")?
+            .QuerySelectorAll("tbody > tr");
 
-        Assert.NotNull(resultRow);
-        var nameLink = resultRow.GetElementByTestId("taskId")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
+        Assert.NotNull(resultRows);
+        var nameLink = resultRows[0].GetElementByTestId("taskId")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
         Assert.Contains($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve", nameLink!.Href);
+    }
+
+    [Theory]
+    [InlineData("Smith", new[] { "Alphie Smith", "Colin Smith" })]
+    [InlineData("bert", new[] { "Bert Johnson" })]
+    [InlineData("Colin smith", new[] { "Colin Smith" })]
+    [InlineData("Aaron@example.com", new[] { "Alphie Smith", "Bert Johnson", "Colin Smith" })]
+    [InlineData("21 Jan 2025", new[] { "Colin Smith" })]
+    [InlineData("20/1/2025", new[] { "Alphie Smith", "Bert Johnson" })]
+    public async Task Get_Search_ShowsMatchingResult(string search, string[] expected)
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+        var supportTasksList = new List<SupportTask>
+        {
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Alphie").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2025,1,20))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Bert").WithStatedLastName("Johnson").WithCreatedOn(new DateTime(2025,1,20))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Colin").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2025,1,21)))
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?Search={search}&sortBy={OneLoginIdVerificationSupportTasksSortByOption.Name}&sortDirection={SortDirection.Ascending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expected, doc.GetElementByTestId("results")!
+            .QuerySelectorAll("tbody > tr")
+            .Select(row => row.GetElementByTestId("name")!.TrimmedText())
+            .ToArray());
+    }
+
+    [Fact]
+    public async Task Get_SearchByReference_ShowsMatchingResult()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+        var supportTasksList = new List<SupportTask>
+        {
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Alphie").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2025,1,20))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Bert").WithStatedLastName("Johnson").WithCreatedOn(new DateTime(2025,1,20))),
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Colin").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2025,1,21)))
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?Search={supportTasksList[0].SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal([supportTasksList[0].SupportTaskReference], doc.GetElementByTestId("results")!
+            .QuerySelectorAll("tbody > tr")
+            .Select(row => row.GetElementByTestId("taskId")!.TrimmedText())
+            .ToArray());
+    }
+
+    [Fact]
+    public async Task Get_Search_NoMatchingResult_ShowsMessage()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+        var supportTasksList = new List<SupportTask>
+        {
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Alphie").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2025,1,20))),
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?Search=bert");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("results"));
+        Assert.Null(doc.QuerySelector(".govuk-pagination"));
+        Assert.NotNull(doc.GetElementByTestId("search"));
+        Assert.NotNull(doc.GetElementByTestId("no-results-message"));
     }
 
     [Fact]
@@ -252,10 +336,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultSection = doc.GetElementByTestId("results");
-        Assert.NotNull(resultSection);
-        Assert.NotNull(resultSection.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("search"));
+        Assert.Null(doc.GetElementByTestId("results"));
         Assert.Null(doc.QuerySelector(".govuk-pagination"));
+        Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
     }
 
     private static void AssertRowHasContent(IElement row, string testId, string expectedText)
