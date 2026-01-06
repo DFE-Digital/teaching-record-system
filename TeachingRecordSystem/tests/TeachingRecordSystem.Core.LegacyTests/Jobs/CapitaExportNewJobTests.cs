@@ -1086,10 +1086,10 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         Assert.Equal(expectedFailureCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedDuplicateCount, integrationTransaction.DuplicateCount);
         Assert.NotEmpty(integrationTransaction.FileName);
-        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent1, person1));
-        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow1, person1));
-        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent2, person2));
-        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow2, person2));
+        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent1, person1.Person));
+        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow1, person1.Person));
+        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent2, person2.Person));
+        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow2, person2.Person));
     }
 
     [Fact]
