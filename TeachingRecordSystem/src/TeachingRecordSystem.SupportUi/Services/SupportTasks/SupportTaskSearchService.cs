@@ -375,7 +375,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         return new()
         {
-            TotalTaskCount = totalFilteredTaskCount,
+            TotalTaskCount = taskCount,
             SearchResults = orderedResults
         };
     }

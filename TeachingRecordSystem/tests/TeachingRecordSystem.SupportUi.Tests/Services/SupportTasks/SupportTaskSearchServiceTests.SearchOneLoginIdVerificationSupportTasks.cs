@@ -144,6 +144,7 @@ public partial class SupportTaskSearchServiceTests
 
         // Assert
         Assert.Equal(expectedResultCount, results.SearchResults.Count);
+        Assert.Equal(5, results.TotalTaskCount);
         Assert.Equal(2, results.SearchResults.LastPage);
         Assert.Equal(3, results.SearchResults.TotalItemCount);
         Assert.Equal(expectedRecords, results.SearchResults.Select(r => r.FirstName));

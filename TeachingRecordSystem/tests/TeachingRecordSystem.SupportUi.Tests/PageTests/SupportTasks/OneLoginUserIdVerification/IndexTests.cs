@@ -304,6 +304,30 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_Search_NoMatchingResult_ShowsMessage()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+        var supportTasksList = new List<SupportTask>
+        {
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
+                configure.WithStatedFirstName("Alphie").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2025,1,20))),
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?Search=bert");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("results"));
+        Assert.Null(doc.QuerySelector(".govuk-pagination"));
+        Assert.NotNull(doc.GetElementByTestId("search"));
+        Assert.NotNull(doc.GetElementByTestId("no-results-message"));
+    }
+
+    [Fact]
     public async Task Get_NoTasks_ShowsNoTasksMessage()
     {
         // Arrange
@@ -315,10 +339,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var resultSection = doc.GetElementByTestId("results");
-        Assert.NotNull(resultSection);
-        Assert.NotNull(resultSection.GetElementByTestId("no-tasks-message"));
+        Assert.Null(doc.GetElementByTestId("search"));
+        Assert.Null(doc.GetElementByTestId("results"));
         Assert.Null(doc.QuerySelector(".govuk-pagination"));
+        Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
     }
 
     private static void AssertRowHasContent(IElement row, string testId, string expectedText)
