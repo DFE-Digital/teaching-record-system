@@ -947,7 +947,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         };
         dbContext.JobMetadata.Add(jobMetaData);
         await dbContext.SaveChangesAsync();
-
         var originalastName1 = Faker.Name.Last();
         var updateLastName1 = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
@@ -955,7 +954,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             x.WithLastName(originalastName1);
             x.WithGender(Gender.Male);
         });
-
         var originalastName2 = Faker.Name.Last();
         var updateLastName2 = Faker.Name.Last();
         var person2 = await TestData.CreatePersonAsync(x =>
@@ -963,13 +961,13 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             x.WithLastName(originalastName2);
             x.WithGender(Gender.Male);
         });
-
+        var trsPerson1 = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+        var trsPerson2 = await dbContext.Persons.FirstAsync(x => x.PersonId == person2.PersonId);
         var personService = new PersonService(
             dbContext,
             Clock,
             Mock.Of<IEventPublisher>());
-
-        var processContext1 = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
             new PersonDetails()
@@ -984,7 +982,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             }.UpdateAll(),
             new() { Reason = PersonNameChangeReason.DeedPollOrOtherLegalProcess },
             new() { Reason = PersonDetailsChangeReason.AnotherReason }),
-            processContext1);
+            processContext);
         var nameChangeEvent1 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
@@ -1032,10 +1030,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = updateresult2.Changes.ToLegacyPersonDetailsUpdatedEventChanges()
         };
-
         dbContext.AddEventWithoutBroadcast(nameChangeEvent1);
         dbContext.AddEventWithoutBroadcast(nameChangeEvent2);
-
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -1043,37 +1039,37 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
 
         // Assert
         var integrationTransaction = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleAsync(x => x.IntegrationTransactionId == integrationTransactionJobId);
-        var expectedNewRowContent1 = $"{person1.Trn}" +
-            $"{(int)person1.Gender!}" +
+        var expectedNewRowContent1 = $"{trsPerson1.Trn}" +
+            $"{(int)trsPerson1.Gender!}" +
             $"{new string(' ', 9)}" +
-            $"{person1.DateOfBirth!.ToString("ddMMyy")}" +
+            $"{trsPerson1.DateOfBirth!.Value.ToString("ddMMyy")}" +
             $"{new string(' ', 1)}" +
-            $"{person1.LastName.PadRight(17)}" +
+            $"{trsPerson1.LastName.PadRight(17)}" +
             $"{new string('1', 1)}" +
-            $"{person1.FirstName} {person1.MiddleName}".PadRight(35) +
+            $"{trsPerson1.FirstName} {trsPerson1.MiddleName}".PadRight(35) +
             $"{new string(' ', 1)}" +
             $"{"1018Z981"}";
 
-        var expectedNameChangeRow1 = $"{person1.Trn}" +
-            $"{(int)person1.Gender}" +
+        var expectedNameChangeRow1 = $"{trsPerson1.Trn}" +
+            $"{(int)trsPerson1.Gender}" +
             $"{new string(' ', 9)}" +
             $"{originalastName1.PadRight(54, ' ')}" +
             $"{new string(' ', 7)}" +
             $"{"2018Z981"}";
 
-        var expectedNewRowContent2 = $"{person2.Trn}" +
-            $"{(int)person2.Gender!}" +
+        var expectedNewRowContent2 = $"{trsPerson2.Trn}" +
+            $"{(int)trsPerson2.Gender!}" +
             $"{new string(' ', 9)}" +
-            $"{person2.DateOfBirth!.ToString("ddMMyy")}" +
+            $"{trsPerson2.DateOfBirth!.Value.ToString("ddMMyy")}" +
             $"{new string(' ', 1)}" +
-            $"{person2.LastName.PadRight(17)}" +
+            $"{trsPerson2.LastName.PadRight(17)}" +
             $"{new string('1', 1)}" +
-            $"{person2.FirstName} {person2.MiddleName}".PadRight(35) +
+            $"{trsPerson2.FirstName} {trsPerson2.MiddleName}".PadRight(35) +
             $"{new string(' ', 1)}" +
             $"{"1018Z981"}";
 
-        var expectedNameChangeRow2 = $"{person2.Trn}" +
-            $"{(int)person2.Gender}" +
+        var expectedNameChangeRow2 = $"{trsPerson2.Trn}" +
+            $"{(int)trsPerson2.Gender}" +
             $"{new string(' ', 9)}" +
             $"{originalastName2.PadRight(54, ' ')}" +
             $"{new string(' ', 7)}" +
@@ -1086,10 +1082,10 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         Assert.Equal(expectedFailureCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedDuplicateCount, integrationTransaction.DuplicateCount);
         Assert.NotEmpty(integrationTransaction.FileName);
-        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent1, person1.Person));
-        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow1, person1.Person));
-        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent2, person2.Person));
-        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow2, person2.Person));
+        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent1, trsPerson1));
+        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow1, trsPerson1));
+        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent2, trsPerson2));
+        Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow2, trsPerson2));
     }
 
     [Fact]
