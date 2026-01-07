@@ -24,7 +24,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -106,7 +106,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -151,7 +151,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -262,7 +262,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -317,7 +317,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -375,7 +375,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -438,7 +438,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -499,7 +499,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     Array.Empty<PersonMatchedAttribute>()
                 )).ToArray());
@@ -536,7 +536,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -572,7 +572,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -610,7 +610,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -648,7 +648,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -689,7 +689,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -731,7 +731,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -816,7 +816,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                      new[]
                      {
@@ -894,7 +894,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                      [
                         PersonMatchedAttribute.FirstName,
@@ -934,7 +934,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -973,7 +973,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -1009,7 +1009,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -1047,7 +1047,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -1091,7 +1091,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -1137,7 +1137,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -1189,7 +1189,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -1241,7 +1241,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -1300,7 +1300,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
     private async Task<JourneyInstance<ResolveNpqTrnRequestState>> CreateJourneyInstance(
         SupportTask supportTask,
-        MatchPersonResult[] matchedPersons,
+        MatchPersonsResultPerson[] matchedPersons,
         bool useFactory = true)
     {
         var state = useFactory

@@ -42,7 +42,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -83,7 +83,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -126,7 +126,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersons = [new MatchPersonResult(
+            MatchedPersons = [new MatchPersonsResultPerson(
                 matchedPerson.PersonId,
                     new[]
                     {
@@ -206,7 +206,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -245,7 +245,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -287,7 +287,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -328,7 +328,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -380,7 +380,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -428,7 +428,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -469,7 +469,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -518,7 +518,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersons = [new MatchPersonResult(
+            MatchedPersons = [new MatchPersonsResultPerson(
                 matchedPerson.PersonId,
                     new[]
                     {
@@ -672,7 +672,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersons = [new MatchPersonResult(
+            MatchedPersons = [new MatchPersonsResultPerson(
                 matchedPerson.PersonId,
                     new[]
                     {
@@ -729,7 +729,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState
         {
-            MatchedPersons = [new MatchPersonResult(
+            MatchedPersons = [new MatchPersonsResultPerson(
                 matchedPerson.PersonId,
                 new[]
                 {
@@ -807,7 +807,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,

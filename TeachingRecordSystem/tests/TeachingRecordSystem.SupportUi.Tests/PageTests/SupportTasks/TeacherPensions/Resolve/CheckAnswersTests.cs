@@ -72,7 +72,7 @@ public class CheckAnswers : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.TrnRequest,
             MiddleNameSource = PersonAttributeSource.ExistingRecord,
@@ -154,7 +154,7 @@ public class CheckAnswers : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             DateOfBirthSource = PersonAttributeSource.ExistingRecord,
             FirstNameSource = PersonAttributeSource.ExistingRecord,
@@ -208,7 +208,7 @@ public class CheckAnswers : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.TrnRequest,
             MiddleNameSource = PersonAttributeSource.TrnRequest,

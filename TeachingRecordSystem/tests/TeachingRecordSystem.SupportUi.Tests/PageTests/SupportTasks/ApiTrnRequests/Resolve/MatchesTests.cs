@@ -55,7 +55,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -100,7 +100,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -197,7 +197,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -235,7 +235,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -273,7 +273,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -314,7 +314,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -356,7 +356,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -410,7 +410,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -483,7 +483,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -546,7 +546,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -607,7 +607,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     Array.Empty<PersonMatchedAttribute>()
                 )).ToArray());
@@ -678,7 +678,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                      new[]
                      {
@@ -756,7 +756,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                      [
                         PersonMatchedAttribute.FirstName,
@@ -796,7 +796,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -835,7 +835,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -871,7 +871,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -909,7 +909,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -953,7 +953,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             matchedPersonIds.Select(
-                p => new MatchPersonResult(
+                p => new MatchPersonsResultPerson(
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -999,7 +999,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -1057,7 +1057,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -1119,7 +1119,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
     private async Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(
         SupportTask supportTask,
-        MatchPersonResult[] matchedPersons,
+        MatchPersonsResultPerson[] matchedPersons,
         bool useFactory = true)
     {
         var state = useFactory

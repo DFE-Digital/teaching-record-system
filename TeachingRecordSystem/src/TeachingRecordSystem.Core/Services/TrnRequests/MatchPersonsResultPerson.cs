@@ -1,5 +1,5 @@
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
-public record MatchPersonResult(
+public record MatchPersonsResultPerson(
     Guid PersonId,
     IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes);

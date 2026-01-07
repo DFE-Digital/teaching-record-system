@@ -5,14 +5,14 @@ public sealed record MatchPersonsResult
     private readonly Guid _personId;
     private readonly string? _trn;
     private readonly PersonMatchedAttribute[] _matchedAttributes;
-    private readonly MatchPersonResult[] _potentialMatches;
+    private readonly MatchPersonsResultPerson[] _potentialMatches;
 
     private MatchPersonsResult(
         MatchPersonsResultOutcome outcome,
         Guid personId,
         string? trn,
         IEnumerable<PersonMatchedAttribute> matchedAttributes,
-        IEnumerable<MatchPersonResult> potentialMatches)
+        IEnumerable<MatchPersonsResultPerson> potentialMatches)
     {
         Outcome = outcome;
         _personId = personId;
@@ -22,17 +22,17 @@ public sealed record MatchPersonsResult
     }
 
     public static MatchPersonsResult NoMatches() =>
-        new(MatchPersonsResultOutcome.NoMatches, Guid.Empty, null, Array.Empty<PersonMatchedAttribute>(), Array.Empty<MatchPersonResult>());
+        new(MatchPersonsResultOutcome.NoMatches, Guid.Empty, null, Array.Empty<PersonMatchedAttribute>(), Array.Empty<MatchPersonsResultPerson>());
 
-    public static MatchPersonsResult PotentialMatches(IEnumerable<MatchPersonResult> potentialMatches) =>
+    public static MatchPersonsResult PotentialMatches(IEnumerable<MatchPersonsResultPerson> potentialMatches) =>
         new(MatchPersonsResultOutcome.PotentialMatches, Guid.Empty, null, Array.Empty<PersonMatchedAttribute>(), potentialMatches);
 
     public static MatchPersonsResult DefiniteMatch(Guid personId, string trn, IEnumerable<PersonMatchedAttribute> matchedAttributes) =>
-        new(MatchPersonsResultOutcome.DefiniteMatch, personId, trn, matchedAttributes, Array.Empty<MatchPersonResult>());
+        new(MatchPersonsResultOutcome.DefiniteMatch, personId, trn, matchedAttributes, Array.Empty<MatchPersonsResultPerson>());
 
     public MatchPersonsResultOutcome Outcome { get; }
 
-    public IReadOnlyCollection<MatchPersonResult> Matches
+    public IReadOnlyCollection<MatchPersonsResultPerson> Matches
     {
         get
         {

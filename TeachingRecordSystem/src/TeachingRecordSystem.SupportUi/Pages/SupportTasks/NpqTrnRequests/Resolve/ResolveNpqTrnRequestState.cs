@@ -15,7 +15,7 @@ public class ResolveNpqTrnRequestState : IRegisterJourney
         ["supportTaskReference"],
         appendUniqueKey: true);
 
-    public required IReadOnlyCollection<MatchPersonResult> MatchedPersons { get; init; }
+    public required IReadOnlyCollection<MatchPersonsResultPerson> MatchedPersons { get; init; }
     public MatchPersonsResultOutcome MatchOutcome { get; set; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
@@ -46,7 +46,7 @@ public class ResolveNpqTrnRequestStateFactory(TrnRequestService trnRequestServic
             MatchOutcome = matchResult.Outcome,
             MatchedPersons = matchResult.Outcome switch
             {
-                MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonResult(matchResult.PersonId, matchResult.MatchedAttributes)],
+                MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonsResultPerson(matchResult.PersonId, matchResult.MatchedAttributes)],
                 MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.ToArray(),
                 _ => []
             }

@@ -532,7 +532,7 @@ public class TrnRequestService(
             new(name, NpgsqlDbType.Array | NpgsqlDbType.Varchar) { Value = values.ToArray() };
     }
 
-    private MatchPersonResult GetMatchedPerson(TrnRequestMatchQueryResult result) =>
+    private MatchPersonsResultPerson GetMatchedPerson(TrnRequestMatchQueryResult result) =>
         new(
             PersonId: result.person_id,
             MatchedAttributes: GetMatchedAttributes(result)

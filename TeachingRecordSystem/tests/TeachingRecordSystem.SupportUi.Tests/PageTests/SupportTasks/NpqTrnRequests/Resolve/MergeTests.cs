@@ -25,7 +25,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -65,7 +65,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -105,7 +105,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -218,7 +218,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(
+                MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -261,7 +261,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(
+                MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -304,7 +304,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -343,7 +343,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -386,7 +386,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             new ResolveNpqTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -485,7 +485,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId
             });
 
@@ -535,7 +535,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId
             });
 

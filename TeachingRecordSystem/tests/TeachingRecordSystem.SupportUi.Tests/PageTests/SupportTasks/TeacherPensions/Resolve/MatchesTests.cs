@@ -85,7 +85,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
             [
-                new MatchPersonResult(
+                new MatchPersonsResultPerson(
                     duplicatePerson1.PersonId,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -93,7 +93,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                         PersonMatchedAttribute.LastName,
                         PersonMatchedAttribute.NationalInsuranceNumber
                     ]),
-                new MatchPersonResult(
+                new MatchPersonsResultPerson(
                     duplicatePerson2.PersonId,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -148,7 +148,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            [new MatchPersonResult(
+            [new MatchPersonsResultPerson(
                 duplicatePerson1.PersonId,
                 [
                     PersonMatchedAttribute.FirstName,
@@ -200,7 +200,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            [new MatchPersonResult(
+            [new MatchPersonsResultPerson(
                 duplicatePerson1.PersonId,
                 [
                     PersonMatchedAttribute.FirstName,
@@ -273,7 +273,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            [new MatchPersonResult(
+            [new MatchPersonsResultPerson(
                 matchedPerson.PersonId,
                 new[]
                 {
@@ -349,7 +349,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            [new MatchPersonResult(
+            [new MatchPersonsResultPerson(
                 matchedPerson.PersonId,
                 [
                     PersonMatchedAttribute.FirstName,
@@ -401,7 +401,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            [new MatchPersonResult(
+            [new MatchPersonsResultPerson(
                 duplicatePerson1.PersonId,
                 [
                     PersonMatchedAttribute.FirstName,
@@ -450,7 +450,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            [new MatchPersonResult(
+            [new MatchPersonsResultPerson(
                 duplicatePerson1.PersonId,
                 [
                     PersonMatchedAttribute.FirstName,
@@ -500,7 +500,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            [new MatchPersonResult(
+            [new MatchPersonsResultPerson(
                 duplicatePerson1.PersonId,
                 [
                     PersonMatchedAttribute.FirstName,
@@ -554,7 +554,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
-            [new MatchPersonResult(
+            [new MatchPersonsResultPerson(
                 duplicatePerson1.PersonId,
                 [
                     PersonMatchedAttribute.FirstName,
@@ -601,7 +601,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private async Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
         SupportTask supportTask,
-        MatchPersonResult[] matchedPersons,
+        MatchPersonsResultPerson[] matchedPersons,
         bool useFactory = true)
     {
         var state = useFactory

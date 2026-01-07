@@ -53,7 +53,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])]
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])]
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
 
@@ -107,7 +107,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])]
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])]
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
 
@@ -161,7 +161,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])]
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])]
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/keep-record-separate/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");

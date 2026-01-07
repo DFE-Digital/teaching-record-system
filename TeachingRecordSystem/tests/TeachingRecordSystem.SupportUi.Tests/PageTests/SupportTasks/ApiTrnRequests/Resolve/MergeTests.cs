@@ -148,7 +148,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.TrnRequest,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,
@@ -188,7 +188,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.ExistingRecord,
                 MiddleNameSource = PersonAttributeSource.ExistingRecord,
@@ -228,7 +228,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -382,7 +382,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(matchedPerson.PersonId, [])],
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId
             });
 

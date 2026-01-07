@@ -40,7 +40,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -81,7 +81,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -124,7 +124,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var state = new ResolveApiTrnRequestState
         {
-            MatchedPersons = [new MatchPersonResult(
+            MatchedPersons = [new MatchPersonsResultPerson(
                 matchedPerson.PersonId,
                     new[]
                     {
@@ -204,7 +204,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -243,7 +243,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -282,7 +282,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -322,7 +322,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -364,7 +364,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -405,7 +405,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -451,7 +451,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -502,7 +502,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -543,7 +543,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             new ResolveApiTrnRequestState
             {
                 MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonResult(
+                    p => new MatchPersonsResultPerson(
                         p,
                         [
                             PersonMatchedAttribute.FirstName,
@@ -590,7 +590,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(
+                MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -674,7 +674,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(
+                MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -755,7 +755,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(
+                MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
                         PersonMatchedAttribute.FirstName,
@@ -809,7 +809,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                MatchedPersons = [new MatchPersonResult(
+                MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
                         PersonMatchedAttribute.FirstName,

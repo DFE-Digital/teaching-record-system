@@ -71,7 +71,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
 
@@ -166,7 +166,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
@@ -211,7 +211,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
@@ -259,7 +259,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
@@ -306,7 +306,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
@@ -371,7 +371,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);

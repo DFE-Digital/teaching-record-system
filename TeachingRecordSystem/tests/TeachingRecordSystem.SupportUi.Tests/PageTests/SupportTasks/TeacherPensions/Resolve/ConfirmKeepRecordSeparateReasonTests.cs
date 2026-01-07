@@ -68,7 +68,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             Reason = "THIS IS A DIFFERENT RECORD",
             KeepSeparateReason = KeepingRecordSeparateReason.AnotherReason
         };
@@ -112,7 +112,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch,
             Reason = null
         };
@@ -156,7 +156,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
@@ -241,7 +241,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonResult(duplicatePerson1.PersonId, [])],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             KeepSeparateReason = KeepingRecordSeparateReason.AnotherReason,
             Reason = keepReason
         };
