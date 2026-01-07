@@ -51,9 +51,43 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         // Set up two potential matched records to merge with
-        var (supportTask, requestData, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var emailAddress = TestData.GenerateUniqueEmail();
+
+        var matchedPerson1 = await TestData.CreatePersonAsync(p =>
+        {
+            p.WithFirstName(firstName);
+            p.WithMiddleName(middleName);
+            p.WithLastName(lastName);
+            p.WithDateOfBirth(dateOfBirth);
+            p.WithEmailAddress(emailAddress);
+        });
+
+        var matchedPerson2 = await TestData.CreatePersonAsync(p =>
+        {
+            p.WithFirstName(firstName);
+            p.WithMiddleName(TestData.GenerateChangedMiddleName(middleName));
+            p.WithLastName(lastName);
+            p.WithDateOfBirth(dateOfBirth);
+        });
+
+        var (supportTask, requestData, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t
+                .WithMatchedPersons(matchedPerson1.PersonId, matchedPerson2.PersonId)
+                .WithStatus(SupportTaskStatus.Open)
+                .WithFirstName(firstName)
+                .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
+                .WithLastName(lastName)
+                .WithDateOfBirth(dateOfBirth)
+                .WithGender(matchedPerson1.Gender)
+                .WithEmailAddress(emailAddress)
+            );
+
         var supportTaskReference = supportTask.SupportTaskReference;
-        var matchedPersonA = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == matchedPersonIds[0]));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -88,9 +122,9 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and update existing record");
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", $"TRN request for {StringHelper.JoinNonEmpty(' ', matchedPersonA.FirstName, matchedPersonA.MiddleName, matchedPersonA.LastName)} completed");
+        await page.AssertBannerAsync("Success", $"TRN request for {StringHelper.JoinNonEmpty(' ', matchedPerson1.FirstName, matchedPerson1.MiddleName, matchedPerson1.LastName)} completed");
 
-        await page.AssertBannerLinksToPersonRecord(matchedPersonA.PersonId);
+        await page.AssertBannerLinksToPersonRecord(matchedPerson1.PersonId);
     }
 
     [Fact]
