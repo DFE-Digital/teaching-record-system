@@ -25,7 +25,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         return supportTask;
-    }    
+    }
 
     protected IReadOnlyCollection<PersonMatchedAttribute> GetAttributesToUpdate()
     {

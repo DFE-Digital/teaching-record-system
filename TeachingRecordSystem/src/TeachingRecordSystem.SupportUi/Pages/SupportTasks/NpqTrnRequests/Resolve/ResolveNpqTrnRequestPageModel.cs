@@ -109,7 +109,7 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
                 yield return PersonMatchedAttribute.Gender;
             }
         }
-    }    
+    }
 
     protected NpqTrnRequestDataPersonAttributes GetResolvedPersonAttributes(
         NpqTrnRequestDataPersonAttributes? selectedPersonAttributes)
