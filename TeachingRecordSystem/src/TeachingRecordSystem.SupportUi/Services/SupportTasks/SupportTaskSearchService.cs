@@ -370,7 +370,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 .OrderBy(r => r.FirstName, sortDirection)
                 .ThenBy(r => r.LastName, sortDirection),
             OneLoginIdVerificationSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, sortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection),
+            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection).ThenBy(r => r.SupportTaskReference, sortDirection),
             _ => results
         }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
 

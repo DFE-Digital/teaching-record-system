@@ -32,7 +32,7 @@ public class Index(SupportTaskSearchService searchService, SupportUiLinkGenerato
     public async Task OnGetAsync()
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
-        var sortBy = SortBy ?? OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference;
+        var sortBy = SortBy ?? OneLoginIdVerificationSupportTasksSortByOption.RequestedOn;
         var searchOptions = new OneLoginUserIdVerificationSupportTasksOptions(Search, sortBy, sortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
