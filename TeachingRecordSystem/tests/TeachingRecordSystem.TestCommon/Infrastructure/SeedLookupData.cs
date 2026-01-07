@@ -7,7 +7,10 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
 {
     Task IStartupTask.ExecuteAsync()
     {
-        return AddTrainingProvidersAsync();
+        return Task.WhenAll(
+            AddTrainingProvidersAsync(),
+            AddNameSynonymsAsync()
+        );
     }
 
     public static async Task EnsureTestTrainingProvidersAsync(TrsDbContext dbContext)
@@ -55,6 +58,33 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
         await dbContext.SaveChangesAsync();
     }
 
+    public static async Task EnsureNameSynonymsAsync(TrsDbContext dbContext)
+    {
+        NameSynonyms[] nameSynonyms = [
+            new NameSynonyms()
+            {
+                Name = "Andrew",
+                Synonyms = ["Andy", "Drew"]
+            },
+            new NameSynonyms()
+            {
+                Name = "Elizabeth",
+                Synonyms = ["Liz", "Lizzy", "Beth", "Eliza"]
+            },
+
+        ];
+        var synonymNames = nameSynonyms.Select(s => s.Name).ToHashSet();
+
+        var existingSynonymNames = await dbContext.NameSynonyms
+            .Where(s => synonymNames.Contains(s.Name))
+            .Select(s => s.Name)
+            .ToListAsync();
+
+        dbContext.NameSynonyms.AddRange(nameSynonyms.Where(s => !existingSynonymNames.Contains(s.Name)));
+
+        await dbContext.SaveChangesAsync();
+    }
+
     private async Task AddTrainingProvidersAsync()
     {
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
@@ -65,5 +95,17 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
         }
 
         await EnsureTestTrainingProvidersAsync(dbContext);
+    }
+
+    private async Task AddNameSynonymsAsync()
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        if (await dbContext.NameSynonyms.AnyAsync())
+        {
+            return;
+        }
+
+        await EnsureNameSynonymsAsync(dbContext);
     }
 }

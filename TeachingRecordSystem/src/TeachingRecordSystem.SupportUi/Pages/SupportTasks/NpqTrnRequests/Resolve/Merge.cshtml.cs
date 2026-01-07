@@ -97,36 +97,35 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             context.Result = Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
-        var personAttributes = await GetPersonAttributesAsync(personId);
 
-        var attributeMatches = GetPersonAttributeMatches(
-            personAttributes.FirstName,
-            personAttributes.MiddleName,
-            personAttributes.LastName,
-            personAttributes.DateOfBirth,
-            personAttributes.EmailAddress,
-            personAttributes.NationalInsuranceNumber,
-            personAttributes.Gender);
+        var personAttributes = await GetPersonAttributesAsync(personId);
+        var attributeMatches = JourneyInstance!.State.MatchedPersons
+            .Single(m => m.PersonId == personId)
+            .MatchedAttributes;
 
         DateOfBirth = new PersonAttribute<DateOnly?>(
             personAttributes.DateOfBirth,
             requestData.DateOfBirth,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
+            Different: personAttributes.DateOfBirth != requestData.DateOfBirth,
+            Highlight: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
 
         EmailAddress = new PersonAttribute<string?>(
             personAttributes.EmailAddress,
             requestData.EmailAddress,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.EmailAddress));
+            Different: !(personAttributes.EmailAddress == requestData.EmailAddress || (string.IsNullOrEmpty(personAttributes.EmailAddress) && string.IsNullOrEmpty(requestData.EmailAddress))),
+            Highlight: !(attributeMatches.Contains(PersonMatchedAttribute.EmailAddress) || (string.IsNullOrEmpty(personAttributes.EmailAddress) && string.IsNullOrEmpty(requestData.EmailAddress))));
 
         NationalInsuranceNumber = new PersonAttribute<string?>(
             personAttributes.NationalInsuranceNumber,
             requestData.NationalInsuranceNumber,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+            Different: !(personAttributes.NationalInsuranceNumber == requestData.NationalInsuranceNumber || (string.IsNullOrEmpty(personAttributes.NationalInsuranceNumber) && string.IsNullOrEmpty(requestData.NationalInsuranceNumber))),
+            Highlight: !(attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber) || (string.IsNullOrEmpty(personAttributes.NationalInsuranceNumber) && string.IsNullOrEmpty(requestData.NationalInsuranceNumber))));
 
         Gender = new PersonAttribute<Gender?>(
             personAttributes.Gender,
             requestData.Gender,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
+            Different: !(personAttributes.Gender == requestData.Gender || (personAttributes.Gender is null && requestData.Gender is null)),
+            Highlight: !(attributeMatches.Contains(PersonMatchedAttribute.Gender) || (personAttributes.Gender is null && requestData.Gender is null)));
 
         PersonName = StringHelper.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
 
@@ -136,6 +135,6 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     }
 
 #pragma warning disable CA1711
-    public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different);
+    public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different, bool Highlight);
 #pragma warning restore CA1711
 }

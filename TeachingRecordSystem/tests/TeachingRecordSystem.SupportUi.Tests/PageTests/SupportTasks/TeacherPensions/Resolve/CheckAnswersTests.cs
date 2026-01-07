@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.PersonDetailsUpdatedEvent;
@@ -27,7 +28,10 @@ public class CheckAnswers : TestBase
     {
         // Arranges
         var taskReference = "1234567";
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [] };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = []
+        };
         var journeyInstance = await CreateJourneyInstance(taskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -68,7 +72,7 @@ public class CheckAnswers : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersonIds = [duplicatePerson1.PersonId],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.TrnRequest,
             MiddleNameSource = PersonAttributeSource.ExistingRecord,
@@ -150,7 +154,7 @@ public class CheckAnswers : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersonIds = [duplicatePerson1.PersonId],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             DateOfBirthSource = PersonAttributeSource.ExistingRecord,
             FirstNameSource = PersonAttributeSource.ExistingRecord,
@@ -204,7 +208,7 @@ public class CheckAnswers : TestBase
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersonIds = [duplicatePerson1.PersonId],
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.TrnRequest,
             MiddleNameSource = PersonAttributeSource.TrnRequest,

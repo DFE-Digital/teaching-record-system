@@ -15,7 +15,7 @@ public class ResolveApiTrnRequestState : IRegisterJourney
         ["supportTaskReference"],
         appendUniqueKey: true);
 
-    public required IReadOnlyCollection<Guid> MatchedPersonIds { get; init; }
+    public required IReadOnlyCollection<MatchPersonsResultPerson> MatchedPersons { get; init; } = [];
     public MatchPersonsResultOutcome MatchOutcome { get; set; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
@@ -47,10 +47,10 @@ public class ResolveApiTrnRequestStateFactory(TrnRequestService trnRequestServic
         var state = new ResolveApiTrnRequestState
         {
             MatchOutcome = matchResult.Outcome,
-            MatchedPersonIds = matchResult.Outcome switch
+            MatchedPersons = matchResult.Outcome switch
             {
-                MatchPersonsResultOutcome.DefiniteMatch => [matchResult.PersonId],
-                MatchPersonsResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds,
+                MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonsResultPerson(matchResult.PersonId, matchResult.MatchedAttributes)],
+                MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.ToArray(),
                 _ => []
             }
         };

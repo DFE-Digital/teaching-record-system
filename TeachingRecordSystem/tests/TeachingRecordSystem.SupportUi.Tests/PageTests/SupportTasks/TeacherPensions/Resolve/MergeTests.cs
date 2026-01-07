@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
 
@@ -68,7 +69,12 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], PersonId = duplicatePerson1.PersonId };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = duplicatePerson1.PersonId
+        };
+
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -158,7 +164,11 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], PersonId = duplicatePerson1.PersonId };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = duplicatePerson1.PersonId
+        };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -199,7 +209,11 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], PersonId = duplicatePerson1.PersonId };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = duplicatePerson1.PersonId
+        };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -243,7 +257,11 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], PersonId = duplicatePerson1.PersonId };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = duplicatePerson1.PersonId
+        };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -286,7 +304,11 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], PersonId = duplicatePerson1.PersonId };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = duplicatePerson1.PersonId
+        };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -347,7 +369,11 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], PersonId = duplicatePerson1.PersonId };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = duplicatePerson1.PersonId
+        };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {

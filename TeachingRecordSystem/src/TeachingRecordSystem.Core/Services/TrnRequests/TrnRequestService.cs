@@ -419,7 +419,8 @@ public class TrnRequestService(
 
         if (matchedOnDobAndNino is [var singleDobAndNinoMatch])
         {
-            return MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.person_id, singleDobAndNinoMatch.trn);
+            var matchedAttributes = GetMatchedAttributes(singleDobAndNinoMatch);
+            return MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.person_id, singleDobAndNinoMatch.trn, matchedAttributes);
         }
 
         var matchedOnNameDateOfBirthEmailAndGender = results
@@ -435,7 +436,8 @@ public class TrnRequestService(
 
         if (matchedOnNameDateOfBirthEmailAndGender is [var singleNameDobEmailGenderMatch] && string.IsNullOrEmpty(request.NationalInsuranceNumber))
         {
-            return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.person_id, singleNameDobEmailGenderMatch.trn);
+            var matchedAttributes = GetMatchedAttributes(singleNameDobEmailGenderMatch);
+            return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.person_id, singleNameDobEmailGenderMatch.trn, matchedAttributes);
         }
 
         request.PotentialDuplicate = true;
@@ -451,10 +453,12 @@ public class TrnRequestService(
                         (r.email_address_matches ? 5 : 0) +
                         (r.national_insurance_number_matches ? 10 : 0);
 
-                    return (r.person_id, score);
+                    var potentialMatch = GetMatchedPerson(r);
+
+                    return (potentialMatch, score);
                 })
                 .OrderByDescending(r => r.score)
-                .Select(r => r.person_id));
+                .Select(r => r.potentialMatch));
     }
 
     private Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
@@ -527,6 +531,27 @@ public class TrnRequestService(
         static NpgsqlParameter CreateArrayParameter(string name, IEnumerable<string?> values) =>
             new(name, NpgsqlDbType.Array | NpgsqlDbType.Varchar) { Value = values.ToArray() };
     }
+
+    private MatchPersonsResultPerson GetMatchedPerson(TrnRequestMatchQueryResult result) =>
+        new(
+            PersonId: result.person_id,
+            MatchedAttributes: GetMatchedAttributes(result)
+        );
+
+    private IReadOnlyCollection<PersonMatchedAttribute> GetMatchedAttributes(TrnRequestMatchQueryResult result) =>
+        new[]
+        {
+            result.first_name_matches ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
+            result.middle_name_matches ? PersonMatchedAttribute.MiddleName : null,
+            result.last_name_matches ? PersonMatchedAttribute.LastName : null,
+            result.date_of_birth_matches ? PersonMatchedAttribute.DateOfBirth : null,
+            result.email_address_matches ? PersonMatchedAttribute.EmailAddress : null,
+            result.national_insurance_number_matches ? PersonMatchedAttribute.NationalInsuranceNumber : null,
+            result.gender_matches ? PersonMatchedAttribute.Gender : null
+        }
+        .Where(a => a is not null)
+        .Select(a => a!.Value)
+        .ToArray();
 
 #pragma warning disable IDE1006 // Naming Styles
     private record TrnRequestMatchQueryResult(

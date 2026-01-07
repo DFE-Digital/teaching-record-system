@@ -1,4 +1,6 @@
+using AngleSharp.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions.Resolve;
@@ -80,7 +82,27 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithCreatedOn(Clock.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
-        var journeyInstance = await CreateJourneyInstance(supportTask, [duplicatePerson1.PersonId, duplicatePerson2.PersonId]);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [
+                new MatchPersonsResultPerson(
+                    duplicatePerson1.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.MiddleName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.NationalInsuranceNumber
+                    ]),
+                new MatchPersonsResultPerson(
+                    duplicatePerson2.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.MiddleName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.NationalInsuranceNumber
+                    ])
+             ]);
+
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -124,7 +146,16 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithCreatedOn(Clock.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
-        var journeyInstance = await CreateJourneyInstance(supportTask, [duplicatePerson1.PersonId]);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(
+                duplicatePerson1.PersonId,
+                [
+                    PersonMatchedAttribute.FirstName,
+                    PersonMatchedAttribute.MiddleName,
+                    PersonMatchedAttribute.LastName,
+                    PersonMatchedAttribute.NationalInsuranceNumber
+                ])]);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -167,7 +198,16 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, [duplicatePerson1.PersonId]);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(
+                duplicatePerson1.PersonId,
+                [
+                    PersonMatchedAttribute.FirstName,
+                    PersonMatchedAttribute.MiddleName,
+                    PersonMatchedAttribute.LastName,
+                    PersonMatchedAttribute.NationalInsuranceNumber
+                ])]);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -181,6 +221,158 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
+    }
+
+    public static TheoryData<PersonMatchedAttribute[]> GetHighlightedDifferencesData() => new(
+        [PersonMatchedAttribute.FirstName],
+        [PersonMatchedAttribute.MiddleName],
+        [PersonMatchedAttribute.LastName],
+        [PersonMatchedAttribute.DateOfBirth],
+        [PersonMatchedAttribute.NationalInsuranceNumber],
+        [PersonMatchedAttribute.Gender]
+    );
+
+    [Theory]
+    [MemberData(nameof(GetHighlightedDifferencesData))]
+    public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            matchedPerson.PersonId,
+            applicationUser.UserId,
+            t => t
+                .WithMatchedPersons(matchedPerson.PersonId)
+                .WithFirstName(
+                    matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
+                        ? matchedPerson.FirstName
+                        : TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
+                .WithMiddleName(
+                    matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
+                        ? matchedPerson.MiddleName
+                        : TestData.GenerateChangedMiddleName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
+                .WithLastName(
+                    matchedAttributes.Contains(PersonMatchedAttribute.LastName)
+                        ? matchedPerson.LastName
+                        : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
+                .WithDateOfBirth(
+                    matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)
+                        ? matchedPerson.DateOfBirth
+                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
+                .WithNationalInsuranceNumber(
+                    matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
+                        ? matchedPerson.NationalInsuranceNumber
+                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!))
+                .WithGender(
+                    matchedAttributes.Contains(PersonMatchedAttribute.Gender)
+                        ? matchedPerson.Gender
+                        : TestData.GenerateChangedGender(matchedPerson.Gender!)));
+
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(
+                matchedPerson.PersonId,
+                new[]
+                {
+                    matchedAttributes.Contains(PersonMatchedAttribute.FirstName) ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
+                    matchedAttributes.Contains(PersonMatchedAttribute.MiddleName) ? PersonMatchedAttribute.MiddleName : null,
+                    matchedAttributes.Contains(PersonMatchedAttribute.LastName) ? PersonMatchedAttribute.LastName : null,
+                    matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth) ? PersonMatchedAttribute.DateOfBirth : null,
+                    matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber) ? PersonMatchedAttribute.NationalInsuranceNumber : null,
+                    matchedAttributes.Contains(PersonMatchedAttribute.Gender) ? PersonMatchedAttribute.Gender : null
+                }
+                .Where(a => a is not null)
+                .Select(a => a!.Value)
+                .ToArray()
+            )],
+            useFactory: false);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
+        Assert.NotNull(firstMatchDetails);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "First name", !matchedAttributes.Contains(PersonMatchedAttribute.FirstName));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Last name", !matchedAttributes.Contains(PersonMatchedAttribute.LastName));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
+    }
+
+    public static TheoryData<PersonMatchedAttribute> GetSynonymMatchedData() => new(
+        PersonMatchedAttribute.FirstName,
+        PersonMatchedAttribute.MiddleName,
+        PersonMatchedAttribute.LastName
+    );
+
+    [Theory]
+    [MemberData(nameof(GetSynonymMatchedData))]
+    public async Task Get_WhenMatchedOnSynonymDoesNotHighlightAsDifferenceBetweenMatchAndTrnRequest(PersonMatchedAttribute synonymMatchedAttribute)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var name = "Andrew";
+        var synonym = "Andy";
+        var firstName = synonymMatchedAttribute == PersonMatchedAttribute.FirstName ? name : TestData.GenerateFirstName();
+        var middleName = synonymMatchedAttribute == PersonMatchedAttribute.MiddleName ? name : TestData.GenerateMiddleName();
+        var lastName = synonymMatchedAttribute == PersonMatchedAttribute.LastName ? name : TestData.GenerateLastName();
+        var matchedPerson = await TestData.CreatePersonAsync(
+            p => p.WithNationalInsuranceNumber());
+
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            matchedPerson.PersonId,
+            applicationUser.UserId,
+            t => t
+                .WithMatchedPersons(matchedPerson.PersonId)
+                .WithFirstName(
+                    synonymMatchedAttribute == PersonMatchedAttribute.FirstName
+                        ? synonym
+                        : matchedPerson.FirstName)
+                .WithMiddleName(
+                    synonymMatchedAttribute == PersonMatchedAttribute.MiddleName
+                        ? synonym
+                        : matchedPerson.MiddleName)
+                .WithLastName(
+                    synonymMatchedAttribute == PersonMatchedAttribute.LastName
+                        ? synonym
+                        : matchedPerson.LastName));
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(
+                matchedPerson.PersonId,
+                [
+                    PersonMatchedAttribute.FirstName,
+                    PersonMatchedAttribute.MiddleName,
+                    PersonMatchedAttribute.LastName
+                ]
+            )],
+            useFactory: false);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
+        Assert.NotNull(firstMatchDetails);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "First name", false);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Last name", false);
     }
 
     [Fact]
@@ -207,7 +399,16 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Closed);
             });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, [duplicatePerson1.PersonId]);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(
+                duplicatePerson1.PersonId,
+                [
+                    PersonMatchedAttribute.FirstName,
+                    PersonMatchedAttribute.MiddleName,
+                    PersonMatchedAttribute.LastName,
+                    PersonMatchedAttribute.NationalInsuranceNumber
+                ])]);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -247,7 +448,16 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask, [duplicatePerson1.PersonId]);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(
+                duplicatePerson1.PersonId,
+                [
+                    PersonMatchedAttribute.FirstName,
+                    PersonMatchedAttribute.MiddleName,
+                    PersonMatchedAttribute.LastName,
+                    PersonMatchedAttribute.NationalInsuranceNumber
+                ])]);
         var unmatchedPerson = await TestData.CreatePersonAsync();
         var personId = unmatchedPerson.PersonId;
 
@@ -288,7 +498,16 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithCreatedOn(Clock.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
-        var journeyInstance = await CreateJourneyInstance(supportTask, [duplicatePerson1.PersonId]);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(
+                duplicatePerson1.PersonId,
+                [
+                    PersonMatchedAttribute.FirstName,
+                    PersonMatchedAttribute.MiddleName,
+                    PersonMatchedAttribute.LastName,
+                    PersonMatchedAttribute.NationalInsuranceNumber
+                ])]);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -333,7 +552,16 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithCreatedOn(Clock.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
-        var journeyInstance = await CreateJourneyInstance(supportTask, [duplicatePerson1.PersonId]);
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(
+                duplicatePerson1.PersonId,
+                [
+                    PersonMatchedAttribute.FirstName,
+                    PersonMatchedAttribute.MiddleName,
+                    PersonMatchedAttribute.LastName,
+                    PersonMatchedAttribute.NationalInsuranceNumber
+                ])]);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -355,16 +583,32 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(Guid.Empty, journeyInstance.State.PersonId);
     }
 
+    private void AssertMatchRowHasExpectedHighlight(IElement matchDetails, string summaryListKey, bool expectHighlight)
+    {
+        var valueElement = matchDetails.GetSummaryListValueElementByKey(summaryListKey);
+        Assert.NotNull(valueElement);
+        var highlightElement = valueElement.GetElementsByClassName("hods-highlight").SingleOrDefault();
+
+        if (expectHighlight)
+        {
+            Assert.False(highlightElement == null, $"{summaryListKey} should be highlighted");
+        }
+        else
+        {
+            Assert.True(highlightElement == null, $"{summaryListKey} should not be highlighted");
+        }
+    }
+
     private async Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
         SupportTask supportTask,
-        Guid[] matchedPersonIds,
+        MatchPersonsResultPerson[] matchedPersons,
         bool useFactory = true)
     {
         var state = useFactory
             ? await CreateJourneyStateWithFactory<ResolveTeacherPensionsPotentialDuplicateStateFactory, ResolveTeacherPensionsPotentialDuplicateState>(factory => factory.CreateAsync(supportTask))
             : new ResolveTeacherPensionsPotentialDuplicateState
             {
-                MatchedPersonIds = matchedPersonIds
+                MatchedPersons = matchedPersons
             };
 
         return await CreateJourneyInstance(supportTask.SupportTaskReference, state);
