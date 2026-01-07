@@ -570,14 +570,14 @@ public class ChangeLogInductionEventTests : TestBase
         DateOnly? oldCompletedDate = Clock.Today.AddDays(-10);
         InductionStatus oldInductionStatus = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons) ? InductionStatus.Exempt : InductionStatus.InProgress;
         Guid[] oldExemptionReasons = [Guid.Parse("5a80cee8-98a8-426b-8422-b0e81cb49b36"), Guid.Parse("15014084-2d8d-4f51-9198-b0e1881f8896")];
-        string[] oldExemptionReasonNames = ["Qualified before 07 May 2000", "Qualified between 07 May 1999 and 01 Apr 2003. First post was in Wales and lasted a minimum of two terms."];
+        string[] oldExemptionReasonNames = ["They qualified before 07 May 2000", "They qualified between 7 May 1999 and 1 April 2003 and first taught in Wales for at least 2 terms"];
         var oldCpdModifiedOn = Clock.UtcNow.AddDays(-2);
 
         DateOnly? startDate = Clock.Today.AddYears(-1).AddDays(1);
         DateOnly? completedDate = Clock.Today.AddDays(-9);
         InductionStatus inductionStatus = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons) ? InductionStatus.Exempt : InductionStatus.RequiredToComplete;
         Guid[] exemptionReasons = [Guid.Parse("0997ab13-7412-4560-8191-e51ed4d58d2a")];
-        string[] exemptionReasonNames = ["Qualified through Further Education route between 1 Sep 2001 and 1 Sep 2004"];
+        string[] exemptionReasonNames = ["They qualified through a further education route between 1 September 2001 and 1 September 2004"];
         var cpdModifiedOn = Clock.UtcNow;
 
         var changeReason = PersonInductionChangeReason.AnotherReason.GetDisplayName();
