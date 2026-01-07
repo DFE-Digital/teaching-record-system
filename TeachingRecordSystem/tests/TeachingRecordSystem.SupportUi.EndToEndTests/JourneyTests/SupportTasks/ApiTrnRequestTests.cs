@@ -75,7 +75,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithLastName(lastName)
                 .WithDateOfBirth(dateOfBirth)
                 .WithGender(matchedPerson1.Gender)
-                .WithEmailAddress(TestData.GenerateUniqueEmail())
+                .WithEmailAddress(emailAddress)
             );
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -91,8 +91,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge");
-        await page.CheckAsync($"label{HasTextSelector(requestData.MiddleName)}");
-        await page.CheckAsync($"label{HasTextSelector(matchedPerson1.EmailAddress)}");
+        await page.CheckAsync($"label{HasTextSelector(matchedPerson1.MiddleName)}");
         await page.CheckAsync($"label{HasTextSelector(requestData.NationalInsuranceNumber)}");
         await page.ClickContinueButtonAsync();
 
