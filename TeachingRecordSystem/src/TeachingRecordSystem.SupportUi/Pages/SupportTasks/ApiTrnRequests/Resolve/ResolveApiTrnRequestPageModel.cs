@@ -20,58 +20,6 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
         return supportTask.TrnRequestMetadata!;
     }
 
-    protected IReadOnlyCollection<PersonMatchedAttribute> GetPersonAttributeMatches(
-        string firstName,
-        string middleName,
-        string lastName,
-        DateOnly? dateOfBirth,
-        string? emailAddress,
-        string? nationalInsuranceNumber,
-        Gender? gender)
-    {
-        return Impl().AsReadOnly();
-
-        IEnumerable<PersonMatchedAttribute> Impl()
-        {
-            var requestData = GetRequestData();
-
-            if (firstName == requestData.FirstName)
-            {
-                yield return PersonMatchedAttribute.FirstName;
-            }
-
-            if (middleName == requestData.MiddleName || (string.IsNullOrWhiteSpace(requestData.MiddleName) && string.IsNullOrWhiteSpace(middleName)))
-            {
-                yield return PersonMatchedAttribute.MiddleName;
-            }
-
-            if (lastName == requestData.LastName)
-            {
-                yield return PersonMatchedAttribute.LastName;
-            }
-
-            if (dateOfBirth == requestData.DateOfBirth)
-            {
-                yield return PersonMatchedAttribute.DateOfBirth;
-            }
-
-            if (emailAddress == requestData.EmailAddress)
-            {
-                yield return PersonMatchedAttribute.EmailAddress;
-            }
-
-            if (nationalInsuranceNumber == requestData.NationalInsuranceNumber)
-            {
-                yield return PersonMatchedAttribute.NationalInsuranceNumber;
-            }
-
-            if (gender == requestData.Gender)
-            {
-                yield return PersonMatchedAttribute.Gender;
-            }
-        }
-    }
-
     protected IReadOnlyCollection<PersonMatchedAttribute> GetAttributesToUpdate()
     {
         var state = JourneyInstance!.State;
