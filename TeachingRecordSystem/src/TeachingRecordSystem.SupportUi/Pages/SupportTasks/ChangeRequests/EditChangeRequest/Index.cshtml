@@ -8,15 +8,15 @@
     <govuk-back-link href="@LinkGenerator.SupportTasks.ChangeRequests.Index()" />
 }
 
-<span class="govuk-caption-l" data-testid="heading-caption">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Change of Name" : "Change of Date of Birth") - @Model.PersonName</span>
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<span class="govuk-caption-l" data-testid="heading-caption">Record management</span>
+<h1 class="govuk-heading-l">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Name change request" : "Date of birth change request")</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <table class="govuk-table">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Details</th>
                     <th scope="col" class="govuk-table__header">Current</th>
                     <th scope="col" class="govuk-table__header">New</th>
                 </tr>
@@ -62,7 +62,7 @@
                     <td class="govuk-table__cell" colspan="2" data-testid="email-value">@Model.Email</td>
                 </tr>
                 <tr class="govuk-table__row" data-testid="linked-record">
-                    <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="linked-record-title">Linked record</td>
+                    <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="linked-record-title">TRN</td>
                     <td class="govuk-table__cell" colspan="2" data-testid="linked-record-value">
                         <a href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId!.Value)" target="_blank" rel="noopener noreferrer" class="govuk-link">
                             @Model.Trn (opens in a new tab)
@@ -76,43 +76,27 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <h2 class="govuk-heading-l">Proof</h2>
+        <h2 class="govuk-heading-m">Proof of identity</h2>
         <govuk-details>
             <govuk-details-summary>Documents we accept</govuk-details-summary>
             <govuk-details-text>
-                <ul class="govuk-list govuk-list--spaced">
+                <p class="govuk-body">We accept the following documents:</p>
+                <ul class="govuk-list govuk-list--bullet">
                     @if (Model.ChangeType == SupportTaskType.ChangeNameRequest)
                     {
-                        <li>
-                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Marriage</h4>
-                            <span>Marriage certificate</span>
-                        </li>
-                        <li>
-                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Civil Partnership</h4>
-                            <span>Civil agreement certificate</span>
-                        </li>
-                        <li>
-                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Divorce</h4>
-                            <span>Decree absolute and birth certificate</span>
-                        </li>
-                        <li>
-                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Statutory declaration</h4>
-                            <span>Statutory declaration</span>
-                        </li>
-                        <li>
-                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Deed poll</h4>
-                            <span>Deed poll</span>
-                        </li>
-                        <li>
-                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Fix a typo</h4>
-                            <span>Passport</span>
-                        </li>
+                        <li>passport</li>
+                        <li>marriage certificate</li>
+                        <li>civil agreement certificate</li>
+                        <li>deed poll</li>
+                        <li>birth certificate</li>
+                        <li>decree absolute</li>
+                        <li>statutory declaration</li>
                     }
                     @if (Model.ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
                     {
-                        <li>Birth certificate</li>
-                        <li>Passport</li>
-                        <li>Driving license</li>
+                        <li>passport</li>
+                        <li>birth certificate</li>
+                        <li>driving license</li>
                     }
                 </ul>
             </govuk-details-text>
