@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using NpgsqlTypes;
-using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -111,7 +110,12 @@ public class TrnRequestService(
             publishTrnRequestUpdatedEvent: true,
             processContext);
 
-        await UpdatePersonFromTrnRequestAsync(person, trnRequest, attributesToUpdate, processContext);
+        await personService.UpdatePersonDetailsAsync(new(
+            person.PersonId,
+            trnRequest.PersonDetails.UpdateFromAttributes(attributesToUpdate),
+            null,
+            null),
+            processContext);
     }
 
     private async Task ResolveTrnRequestWithMatchedPersonAsync(
@@ -311,72 +315,6 @@ public class TrnRequestService(
         }
 
         return true;
-    }
-
-    private async Task UpdatePersonFromTrnRequestAsync(
-        Person person,
-        TrnRequestMetadata trnRequest,
-        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
-        ProcessContext processContext)
-    {
-        var oldPersonDetailsEventModel = EventModels.PersonDetails.FromModel(person);
-
-        // TODO Use PersonService when we have one
-        var updateResult = person.UpdateDetails(
-            firstName: attributesToUpdate.Contains(PersonMatchedAttribute.FirstName)
-                ? Option.Some(trnRequest.FirstName!)
-                : Option.None<string>(),
-            middleName: attributesToUpdate.Contains(PersonMatchedAttribute.MiddleName)
-                ? Option.Some(trnRequest.MiddleName ?? string.Empty)
-                : Option.None<string>(),
-            lastName: attributesToUpdate.Contains(PersonMatchedAttribute.LastName)
-                ? Option.Some(trnRequest.LastName!)
-                : Option.None<string>(),
-            dateOfBirth: attributesToUpdate.Contains(PersonMatchedAttribute.DateOfBirth)
-                ? Option.Some<DateOnly?>(trnRequest.DateOfBirth)
-                : Option.None<DateOnly?>(),
-            emailAddress: attributesToUpdate.Contains(PersonMatchedAttribute.EmailAddress)
-                ? Option.Some(trnRequest.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null)
-                : Option.None<EmailAddress?>(),
-            nationalInsuranceNumber: attributesToUpdate.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
-                ? Option.Some(trnRequest.NationalInsuranceNumber is string nationalInsuranceNumber
-                    ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
-                    : null)
-                : Option.None<NationalInsuranceNumber?>(),
-            gender: attributesToUpdate.Contains(PersonMatchedAttribute.Gender)
-                ? Option.Some(trnRequest.Gender)
-                : Option.None<Gender?>(),
-            processContext.Now);
-
-        await dbContext.SaveChangesAsync();
-
-        if (updateResult.Changes != 0)
-        {
-            var changes = PersonDetailsUpdatedEventChanges.None |
-                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.FirstName) ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
-                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.MiddleName) ? PersonDetailsUpdatedEventChanges.MiddleName : 0) |
-                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.LastName) ? PersonDetailsUpdatedEventChanges.LastName : 0) |
-                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.DateOfBirth) ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
-                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.EmailAddress) ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
-                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.NationalInsuranceNumber) ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
-                (updateResult.Changes.HasFlag(LegacyEvents.PersonAttributesChanges.Gender) ? PersonDetailsUpdatedEventChanges.Gender : 0);
-
-            await eventPublisher.PublishEventAsync(
-                new PersonDetailsUpdatedEvent
-                {
-                    EventId = Guid.NewGuid(),
-                    PersonId = person.PersonId,
-                    PersonDetails = EventModels.PersonDetails.FromModel(person),
-                    OldPersonDetails = oldPersonDetailsEventModel,
-                    NameChangeReason = null,
-                    NameChangeEvidenceFile = null,
-                    DetailsChangeReason = null,
-                    DetailsChangeReasonDetail = null,
-                    DetailsChangeEvidenceFile = null,
-                    Changes = changes
-                },
-                processContext);
-        }
     }
 
     private async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)

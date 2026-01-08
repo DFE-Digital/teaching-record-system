@@ -40,11 +40,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await TestData.UpdatePersonAsync(b => b
             .WithPersonId(createPersonResult.PersonId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
         Clock.Advance();
         await TestData.UpdatePersonAsync(b => b
             .WithPersonId(createPersonResult.PersonId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}");
 
@@ -85,11 +85,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await TestData.UpdatePersonAsync(b => b
             .WithPersonId(createPersonResult.PersonId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
         Clock.Advance();
         await TestData.UpdatePersonAsync(b => b
             .WithPersonId(createPersonResult.PersonId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}");
 

@@ -29,5 +29,8 @@ public enum ProcessType
     PersonDetailsUpdating = 25,
     PersonDeactivating = 26,
     PersonReactivating = 27,
-    TeacherPensionsRecordImporting = 28
+    TeacherPensionsRecordImporting = 28,
+    PersonMerging = 29,
+    ChangeOfNameRequestApproving = 30,
+    ChangeOfDateOfBirthRequestApproving = 31
 }

@@ -2,6 +2,6 @@ namespace TeachingRecordSystem.Core.Services.Persons;
 
 public record UpdatePersonDetailsOptions(
     Guid PersonId,
-    PersonDetails PersonDetails,
+    PersonDetailsToUpdate PersonDetails,
     Justification<PersonNameChangeReason>? NameChangeJustification,
     Justification<PersonDetailsChangeReason>? DetailsChangeJustification);
