@@ -51,7 +51,7 @@ public partial class TrnRequestServiceTests
     }
 
     [Fact]
-    public async Task MatchPersonsAsync_WithOneMatchOnNinoAndDobAndOtherMatchesOnDifferentFields_ReturnDefiniteMatch()
+    public async Task MatchPersonsAsync_WithOneMatchOnNinoAndDobAndOtherMatchesOnDifferentFields_ReturnsDefiniteMatch()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -100,6 +100,113 @@ public partial class TrnRequestServiceTests
         // Assert
         Assert.Equal(MatchPersonsResultOutcome.DefiniteMatch, result.Outcome);
         Assert.Equal(person1.PersonId, result.PersonId);
+    }
+
+    [Fact]
+    public async Task MatchPersonsAsync_WithOneMatchOnOneLoginIdAndOtherMatchesOnDifferentFields_ReturnsDefiniteMatch()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var oneLoginUserSubject = Guid.NewGuid().ToString();
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+
+        var person1 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(firstName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmailAddress(emailAddress)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
+            .WithLastName(TestData.GenerateChangedLastName(lastName))
+            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
+            .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber)));
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(
+            personId: person2.PersonId,
+            verifiedInfo: ([person2.FirstName, person2.LastName], person2.DateOfBirth));
+
+        var requestData = new TrnRequestMetadata()
+        {
+            ApplicationUserId = applicationUser.UserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            EmailAddress = emailAddress,
+            OneLoginUserSubject = oneLoginUser.Subject,
+            FirstName = firstName,
+            MiddleName = null,
+            LastName = lastName,
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            Name = [firstName, lastName],
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
+
+        // Act
+        var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
+
+        // Assert
+        Assert.Equal(MatchPersonsResultOutcome.DefiniteMatch, result.Outcome);
+        Assert.Equal(person2.PersonId, result.PersonId);
+    }
+
+    [Fact]
+    public async Task MatchPersonsAsync_WithOneLoginIdNotInTrsAndMatchOnDifferentFields_ReturnsPotentialMatch()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+
+        var person1 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(firstName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth));
+
+        var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
+            .WithLastName(TestData.GenerateChangedLastName(lastName))
+            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
+            .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber)));
+
+        var noneTrsOneLoginUserSubject = Guid.NewGuid().ToString();
+
+        var requestData = new TrnRequestMetadata()
+        {
+            ApplicationUserId = applicationUser.UserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            EmailAddress = emailAddress,
+            OneLoginUserSubject = noneTrsOneLoginUserSubject,
+            FirstName = firstName,
+            MiddleName = null,
+            LastName = lastName,
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            Name = [firstName, lastName],
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
+
+        // Act
+        var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
+
+        // Assert
+        Assert.Equal(MatchPersonsResultOutcome.PotentialMatches, result.Outcome);
+        Assert.Equal(person1.PersonId, result.Matches.Single().PersonId);
     }
 
     [Theory]

@@ -345,6 +345,21 @@ public class TrnRequestService(
     {
         request.PotentialDuplicate = false;
 
+        // If a One Login ID is provided then ignore other matching rules and match only on that if it's associated with a teaching record
+        if (!string.IsNullOrEmpty(request.OneLoginUserSubject))
+        {
+            var oneLoginUser = await dbContext.OneLoginUsers
+                .Include(o => o.Person)
+                .SingleOrDefaultAsync(u => u.Subject == request.OneLoginUserSubject);
+
+            if (oneLoginUser?.Person is Person person)
+            {
+                var match = (await GetMatchesFromTrnRequestAsync(request, person.PersonId))[0];
+                var matchedAttributes = GetMatchedAttributes(match);
+                return MatchPersonsResult.DefiniteMatch(person.PersonId, person.Trn, matchedAttributes);
+            }
+        }
+
         var results = (await GetMatchesFromTrnRequestAsync(request)).ToList();
         results.RemoveAll(r => excludePersonIds.Contains(r.person_id));
 
@@ -399,9 +414,10 @@ public class TrnRequestService(
                 .Select(r => r.potentialMatch));
     }
 
-    private Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
+    private Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request, Guid? personId = null)
     {
         // Find all Active records with a TRN that match on:
+        // person ID (if provided) *OR*
         // - at least three of first name, middle name, last name, DOB *OR*
         // - NINO *OR*
         // - email address.
@@ -422,7 +438,8 @@ public class TrnRequestService(
                         :date_of_birth date_of_birth,
                         (:email_address COLLATE "case_insensitive") email_address,
                         array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers,
-                        :gender gender
+                        :gender gender,
+                        :person_id person_id
                 )
                 SELECT
                     p.person_id,
@@ -443,14 +460,15 @@ public class TrnRequestService(
                     CASE WHEN vars.gender IS NOT NULL AND p.gender = vars.gender THEN true ELSE false END gender_matches
                 FROM persons p, vars
                 WHERE
-                    p.status = 0 AND (
+                    (vars.person_id IS NOT NULL AND p.person_id = vars.person_id) OR
+                    (vars.person_id IS NULL AND p.status = 0 AND (
                         (p.names && vars.first_names AND p.names && vars.middle_names AND p.names && vars.last_names) OR
                         (p.names && vars.first_names AND p.names && vars.middle_names AND p.date_of_birth = vars.date_of_birth) OR
                         (p.names && vars.middle_names AND p.names && vars.last_names AND p.date_of_birth = vars.date_of_birth) OR
                         (p.names && vars.first_names AND p.names && vars.last_names AND p.date_of_birth = vars.date_of_birth) OR
                         (vars.email_address IS NOT NULL AND p.email_address = vars.email_address) OR
                         (array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers)
-                    )
+                    ))
                 """,
                 parameters:
                 // ReSharper disable FormatStringProblem
@@ -461,7 +479,8 @@ public class TrnRequestService(
                     new NpgsqlParameter("date_of_birth", NpgsqlDbType.Date) { Value = (object?)request.DateOfBirth ?? DBNull.Value },
                     new NpgsqlParameter("national_insurance_number", NpgsqlDbType.Varchar) { Value = (object?)nationalInsuranceNumber ?? DBNull.Value },
                     new NpgsqlParameter("email_address", NpgsqlDbType.Varchar) { Value = (object?)request.EmailAddress ?? DBNull.Value },
-                    new NpgsqlParameter("gender", NpgsqlDbType.Integer) { Value = (object?)(int?)request.Gender ?? DBNull.Value }
+                    new NpgsqlParameter("gender", NpgsqlDbType.Integer) { Value = (object?)(int?)request.Gender ?? DBNull.Value },
+                    new NpgsqlParameter("person_id", NpgsqlDbType.Uuid) { Value = (object?)personId ?? DBNull.Value }
                 ]
                 // ReSharper restore FormatStringProblem
             ).ToArrayAsync();
