@@ -117,7 +117,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"Change of Name - {createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TrimmedText());
+        Assert.Equal($"Name change request", doc.GetElementsByTagName("h1")!.First().TrimmedText());
 
         var firstNameRow = doc.GetElementByTestId("first-name");
         if (hasNewFirstName)
@@ -207,7 +207,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"Change of Date of Birth - {createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TrimmedText());
+        Assert.Equal($"Date of birth change request", doc.GetElementsByTagName("h1")!.First().TrimmedText());
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthRow);

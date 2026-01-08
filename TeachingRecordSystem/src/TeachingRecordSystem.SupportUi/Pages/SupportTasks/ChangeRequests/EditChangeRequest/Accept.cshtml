@@ -8,8 +8,8 @@
     <govuk-back-link href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Index(Model.SupportTaskReference)" />
 }
 
-<span class="govuk-caption-l">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Change of Name" : "Change of Date of Birth") - @Model.PersonName</span>
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<span class="govuk-caption-l">Record management</span>
+<h1 class="govuk-heading-l">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Name change request" : "Date of birth change request")</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
@@ -17,7 +17,7 @@
             <table class="govuk-table">                
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Details</th>
                         <th scope="col" class="govuk-table__header">Current</th>
                         <th scope="col" class="govuk-table__header">New</th>
                     </tr>
