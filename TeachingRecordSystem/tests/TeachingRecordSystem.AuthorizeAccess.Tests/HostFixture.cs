@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -65,6 +66,21 @@ public class HostFixture : InitializeDbFixture
 
                 // Publish events synchronously
                 PublishEventsDbCommandInterceptor.ConfigureServices(services);
+
+                services.Configure<AuthorizeAccessOptions>(options =>
+                {
+                    using var rsa = RSA.Create(keySizeInBits: 2048);
+                    var privateKeyPem = rsa.ExportRSAPrivateKeyPem();
+
+                    options.OneLoginSigningKeys =
+                    [
+                        new AuthorizeAccessOptionsOneLoginSigningKey
+                        {
+                            KeyId = "test-key-1",
+                            PrivateKeyPem = privateKeyPem
+                        }
+                    ];
+                });
 
                 services
                     .AddSingleton(DbHelper.Instance)

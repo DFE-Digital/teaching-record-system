@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
@@ -1254,7 +1255,21 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
     private SignInJourneyHelper CreateHelper(TrsDbContext dbContext, Action<Mock<OneLoginService>>? configureOneLoginServiceMock = null)
     {
         var linkGenerator = new FakeLinkGenerator();
-        var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
+
+        using var rsa = RSA.Create(keySizeInBits: 2048);
+
+        var options = Options.Create(new AuthorizeAccessOptions
+        {
+            ShowDebugPages = false,
+            OneLoginSigningKeys =
+            [
+                new AuthorizeAccessOptionsOneLoginSigningKey
+                {
+                    KeyId = "test-key-id",
+                    PrivateKeyPem = rsa.ExportRSAPrivateKeyPem()
+                }
+            ]
+        });
 
         var oneLoginServiceMock = new Mock<OneLoginService>(dbContext, Mock.Of<INotificationSender>(), Mock.Of<IBackgroundJobScheduler>())
         {
