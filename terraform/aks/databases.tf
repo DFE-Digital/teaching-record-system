@@ -40,18 +40,24 @@ module "postgres" {
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "wal_level" {
+  count = var.deploy_azure_backing_services ? 1 : 0
+
   name      = "wal_level"
   server_id = module.postgres.azure_server_id
   value     = "logical"
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "shared_preload_libraries" {
+  count = var.deploy_azure_backing_services ? 1 : 0
+
   name      = "shared_preload_libraries"
   server_id = module.postgres.azure_server_id
   value     = "pg_cron,pg_stat_statements"
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "hot_standby_feedback" {
+  count = var.deploy_azure_backing_services ? 1 : 0
+
   name      = "hot_standby_feedback"
   server_id = module.postgres.azure_server_id
   value     = "on"

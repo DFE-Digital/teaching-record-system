@@ -24,6 +24,15 @@ dv_review: dev-cluster
 	$(eval export TF_VAR_docker_image=$(IMAGE))
 	$(eval export TF_VAR_app_name=$(APP_NAME))
 
+.PHONY: review
+review: test-cluster
+	$(if $(APP_NAME), , $(error Missing environment variable "APP_NAME", Please specify a pr number for your review app))
+	$(if $(IMAGE), , $(error Missing environment variable "IMAGE", Please specify an image tag for your review app))
+	$(eval include global_config/review.sh)
+	$(eval backend_key=-backend-config=key=$(APP_NAME).tfstate)
+	$(eval export TF_VAR_docker_image=$(IMAGE))
+	$(eval export TF_VAR_app_name=$(APP_NAME))
+
 .PHONY: dev
 dev: test-cluster
 	$(eval include global_config/dev.sh)
