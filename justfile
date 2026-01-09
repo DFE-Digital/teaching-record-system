@@ -129,6 +129,14 @@ create-admin email name:
 make *ARGS:
   @make {{ARGS}}
 
+deploy-dev branch=`git branch --show-current`: (_deploy branch 'dev')
+
+deploy-preprod branch=`git branch --show-current`: (_deploy branch 'pre-production')
+
+[private]
+_deploy branch environment:
+  @gh workflow run deploy.yml --ref {{branch}} -f environment={{environment}}
+
 # Removes the cached DB schema version file for tests
 remove-tests-schema-cache:
   @dotnet pwsh -nop -file ../scripts/Remove-TestsSchemaCache.ps1
