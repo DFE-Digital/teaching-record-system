@@ -22,9 +22,6 @@ public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUpload
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -39,14 +36,11 @@ public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUpload
     {
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.StartDate = StartDate!.Value;
-        });
+        var nextStep = linkGenerator.Alerts.AddAlert.Reason(PersonId, JourneyInstance!.InstanceId);
 
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.AddAlert.Reason(PersonId, JourneyInstance.InstanceId));
+        return await JourneyInstance.UpdateStateAndRedirectToNextStepAsync(
+            state => state.StartDate = StartDate!.Value,
+            nextStep);
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -58,12 +52,6 @@ public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUpload
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.AddLink is null)
-        {
-            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Link(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
