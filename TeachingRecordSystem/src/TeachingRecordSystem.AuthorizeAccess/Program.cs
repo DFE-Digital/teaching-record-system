@@ -1,6 +1,7 @@
 using Dfe.Analytics.AspNetCore;
 using GovUk.Frontend.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.AuthorizeAccess;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Middleware;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
@@ -89,6 +90,13 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+
+app.MapGet("/one-login-jwks", async ctx =>
+{
+    var options = ctx.RequestServices.GetRequiredService<IOptions<AuthorizeAccessOptions>>();
+    var jwks = options.Value.GetOneLoginSigningKeysJwks();
+    await ctx.Response.WriteAsJsonAsync(jwks);
+});
 
 if (builder.Configuration["RootRedirect"] is string rootRedirect)
 {

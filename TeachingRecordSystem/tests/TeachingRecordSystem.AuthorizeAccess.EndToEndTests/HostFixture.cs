@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -88,6 +89,21 @@ public sealed class HostFixture : InitializeDbFixture
                         });
 
                     services.Configure<OpenIddictServerAspNetCoreOptions>(options => options.DisableTransportSecurityRequirement = true);
+
+                    services.Configure<AuthorizeAccessOptions>(options =>
+                    {
+                        using var rsa = RSA.Create(keySizeInBits: 2048);
+                        var privateKeyPem = rsa.ExportRSAPrivateKeyPem();
+
+                        options.OneLoginSigningKeys =
+                        [
+                            new AuthorizeAccessOptionsOneLoginSigningKey
+                            {
+                                KeyId = "test-key-1",
+                                PrivateKeyPem = privateKeyPem
+                            }
+                        ];
+                    });
 
                     services
                         .AddSingleton(DbHelper.Instance)
