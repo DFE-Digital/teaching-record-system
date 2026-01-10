@@ -3,6 +3,7 @@ using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.TestCommon;
+
 public partial class TestData
 {
     public async Task<SupportTask> CreateTeacherPensionsPotentialDuplicateTaskAsync(
