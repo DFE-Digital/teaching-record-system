@@ -25,5 +25,10 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
                 v => JsonSerializer.Deserialize<ISupportTaskData>(v, ISupportTaskData.SerializerOptions)!);
         builder.HasOne(t => t.TrnRequestMetadata).WithMany().HasForeignKey(p => new { p.TrnRequestApplicationUserId, p.TrnRequestId });
         builder.HasOne<SupportTaskTypeInfo>().WithMany().HasForeignKey(t => t.SupportTaskType);
+        builder.Property(t => t.ResolveJourneySavedState)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, SavedJourneyState.SerializerOptions),
+                v => JsonSerializer.Deserialize<SavedJourneyState>(v, SavedJourneyState.SerializerOptions));
     }
 }
