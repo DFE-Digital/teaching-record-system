@@ -29,7 +29,8 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
                     EvidenceFileName = "evidence.jpeg",
                     EmailAddress = TestData.GenerateUniqueEmail(),
                     ChangeRequestOutcome = null
-                }
+                },
+                ResolveJourneySavedState = null
             }
         };
 

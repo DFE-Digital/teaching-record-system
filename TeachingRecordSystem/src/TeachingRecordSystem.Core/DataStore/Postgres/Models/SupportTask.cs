@@ -22,6 +22,7 @@ public class SupportTask
     public string? TrnRequestId { get; init; }
     public TrnRequestMetadata? TrnRequestMetadata { get; }
     public required ISupportTaskData Data { get; set; }
+    public SavedJourneyState? ResolveJourneySavedState { get; set; }
 
     public static SupportTask Create(
         SupportTaskType supportTaskType,
