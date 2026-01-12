@@ -11,5 +11,8 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
     [FromRoute]
     public Guid PersonId { get; set; }
 
-    public IActionResult OnGet() => Redirect(linkGenerator.Persons.MergePerson.EnterTrn(PersonId, JourneyInstance!.InstanceId));
+    public IActionResult OnGet()
+    {
+        return Redirect(linkGenerator.Persons.MergePerson.EnterTrn(PersonId, JourneyInstance!.InstanceId));
+    }
 }

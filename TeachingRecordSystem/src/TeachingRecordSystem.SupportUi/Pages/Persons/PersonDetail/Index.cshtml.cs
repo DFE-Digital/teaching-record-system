@@ -10,8 +10,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 [AllowDeactivatedPerson]
 public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizationService) : PageModel
 {
-    private static readonly InductionStatus[] _invalidInductionStatusesForMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
@@ -33,6 +31,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
             .IgnoreQueryFilters()
             .Include(p => p.PreviousNames).AsSplitQuery()
             .Include(p => p.Alerts).AsSplitQuery()
+            .Include(p => p.Qualifications).AsSplitQuery()
             .SingleAsync(p => p.PersonId == PersonId);
 
         Person = BuildPersonInfo(person);
@@ -48,12 +47,15 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
             canEditPersonData &&
             Person.IsActive;
 
+        var hasMandatoryQualification = person.Qualifications!
+            .Any(q => q.QualificationType == QualificationType.MandatoryQualification);
+
         CanMerge =
             canEditNonPersonOrAlertData &&
             !HasOpenAlert &&
+            !hasMandatoryQualification &&
             Person!.IsActive &&
-            (PersonProfessionalStatus is not PersonProfessionalStatusInfo professionalStatus ||
-                !_invalidInductionStatusesForMerge.Contains(professionalStatus.InductionStatus));
+            PersonProfessionalStatus is not PersonProfessionalStatusInfo professionalStatus;
 
         // Person cannot be reactivated if they were deactivated as part of a merge
         // where they were merged into another Person (i.e. they were the secondary

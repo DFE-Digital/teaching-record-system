@@ -246,6 +246,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("No", doc.GetSummaryListValueByKey("Early years professional status (EYPS)"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Partial qualified teacher status (PQTS)"));
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
+        Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
     [Fact]
@@ -275,6 +276,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("No", doc.GetSummaryListValueByKey("Early years professional status (EYPS)"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Partial qualified teacher status (PQTS)"));
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
+        Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
     [Fact]
@@ -304,14 +306,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("No", doc.GetSummaryListValueByKey("Early years professional status (EYPS)"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Partial qualified teacher status (PQTS)"));
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
+        Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
     [Fact]
     public async Task Get_PersonHasEyps_ShowsDetails()
     {
         // Arrange
-        var awardDate = Clock.Today;
-
         var person = await TestData.CreatePersonAsync(p => p
 
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
@@ -333,6 +334,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("Holds", doc.GetSummaryListValueByKey("Early years professional status (EYPS)"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Partial qualified teacher status (PQTS)"));
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
+        Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
     [Fact]
@@ -362,6 +364,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("No", doc.GetSummaryListValueByKey("Early years professional status (EYPS)"));
         Assert.Equal("Holds", doc.GetSummaryListValueByKey("Partial qualified teacher status (PQTS)"));
         Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("PQTS held since"));
+        Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
     [Theory]
@@ -478,14 +481,31 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("merge-button"));
     }
 
+    [Fact]
+    public async Task Get_PersonHasMandatoryQualification_DoesNotShowMergeButton()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithMandatoryQualification());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("merge-button"));
+    }
+
     [Theory]
     [InlineData(InductionStatus.InProgress, false)]
     [InlineData(InductionStatus.Passed, false)]
     [InlineData(InductionStatus.Failed, false)]
     [InlineData(InductionStatus.None, true)]
-    [InlineData(InductionStatus.Exempt, true)]
-    [InlineData(InductionStatus.FailedInWales, true)]
-    [InlineData(InductionStatus.RequiredToComplete, true)]
+    [InlineData(InductionStatus.Exempt, false)]
+    [InlineData(InductionStatus.FailedInWales, false)]
+    [InlineData(InductionStatus.RequiredToComplete, false)]
     public async Task Get_PersonWithInductionStatus_ShowsMergeButtonAsExpected(InductionStatus status, bool expectMergeButtonToBeShown)
     {
         // Arrange
