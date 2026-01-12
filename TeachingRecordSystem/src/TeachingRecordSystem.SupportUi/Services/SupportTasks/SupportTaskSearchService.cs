@@ -288,10 +288,6 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             .Where(t => t.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && t.Status == SupportTaskStatus.Open)
             .ToListAsync();
 
-
-
-
-
         var unorderedResults = tasks.Select(t =>
         {
             var data = t.Data as TeacherPensionsPotentialDuplicateData;
@@ -302,7 +298,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 data!.IntegrationTransactionId,
                 StringHelper.JoinNonEmpty(' ', t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName),
                 t.CreatedOn,
-                NameParts: new []{ t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName}
+                NameParts: new[] { t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName }
             );
         }).AsQueryable();
 
@@ -313,7 +309,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         else if (SearchTextIsName(search, out var name))
         {
             unorderedResults = unorderedResults.Where(t =>
-                name.All(n =>  t.NameParts!.Any(m => string.Equals(m, n, StringComparison.OrdinalIgnoreCase))));
+                name.All(n => t.NameParts!.Any(m => string.Equals(m, n, StringComparison.OrdinalIgnoreCase))));
         }
 
         var searchResults = (sortBy switch
