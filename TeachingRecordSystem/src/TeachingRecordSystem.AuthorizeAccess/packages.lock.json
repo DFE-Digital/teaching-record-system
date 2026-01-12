@@ -78,6 +78,12 @@
         "resolved": "17.14.15",
         "contentHash": "mXQPJsbuUD2ydq4/ffd8h8tSOFCXec+2xJOVNCvXjuMOq/+5EKHq3D2m2MC2+nUaXeFMSt66VS/J4HdKBixgcw=="
       },
+      "Microsoft.Web.LibraryManager.Build": {
+        "type": "Direct",
+        "requested": "[3.0.71, )",
+        "resolved": "3.0.71",
+        "contentHash": "uO0RegM2P5ZZhQDJQ+YSiugXJgNnh4gmjMd3VofeoE9MSu60zYoR3meA9SAm6PVJW2t//SzICXQf4+JtfUTJQA=="
+      },
       "OpenIddict.AspNetCore": {
         "type": "Direct",
         "requested": "[7.2.0, )",

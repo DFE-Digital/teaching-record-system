@@ -109,4 +109,4 @@ if (builder.Configuration["RootRedirect"] is string rootRedirect)
 
 app.Run();
 
-public partial class Program { }
+public partial class Program;
