@@ -67,11 +67,11 @@ public static class PageExtensions
 
     public static async Task AssertBannerAsync(this IPage page, string title, string text)
     {
-        var bannerTitle = page.Locator("h2.govuk-notification-banner__title");
-        var bannerText = page.Locator("h3.govuk-notification-banner__heading");
+        var bannerTitle = (await page.Locator("h2.govuk-notification-banner__title").TextContentAsync())?.Trim();
+        var bannerText = (await page.Locator("h3.govuk-notification-banner__heading").TextContentAsync())?.Trim();
 
-        Assert.Equal(title, await bannerTitle.TextContentAsync());
-        Assert.Equal(text, await bannerText.TextContentAsync());
+        Assert.Equal(title, bannerTitle);
+        Assert.Equal(text, bannerText);
     }
 
     public static async Task FillDateInputAsync(this IPage page, string id, DateOnly date)

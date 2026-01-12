@@ -413,6 +413,76 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
     }
 
     [Fact]
+    public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToListPage()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithStatedFirstName(matchedPerson.FirstName)
+                .WithStatedLastName(matchedPerson.LastName)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedTrn(matchedPerson.Trn!));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            state => state.Verified = true,
+            new MatchPersonResult(
+                matchedPerson.PersonId,
+                matchedPerson.Trn,
+                [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
+                ]));
+
+        var chosenPersonId = matchedPerson.PersonId;
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Action", "SaveAndComeBackLater" },
+                { "MatchedPersonId", chosenPersonId.ToString() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/support-tasks/one-login-user-id-verification", response.Headers.Location?.OriginalString);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            supportTask = (await dbContext.SupportTasks.FindAsync(supportTask.SupportTaskReference))!;
+            Assert.NotNull(supportTask.ResolveJourneySavedState);
+
+            Assert.Equal("Matches", supportTask.ResolveJourneySavedState.PageName);
+
+            Assert.Collection(
+                supportTask.ResolveJourneySavedState.ModelStateValues,
+                kvp =>
+                {
+                    Assert.Equal("MatchedPersonId", kvp.Key);
+                    Assert.Equal(chosenPersonId.ToString(), kvp.Value);
+                });
+
+            var savedState = supportTask.ResolveJourneySavedState.GetState<ResolveOneLoginUserIdVerificationState>();
+            Assert.NotNull(savedState);
+            Assert.True(savedState.Verified);
+        });
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance);
+    }
+
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToListPage()
     {
         // Arrange
@@ -442,7 +512,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
             HttpMethod.Post,
             $"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder { { "Cancel", "true" } }
+            Content = new FormUrlEncodedContentBuilder { { "Action", "Cancel" } }
         };
 
         // Act

@@ -90,6 +90,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public async Task<IActionResult> OnPostAsync()
     {
+        ModelState.TryGetValue(nameof(ApiRoles), out var entry);
+
         // Sanitize roles
         var newApiRoles = ApiRoles!.Where(r => Core.ApiRoles.All.Contains(r)).ToArray();
 

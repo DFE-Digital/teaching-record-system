@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
@@ -9,11 +10,19 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerifi
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
 public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    public static class Actions
+    {
+        public const string SaveAndComeBackLater = nameof(SaveAndComeBackLater);
+        public const string Cancel = nameof(Cancel);
+    }
+
     private readonly InlineValidator<Matches> _validator = new()
     {
         v => v.RuleFor(m => m.MatchedPersonId)
             .NotNull().WithMessage("Select what you want to do with this GOV.UK One Login")
     };
+
+    private SupportTask? _supportTask;
 
     public JourneyInstance<ResolveOneLoginUserIdVerificationState> JourneyInstance { get; set; } = null!;
 
@@ -33,24 +42,54 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
 
     public void OnGet()
     {
+        JourneyInstance.State.ApplySavedModelStateValues(nameof(Matches), this.ModelState);
     }
 
-    public async Task<IActionResult> OnPostAsync(bool cancel)
+    public async Task<IActionResult> OnPostAsync(string? action)
     {
-        if (cancel)
+        if (action is Actions.Cancel)
         {
-            await JourneyInstance.DeleteAsync();
+            return await HandleCancelAsync();
+        }
 
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());
+        if (action is Actions.SaveAndComeBackLater)
+        {
+            return await HandleSaveAndReturnAsync();
         }
 
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance.UpdateStateAsync(state => state.MatchedPersonId = MatchedPersonId);
+        await JourneyInstance.UpdateStateAsync(state =>
+        {
+            state.MatchedPersonId = MatchedPersonId;
+            state.ClearSavedModelStateValues(nameof(Matches));
+        });
 
         return MatchedPersonId != ResolveOneLoginUserIdVerificationState.NotMatchedPersonIdSentinel ?
             Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.ConfirmConnect(SupportTaskReference, JourneyInstance.InstanceId)) :
             Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.NotConnecting(SupportTaskReference, JourneyInstance.InstanceId));
+    }
+
+    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    {
+        var savedJourneyState = this.CreateSavedJourneyState(
+            nameof(Matches),
+            JourneyInstance.State,
+            excludeKeys: ["Action", nameof(SupportTaskReference)]);
+
+        _supportTask!.ResolveJourneySavedState = savedJourneyState;
+        await dbContext.SaveChangesAsync();
+
+        await JourneyInstance.DeleteAsync();
+
+        return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());
+    }
+
+    private async Task<IActionResult> HandleCancelAsync()
+    {
+        await JourneyInstance.DeleteAsync();
+
+        return Redirect(linkGenerator.SupportTasks.OneLoginUserIdVerification.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -67,9 +106,9 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
             return;
         }
 
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var oneLoginUser = supportTask.OneLoginUser!;
-        var data = supportTask.GetData<OneLoginUserIdVerificationData>();
+        _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var oneLoginUser = _supportTask.OneLoginUser!;
+        var data = _supportTask.GetData<OneLoginUserIdVerificationData>();
 
         Name = $"{data.StatedFirstName} {data.StatedLastName}";
         DateOfBirth = data.StatedDateOfBirth;
