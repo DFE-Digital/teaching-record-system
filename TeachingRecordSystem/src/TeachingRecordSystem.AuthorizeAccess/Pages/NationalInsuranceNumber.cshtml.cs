@@ -1,16 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
-[Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-public class NationalInsuranceNumberModel(SignInJourneyHelper helper) : PageModel
+[Journey(SignInJourneyCoordinator.JourneyName)]
+public class NationalInsuranceNumberModel(SignInJourneyCoordinator coordinator) : PageModel
 {
-    public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
-
     [FromQuery]
     public bool? FromCheckAnswers { get; set; }
 
@@ -26,8 +22,8 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper) : PageMode
 
     public void OnGet()
     {
-        HaveNationalInsuranceNumber = JourneyInstance!.State.HaveNationalInsuranceNumber;
-        NationalInsuranceNumber = JourneyInstance!.State.NationalInsuranceNumber;
+        HaveNationalInsuranceNumber = coordinator.State.HaveNationalInsuranceNumber;
+        NationalInsuranceNumber = coordinator.State.NationalInsuranceNumber;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -49,26 +45,11 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper) : PageMode
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.SetNationalInsuranceNumber(HaveNationalInsuranceNumber!.Value, NationalInsuranceNumber));
+        coordinator.UpdateState(state => state.SetNationalInsuranceNumber(HaveNationalInsuranceNumber!.Value, NationalInsuranceNumber));
 
-        return await helper.TryMatchToTeachingRecordAsync(JourneyInstance!) ? Redirect(helper.LinkGenerator.Found(JourneyInstance!.InstanceId)) :
-            FromCheckAnswers == true ? Redirect(helper.LinkGenerator.CheckAnswers(JourneyInstance!.InstanceId)) :
-            Redirect(helper.LinkGenerator.Trn(JourneyInstance!.InstanceId));
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var state = JourneyInstance!.State;
-
-        if (state.AuthenticationTicket is not null)
-        {
-            // Already matched to a Teaching Record
-            context.Result = Redirect(helper.GetSafeRedirectUri(JourneyInstance));
-        }
-        else if (state.OneLoginAuthenticationTicket is null || !state.IdentityVerified)
-        {
-            // Not authenticated/verified with One Login
-            context.Result = BadRequest();
-        }
+        return await coordinator.AdvanceToAsync(async links =>
+            await coordinator.TryMatchToTeachingRecordAsync() ? links.Found() :
+            FromCheckAnswers == true ? links.CheckAnswers() :
+            links.Trn());
     }
 }

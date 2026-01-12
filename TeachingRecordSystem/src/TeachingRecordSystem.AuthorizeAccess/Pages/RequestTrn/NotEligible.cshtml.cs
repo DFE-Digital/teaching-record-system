@@ -4,8 +4,8 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class NotEligibleModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class NotEligibleModel(RequestTrnLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -14,7 +14,7 @@ public class NotEligibleModel(AuthorizeAccessLinkGenerator linkGenerator) : Page
         var state = JourneyInstance!.State;
         if (state.HasPendingTrnRequest)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.Submitted(JourneyInstance!.InstanceId));
         }
         else if (state.IsTakingNpq is null)
         {

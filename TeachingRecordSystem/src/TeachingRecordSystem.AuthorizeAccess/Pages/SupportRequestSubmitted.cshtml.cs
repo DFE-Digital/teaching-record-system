@@ -1,21 +1,18 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
-[Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-public class SupportRequestSubmittedModel(SignInJourneyHelper helper) : PageModel
+[Journey(SignInJourneyCoordinator.JourneyName)]
+public class SupportRequestSubmittedModel(SignInJourneyCoordinator coordinator) : PageModel
 {
-    public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
-
     public void OnGet()
     {
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var state = JourneyInstance!.State;
+        var state = coordinator.State;
 
         if (state.OneLoginAuthenticationTicket is null || !state.IdentityVerified)
         {
@@ -25,22 +22,22 @@ public class SupportRequestSubmittedModel(SignInJourneyHelper helper) : PageMode
         else if (state.AuthenticationTicket is not null)
         {
             // Already matched to a Teaching Record
-            context.Result = Redirect(helper.GetSafeRedirectUri(JourneyInstance));
+            context.Result = Redirect(coordinator.GetRedirectUri());
         }
         else if (!state.HaveNationalInsuranceNumber.HasValue)
         {
             // Not answered the NINO question
-            context.Result = Redirect(helper.LinkGenerator.NationalInsuranceNumber(JourneyInstance.InstanceId));
+            context.Result = Redirect(coordinator.Links.NationalInsuranceNumber());
         }
         else if (!state.HaveTrn.HasValue)
         {
             // Not answered the TRN question
-            context.Result = Redirect(helper.LinkGenerator.Trn(JourneyInstance.InstanceId));
+            context.Result = Redirect(coordinator.Links.Trn());
         }
         else if (!state.HasPendingSupportRequest)
         {
             // Not submitted a submit request
-            context.Result = Redirect(helper.LinkGenerator.CheckAnswers(JourneyInstance.InstanceId));
+            context.Result = Redirect(coordinator.Links.CheckAnswers());
         }
     }
 }

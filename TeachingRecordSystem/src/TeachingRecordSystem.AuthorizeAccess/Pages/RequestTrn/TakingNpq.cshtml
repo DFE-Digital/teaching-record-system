@@ -6,7 +6,7 @@
 @inject IConfiguration config;
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.RequestTrn(Model.JourneyInstance!.InstanceId, config.GetRequiredValue("RequestTrnAccessToken"))" />
+    <govuk-back-link href="@LinkGenerator.Index(Model.JourneyInstance!.InstanceId, config.GetRequiredValue("RequestTrnAccessToken"))" />
 }
 
 <div class="govuk-grid-row">

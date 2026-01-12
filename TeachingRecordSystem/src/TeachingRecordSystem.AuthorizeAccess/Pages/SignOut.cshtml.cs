@@ -1,16 +1,13 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
-[Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-public class SignOutModel : PageModel
+[Journey(SignInJourneyCoordinator.JourneyName)]
+public class SignOutModel(SignInJourneyCoordinator coordinator) : PageModel
 {
-    public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
-
-    public string ServiceName => JourneyInstance!.State.ServiceName;
+    public string ServiceName => coordinator.State.ServiceName;
 
     public void OnGet()
     {
@@ -18,9 +15,9 @@ public class SignOutModel : PageModel
 
     public IActionResult OnPost() =>
         SignOut(
-            new AuthenticationProperties()
+            new AuthenticationProperties
             {
-                RedirectUri = JourneyInstance!.State.ServiceUrl
+                RedirectUri = coordinator.State.ServiceUrl
             },
-            JourneyInstance.State.OneLoginAuthenticationScheme);
+            coordinator.State.OneLoginAuthenticationScheme);
 }

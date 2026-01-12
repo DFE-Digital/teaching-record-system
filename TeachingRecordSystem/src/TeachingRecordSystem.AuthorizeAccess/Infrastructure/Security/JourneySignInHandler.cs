@@ -1,32 +1,35 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 /// <summary>
 /// An <see cref="IAuthenticationSignInHandler"/> that persists an <see cref="AuthenticationTicket"/> to
-/// the current FormFlow instance's state.
+/// the current journey's state.
 /// </summary>
-public class FormFlowJourneySignInHandler(SignInJourneyHelper helper) : IAuthenticationSignInHandler
+public class JourneySignInHandler(IJourneyInstanceProvider journeyInstanceProvider) : IAuthenticationSignInHandler
 {
     private AuthenticationScheme? _scheme;
     private HttpContext? _context;
 
-    public async Task<AuthenticateResult> AuthenticateAsync()
+    public Task<AuthenticateResult> AuthenticateAsync()
     {
         EnsureInitialized();
 
-        var journeyInstance = await helper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context);
+        return Task.FromResult(Impl());
 
-        if (journeyInstance is null || journeyInstance.State.OneLoginAuthenticationTicket is null)
+        AuthenticateResult Impl()
         {
-            return AuthenticateResult.NoResult();
-        }
+            var coordinator = journeyInstanceProvider.GetJourneyInstance(_context) as SignInJourneyCoordinator;
 
-        return AuthenticateResult.Success(journeyInstance.State.OneLoginAuthenticationTicket);
+            if (coordinator?.State.OneLoginAuthenticationTicket is null)
+            {
+                return AuthenticateResult.NoResult();
+            }
+
+            return AuthenticateResult.Success(coordinator.State.OneLoginAuthenticationTicket);
+        }
     }
 
     public async Task ChallengeAsync(AuthenticationProperties? properties)
@@ -61,27 +64,26 @@ public class FormFlowJourneySignInHandler(SignInJourneyHelper helper) : IAuthent
             throw new InvalidOperationException($"{PropertyKeys.JourneyInstanceId} must be specified in {nameof(properties)}.");
         }
 
-        var journeyInstanceId = JourneyInstanceId.Deserialize(serializedInstanceId);
-
-        var journeyInstance = await helper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context, journeyInstanceId) ??
-            throw new InvalidOperationException("No FormFlow journey.");
+        var coordinator = (SignInJourneyCoordinator?)journeyInstanceProvider.GetJourneyInstance(_context) ??
+            throw new InvalidOperationException("No journey.");
 
         var ticket = new AuthenticationTicket(user, properties, _scheme.Name);
 
-        var result = await helper.OnOneLoginCallbackAsync(journeyInstance, ticket);
+        var result = await coordinator.OnOneLoginCallbackAsync(ticket);
 
-        // Override the redirect done by RemoteAuthenticationHandler
-        _context.Response.OnStarting(() => result.ExecuteAsync(_context));
+        await result.ExecuteAsync(_context);
     }
 
-    public async Task SignOutAsync(AuthenticationProperties? properties)
+    public Task SignOutAsync(AuthenticationProperties? properties)
     {
         EnsureInitialized();
 
-        var journeyInstance = await helper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context) ??
-            throw new InvalidOperationException("No FormFlow journey.");
+        var coordinator = journeyInstanceProvider.GetJourneyInstance(_context) as SignInJourneyCoordinator ??
+            throw new InvalidOperationException("No journey.");
 
-        await journeyInstance.UpdateStateAsync(state => state.Reset());
+        coordinator.OnSignOut();
+
+        return Task.CompletedTask;
     }
 
     [MemberNotNull(nameof(_context), nameof(_scheme))]

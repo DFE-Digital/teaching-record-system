@@ -3,74 +3,88 @@ using System.Security.Claims;
 using System.Transactions;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.WebCommon.FormFlow;
-using TeachingRecordSystem.WebCommon.FormFlow.State;
 using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
-public class SignInJourneyHelper(
+[JourneyCoordinator(JourneyName, routeValueKeys: [])]
+[UsedImplicitly]
+public class SignInJourneyCoordinator(
     TrsDbContext dbContext,
     OneLoginService oneLoginService,
     IdDbContext idDbContext,
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
-    IUserInstanceStateProvider userInstanceStateProvider,
-    IClock clock)
+    IClock clock) :
+    JourneyCoordinator<SignInJourneyState>
 {
-    public const string AuthenticationOnlyVtr = "Cl.Cm";
-    public const string AuthenticationAndIdentityVerificationVtr = "Cl.Cm.P2";
+    public const string JourneyName = "SignInJourney";
+
+    public static class Vtrs
+    {
+        public const string AuthenticationOnly = "Cl.Cm";
+        public const string AuthenticationAndIdentityVerification = "Cl.Cm.P2";
+    }
 
     // ID's database has a user_id column to indicate that a TRN token has been used already.
     // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
     private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
 
-    public AuthorizeAccessLinkGenerator LinkGenerator { get; } = linkGenerator;
+    private LinkHelper? _linkHelper;
 
-    public IUserInstanceStateProvider UserInstanceStateProvider { get; } = userInstanceStateProvider;
+    public LinkHelper Links => _linkHelper ??= new LinkHelper(linkGenerator, InstanceId);
+
+    //private AuthorizeAccessLinkGenerator LinkGenerator { get; } = linkGenerator;
 
     public bool ShowDebugPages => optionsAccessor.Value.ShowDebugPages;
 
-    public IResult SignInWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance) =>
-        OneLoginChallenge(journeyInstance, AuthenticationOnlyVtr);
+    public AdvanceToResult AdvanceTo(Func<LinkHelper, string> getUrl) => AdvanceTo(getUrl(Links));
 
-    public IResult VerifyIdentityWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance) =>
-        OneLoginChallenge(journeyInstance, AuthenticationAndIdentityVerificationVtr);
+    public async Task<AdvanceToResult> AdvanceToAsync(Func<LinkHelper, Task<string>> getUrl)
+    {
+        var url = await getUrl(Links);
+        return AdvanceTo(url);
+    }
 
-    public async Task<IResult> OnOneLoginCallbackAsync(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    public IResult SignInWithOneLogin() =>
+        OneLoginChallenge(Vtrs.AuthenticationOnly);
+
+    public IResult VerifyIdentityWithOneLogin() =>
+        OneLoginChallenge(Vtrs.AuthenticationAndIdentityVerification);
+
+    public async Task<IResult> OnOneLoginCallbackAsync(AuthenticationTicket ticket)
     {
         if (!ticket.Properties.TryGetVectorsOfTrust(out var vtr))
         {
             throw new InvalidOperationException("No vtr.");
         }
 
-        if (vtr.SequenceEqual([AuthenticationOnlyVtr]))
+        if (vtr.SequenceEqual([Vtrs.AuthenticationOnly]))
         {
-            await OnUserAuthenticatedAsync(journeyInstance, ticket);
+            await OnUserAuthenticatedAsync(ticket);
         }
         else
         {
-            Debug.Assert(vtr.SequenceEqual([AuthenticationAndIdentityVerificationVtr]));
-            Debug.Assert(journeyInstance.State.OneLoginAuthenticationTicket is not null);
-            await OnUserVerifiedAsync(journeyInstance, ticket);
+            Debug.Assert(vtr.SequenceEqual([Vtrs.AuthenticationAndIdentityVerification]));
+            Debug.Assert(State.OneLoginAuthenticationTicket is not null);
+            await OnUserVerifiedAsync(ticket);
         }
 
         if (ShowDebugPages)
         {
-            return Results.Redirect(LinkGenerator.DebugIdentity(journeyInstance.InstanceId));
+            return SetPathAndAdvanceTo(Links.DebugIdentity());
         }
 
-        return GetNextPage(journeyInstance);
+        return GetNextPage();
     }
 
-    public async Task OnUserAuthenticatedAsync(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    public async Task OnUserAuthenticatedAsync(AuthenticationTicket ticket)
     {
         var sub = ticket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
         var email = ticket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
@@ -118,7 +132,7 @@ public class SignInJourneyHelper(
 
         await dbContext.SaveChangesAsync();
 
-        await journeyInstance.UpdateStateAsync(state =>
+        UpdateState(state =>
         {
             state.Reset();
             state.OneLoginAuthenticationTicket = ticket;
@@ -137,14 +151,13 @@ public class SignInJourneyHelper(
         });
     }
 
-    public Task OnUserVerifiedAsync(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    public Task OnUserVerifiedAsync(AuthenticationTicket ticket)
     {
         var verifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
         var verifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
         var coreIdentityClaimVc = ticket.Principal.FindFirstValue("vc") ?? throw new InvalidOperationException("No vc claim present.");
 
         return OnUserVerifiedCoreAsync(
-            journeyInstance,
             verifiedNames,
             verifiedDatesOfBirth,
             coreIdentityClaimVc,
@@ -152,13 +165,12 @@ public class SignInJourneyHelper(
     }
 
     public async Task OnUserVerifiedCoreAsync(
-        JourneyInstance<SignInJourneyState> journeyInstance,
         string[][] verifiedNames,
         DateOnly[] verifiedDatesOfBirth,
         string? coreIdentityClaimVc,
         Action<SignInJourneyState>? updateState = null)
     {
-        var sub = journeyInstance.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+        var sub = State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
 
         var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == sub);
         oneLoginUser.SetVerified(clock.UtcNow, OneLoginUserVerificationRoute.OneLogin, verifiedByApplicationUserId: null, verifiedNames, verifiedDatesOfBirth);
@@ -185,7 +197,7 @@ public class SignInJourneyHelper(
 
         await dbContext.SaveChangesAsync();
 
-        await journeyInstance.UpdateStateAsync(state =>
+        UpdateState(state =>
         {
             updateState?.Invoke(state);
             state.AttemptedIdentityVerification = true;
@@ -209,7 +221,7 @@ public class SignInJourneyHelper(
             using var sc = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
 
             // First try and match on TRN Token
-            if (journeyInstance.State.TrnToken is string trnToken)
+            if (State.TrnToken is string trnToken)
             {
                 trnTokenModel = await idDbContext.TrnTokens.SingleOrDefaultAsync(
                     t => t.TrnToken == trnToken && t.ExpiresUtc > clock.UtcNow && t.UserId == null);
@@ -266,58 +278,57 @@ public class SignInJourneyHelper(
         }
     }
 
-    public async Task<IResult> OnVerificationFailedAsync(JourneyInstance<SignInJourneyState> journeyInstance)
+    public IResult OnVerificationFailed()
     {
-        await journeyInstance.UpdateStateAsync(state =>
+        UpdateState(state =>
         {
             state.AttemptedIdentityVerification = true;
         });
 
-        return GetNextPage(journeyInstance);
+        return GetNextPage();
     }
 
-    public IResult GetNextPage(JourneyInstance<SignInJourneyState> journeyInstance) => journeyInstance.State switch
+    public void OnSignOut() => UpdateState(s => s.Reset());
+
+    public IResult GetNextPage() => State switch
     {
         // Authentication is complete
-        { AuthenticationTicket: not null } => Results.Redirect(GetSafeRedirectUri(journeyInstance)),
+        { AuthenticationTicket: not null } => SetPathAndAdvanceTo(GetRedirectUri()),
 
         // Authenticated with OneLogin, identity verification succeeded, not yet matched to teaching record
         { OneLoginAuthenticationTicket: not null, IdentityVerified: true, AuthenticationTicket: null } =>
-            Results.Redirect(LinkGenerator.Connect(journeyInstance.InstanceId)),
+            SetPathAndAdvanceTo(Links.Connect()),
 
         // Authenticated with OneLogin, not yet verified
         { OneLoginAuthenticationTicket: not null, IdentityVerified: false, AttemptedIdentityVerification: false } =>
-            VerifyIdentityWithOneLogin(journeyInstance),
+            VerifyIdentityWithOneLogin(),
 
         // Authenticated with OneLogin, identity verification failed
-        { OneLoginAuthenticationTicket: not null, IdentityVerified: false } => Results.Redirect(LinkGenerator.NotVerified(journeyInstance.InstanceId)),
+        { OneLoginAuthenticationTicket: not null, IdentityVerified: false } => SetPathAndAdvanceTo(Links.NotVerified()),
 
         _ => throw new InvalidOperationException("Cannot determine next page.")
     };
 
-    public string GetSafeRedirectUri(JourneyInstance<SignInJourneyState> journeyInstance) =>
-        EnsureUrlHasJourneyId(journeyInstance.State.RedirectUri, journeyInstance.InstanceId);
+    public string GetRedirectUri() => State.RedirectUri;
 
-    public async Task<bool> TryMatchToTeachingRecordAsync(JourneyInstance<SignInJourneyState> journeyInstance)
+    public async Task<bool> TryMatchToTeachingRecordAsync()
     {
-        var state = journeyInstance.State;
-
-        if (state.OneLoginAuthenticationTicket is null || !state.IdentityVerified)
+        if (State.OneLoginAuthenticationTicket is null || !State.IdentityVerified)
         {
             throw new InvalidOperationException("Cannot match to a teaching record without a verified One Login user.");
         }
 
-        var names = state.VerifiedNames;
-        var datesOfBirth = state.VerifiedDatesOfBirth;
-        var nationalInsuranceNumber = state.NationalInsuranceNumber;
-        var trn = state.Trn;
-        var trnTokenTrn = state.TrnTokenTrn;
+        var names = State.VerifiedNames;
+        var datesOfBirth = State.VerifiedDatesOfBirth;
+        var nationalInsuranceNumber = State.NationalInsuranceNumber;
+        var trn = State.Trn;
+        var trnTokenTrn = State.TrnTokenTrn;
 
         var matchResult = await oneLoginService.MatchPersonAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn, trnTokenTrn));
 
         if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {
-            var subject = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+            var subject = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
 
             var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == subject);
             oneLoginUser.FirstSignIn = clock.UtcNow;
@@ -325,12 +336,20 @@ public class SignInJourneyHelper(
             oneLoginUser.SetMatched(clock.UtcNow, matchedPersonId, OneLoginUserMatchRoute.Interactive, matchedAttributes.ToArray());
             await dbContext.SaveChangesAsync();
 
-            await journeyInstance.UpdateStateAsync(state => Complete(state, matchedTrn));
+            UpdateState(state => Complete(state, matchedTrn));
 
             return true;
         }
 
         return false;
+    }
+
+    private IResult SetPathAndAdvanceTo(string url)
+    {
+        var step = CreateStepFromUrl(url);
+        var path = new JourneyPath([step]);
+        UnsafeSetPath(path);
+        return Results.Redirect(url);
     }
 
     private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser)
@@ -401,26 +420,34 @@ public class SignInJourneyHelper(
         state.AuthenticationTicket = new AuthenticationTicket(principal, properties: null, AuthenticationSchemes.MatchToTeachingRecord);
     }
 
-    private static string EnsureUrlHasJourneyId(string url, JourneyInstanceId instanceId)
-    {
-        var queryParamName = Constants.UniqueKeyQueryParameterName;
-
-        if (!url.Contains($"{queryParamName}=", StringComparison.Ordinal))
-        {
-            return QueryHelpers.AddQueryString(url, queryParamName, instanceId.UniqueKey!);
-        }
-        else
-        {
-            return url;
-        }
-    }
-
-    private IResult OneLoginChallenge(JourneyInstance<SignInJourneyState> journeyInstance, string vtr)
+    private IResult OneLoginChallenge(string vtr)
     {
         var delegatedProperties = new AuthenticationProperties();
         delegatedProperties.SetVectorsOfTrust([vtr]);
-        delegatedProperties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
-        return Results.Challenge(delegatedProperties, authenticationSchemes: [journeyInstance.State.OneLoginAuthenticationScheme]);
+        delegatedProperties.Items.Add(JourneySignInHandler.PropertyKeys.JourneyInstanceId, InstanceId.ToString());
+        return Results.Challenge(delegatedProperties, authenticationSchemes: [State.OneLoginAuthenticationScheme]);
+    }
+
+    public sealed class LinkHelper(AuthorizeAccessLinkGenerator linkGenerator, JourneyInstanceId instanceId)
+    {
+        public string DebugIdentity() => linkGenerator.DebugIdentity(instanceId);
+
+        public string Connect() => linkGenerator.Connect(instanceId);
+
+        public string NationalInsuranceNumber(string? returnUrl = null) =>
+            linkGenerator.NationalInsuranceNumber(instanceId, returnUrl);
+
+        public string Trn(string? returnUrl = null) => linkGenerator.Trn(instanceId, returnUrl);
+
+        public string CheckAnswers() => linkGenerator.CheckAnswers(instanceId);
+
+        public string SupportRequestSubmitted() => linkGenerator.SupportRequestSubmitted(instanceId);
+
+        public string Found() => linkGenerator.Found(instanceId);
+
+        public string NotFound() => linkGenerator.NotFound(instanceId);
+
+        public string NotVerified() => linkGenerator.NotVerified(instanceId);
     }
 
     private record TryMatchToIdentityUserResult(

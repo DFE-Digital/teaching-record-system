@@ -2284,6 +2284,11 @@
         "resolved": "6.1.0",
         "contentHash": "UGdtyKWJqXXinyvGB9X6NVoIYbTAidoZYmn3aXzxeEYC9+OL8vF36eDt1qjb6RqBkWDl4v7iE84ecI+dFhA80A=="
       },
+      "UUID": {
+        "type": "Transitive",
+        "resolved": "1.1.1",
+        "contentHash": "K/eeCvoeofNIg2SKG04/XbrjBmAYfWEOAJ12XkwPx3dxBSAiUh5CeutPbFgiiRzyWPJqDb3m0DRrtntgIiP2wQ=="
+      },
       "xunit.v3.common": {
         "type": "Transitive",
         "resolved": "3.2.0",
@@ -2345,6 +2350,7 @@
           "Dfe.Analytics": "[0.2.6, )",
           "GovUk.Frontend.AspNetCore": "[3.4.3, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.0, )",
+          "GovUk.Questions.AspNetCore": "[0.1.0-alpha.0.82, )",
           "Humanizer.Core": "[2.14.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
@@ -2636,6 +2642,15 @@
         "contentHash": "xmddqVvAp7m9B47sk9mczdGk/IjKca5dbnClcJCAOf/D4/sGbKbjavR2szu1uXWEIHU5v+TgegEia48LFed0IA==",
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.16"
+        }
+      },
+      "GovUk.Questions.AspNetCore": {
+        "type": "CentralTransitive",
+        "requested": "[0.1.0-alpha.0.82, )",
+        "resolved": "0.1.0-alpha.0.82",
+        "contentHash": "2wk1vDi/zN8usGppzB/s1++3akRUxDHcnU88IKUTSpQ7LxXbSsEWOCrVs61KEv/rfJTkuvFfN6X3lsVyAfmYBA==",
+        "dependencies": {
+          "UUID": "1.1.1"
         }
       },
       "GovukNotify": {

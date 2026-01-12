@@ -4,8 +4,8 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class SubmittedModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class SubmittedModel(RequestTrnLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -13,7 +13,7 @@ public class SubmittedModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMo
     {
         if (!JourneyInstance!.State.HasPendingTrnRequest)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.CheckAnswers(JourneyInstance!.InstanceId));
         }
     }
 }

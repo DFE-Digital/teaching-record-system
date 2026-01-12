@@ -1,16 +1,18 @@
 @page "/check-answers"
+@inject SignInJourneyCoordinator.LinkHelper Links
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.AuthorizeAccess.Pages.CheckAnswersModel
 @{
     ViewBag.Title = "Check your answers";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NotFound(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@Links.NotFound()" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.CheckAnswers(Model.JourneyInstance!.InstanceId)" method="post">
+        <form method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <h2 class="govuk-heading-m">GOV.UK One Login</h2>
@@ -41,7 +43,10 @@
                         @(Model.NationalInsuranceNumber ?? "None")
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="National Insurance number">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@Links.NationalInsuranceNumber(returnUrl: Request.GetEncodedPathAndQuery())"
+                                                       visually-hidden-text="National Insurance number">
+                            Change
+                        </govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -52,7 +57,10 @@
                         @(Model.Trn ?? "None")
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="teacher reference number">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@Links.Trn(returnUrl: Request.GetEncodedPathAndQuery())"
+                                                       visually-hidden-text="teacher reference number">
+                            Change
+                        </govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>

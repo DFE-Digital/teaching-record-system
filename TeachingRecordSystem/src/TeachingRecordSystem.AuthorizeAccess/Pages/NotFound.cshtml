@@ -1,14 +1,15 @@
 @page "/not-found"
+@inject SignInJourneyCoordinator.LinkHelper Links
 @model TeachingRecordSystem.AuthorizeAccess.Pages.NotFoundModel
 @{
     ViewBag.Title = "We haven’t found your teaching record";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@Links.Trn()" />
 }
 
-<form action="@LinkGenerator.NotFound(Model.JourneyInstance!.InstanceId)" method="post">
+<form method="post">
     <govuk-panel class="govuk-panel--interruption">
         <govuk-panel-title>@ViewBag.Title</govuk-panel-title>
 

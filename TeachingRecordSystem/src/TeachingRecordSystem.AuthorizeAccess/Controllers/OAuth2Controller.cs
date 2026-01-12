@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Claims;
 using Dfe.Analytics.AspNetCore;
 using Microsoft.AspNetCore;
@@ -16,12 +17,14 @@ namespace TeachingRecordSystem.AuthorizeAccess.Controllers;
 
 public class OAuth2Controller(
     TrsDbContext dbContext,
+    IJourneyInstanceProvider journeyInstanceProvider,
     IOpenIddictAuthorizationManager authorizationManager,
     IOpenIddictScopeManager scopeManager) : Controller
 {
     [HttpGet("~/oauth2/authorize")]
     [HttpPost("~/oauth2/authorize")]
     [IgnoreAntiforgeryToken]
+    [Journey(SignInJourneyCoordinator.JourneyName, Optional = true)]
     public async Task<IActionResult> AuthorizeAsync()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -57,17 +60,31 @@ public class OAuth2Controller(
             var serviceUrl = new Uri(request.RedirectUri!).GetLeftPart(UriPartial.Authority);
             var trnToken = parameters.GroupBy(kvp => kvp.Key).FirstOrDefault(kvp => kvp.Key == "trn_token")?.Select(kvp => kvp.Value).FirstOrDefault();
 
-            var authenticationProperties = new AuthenticationProperties()
-            {
-                RedirectUri = Request.PathBase + Request.Path + QueryString.Create(parameters),
-                Items =
+            var redirectToSelf = Request.PathBase + Request.Path + QueryString.Create(parameters);
+
+            var coordinator = journeyInstanceProvider.GetJourneyInstance(HttpContext);
+
+            coordinator ??= await journeyInstanceProvider.TryCreateNewInstanceAsync(
+                HttpContext,
+                ctx =>
                 {
-                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, client.OneLoginAuthenticationSchemeName },
-                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, client.Name },
-                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, serviceUrl },
-                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ClientApplicationUserId, client.UserId.ToString() },
-                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.TrnToken, trnToken }
-                }
+                    redirectToSelf += $"&{JourneyInstanceId.KeyRouteValueName}={Uri.EscapeDataString(ctx.InstanceId.Key)}";
+
+                    var state = new SignInJourneyState(
+                        redirectToSelf,
+                        client.Name,
+                        serviceUrl,
+                        client.OneLoginAuthenticationSchemeName!,
+                        client.UserId,
+                        trnToken);
+
+                    return Task.FromResult<object>(state);
+                });
+            Debug.Assert(coordinator is not null);
+
+            var authenticationProperties = new AuthenticationProperties
+            {
+                RedirectUri = redirectToSelf
             };
 
             return Challenge(authenticationProperties, childAuthenticationScheme);

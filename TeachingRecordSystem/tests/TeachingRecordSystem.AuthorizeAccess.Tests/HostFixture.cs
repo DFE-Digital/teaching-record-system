@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using GovUk.OneLogin.AspNetCore;
+using GovUk.Questions.AspNetCore.Testing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -87,7 +88,8 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton<TestData>()
                     .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                     .AddSingleton(GetMockFileService())
-                    .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>();
+                    .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()
+                    .AddGovUkQuestionsTestingServices();
 
                 TestScopedServices.ConfigureServices(services);
 

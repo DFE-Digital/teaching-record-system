@@ -7,8 +7,8 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock clock) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class DateOfBirthModel(RequestTrnLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -40,8 +40,8 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock
         await JourneyInstance!.UpdateStateAsync(state => state.DateOfBirth = DateOfBirth);
 
         return FromCheckAnswers == true ?
-            Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.RequestTrnIdentity(JourneyInstance!.InstanceId));
+            Redirect(linkGenerator.CheckAnswers(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.Identity(JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -49,11 +49,11 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock
         var state = JourneyInstance!.State;
         if (state.HasPendingTrnRequest)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.Submitted(JourneyInstance!.InstanceId));
         }
         else if (state.HasPreviousName is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnPreviousName(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.PreviousName(JourneyInstance.InstanceId));
         }
     }
 }

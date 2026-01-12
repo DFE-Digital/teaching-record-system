@@ -1,25 +1,22 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using GovUk.OneLogin.AspNetCore;
+using GovUk.Questions.AspNetCore.Description;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.WebCommon.FormFlow;
-using static TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security.FormFlowJourneySignInHandler;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 public sealed class OneLoginAuthenticationSchemeProvider(
-        IAuthenticationSchemeProvider innerProvider,
-        IDbContextFactory<TrsDbContext> dbContextFactory,
+    IAuthenticationSchemeProvider innerProvider,
+    IDbContextFactory<TrsDbContext> dbContextFactory,
         IOptions<AuthorizeAccessOptions> authorizeAccessOptionsAccessor,
-        IOptionsMonitorCache<OneLoginOptions> oneLoginOptionsMonitorCache,
-        ILogger<OneLoginAuthenticationSchemeProvider> logger) :
+    IOptionsMonitorCache<OneLoginOptions> oneLoginOptionsMonitorCache,
+    ILogger<OneLoginAuthenticationSchemeProvider> logger) :
     IAuthenticationSchemeProvider, IConfigureNamedOptions<OneLoginOptions>, IDisposable, IHostedService
 {
     private IReadOnlyCollection<AuthenticationSchemeAndApplicationUser> _schemeCache = [];
@@ -137,8 +134,42 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         var user = GetApplicationUserForScheme(name);
         user.EnsureConfiguredForOneLogin();
 
-        options.SignInScheme = AuthenticationSchemes.FormFlowJourney;
-        options.UseJwtSecuredAuthorizationRequest = false;  // TEMP, the default is currently broken in OneLogin.AspNetCore package
+        options.SignInScheme = AuthenticationSchemes.SignInJourney;
+
+        options.Events.OnMessageReceived = context =>
+        {
+            if (context.Request.Path == context.Options.CallbackPath)
+            {
+                // Ensure we've got the journey instance key in the URL
+                // and the journey metadata on the endpoint so the coordinator can be activated.
+
+                if (!context.Request.Query.ContainsKey(JourneyInstanceId.KeyRouteValueName))
+                {
+                    if (context.Properties is null ||
+                        !context.Properties.Items.TryGetValue(JourneySignInHandler.PropertyKeys.JourneyInstanceId, out var serializedInstanceId) ||
+                        serializedInstanceId is null)
+                    {
+                        throw new InvalidOperationException(
+                            $"{JourneySignInHandler.PropertyKeys.JourneyInstanceId} must be specified in {nameof(context.Properties)}.");
+                    }
+
+                    var instanceId = JourneyInstanceId.Parse(serializedInstanceId);
+
+                    var queryParams = context.HttpContext.Request.Query.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                    queryParams[JourneyInstanceId.KeyRouteValueName] = instanceId.Key;
+                    context.HttpContext.Request.Query = new QueryCollection(queryParams);
+                }
+
+                context.HttpContext.SetEndpoint(
+                    new Endpoint(
+                        requestDelegate: null,
+                        metadata: new EndpointMetadataCollection(
+                            new EndpointJourneyMetadata { JourneyName = SignInJourneyCoordinator.JourneyName }),
+                        displayName: null));
+            }
+
+            return Task.CompletedTask;
+        };
 
         options.Events.OnRedirectToIdentityProviderForSignOut = context =>
         {
@@ -156,19 +187,30 @@ public sealed class OneLoginAuthenticationSchemeProvider(
             return Task.CompletedTask;
         };
 
+        options.Events.OnTicketReceived = async context =>
+        {
+            context.HandleResponse();
+
+            await context.HttpContext.SignInAsync(
+                AuthenticationSchemes.SignInJourney,
+                context.Principal!,
+                context.Properties);
+        };
+
         options.Events.OnAccessDenied = async context =>
         {
             // This handles the scenario where we've requested ID verification but One Login couldn't do it.
 
-            if (context.Properties!.TryGetVectorsOfTrust(out var vtr) && vtr.SequenceEqual([SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr]) &&
-                TryGetJourneyInstanceId(context.Properties, out var journeyInstanceId))
+            if (context.Properties!.TryGetVectorsOfTrust(out var vtr) &&
+                vtr.SequenceEqual([SignInJourneyCoordinator.Vtrs.AuthenticationAndIdentityVerification]))
             {
                 context.HandleResponse();
 
-                var signInJourneyHelper = context.HttpContext.RequestServices.GetRequiredService<SignInJourneyHelper>();
-                var journeyInstance = (await signInJourneyHelper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(context.HttpContext, journeyInstanceId))!;
+                var journeyInstanceProvider = context.HttpContext.RequestServices.GetRequiredService<IJourneyInstanceProvider>();
+                var coordinator = journeyInstanceProvider.GetSignInJourneyCoordinator(context.HttpContext) ??
+                    throw new InvalidOperationException("No journey.");
 
-                var result = await signInJourneyHelper.OnVerificationFailedAsync(journeyInstance);
+                var result = coordinator.OnVerificationFailed();
                 await result.ExecuteAsync(context.HttpContext);
             }
         };
@@ -203,21 +245,6 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         options.NonceCookie.Name = "onelogin-nonce.";
 
         static string EnsurePrefixedWithSlash(string value) => !value.StartsWith('/') ? "/" + value : value;
-
-        static bool TryGetJourneyInstanceId(
-            AuthenticationProperties? properties,
-            [NotNullWhen(true)] out JourneyInstanceId? journeyInstanceId)
-        {
-            if (properties?.Items.TryGetValue(PropertyKeys.JourneyInstanceId, out var serializedInstanceId) == true
-                && serializedInstanceId is not null)
-            {
-                journeyInstanceId = JourneyInstanceId.Deserialize(serializedInstanceId);
-                return true;
-            }
-
-            journeyInstanceId = default;
-            return false;
-        }
     }
 
     void IConfigureOptions<OneLoginOptions>.Configure(OneLoginOptions options)
