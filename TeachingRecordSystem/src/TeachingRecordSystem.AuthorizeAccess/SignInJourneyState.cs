@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
@@ -14,11 +13,6 @@ public class SignInJourneyState(
     Guid clientApplicationUserId,
     string? trnToken = null)
 {
-    public const string JourneyName = "SignInJourney";
-
-    public static JourneyDescriptor JourneyDescriptor { get; } =
-        new JourneyDescriptor(JourneyName, typeof(SignInJourneyState), requestDataKeys: [], appendUniqueKey: true);
-
     public string RedirectUri { get; } = redirectUri;
 
     public string ServiceName { get; } = serviceName;

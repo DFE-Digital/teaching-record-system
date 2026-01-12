@@ -8,8 +8,8 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileService fileService) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class IdentityModel(RequestTrnLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -85,8 +85,8 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
         });
 
         return FromCheckAnswers == true ?
-            Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.RequestTrnNationalInsuranceNumber(JourneyInstance!.InstanceId));
+            Redirect(linkGenerator.CheckAnswers(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.NationalInsuranceNumber(JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -94,11 +94,11 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
         var state = JourneyInstance!.State;
         if (state.HasPendingTrnRequest)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.Submitted(JourneyInstance!.InstanceId));
         }
         else if (state.DateOfBirth is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnDateOfBirth(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.DateOfBirth(JourneyInstance.InstanceId));
         }
 
         if (context.Result is null)

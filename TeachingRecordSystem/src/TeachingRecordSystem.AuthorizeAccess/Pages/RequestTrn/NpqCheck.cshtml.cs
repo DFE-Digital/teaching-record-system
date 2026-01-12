@@ -6,8 +6,8 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class NpqCheckModel(RequestTrnLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -29,7 +29,7 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
 
         await JourneyInstance!.UpdateStateAsync(state => state.HaveRegisteredForAnNpq = HaveRegisteredForAnNpq);
 
-        return Redirect(linkGenerator.RequestTrnNpqName(JourneyInstance.InstanceId));
+        return Redirect(linkGenerator.NpqName(JourneyInstance.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -37,7 +37,7 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
         var state = JourneyInstance!.State;
         if (state.HasPendingTrnRequest)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.Submitted(JourneyInstance!.InstanceId));
         }
     }
 }

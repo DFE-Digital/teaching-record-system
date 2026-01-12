@@ -1,16 +1,17 @@
 @page "/trn"
+@inject SignInJourneyCoordinator.LinkHelper Links
 @model TeachingRecordSystem.AuthorizeAccess.Pages.TrnModel
 @{
     ViewBag.Title = "Teacher reference number (TRN)";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@Links.NationalInsuranceNumber()" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-details>

@@ -4,7 +4,7 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), ActivatesJourney, RequireJourneyInstance]
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(IConfiguration configuration) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }

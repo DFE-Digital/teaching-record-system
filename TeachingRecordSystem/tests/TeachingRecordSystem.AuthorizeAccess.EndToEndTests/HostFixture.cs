@@ -73,7 +73,9 @@ public sealed class HostFixture : InitializeDbFixture
 
                 builder.ConfigureServices((context, services) =>
                 {
-                    services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
+                    services.AddDbContext<IdDbContext>(
+                        options => options.UseInMemoryDatabase("TeacherAuthId"),
+                        contextLifetime: ServiceLifetime.Transient);
 
                     services.Configure<AuthenticationOptions>(options =>
                     {
@@ -184,8 +186,9 @@ public sealed class HostFixture : InitializeDbFixture
 
         _initialized = true;
 
-        await Services.GetRequiredService<DbHelper>().InitializeAsync();
-
+        var dbHelper = Services.GetRequiredService<DbHelper>();
+        await dbHelper.InitializeAsync();
+        await dbHelper.ClearDataAsync();
         await AddTestAppToApplicationUsers();
     }
 

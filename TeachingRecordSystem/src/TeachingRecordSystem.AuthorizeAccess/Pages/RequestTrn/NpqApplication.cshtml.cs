@@ -5,8 +5,8 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class NpqApplicationModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class NpqApplicationModel(RequestTrnLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -28,11 +28,11 @@ public class NpqApplicationModel(AuthorizeAccessLinkGenerator linkGenerator) : P
 
         if (FromCheckAnswers == true)
         {
-            return Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId));
+            return Redirect(linkGenerator.CheckAnswers(JourneyInstance!.InstanceId));
         }
         else
         {
-            return Redirect(linkGenerator.RequestTrnWorkingInSchoolOrEducationalSetting(JourneyInstance.InstanceId));
+            return Redirect(linkGenerator.WorkingInSchoolOrEducationalSetting(JourneyInstance.InstanceId));
         }
 
     }

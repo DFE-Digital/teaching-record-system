@@ -5,8 +5,8 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class TakingNpqModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class TakingNpqModel(RequestTrnLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -24,7 +24,7 @@ public class TakingNpqModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMo
         await JourneyInstance!.UpdateStateAsync(state => state.IsTakingNpq = IsTakingAnNpq);
 
         return IsTakingAnNpq == true ?
-            Redirect(linkGenerator.RequestTrnNpqCheck(JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.RequestTrnNotEligible(JourneyInstance.InstanceId));
+            Redirect(linkGenerator.NpqCheck(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.NotEligible(JourneyInstance.InstanceId));
     }
 }

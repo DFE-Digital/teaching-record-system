@@ -78,12 +78,13 @@ app.UseStaticFiles();
 if (builder.Environment.IsProduction())
 {
     app.UseDfeAnalytics();
+    app.UseMiddleware<AddAnalyticsDataMiddleware>();
 }
-
-app.UseMiddleware<AddAnalyticsDataMiddleware>();
 
 app.UseRouting();
 app.UseTransactions();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
