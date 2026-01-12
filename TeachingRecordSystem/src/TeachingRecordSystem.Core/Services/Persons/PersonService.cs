@@ -328,6 +328,21 @@ public class PersonService(
         deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
         deactivatingPerson.UpdatedOn = now;
 
+        // If the deactivated person was associated with a One Login User, transfer that association to the retained person
+        var oneLoginUser = await dbContext.OneLoginUsers
+            .SingleOrDefaultAsync(u => u.PersonId == deactivatingPerson.PersonId);
+
+        if (oneLoginUser is not null)
+        {
+            oneLoginUser.SetMatched(
+                now,
+                retainedPerson.PersonId,
+                OneLoginUserMatchRoute.SupportUi,
+                matchedAttributes: null);
+
+            // Events to be added in follow up work
+        }
+
         await dbContext.SaveChangesAsync();
 
         await eventPublisher.PublishEventAsync(

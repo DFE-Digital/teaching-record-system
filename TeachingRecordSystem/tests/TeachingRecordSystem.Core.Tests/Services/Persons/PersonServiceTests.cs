@@ -1103,6 +1103,46 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         });
     }
 
+    [Fact]
+    public async Task MergePersonsAsync_PersonToDeactivateIsAssociatedWithOneLoginUser_AssociatesThatOneLoginUserWithRetainedPerson()
+    {
+        // Arrange
+        var personToRetain = await TestData.CreatePersonAsync();
+        var personToDeactivate = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(
+            personId: personToDeactivate.PersonId,
+            verifiedInfo: ([personToDeactivate.FirstName, personToDeactivate.LastName], personToDeactivate.DateOfBirth));
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "evidence.jpg";
+        var comments = Faker.Lorem.Paragraph();
+
+        var options = new MergePersonsOptions(
+            personToDeactivate.PersonId,
+            personToRetain.PersonId,
+            personToRetain.Person.Details,
+            new()
+            {
+                FileId = evidenceFileId,
+                Name = evidenceFileName
+            },
+            comments);
+
+        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedOneLoginUser = await dbContext.OneLoginUsers
+                .SingleAsync(o => o.Subject == oneLoginUser.Subject);
+            Assert.Equal(personToRetain.PersonId, updatedOneLoginUser.PersonId);
+            Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
+            Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
+        });
+    }
+
     private Task WithServiceAsync(Func<PersonService, Task> action, params object[] arguments) =>
         WithServiceAsync<PersonService>(action, arguments);
 

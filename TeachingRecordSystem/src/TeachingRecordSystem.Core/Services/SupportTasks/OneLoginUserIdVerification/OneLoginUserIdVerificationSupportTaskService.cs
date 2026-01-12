@@ -125,7 +125,7 @@ public class OneLoginUserIdVerificationSupportTaskService(
             {
                 OneLoginUserSubject = supportTask.OneLoginUserSubject!,
                 MatchedPersonId = options.MatchedPersonId,
-                MatchRoute = OneLoginUserMatchRoute.Support,
+                MatchRoute = OneLoginUserMatchRoute.SupportUi,
                 MatchedAttributes = options.MatchedAttributes
             },
             processContext);

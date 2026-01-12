@@ -162,7 +162,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
 
             oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject);
             Assert.Equal(person.PersonId, oneLoginUser.PersonId);
-            Assert.Equal(OneLoginUserMatchRoute.Support, oneLoginUser.MatchRoute);
+            Assert.Equal(OneLoginUserMatchRoute.SupportUi, oneLoginUser.MatchRoute);
             Assert.NotEmpty(oneLoginUser.MatchedAttributes!);
         });
     }

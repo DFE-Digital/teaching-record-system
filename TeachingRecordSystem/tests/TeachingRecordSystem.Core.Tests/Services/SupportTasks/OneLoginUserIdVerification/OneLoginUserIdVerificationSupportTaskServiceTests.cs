@@ -209,7 +209,7 @@ public class OneLoginUserIdVerificationSupportTaskServiceTests(ServiceFixture fi
         Assert.Collection(updatedOneLoginUser.VerifiedDatesOfBirth, dob => Assert.Equal(data.StatedDateOfBirth, dob));
         Assert.Equal(matchedPerson.PersonId, updatedOneLoginUser.PersonId);
         Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
-        Assert.Equal(OneLoginUserMatchRoute.Support, updatedOneLoginUser.MatchRoute);
+        Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
         Assert.NotNull(updatedOneLoginUser.MatchedAttributes);
 
         await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
