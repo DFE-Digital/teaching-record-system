@@ -63,6 +63,45 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
+    [InlineData("Smith", new[] { "ST1" })]
+    [InlineData("Jim", new[] { "ST1" })]
+    [InlineData("Jim Smith", new[] { "ST1" })]
+    [InlineData("1 Jan 2025", new[] { "ST1" })]
+    [InlineData("10/10/2023", new[] { "ST2" })]
+    public async Task Get_Search_ShowsMatchingResult(string search, string[] taskKeys)
+    {
+        // Arrange
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+                createdOn: new DateTime(2025, 1, 1),
+                fileName: "zzzzzz.csv",
+                integrationTransactionId: 100,
+                configurePerson: p => p
+                    .WithFirstName("Smith")
+                    .WithLastName("Jim")
+                    .WithDateOfBirth(new(2025, 1, 1))),
+            ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+                createdOn: new DateTime(2023, 10, 10, 0, 0, 0, DateTimeKind.Utc),
+                fileName: "dd.csv",
+                integrationTransactionId: 100,
+                configurePerson: p => p
+                    .WithFirstName("BOB")
+                    .WithLastName("BUILDER")
+                    .WithDateOfBirth(new(2023, 10, 10))),
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/?Search={Uri.EscapeDataString(search)}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(taskKeys, GetResultTaskKeys(doc, tasks));
+    }
+
+    [Theory]
     [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.Name, SortDirection.Ascending, new[] { "ST2", "ST1" })]
     [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.Name, SortDirection.Descending, new[] { "ST1", "ST2" })]
     [InlineData(TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn, SortDirection.Ascending, new[] { "ST2", "ST1" })]
