@@ -22,13 +22,13 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[3.4.1, )",
-        "resolved": "3.4.1",
-        "contentHash": "zwD+dxTXUN6Joa3ZML6BmakJ6Wx/knJNd28/lem1ks8bZ/c93g+go7arjZ/duZW+ikEZWeDy3BNva31J/PYbbA==",
+        "requested": "[3.4.3, )",
+        "resolved": "3.4.3",
+        "contentHash": "+r4Vp7gDHguSlUd1QAr9u4DhRqftrXAG282s1sQnPOIr6Ou4vy91TQYxCTQ6sk8h7Kr+HHpy//fiyfsB83zGTw==",
         "dependencies": {
           "Fluid.Core": "[2.15.0, 3.0.0)",
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.21",
-          "SoftCircuits.HtmlMonkey": "3.1.0"
+          "HtmlAgilityPack": "1.12.0",
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.22"
         }
       },
       "GovUk.OneLogin.AspNetCore": {
@@ -239,6 +239,11 @@
           "Google.Api.Gax.Rest": "[4.0.0, 5.0.0)",
           "Google.Apis.Bigquery.v2": "[1.57.0.2704, 2.0.0)"
         }
+      },
+      "HtmlAgilityPack": {
+        "type": "Transitive",
+        "resolved": "1.12.0",
+        "contentHash": "VHtVZmfoYhQyA/POvZRLuTpCz1zhzIDrdYRJIRV73e9wKAzjW71biYNOHOWx8MxEX3TE4TWVfx1QDRoZcj2AWw=="
       },
       "IronCompress": {
         "type": "Transitive",
@@ -516,8 +521,8 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "8.0.21",
-        "contentHash": "JmAFU1Iuw84BbgPoHRPeEdlmyZHpTh3xdcM3+mYyNLm2OADHTvDMjoHnMLsxE7Qb5C18aWZror8Qr0+dsf0kcw==",
+        "resolved": "8.0.22",
+        "contentHash": "5Hrl2EyoqmSN/0YKfuYp4qRP8+RU4xguUVMg0J/5J+nDYobiBM4VgCTUN4oaCpIk9063hTsd/WoheKMlZBkVjA==",
         "dependencies": {
           "Microsoft.Extensions.FileProviders.Abstractions": "8.0.0"
         }
@@ -1293,11 +1298,6 @@
         "type": "Transitive",
         "resolved": "1.1.6",
         "contentHash": "aLJu7Q0mVk0e9QwjJLEh70tXQ0Url8fHITrHXwqF+eq7N20jGMOhkmTXUUjpPim+rCm0I4fARcVBRzJPSipN+w=="
-      },
-      "SoftCircuits.HtmlMonkey": {
-        "type": "Transitive",
-        "resolved": "3.1.0",
-        "contentHash": "5QmEUtNtrtU/Ru6734O38SpbCkVs74ff46n7IASV22Z9TYgFm5oMKvQO5zbiLGPFYGDNzjifE7qa4HkcR890zQ=="
       },
       "StackExchange.Redis": {
         "type": "Transitive",

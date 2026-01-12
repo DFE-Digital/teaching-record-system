@@ -254,7 +254,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             SupportTaskType = SupportTaskType.ApiTrnRequest,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Closed,
-            Data = new ApiTrnRequestData()
+            Data = new ApiTrnRequestData(),
+            ResolveJourneySavedState = null
         };
 
         var oldSupportTask = new EventModels.SupportTask
@@ -264,7 +265,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             SupportTaskType = SupportTaskType.ApiTrnRequest,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Open,
-            Data = new ApiTrnRequestData()
+            Data = new ApiTrnRequestData(),
+            ResolveJourneySavedState = null
         };
 
         var requestData = new EventModels.TrnRequestMetadata

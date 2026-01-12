@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
-public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
+public record ResolveOneLoginUserIdVerificationState : IRegisterJourney, IJourneyWithSavedState
 {
     public static Guid NotMatchedPersonIdSentinel => Guid.Empty;
 
@@ -14,6 +14,8 @@ public class ResolveOneLoginUserIdVerificationState : IRegisterJourney
         typeof(ResolveOneLoginUserIdVerificationState),
         ["supportTaskReference"],
         appendUniqueKey: true);
+
+    public SavedJourneyState? SavedJourneyState { get; set; }
 
     public required IReadOnlyCollection<MatchPersonResult> MatchedPersons { get; set; }
 
@@ -52,11 +54,8 @@ public class ResolveOneLoginUserIdVerificationStateFactory(OneLoginService oneLo
             Trn: requestData.StatedTrn,
             TrnTokenTrnHint: requestData.TrnTokenTrn));
 
-        var state = new ResolveOneLoginUserIdVerificationState
-        {
-            MatchedPersons = suggestedMatches
-        };
-
-        return state;
+        return supportTask.ResolveJourneySavedState?.GetState<ResolveOneLoginUserIdVerificationState>() is { } existingState ?
+            existingState with { MatchedPersons = suggestedMatches, SavedJourneyState = supportTask.ResolveJourneySavedState } :
+            new ResolveOneLoginUserIdVerificationState { MatchedPersons = suggestedMatches };
     }
 }
