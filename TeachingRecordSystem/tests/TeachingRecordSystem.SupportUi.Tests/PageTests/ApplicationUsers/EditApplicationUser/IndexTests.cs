@@ -198,6 +198,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "RedirectUris", redirectUris },
                 { "PostLogoutRedirectUris", postLogoutRedirectUris },
                 { "OneLoginClientId", oneLoginClientId },
+                { "UseSharedOneLoginSigningKeys", "false" },
                 { "OneLoginClientKeyPem", oneLoginClientKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
                 { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
@@ -242,6 +243,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "RedirectUris", redirectUris },
                 { "PostLogoutRedirectUris", postLogoutRedirectUris },
                 { "OneLoginClientId", oneLoginClientId },
+                { "UseSharedOneLoginSigningKeys", "false" },
                 { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
                 { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
@@ -328,7 +330,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         string ExpectedErrorMessage)[] GetInvalidOidcDetailsData() =>
     [
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -341,7 +343,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Enter an authentication scheme name"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -354,7 +356,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Authentication scheme name must be 50 characters or less"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -367,7 +369,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Enter the One Login private key"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -380,7 +382,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Enter the One Login client ID"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -393,7 +395,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Enter the One Login redirect URI"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -406,7 +408,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Enter the One Login post logout redirect URI"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -419,7 +421,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "One Login redirect URI must be 100 characters or less"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -458,7 +460,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Client ID must be 50 characters or less"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -471,7 +473,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Enter a client secret"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             new string('x', 201),
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -484,7 +486,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Client secret must be 200 characters or less"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "S",
             "https://localhost/callback",
             "https://localhost/logout-callback",
@@ -497,7 +499,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Client secret must be at least 16 characters"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "foo",
             "https://localhost/logout-callback",
@@ -510,7 +512,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "One or more redirect URIs are not valid"
         ),
         (
-            "client_id",
+            Guid.NewGuid().ToString(),
             "Secret0123456789",
             "https://localhost/callback",
             "foo",

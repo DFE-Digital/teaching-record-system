@@ -61,7 +61,9 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [MaxLength(ApplicationUser.OneLoginClientIdMaxLength, ErrorMessage = "One Login client ID must be 50 characters or less")]
     public string? OneLoginClientId { get; set; }
 
-    [Required(ErrorMessage = "Enter the One Login private key")]
+    [Required(ErrorMessage = "Select whether to use shared One Login signing keys")]
+    public bool? UseSharedOneLoginSigningKeys { get; set; }
+
     public string? OneLoginPrivateKeyPem { get; set; }
 
     [Required(ErrorMessage = "Enter the One Login redirect URI")]
@@ -83,6 +85,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         PostLogoutRedirectUris = _user.PostLogoutRedirectUris?.ToArray() ?? [];
         OneLoginAuthenticationSchemeName = _user.OneLoginAuthenticationSchemeName;
         OneLoginClientId = _user.OneLoginClientId;
+        UseSharedOneLoginSigningKeys = _user.UseSharedOneLoginSigningKeys;
         OneLoginPrivateKeyPem = _user.OneLoginPrivateKeyPem;
         OneLoginRedirectUriPath = _user.OneLoginRedirectUriPath;
         OneLoginPostLogoutRedirectUriPath = _user.OneLoginPostLogoutRedirectUriPath;
@@ -90,8 +93,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public async Task<IActionResult> OnPostAsync()
     {
-        ModelState.TryGetValue(nameof(ApiRoles), out var entry);
-
         // Sanitize roles
         var newApiRoles = ApiRoles!.Where(r => Core.ApiRoles.All.Contains(r)).ToArray();
 
@@ -117,15 +118,22 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 }
             }
 
-            if (ModelState[nameof(OneLoginPrivateKeyPem)]!.Errors.Count == 0)
+            if (UseSharedOneLoginSigningKeys == false)
             {
-                try
+                if (string.IsNullOrEmpty(OneLoginPrivateKeyPem))
                 {
-                    RSA.Create().ImportFromPem(OneLoginPrivateKeyPem);
+                    ModelState.AddModelError(nameof(OneLoginPrivateKeyPem), "Enter the One Login private key");
                 }
-                catch (ArgumentException)
+                else
                 {
-                    ModelState.AddModelError(nameof(OneLoginPrivateKeyPem), "One Login Private Key PEM is invalid");
+                    try
+                    {
+                        RSA.Create().ImportFromPem(OneLoginPrivateKeyPem);
+                    }
+                    catch (ArgumentException)
+                    {
+                        ModelState.AddModelError(nameof(OneLoginPrivateKeyPem), "One Login Private Key PEM is invalid");
+                    }
                 }
             }
 
@@ -172,10 +180,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 (!RedirectUris!.SequenceEqualIgnoringOrder(_user.RedirectUris ?? []) ? ApplicationUserUpdatedEventChanges.RedirectUris : 0) |
                 (!PostLogoutRedirectUris!.SequenceEqualIgnoringOrder(_user.PostLogoutRedirectUris ?? []) ? ApplicationUserUpdatedEventChanges.PostLogoutRedirectUris : 0) |
                 (OneLoginClientId != _user.OneLoginClientId ? ApplicationUserUpdatedEventChanges.OneLoginClientId : 0) |
-                (OneLoginPrivateKeyPem != _user.OneLoginPrivateKeyPem ? ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem : 0) |
+                (UseSharedOneLoginSigningKeys is false && OneLoginPrivateKeyPem != _user.OneLoginPrivateKeyPem ? ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem : 0) |
                 (OneLoginAuthenticationSchemeName != _user.OneLoginAuthenticationSchemeName ? ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName : 0) |
                 (OneLoginRedirectUriPath != _user.OneLoginRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath : 0) |
-                (OneLoginPostLogoutRedirectUriPath != _user.OneLoginPostLogoutRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath : 0);
+                (OneLoginPostLogoutRedirectUriPath != _user.OneLoginPostLogoutRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath : 0) |
+                (UseSharedOneLoginSigningKeys != _user.UseSharedOneLoginSigningKeys ? ApplicationUserUpdatedEventChanges.UseSharedOneLoginSigningKeys : 0);
         }
 
         if (changes != ApplicationUserUpdatedEventChanges.None)
@@ -195,7 +204,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 _user.PostLogoutRedirectUris = [.. PostLogoutRedirectUris!];
                 _user.OneLoginAuthenticationSchemeName = OneLoginAuthenticationSchemeName;
                 _user.OneLoginClientId = OneLoginClientId;
-                _user.OneLoginPrivateKeyPem = OneLoginPrivateKeyPem;
+                _user.UseSharedOneLoginSigningKeys = UseSharedOneLoginSigningKeys!.Value;
+                if (UseSharedOneLoginSigningKeys == false)
+                {
+                    _user.OneLoginPrivateKeyPem = OneLoginPrivateKeyPem;
+                }
                 _user.OneLoginRedirectUriPath = OneLoginRedirectUriPath;
                 _user.OneLoginPostLogoutRedirectUriPath = OneLoginPostLogoutRedirectUriPath;
             }

@@ -50,6 +50,7 @@ public class ApplicationUser : UserBase
     public List<string>? RedirectUris { get; set; }
     public List<string>? PostLogoutRedirectUris { get; set; }
     public string? OneLoginClientId { get; set; }
+    public bool UseSharedOneLoginSigningKeys { get; set; }
     public string? OneLoginPrivateKeyPem { get; set; }
     public string? OneLoginAuthenticationSchemeName { get; set; }
     public string? OneLoginRedirectUriPath { get; set; }
