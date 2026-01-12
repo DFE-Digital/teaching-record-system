@@ -25,6 +25,13 @@ public class AuthorizeAccessOptions
         return _jwks;
     }
 
+    public SigningCredentials GetOneLoginSigningCredentials()
+    {
+        EnsureInitialized();
+
+        return _signingCredentials.First().Value;
+    }
+
     [MemberNotNull(nameof(_jwks), nameof(_signingCredentials))]
     private void EnsureInitialized()
     {
@@ -33,6 +40,11 @@ public class AuthorizeAccessOptions
 #pragma warning disable CS8774 // Member must have a non-null value when exiting.
             return;
 #pragma warning restore CS8774 // Member must have a non-null value when exiting.
+        }
+
+        if (OneLoginSigningKeys.Length == 0)
+        {
+            throw new InvalidOperationException("At least one OneLogin signing key must be configured.");
         }
 
         var jwks = new JsonWebKeySet();

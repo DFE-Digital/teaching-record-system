@@ -58,7 +58,6 @@ public class ApplicationUser : UserBase
 
     [MemberNotNull(
         nameof(OneLoginClientId),
-        nameof(OneLoginPrivateKeyPem),
         nameof(OneLoginAuthenticationSchemeName),
         nameof(OneLoginRedirectUriPath),
         nameof(OneLoginPostLogoutRedirectUriPath))]
@@ -69,7 +68,7 @@ public class ApplicationUser : UserBase
             throw new InvalidOperationException($"{nameof(OneLoginClientId)} is not set.");
         }
 
-        if (OneLoginPrivateKeyPem is null)
+        if (UseSharedOneLoginSigningKeys is false && OneLoginPrivateKeyPem is null)
         {
             throw new InvalidOperationException($"{nameof(OneLoginPrivateKeyPem)} is not set.");
         }
