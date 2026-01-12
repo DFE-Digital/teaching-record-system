@@ -267,6 +267,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0100_ProcessTimestamps.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0101_RemoveUserShortName.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0102_SupportTasksResolveJourneySavedState.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0103_UserUseSharedOneLoginSigningKeys.sql" />
   </ItemGroup>
 
   <ItemGroup>
