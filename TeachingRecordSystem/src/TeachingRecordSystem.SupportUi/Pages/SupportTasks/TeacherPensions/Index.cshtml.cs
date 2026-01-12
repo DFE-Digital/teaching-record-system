@@ -11,6 +11,10 @@ public class IndexModel(SupportTaskSearchService supportTaskSearchService, Suppo
 
     [BindProperty(SupportsGet = true)]
     [FromQuery]
+    public string? Search { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
     public SortDirection? SortDirection { get; set; }
 
     [BindProperty(SupportsGet = true)]
@@ -28,7 +32,7 @@ public class IndexModel(SupportTaskSearchService supportTaskSearchService, Suppo
 
     public async Task<IActionResult> OnGetAsync()
     {
-        var searchOptions = new TeachersPensionsPotentialDuplicatesSearchOptions(SortBy, SortDirection);
+        var searchOptions = new TeachersPensionsPotentialDuplicatesSearchOptions(Search, SortBy, SortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
         var result = await supportTaskSearchService.SearchTeachersPensionsPotentialDuplicatesAsync(searchOptions, paginationOptions);

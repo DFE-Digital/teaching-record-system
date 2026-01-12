@@ -9,7 +9,8 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <span class="govuk-caption-l">Third-party tasks</span>
-        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Potential duplicates via Teachers&rsquo; Pensions</h1>
+        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Potential duplicates via
+            Teachers&rsquo; Pensions</h1>
     </div>
 
     @if (Model.TotalTaskCount == 0)
@@ -21,17 +22,39 @@
     else
     {
         <div class="govuk-grid-column-full-from-desktop">
-            @if (Model.Results!.TotalItemCount == 0)
-            {
-                <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
-                    No matching requests found
-                </p>
-                <p class="govuk-body-m">Try searching again with different details.</p>
-            }
-            else
-            {
-                <table class="govuk-table">
-                    <thead class="govuk-table__head">
+            <div class="govuk-grid-column-two-thirds">
+                <form action="@LinkGenerator.SupportTasks.TeacherPensions.Index()" method="get" asp-antiforgery="false">
+                    <div class="govuk-!-margin-bottom-4">
+                        <govuk-input for="Search" type="search" autocomplete="off">
+                            <govuk-input-label>
+                                <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
+                            </govuk-input-label>
+                            <govuk-input-hint>
+                                Enter a name or date the record was created, for example 31/3/2025
+                            </govuk-input-hint>
+                            <govuk-input-after-input>
+                                <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full"
+                                              type="submit">Search
+                                </govuk-button>
+                            </govuk-input-after-input>
+                        </govuk-input>
+                    </div>
+                </form>
+            </div>
+
+            <div class="govuk-grid-column-full">
+                @if (Model.Results!.Count == 0)
+                {
+                    <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3"
+                       data-testid="no-results-message">
+                        No matching requests found
+                    </p>
+                    <p class="govuk-body-m">Try searching again with different details</p>
+                }
+                else
+                {
+                    <table class="govuk-table">
+                        <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                                 sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.Name ? Model.SortDirection : null)"
@@ -54,24 +77,28 @@
                                 Interface ID
                             </th>
                         </tr>
-                    </thead>
-                    <tbody class="govuk-table__body" data-testid="results">
+                        </thead>
+                        <tbody class="govuk-table__body" data-testid="results">
                         @foreach (var result in Model.Results)
                         {
                             <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                                 <td scope="row" class="govuk-table__cell" data-testid="name">
-                                    <a href="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
+                                    <a href="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.Index(result.SupportTaskReference)"
+                                       class="govuk-link">
                                         @result.Name
                                     </a>
                                 </td>
-                                <td class="govuk-table__cell" data-testid="created-on">@result.CreatedOn.ToString("dd MMM yyyy")</td>
+                                <td class="govuk-table__cell"
+                                    data-testid="created-on">@result.CreatedOn.ToString("dd MMM yyyy")</td>
                                 <td class="govuk-table__cell" data-testid="filename">@result.Filename</td>
-                                <td class="govuk-table__cell" data-testid="integration-transaction-id">@result.IntegrationTransactionId</td>
+                                <td class="govuk-table__cell"
+                                    data-testid="integration-transaction-id">@result.IntegrationTransactionId</td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            }
+                        </tbody>
+                    </table>
+                }
+            </div>
         </div>
     }
 </div>
