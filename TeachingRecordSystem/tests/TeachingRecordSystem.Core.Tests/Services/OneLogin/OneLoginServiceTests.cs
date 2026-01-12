@@ -79,7 +79,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         {
             OneLoginUserSubject = oneLoginUser.Subject,
             MatchedPersonId = Guid.NewGuid(),
-            MatchRoute = OneLoginUserMatchRoute.Support,
+            MatchRoute = OneLoginUserMatchRoute.SupportUi,
             MatchedAttributes = []
         };
 
@@ -103,7 +103,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         {
             OneLoginUserSubject = oneLoginUser.Subject,
             MatchedPersonId = matchedPerson.PersonId,
-            MatchRoute = OneLoginUserMatchRoute.Support,
+            MatchRoute = OneLoginUserMatchRoute.SupportUi,
             MatchedAttributes = [
                 KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName)

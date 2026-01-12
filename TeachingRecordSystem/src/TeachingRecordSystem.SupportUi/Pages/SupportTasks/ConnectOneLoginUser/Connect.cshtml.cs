@@ -44,7 +44,7 @@ public class ConnectModel(TrsDbContext dbContext, OneLoginService oneLoginServic
         oneLoginUser.SetMatched(
             clock.UtcNow,
             PersonDetail!.PersonId,
-            OneLoginUserMatchRoute.Support,
+            OneLoginUserMatchRoute.SupportUi,
             matchedAttributes);
 
         await dbContext.SaveChangesAsync();
