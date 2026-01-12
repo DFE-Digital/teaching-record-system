@@ -17,6 +17,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 public sealed class OneLoginAuthenticationSchemeProvider(
         IAuthenticationSchemeProvider innerProvider,
         IDbContextFactory<TrsDbContext> dbContextFactory,
+        IOptions<AuthorizeAccessOptions> authorizeAccessOptionsAccessor,
         IOptionsMonitorCache<OneLoginOptions> oneLoginOptionsMonitorCache,
         ILogger<OneLoginAuthenticationSchemeProvider> logger) :
     IAuthenticationSchemeProvider, IConfigureNamedOptions<OneLoginOptions>, IDisposable, IHostedService
@@ -137,6 +138,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         user.EnsureConfiguredForOneLogin();
 
         options.SignInScheme = AuthenticationSchemes.FormFlowJourney;
+        options.UseJwtSecuredAuthorizationRequest = false;  // TEMP, the default is currently broken in OneLogin.AspNetCore package
 
         options.Events.OnRedirectToIdentityProviderForSignOut = context =>
         {
@@ -177,8 +179,14 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
         options.Environment = OneLoginEnvironments.Integration;
 
-        using (var rsa = RSA.Create())
+        if (user.UseSharedOneLoginSigningKeys)
         {
+            var key = authorizeAccessOptionsAccessor.Value.GetOneLoginSigningCredentials();
+            options.ClientAuthenticationCredentials = key;
+        }
+        else
+        {
+            using var rsa = RSA.Create();
             var privateKeyPem = user.OneLoginPrivateKeyPem;
             rsa.ImportFromPem(privateKeyPem);
 
