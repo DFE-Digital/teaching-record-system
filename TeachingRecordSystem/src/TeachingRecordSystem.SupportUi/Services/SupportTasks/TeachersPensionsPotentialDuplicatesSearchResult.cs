@@ -11,4 +11,5 @@ public record TeachersPensionsPotentialDuplicatesSearchResultItem(
     string Filename,
     long IntegrationTransactionId,
     string Name,
-    DateTime CreatedOn) : ISupportTaskSearchResult;
+    DateTime CreatedOn,
+    string[] NameParts) : ISupportTaskSearchResult;

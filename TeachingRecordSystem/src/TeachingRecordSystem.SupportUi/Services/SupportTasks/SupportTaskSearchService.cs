@@ -277,6 +277,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
     public async Task<TeachersPensionsPotentialDuplicatesSearchResult> SearchTeachersPensionsPotentialDuplicatesAsync(TeachersPensionsPotentialDuplicatesSearchOptions searchOptions, PaginationOptions paginationOptions)
     {
+        var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
 
@@ -287,6 +288,10 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             .Where(t => t.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && t.Status == SupportTaskStatus.Open)
             .ToListAsync();
 
+
+
+
+
         var unorderedResults = tasks.Select(t =>
         {
             var data = t.Data as TeacherPensionsPotentialDuplicateData;
@@ -296,9 +301,20 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 data!.FileName,
                 data!.IntegrationTransactionId,
                 StringHelper.JoinNonEmpty(' ', t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName),
-                t.CreatedOn
+                t.CreatedOn,
+                NameParts: new []{ t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName}
             );
         }).AsQueryable();
+
+        if (SearchTextIsDate(search, out var minDate, out var maxDate))
+        {
+            unorderedResults = unorderedResults.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
+        }
+        else if (SearchTextIsName(search, out var name))
+        {
+            unorderedResults = unorderedResults.Where(t =>
+                name.All(n =>  t.NameParts!.Any(m => string.Equals(m, n, StringComparison.OrdinalIgnoreCase))));
+        }
 
         var searchResults = (sortBy switch
         {
