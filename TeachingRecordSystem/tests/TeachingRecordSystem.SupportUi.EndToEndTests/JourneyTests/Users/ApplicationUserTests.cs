@@ -72,6 +72,7 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.FillAsync("text=Post logout redirect URIs", newPostLogoutRedirectUris);
         await page.FillAsync("text=Authentication scheme name", newAuthenticationSchemeName);
         await page.FillAsync("text=One Login client ID", newOneLoginClientId);
+        await page.CheckAsync("input[value='False']:below(legend:has-text('Use shared One Login signing keys'))");
         await page.FillAsync("text=One Login private key", newOneLoginPrivateKeyPem);
         await page.FillAsync("text=One Login redirect URI path", newOneLoginRedirectUri);
         await page.FillAsync("text=One Login post logout redirect URI path", newOneLoginPostLogoutRedirectUri);

@@ -244,6 +244,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "PostLogoutRedirectUris", postLogoutRedirectUris },
                 { "OneLoginClientId", oneLoginClientId },
                 { "UseSharedOneLoginSigningKeys", "false" },
+                { "UseSharedOneLoginSigningKeys", "false" },
                 { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
                 { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
@@ -282,6 +283,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.RedirectUris ?? []);
                 Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.PostLogoutRedirectUris ?? []);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginClientId);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.UseSharedOneLoginSigningKeys);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginPrivateKeyPem);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginAuthenticationSchemeName);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginRedirectUriPath);
@@ -292,6 +294,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Collection(applicationUserUpdatedEvent.ApplicationUser.RedirectUris ?? [], uri => Assert.Equal(redirectUris, uri));
                 Assert.Collection(applicationUserUpdatedEvent.ApplicationUser.PostLogoutRedirectUris ?? [], uri => Assert.Equal(postLogoutRedirectUris, uri));
                 Assert.Equal(oneLoginClientId, applicationUserUpdatedEvent.ApplicationUser.OneLoginClientId);
+                Assert.False(applicationUserUpdatedEvent.ApplicationUser.UseSharedOneLoginSigningKeys);
                 Assert.Equal(oneLoginPrivateKeyPem, applicationUserUpdatedEvent.ApplicationUser.OneLoginPrivateKeyPem);
                 Assert.Equal(oneLoginAuthenticationSchemeName, applicationUserUpdatedEvent.ApplicationUser.OneLoginAuthenticationSchemeName);
                 Assert.Equal(oneLoginRedirectUriPath, applicationUserUpdatedEvent.ApplicationUser.OneLoginRedirectUriPath);
@@ -305,6 +308,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ApplicationUserUpdatedEventChanges.RedirectUris |
                         ApplicationUserUpdatedEventChanges.PostLogoutRedirectUris |
                         ApplicationUserUpdatedEventChanges.OneLoginClientId |
+                        ApplicationUserUpdatedEventChanges.UseSharedOneLoginSigningKeys |
                         ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem |
                         ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName |
                         ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath |
