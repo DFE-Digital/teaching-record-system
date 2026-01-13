@@ -34,7 +34,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             PersonId = person.PersonId,
             Status = SupportTaskStatus.Open,
             SupportTaskReference = "REF1",
-            SupportTaskType = SupportTaskType.ChangeNameRequest
+            SupportTaskType = SupportTaskType.ChangeNameRequest,
+            ResolveJourneySavedState = null
         };
         var supportTask = new SupportTask
         {
@@ -43,7 +44,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             PersonId = person.PersonId,
             Status = SupportTaskStatus.Closed,
             SupportTaskReference = "REF1",
-            SupportTaskType = SupportTaskType.ChangeNameRequest
+            SupportTaskType = SupportTaskType.ChangeNameRequest,
+            ResolveJourneySavedState = null
         };
 
         var updatedEvent = new ChangeNameRequestSupportTaskApprovedEvent()
@@ -135,7 +137,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             PersonId = person.PersonId,
             Status = SupportTaskStatus.Open,
             SupportTaskReference = "REF1",
-            SupportTaskType = SupportTaskType.ChangeNameRequest
+            SupportTaskType = SupportTaskType.ChangeNameRequest,
+            ResolveJourneySavedState = null
         };
         var supportTask = new SupportTask
         {
@@ -144,7 +147,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             PersonId = person.PersonId,
             Status = SupportTaskStatus.Closed,
             SupportTaskReference = "REF1",
-            SupportTaskType = SupportTaskType.ChangeNameRequest
+            SupportTaskType = SupportTaskType.ChangeNameRequest,
+            ResolveJourneySavedState = null
         };
 
         var updatedEvent = new ChangeNameRequestSupportTaskRejectedEvent()
@@ -210,7 +214,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             PersonId = person.PersonId,
             Status = SupportTaskStatus.Open,
             SupportTaskReference = "REF1",
-            SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest
+            SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
+            ResolveJourneySavedState = null
         };
         var supportTask = new SupportTask
         {
@@ -219,7 +224,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             PersonId = person.PersonId,
             Status = SupportTaskStatus.Closed,
             SupportTaskReference = "REF1",
-            SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest
+            SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
+            ResolveJourneySavedState = null
         };
 
         var updatedEvent = new ChangeDateOfBirthRequestSupportTaskApprovedEvent()
@@ -302,7 +308,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             PersonId = person.PersonId,
             Status = SupportTaskStatus.Open,
             SupportTaskReference = "REF1",
-            SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest
+            SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
+            ResolveJourneySavedState = null
         };
         var supportTask = new SupportTask
         {
@@ -311,7 +318,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             PersonId = person.PersonId,
             Status = SupportTaskStatus.Closed,
             SupportTaskReference = "REF1",
-            SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest
+            SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
+            ResolveJourneySavedState = null
         };
 
         var updatedEvent = new ChangeDateOfBirthRequestSupportTaskRejectedEvent()
