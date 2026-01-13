@@ -2349,6 +2349,7 @@
           "JetBrains.Annotations": "[2025.2.4, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "[8.14.0, )",
+          "Microsoft.Web.LibraryManager.Build": "[3.0.71, )",
           "OpenIddict.AspNetCore": "[7.2.0, )",
           "OpenIddict.EntityFrameworkCore": "[7.2.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
@@ -2911,6 +2912,12 @@
           "Microsoft.IdentityModel.Protocols": "8.14.0",
           "System.IdentityModel.Tokens.Jwt": "8.14.0"
         }
+      },
+      "Microsoft.Web.LibraryManager.Build": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.71, )",
+        "resolved": "3.0.71",
+        "contentHash": "uO0RegM2P5ZZhQDJQ+YSiugXJgNnh4gmjMd3VofeoE9MSu60zYoR3meA9SAm6PVJW2t//SzICXQf4+JtfUTJQA=="
       },
       "Moq": {
         "type": "CentralTransitive",

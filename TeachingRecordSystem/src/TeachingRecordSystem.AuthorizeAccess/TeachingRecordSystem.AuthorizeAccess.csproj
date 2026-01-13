@@ -8,13 +8,7 @@
   </PropertyGroup>
 
   <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
-    <Copy SourceFiles="wwwroot/lib/govuk-frontend/govuk-frontend.min.js"
-          DestinationFolder="wwwroot"
-          SkipUnchangedFiles="true" />
-  </Target>
-
-  <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
-    <Copy SourceFiles="wwwroot/lib/govuk-frontend/govuk-frontend.min.js"
+    <Copy SourceFiles="wwwroot\lib\govuk-frontend\govuk-frontend.min.js"
           DestinationFolder="wwwroot"
           SkipUnchangedFiles="true" />
   </Target>
@@ -27,6 +21,7 @@
     <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" />
     <PackageReference Include="OpenIddict.AspNetCore" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
   </ItemGroup>
@@ -46,6 +41,12 @@
 
   <ItemGroup>
     <Content Update="wwwroot\lib\**\*" CopyToPublishDirectory="Never" />
+    <Content Update="wwwroot\lib\govuk-one-login-service-header\dist\scripts\*.js" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\govuk-one-login-service-header\init-service-header.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\govuk-one-login-service-header\service-header.js" />
   </ItemGroup>
 
 </Project>

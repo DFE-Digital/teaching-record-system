@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/libman.json",
+  "version": "1.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "@govuk-one-login/service-header@5.0.0",
+      "destination": "wwwroot/lib/govuk-one-login-service-header/"
+    }
+  ]
+}
