@@ -123,9 +123,9 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             EmailAddress = null,
             EvidenceFileId = Guid.NewGuid(),
             EvidenceFileName = "evidence.pdf",
-            FirstName = "NewFirstName",
-            MiddleName = "NewMiddleName",
-            LastName = "NewLastName"
+            FirstName = TestData.GenerateFirstName(),
+            MiddleName = TestData.GenerateMiddleName(),
+            LastName = TestData.GenerateLastName()
         };
 
         var requestData = EventModels.ChangeNameRequestData.FromModel(supportTaskRequestData);
