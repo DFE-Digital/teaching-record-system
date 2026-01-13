@@ -6,7 +6,7 @@ public record ChangeNameRequestSupportTaskApprovedEvent : SupportTaskUpdatedEven
     public required EventModels.ChangeNameRequestData RequestData { get; init; }
     public required ChangeNameRequestSupportTaskApprovedEventChanges Changes { get; init; }
     public required EventModels.PersonDetails PersonAttributes { get; init; }
-    public required EventModels.PersonDetails? OldPersonAttributes { get; init; }
+    public required EventModels.PersonDetails OldPersonAttributes { get; init; }
 }
 
 [Flags]
