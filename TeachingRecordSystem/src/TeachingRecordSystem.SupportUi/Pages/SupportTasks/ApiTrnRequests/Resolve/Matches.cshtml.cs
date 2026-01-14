@@ -27,6 +27,10 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
+    public string Name => StringHelper.JoinNonEmpty(' ', RequestData!.FirstName, RequestData!.MiddleName, RequestData!.LastName);
+
+    public IReadOnlyCollection<(PotentialDuplicate PotentialDuplicate, bool HasNameMismatch)> PotentialDuplicatesWithNameMatchingInfo { get; set; } = Array.Empty<(PotentialDuplicate, bool)>();
+
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
     [BindProperty]
@@ -106,6 +110,10 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 Trn = p.Trn,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
+                PreviousNames = p.PreviousNames!
+                    .OrderBy(n => n.CreatedOn)
+                    .Select(n => StringHelper.JoinNonEmpty(' ', n.FirstName, n.MiddleName, n.LastName))
+                    .ToArray(),
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
             })
             .ToArrayAsync())
@@ -116,6 +124,11 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 Identifier = (char)('A' + i),
                 MatchedAttributes = matchedAttributesLookup[r.PersonId]
             })
+            .ToArray();
+
+        // highlight name mismatches taking into account whether each name part is present in the request data and the match
+        PotentialDuplicatesWithNameMatchingInfo = PotentialDuplicates!
+            .Select(pd => (pd, HasNameMismatch: pd.HasAnyNamePartMismatch(RequestData!.FirstName, RequestData.MiddleName, RequestData.LastName)))
             .ToArray();
 
         await base.OnPageHandlerExecutionAsync(context, next);

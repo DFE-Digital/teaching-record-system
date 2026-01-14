@@ -36,7 +36,7 @@
             else
             {
                 <govuk-inset-text class="govuk-!-margin-top-0">
-                    Differences are <highlight>highlighted</highlight> on the existing records
+                    Details that do not match are <highlight>highlighted</highlight> in the existing records
                 </govuk-inset-text>
             }
 
@@ -55,17 +55,10 @@
                             </govuk-summary-list-row>
                         }
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.FirstName</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@Model.Name</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.MiddleName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.LastName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+
                         @if (showDuplicatesSideBySide)
                         {
                             // Add field so the fields line up when viewed side-by-side
@@ -98,7 +91,7 @@
                     <h2 class="govuk-heading-m">Potential matches</h2>
                 }
 
-                @foreach (var match in Model.PotentialDuplicates!)
+                @foreach (var (match, hasNameMismatch) in Model.PotentialDuplicatesWithNameMatchingInfo!)
                 {
                     <govuk-summary-card data-testid="match" data-personid="@match.PersonId" class="trs-potential-duplicates__item">
                         <govuk-summary-card-title heading-level="3">
@@ -142,23 +135,20 @@
                             }
 
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName))">
-                                    @match.FirstName
+                                <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback highlight="@hasNameMismatch">
+                                    @StringHelper.JoinNonEmpty(' ', match.FirstName, match.MiddleName, match.LastName)
                                 </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!(match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName) || (string.IsNullOrEmpty(Model.RequestData!.MiddleName) && string.IsNullOrEmpty(match.MiddleName))))">
-                                    @match.MiddleName
-                                </govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName))">
-                                    @match.LastName
-                                </govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            @if (match.PreviousNames!.Count > 0)
+                            {
+                                <govuk-summary-list-row>
+                                    <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
+                                    <govuk-summary-list-row-value>
+                                        <list-text-items text-items="@match.PreviousNames"></list-text-items>
+                                    </govuk-summary-list-row-value>
+                                </govuk-summary-list-row>
+                            }
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
                                 <govuk-summary-list-row-value>@match.Trn</govuk-summary-list-row-value>

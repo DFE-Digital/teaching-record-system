@@ -27,6 +27,10 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
+    public string Name => StringHelper.JoinNonEmpty(' ', RequestData?.FirstName, RequestData?.MiddleName, RequestData?.LastName);
+
+    public IReadOnlyCollection<(PotentialDuplicate PotentialDuplicate, bool HasNameMismatch)> PotentialDuplicatesWithNameMatchingInfo { get; set; } = Array.Empty<(PotentialDuplicate, bool)>();
+
     [BindProperty]
     public Guid? PersonId { get; set; }
 
@@ -101,6 +105,10 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
                 Gender = p.Gender,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
+                PreviousNames = p.PreviousNames!
+                    .OrderBy(n => n.CreatedOn)
+                    .Select(n => StringHelper.JoinNonEmpty(' ', n.FirstName, n.MiddleName, n.LastName))
+                    .ToArray(),
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
             })
             .ToArrayAsync())
@@ -116,6 +124,25 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
         NpqEvidenceFile = (RequestData?.NpqEvidenceFileId, RequestData?.NpqEvidenceFileName) is (Guid fileId, string fileName)
             ? new(fileId, fileName) : null;
 
+        PotentialDuplicatesWithNameMatchingInfo = PotentialDuplicates!
+            .Select(pd => (pd, HasNameMismatch: HasNameMismatch(pd, RequestData!)))
+            .ToArray();
+
         await base.OnPageHandlerExecutionAsync(context, next);
+    }
+
+    private static bool HasNameMismatch(PotentialDuplicate pd, TrnRequestMetadata requestData)
+    {
+        return IsFieldMismatch(pd.FirstName, requestData.FirstName, pd.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName))
+            || IsFieldMismatch(pd.MiddleName, requestData.MiddleName, pd.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName))
+            || IsFieldMismatch(pd.LastName, requestData.LastName, pd.MatchedAttributes.Contains(PersonMatchedAttribute.LastName));
+    }
+
+    private static bool IsFieldMismatch(string? potentialDuplicateValue, string? requestValue, bool isMatched)
+    {
+        // Empty/null values are never highlighted as mismatches`n        if (string.IsNullOrEmpty(potentialDuplicateValue) || string.IsNullOrEmpty(requestValue))`n        {`n            return false;`n        }
+
+        // Both have values, use the calculated mismatch
+        return !isMatched;
     }
 }

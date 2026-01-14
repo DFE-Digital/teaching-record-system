@@ -226,8 +226,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = isRecordMatchingOnlySupportTask ?
-            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject) :
-            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, b => b.WithStatedNationalInsuranceNumber(null)) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, b => b.WithStatedNationalInsuranceNumber(null));
 
         var supportTaskData = supportTask.GetData<IOneLoginUserMatchingData>();
         var firstVerifiedOrStatedName = supportTaskData.VerifiedOrStatedNames!.First();
@@ -263,6 +263,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         Assert.NotNull(firstMatchDetails);
         Assert.Equal($"{matchedPerson.FirstName} {matchedPerson.LastName}", firstMatchDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(WebConstants.EmptyFallbackContent, firstMatchDetails.GetSummaryListValueByKey("National Insurance number"));
+        AssertMatchRowNotHighlighted(firstMatchDetails, "National Insurance number");
     }
 
     [Theory]
