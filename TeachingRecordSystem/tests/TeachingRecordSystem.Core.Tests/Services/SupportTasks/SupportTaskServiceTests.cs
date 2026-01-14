@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -312,4 +313,55 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         Events.AssertNoEventsPublished();
     }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_ValidRequestWithSavedJourneyState_UpdatesTaskAndPublishesEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
+
+        var savedJourneyState = new SavedJourneyState(
+            "Page",
+            new Dictionary<string, string?>(),
+            new DummyJourneyState(),
+            typeof(DummyJourneyState));
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTask = supportTask.SupportTaskReference,
+            UpdateData = data => data,
+            Status = SupportTaskStatus.InProgress,
+            SavedJourneyState = Option.Some(savedJourneyState)!,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
+            service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.Equal(UpdateSupportTaskResult.Ok, result);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(options.Status, dbSupportTask.Status);
+            Assert.Equal(savedJourneyState, dbSupportTask.ResolveJourneySavedState);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+            Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
+            Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+            Assert.Equal(options.Comments, supportTaskUpdatedEvent.Comments);
+            Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.ResolveJourneySavedState, supportTaskUpdatedEvent.Changes);
+        });
+    }
+
+    private record DummyJourneyState;
 }

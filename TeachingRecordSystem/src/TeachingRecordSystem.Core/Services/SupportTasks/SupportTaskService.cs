@@ -68,8 +68,36 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         return DeleteSupportTaskResult.Ok;
     }
 
-    public async Task<UpdateSupportTaskResult> UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
+    public Task<UpdateSupportTaskResult> UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext)
+    {
+        return UpdateSupportTaskCoreAsync(options, updateAction: null, processContext);
+    }
+
+    public Task<UpdateSupportTaskResult> UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
         where TData : ISupportTaskData, IEquatable<TData>
+    {
+        return UpdateSupportTaskCoreAsync(
+            options,
+            (supportTask, changes) =>
+            {
+                if (supportTask.SupportTaskType.GetDataType() != typeof(TData))
+                {
+                    throw new InvalidOperationException(
+                        $"{typeof(TData).Name} is not valid for the specified support task's type.");
+                }
+
+                var oldData = supportTask.Data;
+                supportTask.Data = options.UpdateData(supportTask.GetData<TData>());
+
+                return changes | (!supportTask.GetData<TData>().Equals(oldData) ? SupportTaskUpdatedEventChanges.Data : 0);
+            },
+            processContext);
+    }
+
+    public async Task<UpdateSupportTaskResult> UpdateSupportTaskCoreAsync(
+        UpdateSupportTaskOptions options,
+        Func<SupportTask, SupportTaskUpdatedEventChanges, SupportTaskUpdatedEventChanges>? updateAction,
+        ProcessContext processContext)
     {
         var supportTask = options.SupportTask.Value as SupportTask ?? await dbContext.SupportTasks.FindAsync(options.SupportTask.AsT1);
 
@@ -78,22 +106,27 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             return UpdateSupportTaskResult.NotFound;
         }
 
-        if (supportTask.SupportTaskType.GetDataType() != typeof(TData))
-        {
-            throw new InvalidOperationException(
-                $"{typeof(TData).Name} is not valid for the specified support task's type.");
-        }
-
         dbContext.Attach(supportTask);
 
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
 
         supportTask.Status = options.Status;
-        supportTask.Data = options.UpdateData(supportTask.GetData<TData>());
 
         var changes = SupportTaskUpdatedEventChanges.None |
-            (supportTask.Status != oldSupportTaskEventModel.Status ? SupportTaskUpdatedEventChanges.Status : 0) |
-            (!supportTask.GetData<TData>().Equals(oldSupportTaskEventModel.Data) ? SupportTaskUpdatedEventChanges.Data : 0);
+            (supportTask.Status != oldSupportTaskEventModel.Status ? SupportTaskUpdatedEventChanges.Status : 0);
+
+        options.SavedJourneyState.Match(
+            sjs =>
+            {
+                supportTask.ResolveJourneySavedState = sjs;
+                changes |= SupportTaskUpdatedEventChanges.ResolveJourneySavedState;
+            },
+            () => { });
+
+        if (updateAction is not null)
+        {
+            changes = updateAction(supportTask, changes);
+        }
 
         if (changes is not SupportTaskUpdatedEventChanges.None)
         {

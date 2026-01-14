@@ -18,7 +18,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var tasks = dbContext.SupportTasks
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status == SupportTaskStatus.Open);
+            .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status != SupportTaskStatus.Closed);
 
         var totalTaskCount = await tasks.CountAsync();
 
@@ -81,7 +81,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var tasks = dbContext.SupportTasks
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest && t.Status == SupportTaskStatus.Open);
+            .Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest && t.Status != SupportTaskStatus.Closed);
 
         var totalTaskCount = await tasks.CountAsync();
 
@@ -155,7 +155,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var tasks = dbContext.SupportTasks
             .Include(t => t.Person)
             .Where(t => (t.SupportTaskType == SupportTaskType.ChangeNameRequest || t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest)
-                        && t.Status == SupportTaskStatus.Open);
+                        && t.Status != SupportTaskStatus.Closed);
 
         var nameChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeNameRequest);
         var dateOfBirthChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest);
@@ -211,7 +211,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var baseQuery = dbContext.SupportTasks
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded && t.Status == SupportTaskStatus.Open);
+            .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded && t.Status != SupportTaskStatus.Closed);
 
         var groupedBySource = await baseQuery
             .Join(dbContext.ApplicationUsers, t => t.TrnRequestMetadata!.ApplicationUserId, u => u.UserId, (t, u) => new { Task = t, User = u })
@@ -285,7 +285,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             .Include(t => t.Person)
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && t.Status == SupportTaskStatus.Open)
+            .Where(t => t.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && t.Status != SupportTaskStatus.Closed)
             .ToListAsync();
 
         var unorderedResults = tasks.Select(t =>
@@ -339,7 +339,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         var tasks = await dbContext.SupportTasks
             .Include(t => t.OneLoginUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status == SupportTaskStatus.Open)
+            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.Status != SupportTaskStatus.Closed)
             .ToListAsync();
 
         var taskCount = tasks.Count;
