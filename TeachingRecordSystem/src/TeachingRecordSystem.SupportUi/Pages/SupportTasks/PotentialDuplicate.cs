@@ -15,5 +15,8 @@ public record PotentialDuplicate
     public required bool HasQts { get; init; }
     public required bool HasEyts { get; init; }
     public required bool HasActiveAlerts { get; init; }
+    public required IReadOnlyCollection<string> PreviousNames { get; init; }
     public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
+
+    public bool HasNameMismatch => !(MatchedAttributes.Contains(PersonMatchedAttribute.FirstName) && MatchedAttributes.Contains(PersonMatchedAttribute.LastName));
 }

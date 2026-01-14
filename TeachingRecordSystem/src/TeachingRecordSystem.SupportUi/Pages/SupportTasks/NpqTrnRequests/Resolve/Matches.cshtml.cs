@@ -27,6 +27,8 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
+    public string Name => StringHelper.JoinNonEmpty(' ', RequestData?.FirstName, RequestData?.MiddleName, RequestData?.LastName);
+
     [BindProperty]
     public Guid? PersonId { get; set; }
 
@@ -101,6 +103,10 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
                 Gender = p.Gender,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
+                PreviousNames = p.PreviousNames!
+                    .OrderBy(n => n.CreatedOn)
+                    .Select(n => StringHelper.JoinNonEmpty(' ', n.FirstName, n.MiddleName, n.LastName))
+                    .ToArray(),
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
             })
             .ToArrayAsync())

@@ -36,16 +36,8 @@
                     </govuk-summary-card-actions>
                     <govuk-summary-list>
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.FirstName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.MiddleName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.LastName</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@Model.Name</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
@@ -84,23 +76,20 @@
                         </govuk-summary-card-actions>
                         <govuk-summary-list>
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName))">
-                                    @match.FirstName
+                                <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback highlight="@match.HasNameMismatch">
+                                    @StringHelper.JoinNonEmpty(' ', match.FirstName, match.MiddleName, match.LastName)
                                 </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!(match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName) || (string.IsNullOrEmpty(Model.RequestData!.MiddleName) && string.IsNullOrEmpty(match.MiddleName))))">
-                                    @match.MiddleName
-                                </govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName))">
-                                    @match.LastName
-                                </govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            @if (match.PreviousNames!.Count > 0)
+                            {
+                                <govuk-summary-list-row>
+                                    <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
+                                    <govuk-summary-list-row-value>
+                                        <list-text-items text-items="@match.PreviousNames"></list-text-items>
+                                    </govuk-summary-list-row-value>
+                                </govuk-summary-list-row>
+                            }
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
                                 <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.Trn))">

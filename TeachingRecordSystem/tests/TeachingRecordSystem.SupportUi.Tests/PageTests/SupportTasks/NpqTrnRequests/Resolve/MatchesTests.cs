@@ -127,9 +127,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
-        Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueByKey("Middle name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.MiddleName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
@@ -143,6 +141,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), TestData.GenerateLastName(), new DateTime(2020, 1, 1).ToUniversalTime()))
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber()
             .WithGender(TestData.GenerateGender()));
@@ -173,9 +172,8 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(matchedPerson.MiddleName, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
-        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', matchedPerson.PreviousNames.First().FirstName, matchedPerson.PreviousNames.First().MiddleName, matchedPerson.PreviousNames.First().LastName), firstMatchDetails.GetSummaryListValueByKey("Previous names"));
         Assert.Equal(matchedPerson.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(matchedPerson.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));

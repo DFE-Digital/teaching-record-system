@@ -16,6 +16,8 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
+    public string Name => StringHelper.JoinNonEmpty(' ', RequestData?.FirstName, RequestData?.MiddleName, RequestData?.LastName);
+
     [BindProperty]
     [Required(ErrorMessage = "Select a record")]
     public Guid? PersonId { get; set; }
@@ -106,6 +108,10 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
                 Trn = p.Trn,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
+                PreviousNames = p.PreviousNames!
+                    .OrderBy(n => n.CreatedOn)
+                    .Select(n => StringHelper.JoinNonEmpty(' ', n.FirstName, n.MiddleName, n.LastName))
+                    .ToArray(),
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
             })
             .ToArrayAsync())

@@ -22,6 +22,8 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
+    public string Name => StringHelper.JoinNonEmpty(' ', RequestData!.FirstName, RequestData!.MiddleName, RequestData!.LastName);
+
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
     [BindProperty]
@@ -105,6 +107,10 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 Trn = p.Trn,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
+                PreviousNames = p.PreviousNames!
+                    .OrderBy(n => n.CreatedOn)
+                    .Select(n => StringHelper.JoinNonEmpty(' ', n.FirstName, n.MiddleName, n.LastName))
+                    .ToArray(),
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
             })
             .ToArrayAsync())
