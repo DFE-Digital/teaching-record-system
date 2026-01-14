@@ -50,7 +50,7 @@ public class ApplicationUser : UserBase
     public List<string>? RedirectUris { get; set; }
     public List<string>? PostLogoutRedirectUris { get; set; }
     public string? OneLoginClientId { get; set; }
-    public bool UseSharedOneLoginSigningKeys { get; set; }
+    public bool? UseSharedOneLoginSigningKeys { get; set; }
     public string? OneLoginPrivateKeyPem { get; set; }
     public string? OneLoginAuthenticationSchemeName { get; set; }
     public string? OneLoginRedirectUriPath { get; set; }
@@ -66,6 +66,11 @@ public class ApplicationUser : UserBase
         if (OneLoginClientId is null)
         {
             throw new InvalidOperationException($"{nameof(OneLoginClientId)} is not set.");
+        }
+
+        if (UseSharedOneLoginSigningKeys is null)
+        {
+            throw new InvalidOperationException($"{nameof(UseSharedOneLoginSigningKeys)} is not set.");
         }
 
         if (UseSharedOneLoginSigningKeys is false && OneLoginPrivateKeyPem is null)

@@ -10,7 +10,7 @@ public record ApplicationUser
     public required string? ClientSecret { get; init; }
     public required IReadOnlyCollection<string>? RedirectUris { get; init; }
     public required IReadOnlyCollection<string>? PostLogoutRedirectUris { get; init; }
-    public required bool UseSharedOneLoginSigningKeys { get; init; }
+    public required bool? UseSharedOneLoginSigningKeys { get; init; }
     public required string? OneLoginClientId { get; init; }
     public required string? OneLoginPrivateKeyPem { get; init; }
     public required string? OneLoginAuthenticationSchemeName { get; init; }

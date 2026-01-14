@@ -179,7 +179,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
         options.Environment = OneLoginEnvironments.Integration;
 
-        if (user.UseSharedOneLoginSigningKeys)
+        if (user.UseSharedOneLoginSigningKeys is true)
         {
             var key = authorizeAccessOptionsAccessor.Value.GetOneLoginSigningCredentials();
             options.ClientAuthenticationCredentials = key;
