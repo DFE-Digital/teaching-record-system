@@ -32,5 +32,6 @@ public enum ProcessType
     TeacherPensionsRecordImporting = 28,
     PersonMerging = 29,
     ChangeOfNameRequestApproving = 30,
-    ChangeOfDateOfBirthRequestApproving = 31
+    ChangeOfDateOfBirthRequestApproving = 31,
+    OneLoginUserIdVerificationSupportTaskSaving = 32
 }

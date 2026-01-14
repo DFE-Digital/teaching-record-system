@@ -8,7 +8,7 @@ public class SavedJourneyState(
     string pageName,
     IReadOnlyDictionary<string, string?> modelStateValues,
     object state,
-    Type stateType)
+    Type stateType) : IEquatable<SavedJourneyState>
 {
     internal static JsonSerializerOptions SerializerOptions { get; } = new(JsonSerializerDefaults.Web);
 
@@ -17,6 +17,70 @@ public class SavedJourneyState(
     public IReadOnlyDictionary<string, string?> ModelStateValues => modelStateValues;
 
     public T GetState<T>() => (T)state;
+
+    private object State => state;
+
+    public bool Equals(SavedJourneyState? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (!string.Equals(PageName, other.PageName, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (ModelStateValues.Count != other.ModelStateValues.Count)
+        {
+            return false;
+        }
+
+        if (!ModelStateValues.All(kvp =>
+            other.ModelStateValues.TryGetValue(kvp.Key, out var otherValue) &&
+            string.Equals(kvp.Value, otherValue, StringComparison.OrdinalIgnoreCase)))
+        {
+            return false;
+        }
+
+        return State.Equals(other.State);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+
+        return Equals((SavedJourneyState)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(PageName, StringComparer.Ordinal);
+        hashCode.Add(State);
+
+        foreach (var kvp in ModelStateValues.OrderBy(kvp => kvp.Key, StringComparer.Ordinal))
+        {
+            hashCode.Add(kvp.Key, StringComparer.Ordinal);
+            hashCode.Add(kvp.Value, StringComparer.Ordinal);
+        }
+
+        return hashCode.ToHashCode();
+    }
 
     internal static SavedJourneyState? ReadJson(ref Utf8JsonReader reader, JsonSerializerOptions options)
     {

@@ -17,5 +17,6 @@ public enum SupportTaskUpdatedEventChanges
 {
     None = 0,
     Status = 1 << 0,
-    Data = 1 << 1
+    Data = 1 << 1,
+    ResolveJourneySavedState = 1 << 2
 }

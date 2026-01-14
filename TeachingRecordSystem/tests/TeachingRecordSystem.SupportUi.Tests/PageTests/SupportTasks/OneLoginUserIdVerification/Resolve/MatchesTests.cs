@@ -480,6 +480,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
+
+        Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskSaving, p.ProcessContext.ProcessType));
     }
 
     [Fact]

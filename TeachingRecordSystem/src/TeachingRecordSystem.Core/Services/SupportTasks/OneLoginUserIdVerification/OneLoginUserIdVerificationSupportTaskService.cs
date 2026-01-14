@@ -12,7 +12,7 @@ public class OneLoginUserIdVerificationSupportTaskService(
     public async Task ResolveSupportTaskAsync(NotVerifiedOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
-        ThrowIfSupportTaskIsNotOpen(supportTask);
+        ThrowIfSupportTaskIsClosed(supportTask);
 
         var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
@@ -34,7 +34,7 @@ public class OneLoginUserIdVerificationSupportTaskService(
     public async Task ResolveSupportTaskAsync(VerifiedOnlyWithMatchesOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
-        ThrowIfSupportTaskIsNotOpen(supportTask);
+        ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
@@ -71,7 +71,7 @@ public class OneLoginUserIdVerificationSupportTaskService(
     public async Task ResolveSupportTaskAsync(VerifiedOnlyWithoutMatchesOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
-        ThrowIfSupportTaskIsNotOpen(supportTask);
+        ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
@@ -106,7 +106,7 @@ public class OneLoginUserIdVerificationSupportTaskService(
     public async Task ResolveSupportTaskAsync(VerifiedAndConnectedOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
-        ThrowIfSupportTaskIsNotOpen(supportTask);
+        ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
@@ -149,11 +149,11 @@ public class OneLoginUserIdVerificationSupportTaskService(
         Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
     }
 
-    private void ThrowIfSupportTaskIsNotOpen(SupportTask supportTask)
+    private void ThrowIfSupportTaskIsClosed(SupportTask supportTask)
     {
-        if (supportTask.Status is not SupportTaskStatus.Open)
+        if (supportTask.Status is SupportTaskStatus.Closed)
         {
-            throw new InvalidOperationException("Support task is not open.");
+            throw new InvalidOperationException("Support task is closed.");
         }
     }
 }

@@ -1,14 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserIdVerification.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserIdVerification), RequireJourneyInstance]
-public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
+public class Matches(
+    TrsDbContext dbContext,
+    SupportTaskService supportTaskService,
+    IClock clock,
+    SupportUiLinkGenerator linkGenerator) :
+    PageModel
 {
     public static class Actions
     {
@@ -77,8 +84,16 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
             JourneyInstance.State,
             excludeKeys: ["Action", nameof(SupportTaskReference)]);
 
-        _supportTask!.ResolveJourneySavedState = savedJourneyState;
-        await dbContext.SaveChangesAsync();
+        var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskSaving, clock.UtcNow, User.GetUserId());
+
+        await supportTaskService.UpdateSupportTaskAsync(
+            new()
+            {
+                SupportTask = _supportTask!.SupportTaskReference,
+                Status = SupportTaskStatus.InProgress,
+                SavedJourneyState = Option.Some(savedJourneyState)!
+            },
+            processContext);
 
         await JourneyInstance.DeleteAsync();
 

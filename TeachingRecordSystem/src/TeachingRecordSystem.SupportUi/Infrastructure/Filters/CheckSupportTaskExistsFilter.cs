@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly, params SupportTaskType[] supportTaskTypes) : IAsyncResourceFilter
+public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeClosed, params SupportTaskType[] supportTaskTypes) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -44,7 +44,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
 
         if (currentSupportTask is null ||
             !supportTaskTypes.Contains(currentSupportTask.SupportTaskType) ||
-            (openOnly && currentSupportTask.Status != SupportTaskStatus.Open))
+            (excludeClosed && currentSupportTask.Status is SupportTaskStatus.Closed))
         {
             context.Result = new NotFoundResult();
             return;
@@ -56,12 +56,12 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
     }
 }
 
-public class CheckSupportTaskExistsFilterFactory(bool openOnly, params SupportTaskType[] supportTaskTypes) : IFilterFactory, IOrderedFilter
+public class CheckSupportTaskExistsFilterFactory(bool excludeClosed, params SupportTaskType[] supportTaskTypes) : IFilterFactory, IOrderedFilter
 {
     public bool IsReusable => false;
 
     public int Order => -200;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
-        ActivatorUtilities.CreateInstance<CheckSupportTaskExistsFilter>(serviceProvider, openOnly, supportTaskTypes);
+        ActivatorUtilities.CreateInstance<CheckSupportTaskExistsFilter>(serviceProvider, excludeClosed, supportTaskTypes);
 }

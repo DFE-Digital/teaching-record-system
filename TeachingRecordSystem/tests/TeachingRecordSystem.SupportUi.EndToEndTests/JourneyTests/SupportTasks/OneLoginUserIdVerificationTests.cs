@@ -168,7 +168,6 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/matches");
         await page.ClickContinueButtonAsync();
 
-        await page.PauseAsync();
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve/confirm-connect");
         await page.ClickButtonAsync("Confirm and connect account");
 
