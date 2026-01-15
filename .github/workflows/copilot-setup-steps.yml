@@ -27,7 +27,7 @@ jobs:
           - 5432:5432
 
     env:
-      COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS: vsblob.vsassets.io,data.jsdelivr.com
+      COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS: vsblob.vsassets.io,data.jsdelivr.com,data.jsdelivr.com,unpkg.com
       ConnectionStrings__DefaultConnection: "Host=localhost;Username=postgres;Password=trs;Database=tr;Maximum Pool Size=1000;Timeout=30"
 
     steps:
