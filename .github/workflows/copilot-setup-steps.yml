@@ -31,7 +31,7 @@ jobs:
       ConnectionStrings__DefaultConnection: "Host=localhost;Username=postgres;Password=trs;Database=tr;Maximum Pool Size=1000;Timeout=30"
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/checkout@v6
         with:
