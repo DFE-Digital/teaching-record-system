@@ -6,7 +6,7 @@ public record ChangeDateOfBirthRequestSupportTaskApprovedEvent : SupportTaskUpda
     public required EventModels.ChangeDateOfBirthRequestData RequestData { get; init; }
     public required ChangeDateOfBirthRequestSupportTaskApprovedEventChanges Changes { get; init; }
     public required EventModels.PersonDetails PersonAttributes { get; init; }
-    public required EventModels.PersonDetails? OldPersonAttributes { get; init; }
+    public required EventModels.PersonDetails OldPersonAttributes { get; init; }
 }
 
 [Flags]

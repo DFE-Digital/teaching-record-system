@@ -84,7 +84,11 @@ public class ChangeHistoryModel(
             nameof(PersonStatusUpdatedEvent),
             nameof(LegacyEvents.PersonsMergedEvent),
             nameof(TrnAllocatedEvent),
-            nameof(TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)
+            nameof(TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent),
+            nameof(LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent),
+            nameof(LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent),
+            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent),
+            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent)
         };
 
         var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert", StringComparison.Ordinal)).ToArray();
