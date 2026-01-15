@@ -1,0 +1,50 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: trs
+          POSTGRES_DB: trs
+          POSTGRES_INITDB_ARGS: "-c max_connections=1000"
+        options: >-
+          --name postgres
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS: vsblob.vsassets.io,data.jsdelivr.com
+      ConnectionStrings__DefaultConnection: "Host=localhost;Username=postgres;Password=trs;Database=tr;Maximum Pool Size=1000;Timeout=30"
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: extractions/setup-just@v3
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Install tools
+        run: just install-tools
+
+      - name: Restore
+        run: just restore
