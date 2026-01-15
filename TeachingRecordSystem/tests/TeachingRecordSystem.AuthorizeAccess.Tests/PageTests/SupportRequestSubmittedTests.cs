@@ -29,7 +29,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
             {
                 // Arrange
                 var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, createCoreIdentityVc: false);
-                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+                await journeyInstance.OnUserAuthenticatedAsync(ticket);
 
                 var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.SupportRequestSubmitted(journeyInstance.InstanceId));
 
@@ -50,7 +50,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
-                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+                await journeyInstance.OnUserAuthenticatedAsync(ticket);
 
                 var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.SupportRequestSubmitted(journeyInstance.InstanceId));
 
@@ -72,7 +72,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
-                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+                await journeyInstance.OnUserAuthenticatedAsync(ticket);
 
                 journeyInstance.UpdateState(state => state.SetNationalInsuranceNumber(true, Faker.Identification.UkNationalInsuranceNumber()));
 
@@ -97,7 +97,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
                 var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
-                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+                await journeyInstance.OnUserAuthenticatedAsync(ticket);
 
                 var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.SupportRequestSubmitted(journeyInstance.InstanceId));
 
@@ -119,7 +119,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
-                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+                await journeyInstance.OnUserAuthenticatedAsync(ticket);
 
                 var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
                 var trn = await TestData.GenerateTrnAsync();
@@ -150,7 +150,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
-                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+                await journeyInstance.OnUserAuthenticatedAsync(ticket);
 
                 var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
                 var trn = await TestData.GenerateTrnAsync();
