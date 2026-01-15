@@ -29,5 +29,5 @@ public class RequireActivePersonFilter : IResourceFilter, IOrderedFilter
     {
     }
 
-    public int Order => 100;
+    public int Order => FilterOrders.RequireActivePersonFilterOrder;
 }

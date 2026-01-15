@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 public class RequireOpenAlertFilter : IResourceFilter, IOrderedFilter
 {
-    public int Order => 1;  // After CheckAlertExistsFilter
+    public int Order => FilterOrders.RequireOpenAlertFilterOrder;  // After CheckAlertExistsFilter
 
     public void OnResourceExecuted(ResourceExecutedContext context)
     {

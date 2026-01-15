@@ -12,7 +12,7 @@ public class Conventions : IConfigureFolderConventions
             this.GetFolderPathFromNamespace(),
             model =>
             {
-                model.Filters.Add(new ServiceFilterAttribute<CheckMandatoryQualificationExistsFilter>() { Order = -200 });
+                model.Filters.Add(new ServiceFilterAttribute<CheckMandatoryQualificationExistsFilter>() { Order = FilterOrders.CheckMandatoryQualificationExistsFilterOrder });
             });
     }
 }

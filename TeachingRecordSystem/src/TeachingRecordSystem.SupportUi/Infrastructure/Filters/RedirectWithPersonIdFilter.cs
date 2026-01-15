@@ -10,7 +10,7 @@ public partial class RedirectWithPersonIdFilter(TrsDbContext dbContext) : IAsync
     [GeneratedRegex(@"^\/persons\/([0-9]{7})($|\/)")]
     private static partial Regex _personWithTrnPathRegex();
 
-    public static int Order => -1000;
+    public static int Order => FilterOrders.RedirectWithPersonIdFilterOrder;
 
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {

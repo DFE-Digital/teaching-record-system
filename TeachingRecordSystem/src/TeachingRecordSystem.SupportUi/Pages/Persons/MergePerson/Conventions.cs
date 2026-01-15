@@ -15,7 +15,7 @@ public class Conventions : IConfigureFolderConventions
             model =>
             {
                 model.Filters.Add(new CheckPersonExistsFilterFactory());
-                model.Filters.Add(new ServiceFilterAttribute<CheckPersonCanBeMergedFilter>() { Order = -150 }); // After Check Person but before FormFlow
+                model.Filters.Add(new ServiceFilterAttribute<CheckPersonCanBeMergedFilter>() { Order = FilterOrders.CheckPersonCanBeMergedFilterOrder });
                 model.EndpointMetadata.Add(new AuthorizeAttribute()
                 {
                     Policy = AuthorizationPolicies.PersonDataEdit

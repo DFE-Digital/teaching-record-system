@@ -23,7 +23,7 @@ public class RequireFeatureEnabledFilterFactoryAttribute(string featureName) : A
 {
     public bool IsReusable => false;
 
-    public int Order => -300;
+    public int Order => FilterOrders.RequireFeatureEnabledFilterOrder;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
         ActivatorUtilities.CreateInstance<RequireFeatureEnabledFilter>(serviceProvider, featureName);
