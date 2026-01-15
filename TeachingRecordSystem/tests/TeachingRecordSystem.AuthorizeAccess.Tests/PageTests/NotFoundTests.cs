@@ -1,170 +1,166 @@
-// using System.Diagnostics;
-//
-// namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests;
-//
-// public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
-// {
-//     [Fact]
-//     public async Task Get_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
-//     {
-//         // Arrange
-//         var state = CreateNewState();
-//         var journeyInstance = await CreateJourneyInstance(state);
-//
-//         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
-//
-//         // Act
-//         var response = await HttpClient.SendAsync(request);
-//
-//         // Assert
-//         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-//     }
-//
-//     [Fact]
-//     public async Task Get_NotVerifiedWithOneLogin_ReturnsBadRequest()
-//     {
-//         // Arrange
-//         var state = CreateNewState();
-//         var journeyInstance = await CreateJourneyInstance(state);
-//
-//         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-//
-//         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-//         await WithSignInJourneyCoordinator(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
-//
-//         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
-//
-//         // Act
-//         var response = await HttpClient.SendAsync(request);
-//
-//         // Assert
-//         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-//     }
-//
-//     [Fact]
-//     public async Task Get_AlreadyAuthenticated_RedirectsToStateRedirectUri()
-//     {
-//         // Arrange
-//         var state = CreateNewState();
-//         var journeyInstance = await CreateJourneyInstance(state);
-//
-//         var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
-//         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
-//
-//         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-//         await WithSignInJourneyCoordinator(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
-//
-//         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
-//
-//         // Act
-//         var response = await HttpClient.SendAsync(request);
-//
-//         // Assert
-//         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-//         Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-//     }
-//
-//     [Fact]
-//     public async Task Get_NationalInsuranceNumberNotSpecified_RedirectsToNationalInsuranceNumberPage()
-//     {
-//         // Arrange
-//         var state = CreateNewState();
-//         var journeyInstance = await CreateJourneyInstance(state);
-//
-//         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-//
-//         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-//         await WithSignInJourneyCoordinator(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
-//
-//         Debug.Assert(state.NationalInsuranceNumber is null);
-//
-//         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
-//
-//         // Act
-//         var response = await HttpClient.SendAsync(request);
-//
-//         // Assert
-//         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-//         Assert.Equal($"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-//     }
-//
-//     [Fact]
-//     public async Task Get_TrnNotSpecified_RedirectsToTrnPage()
-//     {
-//         // Arrange
-//         var state = CreateNewState();
-//         var journeyInstance = await CreateJourneyInstance(state);
-//
-//         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-//
-//         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-//         await WithSignInJourneyCoordinator(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
-//
-//         Debug.Assert(state.NationalInsuranceNumber is null);
-//         await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber()));
-//
-//         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
-//
-//         // Act
-//         var response = await HttpClient.SendAsync(request);
-//
-//         // Assert
-//         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-//         Assert.Equal($"/trn?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-//     }
-//
-//     [Fact]
-//     public async Task Get_ValidRequest_RendersExpectedContent()
-//     {
-//         // Arrange
-//         var state = CreateNewState();
-//         var journeyInstance = await CreateJourneyInstance(state);
-//
-//         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-//
-//         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-//         await WithSignInJourneyCoordinator(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
-//
-//         await journeyInstance.UpdateStateAsync(async state =>
-//         {
-//             state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber());
-//             state.SetTrn(true, await TestData.GenerateTrnAsync());
-//         });
-//
-//         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
-//
-//         // Act
-//         var response = await HttpClient.SendAsync(request);
-//
-//         // Assert
-//         var doc = await AssertEx.HtmlResponseAsync(response);
-//     }
-//
-//     [Fact]
-//     public async Task Post_ValidRequest_RedirectsToCheckAnswersPage()
-//     {
-//         // Arrange
-//         var state = CreateNewState();
-//         var journeyInstance = await CreateJourneyInstance(state);
-//
-//         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-//
-//         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-//         await WithSignInJourneyCoordinator(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
-//
-//         await journeyInstance.UpdateStateAsync(async state =>
-//         {
-//             state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber());
-//             state.SetTrn(true, await TestData.GenerateTrnAsync());
-//         });
-//
-//         var request = new HttpRequestMessage(HttpMethod.Post, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
-//
-//         // Act
-//         var response = await HttpClient.SendAsync(request);
-//
-//         // Assert
-//         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-//         Assert.Equal($"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-//     }
-// }
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
+
+namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests;
+
+public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
+{
+    [Fact]
+    public Task Get_NotAuthenticatedWithOneLogin_ReturnsBadRequest() =>
+        WithJourneyInstanceAsync(
+            CreateNewState(),
+            async journeyInstance =>
+            {
+                // Arrange
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.NotFound(journeyInstance.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+            });
+
+    [Fact]
+    public Task Get_NotVerifiedWithOneLogin_ReturnsBadRequest() =>
+        WithJourneyInstanceAsync(
+            CreateNewState(),
+            async journeyInstance =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+
+                var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
+                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.NotFound(journeyInstance.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+            });
+
+    [Fact]
+    public Task Get_AlreadyAuthenticated_RedirectsToStateRedirectUri() =>
+        WithJourneyInstanceAsync(
+            CreateNewState(),
+            async journeyInstance =>
+            {
+                // Arrange
+                var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
+
+                var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
+                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.NotFound(journeyInstance.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(journeyInstance.State.RedirectUri, response.Headers.Location?.OriginalString);
+            });
+
+    [Fact]
+    public Task Get_NationalInsuranceNumberNotSpecified_RedirectsToNationalInsuranceNumberPage() =>
+        WithJourneyInstanceAsync(
+            CreateNewState(),
+            async journeyInstance =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
+                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.NotFound(journeyInstance.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.NationalInsuranceNumber(journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
+            });
+
+    [Fact]
+    public Task Get_TrnNotSpecified_RedirectsToTrnPage() =>
+        WithJourneyInstanceAsync(
+            CreateNewState(),
+            async journeyInstance =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
+                await journeyInstance.OnOneLoginCallbackAsync(ticket);
+
+                journeyInstance.UpdateState(state => state.SetNationalInsuranceNumber(true, Faker.Identification.UkNationalInsuranceNumber()));
+
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.NotFound(journeyInstance.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.Trn(journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
+            });
+
+    [Fact]
+    public Task Get_ValidRequest_RendersExpectedContent() =>
+        WithJourneyInstanceAsync(
+            CreateNewState(),
+            async journeyInstance =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                await SetupInstanceStateAsync(journeyInstance, oneLoginUser);
+
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.NotFound(journeyInstance.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                var doc = await AssertEx.HtmlResponseAsync(response);
+            });
+
+    [Fact]
+    public Task Post_ValidRequest_RedirectsToCheckAnswersPage() =>
+        WithJourneyInstanceAsync(
+            CreateNewState(),
+            async journeyInstance =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                await SetupInstanceStateAsync(journeyInstance, oneLoginUser);
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.NotFound(journeyInstance.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.CheckAnswers(journeyInstance.InstanceId), response.Headers.Location?.OriginalString);
+            });
+
+    private async Task SetupInstanceStateAsync(SignInJourneyCoordinator journeyInstance, OneLoginUser oneLoginUser)
+    {
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
+        await journeyInstance.OnOneLoginCallbackAsync(ticket);
+        journeyInstance.UpdateState(state =>
+        {
+            state.SetNationalInsuranceNumber(true, Faker.Identification.UkNationalInsuranceNumber());
+            state.SetTrn(true, TestData.GenerateTrnAsync().Result);
+        });
+        AddUrlToPath(journeyInstance, StepUrls.NotFound);
+    }
+}

@@ -172,6 +172,10 @@ public abstract class TestBase
         public const string NationalInsuranceNumber = "/national-insurance-number";
         public const string Trn = "/trn";
         public const string Found = "/found";
+        public const string NotFound = "/not-found";
+        public const string NotVerified = "/not-verified";
+        public const string CheckAnswers = "/check-answers";
+        public const string SupportRequestSubmitted = "/request-submitted";
     }
 
     protected static class JourneyUrls
@@ -187,5 +191,17 @@ public abstract class TestBase
 
         public static string Found(JourneyInstanceId instanceId) =>
             instanceId.AppendKeyToUrl(StepUrls.Found);
+
+        public static string NotFound(JourneyInstanceId instanceId) =>
+            instanceId.AppendKeyToUrl(StepUrls.NotFound);
+
+        public static string NotVerified(JourneyInstanceId instanceId) =>
+            instanceId.AppendKeyToUrl(StepUrls.NotVerified);
+
+        public static string CheckAnswers(JourneyInstanceId instanceId) =>
+            instanceId.AppendKeyToUrl(StepUrls.CheckAnswers);
+
+        public static string SupportRequestSubmitted(JourneyInstanceId instanceId) =>
+            instanceId.AppendKeyToUrl(StepUrls.SupportRequestSubmitted);
     }
 }
