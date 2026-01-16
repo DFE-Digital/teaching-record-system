@@ -113,7 +113,6 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
         Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.MiddleName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.PreviousFirstName, supportTask.TrnRequestMetadata!.PreviousMiddleName, supportTask.TrnRequestMetadata!.PreviousLastName), requestDetails.GetSummaryListValueByKey("Previous names"));
         Assert.Equal(person.Trn, requestDetails.GetSummaryListValueByKey("TRN"));
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
@@ -227,18 +226,19 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
     }
 
-    public static TheoryData<PersonMatchedAttribute[]> GetHighlightedDifferencesData() => new(
-        [PersonMatchedAttribute.FirstName],
-        [PersonMatchedAttribute.MiddleName],
-        [PersonMatchedAttribute.LastName],
-        [PersonMatchedAttribute.DateOfBirth],
-        [PersonMatchedAttribute.NationalInsuranceNumber],
-        [PersonMatchedAttribute.Gender]
-    );
+    public static TheoryData<PersonMatchedAttribute[], bool> GetHighlightedDifferencesData()
+    {
+        // highlighting is expected if not all of first, middle, and last name are matched, but matching doesn't depend on all three
+        var matches = TrnRequestServiceMatchAttributeCombinations.GetMatchAttributeCombinations()
+            .Select(m => (m, !(m.Contains(PersonMatchedAttribute.FirstName) && m.Contains(PersonMatchedAttribute.MiddleName) && m.Contains(PersonMatchedAttribute.LastName))));
+        var nonMatches = TrnRequestServiceMatchAttributeCombinations.GetNonMatchAttributeCombinationExamples()
+            .Select(nm => (nm, !(nm.Contains(PersonMatchedAttribute.FirstName) && nm.Contains(PersonMatchedAttribute.MiddleName) && nm.Contains(PersonMatchedAttribute.LastName))));
+        return new TheoryData<PersonMatchedAttribute[], bool>(matches.ToArray());
+    }
 
     [Theory]
     [MemberData(nameof(GetHighlightedDifferencesData))]
-    public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes)
+    public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes, bool nameIsHighlighted)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -305,23 +305,25 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "First name", !matchedAttributes.Contains(PersonMatchedAttribute.FirstName));
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Last name", !matchedAttributes.Contains(PersonMatchedAttribute.LastName));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Name", nameIsHighlighted);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
     }
 
-    public static TheoryData<PersonMatchedAttribute> GetSynonymMatchedData() => new(
-        PersonMatchedAttribute.FirstName,
-        PersonMatchedAttribute.MiddleName,
-        PersonMatchedAttribute.LastName
-    );
+    public static TheoryData<PersonMatchedAttribute[], PersonMatchedAttribute> GetSynonymMatchedData()
+    {
+        var matches = new List<(PersonMatchedAttribute[], PersonMatchedAttribute)> {
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.FirstName),
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.MiddleName),
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.LastName),
+        };
+        return new TheoryData<PersonMatchedAttribute[], PersonMatchedAttribute>(matches.ToArray());
+    }
 
     [Theory]
     [MemberData(nameof(GetSynonymMatchedData))]
-    public async Task Get_WhenMatchedOnSynonymDoesNotHighlightAsDifferenceBetweenMatchAndTrnRequest(PersonMatchedAttribute synonymMatchedAttribute)
+    public async Task Get_WhenMatchedOnSynonymDoesNotHighlightAsDifferenceBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes, PersonMatchedAttribute synonymMatchedAttribute)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -339,17 +341,23 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
                 .WithFirstName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.FirstName
-                        ? synonym
-                        : matchedPerson.FirstName)
+                    matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.FirstName
+                            ? synonym
+                            : matchedPerson.FirstName
+                        : TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithMiddleName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.MiddleName
-                        ? synonym
-                        : matchedPerson.MiddleName)
+                    matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.MiddleName
+                            ? synonym
+                            : matchedPerson.MiddleName
+                        : TestData.GenerateChangedMiddleName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithLastName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.LastName
-                        ? synonym
-                        : matchedPerson.LastName));
+                    matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.LastName
+                            ? synonym
+                            : matchedPerson.LastName
+                        : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName])));
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
@@ -374,9 +382,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "First name", false);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Last name", false);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Name", expectHighlight: false);
     }
 
     [Fact]

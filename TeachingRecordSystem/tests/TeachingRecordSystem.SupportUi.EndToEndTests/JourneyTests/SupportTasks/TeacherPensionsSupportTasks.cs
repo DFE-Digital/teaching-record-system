@@ -12,7 +12,11 @@ public class TeacherPensionsSupportTasks(HostFixture hostFixture) : TestBase(hos
         var now = DateTime.UtcNow;
 
         var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
-        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x
+            .WithFirstName(person.FirstName)
+            .WithLastName(person.LastName)
+            .WithNationalInsuranceNumber(person.NationalInsuranceNumber!)
+            .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), TestData.GenerateLastName(), new DateTime(2020, 1, 10).ToUniversalTime())));
         var duplicatePerson2 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/teacher-pensions?_f=1");
         var user = await TestData.CreateUserAsync();

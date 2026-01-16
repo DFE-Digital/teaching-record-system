@@ -59,7 +59,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
                     p,
                     [
                         PersonMatchedAttribute.FirstName,
-                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.MiddleName,
                         PersonMatchedAttribute.DateOfBirth
                     ]
                 )).ToArray());
@@ -75,7 +75,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var doc = await response.GetDocumentAsync();
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.MiddleName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
@@ -117,7 +117,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Assert
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
-        var expectedPreviousName = firstMatch.PreviousNames is not null ? StringHelper.JoinNonEmpty(' ', firstMatch.PreviousNames.First().FirstName, firstMatch.PreviousNames.First().MiddleName, firstMatch.PreviousNames.First().LastName) : null;
+        var previousName = firstMatch.PreviousNames!.First();
+        var expectedPreviousName = firstMatch.PreviousNames is not null ? StringHelper.JoinNonEmpty(' ', previousName.FirstName, previousName.MiddleName, previousName.LastName) : null;
         Assert.NotNull(firstMatchDetails);
         Assert.Equal(StringHelper.JoinNonEmpty(' ', firstMatch.FirstName, firstMatch.MiddleName, firstMatch.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
         if (expectedPreviousName is not null)
@@ -630,19 +631,19 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.NotEmpty(doc.GetAllElementsByTestId("create-new-record-button"));
     }
 
-    public static TheoryData<PersonMatchedAttribute[]> GetHighlightedDifferencesData() => new(
-        [PersonMatchedAttribute.FirstName],
-        [PersonMatchedAttribute.MiddleName],
-        [PersonMatchedAttribute.LastName],
-        [PersonMatchedAttribute.DateOfBirth],
-        [PersonMatchedAttribute.EmailAddress],
-        [PersonMatchedAttribute.NationalInsuranceNumber],
-        [PersonMatchedAttribute.Gender]
-    );
+
+    public static TheoryData<PersonMatchedAttribute[], bool> GetHighlightedDifferencesData()
+    {
+        var matches = TrnRequestServiceMatchAttributeCombinations.GetMatchAttributeCombinations()
+            .Select(m => (m, !(m.Contains(PersonMatchedAttribute.FirstName) && m.Contains(PersonMatchedAttribute.MiddleName) && m.Contains(PersonMatchedAttribute.LastName))));
+        var nonMatches = TrnRequestServiceMatchAttributeCombinations.GetNonMatchAttributeCombinationExamples()
+            .Select(nm => (nm, !(nm.Contains(PersonMatchedAttribute.FirstName) && nm.Contains(PersonMatchedAttribute.MiddleName) && nm.Contains(PersonMatchedAttribute.LastName))));
+        return new TheoryData<PersonMatchedAttribute[], bool>(matches.ToArray());
+    }
 
     [Theory]
     [MemberData(nameof(GetHighlightedDifferencesData))]
-    public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes)
+    public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes, bool nameIsHighlighted)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -713,9 +714,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "First name", !matchedAttributes.Contains(PersonMatchedAttribute.FirstName));
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Last name", !matchedAttributes.Contains(PersonMatchedAttribute.LastName));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Name", nameIsHighlighted);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Email address", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
