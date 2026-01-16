@@ -199,7 +199,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, s => s.WithStatedNationalInsuranceNumber(null));
         var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
         // Person who matches on last name and DOB
