@@ -913,9 +913,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "First name", false);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Last name", false);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Name", false);
     }
 
     [Fact]
