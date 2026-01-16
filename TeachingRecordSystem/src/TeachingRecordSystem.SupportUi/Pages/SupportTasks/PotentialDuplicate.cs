@@ -18,5 +18,7 @@ public record PotentialDuplicate
     public required IReadOnlyCollection<string> PreviousNames { get; init; }
     public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
 
-    public bool HasNameMismatch => !(MatchedAttributes.Contains(PersonMatchedAttribute.FirstName) && MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName) && MatchedAttributes.Contains(PersonMatchedAttribute.LastName));
+    public bool HasFirstNameMismatch => !(String.IsNullOrEmpty(FirstName) || MatchedAttributes.Contains(PersonMatchedAttribute.FirstName));
+    public bool HasMiddleNameMismatch => !(String.IsNullOrEmpty(MiddleName) || MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
+    public bool HasLastNameMismatch => !(String.IsNullOrEmpty(LastName) || MatchedAttributes.Contains(PersonMatchedAttribute.LastName));
 }

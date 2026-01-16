@@ -280,12 +280,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
 
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", true);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", true);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", true);
     }
@@ -843,15 +842,19 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
     }
 
-    public static TheoryData<PersonMatchedAttribute> GetSynonymMatchedData() => new(
-        PersonMatchedAttribute.FirstName,
-        PersonMatchedAttribute.MiddleName,
-        PersonMatchedAttribute.LastName
-    );
+    public static TheoryData<PersonMatchedAttribute[], PersonMatchedAttribute> GetSynonymMatchedData()
+    {
+        var matches = new List<(PersonMatchedAttribute[], PersonMatchedAttribute)> {
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.FirstName),
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.MiddleName),
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.LastName),
+        };
+        return new TheoryData<PersonMatchedAttribute[], PersonMatchedAttribute>(matches.ToArray());
+    }
 
     [Theory]
     [MemberData(nameof(GetSynonymMatchedData))]
-    public async Task Get_WhenMatchedOnSynonymDoesNotHighlightAsDifferenceBetweenMatchAndTrnRequest(PersonMatchedAttribute synonymMatchedAttribute)
+    public async Task Get_WhenMatchedOnSynonymDoesNotHighlightAsDifferenceBetweenMatchAndTrnRequest(PersonMatchedAttribute[] matchedAttributes, PersonMatchedAttribute synonymMatchedAttribute)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -868,17 +871,23 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
                 .WithFirstName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.FirstName
-                        ? synonym
-                        : matchedPerson.FirstName)
+                    matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.FirstName
+                            ? synonym
+                            : matchedPerson.FirstName
+                        : TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithMiddleName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.MiddleName
-                        ? synonym
-                        : matchedPerson.MiddleName)
+                    matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.MiddleName
+                            ? synonym
+                            : matchedPerson.MiddleName
+                        : TestData.GenerateChangedMiddleName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithLastName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.LastName
-                        ? synonym
-                        : matchedPerson.LastName));
+                    matchedAttributes.Contains(PersonMatchedAttribute.LastName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.LastName
+                            ? synonym
+                            : matchedPerson.LastName
+                        : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName])));
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,

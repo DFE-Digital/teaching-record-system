@@ -96,7 +96,7 @@
                     <h2 class="govuk-heading-m">Potential matches</h2>
                 }
 
-                @foreach (var match in Model.PotentialDuplicates!)
+                @foreach (var (match, hasNameMismatch) in Model.PotentialDuplicatesWithNameMatchingInfo!)
                 {
                     <govuk-summary-card data-testid="match" data-personid="@match.PersonId" class="trs-potential-duplicates__item">
                         <govuk-summary-card-title heading-level="3">
@@ -141,7 +141,7 @@
 
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!(match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName) && match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName) && match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName)))">
+                                <govuk-summary-list-row-value use-empty-fallback highlight="@hasNameMismatch">
                                     @StringHelper.JoinNonEmpty(' ', match.FirstName, match.MiddleName, match.LastName)
                                 </govuk-summary-list-row-value>
                             </govuk-summary-list-row>

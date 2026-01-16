@@ -18,6 +18,21 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
     public string Name => StringHelper.JoinNonEmpty(' ', RequestData?.FirstName, RequestData?.MiddleName, RequestData?.LastName);
 
+    private bool HasFirstNameMismatch(PotentialDuplicate pd) =>
+    ((String.IsNullOrEmpty(pd.FirstName) || String.IsNullOrEmpty(RequestData!.FirstName))
+        ? !(String.IsNullOrEmpty(pd.FirstName) && String.IsNullOrEmpty(RequestData!.FirstName))
+        : pd.HasFirstNameMismatch);
+    private bool HasMiddleNameMismatch(PotentialDuplicate pd) =>
+        ((String.IsNullOrEmpty(pd.MiddleName) || String.IsNullOrEmpty(RequestData!.MiddleName))
+            ? !(String.IsNullOrEmpty(pd.MiddleName) && String.IsNullOrEmpty(RequestData!.MiddleName))
+            : pd.HasMiddleNameMismatch);
+    private bool HasLastNameMismatch(PotentialDuplicate pd) =>
+        ((String.IsNullOrEmpty(pd.LastName) || String.IsNullOrEmpty(RequestData!.LastName))
+            ? !(String.IsNullOrEmpty(pd.LastName) && String.IsNullOrEmpty(RequestData!.LastName))
+            : pd.HasLastNameMismatch);
+
+    public IReadOnlyCollection<(PotentialDuplicate PotentialDuplicate, bool HasNameMismatch)> PotentialDuplicatesWithNameMatchingInfo { get; set; } = Array.Empty<(PotentialDuplicate, bool)>();
+
     [BindProperty]
     [Required(ErrorMessage = "Select a record")]
     public Guid? PersonId { get; set; }
@@ -122,6 +137,11 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
                 Identifier = (char)('A' + i),
                 MatchedAttributes = matchedAttributesLookup[r.PersonId]
             })
+            .ToArray();
+
+        // highlight name mismatches taking into account whether each name part is present in the request data and the match
+        PotentialDuplicatesWithNameMatchingInfo = PotentialDuplicates!
+            .Select(pd => (pd, HasFirstNameMismatch(pd) || HasMiddleNameMismatch(pd) || HasLastNameMismatch(pd)))
             .ToArray();
 
         await base.OnPageHandlerExecutionAsync(context, next);
