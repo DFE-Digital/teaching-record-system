@@ -232,6 +232,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifi
         Assert.NotNull(firstMatchDetails);
         Assert.Equal($"{matchedPerson.FirstName} {matchedPerson.LastName}", firstMatchDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
+        AssertMatchRowNotHighlighted(firstMatchDetails, "NI number");
     }
 
     [Fact]

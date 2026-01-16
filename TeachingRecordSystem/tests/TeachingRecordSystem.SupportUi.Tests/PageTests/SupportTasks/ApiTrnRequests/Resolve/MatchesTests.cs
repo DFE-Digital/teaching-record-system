@@ -439,11 +439,9 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
         Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueByKey("Email address"));
-        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueByKey("Middle name"));
         Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
-        AssertMatchRowHasExpectedHighlight("Middle name", false);
         AssertMatchRowHasExpectedHighlight("NI number", false);
         AssertMatchRowHasExpectedHighlight("Gender", false);
         AssertMatchRowHasExpectedHighlight("Email address", false);

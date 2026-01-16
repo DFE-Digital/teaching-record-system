@@ -335,9 +335,6 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
-        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
