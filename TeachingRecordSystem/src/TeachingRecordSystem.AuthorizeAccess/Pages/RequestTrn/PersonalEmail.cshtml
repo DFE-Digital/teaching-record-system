@@ -5,15 +5,15 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId)
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.CheckAnswers(Model.JourneyInstance!.InstanceId)
          : Model.JourneyInstance!.State.WorkEmail is not null ?
-            LinkGenerator.RequestTrnWorkEmail(Model.JourneyInstance!.InstanceId)
-            : LinkGenerator.RequestTrnWorkingInSchoolOrEducationalSetting(Model.JourneyInstance!.InstanceId))" />
+            LinkGenerator.WorkEmail(Model.JourneyInstance!.InstanceId)
+            : LinkGenerator.WorkingInSchoolOrEducationalSetting(Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RequestTrnPersonalEmail(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.PersonalEmail(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
 
             <govuk-input for="PersonalEmail" type="PersonalEmail" autocomplete="email">
                 <govuk-input-label is-page-heading="true" class="govuk-label--l">What is your personal email address?</govuk-input-label>

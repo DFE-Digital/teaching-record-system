@@ -233,10 +233,10 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
 
-        var trnToken = Guid.NewGuid().ToString();
-
-        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        using (var scope = HostFixture.Services.CreateScope())
         {
+            using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
+
             idDbContext.Users.Add(new User()
             {
                 UserId = Guid.NewGuid(),
@@ -271,10 +271,10 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
 
-        var trnToken = Guid.NewGuid().ToString();
-
-        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        using (var scope = HostFixture.Services.CreateScope())
         {
+            using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
+
             idDbContext.Users.Add(new User()
             {
                 UserId = Guid.NewGuid(),
@@ -310,10 +310,10 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
 
-        var trnToken = Guid.NewGuid().ToString();
-
-        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        using (var scope = HostFixture.Services.CreateScope())
         {
+            using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
+
             idDbContext.Users.Add(new User()
             {
                 UserId = Guid.NewGuid(),

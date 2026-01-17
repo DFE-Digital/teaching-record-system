@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.HasNationalInsuranceNumber == true ? LinkGenerator.RequestTrnNationalInsuranceNumber(Model.JourneyInstance!.InstanceId) : LinkGenerator.RequestTrnAddress(Model.JourneyInstance!.InstanceId))" />
+    <govuk-back-link href="@(Model.HasNationalInsuranceNumber == true ? LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId) : LinkGenerator.Address(Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.CheckAnswers(Model.JourneyInstance!.InstanceId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list>
@@ -20,7 +20,7 @@
                         <govuk-summary-list-row-key>NPQ application ID</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.NpqApplicationId</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnNpqApplication(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ application id">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.NpqApplication(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ application id">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
@@ -30,14 +30,14 @@
                         <govuk-summary-list-row-key>NPQ</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.NpqName</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnNpqName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ name">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.NpqName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ name">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>NPQ provider</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.NpqProvider</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnNpqTrainingProvider(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ provider">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.NpqTrainingProvider(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ provider">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
@@ -47,7 +47,7 @@
                         <govuk-summary-list-row-key>Work email</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.WorkEmail</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnWorkEmail(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="work email">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.WorkEmail(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="work email">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
@@ -57,7 +57,7 @@
                         <govuk-summary-list-row-key>Personal email</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.PersonalEmail</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnPersonalEmail(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="personal email">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.PersonalEmail(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="personal email">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
@@ -65,7 +65,7 @@
                     <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="name">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Name(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="name">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 @if (!string.IsNullOrEmpty(Model.PreviousName))
@@ -74,7 +74,7 @@
                         <govuk-summary-list-row-key>Previous name</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.PreviousName</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnPreviousName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="previous name">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.PreviousName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="previous name">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
@@ -82,7 +82,7 @@
                     <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.DateOfBirth!.Value.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnDateOfBirth(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.DateOfBirth(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -91,14 +91,14 @@
                         <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnIdentity(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="proof of identity">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Identity(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="proof of identity">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@(Model.NationalInsuranceNumber ?? "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnNationalInsuranceNumber(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="national insurance number">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="national insurance number">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 @if (Model.HasNationalInsuranceNumber == false)
@@ -118,7 +118,7 @@
                             @Model.Country
                         </govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnAddress(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="address">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.Address(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="address">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }

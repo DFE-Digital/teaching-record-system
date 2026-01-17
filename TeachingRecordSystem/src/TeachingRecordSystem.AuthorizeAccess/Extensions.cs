@@ -46,6 +46,15 @@ public static class Extensions
             options.DefaultFileUploadJavaScriptEnhancements = true;
         });
 
+        services.AddSession();  // TODO Configure production session storage
+
+        services.AddGovUkQuestions();
+
+        if (environment.IsDevelopment())
+        {
+            services.AddDevelopmentJourneyStateStorage();
+        }
+
         services.AddDfeAnalytics()
             .UseFederatedAksBigQueryClientProvider()
             .AddAspNetCoreIntegration(options =>
@@ -72,9 +81,9 @@ public static class Extensions
         {
             options.DefaultAuthenticateScheme = AuthenticationSchemes.MatchToTeachingRecord;
 
-            options.AddScheme(AuthenticationSchemes.FormFlowJourney, scheme =>
+            options.AddScheme(AuthenticationSchemes.SignInJourney, scheme =>
             {
-                scheme.HandlerType = typeof(FormFlowJourneySignInHandler);
+                scheme.HandlerType = typeof(JourneySignInHandler);
             });
 
             options.AddScheme(AuthenticationSchemes.MatchToTeachingRecord, scheme =>
@@ -149,18 +158,18 @@ public static class Extensions
 
         services
             .AddTransient<AuthorizeAccessLinkGenerator, RoutingAuthorizeAccessLinkGenerator>()
-            .AddTransient<FormFlowJourneySignInHandler>()
+            .AddTransient<RequestTrnLinkGenerator, RoutingRequestTrnLinkGenerator>()
+            .AddTransient<JourneySignInHandler>()
             .AddTransient<MatchToTeachingRecordAuthenticationHandler>()
             .AddHttpContextAccessor()
             .AddSingleton<IStartupFilter, FormFlowSessionMiddlewareStartupFilter>()
             .AddFormFlow(options =>
             {
-                options.JourneyRegistry.RegisterJourney(SignInJourneyState.JourneyDescriptor);
                 options.JourneyRegistry.RegisterJourney(RequestTrnJourneyState.JourneyDescriptor);
             })
             .AddSingleton<ICurrentUserIdProvider, FormFlowSessionCurrentUserIdProvider>()
-            .AddTransient<SignInJourneyHelper>()
-            .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
+            .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
+            .AddTransient<SignInJourneyCoordinator.LinkHelper>(sp => sp.GetRequiredService<SignInJourneyCoordinator>().Links);
 
         services.AddOptions<AuthorizeAccessOptions>()
             .Bind(configuration)

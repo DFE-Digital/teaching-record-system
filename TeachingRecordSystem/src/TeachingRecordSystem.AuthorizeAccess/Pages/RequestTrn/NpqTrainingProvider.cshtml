@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.RequestTrnNpqName(Model.JourneyInstance!.InstanceId))" />
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.CheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.NpqName(Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RequestTrnNpqTrainingProvider(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.NpqTrainingProvider(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
 
             <govuk-input for="NpqTrainingProvider" type="email" autocomplete="email">
                 <govuk-input-label is-page-heading="true" class="govuk-label--l">Who is your NPQ training provider?</govuk-input-label>

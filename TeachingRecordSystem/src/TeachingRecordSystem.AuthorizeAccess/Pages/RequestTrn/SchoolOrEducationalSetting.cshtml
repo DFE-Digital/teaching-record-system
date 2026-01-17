@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.RequestTrnNpqTrainingProvider(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.NpqTrainingProvider(Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RequestTrnWorkingInSchoolOrEducationalSetting(Model.JourneyInstance!.InstanceId)" asp-for="IsWorkingInSchoolOrEducationalSetting" method="post">
+        <form action="@LinkGenerator.WorkingInSchoolOrEducationalSetting(Model.JourneyInstance!.InstanceId)" asp-for="IsWorkingInSchoolOrEducationalSetting" method="post">
             <govuk-radios for="IsWorkingInSchoolOrEducationalSetting">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">Are you currently working in a school or educational setting?</govuk-radios-fieldset-legend>

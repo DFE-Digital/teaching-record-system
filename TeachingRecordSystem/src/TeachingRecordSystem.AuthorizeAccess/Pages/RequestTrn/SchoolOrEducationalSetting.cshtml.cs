@@ -5,8 +5,8 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class SchoolOrEducationalSettingModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class SchoolOrEducationalSettingModel(RequestTrnLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -33,7 +33,7 @@ public class SchoolOrEducationalSettingModel(AuthorizeAccessLinkGenerator linkGe
         });
 
         return IsWorkingInSchoolOrEducationalSetting == false ?
-            Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.RequestTrnWorkEmail(JourneyInstance.InstanceId));
+            Redirect(linkGenerator.PersonalEmail(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.WorkEmail(JourneyInstance.InstanceId));
     }
 }

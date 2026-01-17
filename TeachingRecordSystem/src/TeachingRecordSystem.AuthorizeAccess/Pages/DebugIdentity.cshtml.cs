@@ -8,20 +8,17 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
-[Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-[Authorize(AuthenticationSchemes = AuthenticationSchemes.FormFlowJourney)]
+[Journey(SignInJourneyCoordinator.JourneyName)]
+[Authorize(AuthenticationSchemes = AuthenticationSchemes.SignInJourney)]
 public class DebugIdentityModel(
     TrsDbContext dbContext,
-    SignInJourneyHelper helper,
+    SignInJourneyCoordinator coordinator,
     IOptions<AuthorizeAccessOptions> optionsAccessor) : PageModel
 {
     private OneLoginUser? _oneLoginUser;
-
-    public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
 
     [Display(Name = "TRN token")]
     public string? TrnToken { get; set; }
@@ -53,12 +50,12 @@ public class DebugIdentityModel(
 
     public void OnGet()
     {
-        IdentityVerified = JourneyInstance!.State.IdentityVerified;
+        IdentityVerified = coordinator.State.IdentityVerified;
 
         if (IdentityVerified)
         {
-            VerifiedNames = string.Join("\n", JourneyInstance.State.VerifiedNames!.Select(name => string.Join(" ", name)));
-            VerifiedDatesOfBirth = string.Join("\n", JourneyInstance.State.VerifiedDatesOfBirth!.Select(dob => dob.ToString("dd/MM/yyyy")));
+            VerifiedNames = string.Join("\n", coordinator.State.VerifiedNames!.Select(name => string.Join(" ", name)));
+            VerifiedDatesOfBirth = string.Join("\n", coordinator.State.VerifiedDatesOfBirth!.Select(dob => dob.ToString("dd/MM/yyyy")));
         }
     }
 
@@ -110,7 +107,7 @@ public class DebugIdentityModel(
 
         if (_oneLoginUser!.PersonId is not null && !DetachPerson)
         {
-            await JourneyInstance!.UpdateStateAsync(state => helper.Complete(state, _oneLoginUser.Person!.Trn));
+            coordinator.UpdateState(state => coordinator.Complete(state, _oneLoginUser.Person!.Trn));
             return GetNextPage();
         }
 
@@ -121,20 +118,20 @@ public class DebugIdentityModel(
 
         if (IdentityVerified)
         {
-            await helper.OnUserVerifiedCoreAsync(JourneyInstance!, verifiedNames!, verifiedDatesOfBirth!, coreIdentityClaimVc: null);
+            await coordinator.OnUserVerifiedCoreAsync(verifiedNames!, verifiedDatesOfBirth!, coreIdentityClaimVc: null);
         }
         else
         {
             _oneLoginUser.ClearVerifiedInfo();
 
-            await JourneyInstance!.UpdateStateAsync(state => state.ClearVerified());
+            coordinator.UpdateState(state => state.ClearVerified());
         }
 
         await dbContext.SaveChangesAsync();
 
         return GetNextPage();
 
-        IActionResult GetNextPage() => helper.GetNextPage(JourneyInstance!).ToActionResult();
+        IActionResult GetNextPage() => coordinator.GetNextPage().ToActionResult();
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -145,13 +142,13 @@ public class DebugIdentityModel(
             return;
         }
 
-        if (JourneyInstance!.State.OneLoginAuthenticationTicket is null)
+        if (coordinator.State.OneLoginAuthenticationTicket is null)
         {
             context.Result = BadRequest();
             return;
         }
 
-        TrnToken = JourneyInstance.State.TrnToken;
+        TrnToken = coordinator.State.TrnToken;
         Subject = User.FindFirstValue("sub");
         Email = User.FindFirstValue("email");
 

@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.RequestTrnNpqCheck(Model.JourneyInstance!.InstanceId))" />
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.CheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.NpqCheck(Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RequestTrnNpqApplication(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.NpqApplication(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <govuk-input for="NpqApplicationId" spellcheck="false">
                 <govuk-input-label is-page-heading="true" class="govuk-label--l">What is your NPQ application ID?</govuk-input-label>
                 <govuk-input-hint>We’ll use this to check your registration details.</govuk-input-hint>
@@ -28,7 +28,7 @@
                 </govuk-details-text>
             </govuk-details>
             <p class="govuk-body">
-                <a href="@LinkGenerator.RequestTrnNpqName(Model.JourneyInstance!.InstanceId)" class="govuk-link" rel="noreferrer noopener" target="_blank">I cannot find my NPQ application ID</a>
+                <a href="@LinkGenerator.NpqName(Model.JourneyInstance!.InstanceId)" class="govuk-link" rel="noreferrer noopener" target="_blank">I cannot find my NPQ application ID</a>
             </p>
             <govuk-button type="submit">Continue</govuk-button>
         </form>

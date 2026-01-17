@@ -1,12 +1,11 @@
 using System.Security.Claims;
 using GovUk.OneLogin.AspNetCore;
+using GovUk.Questions.AspNetCore;
+using GovUk.Questions.AspNetCore.Testing;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.WebCommon.FormFlow;
-using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -40,32 +39,36 @@ public abstract class TestBase
 
     protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
-    protected async Task<JourneyInstance<SignInJourneyState>> CreateJourneyInstanceAsync(SignInJourneyState state)
+    protected void AddUrlToPath(SignInJourneyCoordinator coordinator, string url)
     {
-        await using var scope = HostFixture.Services.CreateAsyncScope();
-        var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
-
-        var journeyDescriptor = SignInJourneyState.JourneyDescriptor;
-
-        var keysDict = new Dictionary<string, StringValues>
-        {
-            { Constants.UniqueKeyQueryParameterName, new StringValues(Guid.NewGuid().ToString()) }
-        };
-
-        var instanceId = new JourneyInstanceId(journeyDescriptor.JourneyName, keysDict);
-
-        var stateType = typeof(SignInJourneyState);
-
-        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state);
-        return (JourneyInstance<SignInJourneyState>)instance;
+        var newStep = coordinator.CreateStepFromUrl(url);
+        var newPath = new JourneyPath(coordinator.Path.Steps.Append(newStep));
+        coordinator.UnsafeSetPath(newPath);
     }
 
-    protected async Task<JourneyInstance<SignInJourneyState>> ReloadJourneyInstanceAsync(JourneyInstance<SignInJourneyState> journeyInstance)
+    protected async Task WithJourneyCoordinatorAsync(
+        Func<JourneyInstanceId, SignInJourneyState> getState,
+        Func<SignInJourneyCoordinator, Task> action)
     {
-        await using var scope = HostFixture.Services.CreateAsyncScope();
-        var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
-        var reloadedInstance = await stateProvider.GetInstanceAsync(journeyInstance.InstanceId, typeof(SignInJourneyState));
-        return (JourneyInstance<SignInJourneyState>)reloadedInstance!;
+        var journeyHelper = HostFixture.Services.GetRequiredService<JourneyHelper>();
+
+        using var scope = HostFixture.Services.CreateScope();
+
+        SignInJourneyState state;
+        List<string> pathUrls = new();
+
+        var signInJourneyCoordinator = journeyHelper.CreateInstance(
+            new RouteValueDictionary(),
+            instanceId =>
+            {
+                state = getState(instanceId);
+                pathUrls.Add(state.RedirectUri);
+                return state;
+            },
+            pathUrls,
+            () => ActivatorUtilities.CreateInstance<SignInJourneyCoordinator>(scope.ServiceProvider));
+
+        await action(signInJourneyCoordinator);
     }
 
     protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
@@ -73,13 +76,6 @@ public abstract class TestBase
 
     protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
         DbContextFactory.WithDbContextAsync(action);
-
-    protected async Task WithSignInJourneyHelper(Func<SignInJourneyHelper, Task> action)
-    {
-        using var scope = HostFixture.Services.CreateScope();
-        var signInJourneyHelper = scope.ServiceProvider.GetRequiredService<SignInJourneyHelper>();
-        await action(signInJourneyHelper);
-    }
 
     protected AuthenticationTicket CreateOneLoginAuthenticationTicket(
         string vtr,
@@ -99,11 +95,11 @@ public abstract class TestBase
             new("email", email)
         };
 
-        createCoreIdentityVc ??= vtr == SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr;
+        createCoreIdentityVc ??= vtr == SignInJourneyCoordinator.Vtrs.AuthenticationAndIdentityVerification;
 
         if (createCoreIdentityVc == true)
         {
-            if (vtr == SignInJourneyHelper.AuthenticationOnlyVtr)
+            if (vtr == SignInJourneyCoordinator.Vtrs.AuthenticationOnly)
             {
                 throw new ArgumentException("Cannot assign core identity VC with authentication-only vtr.", nameof(vtr));
             }
@@ -136,11 +132,26 @@ public abstract class TestBase
             user.VerifiedNames?.First().Last(),
             user.VerifiedDatesOfBirth?.First());
 
-    protected SignInJourneyState CreateNewState(IdTrnToken trnToken, string redirectUri = "/", Guid clientApplicationUserId = default) =>
-        CreateNewState(redirectUri, clientApplicationUserId, trnToken?.TrnToken, trnToken?.Trn);
+    protected SignInJourneyState CreateNewState(
+        JourneyInstanceId journeyInstanceId,
+        IdTrnToken? trnToken,
+        string redirectUri = "/",
+        Guid clientApplicationUserId = default) =>
+        CreateNewState(journeyInstanceId, redirectUri, clientApplicationUserId, trnToken?.TrnToken, trnToken?.Trn);
 
-    protected SignInJourneyState CreateNewState(string redirectUri = "/", Guid clientApplicationUserId = default, string? trnToken = null, string? trnTokenTrn = null) =>
-        new(
+    protected SignInJourneyState CreateNewState(JourneyInstanceId journeyInstanceId) =>
+        CreateNewState(journeyInstanceId, "/");
+
+    protected SignInJourneyState CreateNewState(
+        JourneyInstanceId journeyInstanceId,
+        string redirectUriBase,
+        Guid clientApplicationUserId = default,
+        string? trnToken = null,
+        string? trnTokenTrn = null)
+    {
+        var redirectUri = journeyInstanceId.EnsureUrlHasKey(redirectUriBase);
+
+        return new(
             redirectUri,
             serviceName: "Test Service",
             serviceUrl: "https://service",
@@ -150,6 +161,7 @@ public abstract class TestBase
         {
             TrnTokenTrn = trnTokenTrn
         };
+    }
 
     private static int _lastTrnToken;
 
@@ -176,5 +188,44 @@ public abstract class TestBase
         await idDbContext.SaveChangesAsync();
 
         return trnToken;
+    }
+
+    protected static class StepUrls
+    {
+        public const string NotVerified = "/not-verified";
+        public const string Connect = "/connect";
+        public const string NationalInsuranceNumber = "/national-insurance-number";
+        public const string Trn = "/trn";
+        public const string Found = "/found";
+        public const string NotFound = "/not-found";
+        public const string CheckAnswers = "/check-answers";
+        public const string RequestSubmitted = "/request-submitted";
+    }
+
+    protected static class JourneyUrls
+    {
+        public static string NotVerified(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.NotVerified);
+
+        public static string Connect(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.Connect);
+
+        public static string NationalInsuranceNumber(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.NationalInsuranceNumber);
+
+        public static string Trn(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.Trn);
+
+        public static string Found(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.Found);
+
+        public static string NotFound(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.NotFound);
+
+        public static string CheckAnswers(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.CheckAnswers);
+
+        public static string RequestSubmitted(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.RequestSubmitted);
     }
 }

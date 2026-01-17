@@ -1,5 +1,4 @@
-using Microsoft.AspNetCore.WebUtilities;
-using TeachingRecordSystem.WebCommon.FormFlow;
+using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
@@ -14,11 +13,11 @@ public abstract class AuthorizeAccessLinkGenerator
     public string Connect(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Connect", journeyInstanceId: journeyInstanceId);
 
-    public string NationalInsuranceNumber(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/NationalInsuranceNumber", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string NationalInsuranceNumber(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        GetRequiredPathByPage("/NationalInsuranceNumber", routeValues: new { returnUrl }, journeyInstanceId: journeyInstanceId);
 
-    public string Trn(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/Trn", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string Trn(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        GetRequiredPathByPage("/Trn", routeValues: new { returnUrl }, journeyInstanceId: journeyInstanceId);
 
     public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/CheckAnswers", journeyInstanceId: journeyInstanceId);
@@ -35,73 +34,19 @@ public abstract class AuthorizeAccessLinkGenerator
     public string SignOut(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SignOut", journeyInstanceId: journeyInstanceId);
 
-    public string RequestTrn(JourneyInstanceId journeyInstanceId, string? AccessToken = null) =>
-        GetRequiredPathByPage("/RequestTrn/Index", routeValues: new { AccessToken }, journeyInstanceId: journeyInstanceId);
-
-    public string TakingNpqRequireTrn(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RequestTrn/TakingNpq", journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnNpqCheck(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RequestTrn/NpqCheck", journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnWorkingInSchoolOrEducationalSetting(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RequestTrn/SchoolOrEducationalSetting", journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnNpqApplication(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/NpqApplication", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnNpqName(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/NpqName", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnNotEligible(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RequestTrn/NotEligible", journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnWorkEmail(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/WorkEmail", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnPersonalEmail(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/PersonalEmail", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnName(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/Name", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnPreviousName(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/PreviousName", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnDateOfBirth(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/DateOfBirth", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnIdentity(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/Identity", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnNationalInsuranceNumber(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/NationalInsuranceNumber", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnAddress(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/Address", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnCheckAnswers(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RequestTrn/CheckAnswers", journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnNpqTrainingProvider(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/NpqTrainingProvider", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnEmailInUse(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RequestTrn/EmailInUse", journeyInstanceId: journeyInstanceId);
-
-    public string RequestTrnSubmitted(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RequestTrn/Submitted", journeyInstanceId: journeyInstanceId);
-
     protected virtual string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
-        var url = GetRequiredPathByPage(page, handler, routeValues);
+        var combinedRouteValues = new RouteValueDictionary(routeValues);
 
-        if (journeyInstanceId?.UniqueKey is string journeyInstanceUniqueKey)
+        if (journeyInstanceId is not null)
         {
-            url = QueryHelpers.AddQueryString(url, Constants.UniqueKeyQueryParameterName, journeyInstanceUniqueKey);
+            foreach (var kvp in journeyInstanceId.RouteValues)
+            {
+                combinedRouteValues[kvp.Key] = kvp.Value;
+            }
         }
 
-        return url;
+        return GetRequiredPathByPage(page, handler, combinedRouteValues);
     }
 
     protected abstract string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null);

@@ -1,14 +1,14 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
-[Journey(SignInJourneyState.JourneyName)]
-public class TestModel : PageModel
+[Journey(SignInJourneyCoordinator.JourneyName, Optional = true)]
+public class TestModel(IJourneyInstanceProvider journeyInstanceProvider) : PageModel
 {
     [FromQuery(Name = "scheme")]
     public string? AuthenticationScheme { get; set; }
@@ -16,7 +16,7 @@ public class TestModel : PageModel
     [FromQuery(Name = "trn_token")]
     public string? TrnToken { get; set; }
 
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
         if (string.IsNullOrEmpty(AuthenticationScheme))
         {
@@ -25,17 +25,28 @@ public class TestModel : PageModel
 
         if (User.Identity?.IsAuthenticated != true)
         {
-            return Challenge(
-                new AuthenticationProperties()
+            var signInJourneyCoordinator = (SignInJourneyCoordinator?)await journeyInstanceProvider.TryCreateNewInstanceAsync(
+                HttpContext,
+                ctx =>
                 {
-                    Items =
-                    {
-                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, AuthenticationScheme },
-                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, "Test service" },
-                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, Request.GetEncodedUrl() },
-                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.TrnToken, TrnToken }
-                    },
-                    RedirectUri = Request.GetEncodedUrl()
+                    var redirectUri = ctx.InstanceId.EnsureUrlHasKey(Request.GetEncodedUrl());
+
+                    var state = new SignInJourneyState(
+                        redirectUri,
+                        "Test service",
+                        serviceUrl: Request.GetEncodedUrl(),
+                        AuthenticationScheme,
+                        clientApplicationUserId: Guid.NewGuid(),
+                        TrnToken);
+
+                    return Task.FromResult<object>(state);
+                });
+            Debug.Assert(signInJourneyCoordinator is not null);
+
+            return Challenge(
+                new AuthenticationProperties
+                {
+                    RedirectUri = signInJourneyCoordinator.State.RedirectUri
                 },
                 AuthenticationSchemes.MatchToTeachingRecord);
         }

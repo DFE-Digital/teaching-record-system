@@ -11,9 +11,9 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
 public class CheckAnswersModel(
-    AuthorizeAccessLinkGenerator linkGenerator,
+    RequestTrnLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
     SupportTaskService supportTaskService,
@@ -159,7 +159,7 @@ public class CheckAnswersModel(
 
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
 
-        return Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.Submitted(JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -167,45 +167,45 @@ public class CheckAnswersModel(
         var state = JourneyInstance!.State;
         if (state.HasPendingTrnRequest)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.Submitted(JourneyInstance!.InstanceId));
         }
         else if (state.HaveRegisteredForAnNpq is null && state.NpqApplicationId is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnNpqApplication(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.NpqApplication(JourneyInstance.InstanceId));
         }
         else if (state.WorkEmail is null && state.WorkingInSchoolOrEducationalSetting == true)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnWorkEmail(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.WorkEmail(JourneyInstance.InstanceId));
         }
         else if (state.PersonalEmail is null)
         {
             // personal email is required for either WorkingInSchoolOrEducationalSetting being true or false
-            context.Result = Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.PersonalEmail(JourneyInstance.InstanceId));
         }
         else if (state.FirstName is null || state.LastName is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Name(JourneyInstance.InstanceId));
         }
         else if (state.HasPreviousName is null || (state.HasPreviousName == true && (state.PreviousFirstName is null || state.PreviousLastName is null)))
         {
-            context.Result = Redirect(linkGenerator.RequestTrnPreviousName(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.PreviousName(JourneyInstance.InstanceId));
         }
         else if (state.DateOfBirth is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnDateOfBirth(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.DateOfBirth(JourneyInstance.InstanceId));
         }
         else if (state.EvidenceFileId is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnIdentity(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.Identity(JourneyInstance!.InstanceId));
         }
         else if (state.HasNationalInsuranceNumber is null || (state.HasNationalInsuranceNumber == true && state.NationalInsuranceNumber is null))
         {
-            context.Result = Redirect(linkGenerator.RequestTrnNationalInsuranceNumber(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.NationalInsuranceNumber(JourneyInstance.InstanceId));
         }
         else if (state.HasNationalInsuranceNumber == false &&
             (state.AddressLine1 is null || state.TownOrCity is null || state.PostalCode is null || state.Country is null))
         {
-            context.Result = Redirect(linkGenerator.RequestTrnAddress(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Address(JourneyInstance.InstanceId));
         }
     }
 }

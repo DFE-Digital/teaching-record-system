@@ -6,8 +6,8 @@ using EmailAddress = TeachingRecordSystem.AuthorizeAccess.DataAnnotations.EmailA
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class WorkEmailModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class WorkEmailModel(RequestTrnLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -34,7 +34,7 @@ public class WorkEmailModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMo
         await JourneyInstance!.UpdateStateAsync(state => state.WorkEmail = WorkEmail);
 
         return FromCheckAnswers == true ?
-            Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance.InstanceId));
+            Redirect(linkGenerator.CheckAnswers(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.PersonalEmail(JourneyInstance.InstanceId));
     }
 }

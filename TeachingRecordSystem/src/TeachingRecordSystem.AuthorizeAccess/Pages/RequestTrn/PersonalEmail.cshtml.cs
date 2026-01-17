@@ -8,8 +8,8 @@ using EmailAddress = TeachingRecordSystem.AuthorizeAccess.DataAnnotations.EmailA
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
-[Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
+[WebCommon.FormFlow.Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
+public class PersonalEmailModel(RequestTrnLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -39,12 +39,12 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsD
 
         if (openTasks)
         {
-            return Redirect(linkGenerator.RequestTrnEmailInUse(JourneyInstance!.InstanceId));
+            return Redirect(linkGenerator.EmailInUse(JourneyInstance!.InstanceId));
         }
 
         return FromCheckAnswers == true ?
-            Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
+            Redirect(linkGenerator.CheckAnswers(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.Name(JourneyInstance.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -52,7 +52,7 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsD
         var state = JourneyInstance!.State;
         if (state.HasPendingTrnRequest)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.Submitted(JourneyInstance!.InstanceId));
             return;
         }
     }

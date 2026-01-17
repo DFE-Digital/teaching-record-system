@@ -1,16 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
-[Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-public class TrnModel(SignInJourneyHelper helper) : PageModel
+[Journey(SignInJourneyCoordinator.JourneyName)]
+public class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
 {
-    public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
-
     [FromQuery]
     public bool? FromCheckAnswers { get; set; }
 
@@ -27,8 +23,8 @@ public class TrnModel(SignInJourneyHelper helper) : PageModel
 
     public void OnGet()
     {
-        HaveTrn = JourneyInstance!.State.HaveTrn;
-        Trn = JourneyInstance!.State.Trn;
+        HaveTrn = coordinator.State.HaveTrn;
+        Trn = coordinator.State.Trn;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -43,30 +39,10 @@ public class TrnModel(SignInJourneyHelper helper) : PageModel
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.SetTrn(HaveTrn!.Value, Trn));
+        coordinator.UpdateState(state => state.SetTrn(HaveTrn!.Value, Trn));
 
-        return await helper.TryMatchToTeachingRecordAsync(JourneyInstance!) ? Redirect(helper.LinkGenerator.Found(JourneyInstance.InstanceId)) :
-            Redirect(helper.LinkGenerator.NotFound(JourneyInstance.InstanceId));
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var state = JourneyInstance!.State;
-
-        if (state.AuthenticationTicket is not null)
-        {
-            // Already matched to a Teaching Record
-            context.Result = Redirect(helper.GetSafeRedirectUri(JourneyInstance));
-        }
-        else if (state.OneLoginAuthenticationTicket is null || !state.IdentityVerified)
-        {
-            // Not authenticated/verified with One Login
-            context.Result = BadRequest();
-        }
-        else if (!state.HaveNationalInsuranceNumber.HasValue)
-        {
-            // Not answered the NINO question
-            context.Result = Redirect(helper.LinkGenerator.NationalInsuranceNumber(JourneyInstance.InstanceId));
-        }
+        return await coordinator.AdvanceToAsync(async links =>
+            await coordinator.TryMatchToTeachingRecordAsync() ? links.Found() :
+            links.NotFound());
     }
 }
