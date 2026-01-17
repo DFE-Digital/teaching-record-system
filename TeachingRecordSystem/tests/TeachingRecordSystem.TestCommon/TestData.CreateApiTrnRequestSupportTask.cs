@@ -197,15 +197,9 @@ public partial class TestData
             {
                 // Matches wasn't explicitly specified; create two person records that match details in this request
 
-<<<<<<< HEAD
-                matchedPersons = await Enumerable.Range(1, 2)
-                    .ToAsyncEnumerable()
-                    .SelectAwait(async _ =>
-=======
                 matchedPersons = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, 2)
                     .ToAsyncEnumerable()
                     .Select(async (int _, CancellationToken _) =>
->>>>>>> 5a142f17c (Upgrade to .NET 10, C# 14 and ASP.NET Core 10)
                     {
                         var person = await testData.CreatePersonAsync(p =>
                         {
@@ -227,14 +221,8 @@ public partial class TestData
                             }
                         });
 
-<<<<<<< HEAD
-                        return person.PersonId;
-                    })
-                    .ToArrayAsync();
-=======
                         return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
                     }));
->>>>>>> 5a142f17c (Upgrade to .NET 10, C# 14 and ASP.NET Core 10)
             }
 
             var potentialDuplicate = matchedPersons.Length > 0;

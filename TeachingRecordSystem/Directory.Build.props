@@ -17,7 +17,7 @@
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>
 
-    <NoWarn>CA1711;CA1304;CA1310;CA1311;CA2254</NoWarn>
+    <NoWarn>CA1711;CA1304;CA1310;CA1311;CA2254;CA1873</NoWarn>
     <NoWarn Condition="'$(IsTestProject)' == 'true'">$(NoWarn);CA1707;CA1711;CA1816;TUnit0046;xUnit1051</NoWarn>
   </PropertyGroup>
 
