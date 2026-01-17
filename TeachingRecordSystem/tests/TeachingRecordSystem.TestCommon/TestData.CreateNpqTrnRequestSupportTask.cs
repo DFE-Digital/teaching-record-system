@@ -227,7 +227,7 @@ public partial class TestData
                             }
                         });
 
-                        return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
+                        return person.PersonId;
                     }));
             }
 
