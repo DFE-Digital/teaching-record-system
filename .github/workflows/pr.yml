@@ -3,7 +3,7 @@ name: Pull request build
 on:
   pull_request:
     branches:
-      - main
+      - "*"
   merge_group:
     branches:
       - main
