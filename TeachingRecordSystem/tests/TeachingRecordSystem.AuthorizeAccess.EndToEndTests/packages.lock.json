@@ -2350,7 +2350,7 @@
           "Dfe.Analytics": "[0.2.6, )",
           "GovUk.Frontend.AspNetCore": "[3.4.3, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.0, )",
-          "GovUk.Questions.AspNetCore": "[0.1.0-alpha.0.87, )",
+          "GovUk.Questions.AspNetCore": "[0.1.0-alpha.0.88, )",
           "Humanizer.Core": "[2.14.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
@@ -2646,9 +2646,9 @@
       },
       "GovUk.Questions.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[0.1.0-alpha.0.87, )",
-        "resolved": "0.1.0-alpha.0.87",
-        "contentHash": "KS2rxXNx57hHN6bVg5w4wJ5aIAb6h0as7xvIoZGax6uHHo2e/kO5la3j+KVQHafvMloathIPe6EjPH+6yPP0qA==",
+        "requested": "[0.1.0-alpha.0.88, )",
+        "resolved": "0.1.0-alpha.0.88",
+        "contentHash": "Z/lMu/6LuYM6DUs/fh345bXNq+DLHSN19W/C/tJ0DG/AUb2XMwxj/xRQ+hBCtiWFv0AlhUvgTTYlbML9ZvoJuw==",
         "dependencies": {
           "UUID": "1.1.1"
         }
