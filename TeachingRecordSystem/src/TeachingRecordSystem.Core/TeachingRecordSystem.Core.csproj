@@ -326,6 +326,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
     <Folder Include="ApiSchema\V3\V20250627\" />
   </ItemGroup>
 
