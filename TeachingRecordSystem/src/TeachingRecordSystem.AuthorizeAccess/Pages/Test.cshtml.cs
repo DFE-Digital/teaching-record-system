@@ -29,7 +29,7 @@ public class TestModel(IJourneyInstanceProvider journeyInstanceProvider) : PageM
                 HttpContext,
                 ctx =>
                 {
-                    var redirectUri = ctx.InstanceId.EnsureUrlHasKey(Request.GetEncodedUrl());
+                    var redirectUri = ctx.InstanceId.EnsureUrlHasKey(Request.GetEncodedPathAndQuery());
 
                     var state = new SignInJourneyState(
                         redirectUri,

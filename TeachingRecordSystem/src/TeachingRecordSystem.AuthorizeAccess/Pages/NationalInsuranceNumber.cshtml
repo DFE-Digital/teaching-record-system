@@ -1,12 +1,7 @@
 @page "/national-insurance-number/{handler?}"
-@inject SignInJourneyCoordinator.LinkHelper Links
 @model TeachingRecordSystem.AuthorizeAccess.Pages.NationalInsuranceNumberModel
 @{
     ViewBag.Title = Html.DisplayNameFor(m => m.NationalInsuranceNumber);
-}
-
-@section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? Links.CheckAnswers() : Links.Connect())" />
 }
 
 <div class="govuk-grid-row">

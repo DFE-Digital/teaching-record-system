@@ -27,8 +27,8 @@
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.13.0" />
     <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.4.0" />
-    <PackageVersion Include="GovUk.Questions.AspNetCore" Version="0.1.0-alpha.0.88" />
-    <PackageVersion Include="GovUk.Questions.AspNetCore.Testing" Version="0.1.0-alpha.0.88" />
+    <PackageVersion Include="GovUk.Questions.AspNetCore" Version="0.1.0-alpha.0.92" />
+    <PackageVersion Include="GovUk.Questions.AspNetCore.Testing" Version="0.1.0-alpha.0.92" />
     <PackageVersion Include="GovukNotify" Version="7.2.0" />
     <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="3.4.3" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.22" />
