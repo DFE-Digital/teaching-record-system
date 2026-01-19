@@ -10,7 +10,6 @@
     <PackageReference Include="Faker.Net" />
     <PackageReference Include="Moq" />
     <PackageReference Include="Respawn" />
-    <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="xunit.v3.assert" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <LangVersion>13.0</LangVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
     <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
     <AnalysisMode>Recommended</AnalysisMode>
     <Nullable>enable</Nullable>
@@ -17,7 +17,7 @@
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>
 
-    <NoWarn>CA1711;CA1304;CA1310;CA1311;CA2254</NoWarn>
+    <NoWarn>CA1711;CA1304;CA1310;CA1311;CA2254;CA1873;CA1715</NoWarn>
     <NoWarn Condition="'$(IsTestProject)' == 'true'">$(NoWarn);CA1707;CA1711;CA1816;TUnit0046;xUnit1051</NoWarn>
   </PropertyGroup>
 
