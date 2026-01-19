@@ -1,8 +1,18 @@
 @inject Joonasw.AspNetCore.SecurityHeaders.Csp.ICspNonceService NonceService
 @inject IJourneyInstanceProvider JourneyInstanceProvider
+@inject AuthorizeAccessLinkGenerator LinkGenerator
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
     Layout = "_GovUkPageTemplate";
+
+    var coordinator = JourneyInstanceProvider.GetJourneyInstance(Context) as SignInJourneyCoordinator;
+
+    if (coordinator is not null)
+    {
+        ViewData.Add("ServiceName", coordinator.State.ServiceName);
+        ViewData.Add("ServiceUrl", coordinator.State.ServiceUrl);
+        ViewData.Add("SignOutLink", LinkGenerator.SignOut(coordinator.InstanceId));
+    }
 
     if (ViewBag.Title is null)
     {

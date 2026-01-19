@@ -13,7 +13,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.EntityFrameworkCore.Models;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Oidc;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
@@ -75,7 +74,6 @@ public static class Extensions
             {
                 options.Filters.Add(new FluentValidationExceptionFilter());
                 options.Filters.Add(new NoCachePageFilter());
-                options.Filters.Add(new AssignViewDataFromFormFlowJourneyResultFilterFactory());
             });
 
         services.AddAuthentication(options =>
