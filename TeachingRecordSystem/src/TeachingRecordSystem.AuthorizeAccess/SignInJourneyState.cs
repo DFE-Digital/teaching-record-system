@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
@@ -35,9 +36,8 @@ public class SignInJourneyState(
 
     public bool AttemptedIdentityVerification { get; set; }
 
-    public bool HasPendingSupportRequest { get; set; }
-
     [JsonInclude]
+    [MemberNotNullWhen(true, nameof(VerifiedNames), nameof(VerifiedDatesOfBirth))]
     public bool IdentityVerified { get; private set; }
 
     [JsonInclude]
@@ -57,6 +57,15 @@ public class SignInJourneyState(
 
     [JsonInclude]
     public string? Trn { get; private set; }
+
+    [JsonInclude]
+    public string? FirstName { get; private set; }
+
+    [JsonInclude]
+    public string? LastName { get; private set; }
+
+    [JsonInclude]
+    public DateOnly? DateOfBirth { get; private set; }
 
     public void Reset()
     {
@@ -79,6 +88,17 @@ public class SignInJourneyState(
         IdentityVerified = false;
         VerifiedNames = null;
         VerifiedDatesOfBirth = null;
+    }
+
+    public void SetName(string firstName, string lastName)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+    }
+
+    public void SetDateOfBirth(DateOnly dateOfBirth)
+    {
+        DateOfBirth = dateOfBirth;
     }
 
     public void SetNationalInsuranceNumber(bool haveNationalInsuranceNumber, string? nationalInsuranceNumber)

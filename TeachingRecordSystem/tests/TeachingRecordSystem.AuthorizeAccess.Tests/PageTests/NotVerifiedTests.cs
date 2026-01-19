@@ -25,6 +25,27 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
                 await AssertEx.HtmlResponseAsync(response);
             });
 
+    [Fact]
+    public Task Post_RedirectsToNamePage() =>
+        WithJourneyCoordinatorAsync(
+            CreateNewState,
+            async coordinator =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+
+                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.NotVerified(coordinator.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.Name(coordinator.InstanceId), response.Headers.Location?.ToString());
+            });
+
     private async Task SetupInstanceStateAsync(SignInJourneyCoordinator coordinator, OneLoginUser oneLoginUser)
     {
         var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);

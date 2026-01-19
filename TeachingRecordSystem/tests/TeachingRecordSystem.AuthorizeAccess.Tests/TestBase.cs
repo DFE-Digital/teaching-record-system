@@ -200,6 +200,8 @@ public abstract class TestBase
         public const string NotFound = "/not-found";
         public const string CheckAnswers = "/check-answers";
         public const string RequestSubmitted = "/request-submitted";
+        public const string Name = "/name";
+        public const string DateOfBirth = "/date-of-birth";
     }
 
     protected static class JourneyUrls
@@ -227,5 +229,11 @@ public abstract class TestBase
 
         public static string RequestSubmitted(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.RequestSubmitted);
+
+        public static string Name(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.Name);
+
+        public static string DateOfBirth(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.DateOfBirth);
     }
 }

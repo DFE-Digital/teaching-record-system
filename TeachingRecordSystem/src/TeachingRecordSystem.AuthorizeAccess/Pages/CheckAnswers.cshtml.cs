@@ -11,6 +11,8 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 [Journey(SignInJourneyCoordinator.JourneyName)]
 public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTaskService supportTaskService, IClock clock) : PageModel
 {
+    public bool IdentityVerified => coordinator.State.IdentityVerified;
+
     public string? Email { get; set; }
 
     public string? Name { get; set; }
@@ -32,34 +34,65 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
         var subject = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
         var email = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
 
-        var processContext = new ProcessContext(
-            ProcessType.ConnectOneLoginUserSupportTaskCreating,
-            clock.UtcNow,
-            SystemUser.SystemUserId);
+        if (IdentityVerified)
+        {
+            var processContext = new ProcessContext(
+                ProcessType.ConnectOneLoginUserSupportTaskCreating,
+                clock.UtcNow,
+                SystemUser.SystemUserId);
 
-        await supportTaskService.CreateSupportTaskAsync(
-            new CreateSupportTaskOptions
-            {
-                SupportTaskType = SupportTaskType.ConnectOneLoginUser,
-                Data = new ConnectOneLoginUserData
+            await supportTaskService.CreateSupportTaskAsync(
+                new CreateSupportTaskOptions
                 {
-                    Verified = true,
+                    SupportTaskType = SupportTaskType.ConnectOneLoginUser,
+                    Data = new ConnectOneLoginUserData
+                    {
+                        Verified = true,
+                        OneLoginUserSubject = subject,
+                        OneLoginUserEmail = email,
+                        VerifiedNames = state.VerifiedNames,
+                        VerifiedDatesOfBirth = state.VerifiedDatesOfBirth,
+                        StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
+                        StatedTrn = state.Trn,
+                        ClientApplicationUserId = state.ClientApplicationUserId,
+                        TrnTokenTrn = state.TrnTokenTrn
+                    },
+                    PersonId = null,
                     OneLoginUserSubject = subject,
-                    OneLoginUserEmail = email,
-                    VerifiedNames = state.VerifiedNames,
-                    VerifiedDatesOfBirth = state.VerifiedDatesOfBirth,
-                    StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
-                    StatedTrn = state.Trn,
-                    ClientApplicationUserId = state.ClientApplicationUserId,
-                    TrnTokenTrn = state.TrnTokenTrn
+                    TrnRequest = null
                 },
-                PersonId = null,
-                OneLoginUserSubject = subject,
-                TrnRequest = null
-            },
-            processContext);
+                processContext);
+        }
+        else
+        {
+            var processContext = new ProcessContext(
+                ProcessType.OneLoginUserIdVerificationSupportTaskCreating,
+                clock.UtcNow,
+                SystemUser.SystemUserId);
 
-        coordinator.UpdateState(s => s.HasPendingSupportRequest = true);
+            await supportTaskService.CreateSupportTaskAsync(
+                new CreateSupportTaskOptions
+                {
+                    SupportTaskType = SupportTaskType.OneLoginUserIdVerification,
+                    Data = new OneLoginUserIdVerificationData
+                    {
+                        OneLoginUserSubject = subject,
+                        StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
+                        StatedTrn = state.Trn,
+                        ClientApplicationUserId = state.ClientApplicationUserId,
+                        TrnTokenTrn = state.TrnTokenTrn,
+                        StatedFirstName = state.FirstName!,
+                        StatedLastName = state.LastName!,
+                        StatedDateOfBirth = state.DateOfBirth!.Value,
+                        EvidenceFileId = default,
+                        EvidenceFileName = "TODO"
+                    },
+                    PersonId = null,
+                    OneLoginUserSubject = subject,
+                    TrnRequest = null
+                },
+                processContext);
+        }
 
         return coordinator.AdvanceTo(
             links => links.SupportRequestSubmitted(),
@@ -71,7 +104,16 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
         var state = coordinator.State;
 
         Email = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
-        Name = string.Join(" ", state.VerifiedNames!.First());
-        DateOfBirth = state.VerifiedDatesOfBirth!.First();
+
+        if (state.IdentityVerified)
+        {
+            Name = string.Join(" ", state.VerifiedNames.First());
+            DateOfBirth = state.VerifiedDatesOfBirth.First();
+        }
+        else
+        {
+            Name = $"{state.FirstName} {state.LastName}";
+            DateOfBirth = state.DateOfBirth!.Value;
+        }
     }
 }

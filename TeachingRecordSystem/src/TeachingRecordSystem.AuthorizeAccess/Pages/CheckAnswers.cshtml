@@ -15,29 +15,53 @@
 
             <govuk-summary-list>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.Email</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.DateOfBirth.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                @if (Model.IdentityVerified)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.DateOfBirth.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
             </govuk-summary-list>
 
             <h2 class="govuk-heading-m">Additional details</h2>
 
             <govuk-summary-list>
+                @if (!Model.IdentityVerified)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@Links.Name(returnUrl: Request.GetEncodedPathAndQuery())"
+                                                           visually-hidden-text="name">
+                                Change
+                            </govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.DateOfBirth.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@Links.DateOfBirth(returnUrl: Request.GetEncodedPathAndQuery())"
+                                                           visually-hidden-text="date of birth">
+                                Change
+                            </govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>
                         National Insurance number
                     </govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
-                        @(Model.NationalInsuranceNumber ?? "None")
-                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@Links.NationalInsuranceNumber(returnUrl: Request.GetEncodedPathAndQuery())"
                                                        visually-hidden-text="National Insurance number">
@@ -49,9 +73,7 @@
                     <govuk-summary-list-row-key>
                         Teacher reference number
                     </govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
-                        @(Model.Trn ?? "None")
-                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@Links.Trn(returnUrl: Request.GetEncodedPathAndQuery())"
                                                        visually-hidden-text="teacher reference number">

@@ -1120,7 +1120,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var result = await coordinator.TryMatchToTeachingRecordAsync();
 
                 // Assert
-                Assert.False(result);
+                Assert.Null(result);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
                 Assert.Null(user.PersonId);
@@ -1172,7 +1172,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var result = await coordinator.TryMatchToTeachingRecordAsync();
 
                 // Assert
-                Assert.True(result);
+                Assert.NotNull(result);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
                 Assert.Equal(Clock.UtcNow, user.FirstSignIn);
