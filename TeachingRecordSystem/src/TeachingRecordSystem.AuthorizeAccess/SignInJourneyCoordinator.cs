@@ -307,22 +307,7 @@ public class SignInJourneyCoordinator(
         _ => throw new InvalidOperationException("Cannot determine next page.")
     };
 
-    public string GetRedirectUri()
-    {
-        var redirectUri = State.RedirectUri;
-
-        if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var absRedirectUri))
-        {
-            throw new InvalidOperationException("Redirect URI is not a valid absolute URI.");
-        }
-
-        if (!redirectUri.Contains($"{JourneyInstanceId.KeyRouteValueName}="))
-        {
-            throw new InvalidOperationException("Redirect URI does not contain journey instance ID.");
-        }
-
-        return absRedirectUri.PathAndQuery;
-    }
+    public string GetRedirectUri() => State.RedirectUri;
 
     public override bool StepIsValid(JourneyPathStep step)
     {

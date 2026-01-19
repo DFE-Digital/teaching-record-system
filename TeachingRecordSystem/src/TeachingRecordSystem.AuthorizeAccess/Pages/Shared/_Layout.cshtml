@@ -1,4 +1,5 @@
 @inject Joonasw.AspNetCore.SecurityHeaders.Csp.ICspNonceService NonceService
+@inject IJourneyInstanceProvider JourneyInstanceProvider
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
     Layout = "_GovUkPageTemplate";
@@ -37,7 +38,15 @@
 }
 
 @section BeforeContent {
-    @await RenderSectionAsync("BeforeContent", required: false)
+    @if (IsSectionDefined("BeforeContent"))
+    {
+        @await RenderSectionAsync("BeforeContent")
+    }
+    else if (JourneyInstanceProvider.GetJourneyInstance(Context) is SignInJourneyCoordinator signInJourneyCoordinator &&
+        signInJourneyCoordinator.GetBackLink() is string backLink)
+    {
+        <govuk-back-link href="@backLink" />
+    }
 }
 
 @RenderBody()

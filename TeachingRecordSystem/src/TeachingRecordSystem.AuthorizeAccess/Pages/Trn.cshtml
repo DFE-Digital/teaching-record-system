@@ -1,12 +1,7 @@
 @page "/trn"
-@inject SignInJourneyCoordinator.LinkHelper Links
 @model TeachingRecordSystem.AuthorizeAccess.Pages.TrnModel
 @{
     ViewBag.Title = "Teacher reference number (TRN)";
-}
-
-@section BeforeContent {
-    <govuk-back-link href="@Links.NationalInsuranceNumber()" />
 }
 
 <div class="govuk-grid-row">
