@@ -11,11 +11,13 @@
 
             <govuk-radios for="HaveNationalInsuranceNumber">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend />
+                    <govuk-radios-fieldset-legend>Do you have a National Insurance number?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-input for="NationalInsuranceNumber" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false" />
+                            <govuk-input for="NationalInsuranceNumber" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
+                                <govuk-input-label>National Insurance number</govuk-input-label>
+                            </govuk-input>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">No</govuk-radios-item>
