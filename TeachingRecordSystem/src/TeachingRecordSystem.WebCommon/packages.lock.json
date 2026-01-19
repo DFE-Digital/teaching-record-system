@@ -34,6 +34,16 @@
           "Microsoft.Bcl.AsyncInterfaces": "8.0.0"
         }
       },
+      "FluentValidation.AspNetCore": {
+        "type": "Direct",
+        "requested": "[11.3.1, )",
+        "resolved": "11.3.1",
+        "contentHash": "FjkfrGGwC+25oH8QpX1ti3gxkFjDDtotkAQWyQz2CkwQwEfRKTANjhh77I79kY8dov2ydK1SY+e4jiOWsbbDdQ==",
+        "dependencies": {
+          "FluentValidation": "11.11.0",
+          "FluentValidation.DependencyInjectionExtensions": "11.11.0"
+        }
+      },
       "Hangfire.AspNetCore": {
         "type": "Direct",
         "requested": "[1.8.22, )",
@@ -162,6 +172,15 @@
         "type": "Transitive",
         "resolved": "4.0.0",
         "contentHash": "QYeAIEmNEpROosThGtU/t3yZJoCcAC9kxhfHnHAp2PmVIFIajaHcuo79CCeEiOxo2zm+mS3wfIIj6d00id7/cQ=="
+      },
+      "FluentValidation.DependencyInjectionExtensions": {
+        "type": "Transitive",
+        "resolved": "11.11.0",
+        "contentHash": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
+        "dependencies": {
+          "FluentValidation": "11.11.0",
+          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
+        }
       },
       "Google.Api.Gax": {
         "type": "Transitive",

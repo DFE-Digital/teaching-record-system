@@ -2159,6 +2159,7 @@
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
           "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.1, )",
+          "FluentValidation.AspNetCore": "[11.3.1, )",
           "Hangfire.AspNetCore": "[1.8.22, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[9.0.10, )",

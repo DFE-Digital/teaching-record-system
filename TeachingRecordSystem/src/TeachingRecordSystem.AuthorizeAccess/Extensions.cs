@@ -73,6 +73,7 @@ public static class Extensions
             .AddRazorPages()
             .AddMvcOptions(options =>
             {
+                options.Filters.Add(new FluentValidationExceptionFilter());
                 options.Filters.Add(new NoCachePageFilter());
                 options.Filters.Add(new AssignViewDataFromFormFlowJourneyResultFilterFactory());
             });

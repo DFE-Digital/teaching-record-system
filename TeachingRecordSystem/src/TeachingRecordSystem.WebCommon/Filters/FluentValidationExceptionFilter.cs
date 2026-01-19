@@ -1,9 +1,11 @@
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+namespace TeachingRecordSystem.WebCommon.Filters;
 
 public class FluentValidationExceptionFilter : IExceptionFilter
 {
