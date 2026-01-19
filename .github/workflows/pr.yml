@@ -126,31 +126,7 @@ jobs:
       matrix:
         project_short_name: ${{ fromJson(needs.get_affected_projects.outputs.project_short_names) }}
 
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_PASSWORD: trs
-          POSTGRES_DB: trs
-          POSTGRES_INITDB_ARGS: "-c max_connections=1000"
-        options: >-
-          --name postgres
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
-      - name: Set postgres wal_level to logical
-        run: |
-          docker exec -i postgres bash << EOF
-          echo "wal_level = logical" >> /var/lib/postgresql/data/postgresql.conf
-          EOF
-
-          docker restart --time 0 postgres
-
       - uses: actions/checkout@v6
 
       - uses: extractions/setup-just@v3
@@ -204,7 +180,6 @@ jobs:
           report_name: "${{ matrix.project_short_name }} test results"
           dotnet_test_args: >-
             --no-build
-            -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=tr;Maximum Pool Size=1000;Timeout=30"
         timeout-minutes: 30
 
   check_test_results:
