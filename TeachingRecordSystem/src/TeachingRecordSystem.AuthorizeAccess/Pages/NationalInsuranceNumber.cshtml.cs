@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,17 +6,27 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 [Journey(SignInJourneyCoordinator.JourneyName)]
 public class NationalInsuranceNumberModel(SignInJourneyCoordinator coordinator) : PageModel
 {
+    private readonly InlineValidator<NationalInsuranceNumberModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.HaveNationalInsuranceNumber)
+            .NotNull()
+            .WithMessage("Select yes if you have a National Insurance number"),
+        v => v.RuleFor(m => m.NationalInsuranceNumber)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .WithMessage("Enter a National Insurance number")
+            .Must(nino => Core.NationalInsuranceNumber.TryParse(nino, out _))
+            .WithMessage("Enter a National Insurance number in the correct format")
+            .When(m => m.HaveNationalInsuranceNumber == true)
+    };
+
     [FromQuery]
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you have a National Insurance number?")]
-    [Required(ErrorMessage = "Select yes if you have a National Insurance number")]
     public bool? HaveNationalInsuranceNumber { get; set; }
 
     [BindProperty]
-    [Display(Name = "National Insurance number")]
-    [Required(ErrorMessage = "Enter a National Insurance number")]
     public string? NationalInsuranceNumber { get; set; }
 
     public void OnGet()
@@ -28,22 +37,7 @@ public class NationalInsuranceNumberModel(SignInJourneyCoordinator coordinator) 
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (HaveNationalInsuranceNumber == true)
-        {
-            if (!string.IsNullOrEmpty(NationalInsuranceNumber) && !Core.NationalInsuranceNumber.TryParse(NationalInsuranceNumber, out _))
-            {
-                ModelState.AddModelError(nameof(NationalInsuranceNumber), "Enter a National Insurance number in the correct format");
-            }
-        }
-        else
-        {
-            ModelState.Remove(nameof(NationalInsuranceNumber));
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
         coordinator.UpdateState(state => state.SetNationalInsuranceNumber(HaveNationalInsuranceNumber!.Value, NationalInsuranceNumber));
 
