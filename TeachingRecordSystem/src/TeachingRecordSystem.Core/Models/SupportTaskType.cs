@@ -5,8 +5,8 @@ namespace TeachingRecordSystem.Core.Models;
 
 public enum SupportTaskType
 {
-    [SupportTaskTypeDescription("connect GOV.UK One Login user to a teaching record", SupportTaskCategory.OneLogin, typeof(ConnectOneLoginUserData))]
-    ConnectOneLoginUser = 1,
+    [SupportTaskTypeDescription("GOV.UK One Login - record matching", SupportTaskCategory.OneLogin, typeof(OneLoginUserRecordMatchingData))]
+    OneLoginUserRecordMatching = 1,
 
     [SupportTaskTypeDescription("change name request", SupportTaskCategory.ChangeRequests, typeof(ChangeNameRequestData))]
     ChangeNameRequest = 2,

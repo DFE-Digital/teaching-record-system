@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
@@ -15,7 +15,7 @@ public static class Extensions
     public static IServiceCollection AddSupportTaskServices(this IServiceCollection services)
     {
         services.AddSupportTaskService();
-        services.AddOneLoginUserIdVerificationSupportTaskService();
+        services.AddTransient<OneLoginUserMatchingSupportTaskService>();
 
         return services;
     }

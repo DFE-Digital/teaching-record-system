@@ -157,7 +157,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             supportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, supportTask.Status);
-            var data = (ConnectOneLoginUserData)supportTask.Data;
+            var data = (OneLoginUserRecordMatchingData)supportTask.Data;
             Assert.Equal(person.PersonId, data.PersonId);
 
             oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject);

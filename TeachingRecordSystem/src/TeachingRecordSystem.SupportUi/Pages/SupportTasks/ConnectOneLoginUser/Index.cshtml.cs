@@ -60,7 +60,7 @@ public class IndexModel(TrsDbContext dbContext, OneLoginService oneLoginService,
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var data = (ConnectOneLoginUserData)supportTask.Data;
+        var data = (OneLoginUserRecordMatchingData)supportTask.Data;
 
         var suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
             data.VerifiedNames!,
