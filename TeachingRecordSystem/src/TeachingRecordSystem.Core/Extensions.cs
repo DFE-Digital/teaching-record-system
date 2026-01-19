@@ -230,7 +230,7 @@ public static class Extensions
     }
 
     public static string GetPostgresConnectionString(this IConfiguration configuration) =>
-        configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
+        configuration.GetRequiredValue($"ConnectionStrings:{TrsDbContext.ConnectionName}");
 
     private class DbDataSourceConnectionFactory(NpgsqlDataSource dataSource) : IConnectionFactory
     {

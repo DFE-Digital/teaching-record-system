@@ -105,6 +105,7 @@
     <PackageVersion Include="System.Net.Http.Json" Version="9.0.10" />
     <PackageVersion Include="System.Reactive" Version="6.1.0" />
     <PackageVersion Include="System.Text.Json" Version="9.0.10" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.10.0" />
     <PackageVersion Include="xunit.analyzers" Version="1.23.0" />
     <PackageVersion Include="xunit.core" Version="2.9.3" />
     <PackageVersion Include="Xunit.DependencyInjection" Version="8.9.1" />

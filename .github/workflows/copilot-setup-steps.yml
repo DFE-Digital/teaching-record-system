@@ -10,25 +10,6 @@ jobs:
     permissions:
       contents: read
 
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_PASSWORD: trs
-          POSTGRES_DB: trs
-          POSTGRES_INITDB_ARGS: "-c max_connections=1000"
-        options: >-
-          --name postgres
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-    env:
-      ConnectionStrings__DefaultConnection: "Host=localhost;Username=postgres;Password=trs;Database=trs;Maximum Pool Size=1000;Timeout=30"
-
     steps:
       - uses: actions/checkout@v6
         with:

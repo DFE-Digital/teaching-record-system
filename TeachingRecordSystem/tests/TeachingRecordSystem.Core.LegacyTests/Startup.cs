@@ -13,9 +13,7 @@ public class Startup
 {
     public void ConfigureHost(IHostBuilder hostBuilder) =>
         hostBuilder
-            .ConfigureAppConfiguration(builder => builder
-                .AddUserSecrets<Startup>(optional: true)
-                .AddEnvironmentVariables())
+            .ConfigureAppConfiguration(builder => builder.AddConfiguration(TestConfiguration.GetConfiguration()))
             .ConfigureServices((context, services) =>
             {
                 services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().InitializeAsync());

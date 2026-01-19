@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -11,6 +12,17 @@ public static class TestConfiguration
         configuration
             .AddUserSecrets("TeachingRecordSystemTests")
             .AddEnvironmentVariables();
+
+        var connectionString = configuration.GetConnectionString(TrsDbContext.ConnectionName);
+        if (connectionString is null)
+        {
+            connectionString = DbHelper.GetTestContainersConnectionString();
+
+            configuration.AddInMemoryCollection([
+                KeyValuePair.Create($"ConnectionStrings:{TrsDbContext.ConnectionName}", (string?)connectionString),
+                KeyValuePair.Create("UseTestContainers", (string?)"true")
+            ]);
+        }
 
         return configuration;
     }

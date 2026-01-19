@@ -16,6 +16,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
 public class TrsDbContext : DbContext
 {
+    public const string ConnectionName = "DefaultConnection";
+
     private readonly IServiceProvider? _serviceProvider;
 
     public TrsDbContext(DbContextOptions<TrsDbContext> options, IServiceProvider serviceProvider)

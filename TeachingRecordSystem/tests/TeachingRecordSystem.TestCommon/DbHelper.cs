@@ -1,44 +1,70 @@
 using System.Data.Common;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon.Infrastructure;
+using Testcontainers.PostgreSql;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public sealed class DbHelper : IDisposable
+public sealed class DbHelper : IAsyncDisposable
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly PostgreSqlContainer? _postgresContainer;
+
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
     private bool _haveResetSchema;
 
-    private DbHelper(IServiceProvider serviceProvider)
+    private DbHelper(IServiceProvider serviceProvider, PostgreSqlContainer? postgresContainer)
     {
         _serviceProvider = serviceProvider;
+        _postgresContainer = postgresContainer;
     }
 
     public static DbHelper Instance { get; } = CreateInstance();
 
     public IDbContextFactory<TrsDbContext> DbContextFactory => _serviceProvider.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
+    public static string GetTestContainersConnectionString() =>
+        "Host=localhost;Port=43007;Database=trs;Username=postgres;Password=postgres;";
+
     private static DbHelper CreateInstance()
     {
         var configuration = TestConfiguration.GetConfiguration();
 
+        var connectionString = configuration.GetPostgresConnectionString();
+
+        PostgreSqlContainer? postgresContainer = null;
+        var useTestContainers = configuration.GetValue<bool>("UseTestContainers");
+        if (useTestContainers)
+        {
+            postgresContainer = new PostgreSqlBuilder("postgres:17")
+                .WithDatabase("trs")
+                .WithReuse(true)
+                .WithPortBinding(43007, 5432)
+                .Build();
+        }
+
         var services = new ServiceCollection();
-        services.AddDatabase(configuration.GetPostgresConnectionString());
+        services.AddDatabase(connectionString);
         var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
 
-        return new DbHelper(serviceProvider);
+        return new DbHelper(serviceProvider, postgresContainer);
     }
 
     public async Task InitializeAsync()
     {
+        if (_postgresContainer != null)
+        {
+            await _postgresContainer.StartAsync();
+        }
+
         var schemaUpdated = await EnsureSchemaAsync();
 
         if (!schemaUpdated)
@@ -177,9 +203,14 @@ public sealed class DbHelper : IDisposable
         await dbContext.SaveChangesAsync();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         _schemaLock.Dispose();
         (_serviceProvider as IDisposable)?.Dispose();
+
+        if (_postgresContainer is not null)
+        {
+            await _postgresContainer.DisposeAsync();
+        }
     }
 }
