@@ -112,6 +112,31 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
 
     [Fact]
+    public Task Post_TrnWithAllZeros_RendersError() =>
+        WithJourneyCoordinatorAsync(
+            CreateNewState,
+            async coordinator =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+
+                var trn = "0000000";
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
+                {
+                    Content = new FormUrlEncodedContentBuilder { { "HaveTrn", bool.TrueString }, { "Trn", trn } }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "Enter a valid teacher reference number");
+            });
+
+    [Fact]
     public Task Post_NoTrnSpecified_UpdatesStateAndRedirectsToNotFoundPage() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
