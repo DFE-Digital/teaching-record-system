@@ -17,10 +17,14 @@
   }
 
   .govuk-button:hover {
-    background-color: govuk-colour("light-grey");
+    background-color: govuk-colour("mid-grey");
   }
 }
 
 .trs-two-thirds {
   width: 66.6666666667%;
+}
+
+.trs-empty-fallback {
+  color: govuk-colour("mid-grey");
 }

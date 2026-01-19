@@ -20,9 +20,6 @@ public class NationalInsuranceNumberModel(SignInJourneyCoordinator coordinator) 
             .When(m => m.HaveNationalInsuranceNumber == true)
     };
 
-    [FromQuery]
-    public bool? FromCheckAnswers { get; set; }
-
     [BindProperty]
     public bool? HaveNationalInsuranceNumber { get; set; }
 
@@ -41,9 +38,6 @@ public class NationalInsuranceNumberModel(SignInJourneyCoordinator coordinator) 
 
         coordinator.UpdateState(state => state.SetNationalInsuranceNumber(HaveNationalInsuranceNumber!.Value, NationalInsuranceNumber));
 
-        return await coordinator.AdvanceToAsync(async links =>
-            await coordinator.TryMatchToTeachingRecordAsync() ? links.Found() :
-            FromCheckAnswers == true ? links.CheckAnswers() :
-            links.Trn());
+        return await coordinator.TryMatchToTeachingRecordAsync() ?? coordinator.AdvanceTo(links => links.Trn());
     }
 }

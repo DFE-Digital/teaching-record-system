@@ -59,7 +59,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
         coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, nationalInsuranceNumber));
         var matched = await coordinator.TryMatchToTeachingRecordAsync();
-        Debug.Assert(matched);
+        Debug.Assert(matched is not null);
         AddUrlToPath(coordinator, StepUrls.Found);
     }
 }

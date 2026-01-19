@@ -38,7 +38,6 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
         {
             s.SetNationalInsuranceNumber(true, nationalInsuranceNumber ?? TestData.GenerateNationalInsuranceNumber());
             s.SetTrn(true, trn ?? await TestData.GenerateTrnAsync());
-            s.HasPendingSupportRequest = true;
         });
         coordinator.UnsafeSetPath(new JourneyPath([coordinator.CreateStepFromUrl(StepUrls.RequestSubmitted)]));
     }

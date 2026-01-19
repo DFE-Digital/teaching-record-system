@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Transactions;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
@@ -43,12 +45,6 @@ public class SignInJourneyCoordinator(
     public bool ShowDebugPages => optionsAccessor.Value.ShowDebugPages;
 
     public AdvanceToResult AdvanceTo(Func<LinkHelper, string> getUrl, PushStepOptions pushStepOptions = default) => AdvanceTo(getUrl(Links), pushStepOptions);
-
-    public async Task<AdvanceToResult> AdvanceToAsync(Func<LinkHelper, Task<string>> getUrl, PushStepOptions pushStepOptions = default)
-    {
-        var url = await getUrl(Links);
-        return AdvanceTo(url, pushStepOptions);
-    }
 
     public IResult SignInWithOneLogin() =>
         OneLoginChallenge(Vtrs.AuthenticationOnly);
@@ -314,11 +310,16 @@ public class SignInJourneyCoordinator(
         return base.StepIsValid(step) || step.NormalizedUrl.StartsWith("/oauth2/authorize");
     }
 
-    public async Task<bool> TryMatchToTeachingRecordAsync()
+    public async Task<IActionResult?> TryMatchToTeachingRecordAsync()
     {
-        if (State.OneLoginAuthenticationTicket is null || !State.IdentityVerified)
+        if (State.OneLoginAuthenticationTicket is null)
         {
             throw new InvalidOperationException("Cannot match to a teaching record without a verified One Login user.");
+        }
+
+        if (!State.IdentityVerified)
+        {
+            return null;
         }
 
         var names = State.VerifiedNames;
@@ -341,13 +342,14 @@ public class SignInJourneyCoordinator(
 
             UpdateState(state => Complete(state, matchedTrn));
 
-            return true;
+            var nextUrl = SquashPathAndAdvanceTo(Links.Found()).Url;
+            return new RedirectResult(nextUrl);
         }
 
-        return false;
+        return null;
     }
 
-    private IResult SquashPathAndAdvanceTo(string url, bool includeRedirectUri = true)
+    private RedirectHttpResult SquashPathAndAdvanceTo(string url, bool includeRedirectUri = true)
     {
         var urls = new List<string>(2) { url };
 
@@ -361,7 +363,7 @@ public class SignInJourneyCoordinator(
         var path = new JourneyPath(steps);
         UnsafeSetPath(path);
 
-        return Results.Redirect(urls.Last());
+        return (RedirectHttpResult)Results.Redirect(urls.Last());
     }
 
     private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser)
@@ -467,9 +469,9 @@ public class SignInJourneyCoordinator(
 
         public string NotVerified() => linkGenerator.NotVerified(instanceId);
 
-        public string Name() => linkGenerator.Name(instanceId);
+        public string Name(string? returnUrl = null) => linkGenerator.Name(instanceId, returnUrl);
 
-        public string DateOfBirth() => linkGenerator.DateOfBirth(instanceId);
+        public string DateOfBirth(string? returnUrl = null) => linkGenerator.DateOfBirth(instanceId, returnUrl);
     }
 
     private record TryMatchToIdentityUserResult(

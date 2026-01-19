@@ -33,5 +33,6 @@ public enum ProcessType
     PersonMerging = 29,
     ChangeOfNameRequestApproving = 30,
     ChangeOfDateOfBirthRequestApproving = 31,
-    OneLoginUserIdVerificationSupportTaskSaving = 32
+    OneLoginUserIdVerificationSupportTaskSaving = 32,
+    OneLoginUserIdVerificationSupportTaskCreating = 35,
 }

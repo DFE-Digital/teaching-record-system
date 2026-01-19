@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyCoordinator.JourneyName)]
-public class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
+public partial class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
 {
+    [GeneratedRegex(@"\A\D*0{7}\D*\Z")]
+    private static partial Regex TrnPattern();
+
     private readonly InlineValidator<TrnModel> _validator = new()
     {
         v => v.RuleFor(m => m.HaveTrn)
@@ -18,13 +21,10 @@ public class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
             .WithMessage("Enter your teacher reference number")
             .Matches(@"\A\D*(\d{1}\D*){7}\D*\Z")
             .WithMessage("Your teacher reference number should contain 7 digits")
-            .Must(trn => !Regex.IsMatch(trn!, @"\A\D*0{7}\D*\Z"))
+            .Must(trn => !TrnPattern().IsMatch(trn))
             .WithMessage("Enter a valid teacher reference number")
             .When(m => m.HaveTrn == true)
     };
-
-    [FromQuery]
-    public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
     public bool? HaveTrn { get; set; }
@@ -44,8 +44,9 @@ public class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
 
         coordinator.UpdateState(state => state.SetTrn(HaveTrn!.Value, Trn));
 
-        return await coordinator.AdvanceToAsync(async links =>
-            await coordinator.TryMatchToTeachingRecordAsync() ? links.Found() :
-            links.NotFound());
+        return await coordinator.TryMatchToTeachingRecordAsync() ??
+            (coordinator.State.IdentityVerified
+                ? coordinator.AdvanceTo(links => links.NotFound())
+                : coordinator.AdvanceTo(links => links.CheckAnswers()));
     }
 }

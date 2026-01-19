@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
 
@@ -16,7 +17,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser);
 
                 var existingNationalInsuranceNumber = haveExistingValueInState ? Faker.Identification.UkNationalInsuranceNumber() : null;
                 if (existingNationalInsuranceNumber is not null)
@@ -43,7 +44,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser);
 
                 var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.NationalInsuranceNumber(coordinator.InstanceId))
                 {
@@ -66,7 +67,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser);
 
                 var nationalInsuranceNumber = "";
 
@@ -94,7 +95,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser);
 
                 var nationalInsuranceNumber = "xxx";
 
@@ -114,7 +115,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
             });
 
     [Fact]
-    public Task Post_HaveNationalInsuranceNumberNotSpecified_UpdatesStateAndRedirectsToTrnPage() =>
+    public Task Post_HaveNationalInsuranceNumberNotSpecifiedForVerifiedUser_UpdatesStateAndRedirectsToTrnPage() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
             async coordinator =>
@@ -122,7 +123,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser);
 
                 var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.NationalInsuranceNumber(coordinator.InstanceId))
                 {
@@ -142,7 +143,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
             });
 
     [Fact]
-    public Task Post_ValidNationalInsuranceNumberButLookupFailed_UpdatesStateAndRedirectsToTrnPage() =>
+    public Task Post_ValidNationalInsuranceNumberButLookupFailedForVerifiedUser_UpdatesStateAndRedirectsToTrnPage() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
             async coordinator =>
@@ -150,7 +151,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser);
 
                 var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
@@ -176,7 +177,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
             });
 
     [Fact]
-    public Task Post_ValidNationalInsuranceNumberAndLookupSucceeded_UpdatesStateUpdatesOneLoginUserCompletesAuthenticationAndRedirectsToFoundPage() =>
+    public Task Post_ValidNationalInsuranceNumberAndLookupSucceededForVerifiedUser_UpdatesStateUpdatesOneLoginUserCompletesAuthenticationAndRedirectsToFoundPage() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
             async coordinator =>
@@ -187,7 +188,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                     personId: null,
                     verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser);
 
                 var nationalInsuranceNumber = person.NationalInsuranceNumber!;
 
@@ -217,10 +218,87 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 Assert.Equal(person.PersonId, oneLoginUser.PersonId);
             });
 
-    private async Task SetupInstanceStateAsync(SignInJourneyCoordinator coordinator, OneLoginUser oneLoginUser)
+    [Fact]
+    public Task Post_HaveNationalInsuranceNumberNotSpecifiedForUnverifiedUser_UpdatesStateAndRedirectsToTrnPage() =>
+        WithJourneyCoordinatorAsync(
+            CreateNewState,
+            async coordinator =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+
+                await SetupInstanceForUnverifiedUserStateAsync(coordinator, oneLoginUser);
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.NationalInsuranceNumber(coordinator.InstanceId))
+                {
+                    Content = new FormUrlEncodedContentBuilder { { "HaveNationalInsuranceNumber", bool.FalseString } }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.Trn(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+
+                var state = coordinator.State;
+                Assert.False(state.HaveNationalInsuranceNumber);
+                Assert.Null(state.AuthenticationTicket);
+            });
+
+    [Fact]
+    public Task Post_ValidNationalInsuranceNumberForVerifiedUser_UpdatesStateAndRedirectsToTrnPage() =>
+        WithJourneyCoordinatorAsync(
+            CreateNewState,
+            async coordinator =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+
+                await SetupInstanceForUnverifiedUserStateAsync(coordinator, oneLoginUser);
+
+                var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.NationalInsuranceNumber(coordinator.InstanceId))
+                {
+                    Content = new FormUrlEncodedContentBuilder
+                    {
+                        { "HaveNationalInsuranceNumber", bool.TrueString }, { "NationalInsuranceNumber", nationalInsuranceNumber }
+                    }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.Trn(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+
+                var state = coordinator.State;
+                Assert.True(state.HaveNationalInsuranceNumber);
+                Assert.Equal(nationalInsuranceNumber, state.NationalInsuranceNumber);
+                Assert.Null(state.AuthenticationTicket);
+            });
+
+    private async Task SetupInstanceStateForVerifiedUserAsync(SignInJourneyCoordinator coordinator, OneLoginUser oneLoginUser)
     {
         var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
         await coordinator.OnOneLoginCallbackAsync(ticket);
+        Debug.Assert(coordinator.State.IdentityVerified);
+        AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
+    }
+
+    private async Task SetupInstanceForUnverifiedUserStateAsync(
+        SignInJourneyCoordinator coordinator,
+        OneLoginUser oneLoginUser)
+    {
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
+        await coordinator.OnOneLoginCallbackAsync(ticket);
+        Debug.Assert(!coordinator.State.IdentityVerified);
+        AddUrlToPath(coordinator, StepUrls.Name);
+        coordinator.UpdateState(s => s.SetName(TestData.GenerateFirstName(), TestData.GenerateLastName()));
+        AddUrlToPath(coordinator, StepUrls.DateOfBirth);
+        coordinator.UpdateState(s => s.SetDateOfBirth(TestData.GenerateDateOfBirth()));
         AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
     }
 }

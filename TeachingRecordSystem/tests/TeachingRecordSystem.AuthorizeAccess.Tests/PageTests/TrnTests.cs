@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
 
@@ -16,7 +17,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
                 var existingTrn = haveExistingValueInState ? await TestData.GenerateTrnAsync() : null;
 
@@ -47,7 +48,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
                 var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
                 {
@@ -70,7 +71,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
                 var trn = "";
 
@@ -95,7 +96,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
                 var trn = "xxx";
 
@@ -120,7 +121,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
                 var trn = "0000000";
 
@@ -137,7 +138,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
 
     [Fact]
-    public Task Post_NoTrnSpecified_UpdatesStateAndRedirectsToNotFoundPage() =>
+    public Task Post_NoTrnSpecifiedForVerifiedUser_UpdatesStateAndRedirectsToNotFoundPage() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
             async coordinator =>
@@ -145,7 +146,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
                 var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
                 {
@@ -166,7 +167,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
 
     [Fact]
-    public Task Post_ValidTrnButLookupFailed_UpdatesStateAndRedirectsToNotFoundPage() =>
+    public Task Post_ValidTrnButLookupFailedForVerifiedUser_UpdatesStateAndRedirectsToNotFoundPage() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
             async coordinator =>
@@ -174,7 +175,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
                 var trn = await TestData.GenerateTrnAsync();
 
@@ -208,7 +209,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                     personId: null,
                     verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
-                await SetupInstanceStateAsync(coordinator, oneLoginUser);
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
                 var trn = person.Trn;
 
@@ -235,13 +236,94 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(person.PersonId, oneLoginUser.PersonId);
             });
 
-    private async Task SetupInstanceStateAsync(
+    [Fact]
+    public Task Post_NoTrnSpecifiedForUnverified_UpdatesStateAndRedirectsToCheckAnswersPage() =>
+        WithJourneyCoordinatorAsync(
+            CreateNewState,
+            async coordinator =>
+            {
+                // Arrange
+                var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: null);
+
+                await SetupInstanceForUnverifiedUserStateAsync(coordinator, oneLoginUser, person.NationalInsuranceNumber!);
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
+                {
+                    Content = new FormUrlEncodedContentBuilder { { "HaveTrn", bool.FalseString } }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.CheckAnswers(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+
+                var state = coordinator.State;
+                Assert.False(state.HaveTrn);
+                Assert.Null(state.Trn);
+                Assert.Null(state.AuthenticationTicket);
+            });
+
+
+    [Fact]
+    public Task Post_ValidTrnForUnverifiedUser_UpdatesStateAndRedirectsToCheckAnswers() =>
+        WithJourneyCoordinatorAsync(
+            CreateNewState,
+            async coordinator =>
+            {
+                // Arrange
+                var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: null);
+
+                await SetupInstanceForUnverifiedUserStateAsync(coordinator, oneLoginUser, person.NationalInsuranceNumber!);
+
+                var trn = person.Trn;
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
+                {
+                    Content = new FormUrlEncodedContentBuilder { { "HaveTrn", bool.TrueString }, { "Trn", trn } }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.CheckAnswers(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+
+                var state = coordinator.State;
+                Assert.True(state.HaveTrn);
+                Assert.Equal(trn, state.Trn);
+                Assert.Null(state.AuthenticationTicket);
+            });
+
+    private async Task SetupInstanceForVerifiedUserStateAsync(
         SignInJourneyCoordinator coordinator,
         OneLoginUser oneLoginUser,
         string? nationalInsuranceNumber = null)
     {
         var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
         await coordinator.OnOneLoginCallbackAsync(ticket);
+        Debug.Assert(coordinator.State.IdentityVerified);
+        AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
+        coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, nationalInsuranceNumber ?? TestData.GenerateNationalInsuranceNumber()));
+        AddUrlToPath(coordinator, StepUrls.Trn);
+    }
+
+    private async Task SetupInstanceForUnverifiedUserStateAsync(
+        SignInJourneyCoordinator coordinator,
+        OneLoginUser oneLoginUser,
+        string? nationalInsuranceNumber = null)
+    {
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
+        await coordinator.OnOneLoginCallbackAsync(ticket);
+        Debug.Assert(!coordinator.State.IdentityVerified);
+        AddUrlToPath(coordinator, StepUrls.Name);
+        coordinator.UpdateState(s => s.SetName(TestData.GenerateFirstName(), TestData.GenerateLastName()));
+        AddUrlToPath(coordinator, StepUrls.DateOfBirth);
+        coordinator.UpdateState(s => s.SetDateOfBirth(TestData.GenerateDateOfBirth()));
         AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
         coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, nationalInsuranceNumber ?? TestData.GenerateNationalInsuranceNumber()));
         AddUrlToPath(coordinator, StepUrls.Trn);

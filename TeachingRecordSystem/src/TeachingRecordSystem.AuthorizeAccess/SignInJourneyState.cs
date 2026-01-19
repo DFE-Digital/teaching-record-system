@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
@@ -35,9 +36,8 @@ public class SignInJourneyState(
 
     public bool AttemptedIdentityVerification { get; set; }
 
-    public bool HasPendingSupportRequest { get; set; }
-
     [JsonInclude]
+    [MemberNotNullWhen(true, nameof(VerifiedNames), nameof(VerifiedDatesOfBirth))]
     public bool IdentityVerified { get; private set; }
 
     [JsonInclude]
