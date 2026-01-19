@@ -15,7 +15,7 @@ public class NationalInsuranceNumberModel(SignInJourneyCoordinator coordinator) 
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .WithMessage("Enter a National Insurance number")
-            .Must(nino => Core.NationalInsuranceNumber.TryParse(nino!, out _))
+            .Must(nino => Core.NationalInsuranceNumber.TryParse(nino, out _))
             .WithMessage("Enter a National Insurance number in the correct format")
             .When(m => m.HaveNationalInsuranceNumber == true)
     };
