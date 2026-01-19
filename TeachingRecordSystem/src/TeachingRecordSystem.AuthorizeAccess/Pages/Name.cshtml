@@ -1,0 +1,27 @@
+@page "/name"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.Name
+@{
+    ViewBag.Title = "Enter your name";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <p class="govuk-hint">
+                Enter your name exactly as it appears on the proof of identity you’ll upload later
+            </p>
+
+            <govuk-input for="FirstName" autocomplete="given-name">
+                <govuk-input-label>First name</govuk-input-label>
+            </govuk-input>
+
+            <govuk-input for="LastName" autocomplete="family-name">
+                <govuk-input-label>Last name</govuk-input-label>
+            </govuk-input>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

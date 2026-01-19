@@ -466,6 +466,10 @@ public class SignInJourneyCoordinator(
         public string NotFound() => linkGenerator.NotFound(instanceId);
 
         public string NotVerified() => linkGenerator.NotVerified(instanceId);
+
+        public string Name() => linkGenerator.Name(instanceId);
+
+        public string DateOfBirth() => linkGenerator.DateOfBirth(instanceId);
     }
 
     private record TryMatchToIdentityUserResult(

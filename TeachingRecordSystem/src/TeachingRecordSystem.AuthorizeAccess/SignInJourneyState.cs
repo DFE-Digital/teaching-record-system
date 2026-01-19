@@ -58,6 +58,12 @@ public class SignInJourneyState(
     [JsonInclude]
     public string? Trn { get; private set; }
 
+    [JsonInclude]
+    public string? FirstName { get; private set; }
+
+    [JsonInclude]
+    public string? LastName { get; private set; }
+
     public void Reset()
     {
         AuthenticationTicket = null;
@@ -79,6 +85,12 @@ public class SignInJourneyState(
         IdentityVerified = false;
         VerifiedNames = null;
         VerifiedDatesOfBirth = null;
+    }
+
+    public void SetName(string firstName, string lastName)
+    {
+        FirstName = firstName;
+        LastName = lastName;
     }
 
     public void SetNationalInsuranceNumber(bool haveNationalInsuranceNumber, string? nationalInsuranceNumber)

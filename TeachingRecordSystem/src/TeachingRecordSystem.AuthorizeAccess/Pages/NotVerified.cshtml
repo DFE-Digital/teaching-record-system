@@ -1,7 +1,32 @@
 @page "/not-verified"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.NotVerifiedModel
 @{
-    ViewBag.Title = "[PLACEHOLDER] Not verified";
+    ViewBag.Title = "We need more information to verify your identity";
 }
 
-<h1>@ViewBag.Title</h1>
+<form method="post">
+    <div class="govuk-panel govuk-panel--interruption">
+        <h1 class="govuk-panel__title">@ViewBag.Title</h1>
+
+        <div class="govuk-panel__body">
+            <div class="trs-two-thirds">
+                <p class="govuk-body">
+                    We’ll use these details to confirm your identity and match you to a teaching record.
+                </p>
+
+                <p class="govuk-body govuk-!-margin-bottom-1">
+                    We’ll ask for:
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>your name</li>
+                        <li>your date of birth</li>
+                        <li>your National Insurance number</li>
+                        <li>your teacher reference number (TRN)</li>
+                        <li>proof of your identity, such as a passport or driving licence</li>
+                    </ul>
+                </p>
+
+                <govuk-button class="govuk-!-margin-bottom-0">Continue</govuk-button>
+            </div>
+        </div>
+    </div>
+</form>
