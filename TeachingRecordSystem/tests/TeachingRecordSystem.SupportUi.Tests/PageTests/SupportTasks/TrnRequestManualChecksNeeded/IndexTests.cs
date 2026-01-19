@@ -155,9 +155,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = 2;
 
         // Create enough tasks to create 3 pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
+        await Enumerable.Range(1, (pageSize * page) + 1)
             .ToAsyncEnumerable()
-            .SelectAwait(async _ => await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync()));
+            .Select(async (int _, CancellationToken _) => await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync()).ToArrayAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/manual-checks-needed?pageNumber={page}");

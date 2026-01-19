@@ -10,9 +10,9 @@
       },
       "Dfe.Analytics": {
         "type": "Direct",
-        "requested": "[0.3.0-alpha.0.20, )",
-        "resolved": "0.3.0-alpha.0.20",
-        "contentHash": "p8cJyGUJDk5s1bRNfk1By0JtmJVDTZsQTcqsCUlasIEZLc8XiVo2pfkYWsC94R9RktHM+Wjsfp/7agZ5sczTHg==",
+        "requested": "[0.3.0, )",
+        "resolved": "0.3.0",
+        "contentHash": "IeyXkwDuCqHFYbu71suqYoaxaqj+J6fMdd2EIMfawbXxgYBKvs3yfsfjaBmXMY4ViR1LsA+dnaNy7Y0MIFtBVg==",
         "dependencies": {
           "Google.Apis.Auth": "1.71.0",
           "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)"

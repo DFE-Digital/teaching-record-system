@@ -178,10 +178,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var pageSize = 20;
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+
         // Create multiple pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, pageSize * 2 + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject)));
+        await Enumerable.Range(1, pageSize * 2 + 1)
+            .ToAsyncEnumerable()
+            .Select(async (int _, CancellationToken _) => await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject))
+            .ToArrayAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/one-login-user-id-verification?pageNumber={page}");
@@ -205,10 +207,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var pageSize = 20;
         var page = 1;
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+
         // Create multiple pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject)));
+        await Enumerable.Range(1, (pageSize * page) + 1)
+            .ToAsyncEnumerable()
+            .Select(async (int _, CancellationToken _) => await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject))
+            .ToArrayAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-id-verification?pageNumber={page}");
 

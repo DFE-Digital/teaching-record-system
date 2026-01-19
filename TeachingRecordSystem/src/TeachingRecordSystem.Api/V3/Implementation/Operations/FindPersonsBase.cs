@@ -41,7 +41,7 @@ public abstract class FindPersonsHandlerBase(
             .ToAsyncEnumerable()
             .Where(id => persons.ContainsKey(id))
             .Select(id => persons[id])
-            .SelectAwait(async person => new FindPersonsResultItem()
+            .Select(async (PostgresModels.Person person, CancellationToken _) => new FindPersonsResultItem()
             {
                 Trn = person.Trn,
                 DateOfBirth = person.DateOfBirth!.Value,

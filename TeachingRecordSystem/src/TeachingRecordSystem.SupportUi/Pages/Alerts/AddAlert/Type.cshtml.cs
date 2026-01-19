@@ -77,7 +77,7 @@ public class TypeModel(
         var alertTypes = await referenceDataCache.GetAlertTypesAsync(activeOnly: true);
         AlertTypes = await alertTypes
             .ToAsyncEnumerable()
-            .WhereAwait(async t => (await authorizationService.AuthorizeAsync(User, t.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Write))) is { Succeeded: true })
+            .Where(async (t, _) => (await authorizationService.AuthorizeAsync(User, t.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Write))) is { Succeeded: true })
             .Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder ?? int.MaxValue))
             .ToArrayAsync();
 

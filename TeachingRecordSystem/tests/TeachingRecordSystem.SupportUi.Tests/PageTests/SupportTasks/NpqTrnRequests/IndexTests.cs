@@ -167,9 +167,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         // Create enough tasks to create 3 pages
-        await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
+        await Enumerable.Range(1, (pageSize * page) + 1)
             .ToAsyncEnumerable()
-            .SelectAwait(async _ => await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId)));
+            .Select(async (int _, CancellationToken _) => await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId))
+            .ToArrayAsync();
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
