@@ -1,4 +1,23 @@
 @page "/date-of-birth"
-@model TeachingRecordSystem.AuthorizeAccess.Pages.DateOfBirth
+@model TeachingRecordSystem.AuthorizeAccess.Pages.DateOfBirthModel
 @{
+    ViewBag.Title = "Enter your date of birth";
 }
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form method="post">
+            <govuk-date-input for="DateOfBirth" error-message-prefix="Your date of birth">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title</govuk-date-input-fieldset-legend>
+                    <govuk-date-input-hint>For example, 31 3 1980</govuk-date-input-hint>
+                    <govuk-date-input-day autocomplete="bday-day" />
+                    <govuk-date-input-month autocomplete="bday-month" />
+                    <govuk-date-input-year autocomplete="bday-year" />
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

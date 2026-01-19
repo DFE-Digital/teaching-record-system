@@ -64,6 +64,9 @@ public class SignInJourneyState(
     [JsonInclude]
     public string? LastName { get; private set; }
 
+    [JsonInclude]
+    public DateOnly? DateOfBirth { get; private set; }
+
     public void Reset()
     {
         AuthenticationTicket = null;
@@ -91,6 +94,11 @@ public class SignInJourneyState(
     {
         FirstName = firstName;
         LastName = lastName;
+    }
+
+    public void SetDateOfBirth(DateOnly dateOfBirth)
+    {
+        DateOfBirth = dateOfBirth;
     }
 
     public void SetNationalInsuranceNumber(bool haveNationalInsuranceNumber, string? nationalInsuranceNumber)
