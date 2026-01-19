@@ -113,6 +113,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
         var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
         await coordinator.OnOneLoginCallbackAsync(ticket);
         coordinator.OnVerificationFailed();
+        AddUrlToPath(coordinator, StepUrls.Name);
         AddUrlToPath(coordinator, StepUrls.DateOfBirth);
     }
 }
