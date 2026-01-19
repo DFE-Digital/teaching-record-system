@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.RegularExpressions;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
@@ -17,7 +18,7 @@ public class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
             .WithMessage("Enter your teacher reference number")
             .Matches(@"\A\D*(\d{1}\D*){7}\D*\Z")
             .WithMessage("Your teacher reference number should contain 7 digits")
-            .Must(trn => !System.Text.RegularExpressions.Regex.IsMatch(trn!, @"^\D*0{7}\D*$"))
+            .Must(trn => !Regex.IsMatch(trn!, @"\A\D*0{7}\D*\Z"))
             .WithMessage("Enter a valid teacher reference number")
             .When(m => m.HaveTrn == true)
     };
