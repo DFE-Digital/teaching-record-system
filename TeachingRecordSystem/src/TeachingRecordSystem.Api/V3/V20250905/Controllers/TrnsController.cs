@@ -27,7 +27,7 @@ public class TrnsController(ICommandDispatcher commandDispatcher) : ControllerBa
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
-            .MapErrorCode(ApiError.ErrorCodes.RecordIsNotActive, StatusCodes.Status410Gone)
+            .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status410Gone)
             .MapErrorCode(
                 ApiError.ErrorCodes.RecordIsMerged,
                 e => RedirectPermanentPreserveMethod(

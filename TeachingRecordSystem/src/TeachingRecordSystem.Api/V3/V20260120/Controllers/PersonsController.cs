@@ -4,10 +4,10 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Api.V3.V20250327.Requests;
-using TeachingRecordSystem.Api.V3.V20250327.Responses;
+using TeachingRecordSystem.Api.V3.V20250627.Requests;
+using TeachingRecordSystem.Api.V3.V20250627.Responses;
 
-namespace TeachingRecordSystem.Api.V3.V20250327.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20260120.Controllers;
 
 [Route("persons")]
 public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
@@ -50,45 +50,11 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
         return result
             .ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
-            .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status404NotFound)
-            .MapErrorCode(ApiError.ErrorCodes.RecordIsMerged, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status410Gone)
+            .MapErrorCode(
+                ApiError.ErrorCodes.RecordIsMerged,
+                e => RedirectPermanentPreserveMethod(
+                    Url.Action("Get", new { trn = (string)e.Data[ApiError.DataKeys.MergedWithTrn] })!))
             .MapErrorCode(ApiError.ErrorCodes.ForbiddenForAppropriateBody, StatusCodes.Status403Forbidden);
-    }
-
-    [HttpPost("find")]
-    [SwaggerOperation(
-        OperationId = "FindPersons",
-        Summary = "Find persons",
-        Description = "Finds persons matching the specified criteria.")]
-    [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync([FromBody] FindPersonsRequest request)
-    {
-        var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
-        var result = await commandDispatcher.DispatchAsync(command);
-        return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
-    }
-
-    [HttpGet("")]
-    [SwaggerOperation(
-        OperationId = "FindPerson",
-        Summary = "Find person",
-        Description = "Finds a person matching the specified criteria.")]
-    [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync(FindPersonRequest request)
-    {
-        var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await commandDispatcher.DispatchAsync(command);
-
-        return result.ToActionResult(r =>
-            Ok(new FindPersonResponse()
-            {
-                Total = r.Total,
-                Query = request,
-                Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
-            }));
     }
 }

@@ -52,6 +52,8 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
         return result
             .ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.RecordIsMerged, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.ForbiddenForAppropriateBody, StatusCodes.Status403Forbidden);
     }
 

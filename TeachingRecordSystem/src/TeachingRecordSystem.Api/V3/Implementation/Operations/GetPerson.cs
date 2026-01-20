@@ -171,7 +171,7 @@ public record GetPersonResultRouteToProfessionalStatusInductionExemption
     public required IReadOnlyCollection<PostgresModels.InductionExemptionReason> ExemptionReasons { get; init; }
 }
 
-public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referenceDataCache) :
+public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbContext, ReferenceDataCache referenceDataCache) :
     ICommandHandler<GetPersonCommand, GetPersonResult>
 {
     public async Task<ApiResult<GetPersonResult>> ExecuteAsync(GetPersonCommand command)
@@ -192,11 +192,6 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
             }
         }
 
-        var personQuery = dbContext.Persons
-            .Where(p => p.Trn == command.Trn)
-            .Include(p => p.Qualifications).AsSplitQuery()
-            .Include(p => p.PreviousNames).AsSplitQuery();
-
         async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
             var openTaskTypes = await dbContext.SupportTasks
@@ -215,16 +210,14 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
             (await GetPendingDetailChangesAsync()) :
             null;
 
-        if (command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts))
-        {
-            personQuery = personQuery.Include(p => p.Alerts).AsSplitQuery();
-        }
+        var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn, query => query
+            .Include(p => p.Qualifications).AsSplitQuery()
+            .Include(p => p.PreviousNames).AsSplitQuery()
+            .Include(p => p.Alerts).AsSplitQuery());
 
-        var person = await personQuery.SingleOrDefaultAsync();
-
-        if (person is null)
+        if (getPersonResult.TryPickT0(out var error, out var person))
         {
-            return ApiError.PersonNotFound(command.Trn);
+            return error;
         }
 
         // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches

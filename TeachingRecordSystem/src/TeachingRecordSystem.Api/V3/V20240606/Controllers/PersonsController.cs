@@ -39,7 +39,9 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
         var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
-            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.RecordIsMerged, StatusCodes.Status404NotFound);
     }
 
     [HttpGet("")]
