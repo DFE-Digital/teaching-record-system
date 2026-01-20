@@ -38,7 +38,7 @@ public class GetPersonHelper(TrsDbContext dbContext)
 
         if (person.Status is PersonStatus.Deactivated)
         {
-            return ApiError.RecordIsNotActive(trn);
+            return ApiError.RecordIsDeactivated(trn);
         }
 
         if (person.Trn != trn)
