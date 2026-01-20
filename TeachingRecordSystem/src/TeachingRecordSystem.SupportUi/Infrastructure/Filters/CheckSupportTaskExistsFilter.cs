@@ -60,7 +60,7 @@ public class CheckSupportTaskExistsFilterFactory(bool excludeClosed, params Supp
 {
     public bool IsReusable => false;
 
-    public int Order => -200;
+    public int Order => FilterOrders.CheckSupportTaskExistsFilterOrder;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
         ActivatorUtilities.CreateInstance<CheckSupportTaskExistsFilter>(serviceProvider, excludeClosed, supportTaskTypes);

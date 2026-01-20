@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 public class CheckUserExistsFilter : IAsyncResourceFilter, IOrderedFilter
 {
-    public int Order => int.MinValue;
+    public int Order => FilterOrders.CheckUserExistsFilterOrder;
 
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {

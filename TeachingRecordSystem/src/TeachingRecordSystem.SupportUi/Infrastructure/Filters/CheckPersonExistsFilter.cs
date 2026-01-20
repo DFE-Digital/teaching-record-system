@@ -54,7 +54,7 @@ public class CheckPersonExistsFilterFactory : IFilterFactory, IOrderedFilter
 {
     public bool IsReusable => false;
 
-    public int Order => -200;
+    public int Order => FilterOrders.CheckPersonExistsFilterOrder;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
         ActivatorUtilities.CreateInstance<CheckPersonExistsFilter>(serviceProvider);

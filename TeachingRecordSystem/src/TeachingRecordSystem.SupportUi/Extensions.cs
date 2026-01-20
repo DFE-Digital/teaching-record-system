@@ -95,6 +95,7 @@ public static class Extensions
             .AddTransient<RequireClosedAlertFilter>()
             .AddTransient<RequireOpenAlertFilter>()
             .AddTransient<RedirectWithPersonIdFilter>()
+            .AddTransient<CheckPersonCanBeMergedFilter>()
             .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
             .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>()
             .AddScoped<SupportUiFormContext>()
