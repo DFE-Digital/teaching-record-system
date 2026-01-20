@@ -127,9 +127,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
-        Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueByKey("Middle name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.MiddleName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
@@ -143,6 +141,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), TestData.GenerateLastName(), new DateTime(2020, 1, 1).ToUniversalTime()))
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber()
             .WithGender(TestData.GenerateGender()));
@@ -173,9 +172,8 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(matchedPerson.MiddleName, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
-        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', matchedPerson.PreviousNames.First().FirstName, matchedPerson.PreviousNames.First().MiddleName, matchedPerson.PreviousNames.First().LastName), firstMatchDetails.GetSummaryListValueByKey("Previous names"));
         Assert.Equal(matchedPerson.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(matchedPerson.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
@@ -247,12 +245,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithNationalInsuranceNumber(false)
-            .WithGender(false)
-            .WithMiddleName(""));
+            .WithGender(false));
 
         var (supportTask, _, matchedPersonIds) = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
         {
-            configure.WithMiddleName("John");
+            configure.WithLastName(TestData.GenerateChangedLastName(matchedPerson.LastName));
             configure.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
             configure.WithGender(TestData.GenerateGender());
             configure.WithEmailAddress(TestData.GenerateUniqueEmail());
@@ -283,13 +280,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
-        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
+
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", true);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", true);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", true);
     }
@@ -339,13 +334,9 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
-        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", false);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", false);
     }
@@ -761,19 +752,18 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 .IsChecked());
     }
 
-    public static TheoryData<PersonMatchedAttribute[]> GetHighlightedDifferencesData() => new(
-        [PersonMatchedAttribute.FirstName],
-        [PersonMatchedAttribute.MiddleName],
-        [PersonMatchedAttribute.LastName],
-        [PersonMatchedAttribute.DateOfBirth],
-        [PersonMatchedAttribute.EmailAddress],
-        [PersonMatchedAttribute.NationalInsuranceNumber],
-        [PersonMatchedAttribute.Gender]
-    );
+    public static TheoryData<PersonMatchedAttribute[], bool> GetHighlightedDifferencesData()
+    {
+        var matches = TrnRequestServiceMatchAttributeCombinations.GetMatchAttributeCombinations()
+            .Select(m => (m, !(m.Contains(PersonMatchedAttribute.FirstName) && m.Contains(PersonMatchedAttribute.MiddleName) && m.Contains(PersonMatchedAttribute.LastName))));
+        var nonMatches = TrnRequestServiceMatchAttributeCombinations.GetNonMatchAttributeCombinationExamples()
+            .Select(nm => (nm, !(nm.Contains(PersonMatchedAttribute.FirstName) && nm.Contains(PersonMatchedAttribute.MiddleName) && nm.Contains(PersonMatchedAttribute.LastName))));
+        return new TheoryData<PersonMatchedAttribute[], bool>(matches.ToArray());
+    }
 
     [Theory]
     [MemberData(nameof(GetHighlightedDifferencesData))]
-    public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes)
+    public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes, bool nameIsHighlighted)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -845,24 +835,26 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "First name", !matchedAttributes.Contains(PersonMatchedAttribute.FirstName));
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Last name", !matchedAttributes.Contains(PersonMatchedAttribute.LastName));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Name", nameIsHighlighted);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Email address", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
     }
 
-    public static TheoryData<PersonMatchedAttribute> GetSynonymMatchedData() => new(
-        PersonMatchedAttribute.FirstName,
-        PersonMatchedAttribute.MiddleName,
-        PersonMatchedAttribute.LastName
-    );
+    public static TheoryData<PersonMatchedAttribute[], PersonMatchedAttribute> GetSynonymMatchedData()
+    {
+        var matches = new List<(PersonMatchedAttribute[], PersonMatchedAttribute)> {
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.FirstName),
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.MiddleName),
+            ([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.MiddleName, PersonMatchedAttribute.LastName], PersonMatchedAttribute.LastName),
+        };
+        return new TheoryData<PersonMatchedAttribute[], PersonMatchedAttribute>(matches.ToArray());
+    }
 
     [Theory]
     [MemberData(nameof(GetSynonymMatchedData))]
-    public async Task Get_WhenMatchedOnSynonymDoesNotHighlightAsDifferenceBetweenMatchAndTrnRequest(PersonMatchedAttribute synonymMatchedAttribute)
+    public async Task Get_WhenMatchedOnSynonymDoesNotHighlightAsDifferenceBetweenMatchAndTrnRequest(PersonMatchedAttribute[] matchedAttributes, PersonMatchedAttribute synonymMatchedAttribute)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -879,17 +871,23 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             t => t
                 .WithMatchedPersons(matchedPerson.PersonId)
                 .WithFirstName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.FirstName
-                        ? synonym
-                        : matchedPerson.FirstName)
+                    matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.FirstName
+                            ? synonym
+                            : matchedPerson.FirstName
+                        : TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithMiddleName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.MiddleName
-                        ? synonym
-                        : matchedPerson.MiddleName)
+                    matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.MiddleName
+                            ? synonym
+                            : matchedPerson.MiddleName
+                        : TestData.GenerateChangedMiddleName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithLastName(
-                    synonymMatchedAttribute == PersonMatchedAttribute.LastName
-                        ? synonym
-                        : matchedPerson.LastName));
+                    matchedAttributes.Contains(PersonMatchedAttribute.LastName)
+                        ? synonymMatchedAttribute == PersonMatchedAttribute.LastName
+                            ? synonym
+                            : matchedPerson.LastName
+                        : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName])));
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
@@ -915,9 +913,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "First name", false);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
-        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Last name", false);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Name", false);
     }
 
     [Fact]

@@ -15,5 +15,10 @@ public record PotentialDuplicate
     public required bool HasQts { get; init; }
     public required bool HasEyts { get; init; }
     public required bool HasActiveAlerts { get; init; }
+    public required IReadOnlyCollection<string> PreviousNames { get; init; }
     public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
+
+    public bool HasFirstNameMismatch => !(String.IsNullOrEmpty(FirstName) || MatchedAttributes.Contains(PersonMatchedAttribute.FirstName));
+    public bool HasMiddleNameMismatch => !(String.IsNullOrEmpty(MiddleName) || MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
+    public bool HasLastNameMismatch => !(String.IsNullOrEmpty(LastName) || MatchedAttributes.Contains(PersonMatchedAttribute.LastName));
 }

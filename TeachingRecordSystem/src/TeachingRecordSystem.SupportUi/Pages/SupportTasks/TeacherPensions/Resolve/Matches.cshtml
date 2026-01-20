@@ -21,7 +21,7 @@
     <div class="govuk-grid-row">
         <div class=@(showDuplicatesSideBySide ? "govuk-grid-column-full-from-desktop" : "govuk-grid-column-two-thirds-from-desktop")>
             <govuk-inset-text class="govuk-!-margin-top-0">
-                Differences are <highlight>highlighted</highlight> in the matched record
+                Details that do not match are <highlight>highlighted</highlight> in the existing records
             </govuk-inset-text>
 
             <div class="trs-potential-duplicates @(showDuplicatesSideBySide ? "trs-potential-duplicates--side-by-side" : "")">
@@ -36,16 +36,8 @@
                     </govuk-summary-card-actions>
                     <govuk-summary-list>
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.FirstName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.MiddleName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.LastName</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@Model.Name</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
@@ -71,7 +63,7 @@
                     <h2 class="govuk-heading-m">Potential matches</h2>
                 }
 
-                @foreach (var match in Model.PotentialDuplicates!)
+                @foreach (var (match, hasNameMismatch) in Model.PotentialDuplicatesWithNameMatchingInfo)
                 {
                     <govuk-summary-card data-testid="match" class="trs-potential-duplicates__item">
                         <govuk-summary-card-title>
@@ -84,23 +76,20 @@
                         </govuk-summary-card-actions>
                         <govuk-summary-list>
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName))">
-                                    @match.FirstName
+                                <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback highlight="@hasNameMismatch">
+                                    @StringHelper.JoinNonEmpty(' ', match.FirstName, match.MiddleName, match.LastName)
                                 </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!(match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName) || (string.IsNullOrEmpty(Model.RequestData!.MiddleName) && string.IsNullOrEmpty(match.MiddleName))))">
-                                    @match.MiddleName
-                                </govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName))">
-                                    @match.LastName
-                                </govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            @if (match.PreviousNames!.Count > 0)
+                            {
+                                <govuk-summary-list-row>
+                                    <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
+                                    <govuk-summary-list-row-value>
+                                        <list-text-items text-items="@match.PreviousNames"></list-text-items>
+                                    </govuk-summary-list-row-value>
+                                </govuk-summary-list-row>
+                            }
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
                                 <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.Trn))">
@@ -140,7 +129,7 @@
                         What do you want to do with the Teachers&rsquo; Pensions record?
                     </govuk-radios-fieldset-legend>
 
-                    @foreach (var match in Model.PotentialDuplicates!)
+                    @foreach (var match in Model.PotentialDuplicates)
                     {
                         <govuk-radios-item value="@match.PersonId">
                             Merge it with Record @match.Identifier

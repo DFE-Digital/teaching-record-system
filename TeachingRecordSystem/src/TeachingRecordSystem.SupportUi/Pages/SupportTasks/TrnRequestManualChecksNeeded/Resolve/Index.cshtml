@@ -39,16 +39,8 @@
                 </govuk-summary-card-actions>
                 <govuk-summary-list>
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.FirstName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.MiddleName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.LastName</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Name</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
@@ -114,6 +106,6 @@
                 <govuk-button type="submit">Confirm</govuk-button>
                 <govuk-button-link href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index()" class="govuk-button--secondary">Cancel</govuk-button-link>
             </div>
-        </div>
+        </div>s
     </div>
 </form>

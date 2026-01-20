@@ -27,6 +27,23 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
+    public string Name => StringHelper.JoinNonEmpty(' ', RequestData?.FirstName, RequestData?.MiddleName, RequestData?.LastName);
+
+    private bool HasFirstNameMismatch(PotentialDuplicate pd) =>
+        ((String.IsNullOrEmpty(pd.FirstName) || String.IsNullOrEmpty(RequestData!.FirstName))
+            ? !(String.IsNullOrEmpty(pd.FirstName) && String.IsNullOrEmpty(RequestData!.FirstName))
+            : pd.HasFirstNameMismatch);
+    private bool HasMiddleNameMismatch(PotentialDuplicate pd) =>
+        ((String.IsNullOrEmpty(pd.MiddleName) || String.IsNullOrEmpty(RequestData!.MiddleName))
+            ? !(String.IsNullOrEmpty(pd.MiddleName) && String.IsNullOrEmpty(RequestData!.MiddleName))
+            : pd.HasMiddleNameMismatch);
+    private bool HasLastNameMismatch(PotentialDuplicate pd) =>
+        ((String.IsNullOrEmpty(pd.LastName) || String.IsNullOrEmpty(RequestData!.LastName))
+            ? !(String.IsNullOrEmpty(pd.LastName) && String.IsNullOrEmpty(RequestData!.LastName))
+            : pd.HasLastNameMismatch);
+
+    public IReadOnlyCollection<(PotentialDuplicate PotentialDuplicate, bool HasNameMismatch)> PotentialDuplicatesWithNameMatchingInfo { get; set; } = Array.Empty<(PotentialDuplicate, bool)>();
+
     [BindProperty]
     public Guid? PersonId { get; set; }
 
@@ -101,6 +118,10 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
                 Gender = p.Gender,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
+                PreviousNames = p.PreviousNames!
+                    .OrderBy(n => n.CreatedOn)
+                    .Select(n => StringHelper.JoinNonEmpty(' ', n.FirstName, n.MiddleName, n.LastName))
+                    .ToArray(),
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
             })
             .ToArrayAsync())
@@ -115,6 +136,10 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
         NpqEvidenceFile = (RequestData?.NpqEvidenceFileId, RequestData?.NpqEvidenceFileName) is (Guid fileId, string fileName)
             ? new(fileId, fileName) : null;
+
+        PotentialDuplicatesWithNameMatchingInfo = PotentialDuplicates!
+            .Select(pd => (pd, HasFirstNameMismatch(pd) || HasMiddleNameMismatch(pd) || HasLastNameMismatch(pd)))
+            .ToArray();
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

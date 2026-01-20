@@ -10,7 +10,13 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest).ExecuteDeleteAsync());
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var (supportTask, requestData, _) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t.WithStatus(SupportTaskStatus.Open));
+        var (supportTask, requestData, matchedPersonIds) = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t.WithStatus(SupportTaskStatus.Open));
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Persons.First(p => matchedPersonIds.First() == p.PersonId).MiddleName = TestData.GenerateMiddleName();
+            await dbContext.SaveChangesAsync();
+        });
+
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

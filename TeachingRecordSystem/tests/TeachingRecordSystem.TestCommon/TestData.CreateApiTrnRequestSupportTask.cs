@@ -207,6 +207,7 @@ public partial class TestData
                                 .WithFirstName(firstName)
                                 .WithMiddleName(middleName ?? string.Empty)
                                 .WithLastName(lastName)
+                                .WithPreviousNames((firstName, middleName ?? testData.GenerateMiddleName(), testData.GenerateChangedLastName(lastName), new DateTime(2020, 8, 1).ToUniversalTime()))
                                 .WithDateOfBirth(dateOfBirth)
                                 .WithEmailAddress(emailAddress);
 

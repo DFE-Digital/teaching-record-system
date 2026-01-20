@@ -12,4 +12,6 @@ public class SuggestedMatchViewModel
     public required string? NationalInsuranceNumber { get; init; }
     public required IReadOnlyCollection<string>? PreviousNames { get; init; } = [];
     public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributeTypes { get; init; }
+
+    public bool HasNameMismatch => !(MatchedAttributeTypes.Contains(PersonMatchedAttribute.FirstName) && MatchedAttributeTypes.Contains(PersonMatchedAttribute.LastName));
 }
