@@ -445,7 +445,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var integrationSummary = doc.GetElementByTestId("integration-record");
         Assert.NotNull(integrationSummary);
-        Assert.Equal(integrationSummary.GetSummaryListValueByKey("Date and time"), createdOn1.ToString(UiDefaults.DateTimeDisplayFormat));
+        Assert.Equal(integrationSummary.GetSummaryListValueByKey("Date and time"), createdOn1.ToString(WebConstants.DateTimeDisplayFormat));
         Assert.Equal(integrationSummary.GetSummaryListValueByKey("File name"), fileName1);
         Assert.Equal(integrationSummary.GetSummaryListValueByKey("Interface ID"), id.ToString());
         Assert.Equal(integrationSummary.GetSummaryListValueByKey("Total count"), totalCount1.ToString());

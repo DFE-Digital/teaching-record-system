@@ -122,7 +122,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expectedCreatedBy, createdBy.TrimmedText());
         var createdDate = doc.GetElementByTestId($"{note.NoteId}-note-created-on");
         Assert.NotNull(createdDate);
-        Assert.Equal(note.CreatedOn.ToString($"{UiDefaults.DateOnlyDisplayFormat} 'at' HH:mm"), createdDate.TrimmedText());
+        Assert.Equal(note.CreatedOn.ToString($"{WebConstants.DateOnlyDisplayFormat} 'at' HH:mm"), createdDate.TrimmedText());
         var noteText = doc.GetElementByTestId($"{note.NoteId}-note-text");
         Assert.NotNull(noteText);
         Assert.Equal(expectedNoteText, noteText.TrimmedText());
@@ -155,7 +155,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expectedCreatedBy, createdBy.TrimmedText());
         var createdDate = doc.GetElementByTestId($"{note.NoteId}-note-created-on");
         Assert.NotNull(createdDate);
-        Assert.Equal(note.CreatedOn.ToString($"{UiDefaults.DateOnlyDisplayFormat} 'at' HH:mm"), createdDate.TrimmedText());
+        Assert.Equal(note.CreatedOn.ToString($"{WebConstants.DateOnlyDisplayFormat} 'at' HH:mm"), createdDate.TrimmedText());
         var noteText = doc.GetElementByTestId($"{note.NoteId}-note-text");
         Assert.NotNull(noteText);
         Assert.Equal(expectedNoteText, noteText.TrimmedText());
@@ -221,7 +221,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(expectedCreatedBy2, createdBy.TrimmedText());
                 var createdDate = item1.GetElementByTestId($"{note2.NoteId}-note-created-on");
                 Assert.NotNull(createdDate);
-                Assert.Equal(note2.CreatedOn.ToString($"{UiDefaults.DateOnlyDisplayFormat} 'at' HH:mm"), createdDate.TrimmedText());
+                Assert.Equal(note2.CreatedOn.ToString($"{WebConstants.DateOnlyDisplayFormat} 'at' HH:mm"), createdDate.TrimmedText());
                 var noteText = item1.GetElementByTestId($"{note2.NoteId}-note-text");
                 Assert.NotNull(noteText);
                 Assert.Equal(expectedNoteText2, noteText.TrimmedText());
@@ -236,7 +236,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(expectedCreatedBy1, createdBy.TrimmedText());
                 var createdDate = item2.GetElementByTestId($"{note1.NoteId}-note-created-on");
                 Assert.NotNull(createdDate);
-                Assert.Equal(note1.CreatedOn.ToString($"{UiDefaults.DateOnlyDisplayFormat} 'at' HH:mm"), createdDate.TrimmedText());
+                Assert.Equal(note1.CreatedOn.ToString($"{WebConstants.DateOnlyDisplayFormat} 'at' HH:mm"), createdDate.TrimmedText());
                 var noteText = item2.GetElementByTestId($"{note1.NoteId}-note-text");
                 Assert.NotNull(noteText);
                 Assert.Equal(expectedNoteText1, noteText.TrimmedText());

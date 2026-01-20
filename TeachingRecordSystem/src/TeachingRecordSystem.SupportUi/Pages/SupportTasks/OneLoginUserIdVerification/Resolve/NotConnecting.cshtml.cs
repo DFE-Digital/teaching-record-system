@@ -14,7 +14,7 @@ public class NotConnecting(SupportUiLinkGenerator linkGenerator) : PageModel
             .NotNull().WithMessage("Select a reason"),
         v => v.RuleFor(x => x.AdditionalDetails)
             .NotNull().WithMessage("Enter additional detail")
-            .MaximumLength(UiDefaults.DetailMaxCharacterCount).WithMessage($"Additional detail must be {UiDefaults.DetailMaxCharacterCount} characters or less")
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount).WithMessage($"Additional detail must be {UiDefaults.ReasonDetailsMaxCharacterCount} characters or less")
             .When(x => x.Reason is OneLoginIdVerificationNotConnectingReason.AnotherReason)
     };
 

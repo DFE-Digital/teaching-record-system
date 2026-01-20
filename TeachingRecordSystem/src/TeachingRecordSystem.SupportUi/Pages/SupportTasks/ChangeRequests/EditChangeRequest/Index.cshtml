@@ -53,8 +53,8 @@
                 {
                     <tr class="govuk-table__row" data-testid="date-of-birth">
                         <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="date-of-birth-title">Date of birth</td>
-                        <td class="govuk-table__cell" data-testid="date-of-birth-current">@Model.DateOfBirthChangeRequest!.CurrentDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
-                        <td class="govuk-table__cell" data-testid="date-of-birth-new">@Model.DateOfBirthChangeRequest!.NewDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                        <td class="govuk-table__cell" data-testid="date-of-birth-current">@Model.DateOfBirthChangeRequest!.CurrentDateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</td>
+                        <td class="govuk-table__cell" data-testid="date-of-birth-new">@Model.DateOfBirthChangeRequest!.NewDateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</td>
                     </tr>
                 }
                 <tr class="govuk-table__row" data-testid="email">
@@ -115,7 +115,7 @@
                 <a href="@Model.Evidence!.FileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="view-larger-@Model.Evidence!.FileId">View larger (opens in new tab)</a>
             </div>
         </div>
-    </div>        
+    </div>
 </div>
 
 <div class="govuk-button-group">

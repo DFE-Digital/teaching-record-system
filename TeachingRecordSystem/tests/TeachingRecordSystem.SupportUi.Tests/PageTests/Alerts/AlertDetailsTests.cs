@@ -62,8 +62,8 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         Assert.Equal(alert.AlertType!.Name, h1.TrimmedText());
 
         Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Details"));
-        Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
-        Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("End date"));
+        Assert.Equal(alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
+        Assert.Equal(alert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("End date"));
     }
 
     [Fact]

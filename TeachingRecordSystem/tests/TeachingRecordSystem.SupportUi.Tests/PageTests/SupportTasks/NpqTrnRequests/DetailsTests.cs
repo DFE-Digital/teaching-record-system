@@ -26,9 +26,9 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Assert
         var doc = await response.GetDocumentAsync();
         doc.AssertSummaryListRowValueContentMatches("Name", $"{metadata.FirstName} {metadata.MiddleName} {metadata.LastName}");
-        doc.AssertSummaryListRowValueContentMatches("Date of birth", metadata.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Date of birth", metadata.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat));
         doc.AssertSummaryListRowValueContentMatches("Email address", metadata.EmailAddress);
-        doc.AssertSummaryListRowValueContentMatches("Working in school or educational setting", metadata.NpqWorkingInEducationalSetting.HasValue ? metadata.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : UiDefaults.EmptyDisplayContent);
+        doc.AssertSummaryListRowValueContentMatches("Working in school or educational setting", metadata.NpqWorkingInEducationalSetting.HasValue ? metadata.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : WebConstants.EmptyFallbackContent);
         doc.AssertSummaryListRowValueContentMatches("NPQ application ID", metadata.NpqApplicationId);
         doc.AssertSummaryListRowValueContentMatches("NPQ name", metadata.NpqName);
         doc.AssertSummaryListRowValueContentMatches("NPQ training provider", metadata.NpqTrainingProvider);

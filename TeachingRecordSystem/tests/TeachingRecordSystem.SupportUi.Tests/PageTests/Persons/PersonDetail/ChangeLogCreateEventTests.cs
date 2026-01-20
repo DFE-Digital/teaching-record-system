@@ -83,7 +83,7 @@ public class ChangeLogCreateEventTests : TestBase
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
         doc.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(emailAddress, v.TrimmedText()));
         doc.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(nationalInsuranceNumber, v.TrimmedText()));
         doc.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(gender.GetDisplayName(), v.TrimmedText()));

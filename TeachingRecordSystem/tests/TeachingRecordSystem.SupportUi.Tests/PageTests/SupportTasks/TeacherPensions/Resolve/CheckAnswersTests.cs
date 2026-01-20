@@ -119,7 +119,7 @@ public class CheckAnswers : TestBase
         Assert.NotNull(merge);
         Assert.Contains(person.FirstName, firstName.TextContent);
         Assert.Contains(duplicatePerson1.LastName, lastName.TextContent);
-        Assert.Contains(duplicatePerson1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dob.TextContent);
+        Assert.Contains(duplicatePerson1.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), dob.TextContent);
         Assert.Contains(person.NationalInsuranceNumber!, niNumber.TextContent);
         Assert.Contains(duplicatePerson1!.Trn, trn.TextContent);
         Assert.Contains(evidenceFileName, evidenceFile.TextContent);

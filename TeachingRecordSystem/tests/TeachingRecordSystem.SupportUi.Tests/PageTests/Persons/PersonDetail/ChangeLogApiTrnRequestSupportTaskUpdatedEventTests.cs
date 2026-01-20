@@ -117,8 +117,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 
         if (changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth))
         {
-            item.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {
@@ -128,8 +128,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 
         if (changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress))
         {
-            item.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(oldEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(oldEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
         }
         else
         {
@@ -139,8 +139,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 
         if (changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber))
         {
-            item.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newNino ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
         }
         else
         {
@@ -150,8 +150,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 
         if (changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender))
         {
-            item.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
         }
         else
         {
@@ -164,13 +164,13 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 
         item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(Clock.UtcNow.ToString(UiDefaults.DateTimeDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(Clock.UtcNow.ToString(WebConstants.DateTimeDisplayFormat), v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Previous name", v => Assert.Equal("Jim Smith", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat) ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateOnlyDisplayFormat) ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Email address", v => Assert.Equal(newEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "National Insurance number", v => Assert.Equal(newNino ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
     }
 
     [Fact]

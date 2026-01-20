@@ -64,7 +64,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Assert
                 var doc = await AssertEx.HtmlResponseAsync(response);
                 Assert.Equal($"{firstName} {lastName}", doc.GetSummaryListValueByKey("Name"));
-                Assert.Equal(dateOfBirth.ToString("d MMMM yyyy"), doc.GetSummaryListValueByKey("Date of birth"));
+                Assert.Equal(dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
                 Assert.Equal(trn, doc.GetSummaryListValueByKey("Teacher reference number"));
             });

@@ -134,8 +134,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
 
         if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.DateOfBirth))
         {
-            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {
@@ -145,8 +145,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
 
         if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.EmailAddress))
         {
-            item.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(oldEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(oldEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
         }
         else
         {
@@ -156,8 +156,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
 
         if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber))
         {
-            item.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newNino ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
         }
         else
         {
@@ -167,8 +167,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
 
         if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.Gender))
         {
-            item.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
         }
         else
         {

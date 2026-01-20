@@ -65,7 +65,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserIdVerifica
 
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal($"{requestData.StatedFirstName} {requestData.StatedLastName}", doc.GetSummaryListValueByKey("Name"));
-        Assert.Equal(requestData.StatedDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(requestData.StatedDateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal(requestData.StatedTrn, doc.GetSummaryListValueByKey("TRN"));
         Assert.Equal(requestData.StatedNationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));

@@ -15,7 +15,7 @@ public class EventEvidenceFileLinkViewComponent(
         {
             uploadedEvidenceFile = new UploadedEvidenceFile(file.FileId, file.Name);
 
-            var fileUrl = await fileService.GetFileUrlAsync(file.FileId, UiDefaults.FileUrlExpiry);
+            var fileUrl = await fileService.GetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry);
             uploadedEvidenceFile.PreviewUrl = linkGenerator.Files.File(file.Name, fileUrl);
         }
 

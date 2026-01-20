@@ -8,8 +8,8 @@
     var supportTaskEvent = Model.ItemModel.Event;
     var details = supportTaskEvent.PersonAttributes;
     var oldDetails = supportTaskEvent.OldPersonAttributes;
-    var dob = details.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat);
-    var oldDob = oldDetails.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat);
+    var dob = details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat);
+    var oldDob = oldDetails.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat);
 }
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-dob-request-approved-event">
     <div class="moj-timeline__header">
@@ -32,7 +32,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Date of request</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@supportTaskEvent.CreatedUtc.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@supportTaskEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
 
             </govuk-summary-list>

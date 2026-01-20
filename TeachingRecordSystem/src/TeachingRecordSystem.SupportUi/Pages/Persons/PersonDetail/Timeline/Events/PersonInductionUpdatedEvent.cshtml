@@ -87,7 +87,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@induction.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@induction.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
 
@@ -95,7 +95,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
             </govuk-summary-list>
@@ -162,7 +162,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 
@@ -170,7 +170,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="old-completed-date" use-empty-fallback>@oldInduction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-completed-date" use-empty-fallback>@oldInduction.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 

@@ -54,7 +54,7 @@
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@details.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                     @if (mergedEvent.Changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.EmailAddress))
@@ -120,7 +120,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback>@oldDetails.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldDetails.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                         @if (mergedEvent.Changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.EmailAddress))

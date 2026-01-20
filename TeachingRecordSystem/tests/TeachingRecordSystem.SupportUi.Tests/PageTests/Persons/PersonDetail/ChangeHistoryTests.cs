@@ -49,7 +49,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.Name,
             process.CreatedOn,
             ("Name", $"{person.FirstName} {person.MiddleName} {person.LastName}"),
-            ("Date of birth", person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)),
+            ("Date of birth", person.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)),
             ("Email address", person.EmailAddress),
             ("National Insurance number", person.NationalInsuranceNumber),
             ("Gender", person.Gender?.GetDisplayName()));
@@ -109,12 +109,12 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             process.CreatedOn,
             ("TRN", person.Trn),
             ("Name", $"{person.FirstName} {person.MiddleName} {person.LastName}"),
-            ("Date of birth", person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)),
+            ("Date of birth", person.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)),
             ("Email address", person.EmailAddress),
             ("National Insurance number", person.NationalInsuranceNumber),
             ("Gender", person.Gender?.GetDisplayName()),
-            ("QTS held since", person.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-            ("EYTS held since", person.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+            ("QTS held since", person.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)),
+            ("EYTS held since", person.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)),
             ("Induction status", person.Person.InductionStatus.GetDisplayName()),
             ("DQT induction status", person.Person.InductionStatus.ToDqtInductionStatus(out _)));
     }
@@ -199,14 +199,14 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             [
                 ("TRN", person.Trn),
                 ("Name", $"{person.FirstName} {person.MiddleName} {person.LastName}"),
-                ("Date of birth", person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("Date of birth", person.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)),
                 ("Email address", person.EmailAddress),
                 ("National Insurance number", person.NationalInsuranceNumber),
                 ("Gender", person.Gender?.GetDisplayName()),
-                ("Date of death", person.Person.DateOfDeath?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-                ("QTS held since", person.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-                ("EYTS held since", person.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-                ("QTLS held since", qtlsDate.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("Date of death", person.Person.DateOfDeath?.ToString(WebConstants.DateOnlyDisplayFormat)),
+                ("QTS held since", person.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)),
+                ("EYTS held since", person.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)),
+                ("QTLS held since", qtlsDate.ToString(WebConstants.DateOnlyDisplayFormat)),
                 ("Qualified teacher learning and skills status (QTLS)", qtlsStatus.GetDisplayName()),
                 ("Induction status", person.Person.InductionStatus.GetDisplayName()),
                 ("DQT induction status", person.Person.InductionStatus.ToDqtInductionStatus(out _))
@@ -214,13 +214,13 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             [
                 ("TRN", @event.OldDetails.Trn),
                 ("Name", $"{@event.OldDetails.FirstName} {@event.OldDetails.MiddleName} {@event.OldDetails.LastName}"),
-                ("Date of birth", @event.OldDetails.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("Date of birth", @event.OldDetails.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)),
                 ("Email address", @event.OldDetails.EmailAddress),
                 ("National Insurance number", @event.OldDetails.NationalInsuranceNumber),
                 ("Gender", @event.OldDetails.Gender?.GetDisplayName()),
-                ("Date of death", @event.OldDetails.DateOfDeath?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-                ("QTS held since", @event.OldDetails.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-                ("EYTS held since", @event.OldDetails.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("Date of death", @event.OldDetails.DateOfDeath?.ToString(WebConstants.DateOnlyDisplayFormat)),
+                ("QTS held since", @event.OldDetails.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)),
+                ("EYTS held since", @event.OldDetails.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)),
                 ("QTLS held since", null),
                 ("Qualified teacher learning and skills status (QTLS)", QtlsStatus.None.GetDisplayName()),
                 ("Induction status", @event.OldDetails.InductionStatus.GetDisplayName()),
@@ -440,7 +440,7 @@ file static class Extensions
             }
 
             description.AssertSummaryListHasRows(
-                expectedSummaryListRows.Select(e => e with { Value = e.Value ?? UiDefaults.EmptyDisplayContent }).ToArray());
+                expectedSummaryListRows.Select(e => e with { Value = e.Value ?? WebConstants.EmptyFallbackContent }).ToArray());
         }
 
         if (expectedPreviousDataSummaryListRows.Count > 0)
@@ -453,7 +453,7 @@ file static class Extensions
             }
 
             previousDetails.AssertSummaryListHasRows(
-                expectedPreviousDataSummaryListRows.Select(e => e with { Value = e.Value ?? UiDefaults.EmptyDisplayContent }).ToArray());
+                expectedPreviousDataSummaryListRows.Select(e => e with { Value = e.Value ?? WebConstants.EmptyFallbackContent }).ToArray());
         }
     }
 }

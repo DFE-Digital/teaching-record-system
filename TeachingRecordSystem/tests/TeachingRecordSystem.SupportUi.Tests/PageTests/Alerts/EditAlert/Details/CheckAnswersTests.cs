@@ -95,8 +95,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
         Assert.Equal(journeyInstance.State.Details, doc.GetSummaryListValueByKey("New details"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Previous details"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
-        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Additional information"));
-        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Evidence"));
+        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Evidence"));
     }
 
     [Theory]

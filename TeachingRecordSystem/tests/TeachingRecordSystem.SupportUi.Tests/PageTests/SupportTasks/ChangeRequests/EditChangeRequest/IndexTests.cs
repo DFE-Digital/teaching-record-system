@@ -211,8 +211,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthRow);
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TrimmedText());
-        Assert.Equal(changeDateOfBirthRequestData.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TrimmedText());
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TrimmedText());
+        Assert.Equal(changeDateOfBirthRequestData.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TrimmedText());
 
         var imageDocument = doc.GetElementByTestId($"image-{changeDateOfBirthRequestData.EvidenceFileId}");
         Assert.NotNull(imageDocument);

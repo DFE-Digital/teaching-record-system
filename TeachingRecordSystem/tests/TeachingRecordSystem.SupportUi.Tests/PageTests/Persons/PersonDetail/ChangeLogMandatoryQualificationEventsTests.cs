@@ -49,11 +49,11 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedText());
                 Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText());
-                Assert.Equal(mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                Assert.Equal(mq.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
                 Assert.Equal(mq.Status!.Value.GetTitle(), item.GetElementByTestId("status")?.TrimmedText());
                 if (populateOptional)
                 {
-                    Assert.Equal(mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
+                    Assert.Equal(mq.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
                     Assert.Equal(addReason?.GetDisplayName(), item.GetElementByTestId("reason")?.TrimmedText());
                     Assert.Equal(addReasonDetail, item.GetElementByTestId("reason-detail")?.TrimmedText());
                     Assert.Equal($"{evidenceFile!.Value.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TrimmedText());
@@ -61,9 +61,9 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 else
                 {
                     Assert.Equal("None", item.GetElementByTestId("end-date")?.TrimmedText());
-                    Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason")?.TrimmedText());
-                    Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
-                    Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("evidence")?.TrimmedText());
+                    Assert.Equal(WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason")?.TrimmedText());
+                    Assert.Equal(WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                    Assert.Equal(WebConstants.EmptyFallbackContent, item.GetElementByTestId("evidence")?.TrimmedText());
                 }
             });
     }
@@ -118,9 +118,9 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TrimmedText());
                 Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedText());
                 Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText());
-                Assert.Equal(mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                Assert.Equal(mq.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
                 Assert.Equal(mq.Status!.Value.GetTitle(), item.GetElementByTestId("status")?.TrimmedText());
-                Assert.Equal(mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
+                Assert.Equal(mq.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
             });
     }
 
@@ -245,9 +245,9 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedText());
                 Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText());
-                Assert.Equal(mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                Assert.Equal(mq.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
                 Assert.Equal(mq.Status!.Value.GetTitle(), item.GetElementByTestId("status")?.TrimmedText());
-                Assert.Equal(mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
+                Assert.Equal(mq.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
             });
     }
 
@@ -789,7 +789,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText()));
+            item => Assert.Equal(oldStartDate.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText()));
     }
 
     [Fact]
@@ -903,7 +903,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Equal(oldEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText()));
+            item => Assert.Equal(oldEndDate.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText()));
     }
 
     //public async Task Person_WithMandatoryQualificationUpdatedEventWithoutChangedEndDate_DoesNotRenderEndDateRowWithinPreviousData()

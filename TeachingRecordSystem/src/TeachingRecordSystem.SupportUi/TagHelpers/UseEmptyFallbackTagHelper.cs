@@ -14,7 +14,7 @@ public class UseEmptyFallbackTagHelper : TagHelper
 
         if (content.IsEmptyOrWhiteSpace)
         {
-            output.Content.SetContent(UiDefaults.EmptyDisplayContent);
+            output.Content.SetContent(WebCommon.WebConstants.EmptyFallbackContent);
         }
     }
 }

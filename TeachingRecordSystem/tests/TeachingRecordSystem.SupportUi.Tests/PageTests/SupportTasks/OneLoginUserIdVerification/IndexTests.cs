@@ -56,14 +56,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertRowHasContent(topRow, "taskId", expectedFirstResult.SupportTaskReference);
         AssertRowHasContent(topRow, "name", $"{expectedFirstResult.StatedFirstName} {expectedFirstResult.StatedLastName}");
         AssertRowHasContent(topRow, "email", expectedFirstResult.EmailAddress!);
-        AssertRowHasContent(topRow, "requested-on", expectedFirstResult.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(topRow, "requested-on", expectedFirstResult.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
 
         var nextRow = resultRows[1];
         var expectedNextResult = expectedResults[1];
         AssertRowHasContent(nextRow, "taskId", expectedNextResult.SupportTaskReference);
         AssertRowHasContent(nextRow, "name", $"{expectedNextResult.StatedFirstName} {expectedNextResult.StatedLastName}");
         AssertRowHasContent(nextRow, "email", expectedNextResult.EmailAddress!);
-        AssertRowHasContent(nextRow, "requested-on", expectedNextResult.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(nextRow, "requested-on", expectedNextResult.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
     }
 
     [Theory]
@@ -163,8 +163,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(resultRows);
         AssertRowHasContent(resultRows[0], "taskId", expectedResultsOrdered[0].SupportTaskReference);
         AssertRowHasContent(resultRows[1], "taskId", expectedResultsOrdered[1].SupportTaskReference);
-        AssertRowHasContent(resultRows[0], "requested-on", expectedResultsOrdered[0].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
-        AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent(resultRows[0], "requested-on", expectedResultsOrdered[0].CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
+        AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
         AssertRowHasContent(resultRows[0], "name", $"{expectedResultsOrdered[0].StatedFirstName} {expectedResultsOrdered[0].StatedLastName}");
         AssertRowHasContent(resultRows[1], "name", $"{expectedResultsOrdered[1].StatedFirstName} {expectedResultsOrdered[1].StatedLastName}");
     }

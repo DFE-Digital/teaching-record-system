@@ -35,17 +35,17 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@qts?.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@qts?.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
-            }            
+            }
 
             @if (qts?.EytsDate is not null)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@qts?.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@qts?.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
-            }            
+            }
         </govuk-summary-list>
     </div>
 </div>

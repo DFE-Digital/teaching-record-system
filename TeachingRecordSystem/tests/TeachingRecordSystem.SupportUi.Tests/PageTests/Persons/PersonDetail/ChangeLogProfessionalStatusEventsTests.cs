@@ -57,8 +57,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal("Not provided", timelineItem.GetElementByTestId("award-date")?.TrimmedText());
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal(route.Name, timelineItem.GetElementByTestId("route")?.TrimmedText());
-        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
-        Assert.Equal(endDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
+        Assert.Equal(startDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
+        Assert.Equal(endDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
         Assert.Equal("Not provided", timelineItem.GetElementByTestId("exemption")?.TrimmedText());
         Assert.Equal(trainingProvider.Name, timelineItem.GetElementByTestId("training-provider")?.TrimmedText());
         Assert.Equal(degreeType.Name, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
@@ -97,7 +97,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var timelineItem = doc.GetElementByTestId("timeline-item-route-created-event");
         Assert.NotNull(timelineItem);
-        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+        Assert.Equal(awardDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Null(timelineItem.GetElementByTestId("qts-date"));
         Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
@@ -237,9 +237,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal($"By {updatedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("status"));
-        Assert.Equal(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
-        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
-        Assert.Equal(endDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
+        Assert.Equal(holdsFrom.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
+        Assert.Equal(startDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
+        Assert.Equal(endDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
         Assert.Equal("Yes", timelineItem.GetElementByTestId("exemption")?.TrimmedText());
         Assert.Equal(trainingProvider.Name, timelineItem.GetElementByTestId("training-provider")?.TrimmedText());
         Assert.Equal(degreeType.Name, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
@@ -248,10 +248,10 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal($"{subject.Reference} - {subject.Name}", timelineItem.GetElementByTestId("subjects")?.TrimmedText());
         Assert.Equal(oldSourceApplicationReference, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
 
-        Assert.Equal(oldAwardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-award-date")?.TrimmedText());
+        Assert.Equal(oldAwardDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-award-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("status"));
-        Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-start-date")!.TrimmedText());
-        Assert.Equal(oldEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-end-date")!.TrimmedText());
+        Assert.Equal(oldStartDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-start-date")!.TrimmedText());
+        Assert.Equal(oldEndDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-end-date")!.TrimmedText());
         Assert.Equal("No", timelineItem.GetElementByTestId("old-exemption")?.TrimmedText());
         Assert.Equal(oldTrainingProvider.Name, timelineItem.GetElementByTestId("old-training-provider")?.TrimmedText());
         Assert.Equal(oldDegreeType.Name, timelineItem.GetElementByTestId("old-degree-type")?.TrimmedText());
@@ -331,7 +331,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal($"By {updatedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
-        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+        Assert.Equal(awardDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
         Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
@@ -346,7 +346,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Null(timelineItem.GetElementByTestId("subjects"));
 
         Assert.Equal(oldStatus.GetDisplayName(), timelineItem.GetElementByTestId("old-status")?.TrimmedText());
-        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
+        Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("old-start-date"));
         Assert.Null(timelineItem.GetElementByTestId("old-end-date"));
         Assert.Null(timelineItem.GetElementByTestId("old-exemption"));
@@ -483,13 +483,13 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+        Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
-        Assert.Equal(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
+        Assert.Equal(holdsFrom.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal(route.Name, timelineItem.GetElementByTestId("route")?.TrimmedText());
-        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
-        Assert.Equal(endDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
+        Assert.Equal(startDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
+        Assert.Equal(endDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
         Assert.Equal("Yes", timelineItem.GetElementByTestId("exemption")?.TrimmedText());
         Assert.Equal(trainingProvider.Name, timelineItem.GetElementByTestId("training-provider")?.TrimmedText());
         Assert.Equal(degreeType.Name, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
@@ -534,8 +534,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
         Assert.NotNull(timelineItem);
-        Assert.Equal(professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
-        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+        Assert.Equal(professionalStatus.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
+        Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
     }
 
     [Fact]
@@ -573,8 +573,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
         Assert.NotNull(timelineItem);
-        Assert.Equal(professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
-        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+        Assert.Equal(professionalStatus.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
+        Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
     }
 
     [Fact]
@@ -612,8 +612,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
         Assert.NotNull(timelineItem);
-        Assert.Equal(professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-pqts-date")?.TrimmedText());
-        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("pqts-date")?.TrimmedText());
+        Assert.Equal(professionalStatus.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-pqts-date")?.TrimmedText());
+        Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("pqts-date")?.TrimmedText());
     }
 
     [Fact]
@@ -816,43 +816,43 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var timelineItem = doc.GetElementByTestId("timeline-item-route-migrated-event");
         Assert.NotNull(timelineItem);
         Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(populateOptional ? awardDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("award-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? awardDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("award-date")?.TrimmedText());
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal(route.Name, timelineItem.GetElementByTestId("route")?.TrimmedText());
-        Assert.Equal(populateOptional ? startDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("start-date")!.TrimmedText());
-        Assert.Equal(populateOptional ? endDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("end-date")!.TrimmedText());
-        Assert.Equal(populateOptional ? "Yes" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("exemption")?.TrimmedText());
-        Assert.Equal(populateOptional ? trainingProvider.Name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("training-provider")?.TrimmedText());
-        Assert.Equal(populateOptional ? degreeType.Name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
-        Assert.Equal(populateOptional ? country.Name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("country")?.TrimmedText());
-        Assert.Equal(populateOptional ? $"From {ageRangeFrom} to {ageRangeTo}" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("age-range")?.TrimmedText());
-        Assert.Equal(populateOptional ? $"{subjects.Single().Reference} - {subjects.Single().Name}" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("subjects")?.TrimmedText());
-        Assert.Equal(populateOptional ? sourceApplicationReference : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtQtsRegistration!.QtsRegistrationId.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-registration-id")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtQtsRegistration!.TeacherStatusName : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("teacher-status-name")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtQtsRegistration!.TeacherStatusValue : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("teacher-status-value")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtQtsRegistration!.EarlyYearsStatusName : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("early-years-status-name")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtQtsRegistration!.EarlyYearsStatusValue : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("early-years-status-value")?.TrimmedText());
-        Assert.Equal(populateOptional ? qtsDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
-        Assert.Equal(populateOptional ? eytsDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
-        Assert.Equal(populateOptional ? pqtsDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("pqts-date")?.TrimmedText());
-        Assert.Equal(populateOptional ? qtlsDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qtls-date")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtInitialTeacherTraining!.InitialTeacherTrainingId.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("itt-id")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtInitialTeacherTraining?.SlugId : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("slug-id")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtInitialTeacherTraining?.ProgrammeType : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("programme-type")?.TrimmedText());
-        Assert.Equal(populateOptional ? startDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("programme-start-date")?.TrimmedText());
-        Assert.Equal(populateOptional ? endDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("programme-end-date")?.TrimmedText());
-        Assert.Equal(populateOptional ? ittResult.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("itt-result")?.TrimmedText());
-        Assert.Equal(populateOptional ? ittQualification.dfeta_name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qualification-name")?.TrimmedText());
-        Assert.Equal(populateOptional ? ittQualification.dfeta_Value : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qualification-value")?.TrimmedText());
-        Assert.Equal(populateOptional ? ittProvider!.Id.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("provider-id")?.TrimmedText());
-        Assert.Equal(populateOptional ? ittProvider!.Name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("provider-name")?.TrimmedText());
-        Assert.Equal(populateOptional ? ittProvider!.dfeta_UKPRN : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("provider-ukprn")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtCountry!.dfeta_name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("country-name")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtCountry!.dfeta_Value : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("country-value")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtAgeRangeFrom.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-age-range-from")?.TrimmedText());
-        Assert.Equal(populateOptional ? dqtAgeRangeTo.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-age-range-to")?.TrimmedText());
-        Assert.Equal(populateOptional ? $"{ittSubject1!.dfeta_Value} - {ittSubject1!.dfeta_name}{ittSubject2!.dfeta_Value} - {ittSubject2!.dfeta_name}{ittSubject3!.dfeta_Value} - {ittSubject3!.dfeta_name}" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-subjects")?.TrimmedText());
+        Assert.Equal(populateOptional ? startDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("start-date")!.TrimmedText());
+        Assert.Equal(populateOptional ? endDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("end-date")!.TrimmedText());
+        Assert.Equal(populateOptional ? "Yes" : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("exemption")?.TrimmedText());
+        Assert.Equal(populateOptional ? trainingProvider.Name : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("training-provider")?.TrimmedText());
+        Assert.Equal(populateOptional ? degreeType.Name : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
+        Assert.Equal(populateOptional ? country.Name : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("country")?.TrimmedText());
+        Assert.Equal(populateOptional ? $"From {ageRangeFrom} to {ageRangeTo}" : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("age-range")?.TrimmedText());
+        Assert.Equal(populateOptional ? $"{subjects.Single().Reference} - {subjects.Single().Name}" : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("subjects")?.TrimmedText());
+        Assert.Equal(populateOptional ? sourceApplicationReference : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.QtsRegistrationId.ToString() : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qts-registration-id")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.TeacherStatusName : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("teacher-status-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.TeacherStatusValue : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("teacher-status-value")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.EarlyYearsStatusName : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("early-years-status-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.EarlyYearsStatusValue : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("early-years-status-value")?.TrimmedText());
+        Assert.Equal(populateOptional ? qtsDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? eytsDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? pqtsDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("pqts-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? qtlsDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qtls-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtInitialTeacherTraining!.InitialTeacherTrainingId.ToString() : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("itt-id")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtInitialTeacherTraining?.SlugId : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("slug-id")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtInitialTeacherTraining?.ProgrammeType : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("programme-type")?.TrimmedText());
+        Assert.Equal(populateOptional ? startDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("programme-start-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? endDate.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("programme-end-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittResult.ToString() : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("itt-result")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittQualification.dfeta_name : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qualification-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittQualification.dfeta_Value : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qualification-value")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittProvider!.Id.ToString() : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("provider-id")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittProvider!.Name : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("provider-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittProvider!.dfeta_UKPRN : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("provider-ukprn")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtCountry!.dfeta_name : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("country-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtCountry!.dfeta_Value : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("country-value")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtAgeRangeFrom.ToString() : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("dqt-age-range-from")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtAgeRangeTo.ToString() : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("dqt-age-range-to")?.TrimmedText());
+        Assert.Equal(populateOptional ? $"{ittSubject1!.dfeta_Value} - {ittSubject1!.dfeta_name}{ittSubject2!.dfeta_Value} - {ittSubject2!.dfeta_name}{ittSubject3!.dfeta_Value} - {ittSubject3!.dfeta_name}" : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("dqt-subjects")?.TrimmedText());
     }
 
     [Fact]
@@ -1009,7 +1009,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         if (changes == DqtQtsRegistrationUpdatedEventChanges.QtsDate)
         {
-            Assert.Equal(qtsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+            Assert.Equal(qtsDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         }
         else
         {
@@ -1018,7 +1018,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         if (changes == DqtQtsRegistrationUpdatedEventChanges.EytsDate)
         {
-            Assert.Equal(eytsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+            Assert.Equal(eytsDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
         }
         else
         {
@@ -1109,8 +1109,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         if (changes == DqtQtsRegistrationUpdatedEventChanges.QtsDate)
         {
-            Assert.Equal(qtsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
-            Assert.Equal(oldQtsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
+            Assert.Equal(qtsDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+            Assert.Equal(oldQtsDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
         }
         else
         {
@@ -1120,8 +1120,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         if (changes == DqtQtsRegistrationUpdatedEventChanges.EytsDate)
         {
-            Assert.Equal(eytsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
-            Assert.Equal(oldEytsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
+            Assert.Equal(eytsDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+            Assert.Equal(oldEytsDate.ToString(WebConstants.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
         }
         else
         {

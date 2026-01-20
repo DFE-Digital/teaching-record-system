@@ -72,8 +72,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
-        Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("current-start-date")!.TrimmedText());
-        Assert.Equal(newStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("new-start-date")!.TrimmedText());
+        Assert.Equal(oldStartDate.ToString(WebConstants.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("current-start-date")!.TrimmedText());
+        Assert.Equal(newStartDate.ToString(WebConstants.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("new-start-date")!.TrimmedText());
         var changeReasonSummary = doc.GetElementByTestId("change-reason-summary");
         Assert.NotNull(changeReasonSummary);
         Assert.Equal(changeReason.GetDisplayName(), changeReasonSummary.GetElementByTestId("change-reason")!.TrimmedText());

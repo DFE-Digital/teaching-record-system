@@ -84,7 +84,7 @@ public class IndexModel(IFileService fileService, SupportUiLinkGenerator linkGen
         {
             FileId = data.EvidenceFileId,
             FileName = data.EvidenceFileName,
-            FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, UiDefaults.FileUrlExpiry),
+            FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry),
             MimeType = evidenceFileMimeType
         };
 

@@ -83,12 +83,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(alert.AlertType!.Name, doc.GetSummaryListValueByKey("Alert type"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Details"));
-        Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Link"));
-        Assert.Equal(alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
-        Assert.Equal(isOpenAlert ? UiDefaults.EmptyDisplayContent : alert.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("End date"));
+        Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Link"));
+        Assert.Equal(alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
+        Assert.Equal(isOpenAlert ? WebConstants.EmptyFallbackContent : alert.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("End date"));
         Assert.Equal(journeyInstance.State.DeleteReason?.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
-        Assert.Equal(populateOptional ? journeyInstance.State.DeleteReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Additional information"));
-        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Evidence"));
+        Assert.Equal(populateOptional ? journeyInstance.State.DeleteReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Evidence"));
     }
 
     [Theory]

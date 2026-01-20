@@ -32,7 +32,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@dateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (importedEvent.Details.EmailAddress is string emailAddress)
@@ -60,21 +60,21 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Date of death</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@dateOfDeath.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@dateOfDeath.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (importedEvent.Details.QtsDate is DateOnly qtsDate)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>QTS held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@qtsDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@qtsDate.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (importedEvent.Details.EytsDate is DateOnly eytsDate)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>EYTS held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@eytsDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@eytsDate.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (importedEvent.Details.InductionStatus is InductionStatus inductionStatus)
