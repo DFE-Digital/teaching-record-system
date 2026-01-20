@@ -5,47 +5,30 @@ namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 public class GetPersonHelper(TrsDbContext dbContext)
 {
-    public async Task<OneOf<ApiError, PostgresModels.Person>> GetPersonByTrnAsync(
-        string trn,
-        Func<IQueryable<PostgresModels.Person>, IQueryable<PostgresModels.Person>>? configureQuery = null)
+    public async Task<OneOf<ApiError, (Guid PersonId, string Trn)>> GetPersonByTrnAsync(string trn)
     {
-        var query = dbContext.Persons
-            .FromSql(
-                $"""
-                 with recursive active_persons(person_id) as (
-                     select person_id from persons where trn = {trn}
-                     union all
-                     select persons.merged_with_person_id from persons, active_persons
-                     where persons.person_id = active_persons.person_id
-                 )
-                 select p.* from persons p
-                 join active_persons a on p.person_id = a.person_id
-                 where p.merged_with_person_id is null
-                 """)
-            .IgnoreQueryFilters();
+        var result = await dbContext.Database
+            .SqlQuery<Result>($"select * from fn_resolve_record_by_trn({trn})")
+            .SingleOrDefaultAsync();
 
-        if (configureQuery is not null)
-        {
-            query = configureQuery(query);
-        }
-
-        var person = await query.SingleOrDefaultAsync();
-
-        if (person is null)
+        if (result is null)
         {
             return ApiError.PersonNotFound(trn);
         }
 
-        if (person.Status is PersonStatus.Deactivated)
+        if (result.Status is PersonStatus.Deactivated)
         {
             return ApiError.RecordIsDeactivated(trn);
         }
 
-        if (person.Trn != trn)
+        if (result.Trn != trn)
         {
-            return ApiError.RecordIsMerged(trn, person.Trn);
+            return ApiError.RecordIsMerged(trn, result.Trn);
         }
 
-        return person;
+        return (result.PersonId, result.Trn);
     }
+
+    [UsedImplicitly]
+    private record Result(Guid PersonId, string Trn, PersonStatus Status);
 }

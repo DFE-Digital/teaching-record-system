@@ -18,8 +18,10 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
         Summary = "Get person details by TRN",
         Description = "Gets the details of the person corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status308PermanentRedirect)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = $"{ApiRoles.GetPerson},{ApiRoles.AppropriateBody}")]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
