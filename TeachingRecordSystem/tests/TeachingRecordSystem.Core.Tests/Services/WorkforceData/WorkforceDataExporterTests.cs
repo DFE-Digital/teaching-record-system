@@ -10,18 +10,6 @@ namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 [Collection(nameof(WorkforceDataTestCollection))]
 public class WorkforceDataExporterTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
-    public WorkforceDataExporterTests(ServiceFixture fixture) : ServiceTestBase(fixture) { } public void OldConstructor(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache)
-    {
-        // Removed
-        // Clock is inherited
-
-        // TestData is inherited from ServiceTestBase // new TestData(
-            dbFixture.DbContextFactory,
-            referenceDataCache,
-            Clock);
-    }
 
     [Fact]
     public async Task Export_WhenCalled_ExportsDataToParquetFileAndUploadsToGcs()
@@ -89,13 +77,4 @@ public class WorkforceDataExporterTests(ServiceFixture fixture) : ServiceTestBas
         Assert.Equal(personEmployment.UpdatedOn, (DateTime)exportItem[nameof(WorkforceDataExportItem.UpdatedOn)]);
     }
 
-    // Removed InitializeAsync
-
-    // Removed DisposeAsync
-
-    // DbFixture removed
-
-    // TestData inherited from ServiceTestBase
-
-    // Clock inherited from ServiceTestBase
 }

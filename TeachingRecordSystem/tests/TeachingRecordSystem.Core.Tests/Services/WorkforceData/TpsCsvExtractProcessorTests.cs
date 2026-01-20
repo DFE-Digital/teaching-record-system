@@ -6,18 +6,6 @@ namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 [Collection(nameof(WorkforceDataTestCollection))]
 public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
-    public TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBase(fixture) { } public void OldConstructor(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache)
-    {
-        // Removed
-        // Clock is inherited
-
-        // TestData is inherited from ServiceTestBase // new TestData(
-            dbFixture.DbContextFactory,
-            referenceDataCache,
-            Clock);
-    }
 
     [Fact]
     public async Task ProcessNonMatchingTrns_WhenCalledWithTrnsNotMatchingPersonsInTrs_SetsResultToInvalidTrn()
@@ -505,13 +493,4 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         Assert.Equal(employerEmailAddress, updatedTpsEmployment.EmployerEmailAddress);
     }
 
-    // Removed InitializeAsync
-
-    // Removed DisposeAsync
-
-    // DbFixture removed
-
-    // TestData inherited from ServiceTestBase
-
-    // Clock inherited from ServiceTestBase
 }
