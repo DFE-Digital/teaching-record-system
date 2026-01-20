@@ -39,9 +39,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
 
         return
         [
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = null,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -64,9 +64,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid TRN
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = invalidFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -89,9 +89,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null National Insurance Number
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = null,
@@ -114,9 +114,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid National Insurance Number
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = invalidFormatNationalInsuranceNumber,
@@ -139,9 +139,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Date of Birth
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -164,9 +164,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Date of Birth
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -189,9 +189,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Date of Death
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -214,9 +214,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Date of Death
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -239,9 +239,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Local Authority Code
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -264,9 +264,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Local Authority Code
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -289,9 +289,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Establishment Number
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -314,9 +314,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Establishment Number
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -339,9 +339,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Employment Start Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -364,9 +364,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Employment Start Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -389,9 +389,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Employment End Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -414,9 +414,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Employment End Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -439,9 +439,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Full or Part Time Indicator
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -464,9 +464,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Full or Part Time Indicator
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -489,9 +489,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Withdrawl Indicator
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -514,9 +514,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Withdrawl Indicator
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -539,9 +539,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Extract Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -564,9 +564,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Extract Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -589,9 +589,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Null Gender
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -614,9 +614,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Gender
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -639,9 +639,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Member Email Address
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -664,9 +664,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Whitespace in Member Email Address
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -689,9 +689,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Invalid Establishment Email Address
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
@@ -714,9 +714,9 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             },
             // Whitespace in Establishment Email Address
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData
             {
-                Row = new()
+                Row = new TpsCsvExtractRowRaw
                 {
                     Trn = validFormatTrn,
                     NationalInsuranceNumber = validFormatNationalInsuranceNumber,
