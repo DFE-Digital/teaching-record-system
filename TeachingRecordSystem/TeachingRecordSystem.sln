@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Dockerfile = Dockerfile
 		nuget.config = nuget.config
 		global.json = global.json
+		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.TestCommon", "tests\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj", "{DFE6654C-3222-4B20-A871-79581928D3B2}"

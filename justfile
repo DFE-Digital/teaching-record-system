@@ -1,14 +1,6 @@
-set windows-shell := ["powershell.exe", "-nop", "-c"]
-
 export DOTNET_WATCH_SUPPRESS_MSBUILD_INCREMENTALISM := 'true'
 export DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER := 'true'
 export DOTNET_WATCH_RESTART_ON_RUDE_EDIT := 'true'
-
-shebang := if os() == 'windows' {
-  'dotnet pwsh -nop'
-} else {
-  '/usr/bin/env dotnet pwsh -nop'
-}
 
 set working-directory := 'TeachingRecordSystem'
 
@@ -49,29 +41,9 @@ format:
   @terraform fmt ../terraform/aks
 
 # Format any un-committed .tf or .cs files
+[working-directory: '../scripts']
 format-changed:
-  #!{{shebang}}
-
-  function Get-ChangedFiles {
-    param (
-      $Path
-    )
-
-    (git status --porcelain $Path) | foreach { $_.substring(3) } | Where-Object { Test-Path $_ }
-  }
-
-  cd ../
-
-  $changedTfFiles = Get-ChangedFiles "terraform/*.tf"
-  foreach ($tf in $changedTfFiles) {
-    terraform fmt $tf
-  }
-
-  $changedCsFiles = (Get-ChangedFiles "TeachingRecordSystem/**/*.cs") | foreach { $_ -Replace "^TeachingRecordSystem/", "" }
-  if ($changedCsFiles.Length -gt 0) {
-    $dotnetArgs = @("format", "--no-restore", "--include") + $changedCsFiles
-    cd TeachingRecordSystem && dotnet $dotnetArgs
-  }
+  @dotnet run FormatChanged.cs
 
 # Run the EF Core Command-line Tools for the Core project
 [working-directory: 'src/TeachingRecordSystem.Core']
@@ -138,5 +110,6 @@ _deploy branch environment:
   @gh workflow run deploy.yml --ref {{branch}} -f environment={{environment}}
 
 # Removes the cached DB schema version file for tests
+[working-directory: '../scripts']
 remove-tests-schema-cache:
-  @dotnet pwsh -nop -file ../scripts/Remove-TestsSchemaCache.ps1
+  @dotnet run RemoveTestsSchemaCache.cs
