@@ -1,40 +1,31 @@
-#:package CliWrap@3.10.0
+await using var stdOut = Console.OpenStandardOutput();
+await using var stdErr = Console.OpenStandardError();
 
-using CliWrap;
-using CliWrap.Buffered;
+var changedFiles = Utils.GetChangedFiles();
 
-async Task<IReadOnlyCollection<string>> GetChangedFilesAsync(string path)
-{
-    var result = await Cli.Wrap("git")
-        .WithArguments(["status", "--porcelain", path])
-        .ExecuteBufferedAsync();
+var changedTfFiles = changedFiles.Where(path => path.StartsWith("terraform/") && path.EndsWith(".tf"));
 
-    return result.StandardOutput
-        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-        .Select(line => line.Substring(3))
-        .Where(File.Exists)
-        .ToList();
-}
-
-var changedTfFiles = await GetChangedFilesAsync("terraform/*.tf");
 foreach (var tf in changedTfFiles)
 {
-    await Cli.Wrap("terraform")
-        .WithArguments(["fmt", tf])
+    await (Cli.Wrap("terraform")
+            .WithArguments(["fmt", tf])
+        | (stdOut, stdErr))
         .ExecuteAsync();
 }
 
-var changedCsFiles = await GetChangedFilesAsync("TeachingRecordSystem/**/*.cs");
-changedCsFiles = changedCsFiles
+var changedCsFiles = changedFiles
+    .Where(path => path.StartsWith("TeachingRecordSystem/") && path.EndsWith(".cs"))
     .Select(f => f.Replace("TeachingRecordSystem/", ""))
     .ToList();
+
 if (changedCsFiles.Count > 0)
 {
     var dotnetArgs = new List<string> { "format", "--no-restore", "--include" };
     dotnetArgs.AddRange(changedCsFiles);
 
-    await Cli.Wrap("dotnet")
-        .WithArguments(dotnetArgs)
-        .WithWorkingDirectory("TeachingRecordSystem")
+    await (Cli.Wrap("dotnet")
+            .WithArguments(dotnetArgs)
+            .WithWorkingDirectory("TeachingRecordSystem")
+        | (stdOut, stdErr))
         .ExecuteAsync();
 }

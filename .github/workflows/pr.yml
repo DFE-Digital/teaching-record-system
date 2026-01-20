@@ -98,8 +98,7 @@ jobs:
           TARGET_BRANCH=main
           git fetch origin $TARGET_BRANCH --quiet
 
-          echo "project_short_names=$(dotnet run ../scripts/GetTestProjectsToRun.cs -- $TARGET_BRANCH | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
-        working-directory: TeachingRecordSystem
+          echo "project_short_names=$(dotnet run scripts/GetTestProjectsToRun.cs -- origin/$TARGET_BRANCH | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
 
   tests:
     name: Tests
