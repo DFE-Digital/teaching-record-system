@@ -192,6 +192,11 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
             }
         }
 
+        var personQuery = dbContext.Persons
+            .Where(p => p.Trn == command.Trn)
+            .Include(p => p.Qualifications).AsSplitQuery()
+            .Include(p => p.PreviousNames).AsSplitQuery();
+
         async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
             var openTaskTypes = await dbContext.SupportTasks
@@ -210,14 +215,22 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
             (await GetPendingDetailChangesAsync()) :
             null;
 
-        var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn, query => query
-            .Include(p => p.Qualifications).AsSplitQuery()
-            .Include(p => p.PreviousNames).AsSplitQuery()
-            .Include(p => p.Alerts).AsSplitQuery());
-
-        if (getPersonResult.TryPickT0(out var error, out var person))
+        if (command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts))
         {
-            return error;
+            personQuery = personQuery.Include(p => p.Alerts).AsSplitQuery();
+        }
+
+        var person = await personQuery.SingleOrDefaultAsync();
+
+        if (person is null)
+        {
+            var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn);
+            if (getPersonResult.TryPickT0(out var error, out var resolvedPerson))
+            {
+                return error;
+            }
+
+            return await ExecuteAsync(command with { Trn = resolvedPerson.Trn });
         }
 
         // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches
