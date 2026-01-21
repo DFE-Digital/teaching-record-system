@@ -7,11 +7,12 @@ public record OneLoginIdVerificationSupportTasksSearchResult
 }
 
 public record OneLoginIdVerificationSupportTasksSearchResultItem(
-        string SupportTaskReference,
-        string FirstName,
-        string LastName,
-        string? EmailAddress,
-        DateTime CreatedOn) : ISupportTaskSearchResult
+    string SupportTaskReference,
+    SupportTaskStatus Status,
+    string FirstName,
+    string LastName,
+    string? EmailAddress,
+    DateTime CreatedOn) : ISupportTaskSearchResult
 {
     public string Name => $"{FirstName} {LastName}";
 }

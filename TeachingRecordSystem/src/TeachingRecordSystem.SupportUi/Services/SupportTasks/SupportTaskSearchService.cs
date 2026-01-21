@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -347,6 +346,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var results = tasks
             .Select(r => new OneLoginIdVerificationSupportTasksSearchResultItem(
                 r.SupportTaskReference,
+                r.Status,
                 (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName,
                 (r.Data as OneLoginUserIdVerificationData)!.StatedLastName,
                 r.OneLoginUser!.EmailAddress,
@@ -362,10 +362,10 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             results = results.Where(t =>
                 t.EmailAddress != null && string.Equals(t.EmailAddress, email, StringComparison.OrdinalIgnoreCase));
         }
-        else if (SearchTextIsReferenceId(search, out var referenceId))
+        else if (SearchTextIsSupportTaskReference(search))
         {
             results = results.Where(t =>
-                string.Equals(t.SupportTaskReference, referenceId, StringComparison.OrdinalIgnoreCase));
+                string.Equals(t.SupportTaskReference, search, StringComparison.OrdinalIgnoreCase));
         }
         else if (SearchTextIsName(search, out var nameParts))
         {
@@ -375,7 +375,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         var totalFilteredTaskCount = results.Count();
 
-        var orderedResults = (searchOptions.SortBy switch
+        var searchResults = (sortBy switch
         {
             OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => results.OrderBy(r => r.SupportTaskReference, sortDirection),
             OneLoginIdVerificationSupportTasksSortByOption.Name => results
@@ -389,15 +389,12 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         return new()
         {
             TotalTaskCount = taskCount,
-            SearchResults = orderedResults
+            SearchResults = searchResults
         };
     }
 
-    private bool SearchTextIsReferenceId(string searchText, [NotNullWhen(true)] out string? referenceId)
-    {
-        referenceId = searchText.Contains("TRS-", StringComparison.OrdinalIgnoreCase) ? searchText : null;
-        return referenceId is not null;
-    }
+    private bool SearchTextIsSupportTaskReference(string searchText) =>
+        searchText.StartsWith("TRS-", StringComparison.OrdinalIgnoreCase);
 
     private bool SearchTextIsDate(string searchText, out DateTime minDate, out DateTime maxDate)
     {

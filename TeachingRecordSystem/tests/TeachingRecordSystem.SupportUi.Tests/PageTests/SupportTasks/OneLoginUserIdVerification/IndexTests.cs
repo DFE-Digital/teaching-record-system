@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
@@ -32,8 +33,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 (task, user) => new
                 {
                     task.SupportTaskReference,
-                    ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
-                    ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
+                    ((OneLoginUserIdVerificationData)task.Data).StatedFirstName,
+                    ((OneLoginUserIdVerificationData)task.Data).StatedLastName,
                     task.CreatedOn,
                     user.EmailAddress
                 })
@@ -53,15 +54,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(resultRows);
         var topRow = resultRows[0];
         var expectedFirstResult = expectedResults[2];
-        AssertRowHasContent(topRow, "taskId", expectedFirstResult.SupportTaskReference);
-        AssertRowHasContent(topRow, "name", $"{expectedFirstResult.StatedFirstName} {expectedFirstResult.StatedLastName}");
+        AssertRowHasContent(topRow, "task-name-and-id", expectedFirstResult.SupportTaskReference);
         AssertRowHasContent(topRow, "email", expectedFirstResult.EmailAddress!);
         AssertRowHasContent(topRow, "requested-on", expectedFirstResult.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
 
         var nextRow = resultRows[1];
         var expectedNextResult = expectedResults[1];
-        AssertRowHasContent(nextRow, "taskId", expectedNextResult.SupportTaskReference);
-        AssertRowHasContent(nextRow, "name", $"{expectedNextResult.StatedFirstName} {expectedNextResult.StatedLastName}");
+        AssertRowHasContent(nextRow, "task-name-and-id", expectedNextResult.SupportTaskReference);
         AssertRowHasContent(nextRow, "email", expectedNextResult.EmailAddress!);
         AssertRowHasContent(nextRow, "requested-on", expectedNextResult.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
     }
@@ -92,11 +91,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .QuerySelectorAll("tbody > tr");
 
         Assert.NotNull(resultRows);
-        var topRow = resultRows[0];
         var expectedFirstResult = expectedResultsOrderedByReference[sortDirection == SortDirection.Ascending ? 0 : 1];
         var expectedNextResult = expectedResultsOrderedByReference[sortDirection == SortDirection.Ascending ? 1 : 0];
-        AssertRowHasContent(resultRows[0], "taskId", expectedFirstResult.SupportTaskReference);
-        AssertRowHasContent(resultRows[1], "taskId", expectedNextResult.SupportTaskReference);
+        AssertRowHasContent(resultRows[0], "task-name-and-id", expectedFirstResult.SupportTaskReference);
+        AssertRowHasContent(resultRows[1], "task-name-and-id", expectedNextResult.SupportTaskReference);
     }
 
     [Theory]
@@ -126,8 +124,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 (task, user) => new
                 {
                     task.SupportTaskReference,
-                    ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
-                    ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
+                    ((OneLoginUserIdVerificationData)task.Data).StatedFirstName,
+                    ((OneLoginUserIdVerificationData)task.Data).StatedLastName,
+                    task.Status,
                     task.CreatedOn,
                     user.EmailAddress
                 });
@@ -161,12 +160,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .QuerySelectorAll("tbody > tr");
 
         Assert.NotNull(resultRows);
-        AssertRowHasContent(resultRows[0], "taskId", expectedResultsOrdered[0].SupportTaskReference);
-        AssertRowHasContent(resultRows[1], "taskId", expectedResultsOrdered[1].SupportTaskReference);
+        AssertRowHasContent(resultRows[0], "task-name-and-id", $"{expectedResultsOrdered[0].StatedFirstName} {expectedResultsOrdered[0].StatedLastName} {expectedResultsOrdered[0].SupportTaskReference}");
+        AssertRowHasContent(resultRows[1], "task-name-and-id", $"{expectedResultsOrdered[1].StatedFirstName} {expectedResultsOrdered[1].StatedLastName} {expectedResultsOrdered[1].SupportTaskReference}");
+        AssertRowHasContent(resultRows[0], "status", expectedResultsOrdered[0].Status.GetDisplayName()!);
+        AssertRowHasContent(resultRows[1], "status", expectedResultsOrdered[1].Status.GetDisplayName()!);
         AssertRowHasContent(resultRows[0], "requested-on", expectedResultsOrdered[0].CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
         AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
-        AssertRowHasContent(resultRows[0], "name", $"{expectedResultsOrdered[0].StatedFirstName} {expectedResultsOrdered[0].StatedLastName}");
-        AssertRowHasContent(resultRows[1], "name", $"{expectedResultsOrdered[1].StatedFirstName} {expectedResultsOrdered[1].StatedLastName}");
     }
 
     [Theory]
@@ -243,7 +242,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .QuerySelectorAll("tbody > tr");
 
         Assert.NotNull(resultRows);
-        var nameLink = resultRows[0].GetElementByTestId("taskId")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
+        var nameLink = resultRows[0].GetElementByTestId("task-name-and-id")!.GetElementsByTagName("a").FirstOrDefault() as IHtmlAnchorElement;
         Assert.Contains($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve", nameLink!.Href);
     }
 
@@ -277,7 +276,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expected, doc.GetElementByTestId("results")!
             .QuerySelectorAll("tbody > tr")
-            .Select(row => row.GetElementByTestId("name")!.TrimmedText())
+            .Select(row => row.GetElementByTestId("task-name-and-id")?.GetElementsByTagName("a").FirstOrDefault()?.TrimmedText())
             .ToArray());
     }
 
@@ -305,7 +304,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal([supportTasksList[0].SupportTaskReference], doc.GetElementByTestId("results")!
             .QuerySelectorAll("tbody > tr")
-            .Select(row => row.GetElementByTestId("taskId")!.TrimmedText())
+            .Select(row => row.GetElementByTestId("task-id")!.TrimmedText())
             .ToArray());
     }
 
@@ -355,6 +354,15 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var column = row.GetElementByTestId(testId);
         Assert.NotNull(column);
-        Assert.Equal(expectedText, column.TrimmedText());
+        Assert.Contains(expectedText, column.GetTextContentWithNormalizedWhitespace());
+    }
+}
+
+file static class Extensions
+{
+    public static string GetTextContentWithNormalizedWhitespace(this IElement element)
+    {
+        var textContent = element.TextContent;
+        return Regex.Replace(textContent, @"\s+", " ").Trim();
     }
 }

@@ -57,19 +57,17 @@
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                                sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference, direction))">
-                                Task ID
-                            </th>
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                                 sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.Name ? Model.SortDirection : null)"
                                 link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.Name, direction))">
-                                Name
+                                Name and task ID
                             </th>
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                                 sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
                                 link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserIdVerification.Index(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, direction))">
                                 Requested on
+                            </th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
+                                Status
                             </th>
                             <th scope="col" class="govuk-table__header"
                                 sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.Email ? Model.SortDirection : null)"
@@ -82,13 +80,19 @@
                         @foreach (var result in Model.Results!)
                         {
                             <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                                <th scope="row" class="govuk-table__header" data-testid="taskId">
+                                <td class="govuk-table__cell" data-testid="task-name-and-id">
                                     <a href="@LinkGenerator.SupportTasks.OneLoginUserIdVerification.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
-                                        @result.SupportTaskReference
+                                        @result.Name
                                     </a>
-                                </th>
-                                <td class="govuk-table__cell" data-testid="name">@result.Name</td>
+                                    <br />
+                                    <span data-testid="task-id">
+                                        @result.SupportTaskReference
+                                    </span>
+                                </td>
                                 <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat)</td>
+                                <td class="govuk-table__cell" data-testid="status">
+                                    <support-task-status-tag status="@result.Status"/>
+                                </td>
                                 <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
                             </tr>
                         }
