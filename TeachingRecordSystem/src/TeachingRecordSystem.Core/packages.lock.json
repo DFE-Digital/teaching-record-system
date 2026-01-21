@@ -74,12 +74,12 @@
       },
       "EntityFrameworkCore.Projectables": {
         "type": "Direct",
-        "requested": "[4.0.0, )",
-        "resolved": "4.0.0",
-        "contentHash": "cT9xTxBuHuXqpkgu8YQJ8l2pdg/zqYf3XywHJHLS6TplQBZoZZDYlZ7O6MM98BaGgJikp2mE6K3SF5Fyj/TqqA==",
+        "requested": "[5.0.1, )",
+        "resolved": "5.0.1",
+        "contentHash": "g0ofBHoiRIma/0ec3EZluvA2O03XA9ZBOkrXj2smVcgcMwLvNpN/0Z4qILZu9DptNJnqqh28ks8/kGsqAXH/oQ==",
         "dependencies": {
-          "EntityFrameworkCore.Projectables.Abstractions": "4.0.0",
-          "Microsoft.EntityFrameworkCore": "8.0.0"
+          "EntityFrameworkCore.Projectables.Abstractions": "5.0.1",
+          "Microsoft.EntityFrameworkCore": "10.0.0"
         }
       },
       "FluentValidation": {
@@ -543,8 +543,8 @@
       },
       "EntityFrameworkCore.Projectables.Abstractions": {
         "type": "Transitive",
-        "resolved": "4.0.0",
-        "contentHash": "QYeAIEmNEpROosThGtU/t3yZJoCcAC9kxhfHnHAp2PmVIFIajaHcuo79CCeEiOxo2zm+mS3wfIIj6d00id7/cQ=="
+        "resolved": "5.0.1",
+        "contentHash": "rE/6vHrILkXsWGh+8zyv8wNRspnWGc/kYlLvt50ukox574KVl2qH24xqEME3CioeIwf6g4LEA3kfzAlU9J9gsQ=="
       },
       "Google.Api.Gax": {
         "type": "Transitive",
