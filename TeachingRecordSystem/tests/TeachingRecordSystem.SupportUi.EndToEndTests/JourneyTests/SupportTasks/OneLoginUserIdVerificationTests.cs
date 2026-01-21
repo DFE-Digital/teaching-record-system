@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Models.SupportTasks;
+
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
 
 public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -14,14 +16,17 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
                 .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
-                .WithStatedTrn(matchedPerson.Trn!));
+                .WithStatedTrn(matchedPerson.Trn));
+        var taskData = supportTask.GetData<OneLoginUserIdVerificationData>();
+        var firstName = taskData.StatedFirstName;
+        var lastName = taskData.StatedLastName;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/support-tasks/one-login-user-id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
+        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve");
 
         await page.ClickRadioByLabelAsync("Yes, find a matching record");
@@ -44,13 +49,16 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
 
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+        var taskData = supportTask.GetData<OneLoginUserIdVerificationData>();
+        var firstName = taskData.StatedFirstName;
+        var lastName = taskData.StatedLastName;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/support-tasks/one-login-user-id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
+        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve");
 
         await page.ClickRadioByLabelAsync("Yes, find a matching record");
@@ -74,14 +82,17 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
                 .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
-                .WithStatedTrn(matchedPerson.Trn!));
+                .WithStatedTrn(matchedPerson.Trn));
+        var taskData = supportTask.GetData<OneLoginUserIdVerificationData>();
+        var firstName = taskData.StatedFirstName;
+        var lastName = taskData.StatedLastName;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/support-tasks/one-login-user-id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
+        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve");
 
         await page.ClickRadioByLabelAsync("Yes, find a matching record");
@@ -107,13 +118,16 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
 
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+        var taskData = supportTask.GetData<OneLoginUserIdVerificationData>();
+        var firstName = taskData.StatedFirstName;
+        var lastName = taskData.StatedLastName;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/support-tasks/one-login-user-id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
+        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
 
         await page.ClickRadioByLabelAsync("No, reject this request");
         await page.ClickContinueButtonAsync();
@@ -140,14 +154,17 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
                 .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
-                .WithStatedTrn(matchedPerson.Trn!));
+                .WithStatedTrn(matchedPerson.Trn));
+        var taskData = supportTask.GetData<OneLoginUserIdVerificationData>();
+        var firstName = taskData.StatedFirstName;
+        var lastName = taskData.StatedLastName;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/support-tasks/one-login-user-id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
+        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve");
 
         await page.ClickRadioByLabelAsync("Yes, find a matching record");
@@ -160,7 +177,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
 
         // Re-start the journey and check the saved values were persisted
 
-        await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
+        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-id-verification/{supportTask.SupportTaskReference}/resolve");
 
         await page.ClickContinueButtonAsync();
