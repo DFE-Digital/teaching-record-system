@@ -4,11 +4,11 @@
     "net10.0": {
       "GovUk.Questions.AspNetCore.Testing": {
         "type": "Direct",
-        "requested": "[0.1.0-alpha.0.92, )",
-        "resolved": "0.1.0-alpha.0.92",
-        "contentHash": "8my2oRgvxsn2LlyVmj/cOfdx/W3+cQkuKIGtge4RACgSAuEAn6pXec2I69F7sEG4gUClmNtg+vqqWvR/T4fQtw==",
+        "requested": "[0.1.0-alpha.0.93, )",
+        "resolved": "0.1.0-alpha.0.93",
+        "contentHash": "qV9YPtXWkJAa4KY/6Ii9pseXIOx0RbGDFNxl3XdQ1Jf6hrNDM4FlaqcfOYj9SOKnShTE6RpYkShtaC/GpljVlA==",
         "dependencies": {
-          "GovUk.Questions.AspNetCore": "0.1.0-alpha.0.92"
+          "GovUk.Questions.AspNetCore": "0.1.0-alpha.0.93"
         }
       },
       "JetBrains.Annotations": {
@@ -948,7 +948,7 @@
           "Dfe.Analytics": "[0.3.0, )",
           "GovUk.Frontend.AspNetCore": "[3.4.3, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.0, )",
-          "GovUk.Questions.AspNetCore": "[0.1.0-alpha.0.92, )",
+          "GovUk.Questions.AspNetCore": "[0.1.0-alpha.0.93, )",
           "Humanizer.Core": "[2.14.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
@@ -1236,9 +1236,9 @@
       },
       "GovUk.Questions.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[0.1.0-alpha.0.92, )",
-        "resolved": "0.1.0-alpha.0.92",
-        "contentHash": "NeQp5HJVbzeG8TZy375Sv6rW9EPci+Vipt9erxf6htU1vYBEYJ7ICFP3xkt0AfFHuzpcXH2k4hFShODvMywa9w==",
+        "requested": "[0.1.0-alpha.0.93, )",
+        "resolved": "0.1.0-alpha.0.93",
+        "contentHash": "L6tW03t9AxPwqZ8pv5F4yppX4eULYjH1KNHG6D+ZTm12bobXeGw/71YMGKUm67JNU9whMWuNKfVLmb+VULCdYA==",
         "dependencies": {
           "UUID": "1.1.1"
         }
