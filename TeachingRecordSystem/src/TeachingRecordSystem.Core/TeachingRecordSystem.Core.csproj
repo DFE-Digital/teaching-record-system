@@ -318,7 +318,6 @@
     <PackageReference Include="Sentry.Serilog" />
     <PackageReference Include="Serilog.Formatting.Compact" />
     <PackageReference Include="Serilog.Settings.Configuration" />
-    <PackageReference Include="Serilog.Sinks.ApplicationInsights" />
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="SerilogTimings" />
     <PackageReference Include="System.Reactive" />

@@ -171,11 +171,6 @@
           "System.Reflection.TypeExtensions": "4.7.0"
         }
       },
-      "Microsoft.ApplicationInsights": {
-        "type": "Transitive",
-        "resolved": "2.23.0",
-        "contentHash": "nWArUZTdU7iqZLycLKWe0TDms48KKGE6pONH2terYNa8REXiqixrMOkf1sk5DHGMaUTqONU2YkS4SAXBhLStgw=="
-      },
       "Microsoft.Azure.Services.AppAuthentication": {
         "type": "Transitive",
         "resolved": "1.6.2",
@@ -728,7 +723,6 @@
           "Serilog.Expressions": "[5.0.0, )",
           "Serilog.Formatting.Compact": "[3.0.0, )",
           "Serilog.Settings.Configuration": "[10.0.0, )",
-          "Serilog.Sinks.ApplicationInsights": "[4.1.0, )",
           "Serilog.Sinks.Console": "[6.1.1, )",
           "SerilogTimings": "[3.1.0, )",
           "System.Reactive": "[6.1.0, )",
@@ -1178,16 +1172,6 @@
         "contentHash": "wQsv14w9cqlfB5FX2MZpNsTawckN4a8dryuNGbebB/3Nh1pXnROHZov3swtu3Nj5oNG7Ba+xdu7Et/ulAUPanQ==",
         "dependencies": {
           "Serilog": "4.0.0"
-        }
-      },
-      "Serilog.Sinks.ApplicationInsights": {
-        "type": "CentralTransitive",
-        "requested": "[4.1.0, )",
-        "resolved": "4.1.0",
-        "contentHash": "IC7su1J9FFkceWESs1A+AfM/NnBEKRpLpNYzEl+SYPe+RQWgs9PhPSgrIzsj3Un8oGgC/F9OrxibNNZwe+RDTg==",
-        "dependencies": {
-          "Microsoft.ApplicationInsights": "2.23.0",
-          "Serilog": "4.2.0"
         }
       },
       "Serilog.Sinks.Console": {
