@@ -95,7 +95,7 @@ public class ChangeHistoryModel(
 
         var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypesAsync(activeOnly: false)
             .ToAsyncEnumerableAsync()
-            .SelectAwait(async at => (
+            .Select(async (AlertType at, CancellationToken _) => (
                 AlertType: at,
                 CanRead: (await authorizationService.AuthorizeAsync(User, at.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Read))) is { Succeeded: true }))
             .Where(t => t.CanRead)
@@ -168,7 +168,7 @@ public class ChangeHistoryModel(
             .SelectMany(p => p.PersonIds)
             .Distinct()
             .ToAsyncEnumerable()
-            .SelectAwait(async id => await personInfoCache.GetPersonInfoAsync(id))
+            .Select(async (Guid id, CancellationToken _) => await personInfoCache.GetPersonInfoAsync(id))
             .Where(i => i is not null)
             .ToDictionaryAsync(i => i!.PersonId, i => i!);
 

@@ -29,11 +29,11 @@ restore:
 # Install Playwright
 [working-directory: 'tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests']
 install-playwright:
-  @pwsh bin/Debug/net9.0/playwright.ps1 install chromium
+  @pwsh bin/Debug/net10.0/playwright.ps1 install chromium
 
 # Run the trscli
 cli *ARGS:
-  @dotnet {{"src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net9.0" / "trscli.dll"}} {{ARGS}}
+  @dotnet {{"src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net10.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
 build:
@@ -45,7 +45,7 @@ test:
 
 # Format the .NET solution and Terraform code
 format:
-  @dotnet dotnet-format
+  @dotnet format
   @terraform fmt ../terraform/aks
 
 # Format any un-committed .tf or .cs files
@@ -69,7 +69,7 @@ format-changed:
 
   $changedCsFiles = (Get-ChangedFiles "TeachingRecordSystem/**/*.cs") | foreach { $_ -Replace "^TeachingRecordSystem/", "" }
   if ($changedCsFiles.Length -gt 0) {
-    $dotnetArgs = @("dotnet-format", "--no-restore", "--include") + $changedCsFiles
+    $dotnetArgs = @("format", "--no-restore", "--include") + $changedCsFiles
     cd TeachingRecordSystem && dotnet $dotnetArgs
   }
 
@@ -123,7 +123,7 @@ set-tests-secret key value:
 
 [working-directory: 'src/TeachingRecordSystem.Cli']
 create-admin email name:
-  @dotnet {{"bin" / "Debug" / "net9.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
+  @dotnet {{"bin" / "Debug" / "net10.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
 
 [working-directory: '..']
 make *ARGS:

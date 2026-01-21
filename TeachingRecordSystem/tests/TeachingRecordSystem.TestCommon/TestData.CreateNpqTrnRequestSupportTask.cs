@@ -205,7 +205,7 @@ public partial class TestData
 
                 matchedPersons = await Enumerable.Range(1, 2)
                     .ToAsyncEnumerable()
-                    .SelectAwait(async _ =>
+                    .Select(async (int _, CancellationToken _) =>
                     {
                         var person = await testData.CreatePersonAsync(p =>
                         {
