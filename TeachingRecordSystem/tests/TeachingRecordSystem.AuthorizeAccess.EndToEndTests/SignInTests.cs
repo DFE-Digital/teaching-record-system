@@ -395,4 +395,20 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertSignedInAsync(person.Trn);
     }
+
+    [Fact]
+    public async Task SignIn_UserHasPendingTask()
+    {
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync();
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
+
+        await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPageAsync();
+
+        await page.WaitForUrlPathAsync("/pending-support-request");
+    }
 }

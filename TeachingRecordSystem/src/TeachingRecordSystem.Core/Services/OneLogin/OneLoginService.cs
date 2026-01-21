@@ -234,6 +234,16 @@ public class OneLoginService(
             .AsReadOnly();
     }
 
+    public async Task<string?> GetPendingSupportTaskReferenceByUserAsync(string oneLoginUserSubject)
+    {
+        var task = await dbContext.SupportTasks
+            .Where(t => t.OneLoginUserSubject == oneLoginUserSubject && t.Status != SupportTaskStatus.Closed)
+            .OrderBy(t => t.CreatedOn)
+            .FirstOrDefaultAsync();
+
+        return task?.SupportTaskReference;
+    }
+
     private static string? NormalizeTrn(string? value) =>
         string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
 

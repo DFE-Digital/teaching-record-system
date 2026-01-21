@@ -36,6 +36,10 @@ public class SignInJourneyState(
 
     public bool AttemptedIdentityVerification { get; set; }
 
+    public string? CreatedSupportTaskReference { get; set; }
+
+    public string? PendingSupportTaskReference { get; set; }
+
     [JsonInclude]
     [MemberNotNullWhen(true, nameof(VerifiedNames), nameof(VerifiedDatesOfBirth))]
     public bool IdentityVerified { get; private set; }

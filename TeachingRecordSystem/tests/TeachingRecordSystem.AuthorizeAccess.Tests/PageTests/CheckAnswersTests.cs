@@ -99,6 +99,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
                 Assert.Equal(JourneyUrls.RequestSubmitted(coordinator.InstanceId), response.Headers.Location?.OriginalString);
 
+                Assert.NotNull(coordinator.State.CreatedSupportTaskReference);
                 Assert.Collection(
                     coordinator.Path.Steps,
                     s => Assert.Equal(StepUrls.RequestSubmitted, s.NormalizedUrl));
@@ -190,6 +191,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
                 Assert.Equal(JourneyUrls.RequestSubmitted(coordinator.InstanceId), response.Headers.Location?.OriginalString);
 
+                Assert.NotNull(coordinator.State.CreatedSupportTaskReference);
                 Assert.Collection(
                     coordinator.Path.Steps,
                     s => Assert.Equal(StepUrls.RequestSubmitted, s.NormalizedUrl));
