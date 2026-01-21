@@ -903,7 +903,7 @@
           "Serilog.Expressions": "[5.0.0, )",
           "Serilog.Formatting.Compact": "[3.0.0, )",
           "Serilog.Settings.Configuration": "[10.0.0, )",
-          "Serilog.Sinks.ApplicationInsights": "[4.1.0, )",
+          "Serilog.Sinks.ApplicationInsights": "[5.0.0, )",
           "Serilog.Sinks.Console": "[6.1.1, )",
           "SerilogTimings": "[3.1.0, )",
           "System.Reactive": "[6.1.0, )",
@@ -1523,12 +1523,12 @@
       },
       "Serilog.Sinks.ApplicationInsights": {
         "type": "CentralTransitive",
-        "requested": "[4.1.0, )",
-        "resolved": "4.1.0",
-        "contentHash": "IC7su1J9FFkceWESs1A+AfM/NnBEKRpLpNYzEl+SYPe+RQWgs9PhPSgrIzsj3Un8oGgC/F9OrxibNNZwe+RDTg==",
+        "requested": "[5.0.0, )",
+        "resolved": "5.0.0",
+        "contentHash": "1gNxpRR2vZ9RScScpgfrj2utrSHgVDiAgPFdmplSlGCMONaLV+LBDe1uKeD4b/E5sQjtYKGyJ/rgVwSZcdTcZQ==",
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.23.0",
-          "Serilog": "4.2.0"
+          "Serilog": "4.3.0"
         }
       },
       "Serilog.Sinks.Console": {
