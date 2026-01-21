@@ -84,7 +84,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
@@ -138,8 +138,8 @@
                 {
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell"><a href="@LinkGenerator.Alerts.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType!.Name</a></td>
-                        <td class="govuk-table__cell">@alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
-                        <td class="govuk-table__cell">@alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                        <td class="govuk-table__cell">@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</td>
+                        <td class="govuk-table__cell">@alert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</td>
                         <td class="govuk-table__cell">
                             @if (canWrite)
                             {

@@ -38,11 +38,11 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date">@Model.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="end-date">@Model.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.CloseAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

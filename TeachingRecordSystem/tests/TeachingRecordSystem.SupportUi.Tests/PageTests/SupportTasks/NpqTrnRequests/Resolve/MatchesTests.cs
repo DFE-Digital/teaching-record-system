@@ -130,7 +130,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueByKey("First name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueByKey("Middle name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueByKey("Last name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueByKey("Gender"));
@@ -176,7 +176,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
         Assert.Equal(matchedPerson.MiddleName, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
         Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
-        Assert.Equal(matchedPerson.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(matchedPerson.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(matchedPerson.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(matchedPerson.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));
@@ -284,10 +284,10 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
         Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
         Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", true);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", true);
@@ -340,10 +340,10 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
         Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
         Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", false);

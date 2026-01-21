@@ -33,7 +33,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
             <h2 class="govuk-heading-m">Why are you deleting this mandatory qualification?</h2>

@@ -74,7 +74,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
-        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat));
+        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(WebConstants.DateTimeDisplayFormat));
         AssertRowHasContent("potential-duplicate", supportTask.TrnRequestMetadata!.PotentialDuplicate ? "Yes" : "No");
 
         void AssertRowHasContent(string testId, string expectedText)

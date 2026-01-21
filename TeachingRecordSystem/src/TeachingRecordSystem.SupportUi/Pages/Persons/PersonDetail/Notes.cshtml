@@ -42,7 +42,7 @@ else
             <div data-testid="note" class="govuk-!-margin-bottom-3">
                 <div class="govuk-heading-s">
                     Added by <span data-testid="@note.NoteId-note-created-by">@note.CreatedBy</span>
-                    on <span data-testid="@note.NoteId-note-created-on">@note.CreatedOn.ToString($"{UiDefaults.DateOnlyDisplayFormat} 'at' HH:mm")</span>
+                    on <span data-testid="@note.NoteId-note-created-on">@note.CreatedOn.ToString($"{WebConstants.DateOnlyDisplayFormat} 'at' HH:mm")</span>
                 </div>
                 <div class="govuk-details">
                     <div class="govuk-details__text">

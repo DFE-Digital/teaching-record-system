@@ -102,7 +102,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Name", v => Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
         doc.AssertSummaryListRowValue("Gender", v => Assert.Equal(person.Gender!.GetDisplayName(), v.TrimmedText()));
         doc.AssertSummaryListRowValue("Status", v => Assert.Equal(person.Person.Status.GetDisplayName(), v.TrimmedText()));
         doc.AssertSummaryListRowValue("National insurance number", v => Assert.Equal(person.NationalInsuranceNumber, v.TrimmedText()));

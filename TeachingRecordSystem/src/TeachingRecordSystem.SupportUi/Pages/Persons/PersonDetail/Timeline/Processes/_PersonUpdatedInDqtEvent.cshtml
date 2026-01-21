@@ -20,7 +20,7 @@
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         </govuk-summary-list-row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EmailAddress))
@@ -48,28 +48,28 @@
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Date of death</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.DateOfDeath?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.DateOfDeath?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         </govuk-summary-list-row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtsDate))
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>QTS held since</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         </govuk-summary-list-row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EytsDate))
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>EYTS held since</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         </govuk-summary-list-row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsDate))
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>QTLS held since</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.QtlsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.Details.QtlsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         </govuk-summary-list-row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsStatus))
@@ -118,7 +118,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EmailAddress))
@@ -146,28 +146,28 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Date of death</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.DateOfDeath?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.DateOfDeath?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>QTS held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EytsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>EYTS held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>QTLS held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.QtlsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.OldDetails.QtlsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsStatus))

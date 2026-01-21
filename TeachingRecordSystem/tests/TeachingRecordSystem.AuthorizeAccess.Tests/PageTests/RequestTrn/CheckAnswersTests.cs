@@ -241,7 +241,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueByKey("Personal email"));
         Assert.Equal(StringHelper.JoinNonEmpty(' ', state.FirstName, state.MiddleName, state.LastName), doc.GetSummaryListValueByKey("Name"));
         Assert.Equal(StringHelper.JoinNonEmpty(' ', state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName), doc.GetSummaryListValueByKey("Previous name"));
-        Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(state.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Contains(state.EvidenceFileName!, doc.GetSummaryListValueByKey("Proof of identity"));
         if (hasNationalInsuranceNumber)
         {

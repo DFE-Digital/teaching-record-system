@@ -69,7 +69,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
-        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
         AssertRowHasContent("source", applicationUser.Name);
 
         void AssertRowHasContent(string testId, string expectedText)

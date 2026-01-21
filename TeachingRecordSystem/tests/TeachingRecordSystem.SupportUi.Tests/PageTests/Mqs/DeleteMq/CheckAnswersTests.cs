@@ -85,8 +85,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(provider?.Name ?? "None", deletionSummary.GetElementByTestId("provider")!.TrimmedText());
         Assert.Equal(specialism?.GetTitle() ?? "None", deletionSummary.GetElementByTestId("specialism")!.TrimmedText());
         Assert.Equal(status is not null ? status.Value.ToString() : "None", deletionSummary.GetElementByTestId("status")!.TrimmedText());
-        Assert.Equal(startDate is not null ? startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("start-date")!.TrimmedText());
-        Assert.Equal(endDate is not null ? endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("end-date")!.TrimmedText());
+        Assert.Equal(startDate is not null ? startDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("start-date")!.TrimmedText());
+        Assert.Equal(endDate is not null ? endDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("end-date")!.TrimmedText());
 
         var deletionReasonSummary = doc.GetElementByTestId("change-reason-summary");
         Assert.NotNull(deletionReasonSummary);

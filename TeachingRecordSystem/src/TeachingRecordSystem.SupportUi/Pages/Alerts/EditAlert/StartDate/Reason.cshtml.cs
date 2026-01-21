@@ -30,7 +30,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]

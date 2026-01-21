@@ -116,7 +116,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueByKey("Middle name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueByKey("Last name"));
         Assert.Equal(person.Trn, requestDetails.GetSummaryListValueByKey("TRN"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueByKey("Gender"));
     }
@@ -169,7 +169,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(duplicatePerson1.MiddleName, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
         Assert.Equal(duplicatePerson1.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
         Assert.Equal(duplicatePerson1.Trn, firstMatchDetails.GetSummaryListValueByKey("TRN"));
-        Assert.Equal(duplicatePerson1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(duplicatePerson1.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(duplicatePerson1.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(duplicatePerson1.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));
     }

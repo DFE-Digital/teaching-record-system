@@ -143,7 +143,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         return Page();
 
         bool SearchTextIsDate(out DateOnly date) =>
-            DateOnly.TryParseExact(Search, UiDefaults.DateOnlyDisplayFormat, out date) ||
+            DateOnly.TryParseExact(Search, WebConstants.DateOnlyDisplayFormat, out date) ||
             DateOnly.TryParseExact(Search, "d/M/yyyy", out date);
 
         bool SearchTextIsTrn() => Search.Length == 7 && Search.All(Char.IsAsciiDigit);

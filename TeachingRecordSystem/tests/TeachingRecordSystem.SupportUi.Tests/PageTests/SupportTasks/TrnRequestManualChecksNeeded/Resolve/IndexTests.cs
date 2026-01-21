@@ -53,7 +53,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(trnRequestMetadata.FirstName, doc.GetSummaryListValueByKey("First name"));
         Assert.Equal(trnRequestMetadata.MiddleName, doc.GetSummaryListValueByKey("Middle name"));
         Assert.Equal(trnRequestMetadata.LastName, doc.GetSummaryListValueByKey("Last name"));
-        Assert.Equal(trnRequestMetadata.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(trnRequestMetadata.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(trnRequestMetadata.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal(trnRequestMetadata.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National insurance number"));
         Assert.Collection(

@@ -17,14 +17,14 @@
             <govuk-summary-list data-testid="change-summary">
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>New end date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="new-end-date">@Model.NewEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="new-end-date">@Model.NewEndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.EndDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new end date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Previous end date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="current-end-date" use-empty-fallback>@Model.PreviousEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="current-end-date" use-empty-fallback>@Model.PreviousEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
 

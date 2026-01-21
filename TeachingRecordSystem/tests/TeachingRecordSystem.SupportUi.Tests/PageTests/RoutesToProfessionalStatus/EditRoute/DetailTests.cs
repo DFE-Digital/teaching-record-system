@@ -133,11 +133,11 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
         doc.AssertSummaryListRowValueContentMatches("Status", status.GetDisplayName()!);
-        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(WebConstants.DateOnlyDisplayFormat));
         doc.AssertChangeLinkExists("Start date");
-        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(WebConstants.DateOnlyDisplayFormat));
         doc.AssertChangeLinkExists("End date");
-        doc.AssertSummaryListRowValueContentMatches("Held since", awardDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Held since", awardDate.ToString(WebConstants.DateOnlyDisplayFormat));
         doc.AssertSummaryListRowValueContentMatches("Induction exemption", "Not provided");
         doc.AssertSummaryListRowValueContentMatches("Training provider", trainingProvider.Name);
         doc.AssertChangeLinkExists("Training provider");
@@ -181,8 +181,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
         doc.AssertSummaryListRowValueContentMatches("Status", status.Title);
-        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(WebConstants.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(WebConstants.DateOnlyDisplayFormat));
         doc.AssertSummaryListRowValueContentMatches("Training provider", "Not provided");
         doc.AssertSummaryListRowValueContentMatches("Degree type", "Not provided");
         doc.AssertSummaryListRowValueContentMatches("Country of training", "Not provided");

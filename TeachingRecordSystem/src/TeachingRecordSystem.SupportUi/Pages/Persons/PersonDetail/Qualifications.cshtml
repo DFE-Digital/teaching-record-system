@@ -60,21 +60,21 @@ else
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                     @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.TrainingEndDateRequired, professionalStatus.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable)
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                     @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.HoldsFromRequired, professionalStatus.Status.GetHoldsFromDateRequirement()) != FieldRequirement.NotApplicable)
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                     @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.InductionExemptionRequired, professionalStatus.Status.GetInductionExemptionRequirement()) != FieldRequirement.NotApplicable)
@@ -201,7 +201,7 @@ else
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="mq-start-date-@mq.QualificationId">@(mq.StartDate.HasValue ? mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="mq-start-date-@mq.QualificationId">@(mq.StartDate.HasValue ? mq.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         @if (Model.CanEdit)
                         {
@@ -221,7 +221,7 @@ else
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="mq-end-date-@mq.QualificationId">@(mq.EndDate.HasValue ? mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="mq-end-date-@mq.QualificationId">@(mq.EndDate.HasValue ? mq.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         @if (Model.CanEdit)
                         {

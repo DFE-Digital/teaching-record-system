@@ -152,7 +152,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TrimmedText());
         var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TrimmedText();
-        Assert.Contains(setStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), startDate);
+        Assert.Contains(setStartDate.ToString(WebConstants.DateOnlyDisplayFormat), startDate);
         Assert.Null(doc.GetElementByTestId("induction-exemption-reasons"));
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
@@ -205,7 +205,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TrimmedText());
         var completedDate = doc.GetElementByTestId("induction-completed-date")!.Children[1].TrimmedText();
-        Assert.Contains(setCompletedDate.ToString(UiDefaults.DateOnlyDisplayFormat), completedDate);
+        Assert.Contains(setCompletedDate.ToString(WebConstants.DateOnlyDisplayFormat), completedDate);
     }
 
     [Theory]

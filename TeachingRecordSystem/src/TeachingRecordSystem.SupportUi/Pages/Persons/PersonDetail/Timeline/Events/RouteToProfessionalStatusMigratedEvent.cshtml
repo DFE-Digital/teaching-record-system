@@ -53,15 +53,15 @@
             </govuk-summary-list-row>
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <govuk-summary-list-row-value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
@@ -107,7 +107,7 @@
                 <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
                 <govuk-summary-list-row-value data-testId="source-application-reference" use-empty-fallback>@professionalStatus.SourceApplicationReference</govuk-summary-list-row-value>
             </govuk-summary-list-row>
-        </govuk-summary-list>        
+        </govuk-summary-list>
         <govuk-details class="govuk-!-margin-bottom-2">
             <govuk-details-summary>Migrated data</govuk-details-summary>
             <govuk-details-text>
@@ -134,19 +134,19 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@dqtQtsRegistration?.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@dqtQtsRegistration?.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@dqtQtsRegistration?.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@dqtQtsRegistration?.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Partial QTS date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="pqts-date" use-empty-fallback>@dqtQtsRegistration?.PartialRecognitionDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="pqts-date" use-empty-fallback>@dqtQtsRegistration?.PartialRecognitionDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>QTLS date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="qtls-date" use-empty-fallback>@migratedEvent?.DqtQtlsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="qtls-date" use-empty-fallback>@migratedEvent?.DqtQtlsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>ITT ID</govuk-summary-list-row-key>
@@ -162,11 +162,11 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="programme-start-date" use-empty-fallback>@dqtInitialTeacherTraining?.ProgrammeStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="programme-start-date" use-empty-fallback>@dqtInitialTeacherTraining?.ProgrammeStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="programme-end-date" use-empty-fallback>@dqtInitialTeacherTraining?.ProgrammeEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="programme-end-date" use-empty-fallback>@dqtInitialTeacherTraining?.ProgrammeEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Result</govuk-summary-list-row-key>

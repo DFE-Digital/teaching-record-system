@@ -403,10 +403,10 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
     {
         DateOnly date;
 
-        var isDate = DateOnly.TryParseExact(searchText, UiDefaults.DateOnlyDisplayFormat, out date) ||
+        var isDate = DateOnly.TryParseExact(searchText, WebConstants.DateOnlyDisplayFormat, out date) ||
             DateOnly.TryParseExact(searchText, "d/M/yyyy", out date) ||
             DateOnly.TryParseExact(searchText, "d MMM yyyy", out date) ||
-            DateOnly.TryParseExact(searchText, "d MMMM yyyy", out date);
+            DateOnly.TryParseExact(searchText, WebConstants.DateOnlyDisplayFormat, out date);
 
         minDate = date.ToDateTime(new TimeOnly(0, 0, 0), DateTimeKind.Utc);
         maxDate = minDate.AddDays(1);

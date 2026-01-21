@@ -11,19 +11,19 @@
 
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
     </govuk-summary-list-row>
 
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
     </govuk-summary-list-row>
 
     @if (Model.HoldsFromRequired != FieldRequirement.NotApplicable)
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         </govuk-summary-list-row>
     }
     @if (Model.HasInductionExemptionRequired != FieldRequirement.NotApplicable)

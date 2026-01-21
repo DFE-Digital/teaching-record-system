@@ -14,7 +14,7 @@ public class Reject(SupportUiLinkGenerator linkGenerator) : PageModel
             .NotNull().WithMessage("Select a reason"),
         v => v.RuleFor(m => m.AdditionalDetails)
             .NotNull().WithMessage("Enter additional detail")
-            .MaximumLength(UiDefaults.DetailMaxCharacterCount).WithMessage($"Additional detail must be {UiDefaults.DetailMaxCharacterCount} characters or less")
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount).WithMessage($"Additional detail must be {UiDefaults.ReasonDetailsMaxCharacterCount} characters or less")
             .When(m => m.Reason is OneLoginIdVerificationRejectReason.AnotherReason)
     };
 

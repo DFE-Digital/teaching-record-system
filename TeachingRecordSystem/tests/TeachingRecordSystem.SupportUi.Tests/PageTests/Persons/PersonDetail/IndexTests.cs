@@ -59,7 +59,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var previousNames = doc.GetSummaryListValueElementByKey("Previous name(s)")?.QuerySelectorAll("li");
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TrimmedText());
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TrimmedText());
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueByKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
         Assert.Equal(createPersonResult.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
@@ -104,7 +104,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var previousNames = doc.GetSummaryListValueElementByKey("Previous name(s)")?.QuerySelectorAll("li");
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TrimmedText());
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TrimmedText());
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueByKey("Gender"));
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueByKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
@@ -127,10 +127,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetSummaryListValueByKey("Name"));
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Email address"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("National Insurance number"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Gender"));
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Email address"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Gender"));
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
         Assert.Equal("Holds", doc.GetSummaryListValueByKey("Qualified teacher status (QTS)"));
-        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("QTS held since"));
+        Assert.Equal(awardDate.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("QTS held since"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Qualified teacher learning and skills status (QTLS)"));
         Assert.Equal("Required to complete", doc.GetSummaryListValueByKey("Induction status"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Early years teacher status (EYTS)"));
@@ -267,7 +267,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
         Assert.Equal("Holds", doc.GetSummaryListValueByKey("Qualified teacher status (QTS)"));
-        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("QTS held since"));
+        Assert.Equal(awardDate.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("QTS held since"));
         Assert.Equal("Active", doc.GetSummaryListValueByKey("Qualified teacher learning and skills status (QTLS)"));
         Assert.Equal("Required to complete", doc.GetSummaryListValueByKey("Induction status"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Early years teacher status (EYTS)"));
@@ -300,7 +300,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("No", doc.GetSummaryListValueByKey("Qualified teacher learning and skills status (QTLS)"));
         Assert.Null(doc.GetSummaryListValueByKey("Induction status"));
         Assert.Equal("Holds", doc.GetSummaryListValueByKey("Early years teacher status (EYTS)"));
-        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("EYTS held since"));
+        Assert.Equal(awardDate.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("EYTS held since"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Early years professional status (EYPS)"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Partial qualified teacher status (PQTS)"));
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
@@ -361,7 +361,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetSummaryListValueByKey("EYTS held since"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Early years professional status (EYPS)"));
         Assert.Equal("Holds", doc.GetSummaryListValueByKey("Partial qualified teacher status (PQTS)"));
-        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("PQTS held since"));
+        Assert.Equal(awardDate.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("PQTS held since"));
     }
 
     [Theory]
