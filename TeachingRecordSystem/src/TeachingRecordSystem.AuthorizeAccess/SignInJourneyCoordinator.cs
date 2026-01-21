@@ -301,6 +301,12 @@ public class SignInJourneyCoordinator(
         _ => throw new InvalidOperationException("Cannot determine next page.")
     };
 
+    public override string? GetBackLink()
+    {
+        var backLink = base.GetBackLink();
+        return backLink != GetRedirectUri() ? backLink : null;
+    }
+
     public string GetRedirectUri() => State.RedirectUri;
 
     public override bool StepIsValid(JourneyPathStep step)
