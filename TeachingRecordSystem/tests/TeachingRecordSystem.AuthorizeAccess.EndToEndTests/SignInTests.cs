@@ -179,13 +179,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.CheckAsync("label:text-is('No')");
         await page.ClickButtonAsync("Continue");
 
-        await page.WaitForUrlPathAsync("/not-found");
-        await page.ClickButtonAsync("Check your answers");
-
-        await page.WaitForUrlPathAsync("/check-answers");
-        await page.ClickButtonAsync("Submit support request");
-
-        await page.WaitForUrlPathAsync("/request-submitted");
+        await page.WaitForUrlPathAsync("/no-trn");
     }
 
     [Fact]
