@@ -38,9 +38,7 @@ public class SignInJourneyCoordinator(
     // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
     private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
 
-    private LinkHelper? _linkHelper;
-
-    public LinkHelper Links => _linkHelper ??= new LinkHelper(linkGenerator, InstanceId);
+    public LinkHelper Links => field ??= new LinkHelper(linkGenerator, InstanceId);
 
     public bool ShowDebugPages => optionsAccessor.Value.ShowDebugPages;
 
@@ -472,6 +470,8 @@ public class SignInJourneyCoordinator(
         public string Name(string? returnUrl = null) => linkGenerator.Name(instanceId, returnUrl);
 
         public string DateOfBirth(string? returnUrl = null) => linkGenerator.DateOfBirth(instanceId, returnUrl);
+
+        public string NoTrn() => linkGenerator.NoTrn(instanceId);
     }
 
     private record TryMatchToIdentityUserResult(

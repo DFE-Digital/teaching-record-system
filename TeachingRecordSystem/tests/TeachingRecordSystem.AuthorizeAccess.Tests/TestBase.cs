@@ -202,6 +202,7 @@ public abstract class TestBase
         public const string RequestSubmitted = "/request-submitted";
         public const string Name = "/name";
         public const string DateOfBirth = "/date-of-birth";
+        public const string NoTrn = "/no-trn";
     }
 
     protected static class JourneyUrls
@@ -235,5 +236,8 @@ public abstract class TestBase
 
         public static string DateOfBirth(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.DateOfBirth);
+
+        public static string NoTrn(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.NoTrn);
     }
 }
