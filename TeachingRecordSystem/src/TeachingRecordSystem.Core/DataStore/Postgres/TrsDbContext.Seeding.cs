@@ -1,6 +1,5 @@
 using EFCore.BulkExtensions;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
