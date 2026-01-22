@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
-public record OneLoginUserIdVerificationData : ISupportTaskData
+public record OneLoginUserIdVerificationData : IOneLoginUserMatchingData
 {
     public required string OneLoginUserSubject { get; init; }
     public required string StatedFirstName { get; init; }
@@ -19,8 +19,10 @@ public record OneLoginUserIdVerificationData : ISupportTaskData
     public OneLoginUserIdVerificationOutcome Outcome { get; init; }
     public OneLoginIdVerificationRejectReason? RejectReason { get; init; }
     public string? RejectionAdditionalDetails { get; init; }
-    public OneLoginIdVerificationNotConnectingReason? NotConnectingReason { get; init; }
+    public OneLoginUserNotConnectingReason? NotConnectingReason { get; init; }
     public string? NotConnectingAdditionalDetails { get; init; }
+    public string[][]? VerifiedOrStatedNames => [[StatedFirstName, StatedLastName]];
+    public DateOnly[]? VerifiedOrStatedDatesOfBirth => [StatedDateOfBirth];
 }
 
 public enum OneLoginUserIdVerificationOutcome
@@ -39,16 +41,6 @@ public enum OneLoginIdVerificationRejectReason
     ProofIsUnclear,
     [Display(Name = "The proof of identity is the wrong type")]
     ProofIsWrongType,
-    [Display(Name = "Another reason")]
-    AnotherReason
-}
-
-public enum OneLoginIdVerificationNotConnectingReason
-{
-    [Display(Name = "There is no matching record")]
-    NoMatchingRecord,
-    [Display(Name = "The details only partly match a record")]
-    DetailsOnlyPartlyMatch,
     [Display(Name = "Another reason")]
     AnotherReason
 }

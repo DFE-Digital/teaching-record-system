@@ -34,7 +34,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
                 .ThenInclude(m => m!.ApplicationUser);
         }
 
-        if (supportTaskTypes.Intersect([SupportTaskType.ConnectOneLoginUser, SupportTaskType.OneLoginUserIdVerification]).Any())
+        if (supportTaskTypes.Intersect([SupportTaskType.OneLoginUserRecordMatching, SupportTaskType.OneLoginUserIdVerification]).Any())
         {
             currentSupportTaskQuery = currentSupportTaskQuery
                 .Include(t => t.OneLoginUser);

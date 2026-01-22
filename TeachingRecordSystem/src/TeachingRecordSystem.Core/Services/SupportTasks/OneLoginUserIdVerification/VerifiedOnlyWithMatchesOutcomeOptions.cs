@@ -6,6 +6,6 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerifica
 public record VerifiedOnlyWithMatchesOutcomeOptions
 {
     public required SupportTask SupportTask { get; init; }
-    public required OneLoginIdVerificationNotConnectingReason NotConnectingReason { get; init; }
+    public required OneLoginUserNotConnectingReason NotConnectingReason { get; init; }
     public required string? NotConnectingAdditionalDetails { get; init; }
 }

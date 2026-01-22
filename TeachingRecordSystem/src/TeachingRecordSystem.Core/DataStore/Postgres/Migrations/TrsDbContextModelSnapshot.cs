@@ -19,7 +19,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -6404,13 +6404,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         },
                         new
                         {
-                            SupportTaskType = 1,
-                            Name = "connect GOV.UK One Login user to a teaching record"
+                            SupportTaskType = 8,
+                            Name = "GOV.UK One Login - identity verification"
                         },
                         new
                         {
-                            SupportTaskType = 8,
-                            Name = "GOV.UK One Login - identity verification"
+                            SupportTaskType = 1,
+                            Name = "GOV.UK One Login - record matching"
                         },
                         new
                         {

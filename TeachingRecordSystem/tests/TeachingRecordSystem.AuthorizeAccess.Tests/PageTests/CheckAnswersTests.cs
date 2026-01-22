@@ -107,10 +107,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.NotNull(supportTask);
                 Assert.Equal(Clock.UtcNow, supportTask.CreatedOn);
                 Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
-                Assert.Equal(SupportTaskType.ConnectOneLoginUser, supportTask.SupportTaskType);
+                Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTask.SupportTaskType);
                 Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
                 Assert.Equal(oneLoginUser.Subject, supportTask.OneLoginUserSubject);
-                var data = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);
+                var data = Assert.IsType<OneLoginUserRecordMatchingData>(supportTask.Data);
                 Assert.True(data.Verified);
                 Assert.Equal(oneLoginUser.Subject, data.OneLoginUserSubject);
                 Assert.Equal(oneLoginUser.EmailAddress, data.OneLoginUserEmail);
@@ -127,10 +127,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
                     Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
                     Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);
-                    Assert.Equal(SupportTaskType.ConnectOneLoginUser, supportTaskCreatedEvent.SupportTask.SupportTaskType);
+                    Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTaskCreatedEvent.SupportTask.SupportTaskType);
                     Assert.Equal(SupportTaskStatus.Open, supportTaskCreatedEvent.SupportTask.Status);
                     Assert.Equal(oneLoginUser.Subject, supportTaskCreatedEvent.SupportTask.OneLoginUserSubject);
-                    var eventData = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);
+                    var eventData = Assert.IsType<OneLoginUserRecordMatchingData>(supportTask.Data);
                     Assert.True(eventData.Verified);
                     Assert.Equal(oneLoginUser.Subject, eventData.OneLoginUserSubject);
                     Assert.Equal(oneLoginUser.EmailAddress, eventData.OneLoginUserEmail);

@@ -29,7 +29,7 @@ public class ConnectModel(TrsDbContext dbContext, OneLoginService oneLoginServic
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var data = _supportTask!.UpdateData<ConnectOneLoginUserData>(data => data with
+        var data = _supportTask!.UpdateData<OneLoginUserRecordMatchingData>(data => data with
         {
             PersonId = PersonDetail!.PersonId
         });
@@ -65,7 +65,7 @@ public class ConnectModel(TrsDbContext dbContext, OneLoginService oneLoginServic
         }
 
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var data = (ConnectOneLoginUserData)_supportTask.Data;
+        var data = (OneLoginUserRecordMatchingData)_supportTask.Data;
 
         PersonDetail = await dbContext.Persons
             .Where(p => p.Trn == Trn)
