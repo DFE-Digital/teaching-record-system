@@ -56,7 +56,7 @@ public static partial class Commands
             using var scope = services.CreateScope();
             var personService = scope.ServiceProvider.GetRequiredService<PersonService>();
             var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
-            var processContext = new ProcessContext(processType: ProcessType.PersonCreating, now: DateTime.UtcNow,SystemUser.SystemUserId);
+            var processContext = new ProcessContext(processType: ProcessType.PersonCreating, now: DateTime.UtcNow, SystemUser.SystemUserId);
 
             // throw error if input file doesn't exist
             if (!File.Exists(fileName))
@@ -92,7 +92,7 @@ public static partial class Commands
                     var dobStr = GetStringValue(dict, "DATE_OF_BIRTH") ?? GetStringValue(dict, "DOB");
                     var niNumber = GetStringValue(dict, "NATIONAL_INSURANCE_NUMBER") ?? GetStringValue(dict, "NATIONAL_INSURANCE_NUMBER");
                     var ni = NationalInsuranceNumber.Parse(niNumber!);
-                    var qtsDateStr = GetStringValue(dict, "QTS_DATE") ;
+                    var qtsDateStr = GetStringValue(dict, "QTS_DATE");
                     var inductionStatusStr = GetStringValue(dict, "INDUCTION_STATUS");
                     var ittSubject1 = GetStringValue(dict, "ITT_SUBJECT_1") ?? GetStringValue(dict, "ITT_SUBJECT_1") ?? "";
                     var startDateStr = GetStringValue(dict, "ITT_START_DATE") ?? GetStringValue(dict, "ITT_START_DATE") ?? "";
@@ -161,29 +161,29 @@ public static partial class Commands
                     dbContext.Qualifications.Add(professionalStatus);
                     await dbContext.AddEventAndBroadcastAsync(@event);
 
-                     if (!string.IsNullOrWhiteSpace(inductionStatusStr))
-                     {
-                         if (!Enum.TryParse<InductionStatus>(inductionStatusStr, ignoreCase: true, out var parsedInduction))
-                         {
-                             parsedInduction = inductionStatusStr?.Trim().ToLower() switch
-                             {
-                                 "none" => InductionStatus.None,
-                                 "required" => InductionStatus.RequiredToComplete,
-                                 "requiredtocomplete" => InductionStatus.RequiredToComplete,
-                                 "inprogress" => InductionStatus.InProgress,
-                                 "pass" => InductionStatus.Passed,
-                                 "failed" => InductionStatus.Failed,
-                                 "exempt" => InductionStatus.Exempt,
-                                 _ => InductionStatus.None
-                             };
-                         }
+                    if (!string.IsNullOrWhiteSpace(inductionStatusStr))
+                    {
+                        if (!Enum.TryParse<InductionStatus>(inductionStatusStr, ignoreCase: true, out var parsedInduction))
+                        {
+                            parsedInduction = inductionStatusStr?.Trim().ToLower() switch
+                            {
+                                "none" => InductionStatus.None,
+                                "required" => InductionStatus.RequiredToComplete,
+                                "requiredtocomplete" => InductionStatus.RequiredToComplete,
+                                "inprogress" => InductionStatus.InProgress,
+                                "pass" => InductionStatus.Passed,
+                                "failed" => InductionStatus.Failed,
+                                "exempt" => InductionStatus.Exempt,
+                                _ => InductionStatus.None
+                            };
+                        }
 
-                         person.SetInductionStatus(parsedInduction, startDate, null, exemptionReasonIds: [], changeReason: "Imported", changeReasonDetail: null, evidenceFile: null, updatedBy: SystemUser.SystemUserId, now: DateTime.UtcNow, out var inductionEvent);
-                         if (inductionEvent is not null)
-                         {
-                             dbContext.AddEventWithoutBroadcast(inductionEvent);
-                         }
-                     }
+                        person.SetInductionStatus(parsedInduction, startDate, null, exemptionReasonIds: [], changeReason: "Imported", changeReasonDetail: null, evidenceFile: null, updatedBy: SystemUser.SystemUserId, now: DateTime.UtcNow, out var inductionEvent);
+                        if (inductionEvent is not null)
+                        {
+                            dbContext.AddEventWithoutBroadcast(inductionEvent);
+                        }
+                    }
                     await dbContext.SaveChangesAsync();
 
                     var outRow = dict.ToDictionary(k => k.Key, v => v.Value);
@@ -234,7 +234,10 @@ public static partial class Commands
 
     private static DateOnly? ParseDateFlexible(string? s)
     {
-        if (string.IsNullOrWhiteSpace(s)) return null;
+        if (string.IsNullOrWhiteSpace(s))
+        {
+            return null;
+        }
 
         s = s.Trim();
 
