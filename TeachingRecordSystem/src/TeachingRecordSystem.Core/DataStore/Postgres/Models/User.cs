@@ -11,7 +11,7 @@ public abstract class UserBase
 
     public required Guid UserId { get; init; }
     public bool Active { get; set; } = true;
-    public UserType UserType { get; protected set; }
+    public UserType UserType { get; protected init; }
     public required string Name { get; set; }
 }
 
