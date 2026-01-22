@@ -1,9 +1,10 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
 
-public class AlertCreatedNotificationMapperTests(EventMapperFixture fixture) : EventMapperTestBase(fixture)
+public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : EventMapperTestBase(fixture)
 {
     [Fact]
     public Task MapEventAsync_AlertIsNotInternalOnly_ReturnsNotification() =>

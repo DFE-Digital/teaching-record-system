@@ -1,9 +1,10 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
 
-public class AlertUpdatedNotificationMapperTests(EventMapperFixture fixture) : EventMapperTestBase(fixture)
+public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : EventMapperTestBase(fixture)
 {
     [Fact]
     public Task MapEventAsync_AlertIsNotInternalOnly_ReturnsNotification() =>
@@ -18,7 +19,7 @@ public class AlertUpdatedNotificationMapperTests(EventMapperFixture fixture) : E
 
             var alert = person.Alerts.Single();
 
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
+            var @event = await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Alerts.Attach(alert);
 
@@ -65,7 +66,7 @@ public class AlertUpdatedNotificationMapperTests(EventMapperFixture fixture) : E
 
             var alert = person.Alerts.Single();
 
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
+            var @event = await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Alerts.Attach(alert);
 
@@ -103,7 +104,7 @@ public class AlertUpdatedNotificationMapperTests(EventMapperFixture fixture) : E
 
             var alert = person.Alerts.Single();
 
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
+            var @event = await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Alerts.Attach(alert);
 

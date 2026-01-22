@@ -1,53 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema;
 
-public abstract class EventMapperTestBase(EventMapperFixture fixture)
+public abstract class EventMapperTestBase(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
-    public TestableClock Clock => fixture.Clock;
+    protected ReferenceDataCache ReferenceDataCache => Services.GetRequiredService<ReferenceDataCache>();
 
-    public DbFixture DbFixture => fixture.DbFixture;
-
-    public ReferenceDataCache ReferenceDataCache => fixture.ReferenceDataCache;
-
-    public TestData TestData => fixture.TestData;
-
-    public async Task WithEventMapper<TMapper>(Func<TMapper, Task> action)
+    protected async Task WithEventMapper<TMapper>(Func<TMapper, Task> action)
     {
-        await using var scope = fixture.Services.CreateAsyncScope();
-        var mapper = ActivatorUtilities.CreateInstance<TMapper>(scope.ServiceProvider);
-        await action(mapper);
+        await WithServiceAsync(action);
     }
-}
-
-public class EventMapperFixture
-{
-    public EventMapperFixture(
-        DbFixture dbFixture,
-        IServiceProvider serviceProvider)
-    {
-        Clock = new TestableClock();
-        DbFixture = dbFixture;
-        ReferenceDataCache = new ReferenceDataCache(dbFixture.DbContextFactory);
-
-        TestData = new TestData(
-            dbFixture.DbContextFactory,
-            ReferenceDataCache,
-            Clock);
-
-        Services = serviceProvider;
-    }
-
-    public TestableClock Clock { get; }
-
-    public DbFixture DbFixture { get; }
-
-    public ReferenceDataCache ReferenceDataCache { get; set; }
-
-    public TestData TestData { get; }
-
-    public IServiceProvider Services { get; }
-
-    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 }
