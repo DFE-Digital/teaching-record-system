@@ -118,7 +118,7 @@ public class CreateImportClaimTestDataTests(IServiceProvider services) : Command
             csv.AppendLine(string.Join(',',
                 row.FirstName,
                 row.LastName,
-                row.DateOfBirth.ToString("dd/MM/yyyy"),
+                row.DateOfBirth.ToString("yyyy-MM-dd"),
                 row.NationalInsuranceNumber,
                 row.QtsDate,
                 row.CsvInductionStatus,
