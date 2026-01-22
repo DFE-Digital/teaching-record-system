@@ -6,10 +6,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
 public partial class TrsDbContext
 {
-    /// <summary>
-    /// Seeds the database with static reference data.
-    /// This method is called by EF Core's UseSeeding configuration.
-    /// </summary>
     private void SeedData()
     {
         this.BulkInsertOrUpdate(GetAlertCategories());
@@ -28,10 +24,6 @@ public partial class TrsDbContext
         this.BulkInsertOrUpdate(GetEstablishments());
     }
 
-    /// <summary>
-    /// Seeds the database with static reference data asynchronously.
-    /// This method is called by EF Core's UseAsyncSeeding configuration.
-    /// </summary>
     private async Task SeedDataAsync(CancellationToken cancellationToken = default)
     {
         await this.BulkInsertOrUpdateAsync(GetAlertCategories(), cancellationToken: cancellationToken);
