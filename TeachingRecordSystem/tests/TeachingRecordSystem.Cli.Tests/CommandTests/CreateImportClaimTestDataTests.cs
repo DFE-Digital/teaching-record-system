@@ -165,13 +165,14 @@ public class CreateImportClaimTestDataTests(IServiceProvider services) : Command
                         .Include(p => p.Qualifications)
                         .SingleAsync(p => p.Trn == trn);
 
+                    Assert.NotNull(person);
                     Assert.Equal(expected.FirstName, person.FirstName);
                     Assert.Equal(expected.LastName, person.LastName);
                     Assert.Equal(expected.MiddleName, person.MiddleName ?? string.Empty);
                     Assert.Equal(expected.DateOfBirth, person.DateOfBirth);
                     Assert.Equal(expected.NationalInsuranceNumber, person.NationalInsuranceNumber!);
                     Assert.Equal(expected.ExpectedInductionStatus, person.InductionStatus);
-                    var qts = person.Qualifications
+                    var qts = person.Qualifications!
                         .OfType<RouteToProfessionalStatus>()
                         .Single();
 

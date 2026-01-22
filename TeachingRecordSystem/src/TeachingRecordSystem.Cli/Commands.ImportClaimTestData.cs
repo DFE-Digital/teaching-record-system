@@ -4,7 +4,6 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -68,7 +67,10 @@ public static partial class Commands
 
             var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                MissingFieldFound = null, HeaderValidated = null, BadDataFound = null, IgnoreBlankLines = true
+                MissingFieldFound = null,
+                HeaderValidated = null,
+                BadDataFound = null,
+                IgnoreBlankLines = true
             };
 
             using var reader = new StreamReader(fileName);
@@ -116,7 +118,8 @@ public static partial class Commands
                         personDetail,
                         (new Justification<PersonCreateReason>()
                         {
-                            Evidence = null, Reason = PersonCreateReason.AnotherReason,
+                            Evidence = null,
+                            Reason = PersonCreateReason.AnotherReason,
                         })),
                     processContext);
                 var person = dbContext.Persons
