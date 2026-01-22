@@ -25,7 +25,6 @@ public class Startup
                     .AddTestTrnGeneration()
                     .AddSingleton<ReferenceDataCache>()
                     .AddSingleton<TestData>()
-                    .AddSingleton<WebhookReceiver>()
                     .AddSingleton<PersonInfoCache>()
                     .AddSingleton<EventMapperFixture>()
                     .AddSingleton<NightlyEmailJobFixture>()

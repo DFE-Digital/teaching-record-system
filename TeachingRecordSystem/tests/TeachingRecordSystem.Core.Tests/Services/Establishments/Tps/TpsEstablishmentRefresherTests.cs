@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Establishments.Tps;
 
-[Collection(nameof(DisableParallelization))]
+[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public class TpsEstablishmentRefresherTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     private const string KnownGiasLaCodeHackney = "204";

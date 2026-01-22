@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Tests.Services;
+using TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
 [assembly: AssemblyFixture(typeof(ServiceFixture))]
 
@@ -22,7 +23,8 @@ public class ServiceFixture : ServiceProviderFixture
             .AddSupportTaskService()
             .AddPersonService()
             .AddSingleton<INotificationSender, NoopNotificationSender>()
-            .AddTestTrnGeneration();
+            .AddTestTrnGeneration()
+            .AddSingleton<WebhookReceiver>();
 
         TestScopedServices.ConfigureServices(services);
     }
