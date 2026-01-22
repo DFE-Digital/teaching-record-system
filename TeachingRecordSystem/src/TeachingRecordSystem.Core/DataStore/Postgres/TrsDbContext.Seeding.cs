@@ -20,7 +20,8 @@ public partial class TrsDbContext
         this.BulkInsertOrUpdate(GetRouteToProfessionalStatusTypes());
         this.BulkInsertOrUpdate(GetTpsEstablishmentTypes());
         this.BulkInsertOrUpdate(GetTrainingSubjects());
-        this.BulkInsertOrUpdate(GetUsers());
+        this.BulkInsertOrUpdate(GetApplicationUsers());
+        this.BulkInsertOrUpdate(GetSystemUsers());
         this.BulkInsertOrUpdate(GetEstablishments());
     }
 
@@ -38,7 +39,8 @@ public partial class TrsDbContext
         await this.BulkInsertOrUpdateAsync(GetRouteToProfessionalStatusTypes(), cancellationToken: cancellationToken);
         await this.BulkInsertOrUpdateAsync(GetTpsEstablishmentTypes(), cancellationToken: cancellationToken);
         await this.BulkInsertOrUpdateAsync(GetTrainingSubjects(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetUsers(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetApplicationUsers(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetSystemUsers(), cancellationToken: cancellationToken);
         await this.BulkInsertOrUpdateAsync(GetEstablishments(), cancellationToken: cancellationToken);
     }
 
@@ -2405,12 +2407,19 @@ public partial class TrsDbContext
         ];
     }
 
-    private static List<UserBase> GetUsers()
+    private static List<ApplicationUser> GetApplicationUsers()
     {
         return
         [
-            SystemUser.Instance,
             new ApplicationUser { UserId = ApplicationUser.NpqApplicationUserGuid, Name = "NPQ", Active = true }
+        ];
+    }
+
+    private static List<SystemUser> GetSystemUsers()
+    {
+        return
+        [
+            SystemUser.Instance
         ];
     }
 
