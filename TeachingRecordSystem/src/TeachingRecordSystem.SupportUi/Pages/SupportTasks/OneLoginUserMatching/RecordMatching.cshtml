@@ -1,5 +1,105 @@
 @page "/support-tasks/one-login-user-matching/record-matching"
-@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.RecordMatchingModel
+@using TeachingRecordSystem.SupportUi.Services.SupportTasks
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.RecordMatching
 @{
     ViewBag.Title = "GOV.UK One Login - record matching";
 }
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Index()" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">Record management</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    </div>
+
+    @if (Model.TotalTaskCount == 0)
+    {
+        <div class="govuk-grid-column-two-thirds" data-testid="no-tasks-message">
+            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3">
+                There are no outstanding tasks
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="govuk-grid-column-two-thirds">
+            <form action="@LinkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching()" method="get" asp-antiforgery="false" data-testid="search">
+                <div class="govuk-!-margin-bottom-4">
+                    <govuk-input for="Search" type="search" autocomplete="off">
+                        <govuk-input-label>
+                            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
+                        </govuk-input-label>
+                        <govuk-input-hint>
+                            Enter a task ID, name, email address or request date, for example 31/3/2025
+                        </govuk-input-hint>
+                        <govuk-input-after-input>
+                            <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                        </govuk-input-after-input>
+                    </govuk-input>
+                </div>
+            </form>
+        </div>
+        <div class="govuk-grid-column-full">
+            @if (Model.Results!.Count == 0)
+            {
+                <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
+                    No matching requests found
+                </p>
+                <p class="govuk-body-m">Try searching again with different details.</p>
+            }
+            else
+            {
+                <table class="govuk-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == OneLoginUserRecordMatchingSupportTasksSortByOption.Name ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching(Model.Search, OneLoginUserRecordMatchingSupportTasksSortByOption.Name, direction))">
+                                Name and task ID
+                            </th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching(Model.Search, OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn, direction))">
+                                Requested on
+                            </th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
+                                Status
+                            </th>
+                            <th scope="col" class="govuk-table__header"
+                                sort-direction="@(Model.SortBy == OneLoginUserRecordMatchingSupportTasksSortByOption.Email ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching(Model.Search, OneLoginUserRecordMatchingSupportTasksSortByOption.Email, direction))">
+                                Email address
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body" data-testid="results">
+                        @foreach (var result in Model.Results!)
+                        {
+                            <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                                <td class="govuk-table__cell" data-testid="task-name-and-id">
+                                    <a href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
+                                        @result.Name
+                                    </a>
+                                    <br />
+                                    <span data-testid="task-id">
+                                        @result.SupportTaskReference
+                                    </span>
+                                </td>
+                                <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat)</td>
+                                <td class="govuk-table__cell" data-testid="status">
+                                    <support-task-status-tag status="@result.Status"/>
+                                </td>
+                                <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <partial name="_Pagination" model=@Model.Pagination />
+            }
+        </div>
+    }
+</div>

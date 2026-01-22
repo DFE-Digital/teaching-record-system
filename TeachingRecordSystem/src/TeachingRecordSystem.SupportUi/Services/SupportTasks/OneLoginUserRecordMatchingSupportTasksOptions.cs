@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
-public record OneLoginUserIdVerificationSupportTasksOptions(
+public record OneLoginUserRecordMatchingSupportTasksOptions(
     string? Search = null,
-    OneLoginUserIdVerificationSupportTasksSortByOption? SortBy = null,
+    OneLoginUserRecordMatchingSupportTasksSortByOption? SortBy = null,
     SortDirection? SortDirection = null);

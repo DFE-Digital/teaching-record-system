@@ -8,15 +8,15 @@ namespace TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 public partial class SupportTaskSearchServiceTests
 {
     [Theory]
-    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
-    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference, SortDirection.Descending)]
-    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Email, SortDirection.Descending)]
-    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Descending)]
-    [InlineData(OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
-    public async Task SearchOneLoginIdVerificationSupportTasks_ReturnsOrderedResults(OneLoginIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection)
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.SupportTaskReference, SortDirection.Ascending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Email, SortDirection.Ascending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.SupportTaskReference, SortDirection.Descending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Email, SortDirection.Descending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Descending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
+    public async Task SearchOneLoginIdVerificationSupportTasks_ReturnsOrderedResults(OneLoginUserIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection)
     {
         // Arrange
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
@@ -47,22 +47,22 @@ public partial class SupportTaskSearchServiceTests
         var paginationOptions = new PaginationOptions(PageNumber: 1);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
             service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
         // Assert
         var expectedResultsOrdered = (sortBy switch
         {
-            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => sortDirection == SortDirection.Ascending
+            OneLoginUserIdVerificationSupportTasksSortByOption.SupportTaskReference => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.SupportTaskReference)
                 : expectedResults.OrderByDescending(s => s.SupportTaskReference),
-            OneLoginIdVerificationSupportTasksSortByOption.Name => sortDirection == SortDirection.Ascending
+            OneLoginUserIdVerificationSupportTasksSortByOption.Name => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.StatedFirstName).ThenBy(s => s.StatedLastName)
                 : expectedResults.OrderByDescending(s => s.StatedFirstName).ThenByDescending(s => s.StatedLastName),
-            OneLoginIdVerificationSupportTasksSortByOption.Email => sortDirection == SortDirection.Ascending
+            OneLoginUserIdVerificationSupportTasksSortByOption.Email => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.EmailAddress)
                 : expectedResults.OrderByDescending(s => s.EmailAddress),
-            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => sortDirection == SortDirection.Ascending
+            OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.CreatedOn)
                 : expectedResults.OrderByDescending(s => s.CreatedOn),
             _ => expectedResults
@@ -99,12 +99,12 @@ public partial class SupportTaskSearchServiceTests
                 configure.WithStatedFirstName("Edward").WithCreatedOn(new DateTime(2000,10,1,1,5,1)))
         };
 
-        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: null, OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
+        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: null, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
 
         var paginationOptions = new PaginationOptions(PageNumber: pageNumber, ItemsPerPage: 2);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
             service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
         // Assert
@@ -134,12 +134,12 @@ public partial class SupportTaskSearchServiceTests
                 configure.WithStatedFirstName("Edward").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,10,1,1,5,1)))
         };
 
-        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: search, OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
+        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: search, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
 
         var paginationOptions = new PaginationOptions(PageNumber: pageNumber, ItemsPerPage: 2);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
             service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
         // Assert
@@ -172,12 +172,12 @@ public partial class SupportTaskSearchServiceTests
                 configure.WithStatedFirstName("Colin").WithCreatedOn(new DateTime(2025,1,21)))
         };
 
-        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: searchText, OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
+        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: searchText, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
 
         var paginationOptions = new PaginationOptions(PageNumber: 1);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
             service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
         // Assert
@@ -204,12 +204,12 @@ public partial class SupportTaskSearchServiceTests
                 configure.WithStatedFirstName("Colin"))
         };
 
-        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: searchText, OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
+        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: searchText, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
 
         var paginationOptions = new PaginationOptions(PageNumber: 1);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
             service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
         // Assert
@@ -238,12 +238,12 @@ public partial class SupportTaskSearchServiceTests
                 configure.WithStatedFirstName("Colin").WithStatedLastName("Jones"))
         };
 
-        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: searchText, OneLoginIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
+        var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: searchText, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
 
         var paginationOptions = new PaginationOptions(PageNumber: 1);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
             service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
         // Assert
@@ -274,7 +274,7 @@ public partial class SupportTaskSearchServiceTests
             var paginationOptions = new PaginationOptions(PageNumber: 1);
 
             // Act
-            var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+            var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
                 service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
             // Assert
@@ -305,7 +305,7 @@ public partial class SupportTaskSearchServiceTests
         var paginationOptions = new PaginationOptions(PageNumber: 1);
 
         // Act
-        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginIdVerificationSupportTasksSearchResult>(service =>
+        var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
             service.SearchOneLoginIdVerificationSupportTasksAsync(options, paginationOptions));
 
         // Assert
