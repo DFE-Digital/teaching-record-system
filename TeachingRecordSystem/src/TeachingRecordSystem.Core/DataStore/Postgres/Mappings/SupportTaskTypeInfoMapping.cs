@@ -10,7 +10,5 @@ public class SupportTaskTypeInfoMapping : IEntityTypeConfiguration<SupportTaskTy
         builder.ToTable("support_task_types");
         builder.HasKey(t => t.SupportTaskType);
         builder.Property(t => t.Name).HasMaxLength(200);
-
-        builder.HasData(SupportTaskTypeRegistry.All.Select(i => new SupportTaskTypeInfo { SupportTaskType = i.SupportTaskType, Name = i.Name }));
     }
 }

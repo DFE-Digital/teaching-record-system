@@ -47,7 +47,6 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
             .HasFilter("one_login_authentication_scheme_name is not null");
         builder.HasIndex(e => e.ClientId).IsUnique().HasDatabaseName(ApplicationUser.ClientIdUniqueIndexName).HasFilter("client_id is not null");
 
-        builder.HasData(new ApplicationUser { UserId = ApplicationUser.NpqApplicationUserGuid, Name = "NPQ", Active = true });
     }
 }
 
@@ -55,6 +54,5 @@ public class SystemUserMapping : IEntityTypeConfiguration<SystemUser>
 {
     public void Configure(EntityTypeBuilder<SystemUser> builder)
     {
-        builder.HasData(SystemUser.Instance);
     }
 }

@@ -10,7 +10,5 @@ public class InductionStatusInfoMapping : IEntityTypeConfiguration<InductionStat
         builder.ToTable("induction_statuses");
         builder.HasKey(s => s.InductionStatus);
         builder.Property(s => s.Name).HasMaxLength(200);
-
-        builder.HasData(InductionStatusRegistry.All.Select(i => new InductionStatusInfo { InductionStatus = i.InductionStatus, Name = i.Name }));
     }
 }
