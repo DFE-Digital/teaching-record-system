@@ -49,6 +49,6 @@ public partial class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
             await coordinator.TryMatchToTeachingRecordAsync() ??
             (coordinator.State.IdentityVerified
                 ? coordinator.AdvanceTo(links => links.NotFound())
-                : coordinator.AdvanceTo(links => links.CheckAnswers()));
+                : coordinator.AdvanceTo(links => links.ProofOfIdentity()));
     }
 }

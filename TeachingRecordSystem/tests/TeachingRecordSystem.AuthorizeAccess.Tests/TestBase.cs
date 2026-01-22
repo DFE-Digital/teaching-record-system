@@ -205,6 +205,7 @@ public abstract class TestBase
         public const string DateOfBirth = "/date-of-birth";
         public const string NoTrn = "/no-trn";
         public const string PendingSupportRequest = "/pending-support-request";
+        public const string ProofOfIdentity = "/proof-of-identity";
     }
 
     protected static class JourneyUrls
@@ -244,5 +245,8 @@ public abstract class TestBase
 
         public static string PendingSupportRequest(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.PendingSupportRequest);
+
+        public static string ProofOfIdentity(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.ProofOfIdentity);
     }
 }

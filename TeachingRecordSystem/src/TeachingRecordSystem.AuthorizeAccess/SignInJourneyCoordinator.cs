@@ -487,6 +487,8 @@ public class SignInJourneyCoordinator(
         public string NoTrn() => linkGenerator.NoTrn(instanceId);
 
         public string PendingSupportRequest() => linkGenerator.PendingSupportRequest(instanceId);
+
+        public string ProofOfIdentity(string? returnUrl = null) => linkGenerator.ProofOfIdentity(instanceId, returnUrl);
     }
 
     private record TryMatchToIdentityUserResult(
