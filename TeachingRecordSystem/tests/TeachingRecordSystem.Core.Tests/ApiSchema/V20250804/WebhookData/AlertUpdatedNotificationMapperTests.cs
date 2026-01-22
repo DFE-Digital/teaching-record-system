@@ -1,14 +1,17 @@
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
 
-public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : EventMapperTestBase(fixture)
+public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
+    private ReferenceDataCache ReferenceDataCache => Services.GetRequiredService<ReferenceDataCache>();
+
     [Fact]
     public Task MapEventAsync_AlertIsNotInternalOnly_ReturnsNotification() =>
-        WithEventMapper<AlertUpdatedNotificationMapper>(async mapper =>
+        WithServiceAsync<AlertUpdatedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
@@ -55,7 +58,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Event
 
     [Fact]
     public Task MapEventAsync_AlertIsInternalOnly_ReturnsNull() =>
-        WithEventMapper<AlertUpdatedNotificationMapper>(async mapper =>
+        WithServiceAsync<AlertUpdatedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
@@ -93,7 +96,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Event
 
     [Fact]
     public Task MapEventAsync_OnlyLinkIsChanged_ReturnsNull() =>
-        WithEventMapper<AlertUpdatedNotificationMapper>(async mapper =>
+        WithServiceAsync<AlertUpdatedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
