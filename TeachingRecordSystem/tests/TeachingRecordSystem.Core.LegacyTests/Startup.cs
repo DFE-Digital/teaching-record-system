@@ -5,7 +5,6 @@ using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Tests.ApiSchema;
 using TeachingRecordSystem.Core.Tests.Jobs;
-using TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.Tests;
 
