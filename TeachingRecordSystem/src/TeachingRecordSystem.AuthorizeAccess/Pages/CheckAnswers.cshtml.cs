@@ -34,6 +34,8 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
         var subject = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
         var email = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
 
+        SupportTask supportTask;
+
         if (IdentityVerified)
         {
             var processContext = new ProcessContext(
@@ -41,7 +43,7 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
                 clock.UtcNow,
                 SystemUser.SystemUserId);
 
-            await supportTaskService.CreateSupportTaskAsync(
+            supportTask = await supportTaskService.CreateSupportTaskAsync(
                 new CreateSupportTaskOptions
                 {
                     SupportTaskType = SupportTaskType.OneLoginUserRecordMatching,
@@ -70,7 +72,7 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
                 clock.UtcNow,
                 SystemUser.SystemUserId);
 
-            await supportTaskService.CreateSupportTaskAsync(
+            supportTask = await supportTaskService.CreateSupportTaskAsync(
                 new CreateSupportTaskOptions
                 {
                     SupportTaskType = SupportTaskType.OneLoginUserIdVerification,
@@ -93,6 +95,8 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
                 },
                 processContext);
         }
+
+        coordinator.UpdateState(s => s.CreatedSupportTaskReference = supportTask.SupportTaskReference);
 
         return coordinator.AdvanceTo(
             links => links.SupportRequestSubmitted(),

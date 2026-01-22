@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -203,6 +204,7 @@ public abstract class TestBase
         public const string Name = "/name";
         public const string DateOfBirth = "/date-of-birth";
         public const string NoTrn = "/no-trn";
+        public const string PendingSupportRequest = "/pending-support-request";
     }
 
     protected static class JourneyUrls
@@ -239,5 +241,8 @@ public abstract class TestBase
 
         public static string NoTrn(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.NoTrn);
+
+        public static string PendingSupportRequest(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.PendingSupportRequest);
     }
 }

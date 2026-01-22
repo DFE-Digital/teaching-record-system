@@ -122,12 +122,15 @@ public class SignInJourneyCoordinator(
             oneLoginUser.LastSignIn = clock.UtcNow;
         }
 
+        var pendingSupportTaskReference = await oneLoginService.GetPendingSupportTaskReferenceByUserAsync(oneLoginUser.Subject);
+
         await dbContext.SaveChangesAsync();
 
         UpdateState(state =>
         {
             state.Reset();
             state.OneLoginAuthenticationTicket = ticket;
+            state.PendingSupportTaskReference = pendingSupportTaskReference;
 
             if (oneLoginUser.VerificationRoute is not null)
             {
@@ -285,6 +288,10 @@ public class SignInJourneyCoordinator(
         // Authentication is complete
         { AuthenticationTicket: not null } =>
             SquashPathAndAdvanceTo(GetRedirectUri(), includeRedirectUri: false),
+
+        // Authenticated with OneLogin, pending support tasks
+        { OneLoginAuthenticationTicket: not null, PendingSupportTaskReference: not null } =>
+            SquashPathAndAdvanceTo(Links.PendingSupportRequest(), includeRedirectUri: false),
 
         // Authenticated with OneLogin, identity verification succeeded, not yet matched to teaching record
         { OneLoginAuthenticationTicket: not null, IdentityVerified: true, AuthenticationTicket: null } =>
@@ -478,6 +485,8 @@ public class SignInJourneyCoordinator(
         public string DateOfBirth(string? returnUrl = null) => linkGenerator.DateOfBirth(instanceId, returnUrl);
 
         public string NoTrn() => linkGenerator.NoTrn(instanceId);
+
+        public string PendingSupportRequest() => linkGenerator.PendingSupportRequest(instanceId);
     }
 
     private record TryMatchToIdentityUserResult(
