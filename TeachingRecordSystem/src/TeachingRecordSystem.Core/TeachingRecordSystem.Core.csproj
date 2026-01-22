@@ -279,6 +279,7 @@
     <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" />
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="dbup-sqlserver" />
+    <PackageReference Include="EFCore.BulkExtensions.PostgreSql" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="EntityFrameworkCore.Projectables" />
     <PackageReference Include="FluentValidation" />

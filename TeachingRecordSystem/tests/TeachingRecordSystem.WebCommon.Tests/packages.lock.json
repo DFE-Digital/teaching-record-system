@@ -114,6 +114,16 @@
           "Docker.DotNet.Enhanced": "3.131.1"
         }
       },
+      "EFCore.BulkExtensions.Core": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "nKtjTES+tQdbA9cZDbeV8K/nOc/gZG9UwICPTXsFCGiUlqeuR3yM7URCrnaDgVEFVH/iNC2Nf4j5f68L2gr+0Q==",
+        "dependencies": {
+          "MedallionTopologicalSort": "1.0.0",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.1",
+          "NetTopologySuite": "2.6.0"
+        }
+      },
       "EntityFrameworkCore.Projectables.Abstractions": {
         "type": "Transitive",
         "resolved": "4.0.0",
@@ -197,6 +207,11 @@
           "Newtonsoft.Json": "9.0.1",
           "System.Reflection.TypeExtensions": "4.7.0"
         }
+      },
+      "MedallionTopologicalSort": {
+        "type": "Transitive",
+        "resolved": "1.0.0",
+        "contentHash": "dcAqM8TcyZQ/T466CvqNMUUn/G0FQE+4R7l62ngXH7hLFP9yA7yoP/ySsLgiXx3pGUQC3J+cUvXmJOOR/eC+oQ=="
       },
       "Microsoft.ApplicationInsights": {
         "type": "Transitive",
@@ -407,6 +422,11 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0"
         }
+      },
+      "NetTopologySuite": {
+        "type": "Transitive",
+        "resolved": "2.6.0",
+        "contentHash": "1B1OTacTd4QtFyBeuIOcThwSSLUdRZU3bSFIwM8vk36XiZlBMi3K36u74e4OqwwHRHUuJC1PhbDx4hyI266X1Q=="
       },
       "Newtonsoft.Json": {
         "type": "Transitive",
@@ -645,6 +665,7 @@
           "CloudNative.CloudEvents": "[2.8.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[33.1.0, )",
+          "EFCore.BulkExtensions.PostgreSql": "[10.0.0, )",
           "EFCore.NamingConventions": "[10.0.0, )",
           "EntityFrameworkCore.Projectables": "[4.0.0, )",
           "FluentValidation": "[12.1.0, )",
@@ -800,6 +821,16 @@
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
           "Microsoft.Data.SqlClient": "5.1.1",
           "dbup-core": "5.0.37"
+        }
+      },
+      "EFCore.BulkExtensions.PostgreSql": {
+        "type": "CentralTransitive",
+        "requested": "[10.0.0, )",
+        "resolved": "10.0.0",
+        "contentHash": "QqjE3SDR9U0bFDegc7mBrNjZC3pNwLqnrxE7PuCoOMy7dtBW5Qx1XR3BAebGtb3eHj3kMrdk7WWhdTAYeIR06g==",
+        "dependencies": {
+          "EFCore.BulkExtensions.Core": "10.0.0",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0"
         }
       },
       "EFCore.NamingConventions": {

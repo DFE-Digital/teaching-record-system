@@ -1,3 +1,4 @@
+using EFCore.BulkExtensions;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models;
 
@@ -11,22 +12,20 @@ public partial class TrsDbContext
     /// </summary>
     private void SeedData()
     {
-        SeedAlertCategories();
-        SeedAlertTypes();
-        SeedCountries();
-        SeedInductionExemptionReasons();
-        SeedSupportTaskTypes();
-        SeedDegreeTypes();
-        SeedEstablishmentSources();
-        SeedInductionStatusInfo();
-        SeedMandatoryQualificationProviders();
-        SeedRouteToProfessionalStatusTypes();
-        SeedTpsEstablishmentTypes();
-        SeedTrainingSubjects();
-        SeedUsers();
-        SeedEstablishments();
-
-        SaveChanges();
+        this.BulkInsertOrUpdate(GetAlertCategories());
+        this.BulkInsertOrUpdate(GetAlertTypes());
+        this.BulkInsertOrUpdate(GetCountries());
+        this.BulkInsertOrUpdate(GetInductionExemptionReasons());
+        this.BulkInsertOrUpdate(GetSupportTaskTypes());
+        this.BulkInsertOrUpdate(GetDegreeTypes());
+        this.BulkInsertOrUpdate(GetEstablishmentSources());
+        this.BulkInsertOrUpdate(GetInductionStatusInfo());
+        this.BulkInsertOrUpdate(GetMandatoryQualificationProviders());
+        this.BulkInsertOrUpdate(GetRouteToProfessionalStatusTypes());
+        this.BulkInsertOrUpdate(GetTpsEstablishmentTypes());
+        this.BulkInsertOrUpdate(GetTrainingSubjects());
+        this.BulkInsertOrUpdate(GetUsers());
+        this.BulkInsertOrUpdate(GetEstablishments());
     }
 
     /// <summary>
@@ -35,27 +34,26 @@ public partial class TrsDbContext
     /// </summary>
     private async Task SeedDataAsync(CancellationToken cancellationToken = default)
     {
-        SeedAlertCategories();
-        SeedAlertTypes();
-        SeedCountries();
-        SeedInductionExemptionReasons();
-        SeedSupportTaskTypes();
-        SeedDegreeTypes();
-        SeedEstablishmentSources();
-        SeedInductionStatusInfo();
-        SeedMandatoryQualificationProviders();
-        SeedRouteToProfessionalStatusTypes();
-        SeedTpsEstablishmentTypes();
-        SeedTrainingSubjects();
-        SeedUsers();
-        SeedEstablishments();
-
-        await SaveChangesAsync(cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetAlertCategories(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetAlertTypes(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetCountries(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetInductionExemptionReasons(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetSupportTaskTypes(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetDegreeTypes(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetEstablishmentSources(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetInductionStatusInfo(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetMandatoryQualificationProviders(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetRouteToProfessionalStatusTypes(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetTpsEstablishmentTypes(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetTrainingSubjects(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetUsers(), cancellationToken: cancellationToken);
+        await this.BulkInsertOrUpdateAsync(GetEstablishments(), cancellationToken: cancellationToken);
     }
 
-    private void SeedAlertCategories()
+    private static List<AlertCategory> GetAlertCategories()
     {
-        AlertCategories.AddRange(
+        return
+        [
             new AlertCategory { AlertCategoryId = Guid.Parse("ee78d44d-abf8-44a9-b22b-87a821f8d3c9"), Name = "EEA Decision", DisplayOrder = 1 },
             new AlertCategory { AlertCategoryId = Guid.Parse("0ae0707b-1503-477d-bc0f-1505ed95dbdf"), Name = "Failed induction", DisplayOrder = 2 },
             new AlertCategory { AlertCategoryId = Guid.Parse("768c9eb4-355b-4491-bb20-67eb59a97579"), Name = "Flag", DisplayOrder = 3 },
@@ -67,12 +65,14 @@ public partial class TrsDbContext
             new AlertCategory { AlertCategoryId = Guid.Parse("cbf7633f-3904-407d-8371-42a473fa641f"), Name = "Restriction", DisplayOrder = 9 },
             new AlertCategory { AlertCategoryId = Guid.Parse("38df5a00-94ab-486f-8905-d5b2eac04000"), Name = "Section 128 (SoS)", DisplayOrder = 10 },
             new AlertCategory { AlertCategoryId = Guid.Parse("227b75e5-bb98-496c-8860-1baea37aa5c6"), Name = "TRA Decision (SoS)", DisplayOrder = 12 },
-            new AlertCategory { AlertCategoryId = Guid.Parse("e4057fc2-a010-42a9-8cb2-7dcc5c9b5fa7"), Name = "SoS Restriction", DisplayOrder = 11 });
+            new AlertCategory { AlertCategoryId = Guid.Parse("e4057fc2-a010-42a9-8cb2-7dcc5c9b5fa7"), Name = "SoS Restriction", DisplayOrder = 11 }
+        ];
     }
 
-    private void SeedAlertTypes()
+    private static List<AlertType> GetAlertTypes()
     {
-        AlertTypes.AddRange(
+        return
+        [
             new AlertType { AlertTypeId = new Guid("2ca98658-1d5b-49d5-b05f-cc08c8b8502c"), AlertCategoryId = new Guid("ee78d44d-abf8-44a9-b22b-87a821f8d3c9"), Name = "Teacher sanctioned in other EEA member state", DqtSanctionCode = "T8", InternalOnly = true, IsActive = true, DisplayOrder = 1 },
             new AlertType { AlertTypeId = new Guid("9fafaa80-f9f8-44a0-b7b3-cffedcbe0298"), AlertCategoryId = new Guid("0ae0707b-1503-477d-bc0f-1505ed95dbdf"), Name = "Failed induction", DqtSanctionCode = "C2", InternalOnly = false, IsActive = true, DisplayOrder = 1 },
             new AlertType { AlertTypeId = new Guid("651e1f56-3135-4961-bd7e-3f7b2c75cb04"), AlertCategoryId = new Guid("0ae0707b-1503-477d-bc0f-1505ed95dbdf"), Name = "Prohibited by the Secretary of State - failed probation", DqtSanctionCode = "C1", InternalOnly = false, IsActive = false },
@@ -117,12 +117,14 @@ public partial class TrsDbContext
             new AlertType { AlertTypeId = new Guid("38db7946-2dbf-408e-bc48-1625829e7dfe"), AlertCategoryId = new Guid("cbf7633f-3904-407d-8371-42a473fa641f"), Name = "Restricted by the Secretary of State - Not Permitted to work as teacher", DqtSanctionCode = "B2B", InternalOnly = true, IsActive = false },
             new AlertType { AlertTypeId = new Guid("18e04dcb-fb86-4b05-8d5d-ff9c5da738dd"), AlertCategoryId = new Guid("cbf7633f-3904-407d-8371-42a473fa641f"), Name = "Restricted by the Secretary of State - Permitted to work as teacher", DqtSanctionCode = "B2A", InternalOnly = true, IsActive = false },
             new AlertType { AlertTypeId = new Guid("241eeb78-fac7-4c77-8059-c12e93dc2fae"), AlertCategoryId = new Guid("38df5a00-94ab-486f-8905-d5b2eac04000"), Name = "Section 128 barring direction", DqtSanctionCode = "T7", InternalOnly = false, IsActive = true, DisplayOrder = 1 },
-            new AlertType { AlertTypeId = new Guid("7924fe90-483c-49f8-84fc-674feddba848"), AlertCategoryId = new Guid("227b75e5-bb98-496c-8860-1baea37aa5c6"), Name = "Secretary of State decision - no prohibition", DqtSanctionCode = "T6", InternalOnly = false, IsActive = true, DisplayOrder = 1 });
+            new AlertType { AlertTypeId = new Guid("7924fe90-483c-49f8-84fc-674feddba848"), AlertCategoryId = new Guid("227b75e5-bb98-496c-8860-1baea37aa5c6"), Name = "Secretary of State decision - no prohibition", DqtSanctionCode = "T6", InternalOnly = false, IsActive = true, DisplayOrder = 1 }
+        ];
     }
 
-    private void SeedCountries()
+    private static List<Country> GetCountries()
     {
-        Countries.AddRange(
+        return
+        [
             new Country { CountryId = "AF", Name = "Afghanistan", OfficialName = "The Islamic Republic of Afghanistan", CitizenNames = "Afghan" },
             new Country { CountryId = "XQZ", Name = "Akrotiri", OfficialName = "Akrotiri", CitizenNames = "Not applicable" },
             new Country { CountryId = "AL", Name = "Albania", OfficialName = "The Republic of Albania", CitizenNames = "Albanian" },
@@ -341,12 +343,14 @@ public partial class TrsDbContext
             new Country { CountryId = "GB-CYM", Name = "Wales", OfficialName = "Wales", CitizenNames = "Briton, British" },
             new Country { CountryId = "YE", Name = "Yemen", OfficialName = "The Republic of Yemen", CitizenNames = "Yemeni" },
             new Country { CountryId = "ZM", Name = "Zambia", OfficialName = "The Republic of Zambia", CitizenNames = "Zambian" },
-            new Country { CountryId = "ZW", Name = "Zimbabwe", OfficialName = "The Republic of Zimbabwe", CitizenNames = "Zimbabwean" });
+            new Country { CountryId = "ZW", Name = "Zimbabwe", OfficialName = "The Republic of Zimbabwe", CitizenNames = "Zimbabwean" }
+        ];
     }
 
-    private void SeedInductionExemptionReasons()
+    private static List<InductionExemptionReason> GetInductionExemptionReasons()
     {
-        InductionExemptionReasons.AddRange(
+        return
+        [
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedBefore7May2000Id, Name = "They qualified before 07 May 2000", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedBetween7May1999And1April2003FirstPostInWalesId, Name = "They qualified between 7 May 1999 and 1 April 2003 and first taught in Wales for at least 2 terms", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedThroughFurtherEducationRouteBetween1Sep2001And1Sep2004Id, Name = "They qualified through a further education route between 1 September 2001 and 1 September 2004", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
@@ -363,17 +367,19 @@ public partial class TrsDbContext
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.OverseasTrainedTeacherId, Name = "Overseas Trained Teacher", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = true },
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedThroughEeaMutualRecognitionRouteId, Name = "They qualified through a European Economic Area (EEA) mutual recognition route", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceId, Name = "They’re a registered teacher with at least 2 years’ full-time teaching experience", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
-            new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QtlsId, Name = "Exempt through QTLS status provided they maintain membership of The Society of Education and Training", IsActive = true, RouteImplicitExemption = true, RouteOnlyExemption = true });
+            new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QtlsId, Name = "Exempt through QTLS status provided they maintain membership of The Society of Education and Training", IsActive = true, RouteImplicitExemption = true, RouteOnlyExemption = true }
+        ];
     }
 
-    private void SeedSupportTaskTypes()
+    private static List<SupportTaskTypeInfo> GetSupportTaskTypes()
     {
-        Set<SupportTaskTypeInfo>().AddRange(SupportTaskTypeRegistry.All.Select(i => new SupportTaskTypeInfo { SupportTaskType = i.SupportTaskType, Name = i.Name }));
+        return [.. SupportTaskTypeRegistry.All.Select(i => new SupportTaskTypeInfo { SupportTaskType = i.SupportTaskType, Name = i.Name })];
     }
 
-    private void SeedDegreeTypes()
+    private static List<DegreeType> GetDegreeTypes()
     {
-        DegreeTypes.AddRange(
+        return
+        [
             new DegreeType { DegreeTypeId = new("969c89e7-35b8-43d8-be07-17ef76c3b4bf"), Name = "BA", IsActive = true },
             new DegreeType { DegreeTypeId = new("dbb7c27b-8a27-4a94-908d-4b4404acebd5"), Name = "BA (Hons)", IsActive = true },
             new DegreeType { DegreeTypeId = new("1fcd0543-14d1-4866-b961-2812239eec06"), Name = "BA (Hons) Combined Studies/Education of the Deaf", IsActive = true },
@@ -412,29 +418,33 @@ public partial class TrsDbContext
             new DegreeType { DegreeTypeId = new("7471551d-132e-4c5d-82cc-a41190f01245"), Name = "Teachers Certificate FE", IsActive = true },
             new DegreeType { DegreeTypeId = new("dba69141-4101-4e05-80e0-524e3967d589"), Name = "Undergraduate Master of Teaching", IsActive = true },
             new DegreeType { DegreeTypeId = new("9cf31754-5ac5-46a1-99e5-5c98cba1b881"), Name = "Unknown", IsActive = true },
-            new DegreeType { DegreeTypeId = new("826f6cc9-e5f8-4ce7-a5ee-6194d19f7e22"), Name = "BA with Intercalated PGCE", IsActive = true });
+            new DegreeType { DegreeTypeId = new("826f6cc9-e5f8-4ce7-a5ee-6194d19f7e22"), Name = "BA with Intercalated PGCE", IsActive = true }
+        ];
     }
 
-    private void SeedEstablishmentSources()
+    private static List<EstablishmentSource> GetEstablishmentSources()
     {
-        EstablishmentSources.AddRange(
+        return
+        [
             new EstablishmentSource { EstablishmentSourceId = 1, Name = "GIAS" },
-            new EstablishmentSource { EstablishmentSourceId = 2, Name = "TPS" });
+            new EstablishmentSource { EstablishmentSourceId = 2, Name = "TPS" }
+        ];
     }
 
-    private void SeedInductionStatusInfo()
+    private static List<InductionStatusInfo> GetInductionStatusInfo()
     {
-        Set<InductionStatusInfo>().AddRange(InductionStatusRegistry.All.Select(i => new InductionStatusInfo { InductionStatus = i.InductionStatus, Name = i.Name }));
+        return [.. InductionStatusRegistry.All.Select(i => new InductionStatusInfo { InductionStatus = i.InductionStatus, Name = i.Name })];
     }
 
-    private void SeedMandatoryQualificationProviders()
+    private static List<MandatoryQualificationProvider> GetMandatoryQualificationProviders()
     {
-        MandatoryQualificationProviders.AddRange(MandatoryQualificationProvider.All);
+        return [.. MandatoryQualificationProvider.All];
     }
 
-    private void SeedRouteToProfessionalStatusTypes()
+    private static List<RouteToProfessionalStatusType> GetRouteToProfessionalStatusTypes()
     {
-        RouteToProfessionalStatusTypes.AddRange(
+        return
+        [
             new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("6F27BDEB-D00A-4EF9-B0EA-26498CE64713"), Name = "Apply for Qualified Teacher Status in England", ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.NotApplicable, TrainingEndDateRequired = FieldRequirement.NotApplicable, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.Mandatory, TrainingProviderRequired = FieldRequirement.NotApplicable, DegreeTypeRequired = FieldRequirement.NotApplicable, TrainingCountryRequired = FieldRequirement.Mandatory, TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional, TrainingSubjectsRequired = FieldRequirement.Optional, InductionExemptionReasonId = InductionExemptionReason.OverseasTrainedTeacherId },
             new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("6987240E-966E-485F-B300-23B54937FB3A"), Name = "Postgraduate Teaching Apprenticeship", ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.Optional, TrainingEndDateRequired = FieldRequirement.Optional, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.NotApplicable, TrainingProviderRequired = FieldRequirement.Mandatory, DegreeTypeRequired = FieldRequirement.Mandatory, TrainingCountryRequired = FieldRequirement.Optional, TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional, TrainingSubjectsRequired = FieldRequirement.Optional, InductionExemptionReasonId = null },
             new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("57B86CEF-98E2-4962-A74A-D47C7A34B838"), Name = "Assessment Only", ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.Optional, TrainingEndDateRequired = FieldRequirement.Optional, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.NotApplicable, TrainingProviderRequired = FieldRequirement.Mandatory, DegreeTypeRequired = FieldRequirement.Mandatory, TrainingCountryRequired = FieldRequirement.Optional, TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional, TrainingSubjectsRequired = FieldRequirement.Optional, InductionExemptionReasonId = null },
@@ -500,12 +510,14 @@ public partial class TrsDbContext
             new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("20f67e38-f117-4b42-bbfc-5812aa717b94"), Name = "Undergraduate Opt In", ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.Optional, TrainingEndDateRequired = FieldRequirement.Optional, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.NotApplicable, TrainingProviderRequired = FieldRequirement.Mandatory, DegreeTypeRequired = FieldRequirement.Mandatory, TrainingCountryRequired = FieldRequirement.Optional, TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional, TrainingSubjectsRequired = FieldRequirement.Optional, InductionExemptionReasonId = null },
             new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("877ba701-fe26-4951-9f15-171f3755d50d"), Name = "Welsh Recognition", ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.NotApplicable, TrainingEndDateRequired = FieldRequirement.NotApplicable, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.NotApplicable, TrainingProviderRequired = FieldRequirement.NotApplicable, DegreeTypeRequired = FieldRequirement.NotApplicable, TrainingCountryRequired = FieldRequirement.Optional, TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional, TrainingSubjectsRequired = FieldRequirement.Optional, InductionExemptionReasonId = null },
             new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("11B66DE5-4670-4C82-86AA-20E42DF723B7"), Name = "Early Years Teacher Degree Apprenticeship", ProfessionalStatusType = ProfessionalStatusType.EarlyYearsTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.Optional, TrainingEndDateRequired = FieldRequirement.Optional, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.NotApplicable, TrainingProviderRequired = FieldRequirement.Optional, DegreeTypeRequired = FieldRequirement.Mandatory, TrainingCountryRequired = FieldRequirement.Mandatory, TrainingAgeSpecialismTypeRequired = FieldRequirement.Mandatory, TrainingSubjectsRequired = FieldRequirement.Mandatory, InductionExemptionReasonId = null },
-            new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("5D4C01C1-0841-4306-B49C-48AD6499FDC0"), Name = "Teacher Degree Apprenticeship", ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.Optional, TrainingEndDateRequired = FieldRequirement.Optional, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.NotApplicable, TrainingProviderRequired = FieldRequirement.Optional, DegreeTypeRequired = FieldRequirement.Mandatory, TrainingCountryRequired = FieldRequirement.Mandatory, TrainingAgeSpecialismTypeRequired = FieldRequirement.Mandatory, TrainingSubjectsRequired = FieldRequirement.Mandatory, InductionExemptionReasonId = null });
+            new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("5D4C01C1-0841-4306-B49C-48AD6499FDC0"), Name = "Teacher Degree Apprenticeship", ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.Optional, TrainingEndDateRequired = FieldRequirement.Optional, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.NotApplicable, TrainingProviderRequired = FieldRequirement.Optional, DegreeTypeRequired = FieldRequirement.Mandatory, TrainingCountryRequired = FieldRequirement.Mandatory, TrainingAgeSpecialismTypeRequired = FieldRequirement.Mandatory, TrainingSubjectsRequired = FieldRequirement.Mandatory, InductionExemptionReasonId = null }
+        ];
     }
 
-    private void SeedTpsEstablishmentTypes()
+    private static List<TpsEstablishmentType> GetTpsEstablishmentTypes()
     {
-        TpsEstablishmentTypes.AddRange(
+        return
+        [
             new() { TpsEstablishmentTypeId = 1, EstablishmentRangeFrom = "0001", EstablishmentRangeTo = "0099", Description = "Homes set up under the Children and Young Persons Act (e.g. Community Homes)", ShortDescription = "Homes set up under the Children and Young Persons Act (e.g. Community Homes)" },
             new() { TpsEstablishmentTypeId = 2, EstablishmentRangeFrom = "0200", EstablishmentRangeTo = "0399", Description = "Homes set up under the Children and Young Persons Act (e.g. Community Homes)", ShortDescription = "Homes set up under the Children and Young Persons Act (e.g. Community Homes)" },
             new() { TpsEstablishmentTypeId = 3, EstablishmentRangeFrom = "0400", EstablishmentRangeTo = "0524", Description = "Training and occupation centres and other DSS establishments (except day nurseries)", ShortDescription = "Training and occupation centres and other DSS establishments (except day nurseries)" },
@@ -580,12 +592,14 @@ public partial class TrsDbContext
             new() { TpsEstablishmentTypeId = 71, EstablishmentRangeFrom = "5600", EstablishmentRangeTo = "5600", Description = "Service in Intermediate Treatment Centres - providing P & S education (not schools - unattached units)", ShortDescription = "Service in Intermediate Treatment Centres - providing P & S education (not schools - unattached units)" },
             new() { TpsEstablishmentTypeId = 72, EstablishmentRangeFrom = "9099", EstablishmentRangeTo = "9099", Description = "Function Provider within a LEA", ShortDescription = "Function Provider within a LEA" },
             new() { TpsEstablishmentTypeId = 73, EstablishmentRangeFrom = "8899", EstablishmentRangeTo = "8899", Description = "Adult Education Service (residential adult education estabs have numbers allocated in range 8290-8294). Teacher Centres if paid on FE Scales, Adult Literacy Scheme staff (LA)", ShortDescription = "Adult Education Service" },
-            new() { TpsEstablishmentTypeId = 74, EstablishmentRangeFrom = "0999", EstablishmentRangeTo = "0999", Description = "Service of any other kind (eg full-time educational officers in penal estabs Job Creation Schemes). Normally this code will not be used where a teacher is in receipt of a mandatory Burnham salary", ShortDescription = "Service of any other kind (eg full-time educational officers in penal estabs Job Creation Schemes)" });
+            new() { TpsEstablishmentTypeId = 74, EstablishmentRangeFrom = "0999", EstablishmentRangeTo = "0999", Description = "Service of any other kind (eg full-time educational officers in penal estabs Job Creation Schemes). Normally this code will not be used where a teacher is in receipt of a mandatory Burnham salary", ShortDescription = "Service of any other kind (eg full-time educational officers in penal estabs Job Creation Schemes)" }
+        ];
     }
 
-    private void SeedTrainingSubjects()
+    private static List<TrainingSubject> GetTrainingSubjects()
     {
-        TrainingSubjects.AddRange(
+        return
+        [
             new TrainingSubject { TrainingSubjectId = new("58917db9-66a6-4bf0-ab9b-e6f84a697a03"), Reference = "100104", Name = "accountancy", IsActive = true },
             new TrainingSubject { TrainingSubjectId = new("be477e90-58b9-41cf-9bad-6a8cb6f02afb"), Reference = "100105", Name = "accounting", IsActive = true },
             new TrainingSubject { TrainingSubjectId = new("4be3fef8-8089-4bfa-987d-459551b48430"), Reference = "100427", Name = "acoustics", IsActive = true },
@@ -2395,18 +2409,23 @@ public partial class TrsDbContext
             new TrainingSubject { TrainingSubjectId = new("18c1d74e-4b01-4ced-afb7-726b10a2c7fe"), Reference = "P900", Name = "Creative and Media (Diploma)", IsActive = false },
             new TrainingSubject { TrainingSubjectId = new("0e1cfcf8-d7ae-40a9-a09b-61f369648b9e"), Reference = "H990", Name = "Engineering (Diploma)", IsActive = false },
             new TrainingSubject { TrainingSubjectId = new("94e13788-d55d-4d0a-8c7a-ef6b0c94257b"), Reference = "B990", Name = "Hair and Beauty", IsActive = false },
-            new TrainingSubject { TrainingSubjectId = new("13a673ca-3bc4-4e7e-a8cc-0ca0da648a81"), Reference = "N900", Name = "Retail Business", IsActive = false });
+            new TrainingSubject { TrainingSubjectId = new("13a673ca-3bc4-4e7e-a8cc-0ca0da648a81"), Reference = "N900", Name = "Retail Business", IsActive = false }
+        ];
     }
 
-    private void SeedUsers()
+    private static List<UserBase> GetUsers()
     {
-        Set<UserBase>().Add(SystemUser.Instance);
-        Set<UserBase>().Add(new ApplicationUser { UserId = ApplicationUser.NpqApplicationUserGuid, Name = "NPQ", Active = true });
+        return
+        [
+            SystemUser.Instance,
+            new ApplicationUser { UserId = ApplicationUser.NpqApplicationUserGuid, Name = "NPQ", Active = true }
+        ];
     }
 
-    private void SeedEstablishments()
+    private static List<TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment> GetEstablishments()
     {
-        Establishments.AddRange(
+        return
+        [
             new() { EstablishmentId = new Guid("ede07733-97db-4e38-bff1-f3bd73b08986"), Urn = null, LaCode = "330", LaName = null, EstablishmentNumber = "0750", EstablishmentName = "Archdiocese of Birmingham", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 },
             new() { EstablishmentId = new Guid("b6c401ad-2cdc-407e-9fb5-9a524caeab60"), Urn = null, LaCode = "340", LaName = null, EstablishmentNumber = "6006", EstablishmentName = "A.R.T.S. Education", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 },
             new() { EstablishmentId = new Guid("571c41ae-a33a-4ac5-a2b2-467ea5c7c5c4"), Urn = null, LaCode = "383", LaName = null, EstablishmentNumber = "0751", EstablishmentName = "Workers Educational Association", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 },
@@ -2441,6 +2460,7 @@ public partial class TrsDbContext
             new() { EstablishmentId = new Guid("86f4c057-6385-4b05-a794-9837c9a3d428"), Urn = null, LaCode = "751", LaName = null, EstablishmentNumber = "1613", EstablishmentName = "Lighthouse Multi Academy Trust", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 },
             new() { EstablishmentId = new Guid("d36d3900-74ef-431c-a537-4471702f79bd"), Urn = null, LaCode = "751", LaName = null, EstablishmentNumber = "1615", EstablishmentName = "Chester Diocesan Learning Trust", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 },
             new() { EstablishmentId = new Guid("28d30e56-c104-4b9f-8059-774fe3bc18dc"), Urn = null, LaCode = "801", LaName = null, EstablishmentNumber = "0753", EstablishmentName = "People Plus Group Ltd.", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 },
-            new() { EstablishmentId = new Guid("019d868e-5ad4-4ebe-b8b0-f12e450f348a"), Urn = null, LaCode = "845", LaName = null, EstablishmentNumber = "2032", EstablishmentName = "Thornton Grove Academy", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 });
+            new() { EstablishmentId = new Guid("019d868e-5ad4-4ebe-b8b0-f12e450f348a"), Urn = null, LaCode = "845", LaName = null, EstablishmentNumber = "2032", EstablishmentName = "Thornton Grove Academy", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 }
+        ];
     }
 }
