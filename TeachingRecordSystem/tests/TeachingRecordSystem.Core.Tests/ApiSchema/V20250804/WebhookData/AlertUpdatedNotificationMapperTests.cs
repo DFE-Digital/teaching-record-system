@@ -100,7 +100,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
-                .SingleRandom(a => a.InternalOnly);
+                .SingleRandom(a => !a.InternalOnly);
 
             var person = await TestData.CreatePersonAsync(p => p
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
