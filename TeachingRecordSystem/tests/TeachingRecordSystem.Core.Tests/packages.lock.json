@@ -8,6 +8,17 @@
         "resolved": "2025.2.4",
         "contentHash": "TwbgxAkXxY+vNEhNVx/QXjJ4vqxmepOjsgRvvImQPbHkHMMb4W+ahL3laMsxXKtNT7iMy+E1B3xkqao2hf1n3A=="
       },
+      "Microsoft.AspNetCore.Mvc.Testing": {
+        "type": "Direct",
+        "requested": "[10.0.2, )",
+        "resolved": "10.0.2",
+        "contentHash": "wXZUGX1hphnKUKEoi7nBuMjT6UOWJmkw4n424O44WSS20QPFYI9D/UiTkgog6S1N6sKFevGF2JmlcSGvKJH2ng==",
+        "dependencies": {
+          "Microsoft.AspNetCore.TestHost": "10.0.2",
+          "Microsoft.Extensions.DependencyModel": "10.0.2",
+          "Microsoft.Extensions.Hosting": "10.0.2"
+        }
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[18.0.0, )",
@@ -16,6 +27,16 @@
         "dependencies": {
           "Microsoft.CodeCoverage": "18.0.0",
           "Microsoft.TestPlatform.TestHost": "18.0.0"
+        }
+      },
+      "NSign.AspNetCore": {
+        "type": "Direct",
+        "requested": "[1.2.1, )",
+        "resolved": "1.2.1",
+        "contentHash": "AmRRffAcDW+SX5g+liZJ635nOhILHoAj7kWwNw23zgNM9iQgfCP4ExP32+pNbaNs/+w9V6Qhf3D3zwxlwdKhPw==",
+        "dependencies": {
+          "NSign.Abstractions": "1.2.1",
+          "StructuredFieldValues": "0.7.6"
         }
       },
       "xunit.runner.visualstudio": {
@@ -180,6 +201,11 @@
         "resolved": "2.23.0",
         "contentHash": "nWArUZTdU7iqZLycLKWe0TDms48KKGE6pONH2terYNa8REXiqixrMOkf1sk5DHGMaUTqONU2YkS4SAXBhLStgw=="
       },
+      "Microsoft.AspNetCore.TestHost": {
+        "type": "Transitive",
+        "resolved": "10.0.2",
+        "contentHash": "LhgZh1EiJ8crslosaxgWUK4pA0xwwGsptYmmxFtZixNpTvkby4pjR1jVBt8vqGKkDeI91SLs051xowFg96+cgw=="
+      },
       "Microsoft.Azure.Services.AppAuthentication": {
         "type": "Transitive",
         "resolved": "1.6.2",
@@ -312,8 +338,8 @@
       },
       "Microsoft.Extensions.DependencyModel": {
         "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "RFYJR7APio/BiqdQunRq6DB+nDB6nc2qhHr77mlvZ0q0BT8PubMXN7XicmfzCbrDE/dzhBnUKBRXLTcqUiZDGg=="
+        "resolved": "10.0.2",
+        "contentHash": "DHXzj/FKmUDmhzw7AHbMXbNNcgO8Cb9PDbYOUDICjFAdIALy2WbC6pm+dFKiAUNtcYMucZu2iMVw1ef/sdcZFw=="
       },
       "Microsoft.Extensions.Diagnostics": {
         "type": "Transitive",

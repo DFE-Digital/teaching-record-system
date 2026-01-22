@@ -5,7 +5,6 @@ using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Tests.ApiSchema;
 using TeachingRecordSystem.Core.Tests.Jobs;
-using TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.Tests;
 
@@ -26,7 +25,6 @@ public class Startup
                     .AddTestTrnGeneration()
                     .AddSingleton<ReferenceDataCache>()
                     .AddSingleton<TestData>()
-                    .AddSingleton<WebhookReceiver>()
                     .AddSingleton<PersonInfoCache>()
                     .AddSingleton<EventMapperFixture>()
                     .AddSingleton<NightlyEmailJobFixture>()

@@ -4,20 +4,8 @@ using TeachingRecordSystem.Core.Services.WorkforceData;
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
 [Collection(nameof(WorkforceDataTestCollection))]
-public class TpsCsvExtractProcessorTests : IAsyncLifetime
+public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
-    public TpsCsvExtractProcessorTests(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
-
-        TestData = new TestData(
-            dbFixture.DbContextFactory,
-            referenceDataCache,
-            Clock);
-    }
 
     [Fact]
     public async Task ProcessNonMatchingTrns_WhenCalledWithTrnsNotMatchingPersonsInTrs_SetsResultToInvalidTrn()
@@ -34,12 +22,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessNonMatchingTrnsAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.InvalidTrn, i.Result));
     }
@@ -59,12 +47,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessNonMatchingEstablishmentsAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.InvalidEstablishment, i.Result));
     }
@@ -83,12 +71,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataAdded, i.Result));
         var employmentHistory = await dbContext.TpsEmployments.Where(e => e.PersonId == person.PersonId).ToListAsync();
@@ -112,12 +100,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataAdded, i.Result));
         var employmentHistory = await dbContext.TpsEmployments.Where(e => e.PersonId == person.PersonId).ToListAsync();
@@ -141,12 +129,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataAdded, i.Result));
         var employmentHistory = await dbContext.TpsEmployments.Where(e => e.PersonId == person.PersonId).ToListAsync();
@@ -170,12 +158,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataAdded, i.Result));
         var employmentHistory = await dbContext.TpsEmployments.Where(e => e.PersonId == person.PersonId).ToListAsync();
@@ -206,12 +194,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataAdded, i.Result));
         var employmentHistory = await dbContext.TpsEmployments.Where(e => e.PersonId == person.PersonId).ToListAsync();
@@ -240,12 +228,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataAdded, i.Result));
         var employmentHistory = await dbContext.TpsEmployments.Where(e => e.PersonId == person.PersonId).ToListAsync();
@@ -272,12 +260,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataUpdated, i.Result));
         var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == existingPersonEmployment.TpsEmploymentId);
@@ -303,12 +291,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataUpdated, i.Result));
         var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == existingPersonEmployment.TpsEmploymentId);
@@ -332,12 +320,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataUpdated, i.Result));
         var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == existingPersonEmployment.TpsEmploymentId);
@@ -362,12 +350,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataUpdated, i.Result));
         var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == existingPersonEmployment.TpsEmploymentId);
@@ -390,12 +378,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataUpdated, i.Result));
         var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == existingPersonEmployment.TpsEmploymentId);
@@ -418,12 +406,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidNoChange, i.Result));
     }
@@ -441,12 +429,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.UpdateLatestEstablishmentVersionsAsync(CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == existingPersonEmployment.TpsEmploymentId);
         Assert.Equal(establishment2.EstablishmentId, updatedPersonEmployment.EstablishmentId);
     }
@@ -468,12 +456,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.ProcessEndedEmploymentsAsync(CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var updatedPersonEmploymentWhichShouldHaveEndDateSet = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == personEmploymentWhichHasEnded.TpsEmploymentId);
         var updatedPersonEmploymentWhichShouldNotHaveEndDateSet = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == personEmploymentWhichHasNotEnded.TpsEmploymentId);
         Assert.Equal(lastKnownEmployedDateOutsideThreeMonthsOfExtractDate, updatedPersonEmploymentWhichShouldHaveEndDateSet.EndDate);
@@ -495,23 +483,14 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         // Act
         var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
+            DbContextFactory,
+            Clock);
         await processor.BackfillEmployerEmailAddressInEmploymentHistoryAsync(CancellationToken.None);
 
         // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var updatedTpsEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == personEmploymentWithoutEmployerEmailAddress.TpsEmploymentId);
         Assert.Equal(employerEmailAddress, updatedTpsEmployment.EmployerEmailAddress);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
-
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private TestableClock Clock { get; }
 }

@@ -15,8 +15,10 @@ using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
-public class WebhookSenderTests(WebhookReceiver receiver)
+public class WebhookSenderTests(ServiceFixture serviceFixture)
 {
+    private WebhookReceiver WebhookReceiver => serviceFixture.Services.GetRequiredService<WebhookReceiver>();
+
     [Fact]
     public async Task SendMessageAsync_SendsMessageWithExpectedContent()
     {
@@ -42,7 +44,7 @@ public class WebhookSenderTests(WebhookReceiver receiver)
             {
                 WebhookEndpointId = webhookEndpointId,
                 ApplicationUserId = applicationUserId,
-                Address = receiver.Server.BaseAddress + WebhookReceiver.Endpoint.TrimStart('/'),
+                Address = WebhookReceiver.Server.BaseAddress + WebhookReceiver.Endpoint.TrimStart('/'),
                 ApiVersion = apiVersion,
                 CloudEventTypes = [cloudEventType],
                 Enabled = true,
@@ -57,14 +59,14 @@ public class WebhookSenderTests(WebhookReceiver receiver)
             NextDeliveryAttempt = DateTime.UtcNow
         };
 
-        var options = receiver.GetWebhookOptions();
-        var sender = receiver.GetWebhookSender();
+        var options = WebhookReceiver.GetWebhookOptions();
+        var sender = WebhookReceiver.GetWebhookSender();
 
         // Act
         await sender.SendMessageAsync(message);
 
         // Assert
-        await receiver.WebhookMessageRecorder.AssertMessagesReceivedAsync(
+        await WebhookReceiver.WebhookMessageRecorder.AssertMessagesReceivedAsync(
             async req =>
             {
                 Assert.Equal(HttpMethod.Post, req.Method);

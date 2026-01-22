@@ -3,24 +3,12 @@ using Establishment = TeachingRecordSystem.Core.Models.Establishment;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Establishments.Gias;
 
-public class EstablishmentRefresherTests
+[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
+public class EstablishmentRefresherTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
-    public EstablishmentRefresherTests(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
-
-        TestData = new TestData(
-            dbFixture.DbContextFactory,
-            referenceDataCache,
-            Clock);
-    }
-
     [Fact]
     public Task RefreshEstablishments_WhenCalledforNewUrn_AddsNewEstablishments() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var establishmentMasterDataService = Mock.Of<IEstablishmentMasterDataService>();
@@ -140,7 +128,7 @@ public class EstablishmentRefresherTests
 
     [Fact]
     public Task RefreshEstablishments_WhenCalledForExistingUrn_UpdatesEstablishment() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var establishmentMasterDataService = Mock.Of<IEstablishmentMasterDataService>();
@@ -237,10 +225,4 @@ public class EstablishmentRefresherTests
             Assert.Equal(updatedEstablishment.County, establishmentActual.County);
             Assert.Equal(updatedEstablishment.Postcode, establishmentActual.Postcode);
         });
-
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private TestableClock Clock { get; }
 }

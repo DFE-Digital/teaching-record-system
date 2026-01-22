@@ -7,21 +7,9 @@ using TeachingRecordSystem.Core.Services.WorkforceData.Google;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
-[Collection(nameof(WorkforceDataTestCollection))]
-public class WorkforceDataExporterTests : IAsyncLifetime
+[Collection(nameof(WorkforceDataTestCollection)), ClearDbBeforeTest]
+public class WorkforceDataExporterTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
-    public WorkforceDataExporterTests(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
-
-        TestData = new TestData(
-            dbFixture.DbContextFactory,
-            referenceDataCache,
-            Clock);
-    }
 
     [Fact]
     public async Task Export_WhenCalled_ExportsDataToParquetFileAndUploadsToGcs()
@@ -59,8 +47,8 @@ public class WorkforceDataExporterTests : IAsyncLifetime
 
         // Act
         var workforceDataExporter = new WorkforceDataExporter(
-            TestData.Clock,
-            TestData.DbContextFactory,
+            Clock,
+            DbContextFactory,
             optionsAccessor,
             storageClientProvider);
 
@@ -89,13 +77,4 @@ public class WorkforceDataExporterTests : IAsyncLifetime
         Assert.Equal(personEmployment.UpdatedOn, (DateTime)exportItem[nameof(WorkforceDataExportItem.UpdatedOn)]);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
-
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private TestableClock Clock { get; }
 }
