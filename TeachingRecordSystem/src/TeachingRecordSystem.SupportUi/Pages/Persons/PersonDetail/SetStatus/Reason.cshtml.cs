@@ -58,14 +58,14 @@ public class ReasonModel(
     public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? DeactivateReasonDetail { get; set; }
 
     [BindProperty]
     public PersonReactivateReason? ReactivateReason { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ReactivateReasonDetail { get; set; }
 
     [BindProperty]

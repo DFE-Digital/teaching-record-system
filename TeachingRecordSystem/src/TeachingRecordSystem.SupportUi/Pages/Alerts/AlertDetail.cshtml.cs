@@ -59,7 +59,7 @@ public class AlertDetailModel(
         ChangeReasonDetail = changeReasonInfo?.ChangeReasonDetail;
         EvidenceFileName = changeReasonInfo?.EvidenceFileName;
         UploadedEvidenceFileUrl = changeReasonInfo?.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(changeReasonInfo.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(changeReasonInfo.EvidenceFileId!.Value, WebConstants.FileUrlExpiry) :
             null;
         ExternalLinkUri = TrsUriHelper.TryCreateWebsiteUri(Alert.ExternalLink, out var linkUri) ? linkUri : null;
 

@@ -157,8 +157,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
         {
-            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(oldDateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(oldDateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {
@@ -168,8 +168,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
         {
-            doc.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, v.TrimmedText()));
-            doc.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newValueIsDefault ? WebConstants.EmptyFallbackContent : emailAddress, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(previousValueIsDefault ? WebConstants.EmptyFallbackContent : oldEmailAddress, v.TrimmedText()));
         }
         else
         {
@@ -179,8 +179,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
         {
-            doc.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : nationalInsuranceNumber, v.TrimmedText()));
-            doc.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldNationalInsuranceNumber, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newValueIsDefault ? WebConstants.EmptyFallbackContent : nationalInsuranceNumber, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(previousValueIsDefault ? WebConstants.EmptyFallbackContent : oldNationalInsuranceNumber, v.TrimmedText()));
         }
         else
         {
@@ -190,8 +190,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
         {
-            doc.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : gender.GetDisplayName(), v.TrimmedText()));
-            doc.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldGender.GetDisplayName(), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newValueIsDefault ? WebConstants.EmptyFallbackContent : gender.GetDisplayName(), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(previousValueIsDefault ? WebConstants.EmptyFallbackContent : oldGender.GetDisplayName(), v.TrimmedText()));
         }
         else
         {

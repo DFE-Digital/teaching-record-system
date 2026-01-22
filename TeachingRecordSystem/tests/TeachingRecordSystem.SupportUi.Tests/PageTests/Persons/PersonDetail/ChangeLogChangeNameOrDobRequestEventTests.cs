@@ -186,7 +186,7 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
         var title = item.QuerySelector(".moj-timeline__title");
         Assert.NotNull(title);
 
-        item.AssertSummaryListRowValue("details", "Date of request", v => Assert.Equal(updatedEvent.CreatedUtc.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("details", "Date of request", v => Assert.Equal(updatedEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
         item.AssertSummaryListRowValue("reason", "Reason", v => Assert.Equal("No evidence supplied", v.TrimmedText()));
     }
 
@@ -280,8 +280,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
         var title = item.QuerySelector(".moj-timeline__title");
         Assert.NotNull(title);
 
-        item.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(requestData.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-        item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(requestData.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
     }
 
     [Fact]
@@ -354,7 +354,7 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
         var title = item.QuerySelector(".moj-timeline__title");
         Assert.NotNull(title);
 
-        item.AssertSummaryListRowValue("details", "Date of request", v => Assert.Equal(updatedEvent.CreatedUtc.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("details", "Date of request", v => Assert.Equal(updatedEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
         item.AssertSummaryListRowValue("reason", "Reason", v => Assert.Equal("No evidence supplied", v.TrimmedText()));
     }
 }

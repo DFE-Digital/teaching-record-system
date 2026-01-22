@@ -26,14 +26,14 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
     public string SupportTaskDetail(string supportTaskReference, SupportTaskType supportTaskType) =>
         supportTaskType switch
         {
-            SupportTaskType.ConnectOneLoginUser => SupportTasks.ConnectOneLoginUser.Index(supportTaskReference),
+            SupportTaskType.OneLoginUserRecordMatching => SupportTasks.ConnectOneLoginUser.Index(supportTaskReference),
             SupportTaskType.ApiTrnRequest => SupportTasks.ApiTrnRequests.Resolve.Index(supportTaskReference),
             SupportTaskType.TrnRequestManualChecksNeeded => SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(supportTaskReference),
             SupportTaskType.NpqTrnRequest => SupportTasks.NpqTrnRequests.Details(supportTaskReference),
             SupportTaskType.ChangeDateOfBirthRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference),
             SupportTaskType.ChangeNameRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference),
             SupportTaskType.TeacherPensionsPotentialDuplicate => SupportTasks.TeacherPensions.Resolve.Matches(supportTaskReference),
-            SupportTaskType.OneLoginUserIdVerification => SupportTasks.OneLoginUserIdVerification.Resolve.Matches(supportTaskReference),
+            SupportTaskType.OneLoginUserIdVerification => SupportTasks.OneLoginUserMatching.Resolve.Matches(supportTaskReference),
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 

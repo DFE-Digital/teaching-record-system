@@ -36,7 +36,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
         var result = await ExecuteCommandAsync(command);
 
         // Assert
-        AssertError(result, ApiError.ErrorCodes.RecordIsNotActive);
+        AssertError(result, ApiError.ErrorCodes.RecordIsDeactivated);
     }
 
     [Fact]

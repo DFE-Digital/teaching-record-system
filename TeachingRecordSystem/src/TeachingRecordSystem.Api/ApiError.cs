@@ -52,7 +52,7 @@ public sealed record ApiError
         public static int UnableToChangeFailProfessionalStatusStatus => 10055;
         public static int UnableToChangeWithdrawnProfessionalStatusStatus => 10056;
         public static int PiiUpdatesForbiddenPersonHasEyts => 10057;
-        public static int RecordIsNotActive => 10058;
+        public static int RecordIsDeactivated => 10058;
         public static int RecordIsMerged => 10059;
     }
 
@@ -162,8 +162,8 @@ public sealed record ApiError
     public static ApiError PiiUpdatesForbiddenPersonHasEyts() =>
         new(ErrorCodes.PiiUpdatesForbiddenPersonHasEyts, "Updates to PII data is not permitted. Person has EYTS.", "");
 
-    public static ApiError RecordIsNotActive(string trn) =>
-        new(ErrorCodes.RecordIsNotActive, $"Record {trn} is not active.");
+    public static ApiError RecordIsDeactivated(string trn) =>
+        new(ErrorCodes.RecordIsDeactivated, $"Record {trn} is not active.");
 
     public static ApiError RecordIsMerged(string trn, string mergedWithTrn) =>
         new(ErrorCodes.RecordIsMerged, $"Record {trn} has been merged with {mergedWithTrn}.", data: (DataKeys.MergedWithTrn, mergedWithTrn));

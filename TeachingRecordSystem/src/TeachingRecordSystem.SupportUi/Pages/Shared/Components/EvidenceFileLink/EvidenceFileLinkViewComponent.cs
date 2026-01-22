@@ -12,7 +12,7 @@ public class EvidenceFileLinkViewComponent(
     {
         if (evidenceFile is UploadedEvidenceFile file)
         {
-            var fileUrl = await fileService.GetFileUrlAsync(file.FileId, UiDefaults.FileUrlExpiry);
+            var fileUrl = await fileService.GetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry);
             file.PreviewUrl = linkGenerator.Files.File(file.FileName, fileUrl);
         }
 

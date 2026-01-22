@@ -84,8 +84,8 @@
                     "Date of birth",
                     Model.DateOfBirth!.Different,
                     Html.NameFor(m => m.DateOfBirthSource),
-                    Model.DateOfBirth!.PrimaryPersonValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
-                    Model.DateOfBirth!.SecondaryPersonValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
+                    Model.DateOfBirth!.PrimaryPersonValue?.ToString(WebConstants.DateOnlyDisplayFormat),
+                    Model.DateOfBirth!.SecondaryPersonValue?.ToString(WebConstants.DateOnlyDisplayFormat),
                     Model.DateOfBirthSource);
 
                 await RenderChoosePersonAttribute(

@@ -17,7 +17,7 @@ public class UseEmptyFallbackTagHelper : TagHelper
         if (content.IsEmptyOrWhiteSpace)
         {
             output.AddClass("trs-empty-fallback", HtmlEncoder.Default);
-            output.Content.SetContent("Not provided");
+            output.Content.SetContent(WebConstants.EmptyFallbackContent);
         }
     }
 }

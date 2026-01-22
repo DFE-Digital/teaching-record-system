@@ -153,7 +153,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(duplicatesCell);
         Assert.Equal(integrationTransaction.IntegrationTransactionId.ToString(), idCell.TextContent.Trim());
         Assert.Equal(interfaceType.GetDisplayName(), interfaceCell.TextContent.Trim());
-        Assert.Contains(createdOn.ToString(UiDefaults.DateOnlyDisplayFormat), createdonCell.TextContent.Trim());
+        Assert.Contains(createdOn.ToString(WebConstants.DateOnlyDisplayFormat), createdonCell.TextContent.Trim());
         Assert.Contains(createdOn.ToString("hh:mm tt"), createdonCell.TextContent.Trim());
         Assert.Equal(importStatus.ToString(), importstatusCell.TextContent.Trim());
         Assert.Equal(totalCount.ToString(), totalCell.TextContent.Trim());

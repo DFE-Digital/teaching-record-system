@@ -5,6 +5,12 @@
 The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
 
+## 20260120
+
+The `GET /v3/trns/<trn>` endpoint has been revised to behave in the same was as `GET /v3/trns/<trn>` with respect to deactivated records:
+If the TRN exists but is deactivated (and not merged), a 410 response is returned.
+If the TRN exists but has been merged into another record, a 308 response is returned with the retained TRN in the `Location` header e.g. `Location: /v3/persons/<retained TRN>`.
+
 ## 20250905
 
 An endpoint has been added at `GET /v3/trns/<trn>` to check whether a record with the given TRN exists and is active.

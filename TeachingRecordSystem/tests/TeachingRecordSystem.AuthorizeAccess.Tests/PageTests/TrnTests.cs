@@ -138,7 +138,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
 
     [Fact]
-    public Task Post_NoTrnSpecifiedForVerifiedUser_UpdatesStateAndRedirectsToNotFoundPage() =>
+    public Task Post_NoTrnSpecifiedForVerifiedUser_UpdatesStateAndRedirectsToNoTrnPage() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
             async coordinator =>
@@ -158,7 +158,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 // Assert
                 Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-                Assert.Equal(JourneyUrls.NotFound(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+                Assert.Equal(JourneyUrls.NoTrn(coordinator.InstanceId), response.Headers.Location?.OriginalString);
 
                 var state = coordinator.State;
                 Assert.False(state.HaveTrn);
@@ -237,7 +237,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
 
     [Fact]
-    public Task Post_NoTrnSpecifiedForUnverified_UpdatesStateAndRedirectsToCheckAnswersPage() =>
+    public Task Post_NoTrnSpecifiedForUnverified_UpdatesStateAndRedirectsToNoTrnPage() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
             async coordinator =>
@@ -258,7 +258,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 // Assert
                 Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-                Assert.Equal(JourneyUrls.CheckAnswers(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+                Assert.Equal(JourneyUrls.NoTrn(coordinator.InstanceId), response.Headers.Location?.OriginalString);
 
                 var state = coordinator.State;
                 Assert.False(state.HaveTrn);

@@ -47,6 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <_ContentIncludedByDefault Remove="wwwroot\govuk-one-login-service-header\init-service-header.js" />
     <_ContentIncludedByDefault Remove="wwwroot\govuk-one-login-service-header\service-header.js" />
   </ItemGroup>

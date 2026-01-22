@@ -31,7 +31,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Induction started on</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         @if (Model.ShowStartDateChangeLink)
                         {
                             <govuk-summary-list-row-actions>
@@ -45,7 +45,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Induction completed on</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         @if (Model.ShowCompletedDateChangeLink)
                         {
                             <govuk-summary-list-row-actions>

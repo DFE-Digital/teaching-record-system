@@ -48,10 +48,10 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertType!.Name, item.GetElementByTestId("alert-type")?.TrimmedText());
-                    Assert.Equal(alertCreatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertCreatedEvent.AddReason : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertCreatedEvent.AddReasonDetail : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
-                    Assert.Equal(populateOptional ? $"{alertCreatedEvent.EvidenceFile!.Name} (opens in new tab)" : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
+                    Assert.Equal(alertCreatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertCreatedEvent.AddReason : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertCreatedEvent.AddReasonDetail : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                    Assert.Equal(populateOptional ? $"{alertCreatedEvent.EvidenceFile!.Name} (opens in new tab)" : WebConstants.EmptyFallbackContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
                 });
     }
 
@@ -120,7 +120,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertCreatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertCreatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertCreatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertCreatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
                 });
     }
 
@@ -191,9 +191,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                  Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
                  Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                  Assert.Equal(alertType!.Name, item.GetElementByTestId("alert-type")?.TrimmedText());
-                 Assert.Equal(alertDeletedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
-                 Assert.Equal(populateOptional ? alertDeletedEvent.DeletionReasonDetail : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
-                 Assert.Equal(populateOptional ? $"{alertDeletedEvent.EvidenceFile!.Name} (opens in new tab)" : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
+                 Assert.Equal(alertDeletedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                 Assert.Equal(populateOptional ? alertDeletedEvent.DeletionReasonDetail : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                 Assert.Equal(populateOptional ? $"{alertDeletedEvent.EvidenceFile!.Name} (opens in new tab)" : WebConstants.EmptyFallbackContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
              });
     }
 
@@ -266,9 +266,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                  Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                  Assert.Equal(alertDqtDeactivatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                  Assert.Equal(alertDqtDeactivatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                 Assert.Equal(populateOptional ? alertDqtDeactivatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
-                 Assert.Equal(populateOptional ? alertDqtDeactivatedEvent.Alert.Details : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("details")?.TrimmedText());
-                 Assert.Equal(isOpenAlert ? UiDefaults.EmptyDisplayContent : alertDqtDeactivatedEvent.Alert.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
+                 Assert.Equal(populateOptional ? alertDqtDeactivatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                 Assert.Equal(populateOptional ? alertDqtDeactivatedEvent.Alert.Details : WebConstants.EmptyFallbackContent, item.GetElementByTestId("details")?.TrimmedText());
+                 Assert.Equal(isOpenAlert ? WebConstants.EmptyFallbackContent : alertDqtDeactivatedEvent.Alert.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
              });
     }
 
@@ -337,7 +337,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertDqtImportedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertDqtImportedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertDqtImportedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertDqtImportedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
                 });
     }
 
@@ -406,7 +406,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertDqtImportedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertDqtImportedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertDqtImportedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertDqtImportedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
                 });
     }
 
@@ -473,7 +473,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertType!.Name, item.GetElementByTestId("alert-type")?.TrimmedText());
-                    Assert.Equal(alertMigratedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(alertMigratedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
                     Assert.Equal(alertMigratedEvent!.OldAlert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertMigratedEvent!.OldAlert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
                 });
@@ -548,8 +548,8 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(populateOptional ? UiDefaults.EmptyDisplayContent : alertUpdatedEvent.OldAlert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? WebConstants.EmptyFallbackContent : alertUpdatedEvent.OldAlert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TrimmedText());
                 });
     }
 
@@ -583,11 +583,11 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertType!.Name, item.GetElementByTestId("alert-type")?.TrimmedText());
-                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(alertUpdatedEvent.OldAlert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReason : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
-                    Assert.Equal(populateOptional ? $"{alertUpdatedEvent.EvidenceFile!.Name} (opens in new tab)" : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
+                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(alertUpdatedEvent.OldAlert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReason : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReasonDetail : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                    Assert.Equal(populateOptional ? $"{alertUpdatedEvent.EvidenceFile!.Name} (opens in new tab)" : WebConstants.EmptyFallbackContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
                 });
     }
 
@@ -621,9 +621,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.Details : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("details")?.TrimmedText());
-                    Assert.Equal(populateOptional ? UiDefaults.EmptyDisplayContent : alertUpdatedEvent.OldAlert.Details, item.GetElementByTestId("old-details")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.Details : WebConstants.EmptyFallbackContent, item.GetElementByTestId("details")?.TrimmedText());
+                    Assert.Equal(populateOptional ? WebConstants.EmptyFallbackContent : alertUpdatedEvent.OldAlert.Details, item.GetElementByTestId("old-details")?.TrimmedText());
                 });
     }
 
@@ -657,12 +657,12 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertType!.Name, item.GetElementByTestId("alert-type")?.TrimmedText());
-                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent.Alert.Details!, item.GetElementByTestId("details")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent.OldAlert.Details!, item.GetElementByTestId("old-details")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReason : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
-                    Assert.Equal(populateOptional ? $"{alertUpdatedEvent.EvidenceFile!.Name} (opens in new tab)" : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReason : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReasonDetail : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                    Assert.Equal(populateOptional ? $"{alertUpdatedEvent.EvidenceFile!.Name} (opens in new tab)" : WebConstants.EmptyFallbackContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
                 });
     }
 
@@ -696,12 +696,12 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertType!.Name, item.GetElementByTestId("alert-type")?.TrimmedText());
-                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(populateOptional ? $"{alertUpdatedEvent.Alert!.ExternalLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("external-link")?.TrimmedText());
-                    Assert.Equal(populateOptional ? UiDefaults.EmptyDisplayContent : $"{alertUpdatedEvent.OldAlert!.ExternalLink} (opens in new tab)", item.GetElementByTestId("old-external-link")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReason : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
-                    Assert.Equal(populateOptional ? $"{alertUpdatedEvent.EvidenceFile!.Name} (opens in new tab)" : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
+                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? $"{alertUpdatedEvent.Alert!.ExternalLink} (opens in new tab)" : WebConstants.EmptyFallbackContent, item.GetElementByTestId("external-link")?.TrimmedText());
+                    Assert.Equal(populateOptional ? WebConstants.EmptyFallbackContent : $"{alertUpdatedEvent.OldAlert!.ExternalLink} (opens in new tab)", item.GetElementByTestId("old-external-link")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReason : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.ChangeReasonDetail : WebConstants.EmptyFallbackContent, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                    Assert.Equal(populateOptional ? $"{alertUpdatedEvent.EvidenceFile!.Name} (opens in new tab)" : WebConstants.EmptyFallbackContent, item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
                 });
     }
 
@@ -736,9 +736,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(changeType != EndDateChangeType.Reopen ? alertUpdatedEvent.Alert.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("end-date")?.TrimmedText());
-                    Assert.Equal(changeType != EndDateChangeType.Close ? alertUpdatedEvent.OldAlert.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : null, item.GetElementByTestId("old-end-date")?.TrimmedText());
+                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(changeType != EndDateChangeType.Reopen ? alertUpdatedEvent.Alert.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("end-date")?.TrimmedText());
+                    Assert.Equal(changeType != EndDateChangeType.Close ? alertUpdatedEvent.OldAlert.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : null, item.GetElementByTestId("old-end-date")?.TrimmedText());
                 });
     }
 
@@ -773,9 +773,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertType!.Name, item.GetElementByTestId("alert-type")?.TrimmedText());
-                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(changeType != EndDateChangeType.Reopen ? alertUpdatedEvent.Alert.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("end-date")?.TrimmedText());
-                    Assert.Equal(changeType != EndDateChangeType.Close ? alertUpdatedEvent.OldAlert.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : null, item.GetElementByTestId("old-end-date")?.TrimmedText());
+                    Assert.Equal(alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(changeType != EndDateChangeType.Reopen ? alertUpdatedEvent.Alert.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("end-date")?.TrimmedText());
+                    Assert.Equal(changeType != EndDateChangeType.Close ? alertUpdatedEvent.OldAlert.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : null, item.GetElementByTestId("old-end-date")?.TrimmedText());
                 });
     }
 
@@ -809,9 +809,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(populateOptional ? bool.TrueString : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("dqt-spent")?.TrimmedText());
-                    Assert.Equal(populateOptional ? UiDefaults.EmptyDisplayContent : bool.TrueString, item.GetElementByTestId("old-dqt-spent")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? bool.TrueString : WebConstants.EmptyFallbackContent, item.GetElementByTestId("dqt-spent")?.TrimmedText());
+                    Assert.Equal(populateOptional ? WebConstants.EmptyFallbackContent : bool.TrueString, item.GetElementByTestId("old-dqt-spent")?.TrimmedText());
                 });
     }
 
@@ -845,7 +845,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.OldAlert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.OldAlert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
                 });
@@ -924,11 +924,11 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TrimmedText());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TrimmedText());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.Details : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("details")?.TrimmedText());
-                    Assert.Equal(populateOptional ? UiDefaults.EmptyDisplayContent : alertUpdatedEvent.OldAlert.Details, item.GetElementByTestId("old-details")?.TrimmedText());
-                    Assert.Equal(populateOptional ? bool.TrueString : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("dqt-spent")?.TrimmedText());
-                    Assert.Equal(populateOptional ? UiDefaults.EmptyDisplayContent : bool.TrueString, item.GetElementByTestId("old-dqt-spent")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : WebConstants.EmptyFallbackContent, item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.Details : WebConstants.EmptyFallbackContent, item.GetElementByTestId("details")?.TrimmedText());
+                    Assert.Equal(populateOptional ? WebConstants.EmptyFallbackContent : alertUpdatedEvent.OldAlert.Details, item.GetElementByTestId("old-details")?.TrimmedText());
+                    Assert.Equal(populateOptional ? bool.TrueString : WebConstants.EmptyFallbackContent, item.GetElementByTestId("dqt-spent")?.TrimmedText());
+                    Assert.Equal(populateOptional ? WebConstants.EmptyFallbackContent : bool.TrueString, item.GetElementByTestId("old-dqt-spent")?.TrimmedText());
                 });
     }
 

@@ -18,7 +18,7 @@ public class OtherDetailsChangeReasonModel(
     public PersonDetailsChangeReason? Reason { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ReasonDetail { get; set; }
 
     [BindProperty]

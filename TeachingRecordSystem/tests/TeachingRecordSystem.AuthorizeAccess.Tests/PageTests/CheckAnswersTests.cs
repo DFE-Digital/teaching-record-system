@@ -64,7 +64,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Assert
                 var doc = await AssertEx.HtmlResponseAsync(response);
                 Assert.Equal($"{firstName} {lastName}", doc.GetSummaryListValueByKey("Name"));
-                Assert.Equal(dateOfBirth.ToString("d MMMM yyyy"), doc.GetSummaryListValueByKey("Date of birth"));
+                Assert.Equal(dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
                 Assert.Equal(trn, doc.GetSummaryListValueByKey("Teacher reference number"));
             });
@@ -99,6 +99,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
                 Assert.Equal(JourneyUrls.RequestSubmitted(coordinator.InstanceId), response.Headers.Location?.OriginalString);
 
+                Assert.NotNull(coordinator.State.CreatedSupportTaskReference);
                 Assert.Collection(
                     coordinator.Path.Steps,
                     s => Assert.Equal(StepUrls.RequestSubmitted, s.NormalizedUrl));
@@ -107,10 +108,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.NotNull(supportTask);
                 Assert.Equal(Clock.UtcNow, supportTask.CreatedOn);
                 Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
-                Assert.Equal(SupportTaskType.ConnectOneLoginUser, supportTask.SupportTaskType);
+                Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTask.SupportTaskType);
                 Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
                 Assert.Equal(oneLoginUser.Subject, supportTask.OneLoginUserSubject);
-                var data = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);
+                var data = Assert.IsType<OneLoginUserRecordMatchingData>(supportTask.Data);
                 Assert.True(data.Verified);
                 Assert.Equal(oneLoginUser.Subject, data.OneLoginUserSubject);
                 Assert.Equal(oneLoginUser.EmailAddress, data.OneLoginUserEmail);
@@ -127,10 +128,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
                     Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
                     Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);
-                    Assert.Equal(SupportTaskType.ConnectOneLoginUser, supportTaskCreatedEvent.SupportTask.SupportTaskType);
+                    Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTaskCreatedEvent.SupportTask.SupportTaskType);
                     Assert.Equal(SupportTaskStatus.Open, supportTaskCreatedEvent.SupportTask.Status);
                     Assert.Equal(oneLoginUser.Subject, supportTaskCreatedEvent.SupportTask.OneLoginUserSubject);
-                    var eventData = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);
+                    var eventData = Assert.IsType<OneLoginUserRecordMatchingData>(supportTask.Data);
                     Assert.True(eventData.Verified);
                     Assert.Equal(oneLoginUser.Subject, eventData.OneLoginUserSubject);
                     Assert.Equal(oneLoginUser.EmailAddress, eventData.OneLoginUserEmail);
@@ -190,6 +191,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
                 Assert.Equal(JourneyUrls.RequestSubmitted(coordinator.InstanceId), response.Headers.Location?.OriginalString);
 
+                Assert.NotNull(coordinator.State.CreatedSupportTaskReference);
                 Assert.Collection(
                     coordinator.Path.Steps,
                     s => Assert.Equal(StepUrls.RequestSubmitted, s.NormalizedUrl));

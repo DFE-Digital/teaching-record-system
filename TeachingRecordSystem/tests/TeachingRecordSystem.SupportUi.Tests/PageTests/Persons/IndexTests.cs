@@ -46,7 +46,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person1 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
         var person2 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
         var person3 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
-        var search = dateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat);
+        var search = dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
 

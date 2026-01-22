@@ -38,7 +38,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@induction.StartDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@induction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
 
@@ -46,7 +46,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="completion-date" use-empty-fallback>@induction.CompletionDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="completion-date" use-empty-fallback>@induction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
         </govuk-summary-list>
@@ -74,7 +74,7 @@
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
 
@@ -82,7 +82,7 @@
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-completion-date" use-empty-fallback>@oldInduction.CompletionDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value data-testid="old-completion-date" use-empty-fallback>@oldInduction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                 </govuk-summary-list>

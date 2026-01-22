@@ -74,7 +74,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
-        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat));
+        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(WebConstants.DateTimeDisplayFormat));
         AssertRowHasContent("potential-duplicate", supportTask.TrnRequestMetadata!.PotentialDuplicate ? "Yes" : "No");
 
         void AssertRowHasContent(string testId, string expectedText)
@@ -167,9 +167,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         // Create enough tasks to create 3 pages
-        await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
+        await Enumerable.Range(1, (pageSize * page) + 1)
             .ToAsyncEnumerable()
-            .SelectAwait(async _ => await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId)));
+            .Select(async (int _, CancellationToken _) => await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId))
+            .ToArrayAsync();
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

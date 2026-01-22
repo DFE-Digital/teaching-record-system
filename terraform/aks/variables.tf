@@ -169,6 +169,7 @@ locals {
     DfeAnalytics__Environment = var.environment_name
     DfeAnalytics__TableId     = module.dfe_analytics[0].bigquery_table_name
     DfeAnalytics__DatasetId   = module.dfe_analytics[0].bigquery_dataset
+    DfeAnalytics__ProjectId   = module.dfe_analytics[0].bigquery_project_id
   } : {}
 
   federated_auth_secrets = var.enable_dfe_analytics_federated_auth ? {

@@ -126,6 +126,37 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             });
 
     [Fact]
+    public Task OnOneLoginCallback_AuthenticationOnly_UserHasPendingSupportTasks_RedirectsToPendingSupportTasksPage() =>
+        WithJourneyCoordinatorAsync(
+            instanceId => new SignInJourneyState(
+                redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default),
+            async coordinator =>
+            {
+                // Arrange
+                var user = await TestData.CreateOneLoginUserAsync();
+                Clock.Advance();
+
+                await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(user.Subject);
+
+                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: user.Subject);
+
+                // Act
+                var result = await coordinator.OnOneLoginCallbackAsync(authenticationTicket);
+
+                // Assert
+                Assert.NotNull(coordinator.State.OneLoginAuthenticationTicket);
+                Assert.Null(coordinator.State.AuthenticationTicket);
+                Assert.NotNull(coordinator.State.PendingSupportTaskReference);
+
+                var redirectResult = Assert.IsType<RedirectHttpResult>(result);
+                Assert.Equal(JourneyUrls.PendingSupportRequest(coordinator.InstanceId), redirectResult.Url);
+            });
+
+    [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithPendingTrnRequestMatchedOnOneLoginUserSubject_RequestsIdentityVerification() =>
         WithJourneyCoordinatorAsync(
             instanceId => new SignInJourneyState(

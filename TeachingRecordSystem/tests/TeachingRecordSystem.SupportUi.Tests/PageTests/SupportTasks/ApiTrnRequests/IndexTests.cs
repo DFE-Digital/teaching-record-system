@@ -69,7 +69,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
-        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
         AssertRowHasContent("source", applicationUser.Name);
 
         void AssertRowHasContent(string testId, string expectedText)
@@ -158,9 +158,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = 2;
 
         // Create enough tasks to create 3 pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await TestData.CreateApiTrnRequestSupportTaskAsync()));
+        await Enumerable.Range(1, (pageSize * page) + 1)
+            .ToAsyncEnumerable()
+            .Select(async (int _, CancellationToken _) => await TestData.CreateApiTrnRequestSupportTaskAsync())
+            .ToArrayAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/api-trn-requests/?pageNumber={page}");

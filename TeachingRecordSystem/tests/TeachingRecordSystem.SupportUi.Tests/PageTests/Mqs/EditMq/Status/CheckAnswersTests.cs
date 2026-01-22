@@ -129,8 +129,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (isEndDateChange)
         {
-            Assert.Equal(oldEndDate.HasValue ? oldEndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("current-end-date")!.TrimmedText());
-            Assert.Equal(newEndDate.HasValue ? newEndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("new-end-date")!.TrimmedText());
+            Assert.Equal(oldEndDate.HasValue ? oldEndDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("current-end-date")!.TrimmedText());
+            Assert.Equal(newEndDate.HasValue ? newEndDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("new-end-date")!.TrimmedText());
         }
         else
         {

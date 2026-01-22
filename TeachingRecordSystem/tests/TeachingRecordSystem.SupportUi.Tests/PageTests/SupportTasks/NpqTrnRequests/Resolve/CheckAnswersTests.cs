@@ -173,8 +173,8 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
             static object? FormatValue(object? value) => value switch
             {
-                null => UiDefaults.EmptyDisplayContent,
-                DateOnly dateOnly => dateOnly.ToString(UiDefaults.DateOnlyDisplayFormat),
+                null => WebConstants.EmptyFallbackContent,
+                DateOnly dateOnly => dateOnly.ToString(WebConstants.DateOnlyDisplayFormat),
                 Gender gender => gender.GetDisplayName(),
                 _ => value
             };
@@ -1018,7 +1018,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             "Date of birth",
             d => d.DateOfBirth,
             p => p.DateOfBirth,
-            value => ((DateOnly?)value)?.ToString(UiDefaults.DateOnlyDisplayFormat)
+            value => ((DateOnly?)value)?.ToString(WebConstants.DateOnlyDisplayFormat)
         ),
         new(
             PersonMatchedAttribute.EmailAddress,

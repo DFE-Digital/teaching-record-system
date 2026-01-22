@@ -78,7 +78,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(resultRow);
 
         AssertRowHasContent("name", $"{person.FirstName} {person.MiddleName} {person.LastName}");
-        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
         AssertRowHasContent("change-type", supportTaskType == SupportTaskType.ChangeNameRequest ? "Name" : "Date of birth");
 
         void AssertRowHasContent(string testId, string expectedText)
@@ -199,9 +199,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = 2;
 
         // Create enough tasks to create 3 pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await TestData.CreateChangeNameRequestSupportTaskAsync()));
+        await Enumerable.Range(1, (pageSize * page) + 1)
+            .ToAsyncEnumerable()
+            .Select(async (int _, CancellationToken _) => await TestData.CreateChangeNameRequestSupportTaskAsync())
+            .ToArrayAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/change-requests/?pageNumber={page}");

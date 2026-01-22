@@ -19,6 +19,7 @@ public class TrnsController(ICommandDispatcher commandDispatcher) : ControllerBa
     [ProducesResponseType(StatusCodes.Status308PermanentRedirect)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey)]
     public async Task<IActionResult> GetTrnAsync(
         [FromRoute] string trn)
@@ -27,7 +28,7 @@ public class TrnsController(ICommandDispatcher commandDispatcher) : ControllerBa
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
-            .MapErrorCode(ApiError.ErrorCodes.RecordIsNotActive, StatusCodes.Status410Gone)
+            .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status410Gone)
             .MapErrorCode(
                 ApiError.ErrorCodes.RecordIsMerged,
                 e => RedirectPermanentPreserveMethod(

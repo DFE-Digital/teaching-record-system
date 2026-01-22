@@ -151,9 +151,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = 2;
 
         // Create enough tasks to create 3 pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
-                .ToAsyncEnumerable()
-                .SelectAwait(async _ => await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync()));
+        await Enumerable.Range(1, (pageSize * page) + 1)
+            .ToAsyncEnumerable()
+            .Select(async (int _, CancellationToken _) => await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync())
+            .ToArrayAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/teacher-pensions/?pageNumber={page}");

@@ -87,7 +87,7 @@
                                 </a>
                             </th>
                             <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
-                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</td>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateTimeDisplayFormat)</td>
                             <td class="govuk-table__cell" data-testid="potential-duplicate"><tag color="@tagColor">@tagValue</tag></td>
                         </tr>
                     }

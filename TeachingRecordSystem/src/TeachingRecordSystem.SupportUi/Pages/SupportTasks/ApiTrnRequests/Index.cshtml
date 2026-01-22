@@ -86,7 +86,7 @@
                                 </a>
                             </th>
                             <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
-                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat)</td>
                             <td class="govuk-table__cell" data-testid="source"><tag color="TagColor.Auto">@result.SourceApplicationName</tag></td>
                         </tr>
                     }

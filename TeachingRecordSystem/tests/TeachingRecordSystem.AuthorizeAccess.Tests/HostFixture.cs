@@ -110,12 +110,12 @@ public class HostFixture : InitializeDbFixture
             });
         }
 
-        protected override IHost CreateHost(IHostBuilder builder)
+        protected override TestServer CreateServer(IServiceProvider serviceProvider)
         {
+            var server = base.CreateServer(serviceProvider);
             // Ensure we can flow AsyncLocals from tests to the server
-            builder.ConfigureServices(services => services.Configure<TestServerOptions>(o => o.PreserveExecutionContext = true));
-
-            return base.CreateHost(builder);
+            server.PreserveExecutionContext = true;
+            return server;
         }
     }
 

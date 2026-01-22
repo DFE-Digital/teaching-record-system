@@ -38,9 +38,7 @@ public class SignInJourneyCoordinator(
     // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
     private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
 
-    private LinkHelper? _linkHelper;
-
-    public LinkHelper Links => _linkHelper ??= new LinkHelper(linkGenerator, InstanceId);
+    public LinkHelper Links => field ??= new LinkHelper(linkGenerator, InstanceId);
 
     public bool ShowDebugPages => optionsAccessor.Value.ShowDebugPages;
 
@@ -124,12 +122,15 @@ public class SignInJourneyCoordinator(
             oneLoginUser.LastSignIn = clock.UtcNow;
         }
 
+        var pendingSupportTaskReference = await oneLoginService.GetPendingSupportTaskReferenceByUserAsync(oneLoginUser.Subject);
+
         await dbContext.SaveChangesAsync();
 
         UpdateState(state =>
         {
             state.Reset();
             state.OneLoginAuthenticationTicket = ticket;
+            state.PendingSupportTaskReference = pendingSupportTaskReference;
 
             if (oneLoginUser.VerificationRoute is not null)
             {
@@ -288,6 +289,10 @@ public class SignInJourneyCoordinator(
         { AuthenticationTicket: not null } =>
             SquashPathAndAdvanceTo(GetRedirectUri(), includeRedirectUri: false),
 
+        // Authenticated with OneLogin, pending support tasks
+        { OneLoginAuthenticationTicket: not null, PendingSupportTaskReference: not null } =>
+            SquashPathAndAdvanceTo(Links.PendingSupportRequest(), includeRedirectUri: false),
+
         // Authenticated with OneLogin, identity verification succeeded, not yet matched to teaching record
         { OneLoginAuthenticationTicket: not null, IdentityVerified: true, AuthenticationTicket: null } =>
             SquashPathAndAdvanceTo(Links.Connect()),
@@ -302,6 +307,12 @@ public class SignInJourneyCoordinator(
 
         _ => throw new InvalidOperationException("Cannot determine next page.")
     };
+
+    public override string? GetBackLink()
+    {
+        var backLink = base.GetBackLink();
+        return backLink != GetRedirectUri() ? backLink : null;
+    }
 
     public string GetRedirectUri() => State.RedirectUri;
 
@@ -472,6 +483,10 @@ public class SignInJourneyCoordinator(
         public string Name(string? returnUrl = null) => linkGenerator.Name(instanceId, returnUrl);
 
         public string DateOfBirth(string? returnUrl = null) => linkGenerator.DateOfBirth(instanceId, returnUrl);
+
+        public string NoTrn() => linkGenerator.NoTrn(instanceId);
+
+        public string PendingSupportRequest() => linkGenerator.PendingSupportRequest(instanceId);
     }
 
     private record TryMatchToIdentityUserResult(

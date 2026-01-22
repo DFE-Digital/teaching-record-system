@@ -43,7 +43,7 @@
                 @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth)) {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@attributes.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@attributes.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
                 @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress)) {
@@ -106,7 +106,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Created on</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@requestData.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@requestData.CreatedOn.ToString(WebConstants.DateTimeDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
@@ -122,7 +122,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@requestData.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@requestData.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
@@ -157,7 +157,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                         @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress))

@@ -2,15 +2,8 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "dotnet-format": {
-      "version": "9.0.520307",
-      "commands": [
-        "dotnet-format"
-      ],
-      "rollForward": false
-    },
     "dotnet-ef": {
-      "version": "9.0.10",
+      "version": "10.0.1",
       "commands": [
         "dotnet-ef"
       ],

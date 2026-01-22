@@ -1,13 +1,34 @@
 @page "/request-submitted"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.SupportRequestSubmittedModel
 @{
-    ViewBag.Title = "Support request submitted";
+    ViewBag.Title = "Support request sent";
 }
 
-<govuk-panel>
-    <govuk-panel-title>@ViewBag.Title</govuk-panel-title>
-    <govuk-panel-body>
-        We’ll contact you within<br />
-        <strong>5 days</strong>
-    </govuk-panel-body>
-</govuk-panel>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <govuk-panel>
+            <govuk-panel-title>@ViewBag.Title</govuk-panel-title>
+            <govuk-panel-body>
+                <div class="govuk-!-margin-5">
+                    We’ll contact you within 5 working days
+                </div>
+                <div>
+                    Your reference number is:<br/>
+                    <strong>@Model.SupportTaskReference</strong>
+                </div>
+            </govuk-panel-body>
+        </govuk-panel>
+
+        <h2 class="govuk-heading-m">What happens next</h2>
+        <p class="govuk-body">
+            We’ll contact you when we have an update.
+        </p>
+        <p class="govuk-body">
+            You’ll need your reference number if you need to contact support about your request.
+        </p>
+        <p class="govuk-body">
+            We’ll email you once your request has been completed.
+            Please do not submit another support request before then.
+        </p>
+    </div>
+</div>

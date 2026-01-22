@@ -67,8 +67,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(resultRow);
 
         AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
-        AssertRowHasContent("created-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
-        AssertRowHasContent("date-of-birth", supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
+        AssertRowHasContent("created-on", supportTask.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
+        AssertRowHasContent("date-of-birth", supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat));
         AssertRowHasContent("source", supportTask.TrnRequestMetadata.ApplicationUser!.Name);
 
         void AssertRowHasContent(string testId, string expectedText)
@@ -155,9 +155,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = 2;
 
         // Create enough tasks to create 3 pages
-        var tasks = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, (pageSize * page) + 1)
+        await Enumerable.Range(1, (pageSize * page) + 1)
             .ToAsyncEnumerable()
-            .SelectAwait(async _ => await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync()));
+            .Select(async (int _, CancellationToken _) => await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync()).ToArrayAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/manual-checks-needed?pageNumber={page}");

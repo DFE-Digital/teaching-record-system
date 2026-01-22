@@ -40,6 +40,12 @@ public abstract class AuthorizeAccessLinkGenerator
     public string DateOfBirth(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
         GetRequiredPathByPage("/DateOfBirth", routeValues: new { returnUrl }, journeyInstanceId: journeyInstanceId);
 
+    public string NoTrn(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/NoTrn", journeyInstanceId: journeyInstanceId);
+
+    public string PendingSupportRequest(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/PendingSupportRequest", journeyInstanceId: journeyInstanceId);
+
     protected virtual string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
         var combinedRouteValues = new RouteValueDictionary(routeValues);

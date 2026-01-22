@@ -58,7 +58,7 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth))">
-                                @match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)
+                                @match.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>

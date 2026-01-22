@@ -179,13 +179,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.CheckAsync("label:text-is('No')");
         await page.ClickButtonAsync("Continue");
 
-        await page.WaitForUrlPathAsync("/not-found");
-        await page.ClickButtonAsync("Check your answers");
-
-        await page.WaitForUrlPathAsync("/check-answers");
-        await page.ClickButtonAsync("Submit support request");
-
-        await page.WaitForUrlPathAsync("/request-submitted");
+        await page.WaitForUrlPathAsync("/no-trn");
     }
 
     [Fact]
@@ -400,5 +394,21 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPageAsync();
 
         await page.AssertSignedInAsync(person.Trn);
+    }
+
+    [Fact]
+    public async Task SignIn_UserHasPendingTask()
+    {
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync();
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
+
+        await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPageAsync();
+
+        await page.WaitForUrlPathAsync("/pending-support-request");
     }
 }

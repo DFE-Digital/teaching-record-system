@@ -34,14 +34,14 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@migratedEvent.InductionStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="start-date">@migratedEvent.InductionStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (migratedEvent.InductionCompletedDate.HasValue)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="completed-date">@migratedEvent.InductionCompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="completed-date">@migratedEvent.InductionCompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
         </govuk-summary-list>

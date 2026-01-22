@@ -1,16 +1,6 @@
-set windows-shell := ["powershell.exe", "-nop", "-c"]
-
 export DOTNET_WATCH_SUPPRESS_MSBUILD_INCREMENTALISM := 'true'
 export DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER := 'true'
 export DOTNET_WATCH_RESTART_ON_RUDE_EDIT := 'true'
-
-shebang := if os() == 'windows' {
-  'dotnet pwsh -nop'
-} else {
-  '/usr/bin/env dotnet pwsh -nop'
-}
-
-set working-directory := 'TeachingRecordSystem'
 
 user-secrets-id := "TeachingRecordSystem"
 test-user-secrets-id := "TeachingRecordSystemTests"
@@ -19,111 +9,102 @@ default:
   @just --list
 
 # Install local tools
+[working-directory: 'TeachingRecordSystem']
 install-tools:
   @dotnet tool restore
 
 # Restore dependencies
+[working-directory: 'TeachingRecordSystem']
 restore:
   @dotnet restore --locked-mode
 
 # Install Playwright
-[working-directory: 'tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests']
+[working-directory: 'TeachingRecordSystem/tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests']
 install-playwright:
-  @pwsh bin/Debug/net9.0/playwright.ps1 install chromium
+  @pwsh -nop -c bin/Debug/net10.0/playwright.ps1 install chromium
 
 # Run the trscli
 cli *ARGS:
-  @dotnet {{"src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net9.0" / "trscli.dll"}} {{ARGS}}
+  @dotnet {{"TeachingRecordSystem" / "src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net10.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
+[working-directory: 'TeachingRecordSystem']
 build:
   @dotnet build
 
 # Test the .NET solution
+[working-directory: 'TeachingRecordSystem']
 test:
   @dotnet test
 
+# Test projects affected by changes from main branch
+test-changed *ARGS:
+  @dotnet run scripts/TestChanged.cs -- {{ARGS}}
+
 # Format the .NET solution and Terraform code
+[working-directory: 'TeachingRecordSystem']
 format:
-  @dotnet dotnet-format
+  @dotnet format --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
   @terraform fmt ../terraform/aks
 
 # Format any un-committed .tf or .cs files
 format-changed:
-  #!{{shebang}}
-
-  function Get-ChangedFiles {
-    param (
-      $Path
-    )
-
-    (git status --porcelain $Path) | foreach { $_.substring(3) } | Where-Object { Test-Path $_ }
-  }
-
-  cd ../
-
-  $changedTfFiles = Get-ChangedFiles "terraform/*.tf"
-  foreach ($tf in $changedTfFiles) {
-    terraform fmt $tf
-  }
-
-  $changedCsFiles = (Get-ChangedFiles "TeachingRecordSystem/**/*.cs") | foreach { $_ -Replace "^TeachingRecordSystem/", "" }
-  if ($changedCsFiles.Length -gt 0) {
-    $dotnetArgs = @("dotnet-format", "--no-restore", "--include") + $changedCsFiles
-    cd TeachingRecordSystem && dotnet $dotnetArgs
-  }
+  @dotnet run scripts/FormatChanged.cs
 
 # Run the EF Core Command-line Tools for the Core project
-[working-directory: 'src/TeachingRecordSystem.Core']
+[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Core']
 ef *ARGS:
   @dotnet dotnet-ef {{ARGS}}
 
 # Run the API project in Development mode
-[working-directory: 'src/TeachingRecordSystem.Api']
+[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Api']
 run-api:
   @dotnet run
 
 # Run the API project in Development mode and watch for file changes
-[working-directory: 'src/TeachingRecordSystem.Api']
+[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Api']
 watch-api:
   @dotnet watch
 
 # Run the AuthorizeAccess project in Development mode and watch for file changes
-[working-directory: 'src/TeachingRecordSystem.AuthorizeAccess']
+[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.AuthorizeAccess']
 watch-authz:
   @dotnet watch
 
 # Run the UI project in Development mode and watch for file changes
-[working-directory: 'src/TeachingRecordSystem.SupportUi']
+[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.SupportUi']
 watch-ui:
   @dotnet watch
 
 # Watch for file changes and compile any SASS files that have changed
-[working-directory: 'src/TeachingRecordSystem.SupportUi']
+[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.SupportUi']
 watch-ui-sass:
   @sass wwwroot/Styles/site.scss wwwroot/Styles/site.css --watch
 
 # Run the Worker project in Development mode and watch for file changes
-[working-directory: 'src/TeachingRecordSystem.Worker']
+[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Worker']
 watch-worker:
   @dotnet watch
 
 # Build the Docker image
+[working-directory: 'TeachingRecordSystem']
 docker-build *ARGS: restore
   @dotnet publish -c Release --no-restore
   @docker build . {{ARGS}}
 
 # Set a configuration entry in user secrets for running the apps
+[working-directory: 'TeachingRecordSystem']
 set-secret key value:
   @dotnet user-secrets set "{{key}}" "{{value}}" --id {{user-secrets-id}}
 
 # Set a configuration entry in user secrets for tests
+[working-directory: 'TeachingRecordSystem']
 set-tests-secret key value:
   @dotnet user-secrets set "{{key}}" "{{value}}" --id {{test-user-secrets-id}}
 
-[working-directory: 'src/TeachingRecordSystem.Cli']
+[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Cli']
 create-admin email name:
-  @dotnet {{"bin" / "Debug" / "net9.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
+  @dotnet {{"bin" / "Debug" / "net10.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
 
 [working-directory: '..']
 make *ARGS:
@@ -139,4 +120,4 @@ _deploy branch environment:
 
 # Removes the cached DB schema version file for tests
 remove-tests-schema-cache:
-  @dotnet pwsh -nop -file ../scripts/Remove-TestsSchemaCache.ps1
+  @dotnet run scripts/RemoveTestsSchemaCache.cs
