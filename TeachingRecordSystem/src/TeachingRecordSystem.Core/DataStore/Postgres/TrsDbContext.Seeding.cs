@@ -25,6 +25,8 @@ public partial class TrsDbContext
         SeedTrainingSubjects();
         SeedUsers();
         SeedEstablishments();
+
+        SaveChanges();
     }
 
     /// <summary>
@@ -48,7 +50,7 @@ public partial class TrsDbContext
         SeedUsers();
         SeedEstablishments();
 
-        await Task.CompletedTask;
+        await SaveChangesAsync(cancellationToken);
     }
 
     private void SeedAlertCategories()
