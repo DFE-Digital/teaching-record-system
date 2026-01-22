@@ -1,0 +1,13 @@
+<Project>
+  <ItemGroup>
+    <PackageReference Include="CliWrap" Version="3.10.0" />
+    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="CliWrap" />
+    <Using Include="CliWrap.Buffered" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Utils.cs" />
+  </ItemGroup>
+</Project>
