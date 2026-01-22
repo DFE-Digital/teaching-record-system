@@ -1,0 +1,44 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path="appsettings.aks_dev_shared.json" />
+    <File Path="appsettings.aks_pentest_shared.json" />
+    <File Path="appsettings.aks_pre-production_shared.json" />
+    <File Path="appsettings.aks_production_shared.json" />
+    <File Path="appsettings.aks_tps-sandbox_shared.json" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="Dockerfile" />
+    <File Path="global.json" />
+    <File Path="nuget.config" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/TeachingRecordSystem.Api/TeachingRecordSystem.Api.csproj" />
+    <Project Path="src/TeachingRecordSystem.AuthorizeAccess/TeachingRecordSystem.AuthorizeAccess.csproj" />
+    <Project Path="src/TeachingRecordSystem.Cli/TeachingRecordSystem.Cli.csproj" />
+    <Project Path="src/TeachingRecordSystem.Core/TeachingRecordSystem.Core.csproj" />
+    <Project Path="src/TeachingRecordSystem.SupportUi/TeachingRecordSystem.SupportUi.csproj" />
+    <Project Path="src/TeachingRecordSystem.WebCommon/TeachingRecordSystem.WebCommon.csproj" />
+    <Project Path="src/TeachingRecordSystem.Worker/TeachingRecordSystem.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TeachingRecordSystem.Api.IntegrationTests/TeachingRecordSystem.Api.IntegrationTests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.Api.UnitTests/TeachingRecordSystem.Api.UnitTests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.AuthorizeAccess.Tests/TeachingRecordSystem.AuthorizeAccess.Tests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.Cli.Tests/TeachingRecordSystem.Cli.Tests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.Core.LegacyTests/TeachingRecordSystem.Core.LegacyTests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.Core.Tests/TeachingRecordSystem.Core.Tests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.SupportUi.EndToEndTests/TeachingRecordSystem.SupportUi.EndToEndTests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.SupportUi.Tests/TeachingRecordSystem.SupportUi.Tests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.TestCommon.XUnit3/TeachingRecordSystem.TestCommon.XUnit3.csproj" />
+    <Project Path="tests/TeachingRecordSystem.TestCommon/TeachingRecordSystem.TestCommon.csproj" />
+    <Project Path="tests/TeachingRecordSystem.UiTestCommon/TeachingRecordSystem.UiTestCommon.csproj" />
+    <Project Path="tests/TeachingRecordSystem.WebCommon.Tests/TeachingRecordSystem.WebCommon.Tests.csproj" />
+  </Folder>
+</Solution>
