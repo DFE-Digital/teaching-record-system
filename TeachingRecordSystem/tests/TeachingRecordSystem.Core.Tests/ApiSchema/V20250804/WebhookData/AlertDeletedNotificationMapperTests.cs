@@ -1,13 +1,17 @@
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
 
-public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : EventMapperTestBase(fixture)
+public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
+    private ReferenceDataCache ReferenceDataCache => Services.GetRequiredService<ReferenceDataCache>();
+
     [Fact]
     public Task MapEventAsync_AlertIsNotInternalOnly_ReturnsNotification() =>
-        WithEventMapper<AlertDeletedNotificationMapper>(async mapper =>
+        WithServiceAsync<AlertDeletedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
@@ -18,7 +22,7 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
 
             var alert = person.Alerts.Single();
 
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
+            var @event = await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Alerts.Attach(alert);
 
@@ -52,7 +56,7 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
 
     [Fact]
     public Task MapEventAsync_AlertIsInternalOnly_ReturnsNull() =>
-        WithEventMapper<AlertDeletedNotificationMapper>(async mapper =>
+        WithServiceAsync<AlertDeletedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
@@ -63,7 +67,7 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
 
             var alert = person.Alerts.Single();
 
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
+            var @event = await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Alerts.Attach(alert);
 

@@ -1,13 +1,17 @@
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
 
-public class AlertCreatedNotificationMapperTests(EventMapperFixture fixture) : EventMapperTestBase(fixture)
+public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
+    private ReferenceDataCache ReferenceDataCache => Services.GetRequiredService<ReferenceDataCache>();
+
     [Fact]
     public Task MapEventAsync_AlertIsNotInternalOnly_ReturnsNotification() =>
-        WithEventMapper<AlertCreatedNotificationMapper>(async mapper =>
+        WithServiceAsync<AlertCreatedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
@@ -37,7 +41,7 @@ public class AlertCreatedNotificationMapperTests(EventMapperFixture fixture) : E
 
     [Fact]
     public Task MapEventAsync_AlertIsInternalOnly_ReturnsNull() =>
-        WithEventMapper<AlertCreatedNotificationMapper>(async mapper =>
+        WithServiceAsync<AlertCreatedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
