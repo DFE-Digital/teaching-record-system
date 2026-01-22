@@ -44,7 +44,7 @@ test-changed *ARGS:
 # Format the .NET solution and Terraform code
 [working-directory: 'TeachingRecordSystem']
 format:
-  @dotnet format
+  @dotnet format --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
   @terraform fmt ../terraform/aks
 
 # Format any un-committed .tf or .cs files

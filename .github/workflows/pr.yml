@@ -35,7 +35,7 @@ jobs:
         run: just install-tools
 
       - name: Lint
-        run: cd TeachingRecordSystem && dotnet format --verify-no-changes
+        run: cd TeachingRecordSystem && dotnet format --verify-no-changes --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
 
   validate_terraform:
     name: Validate Terraform

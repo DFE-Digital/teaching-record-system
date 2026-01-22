@@ -20,7 +20,7 @@ var changedCsFiles = changedFiles
 
 if (changedCsFiles.Count > 0)
 {
-    var dotnetArgs = new List<string> { "format", "--no-restore", "--include" };
+    var dotnetArgs = new List<string> { "format", "--no-restore", "--exclude", "src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations", "--include" };
     dotnetArgs.AddRange(changedCsFiles);
 
     await (Cli.Wrap("dotnet")
