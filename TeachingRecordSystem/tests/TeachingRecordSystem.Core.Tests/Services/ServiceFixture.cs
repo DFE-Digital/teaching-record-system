@@ -16,8 +16,10 @@ public class ServiceFixture : ServiceProviderFixture
     protected override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services
+            .AddMemoryCache()
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
+            .AddSingleton<PersonInfoCache>()
             .AddEventPublisher()
             .AddOneLoginService()
             .AddSupportTaskService()
