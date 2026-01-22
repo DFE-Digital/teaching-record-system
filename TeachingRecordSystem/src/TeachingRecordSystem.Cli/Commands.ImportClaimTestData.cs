@@ -4,6 +4,7 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -26,12 +27,12 @@ public static partial class Commands
             connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
         }
 
-        var command = new Command("import-claim-test-data", "Imports claim test-data CSV, creates persons/qts routes and outputs a CSV with TRNs populated.")
-        {
-            fileOption,
-            outputOption,
-            connectionStringOption
-        };
+        var command =
+            new Command("import-claim-test-data",
+                "Imports claim test-data CSV, creates persons/qts routes and outputs a CSV with TRNs populated.")
+            {
+                fileOption, outputOption, connectionStringOption
+            };
 
         command.SetAction(async parseResult =>
         {
@@ -56,7 +57,8 @@ public static partial class Commands
             using var scope = services.CreateScope();
             var personService = scope.ServiceProvider.GetRequiredService<PersonService>();
             var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
-            var processContext = new ProcessContext(processType: ProcessType.PersonCreating, now: DateTime.UtcNow, SystemUser.SystemUserId);
+            var processContext = new ProcessContext(processType: ProcessType.PersonCreating, now: DateTime.UtcNow,
+                SystemUser.SystemUserId);
 
             // throw error if input file doesn't exist
             if (!File.Exists(fileName))
@@ -66,10 +68,7 @@ public static partial class Commands
 
             var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                MissingFieldFound = null,
-                HeaderValidated = null,
-                BadDataFound = null,
-                IgnoreBlankLines = true
+                MissingFieldFound = null, HeaderValidated = null, BadDataFound = null, IgnoreBlankLines = true
             };
 
             using var reader = new StreamReader(fileName);
@@ -78,149 +77,149 @@ public static partial class Commands
             var outputRows = new List<IDictionary<string, object?>>();
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-            try
+            var subjects = dbContext.TrainingSubjects.ToArray();
+            var allRoutes = await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
+            foreach (var rec in records)
             {
-                var subjects = dbContext.TrainingSubjects.ToArray();
-                var allRoutes = await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
-                foreach (var rec in records)
+                var dict = ((IDictionary<string, object?>)rec)
+                    .ToDictionary(k => k.Key?.ToString() ?? string.Empty, v => v.Value);
+                var firstName = GetStringValue(dict, "FIRST_NAME") ?? GetStringValue(dict, "FORENAME") ?? "";
+                var middleName = GetStringValue(dict, "MIDDLE_NAME") ?? string.Empty;
+                var lastName = GetStringValue(dict, "LAST_NAME") ?? GetStringValue(dict, "SURNAME") ?? "";
+                var dobStr = GetStringValue(dict, "DATE_OF_BIRTH") ?? GetStringValue(dict, "DOB");
+                var niNumber = GetStringValue(dict, "NATIONAL_INSURANCE_NUMBER") ??
+                               GetStringValue(dict, "NATIONAL_INSURANCE_NUMBER");
+                var ni = NationalInsuranceNumber.Parse(niNumber!);
+                var qtsDateStr = GetStringValue(dict, "QTS_DATE");
+                var inductionStatusStr = GetStringValue(dict, "INDUCTION_STATUS");
+                var ittSubject1 = GetStringValue(dict, "ITT_SUBJECT_1") ?? GetStringValue(dict, "ITT_SUBJECT_1") ?? "";
+                var startDateStr = GetStringValue(dict, "ITT_START_DATE") ??
+                                   GetStringValue(dict, "ITT_START_DATE") ?? "";
+
+                DateOnly? dob = ParseDateFlexible(dobStr);
+                DateOnly? startDate = ParseDateFlexible(startDateStr);
+                DateOnly? qtsDate = ParseDateFlexible(qtsDateStr);
+
+                var personDetail = new PersonDetails()
                 {
-                    var dict = ((IDictionary<string, object?>)rec)
-                        .ToDictionary(k => k.Key?.ToString() ?? string.Empty, v => v.Value);
-                    var firstName = GetStringValue(dict, "FIRST_NAME") ?? GetStringValue(dict, "FORENAME") ?? "";
-                    var middleName = GetStringValue(dict, "MIDDLE_NAME") ?? string.Empty;
-                    var lastName = GetStringValue(dict, "LAST_NAME") ?? GetStringValue(dict, "SURNAME") ?? "";
-                    var dobStr = GetStringValue(dict, "DATE_OF_BIRTH") ?? GetStringValue(dict, "DOB");
-                    var niNumber = GetStringValue(dict, "NATIONAL_INSURANCE_NUMBER") ?? GetStringValue(dict, "NATIONAL_INSURANCE_NUMBER");
-                    var ni = NationalInsuranceNumber.Parse(niNumber!);
-                    var qtsDateStr = GetStringValue(dict, "QTS_DATE");
-                    var inductionStatusStr = GetStringValue(dict, "INDUCTION_STATUS");
-                    var ittSubject1 = GetStringValue(dict, "ITT_SUBJECT_1") ?? GetStringValue(dict, "ITT_SUBJECT_1") ?? "";
-                    var startDateStr = GetStringValue(dict, "ITT_START_DATE") ?? GetStringValue(dict, "ITT_START_DATE") ?? "";
+                    FirstName = firstName,
+                    MiddleName = middleName,
+                    LastName = lastName,
+                    DateOfBirth = dob,
+                    EmailAddress = null,
+                    NationalInsuranceNumber = ni,
+                    Gender = null
+                };
 
-                    DateOnly? dob = ParseDateFlexible(dobStr);
-                    DateOnly? startDate = ParseDateFlexible(startDateStr);
-                    DateOnly? qtsDate = ParseDateFlexible(qtsDateStr);
-
-                    var personDetail = new PersonDetails()
-                    {
-                        FirstName = firstName,
-                        MiddleName = middleName,
-                        LastName = lastName,
-                        DateOfBirth = dob,
-                        EmailAddress = null,
-                        NationalInsuranceNumber = ni,
-                        Gender = null
-                    };
-
-                    var createdPerson = await personService.CreatePersonAsync(
-                        new CreatePersonViaSupportUiOptions(
-                            personDetail,
-                            (new Justification<PersonCreateReason>()
-                            {
-                                Evidence = null,
-                                Reason = PersonCreateReason.AnotherReason,
-                            })),
-                        processContext);
-                    var person = dbContext.Persons
-                        .Include(x => x.Qualifications)
-                        .Single(x => x.PersonId == createdPerson.PersonId);
-
-                    var subjectIds = subjects
-                        .Where(s => s.Name.Equals(ittSubject1, StringComparison.OrdinalIgnoreCase))
-                        .Select(s => s.TrainingSubjectId)
-                        .ToArray();
-
-                    var routeId = RouteToProfessionalStatusType.AssessmentOnlyRouteId;
-                    var routeStatus = RouteToProfessionalStatusStatus.Holds;
-                    DateOnly? holdsFrom = qtsDate;
-                    var professionalStatus = RouteToProfessionalStatus.Create(
-                        person,
-                        allRouteTypes: allRoutes,
-                        routeToProfessionalStatusTypeId: routeId,
-                        sourceApplicationUserId: SystemUser.SystemUserId,
-                        sourceApplicationReference: nameof(CreateImportClaimTestDataCommand),
-                        status: routeStatus,
-                        holdsFrom: qtsDate,
-                        trainingStartDate: startDate,
-                        trainingEndDate: null,
-                        trainingSubjectIds: subjectIds,
-                        trainingAgeSpecialismType: null,
-                        trainingAgeSpecialismRangeFrom: null,
-                        trainingAgeSpecialismRangeTo: null,
-                        trainingCountryId: null,
-                        trainingProviderId: null,
-                        degreeTypeId: null,
-                        isExemptFromInduction: false,
-                        createdBy: SystemUser.SystemUserId,
-                        now: DateTime.UtcNow,
-                        changeReason: null,
-                        changeReasonDetail: null,
-                        evidenceFile: null,
-                        @event: out var @event);
-
-                    dbContext.Qualifications.Add(professionalStatus);
-                    await dbContext.AddEventAndBroadcastAsync(@event);
-
-                    if (!string.IsNullOrWhiteSpace(inductionStatusStr))
-                    {
-                        if (!Enum.TryParse<InductionStatus>(inductionStatusStr, ignoreCase: true, out var parsedInduction))
+                var createdPerson = await personService.CreatePersonAsync(
+                    new CreatePersonViaSupportUiOptions(
+                        personDetail,
+                        (new Justification<PersonCreateReason>()
                         {
-                            parsedInduction = inductionStatusStr?.Trim().ToLower() switch
-                            {
-                                "none" => InductionStatus.None,
-                                "required" => InductionStatus.RequiredToComplete,
-                                "requiredtocomplete" => InductionStatus.RequiredToComplete,
-                                "inprogress" => InductionStatus.InProgress,
-                                "pass" => InductionStatus.Passed,
-                                "failed" => InductionStatus.Failed,
-                                "exempt" => InductionStatus.Exempt,
-                                _ => InductionStatus.None
-                            };
-                        }
+                            Evidence = null, Reason = PersonCreateReason.AnotherReason,
+                        })),
+                    processContext);
+                var person = dbContext.Persons
+                    .Include(x => x.Qualifications)
+                    .Single(x => x.PersonId == createdPerson.PersonId);
 
-                        person.SetInductionStatus(parsedInduction, startDate, null, exemptionReasonIds: [], changeReason: "Imported", changeReasonDetail: null, evidenceFile: null, updatedBy: SystemUser.SystemUserId, now: DateTime.UtcNow, out var inductionEvent);
-                        if (inductionEvent is not null)
+                var subjectIds = subjects
+                    .Where(s => s.Name.Equals(ittSubject1, StringComparison.OrdinalIgnoreCase))
+                    .Select(s => s.TrainingSubjectId)
+                    .ToArray();
+
+                var routeId = RouteToProfessionalStatusType.AssessmentOnlyRouteId;
+                var routeStatus = RouteToProfessionalStatusStatus.Holds;
+                DateOnly? holdsFrom = qtsDate;
+                var professionalStatus = RouteToProfessionalStatus.Create(
+                    person,
+                    allRouteTypes: allRoutes,
+                    routeToProfessionalStatusTypeId: routeId,
+                    sourceApplicationUserId: SystemUser.SystemUserId,
+                    sourceApplicationReference: nameof(CreateImportClaimTestDataCommand),
+                    status: routeStatus,
+                    holdsFrom: qtsDate,
+                    trainingStartDate: startDate,
+                    trainingEndDate: null,
+                    trainingSubjectIds: subjectIds,
+                    trainingAgeSpecialismType: null,
+                    trainingAgeSpecialismRangeFrom: null,
+                    trainingAgeSpecialismRangeTo: null,
+                    trainingCountryId: null,
+                    trainingProviderId: null,
+                    degreeTypeId: null,
+                    isExemptFromInduction: false,
+                    createdBy: SystemUser.SystemUserId,
+                    now: DateTime.UtcNow,
+                    changeReason: null,
+                    changeReasonDetail: null,
+                    evidenceFile: null,
+                    @event: out var @event);
+
+                dbContext.Qualifications.Add(professionalStatus);
+                await dbContext.AddEventAndBroadcastAsync(@event);
+
+                if (!string.IsNullOrWhiteSpace(inductionStatusStr))
+                {
+                    if (!Enum.TryParse<InductionStatus>(inductionStatusStr, ignoreCase: true, out var parsedInduction))
+                    {
+                        parsedInduction = inductionStatusStr?.Trim().ToLower() switch
                         {
-                            dbContext.AddEventWithoutBroadcast(inductionEvent);
-                        }
+                            "none" => InductionStatus.None,
+                            "required" => InductionStatus.RequiredToComplete,
+                            "requiredtocomplete" => InductionStatus.RequiredToComplete,
+                            "inprogress" => InductionStatus.InProgress,
+                            "pass" => InductionStatus.Passed,
+                            "failed" => InductionStatus.Failed,
+                            "exempt" => InductionStatus.Exempt,
+                            _ => InductionStatus.None
+                        };
                     }
-                    await dbContext.SaveChangesAsync();
 
-                    var outRow = dict.ToDictionary(k => k.Key, v => v.Value);
-                    outRow["teacher_reference_number"] = person.Trn;
-                    outputRows.Add(outRow);
+                    person.SetInductionStatus(parsedInduction, startDate, null, exemptionReasonIds: [],
+                        changeReason: "Imported", changeReasonDetail: null, evidenceFile: null,
+                        updatedBy: SystemUser.SystemUserId, now: DateTime.UtcNow, out var inductionEvent);
+                    if (inductionEvent is not null)
+                    {
+                        dbContext.AddEventWithoutBroadcast(inductionEvent);
+                    }
                 }
-                await transaction.CommitAsync();
+                await dbContext.SaveChangesAsync();
 
-                // Write csv with trn
-                using var writer = new StreamWriter(outputFile);
-                using var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                if (outputRows.Count > 0)
+                var outRow = dict.ToDictionary(k => k.Key, v => v.Value);
+                outRow["teacher_reference_number"] = person.Trn;
+                outputRows.Add(outRow);
+            }
+
+            await transaction.CommitAsync();
+
+            // Write csv with trn
+            using var writer = new StreamWriter(outputFile);
+            using var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            if (outputRows.Count > 0)
+            {
+                var header = outputRows[0].Keys.ToArray();
+                foreach (var h in header)
                 {
-                    var header = outputRows[0].Keys.ToArray();
+                    csvWriter.WriteField(h);
+                }
+
+                await csvWriter.NextRecordAsync();
+
+                foreach (var row in outputRows)
+                {
                     foreach (var h in header)
                     {
-                        csvWriter.WriteField(h);
+                        csvWriter.WriteField(row.TryGetValue(h, out var v) && v is not null
+                            ? v.ToString()
+                            : string.Empty);
                     }
+
                     await csvWriter.NextRecordAsync();
-
-                    foreach (var row in outputRows)
-                    {
-                        foreach (var h in header)
-                        {
-                            csvWriter.WriteField(row.TryGetValue(h, out var v) && v is not null ? v.ToString() : string.Empty);
-                        }
-
-                        await csvWriter.NextRecordAsync();
-                    }
                 }
-                return 0;
             }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+
+            return 0;
         });
 
         return command;
