@@ -14,7 +14,7 @@ using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
-public class TrsDbContext : DbContext
+public partial class TrsDbContext : DbContext
 {
     public const string ConnectionName = "DefaultConnection";
 
@@ -158,6 +158,8 @@ public class TrsDbContext : DbContext
             .UseOpenIddict<Guid>()
             .AddInterceptors(new PopulateOidcApplicationInterceptor())
             .UseProjectables()
+            .UseSeeding((context, _) => ((TrsDbContext)context).SeedData())
+            .UseAsyncSeeding((context, _, cancellationToken) => ((TrsDbContext)context).SeedDataAsync(cancellationToken))
             .ConfigureWarnings(b =>
             {
                 b.Throw(CoreEventId.NavigationLazyLoading);
