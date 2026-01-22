@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData.Google;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
-[Collection(nameof(WorkforceDataTestCollection))]
+[Collection(nameof(WorkforceDataTestCollection)), ClearDbBeforeTest]
 public class WorkforceDataExporterTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
 
