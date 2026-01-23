@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -8,49 +7,6 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<SupportTask> CreateConnectOneLoginUserSupportTaskAsync(
-        string oneLoginUserSubject,
-        Guid clientApplicationUserId = default,
-        string? statedNationalInsuranceNumber = null,
-        string? statedTrn = null,
-        string? trnTokenTrn = null) =>
-        WithDbContextAsync(async dbContext =>
-        {
-            var user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUserSubject);
-            Debug.Assert(user.EmailAddress is not null);
-
-            var data = new OneLoginUserRecordMatchingData()
-            {
-                Verified = user.VerificationRoute is not null,
-                OneLoginUserSubject = user.Subject,
-                OneLoginUserEmail = user.EmailAddress!,
-                VerifiedNames = user.VerifiedNames,
-                VerifiedDatesOfBirth = user.VerifiedDatesOfBirth,
-                StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
-                StatedTrn = statedTrn,
-                ClientApplicationUserId = clientApplicationUserId,
-                TrnTokenTrn = trnTokenTrn
-            };
-
-            var reference = SupportTask.GenerateSupportTaskReference();
-
-            var supportTask = new SupportTask()
-            {
-                CreatedOn = Clock.UtcNow,
-                SupportTaskType = SupportTaskType.OneLoginUserRecordMatching,
-                Data = data,
-                OneLoginUserSubject = oneLoginUserSubject,
-                Status = SupportTaskStatus.Open,
-                SupportTaskReference = reference,
-                UpdatedOn = Clock.UtcNow
-            };
-
-            dbContext.SupportTasks.Add(supportTask);
-            await dbContext.SaveChangesAsync();
-
-            return supportTask;
-        });
-
     public Task<SupportTask> CreateOneLoginUserRecordMatchingSupportTaskAsync(
         string oneLoginUserSubject,
         Action<CreateOneLoginUserRecordMatchingSupportTaskBuilder>? configure = null)
@@ -63,7 +19,7 @@ public partial class TestData
     public class CreateOneLoginUserRecordMatchingSupportTaskBuilder(string oneLoginUserSubject)
     {
         private Option<string> _emailAddress;
-        private Option<string[]> _verifiedNames;
+        private Option<string[][]> _verifiedNames;
         private Option<DateOnly> _verifiedDateOfBirth;
         private Option<string?> _statedNationalInsuranceNumber;
         private Option<string> _statedTrn;
@@ -78,9 +34,9 @@ public partial class TestData
             return this;
         }
 
-        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithVerifiedNames(string[] verifiedNames)
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithVerifiedNames(params string[][] verifiedNames)
         {
-            _verifiedNames = Option.Some(verifiedNames);
+            _verifiedNames = Option.Some(verifiedNames.ToArray());
             return this;
         }
 
@@ -130,7 +86,7 @@ public partial class TestData
             testData.WithDbContextAsync(async dbContext =>
             {
                 var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail());
-                var verifiedNames = _verifiedNames.ValueOr([testData.GenerateFirstName(), testData.GenerateLastName()]);
+                var verifiedNames = _verifiedNames.ValueOr([[testData.GenerateFirstName(), testData.GenerateLastName()]]);
                 var verifiedDateOfBirth = _verifiedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
                 var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
                 var statedTrn = _statedTrn.ValueOr(await testData.GenerateTrnAsync());
@@ -144,7 +100,7 @@ public partial class TestData
                     Verified = true,
                     OneLoginUserSubject = oneLoginUserSubject,
                     OneLoginUserEmail = emailAddress,
-                    VerifiedNames = [verifiedNames],
+                    VerifiedNames = verifiedNames,
                     VerifiedDatesOfBirth = [verifiedDateOfBirth],
                     StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
                     StatedTrn = statedTrn,

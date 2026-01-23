@@ -19,7 +19,7 @@ public class IdVerification(SupportTaskSearchService searchService, SupportUiLin
 
     [BindProperty(SupportsGet = true)]
     [FromQuery]
-    public OneLoginIdVerificationSupportTasksSortByOption? SortBy { get; set; }
+    public OneLoginUserIdVerificationSupportTasksSortByOption? SortBy { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
@@ -27,12 +27,12 @@ public class IdVerification(SupportTaskSearchService searchService, SupportUiLin
     public int? TotalTaskCount { get; set; }
     public PaginationViewModel? Pagination { get; set; }
 
-    public ResultPage<OneLoginIdVerificationSupportTasksSearchResultItem>? Results { get; set; }
+    public ResultPage<OneLoginUserIdVerificationSupportTasksSearchResultItem>? Results { get; set; }
 
     public async Task OnGetAsync()
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
-        var sortBy = SortBy ?? OneLoginIdVerificationSupportTasksSortByOption.RequestedOn;
+        var sortBy = SortBy ?? OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn;
         var searchOptions = new OneLoginUserIdVerificationSupportTasksOptions(Search, sortBy, sortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 

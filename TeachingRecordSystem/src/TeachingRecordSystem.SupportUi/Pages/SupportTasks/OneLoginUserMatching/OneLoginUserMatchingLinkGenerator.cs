@@ -8,11 +8,14 @@ public class OneLoginUserMatchingLinkGenerator(LinkGenerator linkGenerator)
     public string IdVerification() =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/IdVerification");
 
-    public string IdVerification(string? search = null, OneLoginIdVerificationSupportTasksSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
+    public string IdVerification(string? search = null, OneLoginUserIdVerificationSupportTasksSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/IdVerification", routeValues: new { search, sortBy, sortDirection, pageNumber });
 
     public string RecordMatching() =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/RecordMatching");
+
+    public string RecordMatching(string? search = null, OneLoginUserRecordMatchingSupportTasksSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/RecordMatching", routeValues: new { search, sortBy, sortDirection, pageNumber });
 
     public ResolveOneLoginUserMatchingLinkGenerator Resolve { get; } = new(linkGenerator);
 }

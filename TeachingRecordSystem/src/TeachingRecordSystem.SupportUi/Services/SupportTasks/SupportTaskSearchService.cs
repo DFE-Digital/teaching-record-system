@@ -330,10 +330,10 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<OneLoginIdVerificationSupportTasksSearchResult> SearchOneLoginIdVerificationSupportTasksAsync(OneLoginUserIdVerificationSupportTasksOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<OneLoginUserIdVerificationSupportTasksSearchResult> SearchOneLoginIdVerificationSupportTasksAsync(OneLoginUserIdVerificationSupportTasksOptions searchOptions, PaginationOptions paginationOptions)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
-        var sortBy = searchOptions.SortBy ?? OneLoginIdVerificationSupportTasksSortByOption.RequestedOn;
+        var sortBy = searchOptions.SortBy ?? OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
 
         var tasks = await dbContext.SupportTasks
@@ -344,7 +344,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var taskCount = tasks.Count;
 
         var results = tasks
-            .Select(r => new OneLoginIdVerificationSupportTasksSearchResultItem(
+            .Select(r => new OneLoginUserIdVerificationSupportTasksSearchResultItem(
                 r.SupportTaskReference,
                 r.Status,
                 (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName,
@@ -377,12 +377,76 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         var searchResults = (sortBy switch
         {
-            OneLoginIdVerificationSupportTasksSortByOption.SupportTaskReference => results.OrderBy(r => r.SupportTaskReference, sortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.Name => results
+            OneLoginUserIdVerificationSupportTasksSortByOption.SupportTaskReference => results.OrderBy(r => r.SupportTaskReference, sortDirection),
+            OneLoginUserIdVerificationSupportTasksSortByOption.Name => results
                 .OrderBy(r => r.FirstName, sortDirection)
                 .ThenBy(r => r.LastName, sortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, sortDirection),
-            OneLoginIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection).ThenBy(r => r.SupportTaskReference, sortDirection),
+            OneLoginUserIdVerificationSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, sortDirection),
+            OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection).ThenBy(r => r.SupportTaskReference, sortDirection),
+            _ => results
+        }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
+
+        return new()
+        {
+            TotalTaskCount = taskCount,
+            SearchResults = searchResults
+        };
+    }
+
+    public async Task<OneLoginUserRecordMatchingSupportTasksSearchResult> SearchOneLoginUserRecordMatchingSupportTasksAsync(OneLoginUserRecordMatchingSupportTasksOptions searchOptions, PaginationOptions paginationOptions)
+    {
+        var search = searchOptions.Search?.Trim() ?? string.Empty;
+        var sortBy = searchOptions.SortBy ?? OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn;
+        var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
+
+        var tasks = await dbContext.SupportTasks
+            .Include(t => t.OneLoginUser)
+            .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching && t.Status != SupportTaskStatus.Closed)
+            .ToListAsync();
+
+        var taskCount = tasks.Count;
+
+        var results = tasks
+            .Select(r => new OneLoginUserRecordMatchingSupportTasksSearchResultItem(
+                r.SupportTaskReference,
+                r.Status,
+                (r.Data as OneLoginUserRecordMatchingData)!.VerifiedNames!.First().First(),
+                (r.Data as OneLoginUserRecordMatchingData)!.VerifiedNames!.First().Last(),
+                (r.Data as OneLoginUserRecordMatchingData)!.VerifiedNames!.Skip(1).SelectMany(n => n).ToArray(),
+                r.OneLoginUser!.EmailAddress,
+                r.CreatedOn))
+            .AsQueryable();
+
+        if (SearchTextIsDate(search, out var minDate, out var maxDate))
+        {
+            results = results.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
+        }
+        else if (SearchTextIsEmailAddress(search, out var email))
+        {
+            results = results.Where(t =>
+                t.EmailAddress != null && string.Equals(t.EmailAddress, email, StringComparison.OrdinalIgnoreCase));
+        }
+        else if (SearchTextIsSupportTaskReference(search))
+        {
+            results = results.Where(t =>
+                string.Equals(t.SupportTaskReference, search, StringComparison.OrdinalIgnoreCase));
+        }
+        else if (SearchTextIsName(search, out var nameParts))
+        {
+            results = results.Where(t =>
+                nameParts.All(n => (new[] { t.FirstName.ToLower(), t.LastName.ToLower() }.Concat(t.OtherVerifiedNames.Select(ovn => ovn.ToLower()))).Contains(n.ToLower())));
+        }
+
+        var totalFilteredTaskCount = results.Count();
+
+        var searchResults = (sortBy switch
+        {
+            OneLoginUserRecordMatchingSupportTasksSortByOption.SupportTaskReference => results.OrderBy(r => r.SupportTaskReference, sortDirection),
+            OneLoginUserRecordMatchingSupportTasksSortByOption.Name => results
+                .OrderBy(r => r.FirstName, sortDirection)
+                .ThenBy(r => r.LastName, sortDirection),
+            OneLoginUserRecordMatchingSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, sortDirection),
+            OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection).ThenBy(r => r.SupportTaskReference, sortDirection),
             _ => results
         }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
 

@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
-public enum OneLoginIdVerificationSupportTasksSortByOption
+public enum OneLoginUserIdVerificationSupportTasksSortByOption
 {
     SupportTaskReference,
     Name,

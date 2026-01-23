@@ -26,7 +26,7 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
     public string SupportTaskDetail(string supportTaskReference, SupportTaskType supportTaskType) =>
         supportTaskType switch
         {
-            SupportTaskType.OneLoginUserRecordMatching => SupportTasks.OneLoginUserMatching.Resolve.Matches(supportTaskReference),
+            SupportTaskType.OneLoginUserRecordMatching => SupportTasks.OneLoginUserMatching.Resolve.Index(supportTaskReference),
             SupportTaskType.ApiTrnRequest => SupportTasks.ApiTrnRequests.Resolve.Index(supportTaskReference),
             SupportTaskType.TrnRequestManualChecksNeeded => SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(supportTaskReference),
             SupportTaskType.NpqTrnRequest => SupportTasks.NpqTrnRequests.Details(supportTaskReference),

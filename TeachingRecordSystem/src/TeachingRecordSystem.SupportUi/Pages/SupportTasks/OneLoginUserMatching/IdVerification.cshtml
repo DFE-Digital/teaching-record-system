@@ -57,21 +57,21 @@
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                                sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.Name ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.Name, direction))">
+                                sort-direction="@(Model.SortBy == OneLoginUserIdVerificationSupportTasksSortByOption.Name ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginUserIdVerificationSupportTasksSortByOption.Name, direction))">
                                 Name and task ID
                             </th>
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                                sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.RequestedOn, direction))">
+                                sort-direction="@(Model.SortBy == OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn, direction))">
                                 Requested on
                             </th>
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
                                 Status
                             </th>
                             <th scope="col" class="govuk-table__header"
-                                sort-direction="@(Model.SortBy == OneLoginIdVerificationSupportTasksSortByOption.Email ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginIdVerificationSupportTasksSortByOption.Email, direction))">
+                                sort-direction="@(Model.SortBy == OneLoginUserIdVerificationSupportTasksSortByOption.Email ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginUserIdVerificationSupportTasksSortByOption.Email, direction))">
                                 Email address
                             </th>
                         </tr>
