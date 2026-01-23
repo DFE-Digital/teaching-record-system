@@ -73,7 +73,7 @@
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Npgsql.DependencyInjection" Version="10.0.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-    <PackageVersion Include="NSign.AspNetCore" Version="1.2.1" />
+    <PackageVersion Include="NSign.AspNetCore" Version="1.2.2" />
     <PackageVersion Include="NSign.Client" Version="1.2.1" />
     <PackageVersion Include="NSign.SignatureProviders" Version="1.2.1" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
