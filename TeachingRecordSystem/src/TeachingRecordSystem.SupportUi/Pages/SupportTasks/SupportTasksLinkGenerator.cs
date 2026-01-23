@@ -1,6 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ConnectOneLoginUser;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching;
@@ -19,7 +18,6 @@ public class SupportTasksLinkGenerator(LinkGenerator linkGenerator)
 
     public ApiTrnRequestsLinkGenerator ApiTrnRequests { get; } = new(linkGenerator);
     public ChangeRequestsLinkGenerator ChangeRequests => new(linkGenerator);
-    public ConnectOneLoginUserLinkGenerator ConnectOneLoginUser { get; } = new(linkGenerator);
     public IntegrationTransactionsLinkGenerator IntegrationTransactions { get; } = new(linkGenerator);
     public NpqTrnRequestsLinkGenerator NpqTrnRequests { get; } = new(linkGenerator);
     public OneLoginUserMatchingLinkGenerator OneLoginUserMatching { get; } = new(linkGenerator);
