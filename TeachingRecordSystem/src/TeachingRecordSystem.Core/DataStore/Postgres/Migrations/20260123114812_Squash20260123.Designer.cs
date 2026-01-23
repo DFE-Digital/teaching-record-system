@@ -14,8 +14,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    [Migration("20260122193736_ResetSnapshot")]
-    partial class ResetSnapshot
+    [Migration("20260123114812_Squash20260123")]
+    partial class Squash20260123
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
