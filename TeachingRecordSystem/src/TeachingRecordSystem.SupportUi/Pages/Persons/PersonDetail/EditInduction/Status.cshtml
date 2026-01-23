@@ -13,7 +13,7 @@
     <govuk-warning-text icon-fallback-text="Warning" data-testid="induction-status-warning">@Model.StatusWarningMessage</govuk-warning-text>
 }
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-two-thirds">
         <span data-testid="induction-status-caption" class="govuk-caption-l">Induction - @Model.PersonName</span>
         <form data-testid="submit-form" action="@LinkGenerator.Persons.PersonDetail.EditInduction.Status(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <govuk-radios for="InductionStatus">

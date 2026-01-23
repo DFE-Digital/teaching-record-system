@@ -13,7 +13,7 @@
 
 <form asp-page="SignOut" method="post">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             @foreach (var parameter in HttpContext.Request.HasFormContentType ? (IEnumerable<KeyValuePair<string, StringValues>>)HttpContext.Request.Form : HttpContext.Request.Query)

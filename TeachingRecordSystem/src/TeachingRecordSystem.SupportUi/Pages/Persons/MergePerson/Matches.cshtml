@@ -10,13 +10,13 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
     </div>
 </div>
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full-from-desktop">
+    <div class="govuk-grid-column-full">
         @if (Model.CannotMergeReason is not null)
         {
             <govuk-warning-text icon-fallback-text="Warning" data-testid="warning-text">

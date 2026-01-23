@@ -10,12 +10,12 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-two-thirds">
         <span class="govuk-caption-l">@Model.Row!.InterfaceType.GetDisplayName()</span>
         <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Row information</h1>
     </div>
 
-    <div class="govuk-grid-column-two-thirds-from-desktop govuk-!-padding-bottom-4 govuk-body-m">
+    <div class="govuk-grid-column-two-thirds govuk-!-padding-bottom-4 govuk-body-m">
         <govuk-summary-card>
             <govuk-summary-card-title>Row details information</govuk-summary-card-title>
             @if (Model.Person != null)
