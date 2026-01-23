@@ -33,4 +33,4 @@ jobs:
         run: just restore
 
       - name: Fetch main
-        run: git fetch origin main --quiet
+        run: git fetch origin main:main --quiet
