@@ -71,6 +71,12 @@ public class SignInJourneyState(
     [JsonInclude]
     public DateOnly? DateOfBirth { get; private set; }
 
+    [JsonInclude]
+    public Guid? ProofOfIdentityFileId { get; private set; }
+
+    [JsonInclude]
+    public string? ProofOfIdentityFileName { get; private set; }
+
     public void Reset()
     {
         AuthenticationTicket = null;
@@ -125,6 +131,12 @@ public class SignInJourneyState(
 
         HaveTrn = haveTrn;
         Trn = haveTrn ? trn! : null;
+    }
+
+    public void SetProofOfIdentityFile(Guid fileId, string fileName)
+    {
+        ProofOfIdentityFileId = fileId;
+        ProofOfIdentityFileName = fileName;
     }
 }
 

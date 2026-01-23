@@ -1,0 +1,42 @@
+@page "/proof-of-identity"
+@using TeachingRecordSystem.AuthorizeAccess.Pages
+@model TeachingRecordSystem.AuthorizeAccess.Pages.ProofOfIdentity
+@{
+    ViewBag.Title = "Upload proof of your identity";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form method="post" enctype="multipart/form-data" name="proof-of-identity-form">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-details>
+                <govuk-details-summary>Documents we accept</govuk-details-summary>
+                <govuk-details-text>
+                    We accept the following documents:
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>passport</li>
+                        <li>driving licence</li>
+                        <li>birth certificate</li>
+                    </ul>
+                </govuk-details-text>
+            </govuk-details>
+
+            <govuk-file-upload for="File" input-accept=".pdf, .jpg, .jpeg, .png">
+                <govuk-file-upload-label class="govuk-label--s">Upload a file</govuk-file-upload-label>
+                <govuk-file-upload-hint>
+                    You can upload a PDF, JPG or PNG file no larger than @(ProofOfIdentity.MaxFileSizeMb)MB
+                </govuk-file-upload-hint>
+            </govuk-file-upload>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" asp-add-nonce="true">
+    document.forms['proof-of-identity-form'].addEventListener('submit', function () {
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.setAttribute('disabled', 'disabled');
+    });
+</script>

@@ -46,6 +46,9 @@ public abstract class AuthorizeAccessLinkGenerator
     public string PendingSupportRequest(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/PendingSupportRequest", journeyInstanceId: journeyInstanceId);
 
+    public string ProofOfIdentity(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        GetRequiredPathByPage("/ProofOfIdentity", routeValues: new { returnUrl }, journeyInstanceId: journeyInstanceId);
+
     protected virtual string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
         var combinedRouteValues = new RouteValueDictionary(routeValues);

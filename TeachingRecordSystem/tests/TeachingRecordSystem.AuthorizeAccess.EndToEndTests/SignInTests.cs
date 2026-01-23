@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using Optional;
 using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 
@@ -410,5 +411,59 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/pending-support-request");
+    }
+
+    [Fact]
+    public async Task SignIn_UnknownUnverifiedUser()
+    {
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email));
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPageAsync();
+
+        await page.WaitForUrlPathAsync("/not-verified");
+        await page.ClickButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/name");
+        await page.FillAsync("label:text-is('First name')", TestData.GenerateFirstName());
+        await page.FillAsync("label:text-is('Last name')", TestData.GenerateLastName());
+        await page.ClickButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/date-of-birth");
+        await page.FillAsync("label:text-is('Day')", "15");
+        await page.FillAsync("label:text-is('Month')", "06");
+        await page.FillAsync("label:text-is('Year')", "1990");
+        await page.ClickButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/national-insurance-number");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
+        await page.ClickButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/trn");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrnAsync());
+        await page.ClickButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/proof-of-identity");
+        await page
+            .Locator("input[type='file']")
+            .SetInputFilesAsync(
+                new FilePayload
+                {
+                    Name = "identity.jpg",
+                    MimeType = "image/jpeg",
+                    Buffer = TestData.JpegImage
+                });
+        await page.ClickButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/check-answers");
+        await page.ClickButtonAsync("Submit support request");
+
+        await page.WaitForUrlPathAsync("/request-submitted");
     }
 }

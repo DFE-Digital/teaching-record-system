@@ -23,6 +23,8 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
 
     public string? Trn => coordinator.State.Trn;
 
+    public string? ProofOfIdentityFileName => coordinator.State.ProofOfIdentityFileName;
+
     public void OnGet()
     {
     }
@@ -86,8 +88,8 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
                         StatedFirstName = state.FirstName!,
                         StatedLastName = state.LastName!,
                         StatedDateOfBirth = state.DateOfBirth!.Value,
-                        EvidenceFileId = default,
-                        EvidenceFileName = "TODO"
+                        EvidenceFileId = state.ProofOfIdentityFileId!.Value,
+                        EvidenceFileName = state.ProofOfIdentityFileName!
                     },
                     PersonId = null,
                     OneLoginUserSubject = subject,

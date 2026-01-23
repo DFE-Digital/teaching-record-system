@@ -46,6 +46,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var dateOfBirth = TestData.GenerateDateOfBirth();
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
                 var trn = await TestData.GenerateTrnAsync();
+                var proofOfIdentityFileId = Guid.NewGuid();
+                var proofOfIdentityFileName = "identity.png";
 
                 await SetupInstanceStateForUnverifiedUserAsync(
                     coordinator,
@@ -54,7 +56,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     lastName,
                     dateOfBirth,
                     nationalInsuranceNumber,
-                    trn);
+                    trn,
+                    proofOfIdentityFileId,
+                    proofOfIdentityFileName);
 
                 var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.CheckAnswers(coordinator.InstanceId));
 
@@ -67,6 +71,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
                 Assert.Equal(trn, doc.GetSummaryListValueByKey("Teacher reference number"));
+                Assert.Equal(proofOfIdentityFileName, doc.GetSummaryListValueByKey("Proof of identity"));
             });
 
     [Fact]
@@ -170,6 +175,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var dateOfBirth = TestData.GenerateDateOfBirth();
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
                 var trn = await TestData.GenerateTrnAsync();
+                var proofOfIdentityFileId = Guid.NewGuid();
+                var proofOfIdentityFileName = "identity.png";
 
                 await SetupInstanceStateForUnverifiedUserAsync(
                     coordinator,
@@ -178,7 +185,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     lastName,
                     dateOfBirth,
                     nationalInsuranceNumber,
-                    trn);
+                    trn,
+                    proofOfIdentityFileId,
+                    proofOfIdentityFileName);
 
                 LegacyEventPublisher.Clear();
 
@@ -211,6 +220,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(dateOfBirth, data.StatedDateOfBirth);
                 Assert.Equal(nationalInsuranceNumber, data.StatedNationalInsuranceNumber);
                 Assert.Equal(trn, data.StatedTrn);
+                Assert.Equal(proofOfIdentityFileId, data.EvidenceFileId);
+                Assert.Equal(proofOfIdentityFileName, data.EvidenceFileName);
                 Assert.Equal(trnToken.Trn, data.TrnTokenTrn);
                 Assert.Equal(applicationUser.UserId, data.ClientApplicationUserId);
 
@@ -267,7 +278,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         string? lastName,
         DateOnly? dateOfBirth,
         string? nationalInsuranceNumber,
-        string? trn)
+        string? trn,
+        Guid? proofOfIdentityFileId = null,
+        string? proofOfIdentityFileName = null)
     {
         var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
         await coordinator.OnOneLoginCallbackAsync(ticket);
@@ -279,8 +292,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
         coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, nationalInsuranceNumber));
         AddUrlToPath(coordinator, StepUrls.Trn);
-        coordinator.UpdateState(s => s.SetTrn(true, trn));
+        coordinator.UpdateState(s => s.SetTrn(trn is not null, trn));
         AddUrlToPath(coordinator, StepUrls.NotFound);
+        coordinator.UpdateState(s => s.SetProofOfIdentityFile(proofOfIdentityFileId ?? Guid.NewGuid(), proofOfIdentityFileName ?? "identity.png"));
+        AddUrlToPath(coordinator, StepUrls.ProofOfIdentity);
         AddUrlToPath(coordinator, StepUrls.CheckAnswers);
     }
 }
