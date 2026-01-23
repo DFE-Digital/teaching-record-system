@@ -11,8 +11,5 @@ public class EstablishmentSourceMapping : IEntityTypeConfiguration<Establishment
         builder.HasKey(e => e.EstablishmentSourceId);
         builder.Property(e => e.Name).HasMaxLength(50).UseCollation(Collations.CaseInsensitive).IsRequired();
 
-        builder.HasData(
-            new EstablishmentSource { EstablishmentSourceId = 1, Name = "GIAS" },
-            new EstablishmentSource { EstablishmentSourceId = 2, Name = "TPS" });
     }
 }

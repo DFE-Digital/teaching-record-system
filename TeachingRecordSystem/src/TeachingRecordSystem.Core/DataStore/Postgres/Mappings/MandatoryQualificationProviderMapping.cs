@@ -10,7 +10,5 @@ public class MandatoryQualificationProviderMapping : IEntityTypeConfiguration<Ma
         builder.ToTable("mandatory_qualification_providers");
         builder.HasKey(p => p.MandatoryQualificationProviderId);
         builder.Property(p => p.Name).HasMaxLength(200);
-
-        builder.HasData(MandatoryQualificationProvider.All);
     }
 }
