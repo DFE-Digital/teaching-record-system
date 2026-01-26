@@ -419,13 +419,12 @@
       },
       "Parquet.Net": {
         "type": "Direct",
-        "requested": "[4.24.0, )",
-        "resolved": "4.24.0",
-        "contentHash": "30XaI5kj3llACxFUdCj9TNZkJGqJ3QMjB1ySaHhEMior9cT6C3SygyftzF7eS2I460M07DK6VbGFBWTWRjod8g==",
+        "requested": "[5.4.0, )",
+        "resolved": "5.4.0",
+        "contentHash": "Kje1gf+Z64NtXPUdPFhIciDouEfmbyF70S4RDhssP7g6jSVEc9u7bAq3Batr4uE8Na0pVyz5si8ROsXRLtLXCg==",
         "dependencies": {
-          "IronCompress": "1.5.2",
-          "Microsoft.Data.Analysis": "0.21.1",
-          "Microsoft.IO.RecyclableMemoryStream": "3.0.0"
+          "IronCompress": "1.7.0",
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1"
         }
       },
       "Polly.Core": {
@@ -506,11 +505,6 @@
         "requested": "[6.1.0, )",
         "resolved": "6.1.0",
         "contentHash": "M5cCC1ZMkZr9jbSQGTHnVkb5TDN67qWCV7AP8TAHdGkvDlu0puT5NzemESNn9+HkYIDpWpocP68/i+/ame2/2w=="
-      },
-      "Apache.Arrow": {
-        "type": "Transitive",
-        "resolved": "11.0.0",
-        "contentHash": "Pc5Mh8JKnJrszFUm1i1cwzCcoudY06TNPVy4VnSPAgfwZWReJkIduANjn6wrIekgpH/o9B9HyyraDPQXNXg8Ww=="
       },
       "Azure.Core": {
         "type": "Transitive",
@@ -622,11 +616,11 @@
       },
       "IronCompress": {
         "type": "Transitive",
-        "resolved": "1.5.2",
-        "contentHash": "ZjWIOrO1a1/xBcpzp0sOxU0JuuajqRjiuhYuDJn3F5sM8R0vZ5K2pxm8b+ck1+OS8RUW1QxNgG3qtbC8uGXm6A==",
+        "resolved": "1.7.0",
+        "contentHash": "soOOMriKl0J/p3V2fKuJ7R6n+SBtvpB+mRxmWU3tNeowmtBs32CyEyxHaBPralorsInVRWPFZDDJ46Eg6A9nqQ==",
         "dependencies": {
-          "Snappier": "1.1.6",
-          "ZstdSharp.Port": "0.8.1"
+          "Snappier": "1.2.0",
+          "ZstdSharp.Port": "0.8.6"
         }
       },
       "JWT": {
@@ -729,15 +723,6 @@
           "Microsoft.VisualStudio.SolutionPersistence": "1.0.52",
           "Newtonsoft.Json": "13.0.3",
           "System.Composition": "9.0.0"
-        }
-      },
-      "Microsoft.Data.Analysis": {
-        "type": "Transitive",
-        "resolved": "0.21.1",
-        "contentHash": "bcvvIkthkOWqH2HRdGZEfyxbtZOBq6AK8Oa1prdSefDCyQsPWRSCZRRqt1Txr8oGZgfdxERT0+BXRYUEKKApPQ==",
-        "dependencies": {
-          "Apache.Arrow": "11.0.0",
-          "Microsoft.ML.DataView": "3.0.1"
         }
       },
       "Microsoft.Data.SqlClient.SNI.runtime": {
@@ -1055,13 +1040,8 @@
       },
       "Microsoft.IO.RecyclableMemoryStream": {
         "type": "Transitive",
-        "resolved": "3.0.0",
-        "contentHash": "irv0HuqoH8Ig5i2fO+8dmDNdFdsrO+DoQcedwIlb810qpZHBNQHZLW7C/AHBQDgLLpw2T96vmMAy/aE4Yj55Sg=="
-      },
-      "Microsoft.ML.DataView": {
-        "type": "Transitive",
         "resolved": "3.0.1",
-        "contentHash": "mkZt1r6Nx5CAoD3klhC7VMQFzwWMHHjoYpv3X9u+GMvTMbSRaDdiA88HUoOzT7kCeq4/L1nKctmrByhLK28Xjw=="
+        "contentHash": "s/s20YTVY9r9TPfTrN5g8zPF1YhwxyqO6PxUkrYTGI2B+OGPe9AdajWZrLhFqXIvqIW23fnUE4+ztrUWNU1+9g=="
       },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
@@ -1156,8 +1136,8 @@
       },
       "Snappier": {
         "type": "Transitive",
-        "resolved": "1.1.6",
-        "contentHash": "aLJu7Q0mVk0e9QwjJLEh70tXQ0Url8fHITrHXwqF+eq7N20jGMOhkmTXUUjpPim+rCm0I4fARcVBRzJPSipN+w=="
+        "resolved": "1.2.0",
+        "contentHash": "Lv83i7hQZbl+r0qkO6VrBZ0OHL/R/onAVcCcxgYpT8inhqJ2/f1qkIWT3gWwdcCz4cPHOQrS0uX40cFUQyOS5Q=="
       },
       "StructuredFieldValues": {
         "type": "Transitive",
@@ -1275,8 +1255,8 @@
       },
       "ZstdSharp.Port": {
         "type": "Transitive",
-        "resolved": "0.8.1",
-        "contentHash": "19tNz33kn2EkyViFXuxfVn338UJaRmkwBphVqP2dVJIYQUQgFrgG5h061mxkRRg1Ax6r+6WOj1FxaFZ5qaWqqg=="
+        "resolved": "0.8.6",
+        "contentHash": "iP4jVLQoQmUjMU88g1WObiNr6YKZGvh4aOXn3yOJsHqZsflwRsxZPcIBvNXgjXO3vQKSLctXGLTpcBPLnWPS8A=="
       },
       "Humanizer.Core": {
         "type": "CentralTransitive",
