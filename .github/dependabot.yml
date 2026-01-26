@@ -26,16 +26,8 @@ updates:
     directory: /
     schedule:
       interval: 'daily'
-    labels:
-    - "dependencies"
-    - "github-actions"
-    - "devops"
 
   - package-ecosystem: terraform
     directory: /terraform/
     schedule:
       interval: 'daily'
-    labels:
-    - "dependencies"
-    - "terraform"
-    - "devops"
