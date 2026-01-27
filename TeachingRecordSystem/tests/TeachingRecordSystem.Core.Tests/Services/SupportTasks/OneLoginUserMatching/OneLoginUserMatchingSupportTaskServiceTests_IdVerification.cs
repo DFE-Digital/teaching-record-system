@@ -7,6 +7,62 @@ namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks.OneLoginUserMatc
 public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
+    public async Task CreateOneLoginUserIdVerificationSupportTaskAsync_CreatesSupportTaskWithExpectedData()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var statedFirstName = Faker.Name.First();
+        var statedLastName = Faker.Name.Last();
+        var statedDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
+        var statedNationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        var statedTrn = await TestData.GenerateTrnAsync();
+        var clientApplicationUserId = Guid.NewGuid();
+        var trnTokenTrn = await TestData.GenerateTrnAsync();
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "evidence.jpg";
+
+        var options = new CreateOneLoginUserIdVerificationSupportTaskOptions
+        {
+            OneLoginUserSubject = oneLoginUser.Subject,
+            StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
+            StatedTrn = statedTrn,
+            ClientApplicationUserId = clientApplicationUserId,
+            TrnTokenTrn = trnTokenTrn,
+            StatedFirstName = statedFirstName,
+            StatedLastName = statedLastName,
+            StatedDateOfBirth = statedDateOfBirth,
+            EvidenceFileId = evidenceFileId,
+            EvidenceFileName = evidenceFileName
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var supportTask = await WithServiceAsync(s => s.CreateOneLoginUserIdVerificationSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.NotNull(supportTask);
+        Assert.Equal(SupportTaskType.OneLoginUserIdVerification, supportTask.SupportTaskType);
+        Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+        Assert.Equal(oneLoginUser.Subject, supportTask.OneLoginUserSubject);
+        Assert.NotNull(supportTask.SupportTaskReference);
+
+        var data = supportTask.GetData<OneLoginUserIdVerificationData>();
+        Assert.Equal(oneLoginUser.Subject, data.OneLoginUserSubject);
+        Assert.Equal(statedFirstName, data.StatedFirstName);
+        Assert.Equal(statedLastName, data.StatedLastName);
+        Assert.Equal(statedDateOfBirth, data.StatedDateOfBirth);
+        Assert.Equal(statedNationalInsuranceNumber, data.StatedNationalInsuranceNumber);
+        Assert.Equal(statedTrn, data.StatedTrn);
+        Assert.Equal(clientApplicationUserId, data.ClientApplicationUserId);
+        Assert.Equal(trnTokenTrn, data.TrnTokenTrn);
+        Assert.Equal(evidenceFileId, data.EvidenceFileId);
+        Assert.Equal(evidenceFileName, data.EvidenceFileName);
+
+        Events.AssertEventsPublished(e => Assert.IsType<SupportTaskCreatedEvent>(e));
+    }
+
+    [Fact]
     public async Task ResolveSupportTaskAsync_WithNotVerifiedOutcome_ClosesSupportTaskAndKeepsUserNotVerifiedAndNotMatched()
     {
         // Arrange
