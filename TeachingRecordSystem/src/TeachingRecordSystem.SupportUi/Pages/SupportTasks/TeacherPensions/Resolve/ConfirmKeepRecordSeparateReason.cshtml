@@ -6,13 +6,13 @@
 
 <form action="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReason(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">Third-party tasks</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <h3 class="govuk-heading-s">Why are you keeping the records separate</h3>
         </div>
 
-        <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+        <div class="govuk-grid-column-full" data-testid="results">
             <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
@@ -29,7 +29,7 @@
     </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
                 <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReasonCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>

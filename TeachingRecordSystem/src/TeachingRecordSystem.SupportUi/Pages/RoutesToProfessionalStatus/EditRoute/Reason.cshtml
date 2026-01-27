@@ -9,7 +9,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-two-thirds">
         <form action="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Edit route - @Model.PersonName</span>
             <govuk-radios for="ChangeReason" data-testid="reason-options">

@@ -14,13 +14,13 @@
 
 <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">TRN requests</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
         </div>
     </div>
     <div class="govuk-grid-row">
-        <div class=@(showDuplicatesSideBySide ? "govuk-grid-column-full-from-desktop" : "govuk-grid-column-two-thirds-from-desktop")>
+        <div class=@(showDuplicatesSideBySide ? "govuk-grid-column-full" : "govuk-grid-column-two-thirds")>
             @if (Model.MatchOutcome == MatchPersonsResultOutcome.DefiniteMatch)
             {
                 <govuk-inset-text class="govuk-!-margin-top-0">
@@ -209,7 +209,7 @@
     </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             @if (Model.MatchOutcome == MatchPersonsResultOutcome.PotentialMatches)
             {
                 <govuk-radios for="PersonId">

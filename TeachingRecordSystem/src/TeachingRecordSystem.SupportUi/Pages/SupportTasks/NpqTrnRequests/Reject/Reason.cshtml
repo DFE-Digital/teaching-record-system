@@ -11,7 +11,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-two-thirds">
         <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Reject.Reason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">TRN request - @Model.PersonName</span>
             <govuk-radios for="RejectionReason" data-testid="reason-options">

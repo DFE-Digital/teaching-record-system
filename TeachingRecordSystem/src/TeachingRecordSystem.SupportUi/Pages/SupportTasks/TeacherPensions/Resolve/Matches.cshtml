@@ -13,13 +13,13 @@
 
 <form action="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">Third-party tasks</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
         </div>
     </div>
     <div class="govuk-grid-row">
-        <div class=@(showDuplicatesSideBySide ? "govuk-grid-column-full-from-desktop" : "govuk-grid-column-two-thirds-from-desktop")>
+        <div class=@(showDuplicatesSideBySide ? "govuk-grid-column-full" : "govuk-grid-column-two-thirds")>
             <govuk-inset-text class="govuk-!-margin-top-0">
                 Differences are <highlight>highlighted</highlight> in the matched record
             </govuk-inset-text>
@@ -133,7 +133,7 @@
     </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop">
+        <div class="govuk-grid-column-two-thirds">
             <govuk-radios for="PersonId">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">

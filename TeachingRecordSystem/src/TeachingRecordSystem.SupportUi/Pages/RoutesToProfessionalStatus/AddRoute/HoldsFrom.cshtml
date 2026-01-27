@@ -11,7 +11,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-two-thirds">
         <form action="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.HoldsFrom(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-date-input for=@Model.HoldsFrom>
