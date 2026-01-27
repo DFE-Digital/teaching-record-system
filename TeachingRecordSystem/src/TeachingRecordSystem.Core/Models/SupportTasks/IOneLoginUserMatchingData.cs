@@ -4,7 +4,6 @@ namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
 public interface IOneLoginUserMatchingData : ISupportTaskData
 {
-    bool? Verified { get; init; }
     string OneLoginUserSubject { get; init; }
     string? StatedNationalInsuranceNumber { get; init; }
     string? StatedTrn { get; init; }

@@ -48,7 +48,7 @@ public class ResolveOneLoginUserMatchingStateFactory(OneLoginService oneLoginSer
         var requestData = supportTask.GetData<IOneLoginUserMatchingData>();
 
         var suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
-            Names: requestData!.VerifiedOrStatedNames!,
+            Names: requestData.VerifiedOrStatedNames!,
             DatesOfBirth: requestData.VerifiedOrStatedDatesOfBirth!,
             NationalInsuranceNumber: requestData.StatedNationalInsuranceNumber,
             Trn: requestData.StatedTrn,
@@ -56,6 +56,10 @@ public class ResolveOneLoginUserMatchingStateFactory(OneLoginService oneLoginSer
 
         return supportTask.ResolveJourneySavedState?.GetState<ResolveOneLoginUserMatchingState>() is { } existingState ?
             existingState with { MatchedPersons = suggestedMatches, SavedJourneyState = supportTask.ResolveJourneySavedState } :
-            new ResolveOneLoginUserMatchingState { MatchedPersons = suggestedMatches, Verified = requestData.Verified };
+            new ResolveOneLoginUserMatchingState
+            {
+                MatchedPersons = suggestedMatches,
+                Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching
+            };
     }
 }

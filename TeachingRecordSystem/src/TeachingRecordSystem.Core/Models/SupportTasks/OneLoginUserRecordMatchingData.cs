@@ -2,7 +2,6 @@ namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
 public record OneLoginUserRecordMatchingData : IOneLoginUserMatchingData
 {
-    public bool? Verified { get; init; }
     public required string OneLoginUserSubject { get; init; }
     public required string OneLoginUserEmail { get; init; }
     public required string[][]? VerifiedNames { get; init; }

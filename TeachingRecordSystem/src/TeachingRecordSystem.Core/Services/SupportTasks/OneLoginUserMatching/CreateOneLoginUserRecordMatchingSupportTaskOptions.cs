@@ -2,7 +2,6 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 public record CreateOneLoginUserRecordMatchingSupportTaskOptions
 {
-    public required bool Verified { get; init; }
     public required string OneLoginUserSubject { get; init; }
     public required string OneLoginUserEmail { get; init; }
     public required string[][]? VerifiedNames { get; init; }

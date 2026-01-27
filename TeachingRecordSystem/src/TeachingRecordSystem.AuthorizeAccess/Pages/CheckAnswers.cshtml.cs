@@ -47,7 +47,6 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, OneLoginUse
             supportTask = await oneLoginUserMatchingSupportTaskService.CreateRecordMatchingSupportTaskAsync(
                 new CreateOneLoginUserRecordMatchingSupportTaskOptions
                 {
-                    Verified = true,
                     OneLoginUserSubject = subject,
                     OneLoginUserEmail = email,
                     VerifiedNames = state.VerifiedNames,

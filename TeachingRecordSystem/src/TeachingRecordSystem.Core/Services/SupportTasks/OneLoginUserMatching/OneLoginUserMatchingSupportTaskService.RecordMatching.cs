@@ -17,7 +17,6 @@ public partial class OneLoginUserMatchingSupportTaskService
                 SupportTaskType = SupportTaskType.OneLoginUserRecordMatching,
                 Data = new OneLoginUserRecordMatchingData
                 {
-                    Verified = options.Verified,
                     OneLoginUserSubject = options.OneLoginUserSubject,
                     OneLoginUserEmail = options.OneLoginUserEmail,
                     VerifiedNames = options.VerifiedNames,

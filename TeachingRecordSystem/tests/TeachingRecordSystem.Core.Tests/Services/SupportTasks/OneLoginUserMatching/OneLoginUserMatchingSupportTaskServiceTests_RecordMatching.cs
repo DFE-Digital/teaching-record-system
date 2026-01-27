@@ -20,7 +20,6 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
 
         var options = new CreateOneLoginUserRecordMatchingSupportTaskOptions
         {
-            Verified = true,
             OneLoginUserSubject = oneLoginUser.Subject,
             OneLoginUserEmail = oneLoginUser.EmailAddress!,
             VerifiedNames = verifiedNames,
@@ -44,7 +43,6 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.NotNull(supportTask.SupportTaskReference);
 
         var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
-        Assert.True(data.Verified);
         Assert.Equal(oneLoginUser.Subject, data.OneLoginUserSubject);
         Assert.Equal(oneLoginUser.EmailAddress, data.OneLoginUserEmail);
         Assert.Equal(verifiedNames, data.VerifiedNames);
@@ -86,7 +84,6 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.True(updatedData.Verified);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.NotConnecting, updatedData.Outcome);
         Assert.Equal(notConnectingReason, updatedData.NotConnectingReason);
@@ -119,7 +116,6 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.True(updatedData.Verified);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.NoMatches, updatedData.Outcome);
 
