@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Prometheus;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
+using TeachingRecordSystem.WebCommon.ModelBinding;
 
 namespace TeachingRecordSystem.WebCommon;
 
@@ -22,6 +24,11 @@ public static class Extensions
         builder.Services.AddHealthChecks().AddNpgSql(sp => sp.GetRequiredService<NpgsqlDataSource>());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         builder.Services.AddSingleton<UrlRedactor>();
+
+        builder.Services.Configure<MvcOptions>(options =>
+        {
+            options.ModelBinderProviders.Insert(0, new TrimmedStringModelBinderProvider());
+        });
 
         if (builder.Environment.IsProduction())
         {
