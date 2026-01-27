@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
 
@@ -6,7 +7,36 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 public partial class OneLoginUserMatchingSupportTaskService
 {
-    public async Task ResolveSupportTaskAsync(NotConnectingOutcomeOptions options, ProcessContext processContext)
+    public async Task<SupportTask> CreateRecordMatchingSupportTaskAsync(
+        CreateOneLoginUserRecordMatchingSupportTaskOptions options,
+        ProcessContext processContext)
+    {
+        var supportTask = await supportTaskService.CreateSupportTaskAsync(
+            new CreateSupportTaskOptions
+            {
+                SupportTaskType = SupportTaskType.OneLoginUserRecordMatching,
+                Data = new OneLoginUserRecordMatchingData
+                {
+                    Verified = options.Verified,
+                    OneLoginUserSubject = options.OneLoginUserSubject,
+                    OneLoginUserEmail = options.OneLoginUserEmail,
+                    VerifiedNames = options.VerifiedNames,
+                    VerifiedDatesOfBirth = options.VerifiedDatesOfBirth,
+                    StatedNationalInsuranceNumber = options.StatedNationalInsuranceNumber,
+                    StatedTrn = options.StatedTrn,
+                    ClientApplicationUserId = options.ClientApplicationUserId,
+                    TrnTokenTrn = options.TrnTokenTrn
+                },
+                PersonId = null,
+                OneLoginUserSubject = options.OneLoginUserSubject,
+                TrnRequest = null
+            },
+            processContext);
+
+        return supportTask;
+    }
+
+    public async Task ResolveRecordMatchingSupportTaskAsync(NotConnectingOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
@@ -33,7 +63,7 @@ public partial class OneLoginUserMatchingSupportTaskService
         await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
     }
 
-    public async Task ResolveSupportTaskAsync(NoMatchesOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveRecordMatchingSupportTaskAsync(NoMatchesOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
@@ -58,7 +88,7 @@ public partial class OneLoginUserMatchingSupportTaskService
         await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
     }
 
-    public async Task ResolveSupportTaskAsync(ConnectedOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveRecordMatchingSupportTaskAsync(ConnectedOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);

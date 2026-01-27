@@ -48,7 +48,7 @@ public class ConfirmNotConnecting(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedOnlyWithMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!,
@@ -61,7 +61,7 @@ public class ConfirmNotConnecting(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new NotConnectingOutcomeOptions
                 {
                     SupportTask = _supportTask!,

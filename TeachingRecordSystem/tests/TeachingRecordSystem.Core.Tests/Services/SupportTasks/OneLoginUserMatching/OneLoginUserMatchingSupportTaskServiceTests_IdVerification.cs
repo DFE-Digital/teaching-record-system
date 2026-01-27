@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks.OneLoginUserMatc
 public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
-    public async Task CreateOneLoginUserIdVerificationSupportTaskAsync_CreatesSupportTaskWithExpectedData()
+    public async Task CreateVerificationSupportTaskAsync_CreatesSupportTaskWithExpectedData()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -38,7 +38,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var supportTask = await WithServiceAsync(s => s.CreateOneLoginUserIdVerificationSupportTaskAsync(options, processContext));
+        var supportTask = await WithServiceAsync(s => s.CreateVerificationSupportTaskAsync(options, processContext));
 
         // Assert
         Assert.NotNull(supportTask);
@@ -63,7 +63,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithNotVerifiedOutcome_ClosesSupportTaskAndKeepsUserNotVerifiedAndNotMatched()
+    public async Task ResolveVerificationSupportTaskAsync_WithNotVerifiedOutcome_ClosesSupportTaskAndKeepsUserNotVerifiedAndNotMatched()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -82,7 +82,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =
@@ -110,7 +110,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithVerifiedOnlyWithPotentialMatchesOutcome_ClosesSupportTaskSetsUserToVerifiedButNotMatched()
+    public async Task ResolveVerificationSupportTaskAsync_WithVerifiedOnlyWithPotentialMatchesOutcome_ClosesSupportTaskSetsUserToVerifiedButNotMatched()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -131,7 +131,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =
@@ -161,7 +161,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithVerifiedOnlyWithoutPotentialMatchesOutcome_ClosesSupportTaskSetsUserToVerifiedButNotMatchedAndEmailsUser()
+    public async Task ResolveVerificationSupportTaskAsync_WithVerifiedOnlyWithoutPotentialMatchesOutcome_ClosesSupportTaskSetsUserToVerifiedButNotMatchedAndEmailsUser()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -177,7 +177,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =
@@ -211,7 +211,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithVerifiedAndConnectedOutcome_ClosesSupportTaskSetsUserToVerifiedAndMatchedAndEmailsUser()
+    public async Task ResolveVerificationSupportTaskAsync_WithVerifiedAndConnectedOutcome_ClosesSupportTaskSetsUserToVerifiedAndMatchedAndEmailsUser()
     {
         // Arrange
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
@@ -244,7 +244,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =

@@ -50,7 +50,7 @@ public class NoMatches(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveVerificationSupportTaskAsync(
                 (VerifiedOnlyWithoutMatchesOutcomeOptions)new()
                 {
                     SupportTask = _supportTask!
@@ -61,7 +61,7 @@ public class NoMatches(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 (NoMatchesOutcomeOptions)new()
                 {
                     SupportTask = _supportTask!

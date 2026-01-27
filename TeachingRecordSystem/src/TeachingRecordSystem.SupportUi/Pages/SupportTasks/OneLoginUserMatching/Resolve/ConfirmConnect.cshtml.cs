@@ -63,7 +63,7 @@ public class ConfirmConnect(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedAndConnectedOutcomeOptions
                 {
                     SupportTask = _supportTask!,
@@ -76,7 +76,7 @@ public class ConfirmConnect(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new ConnectedOutcomeOptions
                 {
                     SupportTask = _supportTask!,

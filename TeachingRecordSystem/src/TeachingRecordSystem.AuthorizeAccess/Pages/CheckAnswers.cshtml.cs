@@ -44,7 +44,7 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, OneLoginUse
                 clock.UtcNow,
                 SystemUser.SystemUserId);
 
-            supportTask = await oneLoginUserMatchingSupportTaskService.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            supportTask = await oneLoginUserMatchingSupportTaskService.CreateRecordMatchingSupportTaskAsync(
                 new CreateOneLoginUserRecordMatchingSupportTaskOptions
                 {
                     Verified = true,
@@ -66,7 +66,7 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, OneLoginUse
                 clock.UtcNow,
                 SystemUser.SystemUserId);
 
-            supportTask = await oneLoginUserMatchingSupportTaskService.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            supportTask = await oneLoginUserMatchingSupportTaskService.CreateVerificationSupportTaskAsync(
                 new CreateOneLoginUserIdVerificationSupportTaskOptions
                 {
                     OneLoginUserSubject = subject,

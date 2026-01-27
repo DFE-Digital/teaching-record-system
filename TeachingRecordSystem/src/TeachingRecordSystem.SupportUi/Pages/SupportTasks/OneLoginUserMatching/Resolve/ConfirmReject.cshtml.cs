@@ -38,7 +38,7 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-        await supportTaskService.ResolveSupportTaskAsync(
+        await supportTaskService.ResolveVerificationSupportTaskAsync(
             new NotVerifiedOutcomeOptions
             {
                 SupportTask = _supportTask!,

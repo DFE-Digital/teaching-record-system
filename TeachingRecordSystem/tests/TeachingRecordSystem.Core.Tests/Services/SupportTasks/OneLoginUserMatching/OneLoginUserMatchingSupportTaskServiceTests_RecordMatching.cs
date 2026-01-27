@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks.OneLoginUserMatc
 public partial class OneLoginUserMatchingSupportTaskServiceTests
 {
     [Fact]
-    public async Task CreateOneLoginUserRecordMatchingSupportTaskAsync_CreatesSupportTaskWithExpectedData()
+    public async Task CreateRecordMatchingSupportTaskAsync_CreatesSupportTaskWithExpectedData()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
@@ -34,7 +34,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var supportTask = await WithServiceAsync(s => s.CreateOneLoginUserRecordMatchingSupportTaskAsync(options, processContext));
+        var supportTask = await WithServiceAsync(s => s.CreateRecordMatchingSupportTaskAsync(options, processContext));
 
         // Assert
         Assert.NotNull(supportTask);
@@ -58,7 +58,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithNotConnectingOutcome_ClosesSupportTaskSetsOutcomeAsExpected()
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNotConnectingOutcome_ClosesSupportTaskSetsOutcomeAsExpected()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -79,7 +79,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =
@@ -96,7 +96,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithNoMatchesOutcome_ClosesSupportTaskSetsOutcomeAsExpectedAndEmailsUser()
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNoMatchesOutcome_ClosesSupportTaskSetsOutcomeAsExpectedAndEmailsUser()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -112,7 +112,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =
@@ -133,7 +133,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithConnectedOutcome_ClosesSupportTaskSetsUserToMatchedAndEmailsUser()
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithConnectedOutcome_ClosesSupportTaskSetsUserToMatchedAndEmailsUser()
     {
         // Arrange
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
@@ -162,7 +162,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =
