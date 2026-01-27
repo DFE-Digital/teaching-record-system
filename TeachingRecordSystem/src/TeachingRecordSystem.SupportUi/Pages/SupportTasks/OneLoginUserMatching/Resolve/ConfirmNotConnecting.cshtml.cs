@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserRecordMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 

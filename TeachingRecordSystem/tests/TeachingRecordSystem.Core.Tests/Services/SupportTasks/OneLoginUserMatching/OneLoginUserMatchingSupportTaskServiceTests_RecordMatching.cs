@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserRecordMatching;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks.OneLoginUserMatching;
 

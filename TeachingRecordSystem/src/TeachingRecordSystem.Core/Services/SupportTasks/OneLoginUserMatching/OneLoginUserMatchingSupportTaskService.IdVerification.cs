@@ -2,13 +2,10 @@ using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
-public partial class OneLoginUserMatchingSupportTaskService(
-    SupportTaskService supportTaskService,
-    OneLoginService oneLoginService)
+public partial class OneLoginUserMatchingSupportTaskService
 {
     public async Task ResolveSupportTaskAsync(NotVerifiedOutcomeOptions options, ProcessContext processContext)
     {

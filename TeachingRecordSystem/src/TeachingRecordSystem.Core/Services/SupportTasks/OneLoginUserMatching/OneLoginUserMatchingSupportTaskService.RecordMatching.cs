@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserRecordMatching;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
