@@ -19,13 +19,13 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[3.4.3, )",
-        "resolved": "3.4.3",
-        "contentHash": "+r4Vp7gDHguSlUd1QAr9u4DhRqftrXAG282s1sQnPOIr6Ou4vy91TQYxCTQ6sk8h7Kr+HHpy//fiyfsB83zGTw==",
+        "requested": "[3.5.1, )",
+        "resolved": "3.5.1",
+        "contentHash": "G96jb/L5+jWFcWmFsA8xoFTUz0yVYD4ArR0A7H8m27qucUyoDdvLUjqY8E5BU+XqvRDhZKiKmFJ3lO8f0Z2g3g==",
         "dependencies": {
           "Fluid.Core": "[2.15.0, 3.0.0)",
           "HtmlAgilityPack": "1.12.0",
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.22"
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.23"
         }
       },
       "Humanizer.Core": {
@@ -201,7 +201,8 @@
         "resolved": "11.11.0",
         "contentHash": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
         "dependencies": {
-          "FluentValidation": "11.11.0"
+          "FluentValidation": "11.11.0",
+          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
         }
       },
       "Fluid.Core": {
@@ -345,6 +346,11 @@
         "resolved": "10.0.2",
         "contentHash": "5C8aKN2HFhXfLhkrVvQ6yH990nw35pS7HNnwdBc628zIREaKJ4/rkdCXzxOdZo/SnCT3Kg7a/CqnhlzuJhlD4Q=="
       },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "2.1.0",
+        "contentHash": "8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ=="
+      },
       "Microsoft.Extensions.DependencyModel": {
         "type": "Transitive",
         "resolved": "10.0.0",
@@ -352,8 +358,8 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "8.0.22",
-        "contentHash": "5Hrl2EyoqmSN/0YKfuYp4qRP8+RU4xguUVMg0J/5J+nDYobiBM4VgCTUN4oaCpIk9063hTsd/WoheKMlZBkVjA=="
+        "resolved": "8.0.23",
+        "contentHash": "r4LEloHJISvha0lZs26rUAGZr/zSTSuT1GeDLgmi3Ow4z7mZ7L48jtvGJCknAX4nlAaJH9YZvfc8RqkixJ38Ew=="
       },
       "Microsoft.Graph": {
         "type": "Transitive",

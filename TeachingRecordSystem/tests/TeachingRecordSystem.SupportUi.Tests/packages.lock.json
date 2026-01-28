@@ -316,8 +316,8 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "8.0.22",
-        "contentHash": "5Hrl2EyoqmSN/0YKfuYp4qRP8+RU4xguUVMg0J/5J+nDYobiBM4VgCTUN4oaCpIk9063hTsd/WoheKMlZBkVjA=="
+        "resolved": "8.0.23",
+        "contentHash": "r4LEloHJISvha0lZs26rUAGZr/zSTSuT1GeDLgmi3Ow4z7mZ7L48jtvGJCknAX4nlAaJH9YZvfc8RqkixJ38Ew=="
       },
       "Microsoft.Graph": {
         "type": "Transitive",
@@ -930,7 +930,7 @@
         "dependencies": {
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
           "DartSassBuilder": "[1.1.0, )",
-          "GovUk.Frontend.AspNetCore": "[3.4.3, )",
+          "GovUk.Frontend.AspNetCore": "[3.5.1, )",
           "Humanizer.Core": "[2.14.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
@@ -1157,13 +1157,13 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[3.4.3, )",
-        "resolved": "3.4.3",
-        "contentHash": "+r4Vp7gDHguSlUd1QAr9u4DhRqftrXAG282s1sQnPOIr6Ou4vy91TQYxCTQ6sk8h7Kr+HHpy//fiyfsB83zGTw==",
+        "requested": "[3.5.1, )",
+        "resolved": "3.5.1",
+        "contentHash": "G96jb/L5+jWFcWmFsA8xoFTUz0yVYD4ArR0A7H8m27qucUyoDdvLUjqY8E5BU+XqvRDhZKiKmFJ3lO8f0Z2g3g==",
         "dependencies": {
           "Fluid.Core": "[2.15.0, 3.0.0)",
           "HtmlAgilityPack": "1.12.0",
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.22"
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.23"
         }
       },
       "GovukNotify": {
