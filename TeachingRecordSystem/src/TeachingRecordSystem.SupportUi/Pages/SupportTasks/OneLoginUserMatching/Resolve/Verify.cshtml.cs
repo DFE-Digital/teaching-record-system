@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
-public class VerifyModel(IFileService fileService, SupportUiLinkGenerator linkGenerator) : PageModel
+public class VerifyModel(ISafeFileService safeFileService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<VerifyModel> _validator = new()
     {
@@ -58,7 +58,7 @@ public class VerifyModel(IFileService fileService, SupportUiLinkGenerator linkGe
 
     public async Task<IActionResult> OnGetEvidenceAsync()
     {
-        var stream = await fileService.OpenReadStreamAsync(Evidence!.FileId);
+        var stream = await safeFileService.OpenReadStreamAsync(Evidence!.FileId);
         return File(stream, Evidence.MimeType);
     }
 
@@ -90,7 +90,7 @@ public class VerifyModel(IFileService fileService, SupportUiLinkGenerator linkGe
         {
             FileId = data.EvidenceFileId,
             FileName = data.EvidenceFileName,
-            FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry),
+            FileUrl = await safeFileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry),
             MimeType = evidenceFileMimeType
         };
 

@@ -29,6 +29,10 @@ public class TestScopedServices
         BlobStorageFileServiceMock
             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
             .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
+        BlobStorageSafeFileServiceMock = new();
+        BlobStorageSafeFileServiceMock
+            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+            .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
         GetAnIdentityApiClientMock = new();
         TrnRequestOptions = new TrnRequestOptions();
         BackgroundJobScheduler = new(serviceProvider);
@@ -43,6 +47,7 @@ public class TestScopedServices
             .AddTestScoped(tss => tss.AzureActiveDirectoryUserServiceMock.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
+            .AddTestScoped(tss => tss.BlobStorageSafeFileServiceMock.Object)
             .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
             .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler)
             .AddTestScoped(tss => tss.CurrentUserProvider)
@@ -73,6 +78,8 @@ public class TestScopedServices
     public TestableFeatureProvider FeatureProvider { get; }
 
     public Mock<IFileService> BlobStorageFileServiceMock { get; }
+
+    public Mock<ISafeFileService> BlobStorageSafeFileServiceMock { get; }
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
