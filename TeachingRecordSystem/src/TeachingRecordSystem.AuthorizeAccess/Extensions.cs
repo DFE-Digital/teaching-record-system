@@ -24,6 +24,7 @@ using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.Filters;
 using TeachingRecordSystem.WebCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.Infrastructure.Redis;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
@@ -45,7 +46,12 @@ public static class Extensions
             options.DefaultFileUploadJavaScriptEnhancements = true;
         });
 
-        services.AddSession();  // TODO Configure production session storage
+        services.AddSession();
+
+        if (environment.IsProduction())
+        {
+            services.AddRedis(configuration);
+        }
 
         services.AddGovUkQuestions();
 
