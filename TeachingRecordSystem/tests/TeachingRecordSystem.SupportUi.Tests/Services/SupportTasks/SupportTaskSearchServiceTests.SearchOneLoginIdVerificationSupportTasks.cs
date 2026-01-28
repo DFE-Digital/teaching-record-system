@@ -299,7 +299,7 @@ public partial class SupportTaskSearchServiceTests
                 configure.WithStatedFirstName("Colin"))
         };
 
-        var search = SupportTask.GenerateSupportTaskReference();
+        var search = "TASK-123";
         var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: search);
 
         var paginationOptions = new PaginationOptions(PageNumber: 1);

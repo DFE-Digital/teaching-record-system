@@ -16,7 +16,6 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 
         var supportTask = new SupportTask
         {
-            SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
             CreatedOn = processContext.Now,
             UpdatedOn = processContext.Now,
             SupportTaskType = options.SupportTaskType,

@@ -12,9 +12,9 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
     public async Task Get_TaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var taskReference = SupportTask.GenerateSupportTaskReference();
+        var supportTaskReference = "TASK-123";
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/api-trn-requests/{taskReference}/resolve/matches");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/api-trn-requests/{supportTaskReference}/resolve/matches");
 
         // Act
         var response = await HttpClient.SendAsync(request);

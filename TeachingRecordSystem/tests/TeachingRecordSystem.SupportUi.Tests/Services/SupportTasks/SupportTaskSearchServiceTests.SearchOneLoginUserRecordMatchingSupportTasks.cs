@@ -301,7 +301,7 @@ public partial class SupportTaskSearchServiceTests
                 configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()]))
         };
 
-        var search = SupportTask.GenerateSupportTaskReference();
+        var search = "TASK-123";
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: search);
 
         var paginationOptions = new PaginationOptions(PageNumber: 1);
