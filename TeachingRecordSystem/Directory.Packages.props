@@ -26,7 +26,7 @@
     <PackageVersion Include="Faker.Net" Version="2.0.163" />
     <PackageVersion Include="FluentValidation" Version="12.1.0" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
-    <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.13.0" />
+    <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.14.0" />
     <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.4.0" />
     <PackageVersion Include="GovUk.Questions.AspNetCore" Version="0.1.0-alpha.0.93" />
     <PackageVersion Include="GovUk.Questions.AspNetCore.Testing" Version="0.1.0-alpha.0.93" />
