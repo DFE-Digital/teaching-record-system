@@ -2,15 +2,42 @@ using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
-public partial class OneLoginUserMatchingSupportTaskService(
-    SupportTaskService supportTaskService,
-    OneLoginService oneLoginService)
+public partial class OneLoginUserMatchingSupportTaskService
 {
-    public async Task ResolveSupportTaskAsync(NotVerifiedOutcomeOptions options, ProcessContext processContext)
+    public async Task<SupportTask> CreateVerificationSupportTaskAsync(
+        CreateOneLoginUserIdVerificationSupportTaskOptions options,
+        ProcessContext processContext)
+    {
+        var supportTask = await supportTaskService.CreateSupportTaskAsync(
+            new CreateSupportTaskOptions
+            {
+                SupportTaskType = SupportTaskType.OneLoginUserIdVerification,
+                Data = new OneLoginUserIdVerificationData
+                {
+                    OneLoginUserSubject = options.OneLoginUserSubject,
+                    StatedNationalInsuranceNumber = options.StatedNationalInsuranceNumber,
+                    StatedTrn = options.StatedTrn,
+                    ClientApplicationUserId = options.ClientApplicationUserId,
+                    TrnTokenTrn = options.TrnTokenTrn,
+                    StatedFirstName = options.StatedFirstName,
+                    StatedLastName = options.StatedLastName,
+                    StatedDateOfBirth = options.StatedDateOfBirth,
+                    EvidenceFileId = options.EvidenceFileId,
+                    EvidenceFileName = options.EvidenceFileName
+                },
+                PersonId = null,
+                OneLoginUserSubject = options.OneLoginUserSubject,
+                TrnRequest = null
+            },
+            processContext);
+
+        return supportTask;
+    }
+
+    public async Task ResolveVerificationSupportTaskAsync(NotVerifiedOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
@@ -32,7 +59,7 @@ public partial class OneLoginUserMatchingSupportTaskService(
         Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
     }
 
-    public async Task ResolveSupportTaskAsync(VerifiedOnlyWithMatchesOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithMatchesOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
@@ -69,7 +96,7 @@ public partial class OneLoginUserMatchingSupportTaskService(
         await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
     }
 
-    public async Task ResolveSupportTaskAsync(VerifiedOnlyWithoutMatchesOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithoutMatchesOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
@@ -104,7 +131,7 @@ public partial class OneLoginUserMatchingSupportTaskService(
         await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
     }
 
-    public async Task ResolveSupportTaskAsync(VerifiedAndConnectedOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveVerificationSupportTaskAsync(VerifiedAndConnectedOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);

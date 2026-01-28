@@ -97,7 +97,6 @@ public partial class TestData
 
                 var data = new OneLoginUserRecordMatchingData()
                 {
-                    Verified = true,
                     OneLoginUserSubject = oneLoginUserSubject,
                     OneLoginUserEmail = emailAddress,
                     VerifiedNames = verifiedNames,

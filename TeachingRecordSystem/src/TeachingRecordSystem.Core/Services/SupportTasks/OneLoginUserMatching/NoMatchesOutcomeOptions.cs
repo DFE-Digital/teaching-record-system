@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserRecordMatching;
+namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 public record NoMatchesOutcomeOptions
 {

@@ -1,13 +1,62 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserRecordMatching;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks.OneLoginUserMatching;
 
 public partial class OneLoginUserMatchingSupportTaskServiceTests
 {
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithNotConnectingOutcome_ClosesSupportTaskSetsOutcomeAsExpected()
+    public async Task CreateRecordMatchingSupportTaskAsync_CreatesSupportTaskWithExpectedData()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+        var verifiedNames = new[] { new[] { Faker.Name.First(), Faker.Name.Last() } };
+        var verifiedDatesOfBirth = new[] { DateOnly.FromDateTime(Faker.Identification.DateOfBirth()) };
+        var statedNationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        var statedTrn = await TestData.GenerateTrnAsync();
+        var clientApplicationUserId = Guid.NewGuid();
+        var trnTokenTrn = await TestData.GenerateTrnAsync();
+
+        var options = new CreateOneLoginUserRecordMatchingSupportTaskOptions
+        {
+            OneLoginUserSubject = oneLoginUser.Subject,
+            OneLoginUserEmail = oneLoginUser.EmailAddress!,
+            VerifiedNames = verifiedNames,
+            VerifiedDatesOfBirth = verifiedDatesOfBirth,
+            StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
+            StatedTrn = statedTrn,
+            ClientApplicationUserId = clientApplicationUserId,
+            TrnTokenTrn = trnTokenTrn
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var supportTask = await WithServiceAsync(s => s.CreateRecordMatchingSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.NotNull(supportTask);
+        Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTask.SupportTaskType);
+        Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+        Assert.Equal(oneLoginUser.Subject, supportTask.OneLoginUserSubject);
+        Assert.NotNull(supportTask.SupportTaskReference);
+
+        var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
+        Assert.Equal(oneLoginUser.Subject, data.OneLoginUserSubject);
+        Assert.Equal(oneLoginUser.EmailAddress, data.OneLoginUserEmail);
+        Assert.Equal(verifiedNames, data.VerifiedNames);
+        Assert.Equal(verifiedDatesOfBirth, data.VerifiedDatesOfBirth);
+        Assert.Equal(statedNationalInsuranceNumber, data.StatedNationalInsuranceNumber);
+        Assert.Equal(statedTrn, data.StatedTrn);
+        Assert.Equal(clientApplicationUserId, data.ClientApplicationUserId);
+        Assert.Equal(trnTokenTrn, data.TrnTokenTrn);
+
+        Events.AssertEventsPublished(e => Assert.IsType<SupportTaskCreatedEvent>(e));
+    }
+
+    [Fact]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNotConnectingOutcome_ClosesSupportTaskSetsOutcomeAsExpected()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -28,14 +77,13 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.True(updatedData.Verified);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.NotConnecting, updatedData.Outcome);
         Assert.Equal(notConnectingReason, updatedData.NotConnectingReason);
@@ -45,7 +93,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithNoMatchesOutcome_ClosesSupportTaskSetsOutcomeAsExpectedAndEmailsUser()
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNoMatchesOutcome_ClosesSupportTaskSetsOutcomeAsExpectedAndEmailsUser()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -61,14 +109,13 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.True(updatedData.Verified);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.NoMatches, updatedData.Outcome);
 
@@ -82,7 +129,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
     }
 
     [Fact]
-    public async Task ResolveSupportTaskAsync_WithConnectedOutcome_ClosesSupportTaskSetsUserToMatchedAndEmailsUser()
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithConnectedOutcome_ClosesSupportTaskSetsUserToMatchedAndEmailsUser()
     {
         // Arrange
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
@@ -111,7 +158,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveSupportTaskAsync(options, processContext));
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
 
         // Assert
         var updatedSupportTask =

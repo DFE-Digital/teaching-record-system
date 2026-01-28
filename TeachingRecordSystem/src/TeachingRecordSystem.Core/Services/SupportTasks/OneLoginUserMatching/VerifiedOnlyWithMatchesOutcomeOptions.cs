@@ -1,7 +1,7 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
-namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
+namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 public record VerifiedOnlyWithMatchesOutcomeOptions
 {

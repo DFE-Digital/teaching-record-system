@@ -3,13 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyCoordinator.JourneyName)]
-public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTaskService supportTaskService, IClock clock) : PageModel
+public class CheckAnswersModel(SignInJourneyCoordinator coordinator, OneLoginUserMatchingSupportTaskService oneLoginUserMatchingSupportTaskService, IClock clock) : PageModel
 {
     public bool IdentityVerified => coordinator.State.IdentityVerified;
 
@@ -45,25 +44,17 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
                 clock.UtcNow,
                 SystemUser.SystemUserId);
 
-            supportTask = await supportTaskService.CreateSupportTaskAsync(
-                new CreateSupportTaskOptions
+            supportTask = await oneLoginUserMatchingSupportTaskService.CreateRecordMatchingSupportTaskAsync(
+                new CreateOneLoginUserRecordMatchingSupportTaskOptions
                 {
-                    SupportTaskType = SupportTaskType.OneLoginUserRecordMatching,
-                    Data = new OneLoginUserRecordMatchingData
-                    {
-                        Verified = true,
-                        OneLoginUserSubject = subject,
-                        OneLoginUserEmail = email,
-                        VerifiedNames = state.VerifiedNames,
-                        VerifiedDatesOfBirth = state.VerifiedDatesOfBirth,
-                        StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
-                        StatedTrn = state.Trn,
-                        ClientApplicationUserId = state.ClientApplicationUserId,
-                        TrnTokenTrn = state.TrnTokenTrn
-                    },
-                    PersonId = null,
                     OneLoginUserSubject = subject,
-                    TrnRequest = null
+                    OneLoginUserEmail = email,
+                    VerifiedNames = state.VerifiedNames,
+                    VerifiedDatesOfBirth = state.VerifiedDatesOfBirth,
+                    StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
+                    StatedTrn = state.Trn,
+                    ClientApplicationUserId = state.ClientApplicationUserId,
+                    TrnTokenTrn = state.TrnTokenTrn
                 },
                 processContext);
         }
@@ -74,26 +65,19 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, SupportTask
                 clock.UtcNow,
                 SystemUser.SystemUserId);
 
-            supportTask = await supportTaskService.CreateSupportTaskAsync(
-                new CreateSupportTaskOptions
+            supportTask = await oneLoginUserMatchingSupportTaskService.CreateVerificationSupportTaskAsync(
+                new CreateOneLoginUserIdVerificationSupportTaskOptions
                 {
-                    SupportTaskType = SupportTaskType.OneLoginUserIdVerification,
-                    Data = new OneLoginUserIdVerificationData
-                    {
-                        OneLoginUserSubject = subject,
-                        StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
-                        StatedTrn = state.Trn,
-                        ClientApplicationUserId = state.ClientApplicationUserId,
-                        TrnTokenTrn = state.TrnTokenTrn,
-                        StatedFirstName = state.FirstName!,
-                        StatedLastName = state.LastName!,
-                        StatedDateOfBirth = state.DateOfBirth!.Value,
-                        EvidenceFileId = state.ProofOfIdentityFileId!.Value,
-                        EvidenceFileName = state.ProofOfIdentityFileName!
-                    },
-                    PersonId = null,
                     OneLoginUserSubject = subject,
-                    TrnRequest = null
+                    StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
+                    StatedTrn = state.Trn,
+                    ClientApplicationUserId = state.ClientApplicationUserId,
+                    TrnTokenTrn = state.TrnTokenTrn,
+                    StatedFirstName = state.FirstName!,
+                    StatedLastName = state.LastName!,
+                    StatedDateOfBirth = state.DateOfBirth!.Value,
+                    EvidenceFileId = state.ProofOfIdentityFileId!.Value,
+                    EvidenceFileName = state.ProofOfIdentityFileName!
                 },
                 processContext);
         }

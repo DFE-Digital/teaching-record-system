@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserRecordMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -50,7 +48,7 @@ public class ConfirmNotConnecting(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedOnlyWithMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!,
@@ -63,7 +61,7 @@ public class ConfirmNotConnecting(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new NotConnectingOutcomeOptions
                 {
                     SupportTask = _supportTask!,

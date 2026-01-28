@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
@@ -39,7 +38,7 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-        await supportTaskService.ResolveSupportTaskAsync(
+        await supportTaskService.ResolveVerificationSupportTaskAsync(
             new NotVerifiedOutcomeOptions
             {
                 SupportTask = _supportTask!,

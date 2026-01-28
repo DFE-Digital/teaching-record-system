@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserIdVerification;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
-using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserRecordMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -52,7 +50,7 @@ public class NoMatches(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveVerificationSupportTaskAsync(
                 (VerifiedOnlyWithoutMatchesOutcomeOptions)new()
                 {
                     SupportTask = _supportTask!
@@ -63,7 +61,7 @@ public class NoMatches(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveSupportTaskAsync(
+            await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 (NoMatchesOutcomeOptions)new()
                 {
                     SupportTask = _supportTask!
