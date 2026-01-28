@@ -20,10 +20,10 @@ resource "azurerm_storage_account" "safe_storage" {
 }
 
 resource "azurerm_security_center_storage_defender" "safe_storage" {
-  storage_account_id = azurerm_storage_account.safe_storage.id
-  malware_scanning_on_upload_enabled = true
+  storage_account_id                          = azurerm_storage_account.safe_storage.id
+  malware_scanning_on_upload_enabled          = true
   malware_scanning_on_upload_cap_gb_per_month = 100
-  override_subscription_settings_enabled = true
+  override_subscription_settings_enabled      = true
 }
 
 resource "azurerm_storage_container" "safe_uploads" {

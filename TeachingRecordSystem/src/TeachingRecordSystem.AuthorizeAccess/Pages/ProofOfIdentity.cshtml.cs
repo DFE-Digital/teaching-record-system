@@ -45,7 +45,7 @@ public class ProofOfIdentity(SignInJourneyCoordinator coordinator, ISafeFileServ
         {
             ModelState.AddModelError(nameof(File), "The selected file contains a virus");
             return this.PageWithErrors();
-        }        
+        }
 
         coordinator.UpdateState(state => state.SetProofOfIdentityFile(fileId, File.FileName));
 

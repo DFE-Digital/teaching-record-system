@@ -27,7 +27,7 @@ public class TestScopedServices
             {
                 fileId = fileIdOverride ?? Guid.NewGuid();
             })
-            .ReturnsAsync(true);        
+            .ReturnsAsync(true);
         BackgroundJobScheduler = new(serviceProvider);
     }
 

@@ -48,7 +48,7 @@ public class BlobStorageSafeFileService : ISafeFileService
 
             return malwareScanResult == MalwareScanSuccessValue;
         }
-    }    
+    }
 
     public async Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
     {
@@ -83,7 +83,7 @@ public class BlobStorageSafeFileService : ISafeFileService
     private async Task<string?> PollForMalwareScanResultAsync(BlobClient blobClient, CancellationToken cancellationToken)
     {
         await Task.Delay(InitialPollingDelayMs, cancellationToken);
-        
+
         string? malwareScanResult = null;
         var malwareScanComplete = false;
 
