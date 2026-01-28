@@ -803,11 +803,11 @@
       },
       "RedisRateLimiting": {
         "type": "Transitive",
-        "resolved": "1.2.0",
-        "contentHash": "8PFC4H7/enImkKt+japd5pvtEofGH9tuRWTJ/Ty7QY0x0gtxaH4lfqm9JXPCXQMBfSDjIWvc2pmW233udS4IUQ==",
+        "resolved": "1.2.1",
+        "contentHash": "rYisSFv+0bi8iLLUwzPF4afVvCD4nUFI6YiWOy4UTxOzkyfZPA1a0C9o9TyRKQRZ06f+tfgoaUA2q3A0YNnGng==",
         "dependencies": {
-          "StackExchange.Redis": "2.7.33",
-          "System.Threading.RateLimiting": "8.0.0"
+          "StackExchange.Redis": "2.8.0",
+          "System.Threading.RateLimiting": "10.0.0"
         }
       },
       "Sentry": {
@@ -861,8 +861,8 @@
       },
       "StackExchange.Redis": {
         "type": "Transitive",
-        "resolved": "2.7.33",
-        "contentHash": "2kCX5fvhEE824a4Ab5Imyi8DRuGuTxyklXV01kegkRpsWJcPmO6+GAQ+HegKxvXAxlXZ8yaRspvWJ8t3mMClfQ==",
+        "resolved": "2.8.0",
+        "contentHash": "MjAJ0ejH8zLhtuN5+Z+/I07NmPGdVuGEvE2+4xONQoFwgl+7vbQ/A6jlUgH9UkZb4s9Mu9QDyBq1TkRqQcOgTQ==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
           "Pipelines.Sockets.Unofficial": "2.2.8"
@@ -965,8 +965,8 @@
       },
       "System.Threading.RateLimiting": {
         "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "7mu9v0QDv66ar3DpGSZHg9NuNcxDaaAcnMULuZlaTpP9+hwXhrxNGsF5GmLkSHxFdb5bBc1TzeujsRgTrPWi+Q=="
+        "resolved": "10.0.0",
+        "contentHash": "0QWWGhde46NBFfMO/51QxfRNg7fnzhD8sxY38cP3HR5Sb1jkmSGpttKV1ILO2sJw7vSXQPtr3uqvXsN5iYsu5g=="
       },
       "Testcontainers": {
         "type": "Transitive",
@@ -1043,7 +1043,7 @@
           "MediatR": "[12.2.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.2, )",
           "Moq": "[4.20.72, )",
-          "RedisRateLimiting.AspNetCore": "[1.2.0, )",
+          "RedisRateLimiting.AspNetCore": "[1.2.1, )",
           "Swashbuckle.AspNetCore": "[6.6.2, )",
           "Swashbuckle.AspNetCore.Annotations": "[6.6.2, )",
           "System.IdentityModel.Tokens.Jwt": "[8.14.0, )",
@@ -1667,11 +1667,11 @@
       },
       "RedisRateLimiting.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[1.2.0, )",
-        "resolved": "1.2.0",
-        "contentHash": "o41D6Mp/eKdj6xue1sQ2VzHlnJgH3U/At8Mu1+q3vph5kXDYdMU5E5S0PP+CKXNJMmbGOMGwLZa2L0rRbwSB+Q==",
+        "requested": "[1.2.1, )",
+        "resolved": "1.2.1",
+        "contentHash": "2kjolrrDgVll/fYGWcnxlh7BEmTr/oOp9M2I+orEIWvXciLVlwTVGarAFTcX8mZ7YFtDP3zaofMi08CMh4GVxw==",
         "dependencies": {
-          "RedisRateLimiting": "1.2.0"
+          "RedisRateLimiting": "1.2.1"
         }
       },
       "Respawn": {
