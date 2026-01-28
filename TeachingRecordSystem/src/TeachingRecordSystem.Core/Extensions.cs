@@ -52,6 +52,9 @@ public static class Extensions
             services.AddAzureClients(clientBuilder =>
             {
                 clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
+
+                clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("SafeStorageConnectionString"))
+                    .WithName("safe");
             });
 
             services.AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (sp, key) =>

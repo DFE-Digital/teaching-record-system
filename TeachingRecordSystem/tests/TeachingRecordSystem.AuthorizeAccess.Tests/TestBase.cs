@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Files;
 using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
@@ -39,6 +40,8 @@ public abstract class TestBase
     protected HttpClient HttpClient { get; }
 
     protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    protected Mock<ISafeFileService> SafeFileService => _testServices.SafeFileService;
 
     protected void AddUrlToPath(SignInJourneyCoordinator coordinator, string url)
     {

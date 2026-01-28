@@ -77,6 +77,7 @@ public sealed class HostFixture : InitializeDbFixture
                         .AddSingleton(DbHelper.Instance)
                         .AddSingleton<TestData>()
                         .AddSingleton(GetMockFileService())
+                        .AddSingleton(GetMockSafeFileService())
                         .AddSingleton(GetMockAdUserService())
                         .AddSingleton(GetMockGetAnIdentityApiClient())
                         .AddStartupTask<SeedLookupData>()
@@ -92,6 +93,16 @@ public sealed class HostFixture : InitializeDbFixture
                             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
                             .ReturnsAsync("https://fake.blob.core.windows.net/fake");
                         return fileService.Object;
+                    }
+
+                    ISafeFileService GetMockSafeFileService()
+                    {
+                        var safeFileService = new Mock<ISafeFileService>();
+                        safeFileService
+                            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                            .ReturnsAsync("https://fake.blob.core.windows.net/fake");
+
+                        return safeFileService.Object;
                     }
 
                     IAadUserService GetMockAdUserService()
