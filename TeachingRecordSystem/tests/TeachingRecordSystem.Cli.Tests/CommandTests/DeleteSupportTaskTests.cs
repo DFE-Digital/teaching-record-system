@@ -1,5 +1,4 @@
 using System.CommandLine;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
@@ -37,7 +36,7 @@ public class DeleteSupportTaskTests(IServiceProvider services) : CommandTestBase
     public async Task TaskDoesNotExist_ReturnsError()
     {
         // Arrange
-        var supportTaskReference = SupportTask.GenerateSupportTaskReference();
+        var supportTaskReference = "TASK-123";
 
         var command = GetCommand();
 

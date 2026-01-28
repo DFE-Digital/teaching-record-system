@@ -10,7 +10,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_TaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var supportTaskReference = SupportTask.GenerateSupportTaskReference();
+        var supportTaskReference = "TASK-123";
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTaskReference}/resolve");
 
         // Act
@@ -67,7 +67,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_TaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var supportTaskReference = SupportTask.GenerateSupportTaskReference();
+        var supportTaskReference = "TASK-123";
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTaskReference}/resolve");
 
         // Act
