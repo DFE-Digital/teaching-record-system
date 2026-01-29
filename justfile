@@ -2,6 +2,8 @@ export DOTNET_WATCH_SUPPRESS_MSBUILD_INCREMENTALISM := 'true'
 export DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER := 'true'
 export DOTNET_WATCH_RESTART_ON_RUDE_EDIT := 'true'
 
+set windows-shell := ["powershell.exe", "-nop", "-c"]
+
 user-secrets-id := "TeachingRecordSystem"
 test-user-secrets-id := "TeachingRecordSystemTests"
 
