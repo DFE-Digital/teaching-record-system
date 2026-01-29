@@ -1,11 +1,11 @@
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.OpenApi;
+using Microsoft.OpenApi;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
 
-public class ContentTypesOperationFilter : IOperationFilter
+public class ContentTypesOperationTransformer : IOpenApiOperationTransformer
 {
-    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
     {
         // Remove invalid Content-Types for a given request/response
 
@@ -35,5 +35,7 @@ public class ContentTypesOperationFilter : IOperationFilter
                 }
             }
         }
+
+        return Task.CompletedTask;
     }
 }

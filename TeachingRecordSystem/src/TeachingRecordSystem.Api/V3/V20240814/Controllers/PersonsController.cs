@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240814.Requests;
@@ -11,12 +10,7 @@ namespace TeachingRecordSystem.Api.V3.V20240814.Controllers;
 [Route("persons")]
 public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
-    [HttpPost("find")]
-    [SwaggerOperation(
-        OperationId = "FindPersons",
-        Summary = "Find persons",
-        Description = "Finds persons matching the specified criteria.")]
-    [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
+    [HttpPost("find")]    [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> FindPersonsAsync([FromBody] FindPersonsRequest request)
@@ -26,12 +20,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
         return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
     }
 
-    [HttpGet("")]
-    [SwaggerOperation(
-        OperationId = "FindPerson",
-        Summary = "Find person",
-        Description = "Finds a person matching the specified criteria.")]
-    [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
+    [HttpGet("")]    [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> FindPersonsAsync(FindPersonRequest request)
