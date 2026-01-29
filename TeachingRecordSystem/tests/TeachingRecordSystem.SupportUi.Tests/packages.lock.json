@@ -694,8 +694,8 @@
       },
       "Sentry": {
         "type": "Transitive",
-        "resolved": "5.16.2",
-        "contentHash": "JZiKizATWdBe4dSdvMhp3d/TiMUug3VvWjiu9ZH5UfTbrwGWYUexZ4ZGdyrIB2GuWlLBUWs3Vi1GFv3pNhRKFg=="
+        "resolved": "6.0.0",
+        "contentHash": "KomDnmKInN30NIaf52UsRYCK/QS8cBe1jV+JslxBzys30wPH0Wv0U20YQ2oJ65P0+XLv0JqNHmgAjN1zDy/fzQ=="
       },
       "Serilog.Extensions.Logging": {
         "type": "Transitive",
@@ -984,7 +984,7 @@
           "JetBrains.Annotations": "[2025.2.4, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[10.0.2, )",
           "Microsoft.Extensions.Caching.StackExchangeRedis": "[10.0.2, )",
-          "Sentry.AspNetCore": "[5.16.2, )",
+          "Sentry.AspNetCore": "[6.0.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "prometheus-net.AspNetCore": "[8.2.1, )"
@@ -1457,20 +1457,20 @@
       },
       "Sentry.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[5.16.2, )",
-        "resolved": "5.16.2",
-        "contentHash": "HUywHpRKdzCuPc2oEyMkBCje4x4abvyxw8h3lWA7ybplMHatc7Y5ZIO3GdZSflfTeql+hKnJFlJtYu7Nfp1jjg==",
+        "requested": "[6.0.0, )",
+        "resolved": "6.0.0",
+        "contentHash": "PI8Zx2IHI8r88rBn73B/5IXGIAG4LHXECjWhk58IXI/b2iHuBlbJKtv6onzfySOs3TFPhmfRtYkVI5nAYWALVQ==",
         "dependencies": {
-          "Sentry.Extensions.Logging": "5.16.2"
+          "Sentry.Extensions.Logging": "6.0.0"
         }
       },
       "Sentry.Extensions.Logging": {
         "type": "CentralTransitive",
         "requested": "[5.16.2, )",
-        "resolved": "5.16.2",
-        "contentHash": "bTZigDBAPSyA0D8uXzpXyrsUyxBmQn703U3kkiOCgV2Uc+DuSMUabiVHVSuxPPfbOyTUC2wY2vsOjdlpnXI5zQ==",
+        "resolved": "6.0.0",
+        "contentHash": "c9jXcKZPq6qTWsg7y8MWgOXuuUxxSR/56xKA/GLNEuqxOUTeJ/pWxR4tgrhQ4oTyZwdTEoNyiZpa3Go9ij7Gaw==",
         "dependencies": {
-          "Sentry": "5.16.2"
+          "Sentry": "6.0.0"
         }
       },
       "Sentry.Serilog": {
