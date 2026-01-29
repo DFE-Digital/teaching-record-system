@@ -33,8 +33,8 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 // Assert
                 var doc = await AssertEx.HtmlResponseAsync(response);
-                Assert.Equal(existingFirstName ?? "", doc.GetElementById("FirstName")?.GetAttribute("value"));
-                Assert.Equal(existingLastName ?? "", doc.GetElementById("LastName")?.GetAttribute("value"));
+                Assert.Equal(existingFirstName, doc.GetElementById("FirstName")?.GetAttribute("value"));
+                Assert.Equal(existingLastName, doc.GetElementById("LastName")?.GetAttribute("value"));
             });
 
     [Theory]

@@ -36,7 +36,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 // Assert
                 var doc = await AssertEx.HtmlResponseAsync(response);
-                Assert.Equal(existingTrn ?? "", doc.GetElementById("Trn")?.GetAttribute("value"));
+                Assert.Equal(existingTrn, doc.GetElementById("Trn")?.GetAttribute("value"));
             });
 
     [Fact]
