@@ -783,7 +783,7 @@
           "Faker.Net": "[2.0.163, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "Moq": "[4.20.72, )",
-          "Respawn": "[6.2.1, )",
+          "Respawn": "[7.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "Testcontainers.PostgreSql": "[4.10.0, )",
           "xunit.v3.assert": "[3.2.0, )"
@@ -1210,12 +1210,9 @@
       },
       "Respawn": {
         "type": "CentralTransitive",
-        "requested": "[6.2.1, )",
-        "resolved": "6.2.1",
-        "contentHash": "b8v9a1+08FKiDtqi6KllaJEeJiB1cmkD3kmOXDNIR+U85gEaZitwl6Gxq6RU5NL34OLmdQ5dB+QE0rhVCX+lEA==",
-        "dependencies": {
-          "Microsoft.Data.SqlClient": "4.0.5"
-        }
+        "requested": "[7.0.0, )",
+        "resolved": "7.0.0",
+        "contentHash": "AyWlducZGOnmlEVz4PaL3Qv8wcY3ClPZS9CrlDnSVahGd/E9tTEgSFiC8yoV/F6o6P6IYm8xnHFa/vmWT8tfcw=="
       },
       "Scrutor": {
         "type": "CentralTransitive",

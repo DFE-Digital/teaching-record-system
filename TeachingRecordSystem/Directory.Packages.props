@@ -84,7 +84,7 @@
     <PackageVersion Include="Polly.Core" Version="8.6.5" />
     <PackageVersion Include="prometheus-net.AspNetCore" Version="8.2.1" />
     <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.2.0" />
-    <PackageVersion Include="Respawn" Version="6.2.1" />
+    <PackageVersion Include="Respawn" Version="7.0.0" />
     <PackageVersion Include="Scrutor" Version="7.0.0" />
     <PackageVersion Include="Sentry.AspNetCore" Version="5.16.2" />
     <PackageVersion Include="Sentry.Extensions.Logging" Version="5.16.2" />
