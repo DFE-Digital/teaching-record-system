@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyCoordinator.JourneyName)]
-public class ProofOfIdentity(SignInJourneyCoordinator coordinator, IFileService fileService) : PageModel
+public class ProofOfIdentity(SignInJourneyCoordinator coordinator, ISafeFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 10;
 
@@ -41,7 +41,11 @@ public class ProofOfIdentity(SignInJourneyCoordinator coordinator, IFileService 
         await _validator.ValidateAndThrowAsync(this);
 
         using var stream = File!.OpenReadStream();
-        var fileId = await fileService.UploadFileAsync(stream, File.ContentType);
+        if (!await fileService.TrySafeUploadAsync(stream, File.ContentType, out var fileId))
+        {
+            ModelState.AddModelError(nameof(File), "The selected file contains a virus");
+            return this.PageWithErrors();
+        }
 
         coordinator.UpdateState(state => state.SetProofOfIdentityFile(fileId, File.FileName));
 

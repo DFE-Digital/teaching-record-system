@@ -7,6 +7,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFileService(this IServiceCollection services)
     {
         services.AddSingleton<IFileService, BlobStorageFileService>();
+        services.AddSingleton<ISafeFileService, BlobStorageSafeFileService>();
         services.AddSingleton<BlobStorageImportFileStorageService>();
         services.AddSingleton<IImportFileStorageService, BlobStorageImportFileStorageService>();
 
