@@ -201,6 +201,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(professionalStatusEmailJobOptions.JobSchedule));
 
+            recurringJobManager.AddOrUpdate<FixNoneEventsJob>(
+                nameof(FixNoneEventsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.RemoveIfExists("CreateDqtAnnotationAuditEventsJob");
             recurringJobManager.RemoveIfExists("SyncAllPersonsFromCrmJob");
             recurringJobManager.RemoveIfExists("ClearAlertsJob");
@@ -215,6 +220,7 @@ public static class Extensions
             recurringJobManager.RemoveIfExists("BackfillPersonCreatedByTpsJob");
             recurringJobManager.RemoveIfExists("FixIncorrectOttRouteMigrationMappingsJob");
             recurringJobManager.RemoveIfExists("CpdInductionImporterJob");
+
 
             return Task.CompletedTask;
         });
