@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 public sealed class OneLoginAuthenticationSchemeProvider(
     IAuthenticationSchemeProvider innerProvider,
     IDbContextFactory<TrsDbContext> dbContextFactory,
-        IOptions<AuthorizeAccessOptions> authorizeAccessOptionsAccessor,
+    IOptions<AuthorizeAccessOptions> authorizeAccessOptionsAccessor,
     IOptionsMonitorCache<OneLoginOptions> oneLoginOptionsMonitorCache,
     ILogger<OneLoginAuthenticationSchemeProvider> logger) :
     IAuthenticationSchemeProvider, IConfigureNamedOptions<OneLoginOptions>, IDisposable, IHostedService
@@ -219,7 +219,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
         options.Claims.Add(OneLoginClaimTypes.CoreIdentity);
 
-        options.Environment = OneLoginEnvironments.Integration;
+        options.Environment = authorizeAccessOptionsAccessor.Value.OneLoginEnvironment;
 
         if (user.UseSharedOneLoginSigningKeys is true)
         {

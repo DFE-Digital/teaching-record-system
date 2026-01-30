@@ -18,6 +18,9 @@ public class AuthorizeAccessOptions
     [Required]
     public required AuthorizeAccessOptionsOneLoginSigningKey[] OneLoginSigningKeys { get; set; }
 
+    [Required]
+    public required string OneLoginEnvironment { get; set; }
+
     public JsonWebKeySet GetOneLoginSigningKeysJwks()
     {
         EnsureInitialized();
