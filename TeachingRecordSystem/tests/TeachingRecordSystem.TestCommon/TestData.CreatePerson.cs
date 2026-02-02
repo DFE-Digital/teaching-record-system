@@ -698,23 +698,34 @@ public partial class TestData
             var reason = _reason.ValueOr("Another reason");
             var reasonDetail = _reasonDetail.ValueOr(testData.GenerateLoremIpsum());
             var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(SystemUser.SystemUserId));
-            var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
+            var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow)!.Value;
 
-            var alert = Alert.Create(
-                alertTypeId!.Value,
-                personId,
-                details,
-                externalLink,
-                startDate,
-                endDate,
-                reason,
-                reasonDetail,
-                evidenceFile: null,
-                createdByUser,
-                createdUtc!.Value,
-                out var createdEvent);
-
+            var alert = new Alert
+            {
+                AlertId = Guid.NewGuid(),
+                AlertTypeId = alertTypeId!.Value,
+                PersonId = personId,
+                Details = details,
+                ExternalLink = externalLink,
+                StartDate = startDate,
+                EndDate = endDate,
+                CreatedOn = createdUtc,
+                UpdatedOn = createdUtc,
+                DeletedOn = null
+            };
             dbContext.Alerts.Add(alert);
+
+            var createdEvent = new LegacyEvents.AlertCreatedEvent
+            {
+                PersonId = alert.PersonId,
+                Alert = EventModels.Alert.FromModel(alert),
+                AddReason = reason,
+                AddReasonDetail = reasonDetail,
+                EvidenceFile = null,
+                EventId = Guid.NewGuid(),
+                CreatedUtc = createdUtc,
+                RaisedBy = createdByUser
+            };
             dbContext.AddEventWithoutBroadcast(createdEvent);
 
             return (alert.AlertId, [createdEvent]);

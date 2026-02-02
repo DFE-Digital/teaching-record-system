@@ -11,6 +11,7 @@ using Serilog;
 using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.InductionExemptions;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
@@ -109,7 +110,8 @@ public static class Extensions
             .AddNoteService()
             .AddPersonService()
             .AddInductionExemptionService()
-            .AddOneLoginService();
+            .AddOneLoginService()
+            .AddAlertService();
 
         return services;
     }

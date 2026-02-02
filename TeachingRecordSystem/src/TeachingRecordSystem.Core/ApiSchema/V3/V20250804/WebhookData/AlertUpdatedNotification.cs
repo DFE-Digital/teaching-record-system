@@ -12,11 +12,11 @@ public record AlertUpdatedNotification : IWebhookMessageData
 }
 
 public class AlertUpdatedNotificationMapper(PersonInfoCache personInfoCache, ReferenceDataCache referenceDataCache) :
-    IEventMapper<AlertUpdatedEvent, AlertUpdatedNotification>
+    IEventMapper<LegacyEvents.AlertUpdatedEvent, AlertUpdatedNotification>
 {
-    public async Task<AlertUpdatedNotification?> MapEventAsync(AlertUpdatedEvent @event)
+    public async Task<AlertUpdatedNotification?> MapEventAsync(LegacyEvents.AlertUpdatedEvent @event)
     {
-        if ((@event.Changes & (AlertUpdatedEventChanges.DqtSpent | AlertUpdatedEventChanges.DqtSanctionCode)) != 0)
+        if ((@event.Changes & (LegacyEvents.AlertUpdatedEventChanges.DqtSpent | LegacyEvents.AlertUpdatedEventChanges.DqtSanctionCode)) != 0)
         {
             throw new NotSupportedException("Events originating from DQT are not supported.");
         }
@@ -33,7 +33,7 @@ public class AlertUpdatedNotificationMapper(PersonInfoCache personInfoCache, Ref
         }
 
         // We don't expose 'ExternalLink' so if that's the only thing that's changed then don't create a message
-        if (@event.Changes == AlertUpdatedEventChanges.ExternalLink)
+        if (@event.Changes == LegacyEvents.AlertUpdatedEventChanges.ExternalLink)
         {
             return null;
         }

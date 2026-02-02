@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
+    AlertService alertService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock) : PageModel
@@ -18,9 +19,6 @@ public class CheckAnswersModel(
 
     [FromQuery]
     public Guid PersonId { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -67,25 +65,23 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
+        var processContext = new ProcessContext(ProcessType.AlertCreating, clock.UtcNow, User.GetUserId());
 
-        var alert = Alert.Create(
-            AlertTypeId,
-            PersonId,
-            Details,
-            Link,
-            StartDate,
-            endDate: null,
-            AddReason.GetDisplayName(),
-            AddReasonDetail,
-            evidenceFile: EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
-            now,
-            out var createdEvent);
-
-        dbContext.Alerts.Add(alert);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
-        await dbContext.SaveChangesAsync();
+        await alertService.CreateAlertAsync(
+            new CreateAlertOptions
+            {
+                AlertTypeId = AlertTypeId,
+                PersonId = PersonId,
+                Details = Details,
+                ExternalLink = Link,
+                StartDate = StartDate,
+                EndDate = null,
+                Reason = AddReason.GetDisplayName(),
+                ReasonDetails = AddReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel(),
+                CreatedBy = User.GetUserId()
+            },
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert added");
