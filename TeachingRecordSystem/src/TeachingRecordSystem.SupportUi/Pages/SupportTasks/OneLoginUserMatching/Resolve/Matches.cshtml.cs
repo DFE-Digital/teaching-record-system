@@ -87,12 +87,16 @@ public class Matches(
             JourneyInstance.State,
             excludeKeys: ["Action", nameof(SupportTaskReference)]);
 
-        var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskSaving, clock.UtcNow, User.GetUserId());
+        var processType = _supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+            ProcessType.OneLoginUserIdVerificationSupportTaskSaving :
+            ProcessType.OneLoginUserRecordMatchingSupportTaskSaving;
+
+        var processContext = new ProcessContext(processType, clock.UtcNow, User.GetUserId());
 
         await supportTaskService.UpdateSupportTaskAsync(
             new()
             {
-                SupportTask = _supportTask!.SupportTaskReference,
+                SupportTask = _supportTask.SupportTaskReference,
                 Status = SupportTaskStatus.InProgress,
                 SavedJourneyState = Option.Some(savedJourneyState)!
             },

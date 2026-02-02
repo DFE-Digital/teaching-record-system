@@ -558,7 +558,11 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
 
-        Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskSaving, p.ProcessContext.ProcessType));
+        Events.AssertProcessesCreated(p => Assert.Equal(
+            isRecordMatchingOnlySupportTask ?
+                ProcessType.OneLoginUserRecordMatchingSupportTaskSaving :
+                ProcessType.OneLoginUserIdVerificationSupportTaskSaving,
+            p.ProcessContext.ProcessType));
     }
 
     [Theory]
