@@ -28,7 +28,7 @@ public class FixNoneEventsJob
                 SELECT event_id, payload
                 FROM events
                 WHERE event_name = 'PersonDetailsUpdatedEvent'
-                  AND COALESCE((payload ->> 'Changes')::int, 0) = 0
+                  AND COALESCE((payload ->> 'Changes')::int, 0) = 16
                 ")
                 .AsNoTracking()
                 .Select(e => new { e.EventId, Payload = e.Payload.ToString() })
@@ -51,7 +51,7 @@ public class FixNoneEventsJob
                     evt.PersonDetails,
                     evt.OldPersonDetails);
 
-                if (newChanges == PersonDetailsUpdatedEventChanges.None)
+                if (newChanges == Events.Legacy.PersonDetailsUpdatedEventChanges.None)
                 {
                     await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"
                     DELETE FROM events
@@ -71,7 +71,7 @@ public class FixNoneEventsJob
                 )
                 WHERE event_id = {row.EventId}
                   AND event_name = 'PersonDetailsUpdatedEvent'
-                  AND COALESCE((payload ->> 'Changes')::int, 0) = 0
+                  AND COALESCE((payload ->> 'Changes')::int, 0) = 16
             ", cancellationToken);
             }
 
@@ -85,30 +85,30 @@ public class FixNoneEventsJob
         }
     }
 
-    public static PersonDetailsUpdatedEventChanges CalculateChanges(
+    public static Events.Legacy.PersonDetailsUpdatedEventChanges CalculateChanges(
         EventModels.PersonDetails current,
         EventModels.PersonDetails old)
     {
-        var changes = PersonDetailsUpdatedEventChanges.None;
+        var changes = Events.Legacy.PersonDetailsUpdatedEventChanges.None;
 
         if (current.FirstName != old.FirstName)
         {
-            changes |= PersonDetailsUpdatedEventChanges.FirstName;
+            changes |= Events.Legacy.PersonDetailsUpdatedEventChanges.FirstName;
         }
 
         if (current.MiddleName != old.MiddleName)
         {
-            changes |= PersonDetailsUpdatedEventChanges.MiddleName;
+            changes |= Events.Legacy.PersonDetailsUpdatedEventChanges.MiddleName;
         }
 
         if (current.LastName != old.LastName)
         {
-            changes |= PersonDetailsUpdatedEventChanges.LastName;
+            changes |= Events.Legacy.PersonDetailsUpdatedEventChanges.LastName;
         }
 
         if (current.DateOfBirth != old.DateOfBirth)
         {
-            changes |= PersonDetailsUpdatedEventChanges.DateOfBirth;
+            changes |= Events.Legacy.PersonDetailsUpdatedEventChanges.DateOfBirth;
         }
 
         if (!string.Equals(
@@ -116,7 +116,7 @@ public class FixNoneEventsJob
                 old.EmailAddress,
                 StringComparison.Ordinal))
         {
-            changes |= PersonDetailsUpdatedEventChanges.EmailAddress;
+            changes |= Events.Legacy.PersonDetailsUpdatedEventChanges.EmailAddress;
         }
 
         if (!string.Equals(
@@ -124,12 +124,12 @@ public class FixNoneEventsJob
                 old.NationalInsuranceNumber,
                 StringComparison.Ordinal))
         {
-            changes |= PersonDetailsUpdatedEventChanges.NationalInsuranceNumber;
+            changes |= Events.Legacy.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber;
         }
 
         if (current.Gender != old.Gender)
         {
-            changes |= PersonDetailsUpdatedEventChanges.Gender;
+            changes |= Events.Legacy.PersonDetailsUpdatedEventChanges.Gender;
         }
 
         return changes;
