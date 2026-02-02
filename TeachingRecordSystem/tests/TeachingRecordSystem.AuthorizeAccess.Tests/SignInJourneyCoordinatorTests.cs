@@ -1234,6 +1234,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
         var options = Options.Create(new AuthorizeAccessOptions
         {
+            OneLoginEnvironment = "dummy",
             ShowDebugPages = false,
             OneLoginSigningKeys =
             [
