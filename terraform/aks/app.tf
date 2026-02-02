@@ -220,6 +220,7 @@ locals {
     DATABASE_URL                         = module.postgres.url
     Sentry__Dsn                          = module.infrastructure_secrets.map.SENTRY-DSN
     StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+    SafeStorageConnectionString          = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.safe_storage.name};AccountKey=${azurerm_storage_account.safe_storage.primary_access_key}"
     SftpStorageName                      = "${azurerm_storage_account.sftp_storage.name}"
     SftpStorageAccessKey                 = "${azurerm_storage_account.sftp_storage.primary_access_key}"
   }, { for k, v in module.infrastructure_secrets.map : replace(k, "--", "__") => v })

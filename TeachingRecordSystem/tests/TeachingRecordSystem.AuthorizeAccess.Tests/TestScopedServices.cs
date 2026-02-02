@@ -16,6 +16,18 @@ public class TestScopedServices
         LegacyEventObserver = new();
         GetAnIdentityApiClient = new();
         BlobStorageFileService = new();
+        SafeFileService = new();
+        SafeFileService
+            .Setup(s => s.TrySafeUploadAsync(
+                It.IsAny<Stream>(),
+                It.IsAny<string?>(),
+                out It.Ref<Guid>.IsAny,
+                null))
+            .Callback((Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride) =>
+            {
+                fileId = fileIdOverride ?? Guid.NewGuid();
+            })
+            .ReturnsAsync(true);
         BackgroundJobScheduler = new(serviceProvider);
     }
 
@@ -25,6 +37,7 @@ public class TestScopedServices
             .AddSingleton<IEventObserver>(new ForwardToTestScopedEventObserver())
             .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
             .AddTestScoped(tss => tss.Events)
+            .AddTestScoped(tss => tss.SafeFileService.Object)
             .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>())
             .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler);
 
@@ -50,6 +63,8 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 
     public Mock<IFileService> BlobStorageFileService { get; }
+
+    public Mock<ISafeFileService> SafeFileService { get; }
 
     public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
 

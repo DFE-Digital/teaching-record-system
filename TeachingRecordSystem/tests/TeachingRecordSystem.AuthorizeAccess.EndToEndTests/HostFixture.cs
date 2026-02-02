@@ -113,6 +113,7 @@ public sealed class HostFixture : InitializeDbFixture
                         .AddSingleton<OneLoginCurrentUserProvider>()
                         .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                         .AddSingleton(GetMockFileService())
+                        .AddSingleton(GetMockSafeFileService())
                         .AddSingleton(Mock.Of<IGetAnIdentityApiClient>())
                         .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
 
@@ -129,6 +130,23 @@ public sealed class HostFixture : InitializeDbFixture
                             .Setup(s => s.OpenReadStreamAsync(It.IsAny<Guid>()))
                             .ReturnsAsync(() => new MemoryStream(TestData.JpegImage));
                         return fileService.Object;
+                    }
+
+                    ISafeFileService GetMockSafeFileService()
+                    {
+                        var safeFileService = new Mock<ISafeFileService>();
+                        safeFileService
+                            .Setup(s => s.TrySafeUploadAsync(
+                                It.IsAny<Stream>(),
+                                It.IsAny<string?>(),
+                                out It.Ref<Guid>.IsAny,
+                                null))
+                            .Callback((Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride) =>
+                            {
+                                fileId = fileIdOverride ?? Guid.NewGuid();
+                            })
+                            .ReturnsAsync(true);
+                        return safeFileService.Object;
                     }
                 });
             });

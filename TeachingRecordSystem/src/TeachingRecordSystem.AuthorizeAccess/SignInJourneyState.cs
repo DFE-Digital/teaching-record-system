@@ -95,6 +95,7 @@ public class SignInJourneyState(
     // Used by the Debug page
     public void ClearVerified()
     {
+        AttemptedIdentityVerification = false;
         IdentityVerified = false;
         VerifiedNames = null;
         VerifiedDatesOfBirth = null;

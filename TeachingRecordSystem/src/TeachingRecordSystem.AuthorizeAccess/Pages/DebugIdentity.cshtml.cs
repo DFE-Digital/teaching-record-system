@@ -30,6 +30,10 @@ public class DebugIdentityModel(
     public string? Email { get; set; }
 
     [BindProperty]
+    [Display(Name = "Attempted identity verification")]
+    public bool AttemptedIdentityVerification { get; set; }
+
+    [BindProperty]
     [Display(Name = "Identity verified")]
     public bool IdentityVerified { get; set; }
 
@@ -50,6 +54,7 @@ public class DebugIdentityModel(
 
     public void OnGet()
     {
+        AttemptedIdentityVerification = coordinator.State.AttemptedIdentityVerification;
         IdentityVerified = coordinator.State.IdentityVerified;
 
         if (IdentityVerified)
@@ -125,6 +130,11 @@ public class DebugIdentityModel(
             _oneLoginUser.ClearVerifiedInfo();
 
             coordinator.UpdateState(state => state.ClearVerified());
+
+            if (AttemptedIdentityVerification)
+            {
+                return coordinator.OnVerificationFailed().ToActionResult();
+            }
         }
 
         await dbContext.SaveChangesAsync();

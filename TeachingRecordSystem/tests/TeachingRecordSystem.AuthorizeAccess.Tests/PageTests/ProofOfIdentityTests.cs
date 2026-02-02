@@ -102,6 +102,50 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
             });
 
     [Fact]
+    public Task Post_FileContainsAVirus_ReturnsError() =>
+        WithJourneyCoordinatorAsync(
+            CreateNewState,
+            async coordinator =>
+            {
+                // Arrange
+                SafeFileService
+                    .Setup(s => s.TrySafeUploadAsync(
+                                It.IsAny<Stream>(),
+                                It.IsAny<string?>(),
+                                out It.Ref<Guid>.IsAny,
+                                null))
+                    .ReturnsAsync(false);
+
+                var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: null);
+
+                await SetupInstanceStateAsync(coordinator, oneLoginUser, person.NationalInsuranceNumber!);
+
+                var fileName = "proof.jpg";
+                var content = new ByteArrayContent(TestData.JpegImage);
+                content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "File",
+                    FileName = fileName
+                };
+                content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.ProofOfIdentity(coordinator.InstanceId))
+                {
+                    Content = new MultipartFormDataContentBuilder
+                    {
+                        { "File", (content, fileName) }
+                    }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                await AssertEx.HtmlResponseHasErrorAsync(response, "File", "The selected file contains a virus");
+            });
+
+    [Fact]
     public Task Post_ValidFile_UpdatesStateAndRedirectsToProofOfIdentity() =>
         WithJourneyCoordinatorAsync(
             CreateNewState,
