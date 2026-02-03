@@ -13,6 +13,8 @@ public class SetQtlsHandler(
     IClock clock) :
     ICommandHandler<SetQtlsCommand, QtlsResult>
 {
+    private static readonly DateOnly QtsCutoff = new(2012, 4, 1);
+
     public async Task<ApiResult<QtlsResult>> ExecuteAsync(SetQtlsCommand command)
     {
         var person = await dbContext.Persons
@@ -37,6 +39,9 @@ public class SetQtlsHandler(
 
         var existingQualification = qtlsQualifications.SingleOrDefault();
         var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
+        DateOnly? adjustedQtsDate = command.QtsDate is not null && command.QtsDate < QtsCutoff
+            ? QtsCutoff
+            : command.QtsDate;
 
         if (command.QtsDate is not null)
         {
@@ -49,7 +54,7 @@ public class SetQtlsHandler(
                     sourceApplicationUserId: null,
                     sourceApplicationReference: null,
                     status: RouteToProfessionalStatusStatus.Holds,
-                    holdsFrom: command.QtsDate,
+                    holdsFrom: adjustedQtsDate,
                     trainingStartDate: null,
                     trainingEndDate: null,
                     trainingSubjectIds: null,
@@ -73,8 +78,9 @@ public class SetQtlsHandler(
             else
             {
                 existingQualification.Update(
-                    allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                    ps => ps.HoldsFrom = command.QtsDate,
+                    allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(
+                        activeOnly: false),
+                    ps => ps.HoldsFrom = adjustedQtsDate,
                     changeReason: null,
                     changeReasonDetail: null,
                     evidenceFile: null,
@@ -111,4 +117,3 @@ public class SetQtlsHandler(
         };
     }
 }
-
