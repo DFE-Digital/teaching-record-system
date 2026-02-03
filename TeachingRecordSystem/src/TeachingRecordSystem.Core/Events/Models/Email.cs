@@ -16,8 +16,8 @@ public record Email
         EmailId = email.EmailId,
         TemplateId = email.TemplateId,
         EmailAddress = email.EmailAddress,
-        Personalization = new ReadOnlyDictionary<string, string>(email.Personalization),
-        Metadata = new ReadOnlyDictionary<string, object>(email.Metadata),
+        Personalization = email.Personalization.ToDictionary(),
+        Metadata = email.Metadata.ToDictionary(),
         SentOn = email.SentOn
     };
 }
