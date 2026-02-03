@@ -63,7 +63,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     }
 
     [Fact]
-    public async Task ResolveVerificationSupportTaskAsync_WithNotVerifiedOutcome_ClosesSupportTaskAndKeepsUserNotVerifiedAndNotMatched()
+    public async Task ResolveVerificationSupportTaskAsync_WithNotVerifiedOutcome_ClosesSupportTaskAndKeepsUserNotVerifiedAndNotMatchedAndEmailsUser()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -107,6 +107,75 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Assert.Null(updatedOneLoginUser.MatchedAttributes);
 
         Events.AssertEventsPublished(e => Assert.IsType<SupportTaskUpdatedEvent>(e));
+
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails, e => Assert.Equal(EmailTemplateIds.OneLoginNotVerified, e.TemplateId));
+
+        Events.AssertEventsPublished(
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e),
+            e => Assert.IsType<EmailSentEvent>(e));
+    }
+
+    [Theory]
+    [InlineData(OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest, "The proof of identity does not match the request details")]
+    [InlineData(OneLoginIdVerificationRejectReason.ProofIsUnclear, "The proof of identity is unclear")]
+    [InlineData(OneLoginIdVerificationRejectReason.ProofIsWrongType, "The proof of identity is the wrong type")]
+    public async Task ResolveVerificationSupportTaskAsync_WithNotVerifiedOutcome_EmailReason(
+        OneLoginIdVerificationRejectReason reason,
+        string expectedEmailReasonText)
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var rejectionAdditionalDetails = Faker.Lorem.Paragraph();
+
+        var options = new NotVerifiedOutcomeOptions
+        {
+            SupportTask = supportTask,
+            RejectReason = reason,
+            RejectionAdditionalDetails = rejectionAdditionalDetails
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails,
+            e => Assert.Equal(e.Personalization["reason"], expectedEmailReasonText));
+    }
+
+    [Fact]
+    public async Task ResolveVerificationSupportTaskAsync_WithNotVerifiedOutcome_AnotherReasonUsesReasonDetailsInEmail()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var rejectionAdditionalDetails = Faker.Lorem.Paragraph();
+
+        var options = new NotVerifiedOutcomeOptions
+        {
+            SupportTask = supportTask,
+            RejectReason = OneLoginIdVerificationRejectReason.AnotherReason,
+            RejectionAdditionalDetails = rejectionAdditionalDetails
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails,
+            e => Assert.Equal(e.Personalization["reason"], rejectionAdditionalDetails));
     }
 
     [Fact]

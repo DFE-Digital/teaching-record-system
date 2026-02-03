@@ -18,4 +18,5 @@ public static class EmailTemplateIds
     public const string TraineeTrnRecipient = "eaee1db2-9fd9-460d-87d1-4c4f0204f3e4";
     public const string OneLoginCannotFindRecord = "5ff8337f-1861-4c1c-a126-16cfd2c63548";
     public const string OneLoginRecordMatched = "a530e8cd-470c-42f5-a2fc-594552c4c6fd";
+    public const string OneLoginNotVerified = "66608490-fee0-419e-97b9-ca34ee1a9f9d";
 }
