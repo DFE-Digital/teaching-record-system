@@ -14,7 +14,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator) : PageModel
             .NotNull().WithMessage("Select a reason for rejecting this request")
     };
 
-    public string PersonName => StringExtensions.JoinNonEmpty(' ', RequestData!.Name);
+    public string PersonName => ' '.JoinNonEmpty(RequestData!.Name);
 
     public TrnRequestMetadata? RequestData { get; set; }
 

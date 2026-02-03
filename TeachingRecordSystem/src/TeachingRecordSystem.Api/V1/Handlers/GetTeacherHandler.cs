@@ -60,7 +60,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             Induction = MapInduction(),
             InitialTeacherTraining = null,
             Qualifications = [],
-            Name = StringExtensions.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
+            Name = ' '.JoinNonEmpty(person.FirstName, person.MiddleName, person.LastName),
             DateOfBirth = person.DateOfBirth.ToDateTime(),
             ActiveAlert = person.HasOpenAlert,
             State = 0,

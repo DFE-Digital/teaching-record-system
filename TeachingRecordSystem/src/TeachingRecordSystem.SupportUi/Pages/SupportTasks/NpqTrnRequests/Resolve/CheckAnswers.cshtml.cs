@@ -140,7 +140,7 @@ public class CheckAnswersModel(
         var emailMessage = CreatingNewRecord ? " and the user has been notified by email" : "";
 
         TempData.SetFlashSuccess(
-            $"TRN request for {StringExtensions.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed{emailMessage}",
+            $"TRN request for {' '.JoinNonEmpty(FirstName, MiddleName, LastName)} completed{emailMessage}",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(trnRequest.ResolvedPersonId!.Value)));
 
         await JourneyInstance!.CompleteAsync();

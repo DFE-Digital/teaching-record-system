@@ -1,7 +1,7 @@
 @model TimelineItem<TimelineProcess>
 @{
     var importedEvent = Model.ItemModel.GetEvent<PersonImportedIntoDqtEvent>();
-    var name = StringExtensions.JoinNonEmpty(' ', importedEvent.Details.FirstName, importedEvent.Details.MiddleName, importedEvent.Details.LastName);
+    var name = ' '.JoinNonEmpty( importedEvent.Details.FirstName, importedEvent.Details.MiddleName, importedEvent.Details.LastName);
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">

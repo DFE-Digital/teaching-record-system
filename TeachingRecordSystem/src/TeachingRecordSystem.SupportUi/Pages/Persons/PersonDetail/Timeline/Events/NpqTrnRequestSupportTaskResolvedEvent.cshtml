@@ -25,12 +25,12 @@
     var attributes = updatedEvent.PersonAttributes;
     var oldAttributes = updatedEvent.OldPersonAttributes;
 
-    var name = StringExtensions.JoinNonEmpty(' ', attributes.FirstName, attributes.MiddleName, attributes.LastName);
+    var name = ' '.JoinNonEmpty( attributes.FirstName, attributes.MiddleName, attributes.LastName);
     var oldName = oldAttributes != null
-        ? StringExtensions.JoinNonEmpty(' ', oldAttributes.FirstName, oldAttributes.MiddleName, oldAttributes.LastName)
+        ? ' '.JoinNonEmpty( oldAttributes.FirstName, oldAttributes.MiddleName, oldAttributes.LastName)
         : null;
 
-    var requestDataName = StringExtensions.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName);
+    var requestDataName = ' '.JoinNonEmpty( requestData.FirstName, requestData.MiddleName, requestData.LastName);
     var evidenceFileUrl = requestData.NpqEvidenceFileId is not null ? await FileService.GetFileUrlAsync(requestData.NpqEvidenceFileId!.Value, TimeSpan.FromMinutes(15)) : null;
 }
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-details-updated-event">

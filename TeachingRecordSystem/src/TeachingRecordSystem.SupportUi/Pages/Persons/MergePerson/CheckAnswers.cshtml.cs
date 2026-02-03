@@ -141,7 +141,7 @@ public class CheckAnswersModel(
             Comments), processContext);
 
         TempData.SetFlashSuccess(
-            $"Records merged for {StringExtensions.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
+            $"Records merged for {' '.JoinNonEmpty(FirstName, MiddleName, LastName)}",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId)));
 
         await JourneyInstance!.CompleteAsync();

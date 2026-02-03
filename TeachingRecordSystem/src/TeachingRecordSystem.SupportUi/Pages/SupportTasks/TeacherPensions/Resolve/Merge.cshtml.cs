@@ -110,7 +110,7 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             Different: false,
             Highlight: false);
 
-        PersonName = StringExtensions.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
+        PersonName = ' '.JoinNonEmpty(personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

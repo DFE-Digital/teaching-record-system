@@ -37,7 +37,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and create record");
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", $"TRN request for {StringExtensions.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName)} completed and the user has been notified by email");
+        await page.AssertBannerAsync("Success", $"TRN request for {' '.JoinNonEmpty(requestData.FirstName, requestData.MiddleName, requestData.LastName)} completed and the user has been notified by email");
 
         await page.AssertBannerLinksToPersonRecord();
     }
@@ -122,7 +122,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and update existing record");
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", $"TRN request for {StringExtensions.JoinNonEmpty(' ', matchedPerson1.FirstName, matchedPerson1.MiddleName, matchedPerson1.LastName)} completed");
+        await page.AssertBannerAsync("Success", $"TRN request for {' '.JoinNonEmpty(matchedPerson1.FirstName, matchedPerson1.MiddleName, matchedPerson1.LastName)} completed");
 
         await page.AssertBannerLinksToPersonRecord(matchedPerson1.PersonId);
     }
@@ -179,7 +179,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and create record");
 
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", $"TRN request for {StringExtensions.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName)} completed and the user has been notified by email");
+        await page.AssertBannerAsync("Success", $"TRN request for {' '.JoinNonEmpty(requestData.FirstName, requestData.MiddleName, requestData.LastName)} completed and the user has been notified by email");
 
         await page.AssertBannerLinksToPersonRecord();
     }
@@ -245,7 +245,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and update existing record");
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", $"TRN request for {StringExtensions.JoinNonEmpty(' ', matchedPerson1.FirstName, matchedPerson1.MiddleName, matchedPerson1.LastName)} completed");
+        await page.AssertBannerAsync("Success", $"TRN request for {' '.JoinNonEmpty(matchedPerson1.FirstName, matchedPerson1.MiddleName, matchedPerson1.LastName)} completed");
 
         await page.AssertBannerLinksToPersonRecord(matchedPerson1.PersonId);
     }
@@ -287,7 +287,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and create record");
 
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", $"TRN request for {StringExtensions.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName)} completed and the user has been notified by email");
+        await page.AssertBannerAsync("Success", $"TRN request for {' '.JoinNonEmpty(requestData.FirstName, requestData.MiddleName, requestData.LastName)} completed and the user has been notified by email");
 
         await page.AssertBannerLinksToPersonRecord();
     }

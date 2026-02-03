@@ -35,8 +35,8 @@ public class CheckAnswersModel(
     public string? PreviousMiddleName { get; set; }
     public string? PreviousLastName { get; set; }
 
-    public string Name => StringExtensions.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
-    public string PreviousName => StringExtensions.JoinNonEmpty(' ', PreviousFirstName, PreviousMiddleName, PreviousLastName);
+    public string Name => ' '.JoinNonEmpty(FirstName, MiddleName, LastName);
+    public string PreviousName => ' '.JoinNonEmpty(PreviousFirstName, PreviousMiddleName, PreviousLastName);
 
     public DateOnly? DateOfBirth { get; set; }
 

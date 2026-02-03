@@ -187,7 +187,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.Person!.FirstName,
                 t.Person.MiddleName,
                 t.Person.LastName,
-                StringExtensions.JoinNonEmpty(' ', t.Person.FirstName, t.Person.MiddleName, t.Person.LastName),
+                ' '.JoinNonEmpty(t.Person.FirstName, t.Person.MiddleName, t.Person.LastName),
                 t.CreatedOn,
                 t.SupportTaskType))
             .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
@@ -295,7 +295,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.SupportTaskReference,
                 data!.FileName,
                 data!.IntegrationTransactionId,
-                StringExtensions.JoinNonEmpty(' ', t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName),
+                ' '.JoinNonEmpty(t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName),
                 t.CreatedOn,
                 NameParts: new[] { t.Person!.FirstName, t.Person!.MiddleName, t.Person!.LastName }
             );

@@ -5,7 +5,7 @@
 @{
     var createdEvent = Model.ItemModel.Event;
     var details = createdEvent.PersonAttributes;
-    var name = StringExtensions.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
+    var name = ' '.JoinNonEmpty( details.FirstName, details.MiddleName, details.LastName);
     var email = EmailAddress.TryParse(details.EmailAddress, out var parsedEmail)
         ? parsedEmail.ToDisplayString()
         : details.EmailAddress;

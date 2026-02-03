@@ -17,7 +17,7 @@ public class RowModel(TrsDbContext context) : PageModel
 
     public Person? Person { get; set; }
 
-    public string? PersonName => Person is not null ? StringExtensions.JoinNonEmpty(' ', Person.FirstName, Person.MiddleName, Person.LastName) : null;
+    public string? PersonName => Person is not null ? ' '.JoinNonEmpty(Person.FirstName, Person.MiddleName, Person.LastName) : null;
 
     public async Task<IActionResult> OnGetAsync()
     {

@@ -88,9 +88,9 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             await dbContext.SaveChangesAsync();
         });
 
-        var oldName = StringExtensions.JoinNonEmpty(' ', [person.FirstName, person.MiddleName, person.LastName]);
+        var oldName = ' '.JoinNonEmpty([person.FirstName, person.MiddleName, person.LastName]);
 
-        var newName = StringExtensions.JoinNonEmpty(' ', [requestData!.FirstName, requestData.MiddleName, requestData.LastName]);
+        var newName = ' '.JoinNonEmpty([requestData!.FirstName, requestData.MiddleName, requestData.LastName]);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
         // Act
@@ -169,9 +169,9 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             await dbContext.SaveChangesAsync();
         });
 
-        var oldName = StringExtensions.JoinNonEmpty(' ', [person.FirstName, person.MiddleName, person.LastName]);
+        var oldName = ' '.JoinNonEmpty([person.FirstName, person.MiddleName, person.LastName]);
 
-        var newName = StringExtensions.JoinNonEmpty(' ', [requestData!.FirstName, requestData.MiddleName, requestData.LastName]);
+        var newName = ' '.JoinNonEmpty([requestData!.FirstName, requestData.MiddleName, requestData.LastName]);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
         // Act

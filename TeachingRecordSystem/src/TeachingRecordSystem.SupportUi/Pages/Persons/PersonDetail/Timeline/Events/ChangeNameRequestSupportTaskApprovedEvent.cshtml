@@ -8,8 +8,8 @@
     var supportTaskEvent = Model.ItemModel.Event;
     var details = supportTaskEvent.PersonAttributes;
     var oldDetails = supportTaskEvent.OldPersonAttributes;
-    var name = StringExtensions.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
-    var oldName = StringExtensions.JoinNonEmpty(' ', oldDetails.FirstName, oldDetails.MiddleName, oldDetails.LastName);
+    var name = ' '.JoinNonEmpty( details.FirstName, details.MiddleName, details.LastName);
+    var oldName = ' '.JoinNonEmpty( oldDetails.FirstName, oldDetails.MiddleName, oldDetails.LastName);
 }
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-name-request-approved-event">
     <div class="moj-timeline__header">

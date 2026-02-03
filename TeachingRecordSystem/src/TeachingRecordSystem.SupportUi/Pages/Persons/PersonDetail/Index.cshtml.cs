@@ -94,7 +94,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
 
         return new PersonInfo
         {
-            Name = StringExtensions.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
+            Name = ' '.JoinNonEmpty(person.FirstName, person.MiddleName, person.LastName),
             DateOfBirth = person.DateOfBirth,
             Trn = person.Trn,
             NationalInsuranceNumber = person.NationalInsuranceNumber,
@@ -103,7 +103,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
             HasActiveAlert = hasActiveAlert,
             PreviousNames = person.PreviousNames!
                 .OrderByDescending(n => n.CreatedOn)
-                .Select(name => StringExtensions.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
+                .Select(name => ' '.JoinNonEmpty(name.FirstName, name.MiddleName, name.LastName))
                 .ToArray(),
             IsActive = person.Status == PersonStatus.Active,
             MergedWithPersonId = person.MergedWithPersonId

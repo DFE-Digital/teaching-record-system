@@ -40,7 +40,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and update primary record");
 
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
-        await page.AssertBannerAsync("Success", $"Records merged for {StringExtensions.JoinNonEmpty(' ', person1.FirstName, person1.MiddleName, person1.LastName)}");
+        await page.AssertBannerAsync("Success", $"Records merged for {' '.JoinNonEmpty(person1.FirstName, person1.MiddleName, person1.LastName)}");
 
         await page.AssertBannerLinksToPersonRecord(person2.PersonId);
     }

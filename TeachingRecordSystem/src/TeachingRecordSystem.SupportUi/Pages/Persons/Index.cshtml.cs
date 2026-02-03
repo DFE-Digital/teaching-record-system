@@ -160,7 +160,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         public required string? NationalInsuranceNumber { get; init; }
         public required PersonStatus PersonStatus { get; init; }
 
-        public string Name => StringExtensions.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+        public string Name => ' '.JoinNonEmpty(FirstName, MiddleName, LastName);
     }
 
 #pragma warning disable IDE1006 // Naming Styles
