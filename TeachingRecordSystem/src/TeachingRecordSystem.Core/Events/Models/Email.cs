@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-
 namespace TeachingRecordSystem.Core.Events.Models;
 
 public record Email
