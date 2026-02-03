@@ -28,7 +28,8 @@ We need to load this into TRS each month.
 - Request access to the **s189 TRA production PIM** group at Home -> Privileged Identity Management -> My Roles -> Groups.
 - Navigate to the blob storage container where the files should be uploaded at Home -> Storage accounts -> s189p01trspdsa -> Containers -> tps-extracts.
 - Upload both files to a virtual folder called **Pending**.
-- Delete the files from all other temporary locations other than the **Pending** folder.
+- Delete the files from all other temporary locations (including your local PC) other than the **Pending** folder.
+- Alternatively you can use the **Microsoft Azure Storage Explorer** desktop app which is available from https://azure.microsoft.com/en-us/products/storage/storage-explorer#Download-4.
 
 ### 3. Trigger the import job in Hangfire
 
