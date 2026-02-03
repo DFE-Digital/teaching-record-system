@@ -20,6 +20,22 @@ public class OneLoginService(
             GetOneLoginCannotFindRecordEmailPersonalization(personName));
     }
 
+    public async Task EnqueueNotVerifiedEmailAsync(string emailAddress, string personName, string reason, ProcessContext processContext)
+    {
+        var email = new Email
+        {
+            EmailId = Guid.NewGuid(),
+            TemplateId = EmailTemplateIds.OneLoginNotVerified,
+            EmailAddress = emailAddress,
+            Personalization = GetOneLoginNotVerifiedEmailPersonalization(personName, reason).ToDictionary()
+        };
+
+        dbContext.Emails.Add(email);
+        await dbContext.SaveChangesAsync();
+
+        await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
+    }
+
     public async Task EnqueueRecordNotFoundEmailAsync(string emailAddress, string personName, ProcessContext processContext)
     {
         var email = new Email
@@ -96,6 +112,13 @@ public class OneLoginService(
 
     private static IReadOnlyDictionary<string, string> GetOneLoginCannotFindRecordEmailPersonalization(string personName) =>
         new Dictionary<string, string> { ["name"] = personName };
+
+    private static IReadOnlyDictionary<string, string> GetOneLoginNotVerifiedEmailPersonalization(string personName, string reason) =>
+        new Dictionary<string, string>
+        {
+            ["name"] = personName,
+            ["reason"] = reason
+        };
 
     public virtual async Task<MatchPersonResult?> MatchPersonAsync(MatchPersonOptions options)
     {

@@ -42,6 +42,8 @@ public partial class OneLoginUserMatchingSupportTaskService
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
+        var data = supportTask.GetData<OneLoginUserIdVerificationData>();
+
         var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
             {
@@ -57,6 +59,12 @@ public partial class OneLoginUserMatchingSupportTaskService
             },
             processContext);
         Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
+
+        var name = $"{data.StatedFirstName} {data.StatedLastName}";
+        var reason = options.RejectReason is OneLoginIdVerificationRejectReason.AnotherReason
+            ? options.RejectionAdditionalDetails!
+            : options.RejectReason.GetDisplayName()!;
+        await oneLoginService.EnqueueNotVerifiedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, reason, processContext);
     }
 
     public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithMatchesOutcomeOptions options, ProcessContext processContext)
