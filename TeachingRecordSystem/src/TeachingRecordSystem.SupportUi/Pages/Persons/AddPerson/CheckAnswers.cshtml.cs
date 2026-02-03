@@ -24,7 +24,7 @@ public class CheckAnswersModel(
     public string? ReasonDetail { get; set; }
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
-    public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+    public string Name => StringExtensions.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
     public string? ChangePersonalDetailsLink =>
         GetPageLink(AddPersonJourneyPage.PersonalDetails, true);

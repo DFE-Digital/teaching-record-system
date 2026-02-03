@@ -22,4 +22,7 @@ public static class StringExtensions
     {
         return string.IsNullOrEmpty(text) ? null : text;
     }
+
+    public static string JoinNonEmpty(char separator, params string?[] values)
+        => string.Join(separator, values.Where(v => !string.IsNullOrEmpty(v)));
 }

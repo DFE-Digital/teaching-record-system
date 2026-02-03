@@ -166,7 +166,7 @@ public class AcceptModel(
             return;
         }
 
-        PersonName = StringHelper.JoinNonEmpty(
+        PersonName = StringExtensions.JoinNonEmpty(
             ' ',
             person.FirstName,
             person.MiddleName,

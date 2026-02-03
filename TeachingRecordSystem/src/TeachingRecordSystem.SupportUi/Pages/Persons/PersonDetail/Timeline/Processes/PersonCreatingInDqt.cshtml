@@ -1,7 +1,7 @@
 @model TimelineItem<TimelineProcess>
 @{
     var createdEvent = Model.ItemModel.GetEvent<PersonCreatedEvent>();
-    var name = StringHelper.JoinNonEmpty(' ', createdEvent.Details.FirstName, createdEvent.Details.MiddleName, createdEvent.Details.LastName);
+    var name = StringExtensions.JoinNonEmpty(' ', createdEvent.Details.FirstName, createdEvent.Details.MiddleName, createdEvent.Details.LastName);
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">

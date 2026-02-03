@@ -10,7 +10,7 @@
     }
     @if (Model.Changes.HasAnyFlag(PersonUpdatedInDqtEventChanges.FirstName | PersonUpdatedInDqtEventChanges.MiddleName | PersonUpdatedInDqtEventChanges.LastName))
     {
-        var name = StringHelper.JoinNonEmpty(' ', Model.Details.FirstName, Model.Details.MiddleName, Model.Details.LastName);
+        var name = StringExtensions.JoinNonEmpty(' ', Model.Details.FirstName, Model.Details.MiddleName, Model.Details.LastName);
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
@@ -108,7 +108,7 @@
             }
             @if (Model.Changes.HasAnyFlag(PersonUpdatedInDqtEventChanges.FirstName | PersonUpdatedInDqtEventChanges.MiddleName | PersonUpdatedInDqtEventChanges.LastName))
             {
-                var name = StringHelper.JoinNonEmpty(' ', Model.OldDetails.FirstName, Model.OldDetails.MiddleName, Model.OldDetails.LastName);
+                var name = StringExtensions.JoinNonEmpty(' ', Model.OldDetails.FirstName, Model.OldDetails.MiddleName, Model.OldDetails.LastName);
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>

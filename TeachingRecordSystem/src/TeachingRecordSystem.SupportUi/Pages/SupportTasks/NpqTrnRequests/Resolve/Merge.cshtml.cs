@@ -127,7 +127,7 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             Different: !(personAttributes.Gender == requestData.Gender || (personAttributes.Gender is null && requestData.Gender is null)),
             Highlight: !(attributeMatches.Contains(PersonMatchedAttribute.Gender) || (personAttributes.Gender is null && requestData.Gender is null)));
 
-        PersonName = StringHelper.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
+        PersonName = StringExtensions.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
 
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
 

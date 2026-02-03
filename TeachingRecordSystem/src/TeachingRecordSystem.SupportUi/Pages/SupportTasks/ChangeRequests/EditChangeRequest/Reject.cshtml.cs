@@ -188,7 +188,7 @@ public class RejectModel(
             return;
         }
 
-        PersonName = StringHelper.JoinNonEmpty(
+        PersonName = StringExtensions.JoinNonEmpty(
             ' ',
             person.FirstName,
             person.MiddleName,

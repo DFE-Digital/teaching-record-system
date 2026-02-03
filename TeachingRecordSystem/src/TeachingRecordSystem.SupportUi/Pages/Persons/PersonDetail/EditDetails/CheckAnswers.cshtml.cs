@@ -29,7 +29,7 @@ public class CheckAnswersModel(
     public string? OtherDetailsChangeReasonDetail { get; set; }
     public UploadedEvidenceFile? OtherDetailsChangeEvidenceFile { get; set; }
 
-    public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+    public string Name => StringExtensions.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
     public string? ChangePersonalDetailsLink =>
         GetPageLink(EditDetailsJourneyPage.PersonalDetails, true);

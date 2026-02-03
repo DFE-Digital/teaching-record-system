@@ -17,7 +17,7 @@ public class CheckAnswersModel(
 {
     public string? SourceApplicationUserName { get; set; }
 
-    public string PersonName => StringHelper.JoinNonEmpty(' ', RequestData!.Name);
+    public string PersonName => StringExtensions.JoinNonEmpty(' ', RequestData!.Name);
 
     public TrnRequestMetadata? RequestData { get; set; }
 

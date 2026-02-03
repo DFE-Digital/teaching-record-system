@@ -239,8 +239,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.WorkEmail, doc.GetSummaryListValueByKey("Work email"));
         Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueByKey("Personal email"));
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', state.FirstName, state.MiddleName, state.LastName), doc.GetSummaryListValueByKey("Name"));
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName), doc.GetSummaryListValueByKey("Previous name"));
+        Assert.Equal(StringExtensions.JoinNonEmpty(' ', state.FirstName, state.MiddleName, state.LastName), doc.GetSummaryListValueByKey("Name"));
+        Assert.Equal(StringExtensions.JoinNonEmpty(' ', state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName), doc.GetSummaryListValueByKey("Previous name"));
         Assert.Equal(state.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Contains(state.EvidenceFileName!, doc.GetSummaryListValueByKey("Proof of identity"));
         if (hasNationalInsuranceNumber)

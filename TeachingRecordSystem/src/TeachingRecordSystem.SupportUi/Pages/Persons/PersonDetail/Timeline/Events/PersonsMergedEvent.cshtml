@@ -15,8 +15,8 @@
 
     var details = mergedEvent.PersonAttributes;
     var oldDetails = mergedEvent.OldPersonAttributes;
-    var name = StringHelper.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
-    var oldName = StringHelper.JoinNonEmpty(' ', oldDetails.FirstName, oldDetails.MiddleName, oldDetails.LastName);
+    var name = StringExtensions.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
+    var oldName = StringExtensions.JoinNonEmpty(' ', oldDetails.FirstName, oldDetails.MiddleName, oldDetails.LastName);
     var email = EmailAddress.TryParse(details.EmailAddress, out var parsedEmail)
         ? parsedEmail.ToDisplayString()
         : details.EmailAddress;

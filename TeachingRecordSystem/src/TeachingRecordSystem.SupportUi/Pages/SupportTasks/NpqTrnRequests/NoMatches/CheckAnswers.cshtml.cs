@@ -101,7 +101,7 @@ public class CheckAnswersModel(
         }
 
         TempData.SetFlashSuccess(
-            $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed and the user has been notified by email",
+            $"TRN request for {StringExtensions.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed and the user has been notified by email",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value)));
 
         return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
