@@ -54,6 +54,8 @@ public sealed record ApiError
         public static int PiiUpdatesForbiddenPersonHasEyts => 10057;
         public static int RecordIsDeactivated => 10058;
         public static int RecordIsMerged => 10059;
+        public static int OpenNameChangeRequestAlreadyExists => 10060;
+        public static int OpenDateOfBirthChangeRequestAlreadyExists => 10061;
     }
 
     public static class DataKeys
@@ -167,6 +169,12 @@ public sealed record ApiError
 
     public static ApiError RecordIsMerged(string trn, string mergedWithTrn) =>
         new(ErrorCodes.RecordIsMerged, $"Record {trn} has been merged with {mergedWithTrn}.", data: (DataKeys.MergedWithTrn, mergedWithTrn));
+
+    public static ApiError OpenChangeNameRequestAlreadyExists() =>
+        new(ErrorCodes.OpenNameChangeRequestAlreadyExists, "An open name change request already exists.");
+
+    public static ApiError OpenChangeDateOfBirthRequestAlreadyExists() =>
+        new(ErrorCodes.OpenDateOfBirthChangeRequestAlreadyExists, "An open date of birth change request already exists.");
 
     public IActionResult ToActionResult(int statusCode = 400)
     {

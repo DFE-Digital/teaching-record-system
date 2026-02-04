@@ -44,6 +44,16 @@ public class CreateDateOfBirthChangeRequestHandler(
             return ApiError.PersonNotFound(command.Trn);
         }
 
+        var existingOpenRequest = await dbContext.SupportTasks
+            .AnyAsync(t => t.PersonId == person.PersonId
+                && t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest
+                && t.IsOutstanding);
+
+        if (existingOpenRequest)
+        {
+            return ApiError.OpenChangeDateOfBirthRequestAlreadyExists();
+        }
+
         using var evidenceFileResponse = await _downloadEvidenceFileHttpClient.GetAsync(
             command.EvidenceFileUrl,
             HttpCompletionOption.ResponseHeadersRead);
