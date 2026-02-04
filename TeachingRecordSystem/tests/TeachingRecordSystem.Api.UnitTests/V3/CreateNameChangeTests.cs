@@ -41,9 +41,11 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
+
         await TestData.CreateChangeNameRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithStatus(SupportTaskStatus.Open));
+
         var command = await CreateCommand() with
         {
             Trn = person.Trn
@@ -53,7 +55,7 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
         var result = await ExecuteCommandAsync(command);
 
         // Assert
-        AssertError(result, ApiError.ErrorCodes.OpenChangeRequestAlreadyExists);
+        AssertError(result, ApiError.ErrorCodes.OpenNameChangeRequestAlreadyExists);
     }
 
     [Fact]
@@ -61,9 +63,11 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
+
         await TestData.CreateChangeNameRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithStatus(SupportTaskStatus.InProgress));
+
         var command = await CreateCommand() with
         {
             Trn = person.Trn
@@ -73,7 +77,7 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
         var result = await ExecuteCommandAsync(command);
 
         // Assert
-        AssertError(result, ApiError.ErrorCodes.OpenChangeRequestAlreadyExists);
+        AssertError(result, ApiError.ErrorCodes.OpenNameChangeRequestAlreadyExists);
     }
 
     [Fact]
@@ -81,9 +85,11 @@ public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : 
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
+
         await TestData.CreateChangeNameRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithStatus(SupportTaskStatus.Closed));
+
         var command = await CreateCommand() with
         {
             Trn = person.Trn

@@ -45,14 +45,13 @@ public class CreateDateOfBirthChangeRequestHandler(
         }
 
         var existingOpenRequest = await dbContext.SupportTasks
-            .Where(t => t.PersonId == person.PersonId
+            .AnyAsync(t => t.PersonId == person.PersonId
                 && t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest
-                && (t.Status == SupportTaskStatus.Open || t.Status == SupportTaskStatus.InProgress))
-            .AnyAsync();
+                && t.IsOutstanding);
 
         if (existingOpenRequest)
         {
-            return ApiError.OpenChangeRequestAlreadyExists("change date of birth");
+            return ApiError.OpenChangeDateOfBirthRequestAlreadyExists();
         }
 
         using var evidenceFileResponse = await _downloadEvidenceFileHttpClient.GetAsync(

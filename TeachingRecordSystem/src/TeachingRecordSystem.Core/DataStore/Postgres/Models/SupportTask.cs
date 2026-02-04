@@ -1,3 +1,4 @@
+using EntityFrameworkCore.Projectables;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -19,6 +20,9 @@ public class SupportTask
     public TrnRequestMetadata? TrnRequestMetadata { get; }
     public required ISupportTaskData Data { get; set; }
     public SavedJourneyState? ResolveJourneySavedState { get; set; }
+
+    [Projectable]
+    public bool IsOutstanding => Status != SupportTaskStatus.Closed;
 
     public static SupportTask Create(
         SupportTaskType supportTaskType,

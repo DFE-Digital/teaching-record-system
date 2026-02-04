@@ -47,14 +47,13 @@ public class CreateNameChangeRequestHandler(
         }
 
         var existingOpenRequest = await dbContext.SupportTasks
-            .Where(t => t.PersonId == person.PersonId
+            .AnyAsync(t => t.PersonId == person.PersonId
                 && t.SupportTaskType == SupportTaskType.ChangeNameRequest
-                && (t.Status == SupportTaskStatus.Open || t.Status == SupportTaskStatus.InProgress))
-            .AnyAsync();
+                && t.IsOutstanding);
 
         if (existingOpenRequest)
         {
-            return ApiError.OpenChangeRequestAlreadyExists("change name");
+            return ApiError.OpenChangeNameRequestAlreadyExists();
         }
 
         using var evidenceFileResponse = await _downloadEvidenceFileHttpClient.GetAsync(
