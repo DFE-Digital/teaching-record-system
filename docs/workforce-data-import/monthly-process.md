@@ -13,13 +13,14 @@ We need to load this into TRS each month.
 ### 1. Download files from secure link with TPS
 
 - Check files are available:
+  - Instructions to access the secure link are available [here](https://educationgovuk.sharepoint.com.mcas.ms/sites/TRATransformationTeamDocs/SitePages/TRS%20Teacher%20Pensions%20Monthly%20Workforce%20Data%20Download.aspx).
   - 2 files should be ready to download on the 25th of each month from an agreed secure location.  
   The files will be named Workforce-Dataset-1-*YYYYMMDD*-1329.csv and Workforce-Dataset-2-*YYYYMMDD-1329.csv where *YYYYMMDD* is the year, month and day of the extract date.  
-  - If this is not the case then email the contact at TPS to chase when it will be available.
+  - If this is not the case then email the contact[^1] at TPS to chase when it will be available.
 
 - Ensure files are in CSV format:
   - The files contain 7 header lines which include the word **RESTRICTED** which need to be removed to truly make the file a **CSV**.  
-  - Open each file in a text editor[^1] such as **Notepad** or **Visual Studio Code**.
+  - Open each file in a text editor[^2] such as **Notepad** or **Visual Studio Code**.
   - Delete the additional header lines above the field names.
   - Save the file.
 
@@ -195,7 +196,138 @@ We need to load this into TRS each month.
   ```
   - Make a note of any fields with incorrect formats in order to feedback to TPS.
   - The most common fields which may have formatting issues are the `National Insurance Number`, `Member Email Address` and `Establishment Email Address`.
-  
+
+- Drill into the detail of any records with invalid National Insurance Number format and *YYYYMMDD* is the year, month and day of the extract date:
+  - Execute the query
+  ```
+  WITH
+    latest_extracts AS (
+        SELECT
+            *
+        FROM
+            tps_csv_extracts
+        WHERE
+            filename LIKE '%YYYYMMDD%'
+        ORDER BY
+            created_on DESC
+        LIMIT
+            2
+    )
+  SELECT DISTINCT
+      trn,
+      national_insurance_number
+  FROM
+      tps_csv_extract_load_items x
+  WHERE
+      EXISTS (
+          SELECT
+              1
+          FROM
+              latest_extracts le
+          WHERE
+              le.tps_csv_extract_id = x.tps_csv_extract_id
+      )
+      AND (errors >> 1) & 1 = 1;
+  ```
+- Drill into the detail of any records with invalid Member Email Address format and *YYYYMMDD* is the year, month and day of the extract date:
+  - Execute the query
+  ```
+  WITH
+    latest_extracts AS (
+        SELECT
+            *
+        FROM
+            tps_csv_extracts
+        WHERE
+            filename LIKE '%YYYYMMDD%'
+        ORDER BY
+            created_on DESC
+        LIMIT
+            2
+    )
+  SELECT DISTINCT
+      trn,
+      member_email_address
+  FROM
+      tps_csv_extract_load_items x
+  WHERE
+      EXISTS (
+          SELECT
+              1
+          FROM
+              latest_extracts le
+          WHERE
+              le.tps_csv_extract_id = x.tps_csv_extract_id
+      )
+      AND (errors >> 5) & 1 = 1;
+  ```  
+- Drill into the detail of any records with invalid Establishment Number format and *YYYYMMDD* is the year, month and day of the extract date:
+  - Execute the query
+  ```
+  WITH
+    latest_extracts AS (
+        SELECT
+            *
+        FROM
+            tps_csv_extracts
+        WHERE
+            filename LIKE '%YYYYMMDD%'
+        ORDER BY
+            created_on DESC
+        LIMIT
+            2
+    )
+  SELECT DISTINCT
+      trn,
+      establishment_number,
+      local_authority_code
+  FROM
+      tps_csv_extract_load_items x
+  WHERE
+      EXISTS (
+          SELECT
+              1
+          FROM
+              latest_extracts le
+          WHERE
+              le.tps_csv_extract_id = x.tps_csv_extract_id
+      )
+      AND (errors >> 7) & 1 = 1;
+  ```
+- Drill into the detail of any records with invalid Establishment Number format and *YYYYMMDD* is the year, month and day of the extract date:
+  - Execute the query
+  ```
+  WITH
+    latest_extracts AS (
+        SELECT
+            *
+        FROM
+            tps_csv_extracts
+        WHERE
+            filename LIKE '%YYYYMMDD%'
+        ORDER BY
+            created_on DESC
+        LIMIT
+            2
+    )
+  SELECT DISTINCT
+      local_authority_code,
+      establishment_number,
+      establishment_email_address
+  FROM
+      tps_csv_extract_load_items x
+  WHERE
+      EXISTS (
+          SELECT
+              1
+          FROM
+              latest_extracts le
+          WHERE
+              le.tps_csv_extract_id = x.tps_csv_extract_id
+      )
+      AND (errors >> 16) & 1 = 1;
+  ```
+
 - Get the counts of valid / invalid records after trying to match to a TRN and Establishment and create or update a `person_employments` record where *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query
     ```
@@ -303,15 +435,16 @@ We need to load this into TRS each month.
     ```
   - Make a note of the LA Code / Establishment Numbers in order to feedback to TPS.
 - If there are any issues with the data in the extract:
-  - Add a sheet to the Excel spreadsheet **TPS Monthly Extract Issues** for the extract month.
+  - Add a sheet to the Excel spreadsheet [**TPS Monthly Extract Issues**](https://educationgovuk.sharepoint.com/:x:/r/sites/TRATransformationTeamDocs/Shared%20Documents/General/TRS%20Products/Third-party%20data%20integrations/workforce/Capita%20Workforce%20Data/TPS%20Monthly%20Extract%20Issues.xlsx?d=w833a295c88a24771bd9f0b15087d4d3e&csf=1&web=1&e=Gs2zUY) for the extract month.
   - Detail the specific issues.
 
 ### 5. Feedback to TPS with any issues
 
-- Email the contact at TPS with details of any issues importing the provided files e.g.
-  - List of records with any fields in an invalid format[^2].
-  - List of TRNs which are not in the TRS `persons` table[^2] requesting additional personal information held in TPS for these.
+- Email the contact[^1] at TPS with details of any issues importing the provided files e.g.
+  - List of records with any fields in an invalid format[^3].
+  - List of TRNs which are not in the TRS `persons` table[^3] requesting additional personal information held in TPS for these.
   - List of Local Authority Code and Establishment Numbers which are not in the TRS `establishments` table.
 
-[^1]: to avoid the risk of accidentally reformatting the data if editing using **Excel**.
-[^2]: send the specific details via a secure channel if they contain Personal Identifiable Information (PII) and refer to that in the email.
+[^1]: the primary contact for monthly workforce data extract issues for TPS is listed [here](https://educationgovuk.sharepoint.com.mcas.ms/:x:/r/sites/TRATransformationTeamDocs/_layouts/15/Doc.aspx?sourcedoc=%7B42BF8E31-69B4-46E6-B64C-945FEC6C4C67%7D&file=TRS%20Stakeholders%2C%20Contacts%20and%20Call%20List.xlsx&action=default&mobileredirect=true).
+[^2]: to avoid the risk of accidentally reformatting the data if editing using **Excel**.
+[^3]: send the specific details via a secure channel if they contain Personal Identifiable Information (PII) and refer to that in the email (normally copy the sheet for the relevant month from **TPS Monthly Extract Issues** to a separate spreadsheet and send that).
