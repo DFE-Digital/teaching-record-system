@@ -97,7 +97,7 @@
     <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageVersion Include="SerilogTimings" Version="3.1.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.2" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
