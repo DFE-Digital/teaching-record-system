@@ -25,7 +25,8 @@ public partial class TestData
                 UserId = userId ?? SystemUser.SystemUserId,
                 DqtUserId = null,
                 DqtUserName = null,
-                PersonIds = events.SelectMany(e => e.PersonIds).Distinct().ToList()
+                PersonIds = events.SelectMany(e => e.PersonIds).Distinct().ToList(),
+                ChangeReason = null
             };
 
             dbContext.Processes.Add(process);

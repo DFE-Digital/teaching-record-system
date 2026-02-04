@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Mappings;
 
@@ -9,7 +11,12 @@ public class ProcessMapping : IEntityTypeConfiguration<Process>
     {
         builder.ToTable("processes");
         builder.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId);
-        builder.HasIndex(a => a.ProcessType);
-        builder.HasIndex(a => a.PersonIds).HasMethod("GIN");
+        builder.HasIndex(p => p.ProcessType);
+        builder.HasIndex(p => p.PersonIds).HasMethod("GIN");
+        builder.Property(p => p.ChangeReason)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, IChangeReason.SerializerOptions),
+                v => JsonSerializer.Deserialize<IChangeReason>(v, IChangeReason.SerializerOptions)!);
     }
 }
