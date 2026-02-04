@@ -161,7 +161,7 @@ We need to load this into TRS each month.
 | 13            | 8192                                | Withdrawl Indicator         |
 | 14            | 16384                               | Extract Date                |
 | 15            | 32768                               | Gender                      |
-| 15            | 65536                               | Establishment Email Address |
+| 16            | 65536                               | Establishment Email Address |
 
 - Drill into the detail of any records with specific formatting errors and *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query
@@ -294,7 +294,7 @@ We need to load this into TRS each month.
       )
       AND (errors >> 7) & 1 = 1;
   ```
-- Drill into the detail of any records with invalid Establishment Number format and *YYYYMMDD* is the year, month and day of the extract date:
+- Drill into the detail of any records with invalid Establishment Email Address format and *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query
   ```
   WITH
@@ -401,6 +401,46 @@ We need to load this into TRS each month.
         trn;
     ```  
   - Make a note of the TRNs in order to feedback to TPS.
+
+- Drill into records where no `persons` record could be found which match the TRN provided and there is still no matching person in TRS (e.g. if we check a few days later and the person may have been created in TRS via another route like the ITR import in the meantime).
+ - Execute the query
+    ```
+    WITH
+        latest_extracts AS (
+            SELECT
+                *
+            FROM
+                tps_csv_extracts
+            WHERE
+                filename LIKE '%20260125%'
+            ORDER BY
+                created_on DESC
+            LIMIT
+                2
+        )
+    SELECT DISTINCT
+        trn
+    FROM
+        tps_csv_extract_items x
+    WHERE
+        EXISTS (
+            SELECT
+                1
+            FROM
+                latest_extracts le
+            WHERE
+                le.tps_csv_extract_id = x.tps_csv_extract_id
+        )
+        AND result = 3
+        AND NOT EXISTS (SELECT
+                            1
+                        FROM
+                            persons p
+                        WHERE
+                            p.trn = x.trn)
+    ORDER BY
+        trn;
+    ```
 - Drill into records where no `establishments` record could be found which match the Local Authority Code and Establishment Number provided where *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query
     ```
