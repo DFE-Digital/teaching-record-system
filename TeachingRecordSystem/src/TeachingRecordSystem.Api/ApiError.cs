@@ -170,7 +170,7 @@ public sealed record ApiError
         new(ErrorCodes.RecordIsMerged, $"Record {trn} has been merged with {mergedWithTrn}.", data: (DataKeys.MergedWithTrn, mergedWithTrn));
 
     public static ApiError OpenChangeRequestAlreadyExists(string changeRequestType) =>
-        new(ErrorCodes.OpenChangeRequestAlreadyExists, "An open change request already exists.", $"Change request type: '{changeRequestType}'");
+        new(ErrorCodes.OpenChangeRequestAlreadyExists, $"An open {changeRequestType} request already exists.", $"Change request type: '{changeRequestType}'");
 
     public IActionResult ToActionResult(int statusCode = 400)
     {
