@@ -9,10 +9,10 @@
     <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Moq" />
     <PackageReference Include="RedisRateLimiting.AspNetCore" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+    <PackageReference Include="Scalar.AspNetCore" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
 
