@@ -46,6 +46,17 @@ public class CreateNameChangeRequestHandler(
             return ApiError.PersonNotFound(command.Trn);
         }
 
+        var existingOpenRequest = await dbContext.SupportTasks
+            .Where(t => t.PersonId == person.PersonId
+                && t.SupportTaskType == SupportTaskType.ChangeNameRequest
+                && (t.Status == SupportTaskStatus.Open || t.Status == SupportTaskStatus.InProgress))
+            .AnyAsync();
+
+        if (existingOpenRequest)
+        {
+            return ApiError.OpenChangeRequestAlreadyExists("change name");
+        }
+
         using var evidenceFileResponse = await _downloadEvidenceFileHttpClient.GetAsync(
             command.EvidenceFileUrl,
             HttpCompletionOption.ResponseHeadersRead);

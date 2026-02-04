@@ -37,6 +37,67 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
     }
 
     [Fact]
+    public async Task HandleAsync_PersonHasOpenChangeDateOfBirthRequest_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithStatus(SupportTaskStatus.Open));
+        var command = await CreateCommand() with
+        {
+            Trn = person.Trn
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        AssertError(result, ApiError.ErrorCodes.OpenChangeRequestAlreadyExists);
+    }
+
+    [Fact]
+    public async Task HandleAsync_PersonHasInProgressChangeDateOfBirthRequest_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithStatus(SupportTaskStatus.InProgress));
+        var command = await CreateCommand() with
+        {
+            Trn = person.Trn
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        AssertError(result, ApiError.ErrorCodes.OpenChangeRequestAlreadyExists);
+    }
+
+    [Fact]
+    public async Task HandleAsync_PersonHasClosedChangeDateOfBirthRequest_CreatesSupportTaskSuccessfully()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithStatus(SupportTaskStatus.Closed));
+        var command = await CreateCommand() with
+        {
+            Trn = person.Trn
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = AssertSuccess(result);
+        Assert.NotEmpty(success.CaseNumber);
+    }
+
+    [Fact]
     public async Task HandleAsync_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
     {
         // Arrange
