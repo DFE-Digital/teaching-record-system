@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
 
 namespace TeachingRecordSystem.Core;
@@ -74,7 +75,7 @@ public class ProcessContext
 {
     private readonly List<IEvent> _events = new();
 
-    public ProcessContext(ProcessType processType, DateTime now, EventModels.RaisedByUserInfo raisedBy)
+    public ProcessContext(ProcessType processType, DateTime now, EventModels.RaisedByUserInfo raisedBy, IChangeReason? changeReason = null)
     {
         Now = now;
 
@@ -88,7 +89,8 @@ public class ProcessContext
             DqtUserId = raisedBy.DqtUserId,
             DqtUserName = raisedBy.DqtUserName,
             PersonIds = [],
-            Events = []
+            Events = [],
+            ChangeReason = changeReason
         };
     }
 

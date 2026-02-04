@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Optional;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Infrastructure.Json;
@@ -64,6 +65,29 @@ public static class Modifiers
         {
             typeInfo.PolymorphismOptions.DerivedTypes.Add(
                 new JsonDerivedType(supportTaskType.DataType, (int)supportTaskType.SupportTaskType));
+        }
+    }
+
+    public static void ChangeReasons(JsonTypeInfo typeInfo)
+    {
+        if (typeInfo.Type != typeof(IChangeReason))
+        {
+            return;
+        }
+
+        typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+        {
+            TypeDiscriminatorPropertyName = "$change-reason-type",
+            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
+        };
+
+        var changeReasonTypes = typeof(IChangeReason).Assembly.GetTypes()
+            .Where(t => typeof(IChangeReason).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
+
+        foreach (var changeReasonType in changeReasonTypes)
+        {
+            typeInfo.PolymorphismOptions.DerivedTypes.Add(
+                new JsonDerivedType(changeReasonType, changeReasonType.Name));
         }
     }
 

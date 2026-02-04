@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Process
@@ -12,4 +14,5 @@ public class Process
     public required string? DqtUserName { get; init; }
     public ICollection<ProcessEvent>? Events { get; init; }
     public required List<Guid> PersonIds { get; init; }
+    public required IChangeReason? ChangeReason { get; init; }
 }
