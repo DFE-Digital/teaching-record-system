@@ -205,7 +205,7 @@ public static class Extensions
                 nameof(TempUpdateSetHoldsDateJob),
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
-            
+
             recurringJobManager.RemoveIfExists("CreateDqtAnnotationAuditEventsJob");
             recurringJobManager.RemoveIfExists("SyncAllPersonsFromCrmJob");
             recurringJobManager.RemoveIfExists("ClearAlertsJob");
