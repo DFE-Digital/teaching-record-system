@@ -80,7 +80,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 OneLoginUserSubject = supportTask.OneLoginUserSubject!,
                 VerificationRoute = OneLoginUserVerificationRoute.Support,
                 VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
+                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]],
+                CoreIdentityClaimVc = null
             },
             processContext);
 
@@ -117,7 +118,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 OneLoginUserSubject = supportTask.OneLoginUserSubject!,
                 VerificationRoute = OneLoginUserVerificationRoute.Support,
                 VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
+                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]],
+                CoreIdentityClaimVc = null
             },
             processContext);
 
@@ -152,7 +154,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 OneLoginUserSubject = supportTask.OneLoginUserSubject!,
                 VerificationRoute = OneLoginUserVerificationRoute.Support,
                 VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
+                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]],
+                CoreIdentityClaimVc = null
             },
             processContext);
 

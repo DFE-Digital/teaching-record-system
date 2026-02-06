@@ -6,10 +6,6 @@ public class OneLoginUser
 {
     public required string Subject { get; init; }
     public string? EmailAddress { get; set; }
-    public DateTime? FirstOneLoginSignIn { get; set; }
-    public DateTime? LastOneLoginSignIn { get; set; }
-    public DateTime? FirstSignIn { get; set; }
-    public DateTime? LastSignIn { get; set; }
     public Guid? PersonId { get; private set; }
     public Person? Person { get; }
     public DateTime? VerifiedOn { get; private set; }
@@ -27,7 +23,8 @@ public class OneLoginUser
         OneLoginUserVerificationRoute route,
         Guid? verifiedByApplicationUserId,
         string[][]? verifiedNames,
-        DateOnly[]? verifiedDatesOfBirth)
+        DateOnly[]? verifiedDatesOfBirth,
+        string? coreIdentityClaimVc)
     {
         if (route == OneLoginUserVerificationRoute.External && !verifiedByApplicationUserId.HasValue)
         {
@@ -48,6 +45,7 @@ public class OneLoginUser
         VerifiedByApplicationUserId = verifiedByApplicationUserId;
         VerifiedNames = verifiedNames;
         VerifiedDatesOfBirth = verifiedDatesOfBirth;
+        LastCoreIdentityVc = coreIdentityClaimVc;
     }
 
     public void SetMatched(

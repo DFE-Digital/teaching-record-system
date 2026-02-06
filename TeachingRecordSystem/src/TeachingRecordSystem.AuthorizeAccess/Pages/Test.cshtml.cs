@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyCoordinator.JourneyName, Optional = true)]
-public class TestModel(IJourneyInstanceProvider journeyInstanceProvider) : PageModel
+public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventPublisher eventPublisher, IClock clock) : PageModel
 {
     [FromQuery(Name = "scheme")]
     public string? AuthenticationScheme { get; set; }
@@ -27,19 +28,32 @@ public class TestModel(IJourneyInstanceProvider journeyInstanceProvider) : PageM
         {
             var signInJourneyCoordinator = (SignInJourneyCoordinator?)await journeyInstanceProvider.TryCreateNewInstanceAsync(
                 HttpContext,
-                ctx =>
+                async ctx =>
                 {
+                    var processContext = new ProcessContext(ProcessType.TeacherSigningIn, clock.UtcNow, SystemUser.SystemUserId);
+
+                    await eventPublisher.PublishEventAsync(
+                        new AuthorizeAccessRequestStartedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            ApplicationUserId = Guid.Empty,
+                            ClientId = string.Empty,
+                            JourneyInstanceId = ctx.InstanceId.ToString()
+                        },
+                        processContext);
+
                     var redirectUri = ctx.InstanceId.EnsureUrlHasKey(Request.GetEncodedPathAndQuery());
 
                     var state = new SignInJourneyState(
+                        processContext.ProcessId,
                         redirectUri,
                         "Test service",
                         serviceUrl: Request.GetEncodedUrl(),
                         AuthenticationScheme,
-                        clientApplicationUserId: Guid.NewGuid(),
+                        clientApplicationUserId: Guid.Empty,
                         TrnToken);
 
-                    return Task.FromResult<object>(state);
+                    return state;
                 });
             Debug.Assert(signInJourneyCoordinator is not null);
 

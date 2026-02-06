@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;

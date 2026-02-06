@@ -183,7 +183,6 @@ public static class Extensions
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
             services
-                .AddDbContext<IdDbContext>(options => options.UseNpgsql(configuration.GetRequiredConnectionString("Id")))
                 .AddIdentityApi(configuration);
 
             services

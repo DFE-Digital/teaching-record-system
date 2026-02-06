@@ -7,6 +7,7 @@ namespace TeachingRecordSystem.AuthorizeAccess;
 
 [method: JsonConstructor]
 public class SignInJourneyState(
+    Guid signingInProcessId,
     string redirectUri,
     string serviceName,
     string serviceUrl,
@@ -14,6 +15,8 @@ public class SignInJourneyState(
     Guid clientApplicationUserId,
     string? trnToken = null)
 {
+    public Guid SigningInProcessId { get; } = signingInProcessId;
+
     public string RedirectUri { get; } = redirectUri;
 
     public string ServiceName { get; } = serviceName;

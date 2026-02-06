@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
+using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;

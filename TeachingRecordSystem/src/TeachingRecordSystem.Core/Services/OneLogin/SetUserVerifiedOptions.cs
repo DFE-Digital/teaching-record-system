@@ -6,4 +6,5 @@ public record SetUserVerifiedOptions
     public required OneLoginUserVerificationRoute VerificationRoute { get; init; }
     public required DateOnly[] VerifiedDatesOfBirth { get; init; }
     public required string[][] VerifiedNames { get; init; }
+    public required string? CoreIdentityClaimVc { get; init; }
 }

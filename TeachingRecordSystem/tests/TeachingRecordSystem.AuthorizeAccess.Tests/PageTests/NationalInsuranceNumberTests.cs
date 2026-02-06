@@ -213,8 +213,6 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 Assert.NotNull(state.AuthenticationTicket);
 
                 oneLoginUser = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
-                Assert.Equal(Clock.UtcNow, oneLoginUser.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, oneLoginUser.LastSignIn);
                 Assert.Equal(person.PersonId, oneLoginUser.PersonId);
             });
 

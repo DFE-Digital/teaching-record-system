@@ -112,7 +112,7 @@ public static class Extensions
             .AddNoteService()
             .AddPersonService()
             .AddInductionExemptionService()
-            .AddOneLoginService();
+            .AddOneLoginService(configuration);
 
         return services;
     }
