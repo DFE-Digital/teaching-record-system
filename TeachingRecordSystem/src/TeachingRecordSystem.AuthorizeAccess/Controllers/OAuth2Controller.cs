@@ -18,6 +18,8 @@ namespace TeachingRecordSystem.AuthorizeAccess.Controllers;
 public class OAuth2Controller(
     TrsDbContext dbContext,
     IJourneyInstanceProvider journeyInstanceProvider,
+    IEventPublisher eventPublisher,
+    IClock clock,
     IOpenIddictAuthorizationManager authorizationManager,
     IOpenIddictScopeManager scopeManager) : Controller
 {
@@ -53,6 +55,8 @@ public class OAuth2Controller(
         var childAuthenticationScheme = AuthenticationSchemes.MatchToTeachingRecord;
         var authenticateResult = await HttpContext.AuthenticateAsync(childAuthenticationScheme);
 
+        var coordinator = journeyInstanceProvider.GetJourneyInstance(HttpContext);
+
         if (!authenticateResult.Succeeded)
         {
             var parameters = Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList();
@@ -62,15 +66,26 @@ public class OAuth2Controller(
 
             var redirectToSelf = Request.PathBase + Request.Path + QueryString.Create(parameters);
 
-            var coordinator = journeyInstanceProvider.GetJourneyInstance(HttpContext);
-
             coordinator ??= await journeyInstanceProvider.TryCreateNewInstanceAsync(
                 HttpContext,
-                ctx =>
+                async ctx =>
                 {
+                    var processContext = new ProcessContext(ProcessType.TeacherSigningIn, clock.UtcNow, SystemUser.SystemUserId);
+
+                    await eventPublisher.PublishEventAsync(
+                        new AuthorizeAccessRequestStartedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            ApplicationUserId = client.UserId,
+                            ClientId = clientId,
+                            JourneyInstanceId = ctx.InstanceId.ToString()
+                        },
+                        processContext);
+
                     redirectToSelf += $"&{JourneyInstanceId.KeyRouteValueName}={Uri.EscapeDataString(ctx.InstanceId.Key)}";
 
                     var state = new SignInJourneyState(
+                        processContext.ProcessId,
                         redirectToSelf,
                         client.Name,
                         serviceUrl,
@@ -120,6 +135,12 @@ public class OAuth2Controller(
 
         identity.SetAuthorizationId(await authorizationManager.GetIdAsync(authorization));
         identity.SetDestinations(GetDestinations);
+
+        var processContext = await ProcessContext.FromDbAsync(dbContext, ((SignInJourneyState)coordinator!.State).SigningInProcessId, clock.UtcNow);
+
+        await eventPublisher.PublishEventAsync(
+            new AuthorizeAccessRequestCompletedEvent { EventId = Guid.NewGuid() },
+            processContext);
 
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }

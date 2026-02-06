@@ -21,7 +21,7 @@ public class ServiceFixture : ServiceProviderFixture
             .AddSingleton<ReferenceDataCache>()
             .AddSingleton<PersonInfoCache>()
             .AddEventPublisher()
-            .AddOneLoginService()
+            .AddOneLoginService(configuration)
             .AddSupportTaskService()
             .AddPersonService()
             .AddSingleton<INotificationSender, NoopNotificationSender>()

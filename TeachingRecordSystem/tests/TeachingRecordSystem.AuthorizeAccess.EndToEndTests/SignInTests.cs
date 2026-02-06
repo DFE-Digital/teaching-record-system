@@ -1,6 +1,7 @@
 using Microsoft.Playwright;
 using Optional;
-using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
+using TeachingRecordSystem.Core.Services.OneLogin;
+using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 

@@ -36,5 +36,6 @@ public enum ProcessType
     OneLoginUserIdVerificationSupportTaskSaving = 32,
     OneLoginUserRecordMatchingSupportTaskSaving = 33,
     OneLoginUserRecordMatchingSupportTaskCompleting = 34,
-    OneLoginUserIdVerificationSupportTaskCreating = 35
+    OneLoginUserIdVerificationSupportTaskCreating = 35,
+    TeacherSigningIn = 36
 }

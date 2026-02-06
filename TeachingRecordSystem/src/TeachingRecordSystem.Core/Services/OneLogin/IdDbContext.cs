@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 
-namespace TeachingRecordSystem.AuthorizeAccess;
+namespace TeachingRecordSystem.Core.Services.OneLogin;
 
 public class IdDbContext(DbContextOptions<IdDbContext> options) : DbContext(options)
 {
@@ -52,13 +51,13 @@ public class User
     [Column("trn")]
     public string? Trn { get; set; }
     [Column("trn_association_source")]
-    public TrnAssociationSource? TrnAssociationSource { get; set; }
+    public IdModelTypes.TrnAssociationSource? TrnAssociationSource { get; set; }
     [Column("is_deleted")]
     public bool IsDeleted { get; set; }
     [Column("trn_lookup_support_ticket_created")]
     public bool TrnLookupSupportTicketCreated { get; set; }
     [Column("trn_verification_level")]
-    public TrnVerificationLevel? TrnVerificationLevel { get; set; }
+    public IdModelTypes.TrnVerificationLevel? TrnVerificationLevel { get; set; }
 }
 
 public static class IdModelTypes
