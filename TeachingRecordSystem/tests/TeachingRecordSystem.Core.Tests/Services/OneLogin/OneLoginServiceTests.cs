@@ -21,7 +21,8 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
             OneLoginUserSubject = oneLoginUser.Subject,
             VerificationRoute = OneLoginUserVerificationRoute.Support,
             VerifiedNames = [["Test", "User"]],
-            VerifiedDatesOfBirth = [new DateOnly(1990, 1, 1)]
+            VerifiedDatesOfBirth = [new DateOnly(1990, 1, 1)],
+            CoreIdentityClaimVc = null
         };
 
         // Act
@@ -44,7 +45,8 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
             OneLoginUserSubject = oneLoginUser.Subject,
             VerificationRoute = OneLoginUserVerificationRoute.Support,
             VerifiedNames = [["Test", "User"]],
-            VerifiedDatesOfBirth = [new DateOnly(1990, 1, 1)]
+            VerifiedDatesOfBirth = [new DateOnly(1990, 1, 1)],
+            CoreIdentityClaimVc = null
         };
 
         // Act

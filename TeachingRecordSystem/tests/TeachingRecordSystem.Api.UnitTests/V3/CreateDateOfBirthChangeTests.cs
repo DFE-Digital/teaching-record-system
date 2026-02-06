@@ -145,8 +145,8 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
 
             Assert.Collection(
                 t.Events,
-                e => Assert.IsType<SupportTaskCreatedEvent>(e),
-                e => Assert.IsType<EmailSentEvent>(e));
+                e => Assert.IsType<EmailSentEvent>(e),
+                e => Assert.IsType<SupportTaskCreatedEvent>(e));
         });
     }
 

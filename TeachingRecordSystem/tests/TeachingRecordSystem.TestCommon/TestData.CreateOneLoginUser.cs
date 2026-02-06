@@ -36,7 +36,7 @@ public partial class TestData
         {
             var hasSignedInBefore = email != Option.Some((string?)null);
 
-            var user = new OneLoginUser()
+            var user = new OneLoginUser
             {
                 Subject = subject.ValueOr(CreateOneLoginUserSubject())
             };
@@ -44,8 +44,6 @@ public partial class TestData
             if (hasSignedInBefore)
             {
                 user.EmailAddress = email.ValueOr(Faker.Internet.Email());
-                user.FirstOneLoginSignIn = Clock.UtcNow;
-                user.LastOneLoginSignIn = Clock.UtcNow;
             }
 
             if (verifiedInfo is not null)
@@ -54,19 +52,14 @@ public partial class TestData
                     Clock.UtcNow,
                     OneLoginUserVerificationRoute.OneLogin,
                     verifiedByApplicationUserId: null,
-                    [verifiedInfo!.Value.Name],
-                    [verifiedInfo!.Value.DateOfBirth]);
+                    [verifiedInfo.Value.Name],
+                    [verifiedInfo.Value.DateOfBirth],
+                    coreIdentityClaimVc: null);
             }
 
             if (personId is not null)
             {
                 user.SetMatched(Clock.UtcNow, personId.Value, OneLoginUserMatchRoute.Automatic, matchedAttributes: null);
-
-                if (hasSignedInBefore)
-                {
-                    user.FirstSignIn = Clock.UtcNow;
-                    user.LastSignIn = Clock.UtcNow;
-                }
             }
 
             dbContext.OneLoginUsers.Add(user);

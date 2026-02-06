@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
@@ -51,7 +52,7 @@ public abstract class TestBase
     }
 
     protected async Task WithJourneyCoordinatorAsync(
-        Func<JourneyInstanceId, SignInJourneyState> getState,
+        Func<JourneyInstanceId, Guid, SignInJourneyState> getState,
         Func<SignInJourneyCoordinator, Task> action)
     {
         var journeyHelper = HostFixture.Services.GetRequiredService<JourneyHelper>();
@@ -61,11 +62,23 @@ public abstract class TestBase
         SignInJourneyState state;
         List<string> pathUrls = new();
 
-        var signInJourneyCoordinator = journeyHelper.CreateInstance(
+        var signInJourneyCoordinator = await journeyHelper.CreateInstanceAsync(
             new RouteValueDictionary(),
-            instanceId =>
+            async instanceId =>
             {
-                state = getState(instanceId);
+                var process = await TestData.CreateProcessAsync(
+                    ProcessType.TeacherSigningIn,
+                    events: [
+                        new AuthorizeAccessRequestStartedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            JourneyInstanceId = instanceId.ToString(),
+                            ApplicationUserId = Guid.Empty,
+                            ClientId = string.Empty
+                        }
+                    ]);
+
+                state = getState(instanceId, process.ProcessId);
                 pathUrls.Add(state.RedirectUri);
                 return state;
             },
@@ -136,18 +149,20 @@ public abstract class TestBase
             user.VerifiedNames?.First().Last(),
             user.VerifiedDatesOfBirth?.First());
 
-    protected SignInJourneyState CreateNewState(
+    protected SignInJourneyState CreateSignInJourneyState(
         JourneyInstanceId journeyInstanceId,
+        Guid processId,
         IdTrnToken? trnToken,
         string redirectUri = "/",
         Guid clientApplicationUserId = default) =>
-        CreateNewState(journeyInstanceId, redirectUri, clientApplicationUserId, trnToken?.TrnToken, trnToken?.Trn);
+        CreateSignInJourneyState(journeyInstanceId, processId, redirectUri, clientApplicationUserId, trnToken?.TrnToken, trnToken?.Trn);
 
-    protected SignInJourneyState CreateNewState(JourneyInstanceId journeyInstanceId) =>
-        CreateNewState(journeyInstanceId, "/");
+    protected SignInJourneyState CreateSignInJourneyState(JourneyInstanceId journeyInstanceId, Guid processId) =>
+        CreateSignInJourneyState(journeyInstanceId, processId, "/");
 
-    protected SignInJourneyState CreateNewState(
+    protected SignInJourneyState CreateSignInJourneyState(
         JourneyInstanceId journeyInstanceId,
+        Guid processId,
         string redirectUriBase,
         Guid clientApplicationUserId = default,
         string? trnToken = null,
@@ -156,6 +171,7 @@ public abstract class TestBase
         var redirectUri = journeyInstanceId.EnsureUrlHasKey(redirectUriBase);
 
         return new(
+            processId,
             redirectUri,
             serviceName: "Test Service",
             serviceUrl: "https://service",

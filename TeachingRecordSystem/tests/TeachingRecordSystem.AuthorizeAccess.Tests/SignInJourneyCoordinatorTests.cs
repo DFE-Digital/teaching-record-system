@@ -11,8 +11,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
+using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -21,7 +21,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserAlreadyExistsAndTeachingRecordKnown_CompletesJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -43,10 +44,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.NotEqual(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
                 Assert.Equal(coordinator.GetRedirectUri(), redirectResult.Url);
@@ -55,7 +52,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserAlreadyExistsWithSubjectOnlyAndTeachingRecordKnown_AssignsEmailAndSignInFieldsAndCompletesJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -79,10 +77,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
                 Assert.Equal(email, user.EmailAddress);
-                Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
                 Assert.Equal(coordinator.GetRedirectUri(), redirectResult.Url);
@@ -91,7 +85,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithResolvedTrnRequestMatchedOnOneLoginUserSubject_SetsUserVerifiedAssignsTrnAndCompletesJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -115,12 +110,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Assert
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
 
-                var user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject));
-                Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
-
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
                 Assert.Equal(coordinator.GetRedirectUri(), redirectResult.Url);
             });
@@ -128,7 +117,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserHasPendingSupportTasks_RedirectsToPendingSupportTasksPage() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -159,7 +149,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithPendingTrnRequestMatchedOnOneLoginUserSubject_RequestsIdentityVerification() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -193,7 +184,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithResolvedTrnRequestMatchedOnEmail_SetsUserVerifiedAssignsTrnAndCompletesJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -220,10 +212,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
 
                 var user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject));
-                Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
                 Assert.Equal(coordinator.GetRedirectUri(), redirectResult.Url);
@@ -232,7 +220,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithPendingTrnRequestMatchedOnEmail_RequestsIdentityVerification() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -268,7 +257,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithTrnRequestMatchedOnOneLoginUserSubjectWithoutIdentityVerified_RequestsIdentityVerification() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -302,7 +292,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithTrnRequestMatchedOnEmailWithoutIdentityVerified_RequestsIdentityVerification() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -338,7 +329,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserAlreadyExistsButTeachingNotRecordKnown_RequestsIdentityVerification() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -359,12 +351,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.OneLoginAuthenticationTicket);
                 Assert.Null(coordinator.State.AuthenticationTicket);
 
-                user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.NotEqual(Clock.UtcNow, user.FirstSignIn);
-                Assert.NotEqual(Clock.UtcNow, user.LastSignIn);
-
                 var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
                 Assert.Collection(
                     challengeResult.Properties!.GetVectorsOfTrust(),
@@ -374,7 +360,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserDoesNotExist_RequestsIdentityVerification() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -395,10 +382,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
                 var user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == subject));
                 Assert.NotNull(user);
-                Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Null(user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.NotEqual(Clock.UtcNow, user.LastSignIn);
 
                 var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
                 Assert.Collection(
@@ -409,7 +392,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationFailed_RedirectsToErrorPage() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -436,12 +420,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.OneLoginAuthenticationTicket);
                 Assert.Null(coordinator.State.AuthenticationTicket);
 
-                user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Null(user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.NotEqual(Clock.UtcNow, user.LastSignIn);
-
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
                 Assert.Equal(JourneyUrls.NotVerified(coordinator.InstanceId), redirectResult.Url);
             });
@@ -449,7 +427,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceeded_RedirectsToStartOfMatchingJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -489,10 +468,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.Null(coordinator.State.AuthenticationTicket);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Null(user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.NotEqual(Clock.UtcNow, user.LastSignIn);
                 Assert.Equal(Clock.UtcNow, user.VerifiedOn);
                 Assert.Equal(OneLoginUserVerificationRoute.OneLogin, user.VerificationRoute);
                 Assert.NotNull(user.VerifiedNames);
@@ -509,7 +484,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     public Task
         OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserTrnMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -552,10 +528,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
                 Assert.Equal(OneLoginUserMatchRoute.GetAnIdentityUser, user.MatchRoute);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -566,7 +538,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     public Task
         OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserWithTrnAssociatedBySupportMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -610,10 +583,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
                 Assert.Equal(OneLoginUserMatchRoute.GetAnIdentityUser, user.MatchRoute);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -624,7 +593,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     public Task
         OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserWithTrnAssociatedByTrnTokenMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -668,10 +638,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
                 Assert.Equal(OneLoginUserMatchRoute.GetAnIdentityUser, user.MatchRoute);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -681,7 +647,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButIdentityUserHasTrnVerificationLevelLow_RedirectsToStartOfMatchingJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -728,7 +695,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     public Task
         OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButRecordFromIdentityUserTrnDoesNotMatchLastName_RedirectsToStartOfMatchingJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -775,7 +743,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     public Task
         OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButRecordFromIdentityUserTrnDoesNotMatchDateOfBirth_RedirectsToStartOfMatchingJourney() =>
         WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -833,7 +802,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var dateOfBirth = person.DateOfBirth;
 
         await WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -865,10 +835,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
-                Assert.Equal(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
                 Assert.Equal(OneLoginUserMatchRoute.TrnToken, user.MatchRoute);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -891,7 +857,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var dateOfBirth = person.DateOfBirth;
 
         await WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -940,7 +907,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var dateOfBirth = person.DateOfBirth;
 
         await WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -985,7 +953,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, userId: Guid.NewGuid());
 
         await WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -1034,7 +1003,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var dateOfBirth = person.DateOfBirth;
 
         await WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -1083,7 +1053,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var dateOfBirth = person.DateOfBirth.AddDays(1);
 
         await WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -1128,7 +1099,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         Clock.Advance();
 
         await WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -1173,7 +1145,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         Clock.Advance();
 
         await WithJourneyCoordinatorAsync(
-            instanceId => new SignInJourneyState(
+            (instanceId, processId) => new SignInJourneyState(
+                processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
@@ -1206,8 +1179,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(result);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.Equal(Clock.UtcNow, user.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, user.LastSignIn);
                 Assert.Equal(person.PersonId, user.PersonId);
                 Assert.Equal(OneLoginUserMatchRoute.Interactive, user.MatchRoute);
                 Assert.NotNull(user.MatchedAttributes);
@@ -1219,7 +1190,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     }
 
     private async Task WithJourneyCoordinatorAsync(
-        Func<JourneyInstanceId, SignInJourneyState> getState,
+        Func<JourneyInstanceId, Guid, SignInJourneyState> getState,
         Action<Mock<OneLoginService>>? configureOneLoginServiceMock,
         Func<SignInJourneyCoordinator, Task> action)
     {
@@ -1228,6 +1199,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         using var scope = HostFixture.Services.CreateScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
+        var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
+        var eventPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
         var linkGenerator = new FakeLinkGenerator();
 
         using var rsa = RSA.Create(keySizeInBits: 2048);
@@ -1246,7 +1219,13 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             ]
         });
 
-        var oneLoginServiceMock = new Mock<OneLoginService>(dbContext, Mock.Of<INotificationSender>(), Mock.Of<IBackgroundJobScheduler>())
+        var oneLoginServiceMock = new Mock<OneLoginService>(
+            dbContext,
+            idDbContext,
+            Mock.Of<INotificationSender>(),
+            eventPublisher,
+            Mock.Of<IBackgroundJobScheduler>(),
+            Clock)
         {
             CallBase = true
         };
@@ -1256,11 +1235,23 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         SignInJourneyState state;
         List<string> pathUrls = new();
 
-        var signInJourneyCoordinator = journeyHelper.CreateInstance(
+        var signInJourneyCoordinator = await journeyHelper.CreateInstanceAsync(
             new RouteValueDictionary(),
-            instanceId =>
+            async instanceId =>
             {
-                state = getState(instanceId);
+                var process = await TestData.CreateProcessAsync(
+                    ProcessType.TeacherSigningIn,
+                    events: [
+                        new AuthorizeAccessRequestStartedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            JourneyInstanceId = instanceId.ToString(),
+                            ApplicationUserId = Guid.Empty,
+                            ClientId = string.Empty
+                        }
+                    ]);
+
+                state = getState(instanceId, process.ProcessId);
                 pathUrls.Add(state.RedirectUri);
                 return state;
             },

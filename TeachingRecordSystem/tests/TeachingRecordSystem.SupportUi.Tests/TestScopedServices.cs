@@ -20,7 +20,7 @@ public class TestScopedServices
         Clock = new();
         AzureActiveDirectoryUserServiceMock = new();
         EventObserver = new();
-        Events = new();
+        Events = new(Clock);
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         BlobStorageFileServiceMock = new();
         BlobStorageFileServiceMock

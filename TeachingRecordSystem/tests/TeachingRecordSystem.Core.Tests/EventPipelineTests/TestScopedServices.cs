@@ -11,7 +11,7 @@ public class TestScopedServices
     public TestScopedServices()
     {
         Clock = new();
-        Events = new();
+        Events = new(Clock);
         LegacyEventObserver = new();
     }
 

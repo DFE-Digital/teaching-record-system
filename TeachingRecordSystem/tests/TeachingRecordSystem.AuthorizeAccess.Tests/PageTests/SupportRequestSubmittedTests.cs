@@ -9,7 +9,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
     [Fact]
     public Task Get_ValidRequest_ReturnsExpectedContent() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange

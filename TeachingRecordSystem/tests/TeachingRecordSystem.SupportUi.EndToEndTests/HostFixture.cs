@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.EndToEndTests;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -66,6 +67,10 @@ public sealed class HostFixture : InitializeDbFixture
 
                 builder.ConfigureServices((context, services) =>
                 {
+                    services.AddDbContext<IdDbContext>(
+                        options => options.UseInMemoryDatabase("TeacherAuthId"),
+                        contextLifetime: ServiceLifetime.Transient);
+
                     services.Configure<GovUkFrontendOptions>(options => options.DefaultFileUploadJavaScriptEnhancements = false);
 
                     services.AddAuthentication()

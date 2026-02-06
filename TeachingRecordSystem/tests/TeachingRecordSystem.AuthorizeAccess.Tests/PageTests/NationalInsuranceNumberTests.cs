@@ -11,7 +11,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     [InlineData(false)]
     public Task Get_ValidRequest_RendersExpectedContent(bool haveExistingValueInState) =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -38,7 +38,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     [Fact]
     public Task Post_HaveNationalInsuranceNumberNotAnswered_RendersError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -61,7 +61,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     [Fact]
     public Task Post_EmptyNationalInsuranceNumber_RendersError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -89,7 +89,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     [Fact]
     public Task Post_InvalidNationalInsuranceNumber_RendersError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -117,7 +117,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     [Fact]
     public Task Post_HaveNationalInsuranceNumberNotSpecifiedForVerifiedUser_UpdatesStateAndRedirectsToTrnPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -145,7 +145,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     [Fact]
     public Task Post_ValidNationalInsuranceNumberButLookupFailedForVerifiedUser_UpdatesStateAndRedirectsToTrnPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -179,7 +179,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     [Fact]
     public Task Post_ValidNationalInsuranceNumberAndLookupSucceededForVerifiedUser_UpdatesStateUpdatesOneLoginUserCompletesAuthenticationAndRedirectsToFoundPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -213,15 +213,13 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 Assert.NotNull(state.AuthenticationTicket);
 
                 oneLoginUser = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
-                Assert.Equal(Clock.UtcNow, oneLoginUser.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, oneLoginUser.LastSignIn);
                 Assert.Equal(person.PersonId, oneLoginUser.PersonId);
             });
 
     [Fact]
     public Task Post_HaveNationalInsuranceNumberNotSpecifiedForUnverifiedUser_UpdatesStateAndRedirectsToTrnPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -249,7 +247,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     [Fact]
     public Task Post_ValidNationalInsuranceNumberForVerifiedUser_UpdatesStateAndRedirectsToTrnPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange

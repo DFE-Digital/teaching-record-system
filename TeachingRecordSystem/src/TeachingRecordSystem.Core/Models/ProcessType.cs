@@ -18,7 +18,6 @@ public enum ProcessType
     ApiTrnRequestCreating = 14,
     NpqTrnRequestTaskCreating = 15,
     ApiTrnRequestResolving = 16,
-    ConnectOneLoginUserSupportTaskCreating = 17,
     NpqTrnRequestApproving = 18,
     NpqTrnRequestRejecting = 19,
     TrnRequestManualChecksNeededTaskCompleting = 20,
@@ -36,5 +35,5 @@ public enum ProcessType
     OneLoginUserIdVerificationSupportTaskSaving = 32,
     OneLoginUserRecordMatchingSupportTaskSaving = 33,
     OneLoginUserRecordMatchingSupportTaskCompleting = 34,
-    OneLoginUserIdVerificationSupportTaskCreating = 35
+    TeacherSigningIn = 36
 }

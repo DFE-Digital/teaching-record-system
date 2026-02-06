@@ -10,7 +10,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public Task Get_ValidRequest_ReturnsExpectedContent(bool haveExistingValueInState) =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -49,7 +49,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_InvalidRequest_ShowsExpectedError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -77,7 +77,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_ValidRequest_UpdatesStateAndRedirectsToNationalInsuranceNumberPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
