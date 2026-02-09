@@ -144,7 +144,7 @@ public class MandatoryQualificationProvider
         },
         new MandatoryQualificationProvider()
         {
-            MandatoryQualificationProviderId = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
+            MandatoryQualificationProviderId = new Guid("6f72db90-2936-4629-bba6-b9d57841eb43"),
             Name = "Seashell Trust"
         }
     ];
