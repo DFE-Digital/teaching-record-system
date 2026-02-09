@@ -19,6 +19,17 @@
           "Microsoft.Extensions.Hosting": "10.0.2"
         }
       },
+      "Microsoft.EntityFrameworkCore.InMemory": {
+        "type": "Direct",
+        "requested": "[10.0.2, )",
+        "resolved": "10.0.2",
+        "contentHash": "tW3LlDffLljRCGG6w7D1Uz8eI7r+uZ/prpCKutlp+ZILTjxHmkYGYQg+veBbjZ1nZe5vpIr3Z51qMF6rlmdX5A==",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "10.0.2",
+          "Microsoft.Extensions.Caching.Memory": "10.0.2",
+          "Microsoft.Extensions.Logging": "10.0.2"
+        }
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[18.0.0, )",

@@ -10,7 +10,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public Task Get_ValidRequest_ReturnsExpectedContent(bool haveExistingValueInState) =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -42,7 +42,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("John", "", "LastName", "Enter your last name")]
     public Task Post_InvalidRequest_ShowsExpectedError(string firstName, string lastName, string expectedErrorFieldName, string expectedErrorMessage) =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -69,7 +69,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_ValidRequest_UpdatesStateAndRedirectsToDateOfBirthPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange

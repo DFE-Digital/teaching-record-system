@@ -3,7 +3,7 @@ using Xunit.Sdk;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class EventCapture : IEventHandler
+public class EventCapture(IClock clock) : IEventHandler
 {
     private readonly Dictionary<Guid, ProcessAndEvents> _processes = [];
 
@@ -26,14 +26,14 @@ public class EventCapture : IEventHandler
             _processes.Add(processContext.ProcessId, processAndEvents);
         }
 
-        processAndEvents.AddEvent(@event);
+        processAndEvents.AddEvent(@event, clock.UtcNow);
 
         return Task.CompletedTask;
     }
 
     public record ProcessAndEvents
     {
-        private readonly List<IEvent> _events;
+        private readonly List<(IEvent Event, DateTime PublishedOn)> _events;
 
         public ProcessAndEvents(ProcessContext processContext)
         {
@@ -43,13 +43,18 @@ public class EventCapture : IEventHandler
 
         public ProcessContext ProcessContext { get; }
 
-        public IReadOnlyCollection<IEvent> Events => _events.AsReadOnly();
+        public IReadOnlyCollection<IEvent> Events =>
+            _events
+                .OrderBy(t => t.PublishedOn)
+                .ThenBy(t => t.Event.GetType().Name)
+                .Select(t => t.Event)
+                .AsReadOnly();
 
-        internal void AddEvent(IEvent @event) => _events.Add(@event);
+        internal void AddEvent(IEvent @event, DateTime publishedOn) => _events.Add((@event, publishedOn));
 
         public void AssertProcessHasEvent<TEvent>(Action<TEvent>? inspector = null) where TEvent : IEvent
         {
-            var events = _events.OfType<TEvent>().ToArray();
+            var events = _events.Select(t => t.Event).OfType<TEvent>().ToArray();
 
             if (events.Length == 0)
             {

@@ -2,13 +2,18 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyCoordinator.JourneyName)]
-public class CheckAnswersModel(SignInJourneyCoordinator coordinator, OneLoginUserMatchingSupportTaskService oneLoginUserMatchingSupportTaskService, IClock clock) : PageModel
+public class CheckAnswersModel(
+    SignInJourneyCoordinator coordinator,
+    OneLoginUserMatchingSupportTaskService oneLoginUserMatchingSupportTaskService,
+    TrsDbContext dbContext,
+    IClock clock) : PageModel
 {
     public bool IdentityVerified => coordinator.State.IdentityVerified;
 
@@ -35,15 +40,12 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, OneLoginUse
         var subject = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
         var email = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
 
+        var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, clock.UtcNow);
+
         SupportTask supportTask;
 
         if (IdentityVerified)
         {
-            var processContext = new ProcessContext(
-                ProcessType.ConnectOneLoginUserSupportTaskCreating,
-                clock.UtcNow,
-                SystemUser.SystemUserId);
-
             supportTask = await oneLoginUserMatchingSupportTaskService.CreateRecordMatchingSupportTaskAsync(
                 new CreateOneLoginUserRecordMatchingSupportTaskOptions
                 {
@@ -60,11 +62,6 @@ public class CheckAnswersModel(SignInJourneyCoordinator coordinator, OneLoginUse
         }
         else
         {
-            var processContext = new ProcessContext(
-                ProcessType.OneLoginUserIdVerificationSupportTaskCreating,
-                clock.UtcNow,
-                SystemUser.SystemUserId);
-
             supportTask = await oneLoginUserMatchingSupportTaskService.CreateVerificationSupportTaskAsync(
                 new CreateOneLoginUserIdVerificationSupportTaskOptions
                 {

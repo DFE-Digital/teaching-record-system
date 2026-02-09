@@ -21,6 +21,7 @@ using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.Filters;
 using TeachingRecordSystem.WebCommon.FormFlow;
@@ -180,10 +181,14 @@ public static class Extensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        if (environment.IsProduction())
+        {
+            services.AddIdDbContext(configuration);
+        }
+
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
             services
-                .AddDbContext<IdDbContext>(options => options.UseNpgsql(configuration.GetRequiredConnectionString("Id")))
                 .AddIdentityApi(configuration);
 
             services

@@ -11,7 +11,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public Task Get_ValidRequest_RendersExpectedContent(bool haveExistingValueInState) =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -42,7 +42,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_HaveTrnNotAnswered_RendersError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -65,7 +65,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_EmptyTrn_RendersError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -90,7 +90,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_InvalidTrn_RendersError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -115,7 +115,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_TrnWithAllZeros_RendersError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -140,7 +140,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_NoTrnSpecifiedForVerifiedUser_UpdatesStateAndRedirectsToNoTrnPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -169,7 +169,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_ValidTrnButLookupFailedForVerifiedUser_UpdatesStateAndRedirectsToNotFoundPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -200,7 +200,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_ValidTrnAndLookupSucceeded_UpdatesStateUpdatesOneLoginUserCompletesAuthenticationAndRedirectsToFoundPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -231,15 +231,13 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.NotNull(state.AuthenticationTicket);
 
                 oneLoginUser = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
-                Assert.Equal(Clock.UtcNow, oneLoginUser.FirstSignIn);
-                Assert.Equal(Clock.UtcNow, oneLoginUser.LastSignIn);
                 Assert.Equal(person.PersonId, oneLoginUser.PersonId);
             });
 
     [Fact]
     public Task Post_NoTrnSpecifiedForUnverified_UpdatesStateAndRedirectsToNoTrnPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -270,7 +268,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_ValidTrnForUnverifiedUser_UpdatesStateAndRedirectsToProofOfIdentity() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange

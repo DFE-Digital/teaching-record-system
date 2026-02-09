@@ -113,8 +113,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Assert.Collection(emails, e => Assert.Equal(EmailTemplateIds.OneLoginNotVerified, e.TemplateId));
 
         Events.AssertEventsPublished(
-            e => Assert.IsType<SupportTaskUpdatedEvent>(e),
-            e => Assert.IsType<EmailSentEvent>(e));
+            e => Assert.IsType<EmailSentEvent>(e),
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
 
     [Theory]
@@ -226,7 +226,9 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Assert.Null(updatedOneLoginUser.MatchRoute);
         Assert.Null(updatedOneLoginUser.MatchedAttributes);
 
-        Events.AssertEventsPublished(e => Assert.IsType<SupportTaskUpdatedEvent>(e));
+        Events.AssertEventsPublished(
+            e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
 
     [Fact]
@@ -275,8 +277,9 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Assert.Collection(emails, e => Assert.Equal(EmailTemplateIds.OneLoginCannotFindRecord, e.TemplateId));
 
         Events.AssertEventsPublished(
-            e => Assert.IsType<SupportTaskUpdatedEvent>(e),
-            e => Assert.IsType<EmailSentEvent>(e));
+            e => Assert.IsType<EmailSentEvent>(e),
+            e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
 
     [Fact]
@@ -342,8 +345,9 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Assert.Collection(emails, e => Assert.Equal(EmailTemplateIds.OneLoginRecordMatched, e.TemplateId));
 
         Events.AssertEventsPublished(
-            e => Assert.IsType<SupportTaskUpdatedEvent>(e),
-            e => Assert.IsType<EmailSentEvent>(e));
+            e => Assert.IsType<EmailSentEvent>(e),
+            e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
 
     private Task WithServiceAsync(Func<OneLoginUserMatchingSupportTaskService, Task> action, params object[] arguments) =>

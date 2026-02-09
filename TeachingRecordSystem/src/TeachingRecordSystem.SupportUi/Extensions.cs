@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
@@ -107,7 +108,8 @@ public static class Extensions
         {
             services
                 .AddStartupTask<ReferenceDataCache>()
-                .AddRedis(configuration);
+                .AddRedis(configuration)
+                .AddIdDbContext(configuration);
         }
 
         if (environment.IsDevelopment())

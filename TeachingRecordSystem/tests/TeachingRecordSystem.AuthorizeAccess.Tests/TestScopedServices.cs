@@ -12,7 +12,7 @@ public class TestScopedServices
     public TestScopedServices(IServiceProvider serviceProvider)
     {
         Clock = new();
-        Events = new();
+        Events = new(Clock);
         LegacyEventObserver = new();
         GetAnIdentityApiClient = new();
         BlobStorageFileService = new();

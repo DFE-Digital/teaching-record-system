@@ -80,7 +80,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 OneLoginUserSubject = supportTask.OneLoginUserSubject!,
                 VerificationRoute = OneLoginUserVerificationRoute.Support,
                 VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
+                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]],
+                CoreIdentityClaimVc = null
             },
             processContext);
 
@@ -117,7 +118,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 OneLoginUserSubject = supportTask.OneLoginUserSubject!,
                 VerificationRoute = OneLoginUserVerificationRoute.Support,
                 VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
+                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]],
+                CoreIdentityClaimVc = null
             },
             processContext);
 
@@ -146,20 +148,14 @@ public partial class OneLoginUserMatchingSupportTaskService
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        await oneLoginService.SetUserVerifiedAsync(
-            new SetUserVerifiedOptions
+        await oneLoginService.SetUserVerifiedAndMatchedAsync(
+            new SetUserVerifiedAndMatchedOptions
             {
                 OneLoginUserSubject = supportTask.OneLoginUserSubject!,
                 VerificationRoute = OneLoginUserVerificationRoute.Support,
                 VerifiedDatesOfBirth = [data.StatedDateOfBirth],
-                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]]
-            },
-            processContext);
-
-        await oneLoginService.SetUserMatchedAsync(
-            new SetUserMatchedOptions
-            {
-                OneLoginUserSubject = supportTask.OneLoginUserSubject!,
+                VerifiedNames = [[data.StatedFirstName, data.StatedLastName]],
+                CoreIdentityClaimVc = null,
                 MatchedPersonId = options.MatchedPersonId,
                 MatchRoute = OneLoginUserMatchRoute.SupportUi,
                 MatchedAttributes = options.MatchedAttributes

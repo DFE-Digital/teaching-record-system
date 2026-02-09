@@ -8,7 +8,7 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Get_ValidRequest_ReturnsExpectedContent() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -28,7 +28,7 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_RedirectsToNamePage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange

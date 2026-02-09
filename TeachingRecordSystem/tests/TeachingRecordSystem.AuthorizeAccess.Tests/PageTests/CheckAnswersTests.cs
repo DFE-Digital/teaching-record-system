@@ -10,7 +10,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Get_ValidRequestForVerifiedUser_RendersExpectedContent() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -35,7 +35,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Get_ValidRequestForUnverifiedUser_RendersExpectedContent() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -83,7 +83,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true);
 
         await WithJourneyCoordinatorAsync(
-            id => CreateNewState(id, trnToken: trnToken, clientApplicationUserId: applicationUser.UserId),
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, trnToken: trnToken, clientApplicationUserId: applicationUser.UserId),
             async coordinator =>
             {
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
@@ -148,7 +148,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 Events.AssertProcessesCreated(p =>
                 {
-                    Assert.Equal(ProcessType.ConnectOneLoginUserSupportTaskCreating, p.ProcessContext.ProcessType);
+                    Assert.Equal(ProcessType.TeacherSigningIn, p.ProcessContext.ProcessType);
                     p.AssertProcessHasEvent<SupportTaskCreatedEvent>();
                 });
             });
@@ -163,7 +163,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true);
 
         await WithJourneyCoordinatorAsync(
-            id => CreateNewState(id, trnToken: trnToken, clientApplicationUserId: applicationUser.UserId),
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, trnToken: trnToken, clientApplicationUserId: applicationUser.UserId),
             async coordinator =>
             {
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -246,7 +246,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 Events.AssertProcessesCreated(p =>
                 {
-                    Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCreating, p.ProcessContext.ProcessType);
+                    Assert.Equal(ProcessType.TeacherSigningIn, p.ProcessContext.ProcessType);
                     p.AssertProcessHasEvent<SupportTaskCreatedEvent>();
                 });
             });

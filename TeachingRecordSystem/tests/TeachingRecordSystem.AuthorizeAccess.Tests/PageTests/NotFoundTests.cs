@@ -8,7 +8,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Get_ValidRequest_RendersExpectedContent() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -34,7 +34,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public Task Post_ValidRequest_RedirectsToCheckAnswersPage() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange

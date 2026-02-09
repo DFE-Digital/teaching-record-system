@@ -124,8 +124,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.Collection(emails, e => Assert.Equal(EmailTemplateIds.OneLoginCannotFindRecord, e.TemplateId));
 
         Events.AssertEventsPublished(
-            e => Assert.IsType<SupportTaskUpdatedEvent>(e),
-            e => Assert.IsType<EmailSentEvent>(e));
+            e => Assert.IsType<EmailSentEvent>(e),
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
 
     [Fact]
@@ -180,7 +180,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.Collection(emails, e => Assert.Equal(EmailTemplateIds.OneLoginRecordMatched, e.TemplateId));
 
         Events.AssertEventsPublished(
-            e => Assert.IsType<SupportTaskUpdatedEvent>(e),
-            e => Assert.IsType<EmailSentEvent>(e));
+            e => Assert.IsType<EmailSentEvent>(e),
+            e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
 }

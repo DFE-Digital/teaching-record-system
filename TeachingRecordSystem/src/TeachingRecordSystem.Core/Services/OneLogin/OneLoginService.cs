@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Transactions;
 using Npgsql;
 using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -5,14 +7,22 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Notify;
+using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 
 namespace TeachingRecordSystem.Core.Services.OneLogin;
 
 public class OneLoginService(
     TrsDbContext dbContext,
+    IdDbContext idDbContext,
     INotificationSender notificationSender,
-    IBackgroundJobScheduler backgroundJobScheduler)
+    IEventPublisher eventPublisher,
+    IBackgroundJobScheduler backgroundJobScheduler,
+    IClock clock)
 {
+    // ID's database has a user_id column to indicate that a TRN token has been used already.
+    // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
+    private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
+
     public Task<string> GetRecordNotFoundEmailContentAsync(string personName)
     {
         return notificationSender.RenderEmailTemplateAsync(
@@ -82,16 +92,28 @@ public class OneLoginService(
             throw new InvalidOperationException("User is already verified.");
         }
 
+        var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+
         user.SetVerified(
             processContext.Now,
             options.VerificationRoute,
             verifiedByApplicationUserId: null,
             options.VerifiedNames,
-            options.VerifiedDatesOfBirth);
+            options.VerifiedDatesOfBirth,
+            options.CoreIdentityClaimVc);
 
         await dbContext.SaveChangesAsync();
 
-        // TODO Emit an event when we've figured out what they should look like
+        var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+        var updatedEvent = new OneLoginUserUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            OneLoginUser = oneLoginUserEventModel,
+            OldOneLoginUser = oneLoginUserEventModel,
+            Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
+        };
+
+        await eventPublisher.PublishEventAsync(updatedEvent, processContext);
     }
 
     public async Task SetUserMatchedAsync(SetUserMatchedOptions options, ProcessContext processContext)
@@ -103,11 +125,130 @@ public class OneLoginService(
             throw new InvalidOperationException("User must be verified.");
         }
 
+        var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+
         user.SetMatched(processContext.Now, options.MatchedPersonId, options.MatchRoute, options.MatchedAttributes);
 
         await dbContext.SaveChangesAsync();
 
-        // TODO Emit an event when we've figured out what they should look like
+        var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+        var updatedEvent = new OneLoginUserUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            OneLoginUser = oneLoginUserEventModel,
+            OldOneLoginUser = oneLoginUserEventModel,
+            Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
+        };
+
+        await eventPublisher.PublishEventAsync(updatedEvent, processContext);
+    }
+
+    public async Task SetUserVerifiedAndMatchedAsync(SetUserVerifiedAndMatchedOptions options, ProcessContext processContext)
+    {
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject);
+
+        if (user.VerifiedOn is not null)
+        {
+            throw new InvalidOperationException("User is already verified.");
+        }
+
+        var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+
+        user.SetVerified(
+            processContext.Now,
+            options.VerificationRoute,
+            verifiedByApplicationUserId: null,
+            options.VerifiedNames,
+            options.VerifiedDatesOfBirth,
+            options.CoreIdentityClaimVc);
+
+        user.SetMatched(processContext.Now, options.MatchedPersonId, options.MatchRoute, options.MatchedAttributes);
+
+        await dbContext.SaveChangesAsync();
+
+        var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+        var updatedEvent = new OneLoginUserUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            OneLoginUser = oneLoginUserEventModel,
+            OldOneLoginUser = oneLoginUserEventModel,
+            Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
+        };
+
+        await eventPublisher.PublishEventAsync(updatedEvent, processContext);
+    }
+
+    public async Task<FindTeacherIdentityUserResult?> FindTeacherIdentityUserAsync(
+        IEnumerable<string[]> verifiedNames,
+        IEnumerable<DateOnly> verifiedDatesOfBirth,
+        string? trnToken,
+        string emailAddress)
+    {
+        Person? getAnIdentityPerson = null;
+        OneLoginUserMatchRoute? matchRoute = null;
+        IdTrnToken? trnTokenModel = null;
+
+        // First try and match on TRN Token
+        if (trnToken is not null)
+        {
+            trnTokenModel = await WithIdDbContextAsync(c => c.TrnTokens.SingleOrDefaultAsync(
+                t => t.TrnToken == trnToken && t.ExpiresUtc > clock.UtcNow && t.UserId == null));
+            if (trnTokenModel is not null)
+            {
+                getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == trnTokenModel.Trn);
+                matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.TrnToken : null;
+            }
+        }
+
+        // Couldn't match on TRN Token, try and match on email and TRN
+        if (getAnIdentityPerson is null)
+        {
+            var identityUser = await WithIdDbContextAsync(c => c.Users.SingleOrDefaultAsync(
+                u => u.EmailAddress == emailAddress
+                    && u.Trn != null
+                    && u.IsDeleted == false
+                    && (u.TrnVerificationLevel == TrnVerificationLevel.Medium
+                        || u.TrnAssociationSource == TrnAssociationSource.TrnToken
+                        || u.TrnAssociationSource == TrnAssociationSource.SupportUi)));
+            if (identityUser is not null)
+            {
+                getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == identityUser.Trn);
+                matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.GetAnIdentityUser : null;
+            }
+        }
+
+        if (getAnIdentityPerson is null)
+        {
+            return null;
+        }
+
+        // Check the record's last name and DOB match the verified details
+        var matchedLastName = verifiedNames.Select(parts => parts.Last()).FirstOrDefault(name => name.Equals(getAnIdentityPerson.LastName, StringComparison.OrdinalIgnoreCase));
+        var matchedDateOfBirth = verifiedDatesOfBirth.FirstOrDefault(dob => dob == getAnIdentityPerson.DateOfBirth);
+        if (matchedLastName == default || matchedDateOfBirth == default)
+        {
+            return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: null, MatchedAttributes: null);
+        }
+        var matchedAttributes = new Dictionary<PersonMatchedAttribute, string>()
+        {
+            { PersonMatchedAttribute.LastName, matchedLastName },
+            { PersonMatchedAttribute.DateOfBirth, matchedDateOfBirth.ToString("yyyy-MM-dd") }
+        };
+
+        if (trnTokenModel is not null)
+        {
+            // Invalidate the token
+            trnTokenModel.UserId = _teacherAuthIdUserIdSentinel;
+            await WithIdDbContextAsync(c => c.SaveChangesAsync());
+        }
+
+        return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: matchRoute, matchedAttributes);
+
+        async Task<T> WithIdDbContextAsync<T>(Func<IdDbContext, Task<T>> action)
+        {
+            using var sc = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
+            return await action(idDbContext);
+        }
     }
 
     private static IReadOnlyDictionary<string, string> GetOneLoginCannotFindRecordEmailPersonalization(string personName) =>
@@ -267,8 +408,130 @@ public class OneLoginService(
         return task?.SupportTaskReference;
     }
 
+    public async Task<OneLoginUser> OnSignInAsync(string sub, string email, ProcessContext processContext)
+    {
+        EventModels.OneLoginUser? oldOneLoginUserEventModel;
+
+        var oneLoginUser = await dbContext.OneLoginUsers
+            .Include(u => u.Person)
+            .SingleOrDefaultAsync(u => u.Subject == sub);
+
+        if (oneLoginUser is null)
+        {
+            oldOneLoginUserEventModel = null;
+
+            oneLoginUser = new()
+            {
+                Subject = sub,
+                EmailAddress = email
+            };
+            dbContext.OneLoginUsers.Add(oneLoginUser);
+        }
+        else
+        {
+            oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(oneLoginUser);
+
+            oneLoginUser.EmailAddress = email;
+        }
+
+        if (oneLoginUser.PersonId is null)
+        {
+            await TryMatchToTrnRequestAsync(oneLoginUser, processContext);
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(
+            new OneLoginUserSignedInEvent
+            {
+                EventId = Guid.NewGuid(),
+                Subject = oneLoginUser.Subject
+            },
+            processContext);
+
+        var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(oneLoginUser);
+
+        if (oldOneLoginUserEventModel is null)
+        {
+            await eventPublisher.PublishEventAsync(
+                new OneLoginUserCreatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OneLoginUser = oneLoginUserEventModel
+                },
+                processContext);
+        }
+        else
+        {
+            var changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel);
+
+            if (changes is not OneLoginUserUpdatedEventChanges.None)
+            {
+                await eventPublisher.PublishEventAsync(
+                    new OneLoginUserUpdatedEvent
+                    {
+                        EventId = Guid.NewGuid(),
+                        OneLoginUser = oneLoginUserEventModel,
+                        OldOneLoginUser = oldOneLoginUserEventModel,
+                        Changes = changes
+                    },
+                    processContext);
+            }
+        }
+
+        return oneLoginUser;
+    }
+
     private static string? NormalizeTrn(string? value) =>
         string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
+
+    private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser, ProcessContext processContext)
+    {
+        Debug.Assert(oneLoginUser.EmailAddress is not null);
+
+        var requestAndResolvedPerson = await dbContext.TrnRequestMetadata
+            .Join(dbContext.Persons, r => r.ResolvedPersonId, p => p.PersonId, (m, p) => new { TrnRequestMetadata = m, ResolvedPerson = p })
+            .Where(m => m.TrnRequestMetadata.OneLoginUserSubject == oneLoginUser.Subject || m.TrnRequestMetadata.EmailAddress == oneLoginUser.EmailAddress)
+            .ToArrayAsync();
+
+        if (requestAndResolvedPerson is not [{ TrnRequestMetadata: var trnRequestMetadata, ResolvedPerson: var resolvedPerson }])
+        {
+            return null;
+        }
+
+        if (trnRequestMetadata.IdentityVerified != true)
+        {
+            return null;
+        }
+
+        if (trnRequestMetadata.Status is not TrnRequestStatus.Completed)
+        {
+            return null;
+        }
+        Debug.Assert(trnRequestMetadata.ResolvedPersonId.HasValue);
+
+        oneLoginUser.SetVerified(
+            verifiedOn: trnRequestMetadata.CreatedOn,
+            route: OneLoginUserVerificationRoute.External,
+            verifiedByApplicationUserId: trnRequestMetadata.ApplicationUserId,
+            verifiedNames: [trnRequestMetadata.Name],
+            verifiedDatesOfBirth: [trnRequestMetadata.DateOfBirth],
+            coreIdentityClaimVc: null);
+
+        oneLoginUser.SetMatched(
+            processContext.Now,
+            trnRequestMetadata.ResolvedPersonId!.Value,
+            route: OneLoginUserMatchRoute.TrnRequest,
+            matchedAttributes: null);
+
+        return new(resolvedPerson.Trn);
+    }
+
+    public record FindTeacherIdentityUserResult(
+        Guid PersonId,
+        string Trn,
+        OneLoginUserMatchRoute? MatchRoute,
+        IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>? MatchedAttributes);
 
     [UsedImplicitly]
     private record SuggestionsQueryResult(
@@ -287,4 +550,6 @@ public class OneLoginService(
 
     [UsedImplicitly]
     private record MatchedAttributesQueryResult(string AttributeType, string AttributeValue);
+
+    private record TryMatchToTrnRequestResult(string Trn);
 }

@@ -17,7 +17,7 @@ public class TestScopedServices
     {
         Clock = new();
         GetAnIdentityApiClient = new();
-        Events = new();
+        Events = new(Clock);
         LegacyEventObserver = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         TrnRequestOptions = new();

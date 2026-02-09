@@ -10,7 +10,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
     [Fact]
     public Task Get_ValidRequest_RendersExpectedContent() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -31,7 +31,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
     [Fact]
     public Task Post_FileIsNotValidType_ReturnsError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -67,7 +67,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
     [Fact]
     public Task Post_FileIsLargerThan10MB_ReturnsError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -104,7 +104,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
     [Fact]
     public Task Post_FileContainsAVirus_ReturnsError() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange
@@ -148,7 +148,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
     [Fact]
     public Task Post_ValidFile_UpdatesStateAndRedirectsToProofOfIdentity() =>
         WithJourneyCoordinatorAsync(
-            CreateNewState,
+            CreateSignInJourneyState,
             async coordinator =>
             {
                 // Arrange

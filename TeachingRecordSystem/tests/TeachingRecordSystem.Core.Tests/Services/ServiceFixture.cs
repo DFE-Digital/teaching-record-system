@@ -15,6 +15,8 @@ public class ServiceFixture : ServiceProviderFixture
 {
     protected override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
+
         services
             .AddMemoryCache()
             .AddSingleton<TestData>()

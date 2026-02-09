@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Security.Claims;
-using System.Transactions;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,18 +8,15 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
 [JourneyCoordinator(JourneyName, routeValueKeys: [])]
 [UsedImplicitly]
 public class SignInJourneyCoordinator(
-    TrsDbContext dbContext,
     OneLoginService oneLoginService,
-    IdDbContext idDbContext,
+    TrsDbContext dbContext,
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     IClock clock) :
@@ -33,10 +29,6 @@ public class SignInJourneyCoordinator(
         public const string AuthenticationOnly = "Cl.Cm";
         public const string AuthenticationAndIdentityVerification = "Cl.Cm.P2";
     }
-
-    // ID's database has a user_id column to indicate that a TRN token has been used already.
-    // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
-    private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
 
     public LinkHelper Links => field ??= new LinkHelper(linkGenerator, InstanceId);
 
@@ -81,50 +73,12 @@ public class SignInJourneyCoordinator(
         var sub = ticket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
         var email = ticket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
 
-        var oneLoginUser = await dbContext.OneLoginUsers
-            .Include(u => u.Person)
-            .SingleOrDefaultAsync(u => u.Subject == sub);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, clock.UtcNow);
 
-        if (oneLoginUser is null)
-        {
-            oneLoginUser = new()
-            {
-                Subject = sub,
-                EmailAddress = email,
-                FirstOneLoginSignIn = clock.UtcNow,
-                LastOneLoginSignIn = clock.UtcNow
-            };
-            dbContext.OneLoginUsers.Add(oneLoginUser);
-        }
-        else
-        {
-            oneLoginUser.FirstOneLoginSignIn ??= clock.UtcNow;
-            oneLoginUser.LastOneLoginSignIn = clock.UtcNow;
-
-            // Email may have changed since the last sign in or we may have never had it (e.g. if we got the user ID over our API).
-            // TODO Should we emit an event if it has changed?
-            oneLoginUser.EmailAddress = email;
-
-            if (oneLoginUser.PersonId is not null)
-            {
-                oneLoginUser.FirstSignIn ??= clock.UtcNow;
-                oneLoginUser.LastSignIn = clock.UtcNow;
-            }
-        }
-
-        string? trn = oneLoginUser.Person?.Trn;
-
-        if (oneLoginUser.PersonId is null &&
-            await TryMatchToTrnRequestAsync(oneLoginUser) is { } matchResult)
-        {
-            trn = matchResult.Trn;
-            oneLoginUser.FirstSignIn ??= clock.UtcNow;
-            oneLoginUser.LastSignIn = clock.UtcNow;
-        }
+        var oneLoginUser = await oneLoginService.OnSignInAsync(sub, email, processContext);
+        var trn = oneLoginUser.Person?.Trn;
 
         var pendingSupportTaskReference = await oneLoginService.GetPendingSupportTaskReferenceByUserAsync(oneLoginUser.Subject);
-
-        await dbContext.SaveChangesAsync();
 
         UpdateState(state =>
         {
@@ -166,31 +120,46 @@ public class SignInJourneyCoordinator(
         Action<SignInJourneyState>? updateState = null)
     {
         var sub = State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+        var email = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
 
-        var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == sub);
-        oneLoginUser.SetVerified(clock.UtcNow, OneLoginUserVerificationRoute.OneLogin, verifiedByApplicationUserId: null, verifiedNames, verifiedDatesOfBirth);
-        oneLoginUser.LastCoreIdentityVc = coreIdentityClaimVc;
+        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, clock.UtcNow);
+
+        await oneLoginService.SetUserVerifiedAsync(
+            new SetUserVerifiedOptions
+            {
+                OneLoginUserSubject = sub,
+                VerificationRoute = OneLoginUserVerificationRoute.OneLogin,
+                VerifiedDatesOfBirth = verifiedDatesOfBirth,
+                VerifiedNames = verifiedNames,
+                CoreIdentityClaimVc = coreIdentityClaimVc
+            },
+            processContext);
 
         string? trn = null;
         string? trnTokenTrn = null;
 
-        if (await TryMatchToIdentityUserAsync() is TryMatchToIdentityUserResult result)
+        if (await oneLoginService.FindTeacherIdentityUserAsync(verifiedNames, verifiedDatesOfBirth, State.TrnToken, email) is { } result)
         {
-            if (result.MatchRoute == OneLoginUserMatchRoute.TrnToken)
+            if (result.MatchRoute is OneLoginUserMatchRoute.TrnToken)
             {
                 trnTokenTrn = result.Trn;
             }
 
             if (result.MatchRoute is not null)
             {
-                oneLoginUser.FirstSignIn = clock.UtcNow;
-                oneLoginUser.LastSignIn = clock.UtcNow;
-                oneLoginUser.SetMatched(clock.UtcNow, result.PersonId, result.MatchRoute.Value, result.MatchedAttributes!.ToArray());
+                await oneLoginService.SetUserMatchedAsync(
+                    new SetUserMatchedOptions
+                    {
+                        OneLoginUserSubject = sub,
+                        MatchedPersonId = result.PersonId,
+                        MatchRoute = result.MatchRoute.Value,
+                        MatchedAttributes = result.MatchedAttributes!
+                    },
+                    processContext);
+
                 trn = result.Trn;
             }
         }
-
-        await dbContext.SaveChangesAsync();
 
         UpdateState(state =>
         {
@@ -206,69 +175,6 @@ public class SignInJourneyCoordinator(
                 Complete(state, trn);
             }
         });
-
-        async Task<TryMatchToIdentityUserResult?> TryMatchToIdentityUserAsync()
-        {
-            Person? getAnIdentityPerson = null;
-            OneLoginUserMatchRoute? matchRoute = null;
-            IdTrnToken? trnTokenModel = null;
-
-            // First try and match on TRN Token
-            if (State.TrnToken is string trnToken)
-            {
-                trnTokenModel = await WithIdDbContextAsync(c => c.TrnTokens.SingleOrDefaultAsync(
-                    t => t.TrnToken == trnToken && t.ExpiresUtc > clock.UtcNow && t.UserId == null));
-                if (trnTokenModel is not null)
-                {
-                    getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == trnTokenModel.Trn);
-                    matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.TrnToken : null;
-                }
-            }
-
-            // Couldn't match on TRN Token, try and match on email and TRN
-            if (getAnIdentityPerson is null)
-            {
-                var identityUser = await WithIdDbContextAsync(c => c.Users.SingleOrDefaultAsync(
-                    u => u.EmailAddress == oneLoginUser.EmailAddress
-                        && u.Trn != null
-                        && u.IsDeleted == false
-                        && (u.TrnVerificationLevel == TrnVerificationLevel.Medium
-                            || u.TrnAssociationSource == TrnAssociationSource.TrnToken
-                            || u.TrnAssociationSource == TrnAssociationSource.SupportUi)));
-                if (identityUser is not null)
-                {
-                    getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == identityUser.Trn);
-                    matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.GetAnIdentityUser : null;
-                }
-            }
-
-            if (getAnIdentityPerson is null)
-            {
-                return null;
-            }
-
-            // Check the record's last name and DOB match the verified details
-            var matchedLastName = verifiedNames.Select(parts => parts.Last()).FirstOrDefault(name => name.Equals(getAnIdentityPerson.LastName, StringComparison.OrdinalIgnoreCase));
-            var matchedDateOfBirth = verifiedDatesOfBirth.FirstOrDefault(dob => dob == getAnIdentityPerson.DateOfBirth);
-            if (matchedLastName == default || matchedDateOfBirth == default)
-            {
-                return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: null, MatchedAttributes: null);
-            }
-            var matchedAttributes = new Dictionary<PersonMatchedAttribute, string>()
-            {
-                { PersonMatchedAttribute.LastName, matchedLastName },
-                { PersonMatchedAttribute.DateOfBirth, matchedDateOfBirth.ToString("yyyy-MM-dd") }
-            };
-
-            if (trnTokenModel is not null)
-            {
-                // Invalidate the token
-                trnTokenModel.UserId = _teacherAuthIdUserIdSentinel;
-                await WithIdDbContextAsync(c => c.SaveChangesAsync());
-            }
-
-            return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: matchRoute, matchedAttributes);
-        }
     }
 
     public IResult OnVerificationFailed()
@@ -345,11 +251,17 @@ public class SignInJourneyCoordinator(
         {
             var subject = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
 
-            var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == subject);
-            oneLoginUser.FirstSignIn = clock.UtcNow;
-            oneLoginUser.LastSignIn = clock.UtcNow;
-            oneLoginUser.SetMatched(clock.UtcNow, matchedPersonId, OneLoginUserMatchRoute.Interactive, matchedAttributes.ToArray());
-            await dbContext.SaveChangesAsync();
+            var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, clock.UtcNow);
+
+            await oneLoginService.SetUserMatchedAsync(
+                new SetUserMatchedOptions
+                {
+                    OneLoginUserSubject = subject,
+                    MatchedPersonId = matchedPersonId,
+                    MatchRoute = OneLoginUserMatchRoute.Interactive,
+                    MatchedAttributes = matchedAttributes
+                },
+                processContext);
 
             UpdateState(state => Complete(state, matchedTrn));
 
@@ -375,47 +287,6 @@ public class SignInJourneyCoordinator(
         UnsafeSetPath(path);
 
         return (RedirectHttpResult)Results.Redirect(urls.Last());
-    }
-
-    private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser)
-    {
-        Debug.Assert(oneLoginUser.EmailAddress is not null);
-
-        var requestAndResolvedPerson = await dbContext.TrnRequestMetadata
-            .Join(dbContext.Persons, r => r.ResolvedPersonId, p => p.PersonId, (m, p) => new { TrnRequestMetadata = m, ResolvedPerson = p })
-            .Where(m => m.TrnRequestMetadata.OneLoginUserSubject == oneLoginUser.Subject || m.TrnRequestMetadata.EmailAddress == oneLoginUser.EmailAddress)
-            .ToArrayAsync();
-
-        if (requestAndResolvedPerson is not [{ TrnRequestMetadata: var trnRequestMetadata, ResolvedPerson: var resolvedPerson }])
-        {
-            return null;
-        }
-
-        if (trnRequestMetadata.IdentityVerified != true)
-        {
-            return null;
-        }
-
-        if (trnRequestMetadata.Status is not TrnRequestStatus.Completed)
-        {
-            return null;
-        }
-        Debug.Assert(trnRequestMetadata.ResolvedPersonId.HasValue);
-
-        oneLoginUser.SetVerified(
-            verifiedOn: trnRequestMetadata.CreatedOn,
-            route: OneLoginUserVerificationRoute.External,
-            verifiedByApplicationUserId: trnRequestMetadata.ApplicationUserId,
-            verifiedNames: [trnRequestMetadata.Name],
-            verifiedDatesOfBirth: [trnRequestMetadata.DateOfBirth]);
-
-        oneLoginUser.SetMatched(
-            clock.UtcNow,
-            trnRequestMetadata.ResolvedPersonId!.Value,
-            route: OneLoginUserMatchRoute.TrnRequest,
-            matchedAttributes: null);
-
-        return new(resolvedPerson.Trn);
     }
 
     public void Complete(SignInJourneyState state, string trn)
@@ -453,12 +324,6 @@ public class SignInJourneyCoordinator(
         return Results.Challenge(delegatedProperties, authenticationSchemes: [State.OneLoginAuthenticationScheme]);
     }
 
-    private async Task<T> WithIdDbContextAsync<T>(Func<IdDbContext, Task<T>> action)
-    {
-        using var sc = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
-        return await action(idDbContext);
-    }
-
     public sealed class LinkHelper(AuthorizeAccessLinkGenerator linkGenerator, JourneyInstanceId instanceId)
     {
         public string DebugIdentity() => linkGenerator.DebugIdentity(instanceId);
@@ -490,12 +355,4 @@ public class SignInJourneyCoordinator(
 
         public string ProofOfIdentity(string? returnUrl = null) => linkGenerator.ProofOfIdentity(instanceId, returnUrl);
     }
-
-    private record TryMatchToIdentityUserResult(
-        Guid PersonId,
-        string Trn,
-        OneLoginUserMatchRoute? MatchRoute,
-        IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>? MatchedAttributes);
-
-    private record TryMatchToTrnRequestResult(string Trn);
 }
