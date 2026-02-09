@@ -141,6 +141,11 @@ public class MandatoryQualificationProvider
         {
             MandatoryQualificationProviderId = new Guid("d4fc958b-21de-47ec-9f03-36ae237a1b11"),
             Name = "University College, Swansea"
+        },
+        new MandatoryQualificationProvider()
+        {
+            MandatoryQualificationProviderId = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
+            Name = "Seashell Trust"
         }
     ];
 }
