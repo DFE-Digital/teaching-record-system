@@ -461,7 +461,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
     {
         if (SearchTextHelper.IsDate(searchText, out var date))
         {
-            minDate = date.ToDateTime(new TimeOnly(0, 0));
+            minDate = date.ToDateTime(new TimeOnly(0, 0), DateTimeKind.Utc);
             maxDate = minDate.AddDays(1);
             return true;
         }
