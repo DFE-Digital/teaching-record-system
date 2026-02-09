@@ -25,7 +25,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         {
             tasks = tasks.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
         }
-        else if (SearchTextIsEmailAddress(search, out var email))
+        else if (SearchTextHelper.IsEmailAddress(search, out var email))
         {
             tasks = tasks.Where(t =>
                 t.TrnRequestMetadata!.EmailAddress != null &&
@@ -88,7 +88,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         {
             tasks = tasks.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
         }
-        else if (SearchTextIsEmailAddress(search, out var email))
+        else if (SearchTextHelper.IsEmailAddress(search, out var email))
         {
             tasks = tasks.Where(t =>
                 t.TrnRequestMetadata!.EmailAddress != null &&
@@ -357,12 +357,12 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         {
             results = results.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
         }
-        else if (SearchTextIsEmailAddress(search, out var email))
+        else if (SearchTextHelper.IsEmailAddress(search, out var email))
         {
             results = results.Where(t =>
                 t.EmailAddress != null && string.Equals(t.EmailAddress, email, StringComparison.OrdinalIgnoreCase));
         }
-        else if (SearchTextIsSupportTaskReference(search))
+        else if (SearchTextHelper.IsSupportTaskReference(search))
         {
             results = results.Where(t =>
                 string.Equals(t.SupportTaskReference, search, StringComparison.OrdinalIgnoreCase));
@@ -421,12 +421,12 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         {
             results = results.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
         }
-        else if (SearchTextIsEmailAddress(search, out var email))
+        else if (SearchTextHelper.IsEmailAddress(search, out var email))
         {
             results = results.Where(t =>
                 t.EmailAddress != null && string.Equals(t.EmailAddress, email, StringComparison.OrdinalIgnoreCase));
         }
-        else if (SearchTextIsSupportTaskReference(search))
+        else if (SearchTextHelper.IsSupportTaskReference(search))
         {
             results = results.Where(t =>
                 string.Equals(t.SupportTaskReference, search, StringComparison.OrdinalIgnoreCase));
@@ -457,29 +457,18 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    private bool SearchTextIsSupportTaskReference(string searchText) =>
-        searchText.StartsWith("TRS-", StringComparison.OrdinalIgnoreCase);
-
     private bool SearchTextIsDate(string searchText, out DateTime minDate, out DateTime maxDate)
     {
-        DateOnly date;
+        if (SearchTextHelper.IsDate(searchText, out var date))
+        {
+            minDate = date.ToDateTime(new TimeOnly(0, 0), DateTimeKind.Utc);
+            maxDate = minDate.AddDays(1);
+            return true;
+        }
 
-        var isDate = DateOnly.TryParseExact(searchText, WebConstants.DateOnlyDisplayFormat, out date) ||
-            DateOnly.TryParseExact(searchText, "d/M/yyyy", out date) ||
-            DateOnly.TryParseExact(searchText, "d MMM yyyy", out date) ||
-            DateOnly.TryParseExact(searchText, WebConstants.DateOnlyDisplayFormat, out date);
-
-        minDate = date.ToDateTime(new TimeOnly(0, 0, 0), DateTimeKind.Utc);
-        maxDate = minDate.AddDays(1);
-
-        return isDate;
-    }
-
-    private bool SearchTextIsEmailAddress(string searchText, out string email)
-    {
-        email = searchText;
-
-        return searchText.Contains('@');
+        minDate = default;
+        maxDate = default;
+        return false;
     }
 
     private bool SearchTextIsName(string searchText, out string[] nameParts)
