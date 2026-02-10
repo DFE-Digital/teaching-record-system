@@ -271,6 +271,7 @@ public class OneLoginService(
             new GetSuggestedPersonMatchesOptions(
                 options.Names,
                 options.DatesOfBirth,
+                options.EmailAddress,
                 options.NationalInsuranceNumber,
                 options.Trn,
                 options.TrnTokenTrnHint));
@@ -319,6 +320,7 @@ public class OneLoginService(
                     case when array_length(:first_names, 1) > 0 then (fn_split_names(:first_names, include_synonyms => true) collate "case_insensitive") else ARRAY[]::varchar[] end first_names,
                     case when array_length(:last_names, 1) > 0 then (fn_split_names(:last_names, include_synonyms => false) collate "case_insensitive") else ARRAY[]::varchar[] end last_names,
                     :dates_of_birth dates_of_birth,
+                    (:email_address COLLATE "case_insensitive") email_address,
                     :trns trns,
                     array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers
                 )
@@ -333,6 +335,8 @@ public class OneLoginService(
                     (SELECT ARRAY(SELECT UNNEST(p.names) INTERSECT SELECT UNNEST(vars.last_names))) matched_last_name,
                     p.date_of_birth = ANY(vars.dates_of_birth) date_of_birth_matches,
                     (SELECT ARRAY(SELECT p.date_of_birth INTERSECT SELECT UNNEST(vars.dates_of_birth))) matched_date_of_birth,
+                    CASE WHEN vars.email_address IS NOT NULL AND p.email_address = vars.email_address THEN true ELSE false END email_address_matches,
+                    p.email_address matched_email_address,
                     (array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers) national_insurance_number_matches,
                     (SELECT ARRAY(SELECT UNNEST(p.national_insurance_numbers) INTERSECT SELECT UNNEST(vars.national_insurance_numbers))) matched_national_insurance_number
                 FROM persons p, vars
@@ -347,10 +351,14 @@ public class OneLoginService(
                 [
                     new NpgsqlParameter("last_names", lastNames),
                     new NpgsqlParameter("first_names", firstNames),
+                    new NpgsqlParameter("email_address", NpgsqlDbType.Varchar)
+                    {
+                        Value = options.EmailAddress ?? (object)DBNull.Value
+                    },
                     new NpgsqlParameter("dates_of_birth", options.DatesOfBirth.ToArray()),
                     new NpgsqlParameter("national_insurance_number", NpgsqlDbType.Varchar)
                     {
-                        Value = nationalInsuranceNumber is not null ? nationalInsuranceNumber : DBNull.Value
+                        Value = nationalInsuranceNumber ?? (object)DBNull.Value
                     },
                     new NpgsqlParameter("trns", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = trns }
                 ]
@@ -373,6 +381,7 @@ public class OneLoginService(
                 AddMatchedAttribute(r.FirstNameMatches, PersonMatchedAttribute.FirstName, () => r.MatchedFirstName.First());
                 AddMatchedAttribute(r.LastNameMatches, PersonMatchedAttribute.LastName, () => r.MatchedLastName.First());
                 AddMatchedAttribute(r.DateOfBirthMatches, PersonMatchedAttribute.DateOfBirth, () => r.MatchedDateOfBirth.First().ToString("yyyy-MM-dd"));
+                AddMatchedAttribute(r.EmailAddressMatches, PersonMatchedAttribute.EmailAddress, () => r.MatchedEmailAddress!);
                 AddMatchedAttribute(r.NationalInsuranceNumberMatches, PersonMatchedAttribute.NationalInsuranceNumber, () => r.MatchedNationalInsuranceNumber.First());
                 AddMatchedAttribute(r.TrnMatches, PersonMatchedAttribute.Trn, () => r.MatchedTrn.First());
 
@@ -545,6 +554,8 @@ public class OneLoginService(
         bool LastNameMatches,
         string[] MatchedLastName,
         bool DateOfBirthMatches,
+        string? MatchedEmailAddress,
+        bool EmailAddressMatches,
         DateOnly[] MatchedDateOfBirth,
         bool NationalInsuranceNumberMatches,
         string[] MatchedNationalInsuranceNumber);

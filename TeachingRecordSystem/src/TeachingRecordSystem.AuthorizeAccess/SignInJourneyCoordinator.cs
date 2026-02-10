@@ -239,13 +239,16 @@ public class SignInJourneyCoordinator(
             return null;
         }
 
+        var email = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
+
         var names = State.VerifiedNames;
         var datesOfBirth = State.VerifiedDatesOfBirth;
         var nationalInsuranceNumber = State.NationalInsuranceNumber;
         var trn = State.Trn;
         var trnTokenTrn = State.TrnTokenTrn;
 
-        var matchResult = await oneLoginService.MatchPersonAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn, trnTokenTrn));
+        var matchResult = await oneLoginService.MatchPersonAsync(
+            new(names!, datesOfBirth!, email, nationalInsuranceNumber, trn, trnTokenTrn));
 
         if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {
