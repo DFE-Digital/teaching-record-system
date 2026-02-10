@@ -59,7 +59,7 @@ public class ResolveOneLoginUserMatchingStateFactory(OneLoginService oneLoginSer
             new ResolveOneLoginUserMatchingState
             {
                 MatchedPersons = suggestedMatches,
-                Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching
+                Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching ? true : null
             };
     }
 }
