@@ -185,6 +185,12 @@ public static class Extensions
         {
             services.AddIdDbContext(configuration);
         }
+        else
+        {
+            services.AddDbContext<IdDbContext>(
+                options => options.UseInMemoryDatabase("TeacherAuthId"),
+                contextLifetime: ServiceLifetime.Transient);
+        }
 
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {

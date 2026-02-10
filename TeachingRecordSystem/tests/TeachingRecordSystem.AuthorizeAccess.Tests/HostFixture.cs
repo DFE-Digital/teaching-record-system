@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.AuthorizeAccess.Tests;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
@@ -53,8 +52,6 @@ public class HostFixture : InitializeDbFixture
 
             builder.ConfigureServices((context, services) =>
             {
-                services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
-
                 services
                     .Configure<AuthenticationOptions>(options =>
                     {

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Notify;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Tests;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -76,10 +75,6 @@ public class HostFixture : InitializeDbFixture
 
             builder.ConfigureServices((context, services) =>
             {
-                services.AddDbContext<IdDbContext>(
-                    options => options.UseInMemoryDatabase("TeacherAuthId"),
-                    contextLifetime: ServiceLifetime.Transient);
-
                 services.AddAuthentication()
                     .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 

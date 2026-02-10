@@ -108,8 +108,18 @@ public static class Extensions
         {
             services
                 .AddStartupTask<ReferenceDataCache>()
-                .AddRedis(configuration)
-                .AddIdDbContext(configuration);
+                .AddRedis(configuration);
+        }
+
+        if (environment.IsProduction())
+        {
+            services.AddIdDbContext(configuration);
+        }
+        else
+        {
+            services.AddDbContext<IdDbContext>(
+                options => options.UseInMemoryDatabase("TeacherAuthId"),
+                contextLifetime: ServiceLifetime.Transient);
         }
 
         if (environment.IsDevelopment())
