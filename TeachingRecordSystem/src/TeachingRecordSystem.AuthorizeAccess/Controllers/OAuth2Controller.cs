@@ -93,7 +93,7 @@ public class OAuth2Controller(
                         client.UserId,
                         trnToken);
 
-                    return Task.FromResult<object>(state);
+                    return state;
                 });
             Debug.Assert(coordinator is not null);
 
