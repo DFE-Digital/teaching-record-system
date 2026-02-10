@@ -46,11 +46,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         IQueryable<Person> query;
 
-        if (SearchTextIsDate(out var dateOfBirth))
+        if (SearchTextHelper.IsDate(Search, out var dateOfBirth))
         {
             query = dbContext.Persons.IgnoreQueryFilters().Where(p => p.DateOfBirth == dateOfBirth);
         }
-        else if (SearchTextIsTrn())
+        else if (SearchTextHelper.IsTrn(Search))
         {
             query = dbContext.Persons.IgnoreQueryFilters().Where(p => p.Trn == Search);
         }
@@ -141,12 +141,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             pageNumber => linkGenerator.Persons.Index(Search, Statuses, SortBy, pageNumber));
 
         return Page();
-
-        bool SearchTextIsDate(out DateOnly date) =>
-            DateOnly.TryParseExact(Search, WebConstants.DateOnlyDisplayFormat, out date) ||
-            DateOnly.TryParseExact(Search, "d/M/yyyy", out date);
-
-        bool SearchTextIsTrn() => Search.Length == 7 && Search.All(Char.IsAsciiDigit);
     }
 
     public record PersonInfo
