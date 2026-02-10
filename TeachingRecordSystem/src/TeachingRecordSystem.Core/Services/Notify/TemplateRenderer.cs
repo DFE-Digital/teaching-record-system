@@ -14,7 +14,7 @@ internal partial class TemplateRenderer
     [GeneratedRegex(@"\(\(([^)]+)\)\)", RegexOptions.Compiled)]
     private static partial Regex PersonalizationPattern { get; }
 
-    public string Render(string template, IReadOnlyDictionary<string, string> personalization)
+    public string Render(string template, IReadOnlyDictionary<string, string> personalization, bool stripLinks = false)
     {
         var substituted = SubstitutePersonalization(template, personalization);
 
@@ -26,7 +26,7 @@ internal partial class TemplateRenderer
             .UseSoftlineBreakAsHardlineBreak()
             .Build();
 
-        var renderer = new NotifyEmailHtmlRenderer(writer);
+        var renderer = new NotifyEmailHtmlRenderer(writer, stripLinks);
         pipeline.Setup(renderer);
 
         var document = Markdown.Parse(substituted, pipeline);
@@ -59,8 +59,12 @@ internal partial class TemplateRenderer
         private const string ListTableStyle = "padding: 0 0 20px 0;";
         private const string ListTableCellStyle = "font-family: Helvetica, Arial, sans-serif;";
 
-        public NotifyEmailHtmlRenderer(TextWriter writer) : base(writer)
+        private readonly bool _stripLinks;
+
+        public NotifyEmailHtmlRenderer(TextWriter writer, bool stripLinks) : base(writer)
         {
+            _stripLinks = stripLinks;
+
             ObjectRenderers.Clear();
 
             ObjectRenderers.Add(new NotifyHeadingRenderer());
@@ -68,8 +72,8 @@ internal partial class TemplateRenderer
             ObjectRenderers.Add(new NotifyThematicBreakRenderer());
             ObjectRenderers.Add(new NotifyQuoteBlockRenderer());
             ObjectRenderers.Add(new NotifyListRenderer());
-            ObjectRenderers.Add(new NotifyLinkInlineRenderer());
-            ObjectRenderers.Add(new NotifyAutolinkInlineRenderer());
+            ObjectRenderers.Add(new NotifyLinkInlineRenderer(stripLinks));
+            ObjectRenderers.Add(new NotifyAutolinkInlineRenderer(stripLinks));
             ObjectRenderers.Add(new NotifyLineBreakInlineRenderer());
             ObjectRenderers.Add(new HtmlBlockRenderer());
             ObjectRenderers.Add(new CodeBlockRenderer());
@@ -195,11 +199,18 @@ internal partial class TemplateRenderer
 
         private class NotifyLinkInlineRenderer : HtmlObjectRenderer<LinkInline>
         {
+            private readonly bool _stripLinks;
+
+            public NotifyLinkInlineRenderer(bool stripLinks)
+            {
+                _stripLinks = stripLinks;
+            }
+
             protected override void Write(HtmlRenderer renderer, LinkInline obj)
             {
                 var url = obj.GetDynamicUrl?.Invoke() ?? obj.Url;
 
-                if (!string.IsNullOrEmpty(url))
+                if (!_stripLinks && !string.IsNullOrEmpty(url))
                 {
                     var encodedUrl = System.Net.WebUtility.HtmlEncode(url);
                     renderer.Write($"<a style=\"{LinkStyle}\" href=\"{encodedUrl}\"");
@@ -215,7 +226,7 @@ internal partial class TemplateRenderer
 
                 renderer.WriteChildren(obj);
 
-                if (!string.IsNullOrEmpty(url))
+                if (!_stripLinks && !string.IsNullOrEmpty(url))
                 {
                     renderer.Write("</a>");
                 }
@@ -224,6 +235,13 @@ internal partial class TemplateRenderer
 
         private class NotifyAutolinkInlineRenderer : HtmlObjectRenderer<AutolinkInline>
         {
+            private readonly bool _stripLinks;
+
+            public NotifyAutolinkInlineRenderer(bool stripLinks)
+            {
+                _stripLinks = stripLinks;
+            }
+
             protected override void Write(HtmlRenderer renderer, AutolinkInline obj)
             {
                 var url = obj.Url;
@@ -231,7 +249,14 @@ internal partial class TemplateRenderer
                 if (!obj.IsEmail && !string.IsNullOrEmpty(url))
                 {
                     var encodedUrl = System.Net.WebUtility.HtmlEncode(url);
-                    renderer.Write($"<a style=\"{LinkStyle}\" href=\"{encodedUrl}\">{encodedUrl}</a>");
+                    if (_stripLinks)
+                    {
+                        renderer.Write(encodedUrl);
+                    }
+                    else
+                    {
+                        renderer.Write($"<a style=\"{LinkStyle}\" href=\"{encodedUrl}\">{encodedUrl}</a>");
+                    }
                 }
                 else
                 {
