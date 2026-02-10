@@ -4,9 +4,11 @@
     ViewBag.Title = "Check if this GOV.UK One Login matches an existing record";
 }
 
-<govuk-back-link href="@(Model.IsRecordMatchingOnly is true ?
+@section BeforeContent {
+    <govuk-back-link href="@(Model.IsRecordMatchingOnly is true ?
         LinkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching() :
         LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Verify(Model.SupportTaskReference, Model.JourneyInstance.InstanceId))" />
+}
 
 <form method="post">
     <div class="govuk-grid-row">
