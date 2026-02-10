@@ -25,7 +25,7 @@ public class OneLoginService(
 
     public Task<string> GetRecordNotFoundEmailContentAsync(string personName)
     {
-        return notificationSender.RenderEmailTemplateAsync(
+        return notificationSender.RenderEmailTemplateHtmlAsync(
             EmailTemplateIds.OneLoginCannotFindRecord,
             GetOneLoginCannotFindRecordEmailPersonalization(personName));
     }

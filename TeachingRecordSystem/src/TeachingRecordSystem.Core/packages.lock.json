@@ -162,6 +162,12 @@
         "resolved": "2025.2.4",
         "contentHash": "TwbgxAkXxY+vNEhNVx/QXjJ4vqxmepOjsgRvvImQPbHkHMMb4W+ahL3laMsxXKtNT7iMy+E1B3xkqao2hf1n3A=="
       },
+      "Markdig": {
+        "type": "Direct",
+        "requested": "[0.45.0, )",
+        "resolved": "0.45.0",
+        "contentHash": "ObNLcA1b+0lpNNoEg256g9faMeJZi35wZW0AnKJ4nGPJe+5qkwnV26kUvQTHuanFnSX9SdvPzOO41BVJ6XarAg=="
+      },
       "Microsoft.Data.SqlClient": {
         "type": "Direct",
         "requested": "[6.1.3, )",
