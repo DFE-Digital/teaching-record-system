@@ -356,4 +356,82 @@ public class TemplateRendererTests
         Assert.Contains("Item 1", result);
         Assert.Contains("Item 2", result);
     }
+
+    [Fact]
+    public void Render_WithStripLinksTrue_DoesNotRenderAnchorTags()
+    {
+        // Arrange
+        var template = "[Click here](https://example.com)";
+        var personalization = new Dictionary<string, string>();
+
+        // Act
+        var result = _renderer.Render(template, personalization, stripLinks: true);
+
+        // Assert
+        Assert.DoesNotContain("<a", result);
+        Assert.Contains("Click here", result);
+    }
+
+    [Fact]
+    public void Render_WithStripLinksFalse_RendersAnchorTags()
+    {
+        // Arrange
+        var template = "[Click here](https://example.com)";
+        var personalization = new Dictionary<string, string>();
+
+        // Act
+        var result = _renderer.Render(template, personalization, stripLinks: false);
+
+        // Assert
+        Assert.Contains("<a style=\"word-wrap: break-word; color: #1D70B8;\" href=\"https://example.com\">Click here</a>", result);
+    }
+
+    [Fact]
+    public void Render_WithStripLinksDefault_RendersAnchorTags()
+    {
+        // Arrange
+        var template = "[Click here](https://example.com)";
+        var personalization = new Dictionary<string, string>();
+
+        // Act
+        var result = _renderer.Render(template, personalization);
+
+        // Assert
+        Assert.Contains("<a style=\"word-wrap: break-word; color: #1D70B8;\" href=\"https://example.com\">Click here</a>", result);
+    }
+
+    [Fact]
+    public void Render_WithStripLinksTrue_AutolinkDoesNotRenderAnchorTags()
+    {
+        // Arrange
+        var template = "Visit https://example.com for more info";
+        var personalization = new Dictionary<string, string>();
+
+        // Act
+        var result = _renderer.Render(template, personalization, stripLinks: true);
+
+        // Assert
+        Assert.DoesNotContain("<a", result);
+        Assert.Contains("https://example.com", result);
+        Assert.Contains("Visit", result);
+        Assert.Contains("for more info", result);
+    }
+
+    [Fact]
+    public void Render_WithStripLinksTrue_MultipleLinks_DoesNotRenderAnyAnchorTags()
+    {
+        // Arrange
+        var template = """
+            Check out [our website](https://example.com) or visit https://docs.example.com directly.
+            """;
+        var personalization = new Dictionary<string, string>();
+
+        // Act
+        var result = _renderer.Render(template, personalization, stripLinks: true);
+
+        // Assert
+        Assert.DoesNotContain("<a", result);
+        Assert.Contains("our website", result);
+        Assert.Contains("https://docs.example.com", result);
+    }
 }
