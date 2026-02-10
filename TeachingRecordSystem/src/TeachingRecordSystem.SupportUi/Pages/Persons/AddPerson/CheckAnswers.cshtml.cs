@@ -84,8 +84,7 @@ public class CheckAnswersModel(
 
         await JourneyInstance!.CompleteAsync();
 
-        TempData.SetFlashSuccess($"Record created for {Name}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(person.PersonId)));
+        TempData.SetFlashSuccess($"Record created for {Name}");
 
         return Redirect(LinkGenerator.Persons.PersonDetail.Index(person.PersonId));
     }
