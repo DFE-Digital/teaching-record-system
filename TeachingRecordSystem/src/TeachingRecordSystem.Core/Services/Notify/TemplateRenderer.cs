@@ -200,11 +200,13 @@ internal class TemplateRenderer
 
                 if (!string.IsNullOrEmpty(url))
                 {
-                    renderer.Write($"<a style=\"{LinkStyle}\" href=\"{url}\"");
+                    var encodedUrl = System.Net.WebUtility.HtmlEncode(url);
+                    renderer.Write($"<a style=\"{LinkStyle}\" href=\"{encodedUrl}\"");
 
                     if (!string.IsNullOrEmpty(obj.Title))
                     {
-                        renderer.Write($" title=\"{obj.Title}\"");
+                        var encodedTitle = System.Net.WebUtility.HtmlEncode(obj.Title);
+                        renderer.Write($" title=\"{encodedTitle}\"");
                     }
 
                     renderer.Write(">");
@@ -227,7 +229,8 @@ internal class TemplateRenderer
 
                 if (!obj.IsEmail && !string.IsNullOrEmpty(url))
                 {
-                    renderer.Write($"<a style=\"{LinkStyle}\" href=\"{url}\">{url}</a>");
+                    var encodedUrl = System.Net.WebUtility.HtmlEncode(url);
+                    renderer.Write($"<a style=\"{LinkStyle}\" href=\"{encodedUrl}\">{encodedUrl}</a>");
                 }
                 else
                 {
