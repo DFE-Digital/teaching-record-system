@@ -9,14 +9,15 @@ using Markdig.Syntax.Inlines;
 namespace TeachingRecordSystem.Core.Services.Notify;
 
 // See https://github.com/alphagov/notifications-utils/blob/c3b3711d9b63cf131151087be7726f7b9b1b0e55/notifications_utils/markdown.py#L155
-internal class TemplateRenderer
+internal partial class TemplateRenderer
 {
-    private static readonly Regex PersonalizationRegex = new(@"\(\(([^)]+)\)\)", RegexOptions.Compiled);
+    [GeneratedRegex(@"\(\(([^)]+)\)\)", RegexOptions.Compiled)]
+    private static partial Regex PersonalizationPattern { get; }
 
     public string Render(string template, IReadOnlyDictionary<string, string> personalization)
     {
         var substituted = SubstitutePersonalization(template, personalization);
-        
+
         var writer = new StringWriter();
         var pipeline = new MarkdownPipelineBuilder()
             .DisableHtml()
@@ -37,7 +38,7 @@ internal class TemplateRenderer
 
     private static string SubstitutePersonalization(string template, IReadOnlyDictionary<string, string> personalization)
     {
-        return PersonalizationRegex.Replace(template, match =>
+        return PersonalizationPattern.Replace(template, match =>
         {
             var key = match.Groups[1].Value;
             return personalization.TryGetValue(key, out var value) ? value : match.Value;
@@ -61,7 +62,7 @@ internal class TemplateRenderer
         public NotifyEmailHtmlRenderer(TextWriter writer) : base(writer)
         {
             ObjectRenderers.Clear();
-            
+
             ObjectRenderers.Add(new NotifyHeadingRenderer());
             ObjectRenderers.Add(new NotifyParagraphRenderer());
             ObjectRenderers.Add(new NotifyThematicBreakRenderer());
@@ -157,22 +158,22 @@ internal class TemplateRenderer
                 foreach (var item in obj)
                 {
                     var listItem = (ListItemBlock)item;
-                    
+
                     // Capture the list item content
                     var itemWriter = new StringWriter();
                     var itemRenderer = new HtmlRenderer(itemWriter);
                     itemRenderer.ImplicitParagraph = true;
-                    
+
                     // Copy over necessary renderers
                     foreach (var objectRenderer in renderer.ObjectRenderers)
                     {
                         itemRenderer.ObjectRenderers.Add(objectRenderer);
                     }
-                    
+
                     itemRenderer.WriteChildren(listItem);
                     itemWriter.Flush();
                     var content = itemWriter.ToString().Trim();
-                    
+
                     renderer.Write($"<li style=\"{ListItemStyle}\">{content}</li>");
                     renderer.WriteLine();
                 }
