@@ -121,10 +121,12 @@
                             <td class="govuk-table__cell" data-testid="one-login-emails" use-empty-fallback>
                                 @if (personInfo.OneLoginUserEmailAddresses.Length > 0)
                                 {
-                                    @foreach (var email in personInfo.OneLoginUserEmailAddresses)
-                                    {
-                                        <div>@email</div>
-                                    }
+                                    <ul class="govuk-list">
+                                        @foreach (var email in personInfo.OneLoginUserEmailAddresses)
+                                        {
+                                            <li class="govuk-!-margin-bottom-0">@email</li>
+                                        }
+                                    </ul>
                                 }
                             </td>
                             <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(WebConstants.DateOnlyDisplayFormat) : string.Empty)</td>
