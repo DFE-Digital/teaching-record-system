@@ -7,6 +7,7 @@ using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.PublishApi;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Services.WorkforceData;
@@ -29,6 +30,11 @@ public static class Extensions
             .AddHangfireServer()
             .AddWorkforceData()
             .AddMemoryCache();
+
+        if (environment.IsProduction())
+        {
+            services.AddIdDbContext(configuration);
+        }
 
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
