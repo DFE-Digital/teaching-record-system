@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.Core.Services.Notify;
 
 public class NoopNotificationSender : INotificationSender
 {
-    public Task<string> RenderEmailTemplateHtmlAsync(string templateId, IReadOnlyDictionary<string, string> personalization)
+    public Task<string> RenderEmailTemplateHtmlAsync(string templateId, IReadOnlyDictionary<string, string> personalization, bool stripLinks)
     {
         var sb = new StringBuilder();
 
