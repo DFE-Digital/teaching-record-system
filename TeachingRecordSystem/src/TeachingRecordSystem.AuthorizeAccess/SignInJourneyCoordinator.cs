@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Security.Claims;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -222,6 +223,17 @@ public class SignInJourneyCoordinator(
 
     public string GetRedirectUri() => State.RedirectUri;
 
+    public override JourneyPathStep? GetCurrentStep()
+    {
+        // Ensure the sign out URL can always be hit, even though it'll never be in the journey's Path
+        if (HttpContext.Request.GetEncodedPathAndQuery() == Links.SignOut())
+        {
+            return Path.Steps.Last();
+        }
+
+        return base.GetCurrentStep();
+    }
+
     public override bool StepIsValid(JourneyPathStep step)
     {
         return base.StepIsValid(step) || step.NormalizedUrl.StartsWith("/oauth2/authorize");
@@ -354,5 +366,7 @@ public class SignInJourneyCoordinator(
         public string PendingSupportRequest() => linkGenerator.PendingSupportRequest(instanceId);
 
         public string ProofOfIdentity(string? returnUrl = null) => linkGenerator.ProofOfIdentity(instanceId, returnUrl);
+
+        public string SignOut() => linkGenerator.SignOut(instanceId);
     }
 }
