@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -12,18 +11,13 @@ namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 [Route("teachers")]
 public class TeachersController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
-    [HttpGet("{trn}")]
-    [SwaggerOperation(
-        OperationId = "GetTeacherByTrn",
-        Summary = "Get teacher details by TRN",
-        Description = "Gets the details of the teacher corresponding to the given TRN.")]
-    [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
+    [HttpGet("{trn}")]    [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder))] GetTeacherRequestIncludes? include)
     {
         var command = new GetPersonCommand(
             trn,
@@ -43,12 +37,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
             .MapErrorCode(ApiError.ErrorCodes.RecordIsMerged, StatusCodes.Status404NotFound);
     }
 
-    [HttpPost("name-changes")]
-    [SwaggerOperation(
-        OperationId = "CreateNameChange",
-        Summary = "Create name change request",
-        Description = "Creates a name change request for the teacher with the given TRN.")]
-    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [HttpPost("name-changes")]    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> CreateNameChangeAsync(
@@ -70,12 +59,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
         return result.ToActionResult(_ => NoContent());
     }
 
-    [HttpPost("date-of-birth-changes")]
-    [SwaggerOperation(
-        OperationId = "CreateDobChange",
-        Summary = "Create DOB change request",
-        Description = "Creates a date of birth change request for the teacher with the given TRN.")]
-    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [HttpPost("date-of-birth-changes")]    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> CreateDateOfBirthChangeAsync(
@@ -95,12 +79,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
         return result.ToActionResult(_ => NoContent());
     }
 
-    [HttpGet("")]
-    [SwaggerOperation(
-        OperationId = "FindTeachers",
-        Summary = "Find teachers",
-        Description = "Finds teachers with a TRN matching the specified criteria.")]
-    [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
+    [HttpGet("")]    [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> FindTeachersAsync(FindTeachersRequest request)

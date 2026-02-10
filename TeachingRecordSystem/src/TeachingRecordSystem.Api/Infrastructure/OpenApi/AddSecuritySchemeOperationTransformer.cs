@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.OpenApi;
+using Microsoft.OpenApi;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
 
-public class AddSecuritySchemeOperationFilter : IOperationFilter
+public class AddSecuritySchemeOperationTransformer : IOpenApiOperationTransformer
 {
-    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
     {
-        var actionDescriptor = context.ApiDescription.ActionDescriptor;
+        var actionDescriptor = context.Description.ActionDescriptor;
 
         var authorizeAttributes = actionDescriptor.EndpointMetadata.OfType<AuthorizeAttribute>().ToArray();
 
@@ -54,5 +54,7 @@ public class AddSecuritySchemeOperationFilter : IOperationFilter
 
         operation.Security ??= new List<OpenApiSecurityRequirement>();
         operation.Security.Add(requirement);
+
+        return Task.CompletedTask;
     }
 }
