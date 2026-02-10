@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Npgsql;
@@ -22,10 +21,19 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     public PersonSearchSortByOption? SortBy { get; set; }
 
     [BindProperty(SupportsGet = true)]
+    public SortDirection? SortDirection { get; set; }
+
+    [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
     [BindProperty(SupportsGet = true)]
-    public PersonStatus[]? Statuses { get; set; }
+    public bool? IncludeActive { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public bool? IncludeDeactivated { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public bool? IncludeOneLoginUser { get; set; }
 
     public ResultPage<PersonInfo>? SearchResults { get; set; }
 
@@ -42,11 +50,31 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             return Redirect(linkGenerator.Index());
         }
 
-        var sortBy = SortBy ??= PersonSearchSortByOption.LastNameAscending;
+        var sortBy = SortBy ?? PersonSearchSortByOption.Name;
+        var sortDirection = SortDirection ?? TeachingRecordSystem.SupportUi.SortDirection.Ascending;
 
         IQueryable<Person> query;
 
-        if (SearchTextIsDate(out var dateOfBirth))
+        if (SearchTextIsEmail())
+        {
+            var oneLoginUser = await dbContext.OneLoginUsers
+                .Where(o => o.EmailAddress == Search && o.PersonId != null)
+                .FirstOrDefaultAsync();
+
+            if (oneLoginUser is null)
+            {
+                SearchResults = new ResultPage<PersonInfo>([], 0, PageSize, PageNumber ?? 1);
+                Pagination = PaginationViewModel.Create(
+                    SearchResults,
+                    pageNumber => linkGenerator.Persons.Index(Search, IncludeActive, IncludeDeactivated, IncludeOneLoginUser, SortBy, SortDirection, pageNumber));
+                return Page();
+            }
+
+            query = dbContext.Persons
+                .IgnoreQueryFilters()
+                .Where(p => p.PersonId == oneLoginUser.PersonId);
+        }
+        else if (SearchTextIsDate(out var dateOfBirth))
         {
             query = dbContext.Persons.IgnoreQueryFilters().Where(p => p.DateOfBirth == dateOfBirth);
         }
@@ -73,56 +101,80 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             query = dbContext.Persons.IgnoreQueryFilters();
         }
 
+        // Include OneLoginUsers for facet counting and filtering
+        query = query.Include(p => p.OneLoginUsers);
+
         var groupedByStatus = await query
             .Select(p => p.Status)
             .GroupBy(p => p)
             .Select(g => new { Status = g.Key, Count = g.Count() })
             .ToArrayAsync();
 
+        var hasOneLoginUserCount = await query
+            .Where(p => p.OneLoginUsers != null && p.OneLoginUsers.Any())
+            .CountAsync();
+
         Facets = new Dictionary<string, IReadOnlyDictionary<object, int>>
         {
-            [nameof(Statuses)] = groupedByStatus.ToDictionary(g => (object)g.Status, g => g.Count)
+            [nameof(IncludeActive)] = new Dictionary<object, int> { [true] = groupedByStatus.FirstOrDefault(g => g.Status == PersonStatus.Active)?.Count ?? 0 },
+            [nameof(IncludeDeactivated)] = new Dictionary<object, int> { [true] = groupedByStatus.FirstOrDefault(g => g.Status == PersonStatus.Deactivated)?.Count ?? 0 },
+            [nameof(IncludeOneLoginUser)] = new Dictionary<object, int> { [true] = hasOneLoginUserCount }
         };
 
-        if (Statuses is [] or null)
+        // Default to showing active records if no status filters are specified
+        if (IncludeActive is null && IncludeDeactivated is null && IncludeOneLoginUser is null)
         {
-            Statuses = [PersonStatus.Active];
+            IncludeActive = true;
         }
 
-        if (Statuses?.Order().ToArray() is not [PersonStatus.Active, PersonStatus.Deactivated])
+        // Apply status filtering
+        var statusesToInclude = new List<PersonStatus>();
+        if (IncludeActive == true)
         {
-            query = query.Where(p => Statuses!.Contains(p.Status));
+            statusesToInclude.Add(PersonStatus.Active);
+        }
+        if (IncludeDeactivated == true)
+        {
+            statusesToInclude.Add(PersonStatus.Deactivated);
+        }
+
+        if (statusesToInclude.Count > 0)
+        {
+            query = query.Where(p => statusesToInclude.Contains(p.Status));
+        }
+
+        if (IncludeOneLoginUser == true)
+        {
+            query = query.Where(p => p.OneLoginUsers != null && p.OneLoginUsers.Any());
         }
 
         var totalPersonCount = await query.CountAsync();
 
-        if (sortBy == PersonSearchSortByOption.LastNameAscending)
+        // Apply sorting
+        IOrderedQueryable<Person> orderedQuery = sortBy switch
         {
-            query = query.OrderBy(p => p.LastName);
-        }
-        else if (sortBy == PersonSearchSortByOption.LastNameDescending)
-        {
-            query = query.OrderByDescending(p => p.LastName);
-        }
-        else if (sortBy == PersonSearchSortByOption.FirstNameAscending)
-        {
-            query = query.OrderBy(p => p.FirstName);
-        }
-        else if (sortBy == PersonSearchSortByOption.FirstNameDescending)
-        {
-            query = query.OrderByDescending(p => p.FirstName);
-        }
-        else if (sortBy == PersonSearchSortByOption.DateOfBirthAscending)
-        {
-            query = query.OrderBy(p => p.DateOfBirth);
-        }
-        else
-        {
-            Debug.Assert(sortBy == PersonSearchSortByOption.DateOfBirthDescending);
-            query = query.OrderByDescending(p => p.DateOfBirth);
-        }
+            PersonSearchSortByOption.Name => query
+                .OrderBy(p => p.FirstName, sortDirection)
+                .ThenBy(p => p.MiddleName, sortDirection)
+                .ThenBy(p => p.LastName, sortDirection),
+            PersonSearchSortByOption.DateOfBirth => query
+                .OrderBy(p => p.DateOfBirth, sortDirection),
+            PersonSearchSortByOption.OneLoginEmailAddress => query
+                .OrderBy(p => p.OneLoginUsers!.OrderBy(o => o.EmailAddress).Select(o => o.EmailAddress).FirstOrDefault(), sortDirection),
+            PersonSearchSortByOption.Trn => query
+                .OrderBy(p => p.Trn, sortDirection),
+            PersonSearchSortByOption.NationalInsuranceNumber => query
+                .OrderBy(p => p.NationalInsuranceNumber, sortDirection),
+            PersonSearchSortByOption.RecordStatus => query
+                .OrderBy(p => p.Status, sortDirection),
+            _ => query
+                .OrderBy(p => p.FirstName, sortDirection)
+                .ThenBy(p => p.MiddleName, sortDirection)
+                .ThenBy(p => p.LastName, sortDirection)
+        };
 
-        SearchResults = await query
+        SearchResults = await orderedQuery
+            .AsSplitQuery()
             .Select(p => new PersonInfo
             {
                 PersonId = p.PersonId,
@@ -132,13 +184,16 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 DateOfBirth = p.DateOfBirth,
                 Trn = p.Trn,
                 NationalInsuranceNumber = p.NationalInsuranceNumber,
-                PersonStatus = p.Status
+                PersonStatus = p.Status,
+                OneLoginUserEmailAddresses = p.OneLoginUsers != null
+                    ? p.OneLoginUsers.Select(o => o.EmailAddress!).Where(e => e != null).ToArray()!
+                    : Array.Empty<string>()
             })
             .GetPageAsync(PageNumber, PageSize, totalPersonCount);
 
         Pagination = PaginationViewModel.Create(
             SearchResults!,
-            pageNumber => linkGenerator.Persons.Index(Search, Statuses, SortBy, pageNumber));
+            pageNumber => linkGenerator.Persons.Index(Search, IncludeActive, IncludeDeactivated, IncludeOneLoginUser, SortBy, SortDirection, pageNumber));
 
         return Page();
 
@@ -147,6 +202,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             DateOnly.TryParseExact(Search, "d/M/yyyy", out date);
 
         bool SearchTextIsTrn() => Search.Length == 7 && Search.All(Char.IsAsciiDigit);
+
+        bool SearchTextIsEmail() => EmailAddress.TryParse(Search, out _);
     }
 
     public record PersonInfo
@@ -159,6 +216,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         public required string Trn { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
         public required PersonStatus PersonStatus { get; init; }
+        public required string[] OneLoginUserEmailAddresses { get; init; }
 
         public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
     }

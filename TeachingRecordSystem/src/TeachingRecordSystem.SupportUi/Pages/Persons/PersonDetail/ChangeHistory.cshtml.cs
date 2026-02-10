@@ -29,9 +29,6 @@ public class ChangeHistoryModel(
     [FromQuery]
     public int? PageNumber { get; set; }
 
-    [FromQuery]
-    public PersonSearchSortByOption? SortBy { get; set; }
-
     public TimelineItem[]? TimelineItems { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }

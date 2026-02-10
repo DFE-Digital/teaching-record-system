@@ -4,16 +4,16 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 
 public enum PersonSearchSortByOption
 {
-    [Display(Name = "Last name (A-Z)")]
-    LastNameAscending,
-    [Display(Name = "Last name (Z-A)")]
-    LastNameDescending,
-    [Display(Name = "First name (A-Z)")]
-    FirstNameAscending,
-    [Display(Name = "First name (Z-A)")]
-    FirstNameDescending,
-    [Display(Name = "Date of birth (ascending)")]
-    DateOfBirthAscending,
-    [Display(Name = "Date of birth (descending)")]
-    DateOfBirthDescending
+    [Display(Name = "Name")]
+    Name,
+    [Display(Name = "Date of birth")]
+    DateOfBirth,
+    [Display(Name = "One Login email address")]
+    OneLoginEmailAddress,
+    [Display(Name = "TRN")]
+    Trn,
+    [Display(Name = "National Insurance number")]
+    NationalInsuranceNumber,
+    [Display(Name = "Record status")]
+    RecordStatus
 }

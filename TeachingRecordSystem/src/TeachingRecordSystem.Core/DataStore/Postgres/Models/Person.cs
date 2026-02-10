@@ -53,6 +53,7 @@ public class Person
     public ICollection<Qualification>? Qualifications { get; protected set; }
     public ICollection<Alert>? Alerts { get; }
     public ICollection<PreviousName>? PreviousNames { get; }
+    public ICollection<OneLoginUser>? OneLoginUsers { get; }
     public bool CreatedByTps { get; set; }
     public Guid? SourceApplicationUserId { get; set; }
     public string? SourceTrnRequestId { get; set; }

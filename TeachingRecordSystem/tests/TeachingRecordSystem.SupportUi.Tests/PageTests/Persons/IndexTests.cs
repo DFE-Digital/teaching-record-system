@@ -1,3 +1,5 @@
+using Optional;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -104,5 +106,155 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var nameResults = doc.GetAllElementsByTestId("trn");
         Assert.Single(nameResults);
         Assert.Contains(search!, nameResults.Single().TrimmedText());
+    }
+
+    [Fact]
+    public async Task Get_WithSearchThatLooksLikeAnEmailAddress_DisplaysMatchOnOneLoginUserEmail()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var emailAddress = Faker.Internet.Email();
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(emailAddress));
+        var search = emailAddress;
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var personResults = doc.GetAllElementsByTestId($"person-{person.PersonId}");
+        Assert.Single(personResults);
+
+        var emailResults = doc.GetAllElementsByTestId("one-login-emails");
+        Assert.Single(emailResults);
+        Assert.Contains(emailAddress, emailResults.Single().TextContent);
+    }
+
+    [Fact]
+    public async Task Get_WithIncludeActiveFilter_DisplaysOnlyActivePersons()
+    {
+        // Arrange
+        var searchName = $"FilterTest{Guid.NewGuid()}";
+        var activePerson1 = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var activePerson2 = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var deactivatedPerson = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+
+        await WithDbContextAsync(dbContext =>
+            dbContext.Persons
+                .Where(p => p.PersonId == deactivatedPerson.PersonId)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={searchName}&includeActive=true");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.NotNull(doc.GetElementByTestId($"person-{activePerson1.PersonId}"));
+        Assert.NotNull(doc.GetElementByTestId($"person-{activePerson2.PersonId}"));
+        Assert.Null(doc.GetElementByTestId($"person-{deactivatedPerson.PersonId}"));
+
+        var statusResults = doc.GetAllElementsByTestId("status");
+        Assert.All(statusResults.Select(r => r.TrimmedText()), t => Assert.Equal("Active", t));
+    }
+
+    [Fact]
+    public async Task Get_WithIncludeDeactivatedFilter_DisplaysOnlyDeactivatedPersons()
+    {
+        // Arrange
+        var searchName = $"FilterTest{Guid.NewGuid()}";
+        var activePerson = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var deactivatedPerson1 = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var deactivatedPerson2 = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+
+        await WithDbContextAsync(dbContext =>
+            dbContext.Persons
+                .Where(p => p.PersonId == deactivatedPerson1.PersonId)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
+        await WithDbContextAsync(dbContext =>
+            dbContext.Persons
+                .Where(p => p.PersonId == deactivatedPerson2.PersonId)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={searchName}&includeDeactivated=true");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.NotNull(doc.GetElementByTestId($"person-{deactivatedPerson1.PersonId}"));
+        Assert.NotNull(doc.GetElementByTestId($"person-{deactivatedPerson2.PersonId}"));
+        Assert.Null(doc.GetElementByTestId($"person-{activePerson.PersonId}"));
+
+        var statusResults = doc.GetAllElementsByTestId("status");
+        Assert.All(statusResults.Select(r => r.TrimmedText()), t => Assert.Equal("Deactivated", t));
+    }
+
+    [Fact]
+    public async Task Get_WithIncludeOneLoginUserFilter_DisplaysOnlyPersonsWithOneLoginUser()
+    {
+        // Arrange
+        var searchName = $"FilterTest{Guid.NewGuid()}";
+        var personWithOneLogin1 = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var personWithOneLogin2 = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var personWithoutOneLogin = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+
+        await TestData.CreateOneLoginUserAsync(personWithOneLogin1, email: Option.Some<string?>(Faker.Internet.Email()));
+        await TestData.CreateOneLoginUserAsync(personWithOneLogin2, email: Option.Some<string?>(Faker.Internet.Email()));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={searchName}&includeOneLoginUser=true");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.NotNull(doc.GetElementByTestId($"person-{personWithOneLogin1.PersonId}"));
+        Assert.NotNull(doc.GetElementByTestId($"person-{personWithOneLogin2.PersonId}"));
+        Assert.Null(doc.GetElementByTestId($"person-{personWithoutOneLogin.PersonId}"));
+    }
+
+    [Fact]
+    public async Task Get_WithCombinedFilters_DisplaysOnlyMatchingPersons()
+    {
+        // Arrange
+        var searchName = $"FilterTest{Guid.NewGuid()}";
+        var activePersonWithOneLogin = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var activePersonWithoutOneLogin = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var deactivatedPersonWithOneLogin = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+        var deactivatedPersonWithoutOneLogin = await TestData.CreatePersonAsync(b => b.WithFirstName(searchName));
+
+        await TestData.CreateOneLoginUserAsync(activePersonWithOneLogin, email: Option.Some<string?>(Faker.Internet.Email()));
+        await TestData.CreateOneLoginUserAsync(deactivatedPersonWithOneLogin, email: Option.Some<string?>(Faker.Internet.Email()));
+
+        await WithDbContextAsync(dbContext =>
+            dbContext.Persons
+                .Where(p => p.PersonId == deactivatedPersonWithOneLogin.PersonId)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
+        await WithDbContextAsync(dbContext =>
+            dbContext.Persons
+                .Where(p => p.PersonId == deactivatedPersonWithoutOneLogin.PersonId)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={searchName}&includeActive=true&includeOneLoginUser=true");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.NotNull(doc.GetElementByTestId($"person-{activePersonWithOneLogin.PersonId}"));
+        Assert.Null(doc.GetElementByTestId($"person-{activePersonWithoutOneLogin.PersonId}"));
+        Assert.Null(doc.GetElementByTestId($"person-{deactivatedPersonWithOneLogin.PersonId}"));
+        Assert.Null(doc.GetElementByTestId($"person-{deactivatedPersonWithoutOneLogin.PersonId}"));
     }
 }
