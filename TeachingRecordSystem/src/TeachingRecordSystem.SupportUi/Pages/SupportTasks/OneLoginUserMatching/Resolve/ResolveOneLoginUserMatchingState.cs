@@ -46,11 +46,13 @@ public class ResolveOneLoginUserMatchingStateFactory(OneLoginService oneLoginSer
     {
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification or SupportTaskType.OneLoginUserRecordMatching);
         var requestData = supportTask.GetData<IOneLoginUserMatchingData>();
+        var emailAddress = supportTask.OneLoginUser!.EmailAddress;
 
         var suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
             Names: requestData.VerifiedOrStatedNames!,
             DatesOfBirth: requestData.VerifiedOrStatedDatesOfBirth!,
             NationalInsuranceNumber: requestData.StatedNationalInsuranceNumber,
+            EmailAddress: emailAddress,
             Trn: requestData.StatedTrn,
             TrnTokenTrnHint: requestData.TrnTokenTrn));
 

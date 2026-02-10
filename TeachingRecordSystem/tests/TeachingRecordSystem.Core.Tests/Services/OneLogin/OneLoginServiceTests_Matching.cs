@@ -70,7 +70,8 @@ public partial class OneLoginServiceTests
         };
 
         // Act
-        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
+        var result = await WithServiceAsync(
+            s => s.MatchPersonAsync(new(names, datesOfBirth, EmailAddress: null, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
 
         // Assert
         if (expectMatch)
@@ -103,7 +104,8 @@ public partial class OneLoginServiceTests
         var trn = person2.Trn;
 
         // Act
-        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
+        var result = await WithServiceAsync(
+            s => s.MatchPersonAsync(new(names, datesOfBirth, EmailAddress: null, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
 
         // Assert
         Assert.Null(result);
@@ -130,10 +132,53 @@ public partial class OneLoginServiceTests
         var trn = person.Trn;
 
         // Act
-        var result = await WithServiceAsync(s => s.MatchPersonAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
+        var result = await WithServiceAsync(
+            s => s.MatchPersonAsync(new(names, datesOfBirth, EmailAddress: null, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
 
         // Assert
         Assert.NotNull(result);
+    }
+
+    [Fact]
+    public async Task GetSuggestedPersonMatchesAsync_ReturnsExpectedEmailMatchedAttribute()
+    {
+        // Arrange
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+
+        // Person who matches on first name, last name & DOB
+        var person1 = await TestData.CreatePersonAsync(
+            p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithEmailAddress());
+
+        // Person who matches on person NINO
+        var person2 = await TestData.CreatePersonAsync(
+            p => p.WithNationalInsuranceNumber(nationalInsuranceNumber).WithEmailAddress());
+
+        var trn = person1.Trn;
+        string? trnTokenHintTrn = null;
+
+        string[][] names = [[firstName, lastName]];
+        DateOnly[] datesOfBirth = [dateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetSuggestedPersonMatchesAsync(new(names, datesOfBirth, EmailAddress: person1.EmailAddress, nationalInsuranceNumber, trn, trnTokenHintTrn)));
+
+        // Assert
+        Assert.Collection(
+            result,
+            r =>
+            {
+                Assert.Equal(person1.PersonId, r.PersonId);
+                Assert.Contains(r.MatchedAttributes, k => k.Key is PersonMatchedAttribute.EmailAddress);
+            },
+            r =>
+            {
+                Assert.Equal(person2.PersonId, r.PersonId);
+                Assert.DoesNotContain(r.MatchedAttributes, k => k.Key is PersonMatchedAttribute.EmailAddress);
+            });
     }
 
     [Fact]
@@ -174,7 +219,8 @@ public partial class OneLoginServiceTests
         DateOnly[] datesOfBirth = [dateOfBirth];
 
         // Act
-        var result = await WithServiceAsync(s => s.GetSuggestedPersonMatchesAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, trnTokenHintTrn)));
+        var result = await WithServiceAsync(
+            s => s.GetSuggestedPersonMatchesAsync(new(names, datesOfBirth, EmailAddress: null, nationalInsuranceNumber, trn, trnTokenHintTrn)));
 
         // Assert
         Assert.Collection(
