@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using AngleSharp.Html.Dom;
+using Optional;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
@@ -681,5 +682,66 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var setStatusButton = doc.GetElementByTestId("set-status-button") as IHtmlAnchorElement;
         Assert.Null(setStatusButton);
+    }
+
+    [Fact]
+    public async Task Get_WithoutOneLoginUser_DoesNotDisplayOneLoginSummaryCard()
+    {
+        // Arrange
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+        var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth).WithEmailAddress());
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var oneLoginSummary = doc.GetElementByTestId("associated-one-login-users");
+        Assert.Null(oneLoginSummary);
+    }
+
+    [Fact]
+    public async Task Get_WithoutOneLoginUser_DisplaysOneLoginSummaryCard()
+    {
+        // Arrange
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+        var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth).WithEmailAddress());
+        var user = await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var oneLoginSummary = doc.GetElementByTestId("associated-one-login-users");
+        Assert.NotNull(oneLoginSummary);
+        oneLoginSummary.AssertSummaryListRowValue("Email address", v => Assert.Equal(person.EmailAddress, v.TrimmedText()));
+    }
+
+    [Fact]
+    public async Task Get_WithMultipleOneLoginUsers_DisplaysAllOneLoginSummaryRows()
+    {
+        // Arrange
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+        var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth).WithEmailAddress());
+        string? email2 = TestData.GenerateUniqueEmail();
+        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some<string?>(email2), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var oneLoginSummary = doc.GetElementByTestId("associated-one-login-users");
+        Assert.NotNull(oneLoginSummary);
+        oneLoginSummary.AssertSummaryListHasRows(
+            ("Email address", person.EmailAddress),
+            ("Email address", email2)
+        );
+
     }
 }

@@ -29,4 +29,5 @@ public static class JourneyNames
     public const string SetStatus = nameof(SetStatus);
     public const string ResolveTpsPotentialDuplicate = nameof(ResolveTpsPotentialDuplicate);
     public const string ResolveOneLoginUserMatching = nameof(ResolveOneLoginUserMatching);
+    public const string DisconnectOneLogin = nameof(DisconnectOneLogin);
 }
