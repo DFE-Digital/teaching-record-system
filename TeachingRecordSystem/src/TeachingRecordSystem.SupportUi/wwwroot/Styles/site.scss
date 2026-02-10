@@ -94,6 +94,12 @@
   max-width: none;
 }
 
+.trs_checkboxes__wrapper--horizontal {
+  display: flex;
+  gap: 1rem;  
+  align-items: center;
+}
+
 .trs-checkboxes_hint {
   padding-top: 1rem;
 }
@@ -229,6 +235,11 @@
       margin-top: 26px;
     }
   }
+}
+
+.trs-filter__container {
+  background-color: govuk-colour("light-grey");
+  padding: 20px;
 }
 
 .govuk-radios.trs-user-roles {

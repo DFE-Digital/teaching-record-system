@@ -4,68 +4,129 @@
     ViewBag.Title = "Find a record";
 }
 
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
-
-<govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
-
-<filter-layout>
-    <filter-layout-filter>
-        <filter>
-            <filter-options>
-                <govuk-input for="Search" label-class="govuk-label--s" spellcheck="false" />
-
-                <govuk-checkboxes for="Statuses" class="govuk-checkboxes--small">
-                    <govuk-checkboxes-fieldset>
-                        <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s" />
-                        <govuk-checkboxes-item value="@PersonStatus.Active">
-                            @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.Statuses)].GetValueOrDefault(PersonStatus.Active, 0))
-                        </govuk-checkboxes-item>
-                        <govuk-checkboxes-item value="@PersonStatus.Deactivated">
-                            @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.Statuses)].GetValueOrDefault(PersonStatus.Deactivated, 0))
-                        </govuk-checkboxes-item>
-                    </govuk-checkboxes-fieldset>
-                </govuk-checkboxes>
-
-                <govuk-select for="SortBy" label-class="govuk-label--s">
-                    <govuk-select-item value="@PersonSearchSortByOption.LastNameAscending">@PersonSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@PersonSearchSortByOption.LastNameDescending">@PersonSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@PersonSearchSortByOption.FirstNameAscending">@PersonSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@PersonSearchSortByOption.FirstNameDescending">@PersonSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@PersonSearchSortByOption.DateOfBirthAscending">@PersonSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@PersonSearchSortByOption.DateOfBirthDescending">@PersonSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
-                </govuk-select>
-
-                <div class="govuk-button-group">
-                    <govuk-button type="submit">Apply filters</govuk-button>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
+        
+        <div class="govuk-!-margin-top-6">
+            <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
+                <div class="govuk-!-margin-bottom-4">
+                    <govuk-input for="Search" data-testid="search-input" type="search" autocomplete="off">
+                        <govuk-input-label>
+                            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
+                        </govuk-input-label>
+                        <govuk-input-hint>
+                            Enter a name, email address, date of birth or teacher reference number (TRN)
+                        </govuk-input-hint>
+                        <govuk-input-after-input>
+                            <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                        </govuk-input-after-input>
+                    </govuk-input>
                 </div>
-            </filter-options>
-        </filter>
-    </filter-layout-filter>
+            </form>
+        </div>
+    </div>
+</div>
 
-    <filter-layout-content>
-        <table class="govuk-table">
+<div class="govuk-grid-row govuk-!-margin-top-6">
+    <div class="govuk-grid-column-full">
+
+        <div class="trs-filter__container govuk-!-margin-bottom-6">
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-3">Filter by</h3>
+
+            <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false">
+                <input type="hidden" asp-for="Search" />            
+                
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <div class="trs_checkboxes__wrapper--horizontal">
+                            <govuk-checkboxes for="IncludeActive" class="govuk-checkboxes govuk-checkboxes--small">
+                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
+                                    @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.IncludeActive)].GetValueOrDefault(true, 0))
+                                </govuk-checkboxes-item>
+                            </govuk-checkboxes>
+
+                            <govuk-checkboxes for="IncludeDeactivated" class="govuk-checkboxes govuk-checkboxes--small">
+                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
+                                    @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.IncludeDeactivated)].GetValueOrDefault(true, 0))
+                                </govuk-checkboxes-item>
+                            </govuk-checkboxes>
+
+                            <govuk-checkboxes for="IncludeOneLoginUser" class="govuk-checkboxes govuk-checkboxes--small">
+                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
+                                    GOV.UK One Login (@Model.Facets![nameof(Model.IncludeOneLoginUser)].GetValueOrDefault(true, 0))
+                                </govuk-checkboxes-item>
+                            </govuk-checkboxes>
+                        </div>
+                    </div>
+                    <div class="govuk-grid-column-one-third">
+                        <div class="govuk-button-group govuk-!-margin-bottom-0">
+                            <a href="@LinkGenerator.Persons.Index(Model.Search)" class="govuk-link">Clear all</a>
+                            <govuk-button type="submit" class="govuk-!-margin-bottom-0">Apply filters</govuk-button>
+                        </div>
+                    </div>
+                </div>                    
+            </form>
+        </div>
+
+        <table class="govuk-table govuk-!-margin-top-4">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">Name</th>
-                    <th scope="col" class="govuk-table__header">Date of birth</th>
-                    <th scope="col" class="govuk-table__header">TRN</th>
-                    <th scope="col" class="govuk-table__header">National Insurance number</th>
-                    <th scope="col" class="govuk-table__header">Record status</th>
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.Name ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.Name, direction))">
+                        Name
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.OneLoginEmailAddress ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.OneLoginEmailAddress, direction))">
+                        One Login email address(es)
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.DateOfBirth ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.DateOfBirth, direction))">
+                        Date of birth
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.Trn ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.Trn, direction))">
+                        TRN
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.NationalInsuranceNumber ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.NationalInsuranceNumber, direction))">
+                        National Insurance number
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.RecordStatus ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.RecordStatus, direction))">
+                        Record status
+                    </th>
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
-                @if (Model.SearchResults?.Count == 0)
+                @if (Model.SearchResults!.Count == 0)
                 {
                     <tr class="govuk-table__row" data-testid="no-matches">
-                        <td class="govuk-table__cell" colspan="5">No matching records</td>
+                        <td class="govuk-table__cell" colspan="6">No matching records</td>
                     </tr>
                 }
                 else
                 {
-                    @foreach (var personInfo in Model.SearchResults!)
+                    @foreach (var personInfo in Model.SearchResults)
                     {
                         <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
                             <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.Persons.PersonDetail.Index(personInfo.PersonId)" class="govuk-link">@personInfo.Name</a></td>
+                            <td class="govuk-table__cell" data-testid="one-login-emails" use-empty-fallback>
+                                @if (personInfo.OneLoginUserEmailAddresses.Length > 0)
+                                {
+                                    @foreach (var email in personInfo.OneLoginUserEmailAddresses)
+                                    {
+                                        <div>@email</div>
+                                    }
+                                }
+                            </td>
                             <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(WebConstants.DateOnlyDisplayFormat) : string.Empty)</td>
                             <td class="govuk-table__cell" data-testid="trn">@personInfo.Trn</td>
                             <td class="govuk-table__cell" data-testid="nino" use-empty-fallback>@personInfo.NationalInsuranceNumber</td>
@@ -77,5 +138,5 @@
         </table>
 
         <partial name="_Pagination" model="@Model.Pagination" />
-    </filter-layout-content>
-</filter-layout>
+    </div>
+</div>
