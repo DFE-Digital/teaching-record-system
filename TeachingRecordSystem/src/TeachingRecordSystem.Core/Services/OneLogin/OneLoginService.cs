@@ -23,11 +23,12 @@ public class OneLoginService(
     // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
     private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
 
-    public Task<string> GetRecordNotFoundEmailContentAsync(string personName)
+    public Task<string> GetRecordNotFoundEmailContentHtmlAsync(string personName)
     {
         return notificationSender.RenderEmailTemplateHtmlAsync(
             EmailTemplateIds.OneLoginCannotFindRecord,
-            GetOneLoginCannotFindRecordEmailPersonalization(personName));
+            GetOneLoginCannotFindRecordEmailPersonalization(personName),
+            stripLinks: true);
     }
 
     public async Task EnqueueNotVerifiedEmailAsync(string emailAddress, string personName, string reason, ProcessContext processContext)

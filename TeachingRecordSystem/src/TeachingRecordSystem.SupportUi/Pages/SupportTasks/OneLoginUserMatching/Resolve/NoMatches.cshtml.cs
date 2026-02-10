@@ -24,7 +24,7 @@ public class NoMatches(
 
     public string? Name { get; set; }
 
-    public string? EmailContent { get; set; }
+    public string? EmailContentHtml { get; set; }
 
     public bool? IsRecordMatchingOnly { get; set; }
 
@@ -105,7 +105,7 @@ public class NoMatches(
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         Name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
 
-        EmailContent = await oneLoginService.GetRecordNotFoundEmailContentAsync(Name);
+        EmailContentHtml = await oneLoginService.GetRecordNotFoundEmailContentHtmlAsync(Name);
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

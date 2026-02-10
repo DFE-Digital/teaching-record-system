@@ -25,7 +25,7 @@
             </p>
 
             <govuk-inset-text>
-                @Html.ConvertNewlinesToLineBreaks(Model.EmailContent)
+                @Html.Raw(Model.EmailContentHtml)
             </govuk-inset-text>
 
             <div class="govuk-button-group">
