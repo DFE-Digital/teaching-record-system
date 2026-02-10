@@ -23,7 +23,7 @@ public class NotificationSender : INotificationSender
         }
     }
 
-    public async Task<string> RenderEmailTemplateAsync(string templateId, IReadOnlyDictionary<string, string> personalization)
+    public async Task<string> RenderEmailTemplateHtmlAsync(string templateId, IReadOnlyDictionary<string, string> personalization)
     {
         var template = (await _notificationClient.GetTemplateByIdAsync(templateId)) ??
             throw new ArgumentException($"Template with ID '{templateId}' not found.", nameof(templateId));
