@@ -451,15 +451,15 @@ public class OneLoginService(
 
         await dbContext.SaveChangesAsync();
 
+        var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(oneLoginUser);
+
         await eventPublisher.PublishEventAsync(
             new OneLoginUserSignedInEvent
             {
                 EventId = Guid.NewGuid(),
-                Subject = oneLoginUser.Subject
+                OneLoginUser = oneLoginUserEventModel
             },
             processContext);
-
-        var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(oneLoginUser);
 
         if (oldOneLoginUserEventModel is null)
         {

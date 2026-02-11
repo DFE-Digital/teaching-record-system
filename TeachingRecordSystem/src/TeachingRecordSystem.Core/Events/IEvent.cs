@@ -9,9 +9,12 @@ public interface IEvent
     Guid EventId { get; }
     Guid[] PersonIds { get; }
 
-    static JsonSerializerOptions SerializerOptions => new()
+    public static JsonSerializerOptions SerializerOptions => new()
     {
         AllowOutOfOrderMetadataProperties = true,  // jsonb columns may have properties in any order
         TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { Modifiers.Events, Modifiers.SupportTaskData } }
     };
+
+    protected static Guid[] CoalescePersonIds(params IEnumerable<Guid?> personIds) =>
+        personIds.Where(id => id.HasValue).Select(id => id!.Value).Distinct().ToArray();
 }

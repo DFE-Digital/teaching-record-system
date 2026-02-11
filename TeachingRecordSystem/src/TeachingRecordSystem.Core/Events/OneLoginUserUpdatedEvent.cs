@@ -3,7 +3,7 @@ namespace TeachingRecordSystem.Core.Events;
 public record OneLoginUserUpdatedEvent : IEvent
 {
     public required Guid EventId { get; init; }
-    public Guid[] PersonIds => [];
+    public Guid[] PersonIds => IEvent.CoalescePersonIds(OneLoginUser.PersonId, OldOneLoginUser.PersonId);
     public required EventModels.OneLoginUser OneLoginUser { get; init; }
     public required EventModels.OneLoginUser OldOneLoginUser { get; init; }
     public required OneLoginUserUpdatedEventChanges Changes { get; init; }

@@ -352,7 +352,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
             e =>
             {
                 var signedInEvent = Assert.IsType<OneLoginUserSignedInEvent>(e);
-                Assert.Equal(subject, signedInEvent.Subject);
+                Assert.Equal(subject, signedInEvent.OneLoginUser.Subject);
             });
     }
 
@@ -374,7 +374,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         Events.AssertEventsPublished(e =>
         {
             var signedInEvent = Assert.IsType<OneLoginUserSignedInEvent>(e);
-            Assert.Equal(oneLoginUser.Subject, signedInEvent.Subject);
+            Assert.Equal(oneLoginUser.Subject, signedInEvent.OneLoginUser.Subject);
         });
     }
 
@@ -398,7 +398,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
             e =>
             {
                 var signedInEvent = Assert.IsType<OneLoginUserSignedInEvent>(e);
-                Assert.Equal(oneLoginUser.Subject, signedInEvent.Subject);
+                Assert.Equal(oneLoginUser.Subject, signedInEvent.OneLoginUser.Subject);
             },
             e =>
             {
