@@ -1,7 +1,7 @@
 @page "/trn"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.TrnModel
 @{
-    ViewBag.Title = "Teacher reference number (TRN)";
+    ViewBag.Title = "Do you have a teacher reference number (TRN)?";
 }
 
 <div class="govuk-grid-row">
@@ -10,43 +10,31 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-details>
-                <govuk-details-summary>About teacher reference numbers</govuk-details-summary>
+                <govuk-details-summary>About TRNs</govuk-details-summary>
                 <govuk-details-text>
                     <p class="govuk-body">
-                        You’ll have a TRN if you:
-                        <ul class="govuk-list govuk-list--bullet">
-                            <li>hold qualified teacher status (QTS) in England or Wales</li>
-                            <li>hold early years teacher status (EYTS) in England</li>
-                            <li>hold a national professional qualification (NPQ)</li>
-                            <li>are working towards QTS, EYTS or an NPQ</li>
-                            <li>contribute to the Teachers’ Pension Scheme in England or Wales</li>
-                            <li>have a relevant restriction in relation to teaching in England</li>
-                        </ul>
-                    </p>
-                    <p class="govuk-body">
-                        You may not have one yet in you work in early years, further education or qualified as a teacher outside of England.
+                        You’ll have a TRN if you’ve ever trained, worked or been registered to teach in England or Wales.
                     </p>
                     <p class="govuk-body">
                         <a href="https://www.gov.uk/guidance/teacher-reference-number-trn" class="govuk-link" rel="noreferrer" target="_blank">
-                            Learn about TRNs, including how to request one or find a lost TRN (opens in a new tab).
+                            Find out more about TRNs
                         </a>
+                        or
+                        <a href="https://find-a-lost-trn.education.gov.uk/" class="govuk-link" rel="noreferrer" target="_blank">find a lost TRN</a>.
                     </p>
                 </govuk-details-text>
             </govuk-details>
 
             <govuk-radios for="HaveTrn">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend>Do you have a teacher reference number?</govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@true">
-                        Yes
-                        <govuk-radios-item-conditional>
-                            <govuk-input for="Trn" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
-                                <govuk-input-label>Teacher reference number</govuk-input-label>
-                            </govuk-input>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@false">No</govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-item value="@true">
+                    Yes
+                    <govuk-radios-item-conditional>
+                        <govuk-input for="Trn" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
+                            <govuk-input-label>Teacher reference number</govuk-input-label>
+                        </govuk-input>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
+                <govuk-radios-item value="@false">No</govuk-radios-item>
             </govuk-radios>
 
             <govuk-button type="submit">Continue</govuk-button>
