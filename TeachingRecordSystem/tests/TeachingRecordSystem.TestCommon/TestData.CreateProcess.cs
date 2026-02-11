@@ -40,6 +40,7 @@ public partial class TestData
                     EventName = @event.GetType().Name,
                     Payload = @event,
                     PersonIds = @event.PersonIds,
+                    OneLoginUserSubjects = @event.OneLoginUserSubjects,
                     CreatedOn = Clock.UtcNow
                 });
             }

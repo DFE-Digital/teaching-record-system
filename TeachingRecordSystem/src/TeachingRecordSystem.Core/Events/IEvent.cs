@@ -8,6 +8,7 @@ public interface IEvent
 {
     Guid EventId { get; }
     Guid[] PersonIds { get; }
+    string[] OneLoginUserSubjects { get; }
 
     public static JsonSerializerOptions SerializerOptions => new()
     {

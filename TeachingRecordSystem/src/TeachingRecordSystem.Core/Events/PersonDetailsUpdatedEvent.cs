@@ -3,7 +3,8 @@ namespace TeachingRecordSystem.Core.Events;
 public record PersonDetailsUpdatedEvent : IEvent
 {
     public required Guid EventId { get; init; }
-    public Guid[] PersonIds => [PersonId];
+    Guid[] IEvent.PersonIds => [PersonId];
+    string[] IEvent.OneLoginUserSubjects => [];
     public required Guid PersonId { get; init; }
     public required EventModels.PersonDetails PersonDetails { get; init; }
     public required EventModels.PersonDetails OldPersonDetails { get; init; }

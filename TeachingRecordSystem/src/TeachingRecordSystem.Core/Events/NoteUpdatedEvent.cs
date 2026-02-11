@@ -3,7 +3,8 @@ namespace TeachingRecordSystem.Core.Events;
 public record NoteUpdatedEvent : IEvent
 {
     public required Guid EventId { get; init; }
-    public Guid[] PersonIds => [PersonId];
+    Guid[] IEvent.PersonIds => [PersonId];
+    string[] IEvent.OneLoginUserSubjects => [];
     public required Guid PersonId { get; init; }
     public required NoteUpdatedInDqtEventChanges Changes { get; init; }
     public required EventModels.Note Note { get; init; }

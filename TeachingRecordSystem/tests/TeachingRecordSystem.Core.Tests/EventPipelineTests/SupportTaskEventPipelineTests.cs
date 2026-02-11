@@ -45,7 +45,7 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
                 Assert.Equal(@event.EventId, legacyEvent.EventId);
                 Assert.Equal(@event.SupportTask, legacyEvent.SupportTask);
                 Assert.Equal(processContext.Now, legacyEvent.CreatedUtc);
-                Assert.Equal(@event.PersonIds.SingleOrDefault(), legacyEvent.PersonId.ToNullable());
+                Assert.Equal(@event.PersonId, legacyEvent.PersonId.ToNullable());
             });
     }
 }
