@@ -81,18 +81,21 @@
                         </govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>
-                        Proof of identity
-                    </govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.ProofOfIdentityFileName</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@Links.ProofOfIdentity(returnUrl: Request.GetEncodedPathAndQuery())"
-                                                       visually-hidden-text="proof of identity">
-                            Change
-                        </govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                @if (!Model.IdentityVerified)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>
+                            Proof of identity
+                        </govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.ProofOfIdentityFileName</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@Links.ProofOfIdentity(returnUrl: Request.GetEncodedPathAndQuery())"
+                                                           visually-hidden-text="proof of identity">
+                                Change
+                            </govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
             </govuk-summary-list>
 
             <govuk-button type="submit">Submit support request</govuk-button>
