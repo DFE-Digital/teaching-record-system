@@ -89,6 +89,10 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.Equal(notConnectingReason, updatedData.NotConnectingReason);
         Assert.Equal(notConnectingAdditionalDetails, updatedData.NotConnectingAdditionalDetails);
 
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Empty(emails);
+
         Events.AssertEventsPublished(e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
 
