@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Transactions;
+using AngleSharp.Common;
 using Npgsql;
 using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -28,6 +29,22 @@ public class OneLoginService(
         return notificationSender.RenderEmailTemplateHtmlAsync(
             EmailTemplateIds.OneLoginCannotFindRecord,
             GetOneLoginCannotFindRecordEmailPersonalization(personName),
+            stripLinks: true);
+    }
+
+    public Task<string> GetNotVerifiedEmailContentHtmlAsync(string personName, string reason)
+    {
+        return notificationSender.RenderEmailTemplateHtmlAsync(
+            EmailTemplateIds.OneLoginNotVerified,
+            GetOneLoginNotVerifiedEmailPersonalization(personName, reason),
+            stripLinks: true);
+    }
+
+    public Task<string> GetRecordMatchedEmailContentHtmlAsync(string personName)
+    {
+        return notificationSender.RenderEmailTemplateHtmlAsync(
+            EmailTemplateIds.OneLoginRecordMatched,
+            GetRecordMatchedEmailPersonalization(personName),
             stripLinks: true);
     }
 
@@ -65,17 +82,12 @@ public class OneLoginService(
 
     public async Task EnqueueRecordMatchedEmailAsync(string emailAddress, string personName, ProcessContext processContext)
     {
-        var personalization = new Dictionary<string, string>
-        {
-            ["name"] = personName
-        };
-
         var email = new Email
         {
             EmailId = Guid.NewGuid(),
             TemplateId = EmailTemplateIds.OneLoginRecordMatched,
             EmailAddress = emailAddress,
-            Personalization = personalization
+            Personalization = GetRecordMatchedEmailContentHtmlAsync(personName).ToDictionary()
         };
 
         dbContext.Emails.Add(email);
@@ -260,6 +272,12 @@ public class OneLoginService(
         {
             ["name"] = personName,
             ["reason"] = reason
+        };
+
+    private static IReadOnlyDictionary<string, string> GetRecordMatchedEmailPersonalization(string personName) =>
+        new Dictionary<string, string>
+        {
+            ["name"] = personName
         };
 
     public virtual async Task<MatchPersonResult?> MatchPersonAsync(MatchPersonOptions options)

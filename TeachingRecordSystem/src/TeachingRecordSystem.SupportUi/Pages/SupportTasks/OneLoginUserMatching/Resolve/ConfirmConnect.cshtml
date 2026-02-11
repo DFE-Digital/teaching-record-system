@@ -63,6 +63,14 @@
                 </govuk-summary-list>
             </govuk-summary-card>
 
+            <p class="govuk-body">
+                Once you’ve connected this GOV.UK One Login to @(Model.MatchedPersonName)’s record, we’ll send them the email below.
+            </p>
+
+            <govuk-inset-text>
+                @Html.Raw(Model.EmailContentHtml)
+            </govuk-inset-text>
+
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm and connect account</govuk-button>
                 <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary">Cancel</govuk-button>
