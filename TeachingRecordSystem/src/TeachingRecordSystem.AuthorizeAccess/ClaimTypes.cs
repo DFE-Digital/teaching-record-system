@@ -6,7 +6,7 @@ public static class ClaimTypes
     public const string Subject = "sub";
     public const string Trn = "trn";
     public const string OneLoginIdToken = "onelogin_id";
-    public const string OneLoginVerifiedNames = "onelogin_verified_names";
-    public const string OneLoginVerifiedBirthDates = "onelogin_verified_birthdates";
+    public const string VerifiedName = "verified_name";
+    public const string VerifiedDateOfBirth = "verified_date_of_birth";
     public const string TrsUserId = "trs_user_id";
 }
