@@ -198,11 +198,8 @@ public class OAuth2Controller(
             claims.Add(ClaimTypes.Email, oneLoginUser.EmailAddress!);
         }
 
-        if (oneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.OneLogin)
-        {
-            claims.Add(ClaimTypes.OneLoginVerifiedNames, oneLoginUser.VerifiedNames!);
-            claims.Add(ClaimTypes.OneLoginVerifiedBirthDates, oneLoginUser.VerifiedDatesOfBirth!);
-        }
+        claims.Add(ClaimTypes.VerifiedName, oneLoginUser.VerifiedNames!.First());
+        claims.Add(ClaimTypes.VerifiedDateOfBirth, oneLoginUser.VerifiedDatesOfBirth!.First());
 
         return Ok(claims);
     }

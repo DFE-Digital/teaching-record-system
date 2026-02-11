@@ -43,8 +43,8 @@ public static class TestAppConfiguration
                     options.Scope.Add("profile");
                     options.Scope.Add(CustomScopes.TeachingRecord);
 
-                    options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.OneLoginVerifiedNames));
-                    options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.OneLoginVerifiedBirthDates));
+                    options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.VerifiedName));
+                    options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.VerifiedDateOfBirth));
 
                     options.Events.OnRedirectToIdentityProvider = ctx =>
                     {
