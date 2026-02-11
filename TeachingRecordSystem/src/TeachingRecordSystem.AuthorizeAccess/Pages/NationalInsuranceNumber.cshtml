@@ -1,17 +1,15 @@
 @page "/national-insurance-number/{handler?}"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.NationalInsuranceNumberModel
 @{
-    ViewBag.Title = Html.DisplayNameFor(m => m.NationalInsuranceNumber);
+    ViewBag.Title = "Do you have a National Insurance number?";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
-            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-
             <govuk-radios for="HaveNationalInsuranceNumber">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend>Do you have a National Insurance number?</govuk-radios-fieldset-legend>
+                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
