@@ -3,12 +3,17 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
-public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskService, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
+public class ConfirmReject(
+    OneLoginUserMatchingSupportTaskService supportTaskService,
+    OneLoginService oneLoginService,
+    IClock clock,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -22,6 +27,8 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
     public OneLoginIdVerificationRejectReason Reason { get; set; }
 
     public string? AdditionalDetails { get; set; }
+
+    public string? EmailContentHtml { get; set; }
 
     public void OnGet()
     {
@@ -57,7 +64,7 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
         return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
     }
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (JourneyInstance.State.Verified is not false)
         {
@@ -76,5 +83,12 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
         EmailAddress = _supportTask.OneLoginUser!.EmailAddress!;
         Reason = JourneyInstance.State.RejectReason!.Value;
         AdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails;
+
+        var data = _supportTask.GetData<OneLoginUserIdVerificationData>();
+        EmailContentHtml = await oneLoginService.GetNotVerifiedEmailContentHtmlAsync(
+            data.StatedFirstName + " " + data.StatedLastName,
+            Reason.GetDisplayName()!);
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

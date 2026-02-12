@@ -3,14 +3,18 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 using TeachingRecordSystem.SupportUi;
+using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
 public class ConfirmConnect(
     OneLoginUserMatchingSupportTaskService supportTaskService,
+    OneLoginService oneLoginService,
     TrsDbContext dbContext,
     IClock clock,
     SupportUiLinkGenerator linkGenerator) : PageModel
@@ -38,6 +42,8 @@ public class ConfirmConnect(
 
     public string? MatchedPersonNationalInsuranceNumber { get; set; }
 
+    public string? EmailContentHtml { get; set; }
+
     public void OnGet()
     {
     }
@@ -48,18 +54,15 @@ public class ConfirmConnect(
         {
             await JourneyInstance.DeleteAsync();
 
-            if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-            {
-                return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-            }
-
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+            return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+                linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+                linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
         }
 
         var matchedPerson = JourneyInstance.State.MatchedPersons
             .Single(m => m.PersonId == MatchedPersonId);
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
+        if (_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification)
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
@@ -92,12 +95,9 @@ public class ConfirmConnect(
             $"GOV.UK One Login connected to {MatchedPersonName}’s record",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(MatchedPersonId)));
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-        {
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-        }
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+        return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -132,6 +132,11 @@ public class ConfirmConnect(
         MatchedPersonTrn = matchedPerson.Trn;
         MatchedPersonDateOfBirth = matchedPerson.DateOfBirth!.Value;
         MatchedPersonNationalInsuranceNumber = matchedPerson.NationalInsuranceNumber;
+
+        var name = _supportTask.Data is OneLoginUserIdVerificationData verificationData ?
+            verificationData.StatedFirstName + " " + verificationData.StatedLastName :
+            string.Join(" ", _supportTask.OneLoginUser.VerifiedNames!.First());
+        EmailContentHtml = await oneLoginService.GetRecordMatchedEmailContentHtmlAsync(name);
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

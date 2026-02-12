@@ -44,7 +44,7 @@ public class NotConnecting(SupportUiLinkGenerator linkGenerator) : PageModel
         {
             await JourneyInstance.DeleteAsync();
 
-            if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
+            if (_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification)
             {
                 return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
             }

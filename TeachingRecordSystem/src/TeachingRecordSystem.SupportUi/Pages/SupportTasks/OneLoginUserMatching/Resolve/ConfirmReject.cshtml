@@ -41,6 +41,14 @@
                 }
             </govuk-summary-list>
 
+            <p class="govuk-body">
+                We’ll send them the email below to help them check their details and find out what they can do next.
+            </p>
+
+            <govuk-inset-text>
+                @Html.Raw(Model.EmailContentHtml)
+            </govuk-inset-text>
+
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm and reject request</govuk-button>
                 <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary">Cancel</govuk-button>

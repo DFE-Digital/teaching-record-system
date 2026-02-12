@@ -38,7 +38,7 @@ public class NoMatches(
         {
             await JourneyInstance.DeleteAsync();
 
-            if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
+            if (_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification)
             {
                 return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
             }
@@ -46,7 +46,7 @@ public class NoMatches(
             return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
         }
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
+        if (_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification)
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
@@ -75,7 +75,7 @@ public class NoMatches(
             "Email sent",
             $"Request closed for {Name}.");
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
+        if (_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification)
         {
             return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
         }
@@ -98,7 +98,7 @@ public class NoMatches(
         }
 
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        IsRecordMatchingOnly = _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching;
+        IsRecordMatchingOnly = _supportTask!.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching;
         var data = _supportTask.GetData<IOneLoginUserMatchingData>();
 
         // For the time being only display first verified name and dob if there are multiples (but still match on both)

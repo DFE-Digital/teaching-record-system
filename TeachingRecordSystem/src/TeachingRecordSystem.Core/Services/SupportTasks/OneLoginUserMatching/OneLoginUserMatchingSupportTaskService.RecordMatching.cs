@@ -56,10 +56,6 @@ public partial class OneLoginUserMatchingSupportTaskService
             },
             processContext);
         Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
-
-        var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
-        var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
-        await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
     }
 
     public async Task ResolveRecordMatchingSupportTaskAsync(NoMatchesOutcomeOptions options, ProcessContext processContext)

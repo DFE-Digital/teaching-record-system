@@ -36,15 +36,12 @@ public class ConfirmNotConnecting(
         {
             await JourneyInstance.DeleteAsync();
 
-            if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-            {
-                return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-            }
-
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+            return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+                linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+                linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
         }
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
+        if (_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification)
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
@@ -79,12 +76,9 @@ public class ConfirmNotConnecting(
             "GOV.UK One Login not connected to a record",
             $"Request closed for {firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}.");
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-        {
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-        }
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+        return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

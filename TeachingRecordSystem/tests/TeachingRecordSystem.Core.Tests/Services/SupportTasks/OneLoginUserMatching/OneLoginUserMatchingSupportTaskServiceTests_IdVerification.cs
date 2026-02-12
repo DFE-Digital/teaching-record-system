@@ -226,6 +226,10 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Assert.Null(updatedOneLoginUser.MatchRoute);
         Assert.Null(updatedOneLoginUser.MatchedAttributes);
 
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Empty(emails);
+
         Events.AssertEventsPublished(
             e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
             e => Assert.IsType<SupportTaskUpdatedEvent>(e));
