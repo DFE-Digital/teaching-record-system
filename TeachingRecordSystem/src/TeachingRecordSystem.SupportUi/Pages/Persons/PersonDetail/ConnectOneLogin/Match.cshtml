@@ -1,19 +1,111 @@
 @page "/persons/{PersonId}/connect-one-login/match"
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin.MatchModel
 @{
-    ViewBag.Title = "Match GOV.UK One Login user";
+    ViewBag.Title = "Check if this GOV.UK One Login matches an existing record";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Index(Model.PersonId)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Index(Model.PersonId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-l">Record management</span>
-        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<form method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Record management</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <p class="govuk-body">TODO: Implement match confirmation page</p>
-        <p class="govuk-body">Subject: @Model.Subject</p>
+            <govuk-inset-text>
+                Details that do not match are <highlight>highlighted</highlight> in the GOV.UK One Login details
+            </govuk-inset-text>
+
+            <govuk-summary-card data-testid="record">
+                <govuk-summary-card-title>Record details</govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@($"{Model.PersonFirstName} {Model.PersonLastName}")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.PersonEmailAddress</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback="">@Model.PersonDateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.PersonTrn</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.PersonNationalInsuranceNumber</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+
+            <govuk-summary-card data-testid="one-login">
+                <govuk-summary-card-title>GOV.UK One Login details</govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (Model.OneLoginUserVerifiedNames is not null && Model.OneLoginUserVerifiedNames.Length > 0)
+                            {
+                                <ul class="govuk-list">
+                                    @foreach (var namePair in Model.OneLoginUserVerifiedNames)
+                                    {
+                                        var firstName = namePair[0];
+                                        var lastName = namePair.Skip(1).LastOrDefault();
+                                        <li>
+                                            <span highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.FirstName) == true && Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.LastName) == true))">
+                                                @($"{firstName} {lastName}")
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span highlight="true" use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.EmailAddress) == true))">
+                            @Model.OneLoginUserEmailAddress
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (Model.OneLoginUserVerifiedDatesOfBirth is not null && Model.OneLoginUserVerifiedDatesOfBirth.Length > 0)
+                            {
+                                <ul class="govuk-list">
+                                    @foreach (var dob in Model.OneLoginUserVerifiedDatesOfBirth)
+                                    {
+                                        <li>
+                                            <span highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.DateOfBirth) == true))">
+                                                @dob.ToString(WebConstants.DateOnlyDisplayFormat)
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.DateOfBirth) == true))" use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Connect record to GOV.UK One Login</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.MatchCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+            </div>
+        </div>
     </div>
-</div>
+</form>

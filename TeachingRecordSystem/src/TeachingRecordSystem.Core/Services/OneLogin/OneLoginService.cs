@@ -302,6 +302,7 @@ public class OneLoginService(
     public async Task<IReadOnlyCollection<MatchPersonResult>> GetSuggestedPersonMatchesAsync(GetSuggestedPersonMatchesOptions options)
     {
         // Return any record that matches on last name and DOB OR NINO OR TRN.
+        // If PersonId is provided, only match against that specific person.
         // Results should be ordered such that matches on TRN are returned before matches on NINO with matches on last name + DOB last.
 
         var firstNames = options.Names.Select(parts => parts.First()).ToArray();
@@ -318,7 +319,8 @@ public class OneLoginService(
                     :dates_of_birth dates_of_birth,
                     (:email_address COLLATE "case_insensitive") email_address,
                     :trns trns,
-                    array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers
+                    array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers,
+                    :person_id person_id
                 )
                 SELECT
                     p.person_id,
@@ -336,11 +338,13 @@ public class OneLoginService(
                     (array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers) national_insurance_number_matches,
                     (SELECT ARRAY(SELECT UNNEST(p.national_insurance_numbers) INTERSECT SELECT UNNEST(vars.national_insurance_numbers))) matched_national_insurance_number
                 FROM persons p, vars
-                WHERE p.status = 0 AND (
-                    (array_length(vars.last_names, 1) > 0 AND p.date_of_birth = ANY(vars.dates_of_birth) AND p.names && vars.last_names) OR
-                    p.trn = ANY(vars.trns) OR
-                    (array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers)
-                )
+                WHERE
+                    (vars.person_id IS NOT NULL AND p.person_id = vars.person_id) OR
+                    (vars.person_id IS NULL AND p.status = 0 AND (
+                        (array_length(vars.last_names, 1) > 0 AND p.date_of_birth = ANY(vars.dates_of_birth) AND p.names && vars.last_names) OR
+                        p.trn = ANY(vars.trns) OR
+                        (array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers)
+                    ))
                 """,
                 // ReSharper disable FormatStringProblem
                 parameters:
@@ -356,7 +360,8 @@ public class OneLoginService(
                     {
                         Value = nationalInsuranceNumber ?? (object)DBNull.Value
                     },
-                    new NpgsqlParameter("trns", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = trns }
+                    new NpgsqlParameter("trns", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = trns },
+                    new NpgsqlParameter("person_id", NpgsqlDbType.Uuid) { Value = options.PersonId ?? (object)DBNull.Value }
                 ]
                 // ReSharper restore FormatStringProblem
             ).ToArrayAsync();

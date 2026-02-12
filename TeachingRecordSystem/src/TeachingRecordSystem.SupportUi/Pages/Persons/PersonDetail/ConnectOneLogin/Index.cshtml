@@ -17,14 +17,14 @@
                 <govuk-input-label>@ViewBag.Title</govuk-input-label>
                 <govuk-input-hint>
                     <govuk-inset-text>
-                        You’re connecting the record with the TRN @Model.Trn to a GOV.UK One Login. You’ll be able to review the details before confirming
+                        You’re connecting the record with the TRN @Model.Trn to a GOV.UK One Login. You’ll be able to review the details before confirming.
                     </govuk-inset-text>
                 </govuk-input-hint>
             </govuk-input>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button-link href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId)" class="govuk-button--secondary">Cancel and return to record</govuk-button-link>
+                <govuk-button formaction="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.IndexCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
             </div>
         </form>
     </div>
