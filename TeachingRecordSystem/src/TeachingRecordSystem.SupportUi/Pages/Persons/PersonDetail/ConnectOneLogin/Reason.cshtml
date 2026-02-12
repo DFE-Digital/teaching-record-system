@@ -1,0 +1,16 @@
+@page "/persons/{PersonId}/connect-one-login/reason/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin.ReasonModel
+@{
+    ViewBag.Title = "Reason for connecting to GOV.UK One Login";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@Model.BackLink">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        <p class="govuk-body">TODO: Implement reason page</p>
+    </div>
+</div>
