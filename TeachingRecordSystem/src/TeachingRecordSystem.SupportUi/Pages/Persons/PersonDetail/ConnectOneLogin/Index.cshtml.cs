@@ -31,15 +31,7 @@ public class IndexModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var validationResult = await _validator.ValidateAsync(this);
-        if (!validationResult.IsValid)
-        {
-            foreach (var error in validationResult.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Where(u => u.EmailAddress == EmailAddress)
@@ -56,7 +48,7 @@ public class IndexModel(
             var errorMessage = oneLoginUser.PersonId == PersonId
                 ? "This GOV.UK One Login user is already connected to this record"
                 : "This GOV.UK One Login user is already connected to another record";
-            
+
             ModelState.AddModelError(nameof(EmailAddress), errorMessage);
             return this.PageWithErrors();
         }
@@ -66,23 +58,8 @@ public class IndexModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var person = await dbContext.Persons
-            .Where(p => p.PersonId == PersonId)
-            .Select(p => new { p.PersonId, p.Trn })
-            .FirstOrDefaultAsync();
-
-        if (person is null)
-        {
-            context.Result = NotFound();
-            return;
-        }
-
-        Trn = person.Trn;
+        Trn = context.HttpContext.GetCurrentPersonFeature().Trn;
 
         await next();
     }
 }
-
-
-
-
