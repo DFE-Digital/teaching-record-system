@@ -1,3 +1,4 @@
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLogin;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -10,6 +11,7 @@ public class PersonDetailLinkGenerator(LinkGenerator linkGenerator)
     public EditDetailsLinkGenerator EditDetails { get; } = new(linkGenerator);
     public EditInductionLinkGenerator EditInduction { get; } = new(linkGenerator);
     public SetStatusLinkGenerator SetStatus { get; } = new(linkGenerator);
+    public ConnectOneLoginLinkGenerator ConnectOneLogin { get; } = new(linkGenerator);
     public DisconnectOneLoginLinkGenerator DisconnectOneLogin { get; } = new(linkGenerator);
 
     public string Index(Guid personId) =>

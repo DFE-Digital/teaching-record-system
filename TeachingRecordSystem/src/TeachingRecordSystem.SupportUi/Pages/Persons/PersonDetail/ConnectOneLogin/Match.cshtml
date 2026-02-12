@@ -1,0 +1,19 @@
+@page "/persons/{PersonId}/connect-one-login/match"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin.MatchModel
+@{
+    ViewBag.Title = "Match GOV.UK One Login user";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Index(Model.PersonId)">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">Record management</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        <p class="govuk-body">TODO: Implement match confirmation page</p>
+        <p class="govuk-body">Subject: @Model.Subject</p>
+    </div>
+</div>
