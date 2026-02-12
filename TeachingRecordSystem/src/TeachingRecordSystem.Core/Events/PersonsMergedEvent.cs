@@ -4,6 +4,7 @@ public record PersonsMergedEvent : IEvent
 {
     public required Guid EventId { get; init; }
     public Guid[] PersonIds => [RetainedPersonId, DeactivatedPersonId];
+    string[] IEvent.OneLoginUserSubjects => [];
     public required Guid RetainedPersonId { get; init; }
     public required string RetainedPersonTrn { get; init; }
     public required Guid DeactivatedPersonId { get; init; }

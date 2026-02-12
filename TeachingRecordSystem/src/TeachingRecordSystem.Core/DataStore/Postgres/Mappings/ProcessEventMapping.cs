@@ -15,8 +15,10 @@ public class ProcessEventMapping : IEntityTypeConfiguration<ProcessEvent>
             .HasConversion(
                 v => JsonSerializer.Serialize(v, IEvent.SerializerOptions),
                 v => JsonSerializer.Deserialize<IEvent>(v, IEvent.SerializerOptions)!);
+        builder.Property(e => e.OneLoginUserSubjects).HasColumnType("varchar(255)[]");
         builder.HasOne<Process>().WithMany(a => a.Events).HasForeignKey(ae => ae.ProcessId).HasConstraintName("fk_process_events_process_process_id");
         builder.HasIndex(e => new { e.PersonIds, e.EventName }).HasMethod("GIN").IsCreatedConcurrently();
+        builder.HasIndex(e => new { e.OneLoginUserSubjects, e.EventName }).HasMethod("GIN").IsCreatedConcurrently();
         builder.HasIndex(e => e.ProcessId).IsCreatedConcurrently();
     }
 }

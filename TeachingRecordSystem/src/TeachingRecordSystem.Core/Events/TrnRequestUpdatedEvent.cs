@@ -3,7 +3,8 @@ namespace TeachingRecordSystem.Core.Events;
 public record TrnRequestUpdatedEvent : IEvent
 {
     public required Guid EventId { get; init; }
-    public Guid[] PersonIds => [];
+    Guid[] IEvent.PersonIds => [];
+    string[] IEvent.OneLoginUserSubjects => [];
     public required Guid SourceApplicationUserId { get; init; }
     public required string RequestId { get; init; }
     public required TrnRequestUpdatedChanges Changes { get; init; }

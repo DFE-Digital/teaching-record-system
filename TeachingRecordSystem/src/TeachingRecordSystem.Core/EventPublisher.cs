@@ -32,6 +32,7 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
             EventName = @event.GetType().Name,
             Payload = @event,
             PersonIds = @event.PersonIds,
+            OneLoginUserSubjects = @event.OneLoginUserSubjects,
             CreatedOn = processContext.Now
         };
         dbContext.Set<ProcessEvent>().Add(processEvent);
