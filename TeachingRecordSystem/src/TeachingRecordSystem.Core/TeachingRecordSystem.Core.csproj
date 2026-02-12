@@ -270,6 +270,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0102_SupportTasksResolveJourneySavedState.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0103_UserUseSharedOneLoginSigningKeys.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0104_ProcessChangeReason.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0105_ProcessEventsOneLoginUserSubjects.sql" />
   </ItemGroup>
 
   <ItemGroup>
