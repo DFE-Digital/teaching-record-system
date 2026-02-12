@@ -1,0 +1,31 @@
+@page "/persons/{PersonId}/connect-one-login"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin.IndexModel
+@{
+    ViewBag.Title = "Enter the GOV.UK One Login email address you’re connecting to this record";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId)">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form action="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Index(Model.PersonId)" method="post" asp-antiforgery="false">
+            <span class="govuk-caption-l">Record management</span>
+            
+            <govuk-input for="EmailAddress" type="email" label-class="govuk-label--l">
+                <govuk-input-label>@ViewBag.Title</govuk-input-label>
+                <govuk-input-hint>
+                    <govuk-inset-text>
+                        You’re connecting the record with the TRN @Model.Trn to a GOV.UK One Login. You’ll be able to review the details before confirming
+                    </govuk-inset-text>
+                </govuk-input-hint>
+            </govuk-input>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button-link href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId)" class="govuk-button--secondary">Cancel and return to record</govuk-button-link>
+            </div>
+        </form>
+    </div>
+</div>

@@ -117,6 +117,8 @@
 }
 
 <div class="govuk-button-group">
+    <govuk-button-link data-testid="connect-one-login-button" href="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Index(Model.PersonId)">Connect record to GOV.UK One Login</govuk-button-link>
+
     @if (Model.CanSetStatus)
     {
         <govuk-button-link
