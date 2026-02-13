@@ -31,7 +31,7 @@ public class PersonService(
         TrnRequestMetadata? sourceRequest = null;
         if (options.SourceTrnRequest is (var applicationUserId, var requestId))
         {
-            sourceRequest = await dbContext.TrnRequestMetadata.SingleOrDefaultAsync(r => r.ApplicationUserId == applicationUserId && r.RequestId == requestId);
+            sourceRequest = await dbContext.TrnRequestMetadata.FindAsync(applicationUserId, requestId);
             if (sourceRequest is null)
             {
                 throw new InvalidOperationException($"TRN request metadata {options.SourceTrnRequest} does not exist.");
