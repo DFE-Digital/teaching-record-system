@@ -28,7 +28,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
             var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
             var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
 
-            var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
+            var resolvedPerson = await dbContext.Persons.FindAsync(trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId) ?? throw new InvalidOperationException($"Person with ID {trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId} not found.");
 
             var changes = LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.Status;
             EventModels.PersonDetails? oldPersonAttributes;
@@ -84,7 +84,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
             var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
             var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
 
-            var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
+            var resolvedPerson = await dbContext.Persons.FindAsync(trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId) ?? throw new InvalidOperationException($"Person with ID {trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId} not found.");
 
             var changes = LegacyEvents.NpqTrnRequestSupportTaskResolvedEventChanges.Status;
             EventModels.PersonDetails? oldPersonAttributes;
@@ -163,7 +163,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
         {
             var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
 
-            var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
+            var resolvedPerson = await dbContext.Persons.FindAsync(trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId) ?? throw new InvalidOperationException($"Person with ID {trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId} not found.");
 
             var legacyEvent = new LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent
             {
@@ -190,7 +190,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
             var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
             var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
 
-            var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
+            var resolvedPerson = await dbContext.Persons.FindAsync(trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId) ?? throw new InvalidOperationException($"Person with ID {trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId} not found.");
 
             var changes = LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.Status;
             var personAttributes = resolvedPerson.Details.ToEventModel();

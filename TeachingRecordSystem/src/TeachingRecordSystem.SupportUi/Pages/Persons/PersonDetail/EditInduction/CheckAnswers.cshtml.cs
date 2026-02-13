@@ -90,7 +90,7 @@ public class CheckAnswersModel(
                     fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers));
         }
 
-        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        var person = await DbContext.Persons.FindAsync(PersonId) ?? throw new InvalidOperationException($"Person with ID {PersonId} not found.");
 
         person.SetInductionStatus(
             InductionStatus,

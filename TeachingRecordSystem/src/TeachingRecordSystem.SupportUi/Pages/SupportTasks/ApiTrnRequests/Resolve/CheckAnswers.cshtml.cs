@@ -85,7 +85,7 @@ public class CheckAnswers(
         {
             Debug.Assert(state.PersonId is not null);
             var existingPersonId = state.PersonId!.Value;
-            var selectedPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
+            var selectedPerson = await DbContext.Persons.FindAsync(existingPersonId) ?? throw new InvalidOperationException($"Person with ID {existingPersonId} not found.");
 
             selectedPersonAttributes = GetPersonAttributes(selectedPerson);
             var attributesToUpdate = GetAttributesToUpdate();

@@ -11,7 +11,7 @@ public class PersonService(
 {
     public async Task<string?> GetTrnFromPersonIdAsync(Guid personId)
     {
-        return (await dbContext.Persons.SingleAsync(q => q.PersonId == personId)).Trn;
+        return (await dbContext.Persons.FindAsync(personId) ?? throw new InvalidOperationException($"Person with ID {personId} not found.")).Trn;
     }
 
     public Task<Person?> GetPersonAsync(Guid personId, bool includeDeactivatedPersons = false)

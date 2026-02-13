@@ -42,8 +42,8 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
         txn.Complete();
     }
 
-    protected Task<Email> GetEmailByIdAsync(Guid emailId) =>
-        dbContext.Emails.SingleAsync(e => e.EmailId == emailId);
+    protected async Task<Email> GetEmailByIdAsync(Guid emailId) =>
+        await dbContext.Emails.FindAsync(emailId) ?? throw new InvalidOperationException($"Email with ID {emailId} not found.");
 
     protected async Task<Email> SendEmailAsync(Guid emailId)
     {

@@ -57,7 +57,7 @@ public abstract class CommonJourneyPage(
 
     protected virtual async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(PersonId, async () => (await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId)).Trn);
+        await JourneyInstance!.State.EnsureInitializedAsync(PersonId, async () => (await DbContext.Persons.FindAsync(PersonId) ?? throw new InvalidOperationException($"Person with ID {PersonId} not found.")).Trn);
     }
 
     protected virtual Task OnPageHandlerExecutedAsync(PageHandlerExecutedContext context)

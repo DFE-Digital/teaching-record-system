@@ -135,8 +135,8 @@ public class CheckAnswersModel(
         var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, clock.UtcNow, User.GetUserId());
 
         var existingPersonId = JourneyInstance!.State.PersonId!.Value;
-        var teacherPensionPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);
-        var existingPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
+        var teacherPensionPerson = await DbContext.Persons.FindAsync(supportTask.PersonId) ?? throw new InvalidOperationException($"Person with ID {supportTask.PersonId} not found.");
+        var existingPerson = await DbContext.Persons.FindAsync(existingPersonId) ?? throw new InvalidOperationException($"Person with ID {existingPersonId} not found.");
 
         var attributesToUpdate = GetAttributesToUpdate();
         var selectedPersonAttributes = await GetPersonAttributesAsync(existingPersonId);
