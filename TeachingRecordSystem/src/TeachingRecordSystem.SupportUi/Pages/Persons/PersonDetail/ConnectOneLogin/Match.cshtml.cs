@@ -25,9 +25,8 @@ public class MatchModel(
     public string? PersonNationalInsuranceNumber { get; set; }
 
     public string? OneLoginUserEmailAddress { get; set; }
-    public string? OneLoginUserFirstName { get; set; }
-    public string? OneLoginUserLastName { get; set; }
-    public DateOnly? OneLoginUserDateOfBirth { get; set; }
+    public string[][]? OneLoginUserVerifiedNames { get; set; }
+    public DateOnly[]? OneLoginUserVerifiedDatesOfBirth { get; set; }
 
     public IReadOnlyCollection<PersonMatchedAttribute>? MatchedAttributeTypes { get; set; }
 
@@ -63,19 +62,10 @@ public class MatchModel(
             .SingleAsync();
 
         OneLoginUserEmailAddress = oneLoginUser.EmailAddress;
-
-        if (oneLoginUser.VerifiedNames is not null && oneLoginUser.VerifiedNames.Length > 0)
-        {
-            var firstVerifiedName = oneLoginUser.VerifiedNames[0];
-            OneLoginUserFirstName = firstVerifiedName.First();
-            OneLoginUserLastName = firstVerifiedName.LastOrDefault();
-        }
-
-        if (oneLoginUser.VerifiedDatesOfBirth is not null && oneLoginUser.VerifiedDatesOfBirth.Length > 0)
-        {
-            OneLoginUserDateOfBirth = oneLoginUser.VerifiedDatesOfBirth[0];
-        }
+        OneLoginUserVerifiedNames = oneLoginUser.VerifiedNames;
+        OneLoginUserVerifiedDatesOfBirth = oneLoginUser.VerifiedDatesOfBirth;
 
         await next();
     }
 }
+

@@ -49,8 +49,26 @@
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.FirstName) == true && Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.LastName) == true))">
-                            @($"{Model.OneLoginUserFirstName} {Model.OneLoginUserLastName}")
+                        <govuk-summary-list-row-value>
+                            @if (Model.OneLoginUserVerifiedNames is not null && Model.OneLoginUserVerifiedNames.Length > 0)
+                            {
+                                <ul class="govuk-list">
+                                    @foreach (var namePair in Model.OneLoginUserVerifiedNames)
+                                    {
+                                        var firstName = namePair[0];
+                                        var lastName = namePair.Skip(1).LastOrDefault();
+                                        <li>
+                                            <span highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.FirstName) == true && Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.LastName) == true))">
+                                                @($"{firstName} {lastName}")
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span highlight="true" use-empty-fallback></span>
+                            }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
@@ -61,8 +79,24 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.DateOfBirth) == true))">
-                            @Model.OneLoginUserDateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)
+                        <govuk-summary-list-row-value>
+                            @if (Model.OneLoginUserVerifiedDatesOfBirth is not null && Model.OneLoginUserVerifiedDatesOfBirth.Length > 0)
+                            {
+                                <ul class="govuk-list">
+                                    @foreach (var dob in Model.OneLoginUserVerifiedDatesOfBirth)
+                                    {
+                                        <li>
+                                            <span highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.DateOfBirth) == true))">
+                                                @dob.ToString(WebConstants.DateOnlyDisplayFormat)
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.DateOfBirth) == true))" use-empty-fallback></span>
+                            }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>

@@ -39,15 +39,15 @@ public class IndexModel(
 
         if (oneLoginUser is null)
         {
-            ModelState.AddModelError(nameof(EmailAddress), "No GOV.UK One Login user found with this email address");
+            ModelState.AddModelError(nameof(EmailAddress), "The email address you entered is not linked to a GOV.UK One Login record");
             return this.PageWithErrors();
         }
 
         if (oneLoginUser.PersonId is not null)
         {
             var errorMessage = oneLoginUser.PersonId == PersonId
-                ? "This GOV.UK One Login user is already connected to this record"
-                : "This GOV.UK One Login user is already connected to another record";
+                ? "The email address you entered is already connected to this record"
+                : "The email address you entered is already connected to another record";
 
             ModelState.AddModelError(nameof(EmailAddress), errorMessage);
             return this.PageWithErrors();

@@ -93,7 +93,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "No GOV.UK One Login user found with this email address");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is not linked to a GOV.UK One Login record");
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "This GOV.UK One Login user is already connected to this record");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is already connected to this record");
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "This GOV.UK One Login user is already connected to another record");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is already connected to another record");
     }
 
     [Fact]
