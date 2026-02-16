@@ -4,10 +4,10 @@ namespace TeachingRecordSystem.Core;
 public interface IEventHandler
 #pragma warning restore CA1711
 {
-    Task HandleEventAsync(IEvent @event, ProcessContext processContext);
+    Task HandleEventAsync(IEvent @event, ProcessContext processContext, IEventScope eventScope);
 }
 
 public interface IEventHandler<TEvent> where TEvent : IEvent
 {
-    Task HandleEventAsync(TEvent @event, ProcessContext processContext);
+    Task HandleEventAsync(TEvent @event, ProcessContext processContext, IEventScope eventScope);
 }

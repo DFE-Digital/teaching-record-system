@@ -32,7 +32,7 @@ public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventP
                 {
                     var processContext = new ProcessContext(ProcessType.TeacherSigningIn, clock.UtcNow, SystemUser.SystemUserId);
 
-                    await eventPublisher.PublishEventAsync(
+                    await eventPublisher.PublishSingleEventAsync(
                         new AuthorizeAccessRequestStartedEvent
                         {
                             EventId = Guid.NewGuid(),

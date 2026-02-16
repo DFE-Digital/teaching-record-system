@@ -18,7 +18,7 @@ public class EventCapture(IClock clock) : IEventHandler
     public void AssertNoEventsPublished() =>
         Assert.Empty(_processes);
 
-    public Task HandleEventAsync(IEvent @event, ProcessContext processContext)
+    public Task HandleEventAsync(IEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         if (!_processes.TryGetValue(processContext.ProcessId, out var processAndEvents))
         {

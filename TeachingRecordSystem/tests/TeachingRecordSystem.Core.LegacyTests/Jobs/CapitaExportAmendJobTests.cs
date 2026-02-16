@@ -142,7 +142,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<IEventPublisher>());
+            new TestEventPublisher());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
         var updateResult = await personService.UpdatePersonDetailsAsync(new(
             person.PersonId,
@@ -258,7 +258,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<IEventPublisher>());
+            new TestEventPublisher());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
         var updateResult = await personService.UpdatePersonDetailsAsync(new(
             person.PersonId,
@@ -374,7 +374,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var personService = new PersonService(
             dbContext,
             Clock,
-            Mock.Of<IEventPublisher>());
+            new TestEventPublisher());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
         var updateResult = await personService.UpdatePersonDetailsAsync(new(
             person.PersonId,

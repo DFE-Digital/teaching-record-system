@@ -35,7 +35,10 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
         };
 
         // Act
-        await EventPublisher.PublishEventAsync(@event, processContext);
+        await using (var eventScope = EventPublisher.GetOrCreateEventScope(processContext))
+        {
+            await eventScope.PublishEventAsync(@event);
+        }
 
         // Assert
         LegacyEventObserver.AssertEventsSaved(

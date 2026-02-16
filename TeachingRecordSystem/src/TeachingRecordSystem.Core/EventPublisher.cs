@@ -9,65 +9,140 @@ namespace TeachingRecordSystem.Core;
 
 public interface IEventPublisher
 {
-    Task PublishEventAsync(IEvent @event, ProcessContext processContext);
+    IEventScope GetOrCreateEventScope(ProcessContext processContext);
+
+    public async Task PublishSingleEventAsync(IEvent @event, ProcessContext processContext)
+    {
+        await using var scope = GetOrCreateEventScope(processContext);
+        await scope.PublishEventAsync(@event);
+    }
+}
+
+public interface IEventScope : IAsyncDisposable
+{
+    Task PublishEventAsync(IEvent @event);
 }
 
 public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProvider) : IEventPublisher
 {
-    public async Task PublishEventAsync(IEvent @event, ProcessContext processContext)
+    private static readonly AsyncLocal<RootScope?> _rootScope = new();
+
+    public IEventScope GetOrCreateEventScope(ProcessContext processContext)
     {
-        if (dbContext.Entry(processContext.Process).State == EntityState.Detached)
+        if (_rootScope.Value is { } rootScope)
         {
-            dbContext.Set<Process>().Add(processContext.Process);
+            if (!ReferenceEquals(rootScope.ProcessContext, processContext))
+            {
+                throw new InvalidOperationException("Existing event scope is associated with a different ProcessContext.");
+            }
+
+            return new ChildScope(rootScope);
         }
 
-        processContext.Process.UpdatedOn = processContext.Now;
-
-        @event.PersonIds.Except(processContext.Process.PersonIds).ForEach(e => processContext.Process.PersonIds.Add(e));
-
-        var processEvent = new ProcessEvent
-        {
-            ProcessEventId = @event.EventId,
-            ProcessId = processContext.Process.ProcessId,
-            EventName = @event.GetType().Name,
-            Payload = @event,
-            PersonIds = @event.PersonIds,
-            OneLoginUserSubjects = @event.OneLoginUserSubjects,
-            CreatedOn = processContext.Now
-        };
-        dbContext.Set<ProcessEvent>().Add(processEvent);
-
-        await dbContext.SaveChangesAsync();
-
-        processContext.AddEvent(@event);
-
-        await InvokeEventHandlersAsync(@event, processContext);
+        rootScope = new RootScope(processContext, dbContext, serviceProvider);
+        _rootScope.Value = rootScope;
+        return rootScope;
     }
 
-    private async Task InvokeEventHandlersAsync(IEvent @event, ProcessContext processContext)
+    private sealed class ChildScope(RootScope rootScope) : IEventScope
     {
-        var handlers = serviceProvider.GetServices<IEventHandler>();
+        ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
-        foreach (var handler in handlers)
-        {
-            await handler.HandleEventAsync(@event, processContext);
-        }
-
-        var eventType = @event.GetType();
-        var typeSpecificHandlers = serviceProvider.GetServices(typeof(IEventHandler<>).MakeGenericType(eventType));
-
-        foreach (var handler in typeSpecificHandlers)
-        {
-            var wrapper = (IEventHandler)Activator.CreateInstance(typeof(TypedHandlerWrapper<>).MakeGenericType(eventType), handler)!;
-            await wrapper.HandleEventAsync(@event, processContext);
-        }
+        public Task PublishEventAsync(IEvent @event) => rootScope.PublishEventAsync(@event);
     }
 
-    private class TypedHandlerWrapper<TEvent>(IEventHandler<TEvent> innerHandler) : IEventHandler where TEvent : IEvent
+    private sealed class RootScope(
+        ProcessContext processContext,
+        TrsDbContext dbContext,
+        IServiceProvider serviceProvider) : IEventScope
     {
-        public Task HandleEventAsync(IEvent @event, ProcessContext processContext)
+        private readonly List<IEvent> _events = new();
+        private bool _published;
+
+        public ProcessContext ProcessContext => processContext;
+
+        public async Task PublishEventAsync(IEvent @event)
         {
-            return innerHandler.HandleEventAsync(((TEvent)@event), processContext);
+            if (dbContext.Entry(processContext.Process).State == EntityState.Detached)
+            {
+                dbContext.Set<Process>().Add(processContext.Process);
+            }
+
+            processContext.Process.UpdatedOn = processContext.Now;
+
+            @event.PersonIds.Except(processContext.Process.PersonIds).ForEach(e => processContext.Process.PersonIds.Add(e));
+
+            var processEvent = new ProcessEvent
+            {
+                ProcessEventId = @event.EventId,
+                ProcessId = processContext.Process.ProcessId,
+                EventName = @event.GetType().Name,
+                Payload = @event,
+                PersonIds = @event.PersonIds,
+                OneLoginUserSubjects = @event.OneLoginUserSubjects,
+                CreatedOn = processContext.Now
+            };
+            dbContext.Set<ProcessEvent>().Add(processEvent);
+
+            await dbContext.SaveChangesAsync();
+
+            processContext.AddEvent(@event);
+            _events.Add(@event);
+        }
+
+        async ValueTask IAsyncDisposable.DisposeAsync()
+        {
+            if (_published)
+            {
+                return;
+            }
+
+            await ProcessEventsAsync();
+
+            async Task ProcessEventsAsync()
+            {
+                var events = _events.ToArray();
+                _events.Clear();
+
+                foreach (var @event in events)
+                {
+                    await InvokeEventHandlersAsync(@event);
+                }
+
+                if (_events.Count > 0)
+                {
+                    await ProcessEventsAsync();
+                }
+            }
+
+            _published = true;
+        }
+
+        private async Task InvokeEventHandlersAsync(IEvent @event)
+        {
+            var handlers = serviceProvider.GetServices<IEventHandler>();
+
+            foreach (var handler in handlers)
+            {
+                await handler.HandleEventAsync(@event, processContext, this);
+            }
+
+            var eventType = @event.GetType();
+            var typeSpecificHandlers = serviceProvider.GetServices(typeof(IEventHandler<>).MakeGenericType(eventType));
+
+            foreach (var handler in typeSpecificHandlers)
+            {
+                var wrapper = (IEventHandler)Activator.CreateInstance(typeof(TypedHandlerWrapper<>).MakeGenericType(eventType), handler)!;
+                await wrapper.HandleEventAsync(@event, processContext, this);
+            }
+        }
+
+        private class TypedHandlerWrapper<TEvent>(IEventHandler<TEvent> innerHandler) : IEventHandler where TEvent : IEvent
+        {
+            public Task HandleEventAsync(IEvent @event, ProcessContext processContext, IEventScope eventScope)
+            {
+                return innerHandler.HandleEventAsync(((TEvent)@event), processContext, eventScope);
+            }
         }
     }
 }

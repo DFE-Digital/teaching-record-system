@@ -28,6 +28,8 @@ public class PersonService(
 
     public async Task<Person> CreatePersonAsync(CreatePersonOptions options, ProcessContext processContext)
     {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         TrnRequestMetadata? sourceRequest = null;
         if (options.SourceTrnRequest is (var applicationUserId, var requestId))
         {
@@ -60,7 +62,7 @@ public class PersonService(
         dbContext.Add(person);
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new PersonCreatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -72,8 +74,7 @@ public class PersonService(
                 TrnRequestMetadata = sourceRequest is TrnRequestMetadata metadata
                     ? EventModels.TrnRequestMetadata.FromModel(metadata)
                     : null
-            },
-            processContext);
+            });
 
         return person;
     }
@@ -93,6 +94,8 @@ public class PersonService(
         {
             throw new InvalidOperationException("Cannot update a person that is deactivated.");
         }
+
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         var oldDetails = person.Details;
 
@@ -138,7 +141,7 @@ public class PersonService(
 
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -151,8 +154,7 @@ public class PersonService(
                 DetailsChangeReason = options.DetailsChangeJustification?.Reason.GetDisplayName(),
                 DetailsChangeReasonDetail = options.DetailsChangeJustification?.ReasonDetail,
                 DetailsChangeEvidenceFile = options.DetailsChangeJustification?.Evidence?.ToEventModel(),
-            },
-            processContext);
+            });
 
         return new(changes, person.Details, oldDetails);
     }
@@ -173,12 +175,14 @@ public class PersonService(
             throw new InvalidOperationException("Cannot deactivate a person that is already deactivated.");
         }
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         deactivatingPerson.Status = PersonStatus.Deactivated;
         deactivatingPerson.UpdatedOn = clock.UtcNow;
 
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(new PersonDeactivatedEvent
+        await eventScope.PublishEventAsync(new PersonDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = deactivatingPerson.PersonId,
@@ -186,7 +190,7 @@ public class PersonService(
             Reason = options.Justification.Reason.GetDisplayName(),
             ReasonDetail = options.Justification.ReasonDetail,
             EvidenceFile = options.Justification.Evidence?.ToEventModel()
-        }, processContext);
+        });
     }
 
     public async Task ReactivatePersonAsync(ReactivatePersonOptions options, ProcessContext processContext)
@@ -205,19 +209,21 @@ public class PersonService(
             throw new InvalidOperationException("Cannot reactivate a person that is already active.");
         }
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         reactivatingPerson.Status = PersonStatus.Active;
         reactivatingPerson.UpdatedOn = clock.UtcNow;
 
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(new PersonReactivatedEvent
+        await eventScope.PublishEventAsync(new PersonReactivatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = reactivatingPerson.PersonId,
             Reason = options.Justification.Reason.GetDisplayName(),
             ReasonDetail = options.Justification.ReasonDetail,
             EvidenceFile = options.Justification.Evidence?.ToEventModel()
-        }, processContext);
+        });
     }
 
     public async Task DeactivatePersonViaMergeAsync(DeactivatePersonViaMergeOptions options, ProcessContext processContext)
@@ -235,6 +241,8 @@ public class PersonService(
         {
             throw new InvalidOperationException("Cannot deactivate a person that is already deactivated.");
         }
+
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         var retainedPerson = await dbContext.Persons
             .IgnoreQueryFilters()
@@ -256,7 +264,7 @@ public class PersonService(
 
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new PersonDeactivatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -265,8 +273,7 @@ public class PersonService(
                 Reason = null,
                 ReasonDetail = null,
                 EvidenceFile = null
-            },
-            processContext);
+            });
     }
 
     public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
@@ -298,6 +305,8 @@ public class PersonService(
         {
             throw new InvalidOperationException("Cannot merge a person that is deactivated.");
         }
+
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         var now = clock.UtcNow;
         var oldRetainedPersonDetails = retainedPerson.Details.ToEventModel();
@@ -345,7 +354,7 @@ public class PersonService(
 
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new PersonsMergedEvent()
             {
                 EventId = Guid.NewGuid(),
@@ -359,7 +368,6 @@ public class PersonService(
                 EvidenceFile = options.Evidence?.ToEventModel(),
                 Comments = options.Comments,
                 Changes = changes
-            },
-            processContext);
+            });
     }
 }

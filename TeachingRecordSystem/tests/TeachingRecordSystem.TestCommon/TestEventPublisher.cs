@@ -2,8 +2,21 @@ namespace TeachingRecordSystem.TestCommon;
 
 public class TestEventPublisher : IEventPublisher
 {
-    public Task PublishEventAsync(IEvent @event, ProcessContext processContext)
+    public IEventScope GetOrCreateEventScope(ProcessContext processContext)
     {
-        return Task.CompletedTask;
+        return new TestEventScope();
+    }
+
+    private class TestEventScope : IEventScope
+    {
+        public ValueTask DisposeAsync()
+        {
+            return ValueTask.CompletedTask;
+        }
+
+        public Task PublishEventAsync(IEvent @event)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

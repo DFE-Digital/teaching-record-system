@@ -72,7 +72,7 @@ public class OAuth2Controller(
                 {
                     var processContext = new ProcessContext(ProcessType.TeacherSigningIn, clock.UtcNow, SystemUser.SystemUserId);
 
-                    await eventPublisher.PublishEventAsync(
+                    await eventPublisher.PublishSingleEventAsync(
                         new AuthorizeAccessRequestStartedEvent
                         {
                             EventId = Guid.NewGuid(),
@@ -138,7 +138,7 @@ public class OAuth2Controller(
 
         var processContext = await ProcessContext.FromDbAsync(dbContext, ((SignInJourneyState)coordinator!.State).SigningInProcessId, clock.UtcNow);
 
-        await eventPublisher.PublishEventAsync(
+        await eventPublisher.PublishSingleEventAsync(
             new AuthorizeAccessRequestCompletedEvent { EventId = Guid.NewGuid() },
             processContext);
 

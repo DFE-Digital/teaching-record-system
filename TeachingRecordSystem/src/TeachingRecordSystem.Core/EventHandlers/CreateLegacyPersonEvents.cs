@@ -9,7 +9,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     IEventHandler<PersonReactivatedEvent>,
     IEventHandler<PersonsMergedEvent>
 {
-    public async Task HandleEventAsync(PersonCreatedEvent @event, ProcessContext processContext)
+    public async Task HandleEventAsync(PersonCreatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         if (processContext.ProcessType is ProcessType.PersonCreating
             or ProcessType.TeacherPensionsRecordImporting)
@@ -33,7 +33,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
         }
     }
 
-    public async Task HandleEventAsync(PersonDetailsUpdatedEvent @event, ProcessContext processContext)
+    public async Task HandleEventAsync(PersonDetailsUpdatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         if (processContext.ProcessType is ProcessType.PersonDetailsUpdating)
         {
@@ -59,7 +59,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
         }
     }
 
-    public async Task HandleEventAsync(PersonDeactivatedEvent @event, ProcessContext processContext)
+    public async Task HandleEventAsync(PersonDeactivatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         if (processContext.ProcessType is ProcessType.PersonDeactivating)
         {
@@ -83,7 +83,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
         }
     }
 
-    public async Task HandleEventAsync(PersonReactivatedEvent @event, ProcessContext processContext)
+    public async Task HandleEventAsync(PersonReactivatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         if (processContext.ProcessType is ProcessType.PersonReactivating)
         {
@@ -107,7 +107,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
         }
     }
 
-    public async Task HandleEventAsync(PersonsMergedEvent @event, ProcessContext processContext)
+    public async Task HandleEventAsync(PersonsMergedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         if (processContext.ProcessType is ProcessType.PersonMerging)
         {
