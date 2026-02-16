@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEvent;
 
@@ -175,12 +176,12 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
         var personService = new PersonService(
             dbContext,
-            Clock,
+            Mock.Of<OneLoginService>(),
             new TestEventPublisher());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -393,7 +394,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -459,7 +460,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -524,7 +525,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -593,7 +594,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddYears(-3), SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -627,7 +628,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext2 = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddYears(-1), SystemUser.SystemUserId);
         var updateresult2 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -661,7 +662,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext3 = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddYears(-1), SystemUser.SystemUserId);
         var updateresult3 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -850,7 +851,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -970,7 +971,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult1 = await personService.UpdatePersonDetailsAsync(new(
             person1.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person1.FirstName,
                 MiddleName = person1.MiddleName,
@@ -1002,7 +1003,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var processContext2 = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
         var updateresult2 = await personService.UpdatePersonDetailsAsync(new(
             person2.PersonId,
-            new PersonDetails()
+            new EventModels.PersonDetails()
             {
                 FirstName = person2.FirstName,
                 MiddleName = person2.MiddleName,

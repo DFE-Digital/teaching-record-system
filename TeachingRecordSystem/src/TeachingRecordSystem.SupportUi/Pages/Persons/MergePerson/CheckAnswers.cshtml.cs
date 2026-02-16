@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
@@ -80,13 +82,13 @@ public class CheckAnswersModel(
         ResolvableAttributes = changedService.GetResolvableMergedAttributes(
              new List<ResolvedMergedAttribute>
              {
-                 new ResolvedMergedAttribute(PersonMatchedAttribute.Gender, state.GenderSource),
-                 new ResolvedMergedAttribute(PersonMatchedAttribute.FirstName, state.FirstNameSource),
-                 new ResolvedMergedAttribute(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
-                 new ResolvedMergedAttribute(PersonMatchedAttribute.LastName, state.LastNameSource),
-                 new ResolvedMergedAttribute(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
-                 new ResolvedMergedAttribute(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
-                 new ResolvedMergedAttribute(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
+                 new(PersonMatchedAttribute.Gender, state.GenderSource),
+                 new(PersonMatchedAttribute.FirstName, state.FirstNameSource),
+                 new(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
+                 new(PersonMatchedAttribute.LastName, state.LastNameSource),
+                 new(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+                 new(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
+                 new(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
              });
 
         var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
@@ -122,23 +124,31 @@ public class CheckAnswersModel(
         var primaryPersonId = state.PrimaryPersonId!.Value;
         var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId!.Value;
 
-        var processContext = new ProcessContext(ProcessType.PersonMerging, clock.UtcNow, User.GetUserId());
-
-        await personService.MergePersonsAsync(new(
-            secondaryPersonId,
-            primaryPersonId,
-            new PersonDetails()
+        var processContext = new ProcessContext(
+            ProcessType.PersonMerging,
+            clock.UtcNow,
+            User.GetUserId(),
+            new ChangeReasonWithDetailsAndEvidence
             {
-                FirstName = FirstName ?? string.Empty,
-                MiddleName = MiddleName ?? string.Empty,
-                LastName = LastName ?? string.Empty,
-                DateOfBirth = DateOfBirth,
-                EmailAddress = EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
-                NationalInsuranceNumber = NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
-                Gender = Gender
+                Reason = null,
+                Details = Comments,
+                EvidenceFile = EvidenceFile?.ToEventModel()
+            });
+
+        await personService.MergePersonsAsync(
+            new MergePersonsOptions
+            {
+                DeactivatingPersonId = secondaryPersonId,
+                RetainedPersonId = primaryPersonId,
+                FirstName = state.FirstNameSource is not PersonAttributeSource.PrimaryPerson ? Option.Some(FirstName!) : default,
+                MiddleName = state.MiddleNameSource is not PersonAttributeSource.PrimaryPerson ? Option.Some(MiddleName ?? string.Empty) : default,
+                LastName = state.LastNameSource is not PersonAttributeSource.PrimaryPerson ? Option.Some(LastName!) : default,
+                DateOfBirth = state.DateOfBirthSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<DateOnly?>(DateOfBirth!.Value) : default,
+                EmailAddress = state.EmailAddressSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<EmailAddress?>(EmailAddress is var email ? Core.EmailAddress.Parse(email) : null) : default,
+                NationalInsuranceNumber = state.NationalInsuranceNumberSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<NationalInsuranceNumber?>(NationalInsuranceNumber is var nino ? Core.NationalInsuranceNumber.Parse(nino!) : null) : default,
+                Gender = state.GenderSource is not PersonAttributeSource.PrimaryPerson ? Option.Some(Gender) : default
             },
-            EvidenceFile?.ToFile(),
-            Comments), processContext);
+            processContext);
 
         TempData.SetFlashSuccess(
             $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",

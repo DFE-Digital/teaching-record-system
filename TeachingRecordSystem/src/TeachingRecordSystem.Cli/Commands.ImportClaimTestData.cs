@@ -102,25 +102,19 @@ public static partial class Commands
                 DateOnly? startDate = ParseDateFlexible(startDateStr);
                 DateOnly? qtsDate = ParseDateFlexible(qtsDateStr);
 
-                var personDetail = new PersonDetails()
-                {
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-                    DateOfBirth = dob,
-                    EmailAddress = null,
-                    NationalInsuranceNumber = ni,
-                    Gender = null
-                };
-
                 var createdPerson = await personService.CreatePersonAsync(
-                    new CreatePersonViaSupportUiOptions(
-                        personDetail,
-                        (new Justification<PersonCreateReason>()
-                        {
-                            Evidence = null,
-                            Reason = PersonCreateReason.AnotherReason,
-                        })),
+                    new CreatePersonOptions
+                    {
+                        Trn = default,
+                        SourceTrnRequest = null,
+                        FirstName = firstName,
+                        MiddleName = middleName,
+                        LastName = lastName,
+                        DateOfBirth = dob,
+                        EmailAddress = null,
+                        NationalInsuranceNumber = ni,
+                        Gender = null
+                    },
                     processContext);
                 var person = dbContext.Persons
                     .Include(x => x.Qualifications)

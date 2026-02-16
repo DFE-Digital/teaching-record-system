@@ -7,8 +7,5 @@ public record PersonCreatedEvent : IEvent
     string[] IEvent.OneLoginUserSubjects => [];
     public required Guid PersonId { get; init; }
     public required EventModels.PersonDetails Details { get; init; }
-    public required string? CreateReason { get; init; }
-    public required string? CreateReasonDetail { get; init; }
-    public required EventModels.File? EvidenceFile { get; init; }
     public required EventModels.TrnRequestMetadata? TrnRequestMetadata { get; init; }
 }
