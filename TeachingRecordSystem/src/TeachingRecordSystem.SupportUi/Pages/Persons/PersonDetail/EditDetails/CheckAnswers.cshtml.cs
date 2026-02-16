@@ -83,6 +83,8 @@ public class CheckAnswersModel(
     {
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, clock.UtcNow, User.GetUserId());
 
+        var createPreviousName = NameChangeReason is PersonNameChangeReason.MarriageOrCivilPartnership or PersonNameChangeReason.DeedPollOrOtherLegalProcess;
+
         await PersonService.UpdatePersonDetailsAsync(new(
             PersonId,
             new PersonDetails()
