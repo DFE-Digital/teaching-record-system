@@ -1,8 +1,5 @@
 @page "/persons/{personId}"
-@using Microsoft.AspNetCore.Authorization
-@using TeachingRecordSystem.SupportUi.Pages.Common
 @using TeachingRecordSystem.SupportUi.Pages.Shared
-@using TeachingRecordSystem.SupportUi.Infrastructure.Security
 
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel
 
@@ -21,20 +18,20 @@
     </govuk-notification-banner>
 }
 
-@if (Model.OneLoginUsers?.Length > 0)
+@if (Model.ConnectedOneLoginUsers?.Length > 0)
 {
     <govuk-summary-card data-testid="associated-one-login-users">
         <govuk-summary-card-title>Connected GOV.UK One Login details
         </govuk-summary-card-title>
         <govuk-summary-list>
-            @foreach (var user in Model.OneLoginUsers)
+            @foreach (var user in Model.ConnectedOneLoginUsers)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@user.EmailAddress</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(Model.PersonId, user.Subject, journeyInstanceId: null)">Disconnect from this record</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(Model.PersonId, user.Subject, journeyInstanceId: null)">Disconnect</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             }
         </govuk-summary-list>

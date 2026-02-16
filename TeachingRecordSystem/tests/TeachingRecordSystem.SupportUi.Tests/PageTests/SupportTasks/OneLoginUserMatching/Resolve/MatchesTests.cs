@@ -316,8 +316,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         var doc = await response.GetDocumentAsync();
         var radioInputs = doc.QuerySelectorAll("input[type='radio']");
         Assert.Equal(3, radioInputs.Length);
-        Assert.Equal("Connect it to Record A", radioInputs[0].NextElementSibling?.TextContent.Trim());
-        Assert.Equal("Connect it to Record B", radioInputs[1].NextElementSibling?.TextContent.Trim());
+        Assert.Equal($"Connect it to Record A (TRN {matchedPerson1.Trn})", radioInputs[0].NextElementSibling?.TextContent.Trim());
+        Assert.Equal($"Connect it to Record B (TRN {matchedPerson2.Trn})", radioInputs[1].NextElementSibling?.TextContent.Trim());
         Assert.Equal("Do not connect it to a record", radioInputs[2].NextElementSibling?.TextContent.Trim());
     }
 

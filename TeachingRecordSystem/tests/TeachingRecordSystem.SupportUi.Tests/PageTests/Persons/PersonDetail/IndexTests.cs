@@ -726,8 +726,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var dateOfBirth = new DateOnly(1990, 1, 1);
         var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth).WithEmailAddress());
-        string? email2 = TestData.GenerateUniqueEmail();
+        var email2 = TestData.GenerateUniqueEmail();
         await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        Clock.Advance();
         await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some<string?>(email2), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -742,6 +743,5 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             ("Email address", person.EmailAddress),
             ("Email address", email2)
         );
-
     }
 }
