@@ -22,7 +22,7 @@ public class NoteService(TrsDbContext dbContext, IEventPublisher eventPublisher)
         dbContext.Notes.Add(note);
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
+        await eventPublisher.PublishSingleEventAsync(
             new NoteCreatedEvent
             {
                 EventId = Guid.NewGuid(),

@@ -31,7 +31,7 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
         var email = await GetEmailByIdAsync(emailId);
         await SendEmailAsync(email);
 
-        await eventPublisher.PublishEventAsync(
+        await eventPublisher.PublishSingleEventAsync(
             new EmailSentEvent
             {
                 PersonId = personId,

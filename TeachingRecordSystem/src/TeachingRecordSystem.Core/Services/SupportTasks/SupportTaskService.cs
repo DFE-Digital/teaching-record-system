@@ -14,6 +14,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 $"{nameof(options.Data)} type '{options.Data.GetType()}' is not valid for the specified {nameof(SupportTaskType)}.");
         }
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var supportTask = new SupportTask
         {
             CreatedOn = processContext.Now,
@@ -31,19 +33,20 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new SupportTaskCreatedEvent
             {
                 EventId = Guid.NewGuid(),
                 SupportTask = EventModels.SupportTask.FromModel(supportTask)
-            },
-            processContext);
+            });
 
         return supportTask;
     }
 
     public async Task<DeleteSupportTaskResult> DeleteSupportTaskAsync(DeleteSupportTaskOptions options, ProcessContext processContext)
     {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var supportTask = await dbContext.SupportTasks.FindAsync(options.SupportTaskReference);
         if (supportTask is null)
         {
@@ -54,15 +57,14 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new SupportTaskDeletedEvent
             {
                 EventId = Guid.NewGuid(),
                 SupportTaskReference = options.SupportTaskReference,
                 SupportTask = EventModels.SupportTask.FromModel(supportTask),
                 ReasonDetail = options.ReasonDetail
-            },
-            processContext);
+            });
 
         return DeleteSupportTaskResult.Ok;
     }
@@ -98,6 +100,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         Func<SupportTask, SupportTaskUpdatedEventChanges, SupportTaskUpdatedEventChanges>? updateAction,
         ProcessContext processContext)
     {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var supportTask = options.SupportTask.Value as SupportTask ?? await dbContext.SupportTasks.FindAsync(options.SupportTask.AsT1);
 
         if (supportTask is null)
@@ -133,7 +137,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 
             await dbContext.SaveChangesAsync();
 
-            await eventPublisher.PublishEventAsync(
+            await eventScope.PublishEventAsync(
                 new SupportTaskUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
@@ -143,8 +147,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                     SupportTask = EventModels.SupportTask.FromModel(supportTask),
                     Comments = options.Comments,
                     RejectionReason = options.RejectionReason
-                },
-                processContext);
+                });
         }
 
         return UpdateSupportTaskResult.Ok;

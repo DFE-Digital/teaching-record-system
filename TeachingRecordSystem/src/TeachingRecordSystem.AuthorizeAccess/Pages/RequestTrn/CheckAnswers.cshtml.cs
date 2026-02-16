@@ -101,6 +101,8 @@ public class CheckAnswersModel(
 
         var processContext = new ProcessContext(ProcessType.NpqTrnRequestTaskCreating, clock.UtcNow, ApplicationUser.NpqApplicationUserGuid);
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var trnRequest = new TrnRequestMetadata
         {
             OneLoginUserSubject = null,
@@ -138,13 +140,12 @@ public class CheckAnswersModel(
         dbContext.TrnRequestMetadata.Add(trnRequest);
         await dbContext.SaveChangesAsync();
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new TrnRequestCreatedEvent
             {
                 EventId = Guid.NewGuid(),
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest)
-            },
-            processContext);
+            });
 
         await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions

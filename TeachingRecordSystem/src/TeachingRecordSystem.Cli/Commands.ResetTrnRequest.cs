@@ -88,6 +88,8 @@ public partial class Commands
 
                 var processContext = new ProcessContext(ProcessType.TrnRequestResetting, now, SystemUser.SystemUserId);
 
+                await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
                 var oldTrnRequest = EventModels.TrnRequestMetadata.FromModel(request);
                 request.Reset();
 
@@ -108,15 +110,14 @@ public partial class Commands
                 dbContext.SupportTasks.Add(supportTask);
                 await dbContext.SaveChangesAsync();
 
-                await eventPublisher.PublishEventAsync(
+                await eventScope.PublishEventAsync(
                     new SupportTaskCreatedEvent
                     {
                         EventId = Guid.NewGuid(),
                         SupportTask = EventModels.SupportTask.FromModel(supportTask)
-                    },
-                    processContext);
+                    });
 
-                await eventPublisher.PublishEventAsync(
+                await eventScope.PublishEventAsync(
                     new TrnRequestUpdatedEvent
                     {
                         EventId = Guid.NewGuid(),
@@ -126,8 +127,7 @@ public partial class Commands
                         TrnRequest = EventModels.TrnRequestMetadata.FromModel(request),
                         OldTrnRequest = oldTrnRequest,
                         ReasonDetails = reason
-                    },
-                    processContext);
+                    });
 
                 transaction.Complete();
 

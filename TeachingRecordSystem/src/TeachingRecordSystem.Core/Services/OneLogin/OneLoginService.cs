@@ -93,6 +93,8 @@ public class OneLoginService(
             throw new InvalidOperationException("User is already verified.");
         }
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
 
         user.SetVerified(
@@ -114,7 +116,7 @@ public class OneLoginService(
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
-        await eventPublisher.PublishEventAsync(updatedEvent, processContext);
+        await eventScope.PublishEventAsync(updatedEvent);
     }
 
     public async Task SetUserMatchedAsync(SetUserMatchedOptions options, ProcessContext processContext)
@@ -126,6 +128,8 @@ public class OneLoginService(
             throw new InvalidOperationException("User must be verified.");
         }
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
 
         user.SetMatched(processContext.Now, options.MatchedPersonId, options.MatchRoute, options.MatchedAttributes);
@@ -141,7 +145,7 @@ public class OneLoginService(
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
-        await eventPublisher.PublishEventAsync(updatedEvent, processContext);
+        await eventScope.PublishEventAsync(updatedEvent);
     }
 
     public async Task SetUserVerifiedAndMatchedAsync(SetUserVerifiedAndMatchedOptions options, ProcessContext processContext)
@@ -152,6 +156,8 @@ public class OneLoginService(
         {
             throw new InvalidOperationException("User is already verified.");
         }
+
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
 
@@ -176,7 +182,7 @@ public class OneLoginService(
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
-        await eventPublisher.PublishEventAsync(updatedEvent, processContext);
+        await eventScope.PublishEventAsync(updatedEvent);
     }
 
     public async Task<FindTeacherIdentityUserResult?> FindTeacherIdentityUserAsync(
@@ -420,6 +426,8 @@ public class OneLoginService(
 
     public async Task<OneLoginUser> OnSignInAsync(string sub, string email, ProcessContext processContext)
     {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         EventModels.OneLoginUser? oldOneLoginUserEventModel;
 
         var oneLoginUser = await dbContext.OneLoginUsers
@@ -453,23 +461,21 @@ public class OneLoginService(
 
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(oneLoginUser);
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new OneLoginUserSignedInEvent
             {
                 EventId = Guid.NewGuid(),
                 OneLoginUser = oneLoginUserEventModel
-            },
-            processContext);
+            });
 
         if (oldOneLoginUserEventModel is null)
         {
-            await eventPublisher.PublishEventAsync(
+            await eventScope.PublishEventAsync(
                 new OneLoginUserCreatedEvent
                 {
                     EventId = Guid.NewGuid(),
                     OneLoginUser = oneLoginUserEventModel
-                },
-                processContext);
+                });
         }
         else
         {
@@ -477,15 +483,14 @@ public class OneLoginService(
 
             if (changes is not OneLoginUserUpdatedEventChanges.None)
             {
-                await eventPublisher.PublishEventAsync(
+                await eventScope.PublishEventAsync(
                     new OneLoginUserUpdatedEvent
                     {
                         EventId = Guid.NewGuid(),
                         OneLoginUser = oneLoginUserEventModel,
                         OldOneLoginUser = oldOneLoginUserEventModel,
                         Changes = changes
-                    },
-                    processContext);
+                    });
             }
         }
 

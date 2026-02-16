@@ -6,7 +6,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
     IEventHandler<SupportTaskCreatedEvent>,
     IEventHandler<SupportTaskUpdatedEvent>
 {
-    public async Task HandleEventAsync(SupportTaskCreatedEvent @event, ProcessContext processContext)
+    public async Task HandleEventAsync(SupportTaskCreatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         var legacyEvent = new LegacyEvents.SupportTaskCreatedEvent
         {
@@ -21,7 +21,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task HandleEventAsync(SupportTaskUpdatedEvent @event, ProcessContext processContext)
+    public async Task HandleEventAsync(SupportTaskUpdatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         if (processContext.ProcessType is ProcessType.ApiTrnRequestResolving)
         {

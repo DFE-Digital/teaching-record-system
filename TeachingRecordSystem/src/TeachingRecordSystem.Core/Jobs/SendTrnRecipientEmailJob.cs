@@ -21,7 +21,7 @@ public class SendTrnRecipientEmailJob(TrsDbContext dbContext, IEventPublisher ev
 
         var processContext = new ProcessContext(ProcessType.NotifyingTrnRecipient, email.SentOn!.Value, SystemUser.SystemUserId);
 
-        await EventPublisher.PublishEventAsync(
+        await EventPublisher.PublishSingleEventAsync(
             new EmailSentEvent
             {
                 PersonId = personId,

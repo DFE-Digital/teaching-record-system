@@ -25,6 +25,8 @@ public class TrnRequestService(
 {
     public async Task<TrnRequestInfo> CreateTrnRequestAsync(CreateTrnRequestOptions options, ProcessContext processContext)
     {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var trnRequest = new TrnRequestMetadata
         {
             ApplicationUserId = options.ApplicationUserId,
@@ -77,13 +79,12 @@ public class TrnRequestService(
             }
         }
 
-        await eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new TrnRequestCreatedEvent
             {
                 EventId = Guid.NewGuid(),
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest)
-            },
-            processContext);
+            });
 
         return new TrnRequestInfo(trnRequest, trn);
     }
@@ -129,6 +130,8 @@ public class TrnRequestService(
             throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be completed.");
         }
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
         var furtherChecksNeeded = await RequiresFurtherChecksNeededSupportTaskAsync(person.PersonId, trnRequest.ApplicationUserId);
@@ -154,7 +157,7 @@ public class TrnRequestService(
 
         if (publishTrnRequestUpdatedEvent)
         {
-            await eventPublisher.PublishEventAsync(
+            await eventScope.PublishEventAsync(
                 new TrnRequestUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
@@ -164,8 +167,7 @@ public class TrnRequestService(
                     TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                     OldTrnRequest = oldTrnRequestEventModel,
                     ReasonDetails = null
-                },
-                processContext);
+                });
         }
     }
 
@@ -181,6 +183,8 @@ public class TrnRequestService(
         {
             throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be completed.");
         }
+
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         var person = await personService.CreatePersonAsync(
             new CreatePersonViaTrnRequestOptions(
@@ -198,7 +202,7 @@ public class TrnRequestService(
         {
             var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
-            await eventPublisher.PublishEventAsync(
+            await eventScope.PublishEventAsync(
                 new TrnRequestUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
@@ -208,25 +212,26 @@ public class TrnRequestService(
                     TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                     OldTrnRequest = oldTrnRequestEventModel,
                     ReasonDetails = null
-                },
-                processContext);
+                });
         }
 
         return person.Trn;
     }
 
-    public Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public async Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
             throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be rejected.");
         }
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
         trnRequest.SetRejected();
 
-        return eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new TrnRequestUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -236,11 +241,10 @@ public class TrnRequestService(
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                 OldTrnRequest = oldTrnRequestEventModel,
                 ReasonDetails = null
-            },
-            processContext);
+            });
     }
 
-    public Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public async Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -252,11 +256,13 @@ public class TrnRequestService(
             throw new InvalidOperationException("Only resolved requests can be completed.");
         }
 
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
         trnRequest.SetCompleted();
 
-        return eventPublisher.PublishEventAsync(
+        await eventScope.PublishEventAsync(
             new TrnRequestUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -266,8 +272,7 @@ public class TrnRequestService(
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                 OldTrnRequest = oldTrnRequestEventModel,
                 ReasonDetails = null
-            },
-            processContext);
+            });
     }
 
     public async Task<TrnRequestInfo?> GetTrnRequestAsync(Guid applicationUserId, string requestId)
