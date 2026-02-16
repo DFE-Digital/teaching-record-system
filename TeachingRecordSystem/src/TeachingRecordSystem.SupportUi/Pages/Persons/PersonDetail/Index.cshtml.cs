@@ -25,7 +25,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
     public bool CanMerge { get; set; }
     public bool CanSetStatus { get; set; }
 
-    public OneLoginUserInfo[] OneLoginUsers { get; set; } = Array.Empty<OneLoginUserInfo>();
+    public ConnectedOneLoginUserInfo[]? ConnectedOneLoginUsers { get; set; }
 
     public async Task OnGetAsync()
     {
@@ -35,18 +35,12 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
             .IgnoreQueryFilters()
             .Include(p => p.PreviousNames).AsSplitQuery()
             .Include(p => p.Alerts).AsSplitQuery()
+            .Include(p => p.OneLoginUsers).AsSplitQuery()
             .SingleAsync(p => p.PersonId == PersonId);
 
-        Person = BuildPersonInfo(person);
-        PersonProfessionalStatus = BuildPersonStatusInfo(person);
-        OneLoginUsers = await dbContext.OneLoginUsers
-            .Where(u => u.PersonId == PersonId).Select(x => new OneLoginUserInfo()
-            {
-                Subject = x.Subject,
-                PersonId = x.PersonId,
-                EmailAddress = x.EmailAddress
-            })
-            .ToArrayAsync();
+        Person = GetPersonInfo(person);
+        PersonProfessionalStatus = GetPersonStatusInfo(person);
+        ConnectedOneLoginUsers = GetConnectedOneLoginUsers(person);
 
         var canEditPersonData = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit))
             .Succeeded;
@@ -75,7 +69,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
             !personWasDeactivatedAsPartOfAMerge;
     }
 
-    private PersonProfessionalStatusInfo? BuildPersonStatusInfo(Person person)
+    private PersonProfessionalStatusInfo? GetPersonStatusInfo(Person person)
     {
         var personProfessionalStatusInfo = new PersonProfessionalStatusInfo
         {
@@ -98,7 +92,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
         } ? null : personProfessionalStatusInfo;
     }
 
-    private PersonInfo BuildPersonInfo(Person person)
+    private PersonInfo GetPersonInfo(Person person)
     {
         var hasActiveAlert = person.Alerts!.Any(a => a.IsOpen);
 
@@ -118,6 +112,18 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
             IsActive = person.Status == PersonStatus.Active,
             MergedWithPersonId = person.MergedWithPersonId
         };
+    }
+
+    private ConnectedOneLoginUserInfo[] GetConnectedOneLoginUsers(Person person)
+    {
+        return person.OneLoginUsers!
+            .OrderBy(u => u.MatchedOn)
+            .Select(olu => new ConnectedOneLoginUserInfo
+            {
+                Subject = olu.Subject,
+                EmailAddress = olu.EmailAddress
+            })
+            .ToArray();
     }
 
     public record PersonInfo
@@ -144,10 +150,9 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
         public required DateOnly? PqtsDate { get; init; }
     }
 
-    public record OneLoginUserInfo
+    public record ConnectedOneLoginUserInfo
     {
         public required string Subject { get; init; }
         public required string? EmailAddress { get; init; }
-        public required Guid? PersonId { get; init; }
     }
 }

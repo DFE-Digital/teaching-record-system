@@ -91,7 +91,7 @@
                     </govuk-radios-fieldset-legend>
                     @foreach (var match in Model.SuggestedMatches)
                     {
-                        <govuk-radios-item value="@match.PersonId">Connect it to Record @match.Identifier</govuk-radios-item>
+                        <govuk-radios-item value="@match.PersonId">Connect it to Record @match.Identifier (TRN @match.Trn)</govuk-radios-item>
                     }
                     <govuk-radios-item value="@ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel">
                         Do not connect it to a record
