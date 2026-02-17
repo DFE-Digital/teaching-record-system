@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
@@ -44,10 +43,10 @@ public partial class OneLoginUserMatchingSupportTaskService
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
+        await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
             {
-                SupportTask = supportTask,
+                SupportTaskReference = supportTask.SupportTaskReference,
                 UpdateData = data => data with
                 {
                     Verified = false,
@@ -58,7 +57,6 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
-        Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
         var reason = options.RejectReason is OneLoginIdVerificationRejectReason.AnotherReason
@@ -85,10 +83,10 @@ public partial class OneLoginUserMatchingSupportTaskService
             },
             processContext);
 
-        var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
+        await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
             {
-                SupportTask = supportTask.SupportTaskReference,
+                SupportTaskReference = supportTask.SupportTaskReference,
                 UpdateData = data => data with
                 {
                     Verified = true,
@@ -99,7 +97,6 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
-        Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
         await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
@@ -123,10 +120,10 @@ public partial class OneLoginUserMatchingSupportTaskService
             },
             processContext);
 
-        var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
+        await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
             {
-                SupportTask = supportTask.SupportTaskReference,
+                SupportTaskReference = supportTask.SupportTaskReference,
                 UpdateData = data => data with
                 {
                     Verified = true,
@@ -135,7 +132,6 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
-        Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
         await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
@@ -165,10 +161,10 @@ public partial class OneLoginUserMatchingSupportTaskService
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
         await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
 
-        var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
+        await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
             {
-                SupportTask = supportTask.SupportTaskReference,
+                SupportTaskReference = supportTask.SupportTaskReference,
                 UpdateData = data => data with
                 {
                     Verified = true,
@@ -178,7 +174,6 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
-        Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
     }
 
     private void ThrowIfSupportTaskIsClosed(SupportTask supportTask)

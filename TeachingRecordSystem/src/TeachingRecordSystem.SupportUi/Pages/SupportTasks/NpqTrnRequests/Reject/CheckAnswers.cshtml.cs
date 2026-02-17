@@ -44,7 +44,7 @@ public class CheckAnswersModel(
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<NpqTrnRequestData>
             {
-                SupportTask = SupportTaskReference,
+                SupportTaskReference = SupportTaskReference,
                 UpdateData = data => data with { SupportRequestOutcome = SupportRequestOutcome.Rejected },
                 Status = SupportTaskStatus.Closed,
                 Comments = null,

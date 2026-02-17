@@ -96,7 +96,7 @@ public class Matches(
         await supportTaskService.UpdateSupportTaskAsync(
             new()
             {
-                SupportTask = _supportTask.SupportTaskReference,
+                SupportTaskReference = _supportTask.SupportTaskReference,
                 Status = SupportTaskStatus.InProgress,
                 SavedJourneyState = Option.Some(savedJourneyState)!
             },

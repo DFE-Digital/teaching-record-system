@@ -1,6 +1,7 @@
 using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 
 namespace TeachingRecordSystem.Cli;
@@ -48,22 +49,19 @@ public partial class Commands
 
                 var processContext = new ProcessContext(ProcessType.SupportTaskDeleting, clock.UtcNow, SystemUser.SystemUserId);
 
-                var result = await supportTaskService.DeleteSupportTaskAsync(new DeleteSupportTaskOptions(supportTaskReference, reason), processContext);
-
-                transaction.Complete();
-
-                if (result is DeleteSupportTaskResult.Ok)
+                try
                 {
-                    return 0;
+                    await supportTaskService.DeleteSupportTaskAsync(new DeleteSupportTaskOptions(supportTaskReference, reason), processContext);
                 }
-
-                if (result is DeleteSupportTaskResult.NotFound)
+                catch (NotFoundException ex) when (ex.EntityName == nameof(SupportTask))
                 {
                     parseResult.InvocationConfiguration.Error.WriteLine("Support task was not found");
                     return 1;
                 }
 
-                throw new Exception($"Unrecognized result: {result}.");
+                transaction.Complete();
+
+                return 0;
             });
 
         return command;
