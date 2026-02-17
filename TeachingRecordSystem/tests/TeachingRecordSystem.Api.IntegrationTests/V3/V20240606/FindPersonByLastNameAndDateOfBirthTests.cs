@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
@@ -163,10 +165,24 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var person1 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-        var person2 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePersonAsync(p => p.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
         var person3 = await TestData.CreatePersonAsync(p => p.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
-        var updatedLastName = TestData.GenerateChangedLastName(lastName);
-        await TestData.UpdatePersonAsync(p => p.WithPersonId(person2.PersonId).WithUpdatedName(person2.FirstName, person2.MiddleName, updatedLastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.PreviousNames.Add(new PreviousName
+            {
+                PreviousNameId = Guid.NewGuid(),
+                PersonId = person2.PersonId,
+                CreatedOn = Clock.UtcNow,
+                UpdatedOn = Clock.UtcNow,
+                FirstName = person2.FirstName,
+                MiddleName = person2.MiddleName,
+                LastName = lastName
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -205,7 +221,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         dateOfBirth = person2.DateOfBirth,
                         firstName = person2.FirstName,
                         middleName = person2.MiddleName,
-                        lastName = updatedLastName,
+                        lastName = person2.LastName,
                         sanctions = Array.Empty<object>(),
                         previousNames = new object[]
                         {
@@ -213,7 +229,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                             {
                                 firstName = person2.FirstName,
                                 middleName = person2.MiddleName,
-                                lastName = person2.LastName
+                                lastName = lastName
                             }
                         }
                     }
