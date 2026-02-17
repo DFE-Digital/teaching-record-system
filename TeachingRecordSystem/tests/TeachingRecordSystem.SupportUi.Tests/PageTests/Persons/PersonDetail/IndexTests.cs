@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using AngleSharp.Html.Dom;
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
@@ -28,71 +29,50 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var randomEmail = TestData.GenerateUniqueEmail();
         if (!EmailAddress.TryParse(randomEmail, out var email))
         {
-            Assert.Fail($@"Randomly generated email address ""{randomEmail}"" is invalid.");
+            Assert.Fail($"""Randomly generated email address "{randomEmail}" is invalid.""");
         }
-        var updatedFirstName = TestData.GenerateFirstName();
-        var updatedMiddleName = TestData.GenerateMiddleName();
-        var updatedLastName = TestData.GenerateLastName();
-        var createPersonResult = await TestData.CreatePersonAsync(b => b
 
+        var person = await TestData.CreatePersonAsync(b => b
             .WithEmailAddress((string?)email)
             .WithNationalInsuranceNumber()
             .WithGender());
 
-        await TestData.UpdatePersonAsync(b => b
-            .WithPersonId(createPersonResult.PersonId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
-        Clock.Advance();
-        await TestData.UpdatePersonAsync(b => b
-            .WithPersonId(createPersonResult.PersonId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
+        var previousFirstName1 = TestData.GenerateChangedFirstName(person.FirstName);
+        var previousMiddleName1 = TestData.GenerateChangedMiddleName(person.MiddleName);
+        var previousLastName1 = TestData.GenerateChangedLastName(person.LastName);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}");
+        var previousFirstName2 = TestData.GenerateChangedFirstName(person.FirstName);
+        var previousMiddleName2 = TestData.GenerateChangedMiddleName(person.MiddleName);
+        var previousLastName2 = TestData.GenerateChangedLastName(person.LastName);
 
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
-        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetSummaryListValueByKey("Name"));
-        var previousNames = doc.GetSummaryListValueElementByKey("Previous name(s)")?.QuerySelectorAll("li");
-        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TrimmedText());
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TrimmedText());
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
-        Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueByKey("TRN"));
-        Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
-        Assert.Equal(createPersonResult.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
-        Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueByKey("Gender"));
-    }
-
-    [Fact(Skip = "Flaky on CI")]
-    public async Task Get_AfterContactsMigrated_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
-    {
-        // Arrange
-        var randomEmail = TestData.GenerateUniqueEmail();
-        if (!EmailAddress.TryParse(randomEmail, out var email))
+        await WithDbContextAsync(async dbContext =>
         {
-            Assert.Fail($@"Randomly generated email address ""{randomEmail}"" is invalid.");
-        }
-        var updatedFirstName = TestData.GenerateFirstName();
-        var updatedMiddleName = TestData.GenerateMiddleName();
-        var updatedLastName = TestData.GenerateLastName();
-        var createPersonResult = await TestData.CreatePersonAsync(b => b
-            .WithEmailAddress((string?)email)
-            .WithNationalInsuranceNumber()
-            .WithGender());
+            dbContext.PreviousNames.Add(new PreviousName
+            {
+                PreviousNameId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                CreatedOn = Clock.UtcNow.AddDays(-1),
+                UpdatedOn = Clock.UtcNow.AddDays(-1),
+                FirstName = previousFirstName1,
+                MiddleName = previousMiddleName1,
+                LastName = previousLastName1
+            });
 
-        await TestData.UpdatePersonAsync(b => b
-            .WithPersonId(createPersonResult.PersonId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
-        Clock.Advance();
-        await TestData.UpdatePersonAsync(b => b
-            .WithPersonId(createPersonResult.PersonId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName, Core.Services.Persons.PersonNameChangeReason.DeedPollOrOtherLegalProcess));
+            dbContext.PreviousNames.Add(new PreviousName
+            {
+                PreviousNameId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                CreatedOn = Clock.UtcNow.AddDays(-2),
+                UpdatedOn = Clock.UtcNow.AddDays(-2),
+                FirstName = previousFirstName2,
+                MiddleName = previousMiddleName2,
+                LastName = previousLastName2
+            });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}");
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -100,16 +80,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
-        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetSummaryListValueByKey("Name"));
+        Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
+        Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetSummaryListValueByKey("Name"));
         var previousNames = doc.GetSummaryListValueElementByKey("Previous name(s)")?.QuerySelectorAll("li");
-        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TrimmedText());
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TrimmedText());
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
-        Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueByKey("Gender"));
-        Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueByKey("TRN"));
-        Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
-        Assert.Equal(createPersonResult.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
+        Assert.Equal($"{previousFirstName1} {previousMiddleName1} {previousLastName1}", previousNames?.First().TrimmedText());
+        Assert.Equal($"{previousFirstName2} {previousMiddleName2} {previousLastName2}", previousNames?.Last().TrimmedText());
+        Assert.Equal(person.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(person.Trn, doc.GetSummaryListValueByKey("TRN"));
+        Assert.Equal(person.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(person.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
+        Assert.Equal(person.Gender?.GetDisplayName(), doc.GetSummaryListValueByKey("Gender"));
     }
 
     [Fact]
