@@ -13,7 +13,7 @@ public class JobFixture : ServiceProviderFixture
     protected override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddSingleton<IClock>(Clock)
+            .AddSingleton<TimeProvider>(Clock.TimeProvider)
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
             .AddEventPublisher()

@@ -33,7 +33,8 @@ public class CompositionRoot : IAsyncLifetime
             .AddDatabase(configuration)
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
-            .AddSingleton<IClock, TestableClock>()
+            .AddSingleton<TestableClock>()
+            .AddSingleton<TimeProvider>(sp => sp.GetRequiredService<TestableClock>().TimeProvider)
             .AddTestTrnGeneration();
 
         return services.BuildServiceProvider();

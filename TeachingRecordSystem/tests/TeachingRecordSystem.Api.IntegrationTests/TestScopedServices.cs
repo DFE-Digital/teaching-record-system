@@ -30,7 +30,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(sp => GetCurrent().Clock.TimeProvider)
             .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AccessYourTeachingQualificationsOptions)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
@@ -75,11 +75,6 @@ public class TestScopedServices
     public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
 
     public HttpClientInterceptorOptions EvidenceFilesHttpClientInterceptorOptions { get; }
-
-    private class ForwardToTestScopedClock : IClock
-    {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
-    }
 }
 
 file static class ServiceCollectionExtensions

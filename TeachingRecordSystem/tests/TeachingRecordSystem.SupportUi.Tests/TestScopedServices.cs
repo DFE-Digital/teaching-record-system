@@ -89,11 +89,6 @@ public class TestScopedServices
 
     public CurrentUserProvider CurrentUserProvider { get; }
 
-    private class ForwardToTestScopedClock : IClock
-    {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
-    }
-
     private class ForwardToTestScopedEventObserver : IEventObserver
     {
         public void OnEventCreated(LegacyEvents.EventBase @event) => GetCurrent().EventObserver.OnEventCreated(@event);

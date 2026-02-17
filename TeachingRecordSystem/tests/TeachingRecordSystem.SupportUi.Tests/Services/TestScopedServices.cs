@@ -9,7 +9,7 @@ public class TestScopedServices
     public TestScopedServices()
     {
         Clock = new();
-        Events = new(Clock);
+        Events = new(Clock.TimeProvider);
     }
 
     public TestableClock Clock { get; }
@@ -18,7 +18,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(sp => GetCurrent().Clock.TimeProvider)
             .AddSingleton<EventCapture>()
             .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>());
 
@@ -45,11 +45,6 @@ public class TestScopedServices
 
         current = default;
         return false;
-    }
-
-    private class ForwardToTestScopedClock : IClock
-    {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
     }
 }
 

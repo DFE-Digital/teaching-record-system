@@ -12,7 +12,7 @@ public class TestScopedServices
     public TestScopedServices(IServiceProvider serviceProvider)
     {
         Clock = new();
-        Events = new(Clock);
+        Events = new(Clock.TimeProvider);
         LegacyEventObserver = new();
         GetAnIdentityApiClient = new();
         BlobStorageFileService = new();
@@ -33,7 +33,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(sp => GetCurrent().Clock.TimeProvider)
             .AddSingleton<IEventObserver>(new ForwardToTestScopedEventObserver())
             .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
             .AddTestScoped(tss => tss.Events)
@@ -67,11 +67,6 @@ public class TestScopedServices
     public Mock<ISafeFileService> SafeFileService { get; }
 
     public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
-
-    private class ForwardToTestScopedClock : IClock
-    {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
-    }
 
     private class ForwardToTestScopedEventObserver : IEventObserver
     {

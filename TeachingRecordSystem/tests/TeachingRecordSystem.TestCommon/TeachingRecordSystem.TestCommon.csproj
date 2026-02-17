@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Faker.Net" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
     <PackageReference Include="Moq" />
     <PackageReference Include="Respawn" />
     <PackageReference Include="Testcontainers.PostgreSql" />

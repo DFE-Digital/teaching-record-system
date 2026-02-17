@@ -12,7 +12,7 @@ public class TestScopedServices
     public TestScopedServices(IServiceProvider serviceProvider)
     {
         Clock = new();
-        Events = new(Clock);
+        Events = new(Clock.TimeProvider);
         BackgroundJobScheduler = new(serviceProvider);
     }
 
@@ -24,7 +24,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(sp => GetCurrent().Clock.TimeProvider)
             .AddTestScoped<EventCapture>(tss => tss.Events)
             .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>())
             .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler);
@@ -52,11 +52,6 @@ public class TestScopedServices
 
         current = default;
         return false;
-    }
-
-    private class ForwardToTestScopedClock : IClock
-    {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
     }
 }
 
