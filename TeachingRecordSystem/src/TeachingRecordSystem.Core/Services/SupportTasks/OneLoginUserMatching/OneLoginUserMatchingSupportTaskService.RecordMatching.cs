@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
@@ -42,10 +41,10 @@ public partial class OneLoginUserMatchingSupportTaskService
 
         var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
 
-        var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
+        await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
             {
-                SupportTask = supportTask.SupportTaskReference,
+                SupportTaskReference = supportTask.SupportTaskReference,
                 UpdateData = data => data with
                 {
                     Outcome = OneLoginUserRecordMatchingOutcome.NotConnecting,
@@ -55,7 +54,6 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
-        Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
 
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
@@ -69,10 +67,10 @@ public partial class OneLoginUserMatchingSupportTaskService
 
         var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
 
-        var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
+        await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
             {
-                SupportTask = supportTask.SupportTaskReference,
+                SupportTaskReference = supportTask.SupportTaskReference,
                 UpdateData = data => data with
                 {
                     Outcome = OneLoginUserRecordMatchingOutcome.NoMatches
@@ -80,7 +78,6 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
-        Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
 
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
@@ -108,10 +105,10 @@ public partial class OneLoginUserMatchingSupportTaskService
         var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
         await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
 
-        var updateTaskResult = await supportTaskService.UpdateSupportTaskAsync(
+        await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
             {
-                SupportTask = supportTask.SupportTaskReference,
+                SupportTaskReference = supportTask.SupportTaskReference,
                 UpdateData = data => data with
                 {
                     PersonId = options.MatchedPersonId,
@@ -120,6 +117,5 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
-        Debug.Assert(updateTaskResult is UpdateSupportTaskResult.Ok);
     }
 }

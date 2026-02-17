@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks;
@@ -100,11 +101,10 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<SupportTaskService, DeleteSupportTaskResult>(
-            service => service.DeleteSupportTaskAsync(options, processContext));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(service => service.DeleteSupportTaskAsync(options, processContext)));
 
         // Assert
-        Assert.Equal(DeleteSupportTaskResult.NotFound, result);
+        Assert.IsType<NotFoundException>(ex);
         Events.AssertNoEventsPublished();
     }
 
@@ -128,11 +128,10 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<SupportTaskService, DeleteSupportTaskResult>(
-            service => service.DeleteSupportTaskAsync(options, processContext));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(service => service.DeleteSupportTaskAsync(options, processContext)));
 
         // Assert
-        Assert.Equal(DeleteSupportTaskResult.NotFound, result);
+        Assert.IsType<NotFoundException>(ex);
         Events.AssertNoEventsPublished();
     }
 
@@ -149,12 +148,9 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<SupportTaskService, DeleteSupportTaskResult>(
-            service => service.DeleteSupportTaskAsync(options, processContext));
+        await WithServiceAsync<SupportTaskService>(service => service.DeleteSupportTaskAsync(options, processContext));
 
         // Assert
-        Assert.Equal(DeleteSupportTaskResult.Ok, result);
-
         await WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks.IgnoreQueryFilters().SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
@@ -177,7 +173,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTask = supportTaskReference,
+            SupportTaskReference = supportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.Closed,
             Comments = Faker.Lorem.Paragraph()
@@ -186,11 +182,11 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
-            service => service.UpdateSupportTaskAsync(options, processContext));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(
+            service => service.UpdateSupportTaskAsync(options, processContext)));
 
         // Assert
-        Assert.Equal(UpdateSupportTaskResult.NotFound, result);
+        Assert.IsType<NotFoundException>(ex);
         Events.AssertNoEventsPublished();
     }
 
@@ -206,7 +202,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTask = supportTask.SupportTaskReference,
+            SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data with { ChangeRequestOutcome = outcome },
             Status = SupportTaskStatus.Closed,
             Comments = Faker.Lorem.Paragraph()
@@ -215,12 +211,9 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
-            service => service.UpdateSupportTaskAsync(options, processContext));
+        await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
 
         // Assert
-        Assert.Equal(UpdateSupportTaskResult.Ok, result);
-
         await WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
@@ -248,7 +241,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTask = supportTask.SupportTaskReference,
+            SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.Closed,
             Comments = Faker.Lorem.Paragraph()
@@ -257,12 +250,9 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
-            service => service.UpdateSupportTaskAsync(options, processContext));
+        await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
 
         // Assert
-        Assert.Equal(UpdateSupportTaskResult.Ok, result);
-
         await WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
@@ -289,7 +279,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTask = supportTask.SupportTaskReference,
+            SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = supportTask.Status,
             Comments = Faker.Lorem.Paragraph()
@@ -298,12 +288,9 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
-            service => service.UpdateSupportTaskAsync(options, processContext));
+        await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
 
         // Assert
-        Assert.Equal(UpdateSupportTaskResult.Ok, result);
-
         await WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
@@ -330,7 +317,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
-            SupportTask = supportTask.SupportTaskReference,
+            SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.InProgress,
             SavedJourneyState = Option.Some(savedJourneyState)!,
@@ -340,12 +327,9 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<SupportTaskService, UpdateSupportTaskResult>(
-            service => service.UpdateSupportTaskAsync(options, processContext));
+        await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
 
         // Assert
-        Assert.Equal(UpdateSupportTaskResult.Ok, result);
-
         await WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);

@@ -43,15 +43,11 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         return supportTask;
     }
 
-    public async Task<DeleteSupportTaskResult> DeleteSupportTaskAsync(DeleteSupportTaskOptions options, ProcessContext processContext)
+    public async Task DeleteSupportTaskAsync(DeleteSupportTaskOptions options, ProcessContext processContext)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var supportTask = await dbContext.SupportTasks.FindAsync(options.SupportTaskReference);
-        if (supportTask is null)
-        {
-            return DeleteSupportTaskResult.NotFound;
-        }
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
 
         supportTask.DeletedOn = processContext.Now;
 
@@ -65,16 +61,14 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 SupportTask = EventModels.SupportTask.FromModel(supportTask),
                 ReasonDetail = options.ReasonDetail
             });
-
-        return DeleteSupportTaskResult.Ok;
     }
 
-    public Task<UpdateSupportTaskResult> UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext)
+    public Task UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext)
     {
         return UpdateSupportTaskCoreAsync(options, updateAction: null, processContext);
     }
 
-    public Task<UpdateSupportTaskResult> UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
+    public Task UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
         where TData : ISupportTaskData, IEquatable<TData>
     {
         return UpdateSupportTaskCoreAsync(
@@ -95,21 +89,14 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             processContext);
     }
 
-    public async Task<UpdateSupportTaskResult> UpdateSupportTaskCoreAsync(
+    public async Task UpdateSupportTaskCoreAsync(
         UpdateSupportTaskOptions options,
         Func<SupportTask, SupportTaskUpdatedEventChanges, SupportTaskUpdatedEventChanges>? updateAction,
         ProcessContext processContext)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var supportTask = options.SupportTask.Value as SupportTask ?? await dbContext.SupportTasks.FindAsync(options.SupportTask.AsT1);
-
-        if (supportTask is null)
-        {
-            return UpdateSupportTaskResult.NotFound;
-        }
-
-        dbContext.Attach(supportTask);
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
 
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
 
@@ -149,7 +136,5 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                     RejectionReason = options.RejectionReason
                 });
         }
-
-        return UpdateSupportTaskResult.Ok;
     }
 }

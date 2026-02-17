@@ -155,7 +155,7 @@ public class CheckAnswersModel(
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
             {
-                SupportTask = SupportTaskReference,
+                SupportTaskReference = SupportTaskReference,
                 UpdateData = data => data with
                 {
                     ResolvedAttributes = resolvedPersonAttributes,
