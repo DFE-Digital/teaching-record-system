@@ -19,7 +19,7 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 builder.ConfigureLogging();
 
 builder
-    .AddServiceDefaults(dataProtectionBlobName: "SupportUi")
+    .AddServiceDefaults(dataProtectionBlobName: "SupportUi", cacheTableName: "ui")
     .AddCoreServices()
     .AddSupportUiServices();
 

@@ -26,7 +26,6 @@ using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.WebCommon.Filters;
-using TeachingRecordSystem.WebCommon.Infrastructure.Redis;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -107,8 +106,7 @@ public static class Extensions
         if (environment.IsProduction())
         {
             services
-                .AddStartupTask<ReferenceDataCache>()
-                .AddRedis(configuration);
+                .AddStartupTask<ReferenceDataCache>();
         }
 
         if (environment.IsProduction())

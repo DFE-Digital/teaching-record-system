@@ -20,7 +20,6 @@ using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.WebCommon.Filters;
-using TeachingRecordSystem.WebCommon.Infrastructure.Redis;
 
 namespace TeachingRecordSystem.Api;
 
@@ -145,7 +144,6 @@ public static class Extensions
         {
             services
                 .AddStartupTask<ReferenceDataCache>()
-                .AddRedis(configuration)
                 .AddRateLimiting(configuration);
         }
 

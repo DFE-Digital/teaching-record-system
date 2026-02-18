@@ -12,7 +12,7 @@
     <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="Hangfire.AspNetCore" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Postgres" />
     <PackageReference Include="prometheus-net.AspNetCore" />
     <PackageReference Include="Sentry.AspNetCore" />
     <PackageReference Include="Serilog.AspNetCore" />
