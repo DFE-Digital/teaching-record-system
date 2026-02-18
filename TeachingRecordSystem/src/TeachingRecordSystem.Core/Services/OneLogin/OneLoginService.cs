@@ -109,6 +109,29 @@ public class OneLoginService(
         await eventScope.PublishEventAsync(updatedEvent);
     }
 
+    public async Task SetUserUnmatchedAsync(string oneLoginSubject, ProcessContext processContext)
+    {
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject);
+
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
+        var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+        user.SetUnmatched();
+
+        await dbContext.SaveChangesAsync();
+
+        var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+        var updatedEvent = new OneLoginUserUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            OneLoginUser = oneLoginUserEventModel,
+            OldOneLoginUser = oneLoginUserEventModel,
+            Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
+        };
+
+        await eventScope.PublishEventAsync(updatedEvent);
+    }
+
     public async Task SetUserMatchedAsync(SetUserMatchedOptions options, ProcessContext processContext)
     {
         var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject);
@@ -160,6 +183,30 @@ public class OneLoginService(
             options.CoreIdentityClaimVc);
 
         user.SetMatched(processContext.Now, options.MatchedPersonId, options.MatchRoute, options.MatchedAttributes);
+
+        await dbContext.SaveChangesAsync();
+
+        var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+        var updatedEvent = new OneLoginUserUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            OneLoginUser = oneLoginUserEventModel,
+            OldOneLoginUser = oneLoginUserEventModel,
+            Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
+        };
+
+        await eventScope.PublishEventAsync(updatedEvent);
+    }
+
+    public async Task SetUserUnverifiedAndUnmatchedAsync(string oneLoginSubject, ProcessContext processContext)
+    {
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject);
+
+        var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
+        user.SetUnverified();
+        user.SetUnmatched();
 
         await dbContext.SaveChangesAsync();
 

@@ -39,5 +39,6 @@ public enum ProcessType
     PersonOneLoginUserConnecting = 37,
     AlertCreating = 39,
     AlertUpdating = 40,
-    AlertDeleting = 41
+    AlertDeleting = 41,
+    PersonOneLoginUserDisconnecting = 42
 }

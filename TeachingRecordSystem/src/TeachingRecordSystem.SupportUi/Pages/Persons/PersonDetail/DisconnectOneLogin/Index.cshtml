@@ -1,8 +1,66 @@
-@page "/persons/{personId}/disconnect-one-login"
+@page "/persons/{personId}/disconnect-one-login/{oneLoginSubject}"
+@using TeachingRecordSystem.Core.Services.Persons
 @model Index
 @{
     Layout = "_Layout";
-    ViewBag.Title = "Disconnect One Login User";
+    ViewBag.Title = "Why are you disconnecting this GOV.UK One Login from this record?";
 }
 
-<h1>Stub</h1>
+@section BeforeContent {
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form
+            action="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(Model.PersonId, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)"
+            method="post">
+            <span class="govuk-caption-l" data-testid="disconnect-caption">Record Management</span>
+            <govuk-radios for="Reason" data-testid="reason-for-disconnecting-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true"
+                                                  data-testid="change-reason-options-legend">
+                        <govuk-radios-fieldset-legend>
+                            <h2 class="govuk-fieldset__legend--m">
+                                Why are you disconnecting this GOV.UK One Login from this record?
+                            </h2>
+                        </govuk-radios-fieldset-legend>
+
+                        <govuk-inset-text class="govuk-!-margin-top-0">
+                            You`re disconnecting the GOV.UK One Login email address @Model.EmailAddress from this
+                            record. You`ll be able to review the details before confirming.
+                        </govuk-inset-text>
+                    </govuk-radios-fieldset-legend>
+
+                    <govuk-radios-item value="@nameof(DisconnectOneLoginReason.ConnectedIncorrectly)">
+                        @DisconnectOneLoginReason.ConnectedIncorrectly.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@nameof(DisconnectOneLoginReason.NewInformation)">
+                        @DisconnectOneLoginReason.NewInformation.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@nameof(DisconnectOneLoginReason.AnotherReason)">
+                        @DisconnectOneLoginReason.AnotherReason.GetDisplayName()
+
+                        <govuk-radios-item-conditional for="Details" data-testid="disconnect-reason-detail">
+                            <govuk-character-count for="ReasonDetail"
+                                                   max-length="UiDefaults.ReasonDetailsMaxCharacterCount"
+                                                   rows="UiDefaults.ReasonDetailsRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button"
+                              formaction="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.Cancel(Model.PersonId, Model.OneLoginSubject!, Model.JourneyInstance!.InstanceId)"
+                              class="govuk-button--secondary" type="submit">Cancel and return to record
+                </govuk-button>
+            </div>
+
+        </form>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+@page "/persons/{PersonId}/disconnect-one-login/{oneLoginSubject}/check-answers"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Check details before disconnecting GOV.UK One Login from record";
+}
+
+@section BeforeContent {
+    <govuk-back-link data-testid="back-link"
+                     href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.Verified(Model.PersonId, Model.OneLoginSubject, Model!.JourneyInstance!.InstanceId)">
+        Back
+    </govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form
+            action="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers(Model.PersonId, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId)"
+            method="post" data-testid="submit-form">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>GOV.UK One Login email address</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.EmailAddress</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Why are you disconnecting GOV.UK One Login from this record?
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        <div data-testid="disconnect-reason">
+                            @Model.Reason?.GetDisplayName()
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Detail))
+                        {
+                            <div data-testid="disconnect-reason-detail">@Model.Detail</div>
+                        }
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action
+                            href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(Model.PersonId, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                            visually-hidden-text="disconnect reason">Change
+                        </govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Should this One Login User remain verified?</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @Model.StayVerified?.GetDisplayName()
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action
+                            href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.Verified(Model.PersonId, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                            visually-hidden-text="remain verified">Change
+                        </govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="continue-button">Confirm and disconnect account</govuk-button>
+                <govuk-button data-testid="cancel-button"
+                              formaction="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswersCancel(Model.PersonId!, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId)"
+                              class="govuk-button--secondary" type="submit">Cancel
+                </govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
