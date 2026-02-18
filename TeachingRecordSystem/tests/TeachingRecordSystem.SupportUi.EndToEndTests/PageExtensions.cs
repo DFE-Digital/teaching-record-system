@@ -1,4 +1,5 @@
 using Microsoft.Playwright;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
