@@ -24,7 +24,7 @@ builder.ConfigureLogging((config, services) =>
 });
 
 builder
-    .AddServiceDefaults(dataProtectionBlobName: "Api")
+    .AddServiceDefaults(dataProtectionBlobName: "Api", cacheTableName: "api")
     .AddCoreServices()
     .AddApiServices();
 

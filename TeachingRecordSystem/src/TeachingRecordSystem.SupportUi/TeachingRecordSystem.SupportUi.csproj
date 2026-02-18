@@ -12,12 +12,10 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.HealthChecks.Redis" />
     <PackageReference Include="DartSassBuilder" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
     <PackageReference Include="Microsoft.Identity.Web" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.Identity.Web.GraphServiceClientBeta" />

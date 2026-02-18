@@ -20,7 +20,7 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 builder.ConfigureLogging();
 
 builder
-    .AddServiceDefaults(dataProtectionBlobName: "AuthorizeAccess")
+    .AddServiceDefaults(dataProtectionBlobName: "AuthorizeAccess", cacheTableName: "authz")
     .AddCoreServices()
     .AddAuthorizeAccessServices();
 

@@ -17,7 +17,8 @@ public static class Extensions
 {
     public static IHostApplicationBuilder AddServiceDefaults(
         this IHostApplicationBuilder builder,
-        string dataProtectionBlobName)
+        string dataProtectionBlobName,
+        string cacheTableName)
     {
         builder.Services.AddHealthChecks();
 
@@ -53,6 +54,14 @@ public static class Extensions
                     builder.Configuration.GetRequiredValue("StorageConnectionString"),
                     builder.Configuration.GetRequiredValue("DataProtectionKeysContainerName"),
                     dataProtectionBlobName);
+
+            builder.Services.AddDistributedPostgresCache(options =>
+            {
+                options.ConnectionString = builder.Configuration.GetPostgresConnectionString();
+                options.SchemaName = "cache";
+                options.TableName = cacheTableName;
+                options.CreateIfNotExists = true;
+            });
         }
 
         return builder;

@@ -21,6 +21,11 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddRateLimiting(this IServiceCollection services, IConfiguration configuration)
     {
+        var redisConnectionString = configuration.GetRequiredConnectionString("Redis");
+
+        services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+        services.AddHealthChecks().AddRedis(redisConnectionString);
+
         services.AddOptions<ClientIdRateLimiterOptions>()
             .Bind(configuration.GetSection("RateLimiting"))
             .ValidateDataAnnotations()
@@ -28,14 +33,14 @@ public static class ServiceCollectionExtensions
 
         services.AddRateLimiter(options =>
         {
-            const string _windowSecondsHttpContextKey = "RateLimitWindowSeconds";
+            const string windowSecondsHttpContextKey = "RateLimitWindowSeconds";
 
             options.OnRejected = async (context, token) =>
             {
                 await RateLimitMetadata.OnRejected(context.HttpContext, context.Lease, token);
 
                 if (context.Lease.TryGetMetadata(RateLimitMetadataName.Limit, out var limit) &&
-                    context.HttpContext.Items.TryGetValue(_windowSecondsHttpContextKey, out var windowSeconds))
+                    context.HttpContext.Items.TryGetValue(windowSecondsHttpContextKey, out var windowSeconds))
                 {
                     var message = $"A maximum of {limit} calls per {windowSeconds} seconds are permitted.";
 
@@ -63,7 +68,7 @@ public static class ServiceCollectionExtensions
                 var clientRateLimit = rateLimiterOptions.ClientRateLimits.TryGetValue(partitionKey, out var windowOptions) ? windowOptions : rateLimiterOptions.DefaultRateLimit;
 
                 // Window isn't available via RateLimitMetadata so stash it on the HttpContext instead
-                httpContext.Items.TryAdd(_windowSecondsHttpContextKey, clientRateLimit.Window.TotalSeconds);
+                httpContext.Items.TryAdd(windowSecondsHttpContextKey, clientRateLimit.Window.TotalSeconds);
 
                 return RedisRateLimitPartition.GetFixedWindowRateLimiter(partitionKey, key => new RedisFixedWindowRateLimiterOptions()
                 {
