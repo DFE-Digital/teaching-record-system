@@ -1,0 +1,54 @@
+@page "/persons/{PersonId}/connect-one-login/reason"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin.ReasonModel
+@{
+    ViewBag.Title = "Why are you connecting this record to a GOV.UK One Login?";
+}
+
+@section BeforeContent {
+    @{
+        var backLink = Model.FromCheckAnswers
+            ? LinkGenerator.Persons.PersonDetail.ConnectOneLogin.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)
+            : LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Match(Model.PersonId, Model.JourneyInstance!.InstanceId);
+    }
+    <govuk-back-link href="@backLink">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form action="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Record management</span>
+
+            <govuk-radios for="ConnectReason" data-testid="reason-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true">
+                        @ViewBag.Title
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-hint>
+                        <govuk-inset-text>
+                            You’re connecting this record with the GOV.UK One Login email address @Model.OneLoginEmailAddress. You’ll be able to review the details before confirming.
+                        </govuk-inset-text>
+                    </govuk-radios-hint>
+                    <govuk-radios-item value="@ConnectOneLoginReason.SystemCouldNotMatch">
+                        @ConnectOneLoginReason.SystemCouldNotMatch.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@ConnectOneLoginReason.ConnectedToWrongOneLogin">
+                        @ConnectOneLoginReason.ConnectedToWrongOneLogin.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@ConnectOneLoginReason.AnotherReason">
+                        @ConnectOneLoginReason.AnotherReason.GetDisplayName()
+                        <govuk-radios-item-conditional>
+                            <govuk-character-count for="ReasonDetail" max-length="@UiDefaults.ReasonDetailsMaxCharacterCount" rows="@UiDefaults.ReasonDetailsRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.ReasonCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

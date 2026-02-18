@@ -1,15 +1,37 @@
 using Optional;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.ConnectOneLogin;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithValidPersonId_RendersExpectedContent()
+    public async Task Get_WithValidPersonId_RedirectsWithJourneyInstanceId()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/persons/{person.PersonId}/connect-one-login?{Constants.UniqueKeyQueryParameterName}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Get_WithJourneyInstanceId_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState(),
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -40,7 +62,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login")
+
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState(),
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -60,7 +88,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login")
+
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState(),
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -81,7 +115,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var emailAddress = Faker.Internet.Email();
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login")
+
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState(),
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -93,7 +133,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "No GOV.UK One Login user found with this email address");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is not linked to a GOV.UK One Login record");
     }
 
     [Fact]
@@ -104,7 +144,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var emailAddress = Faker.Internet.Email();
         await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(emailAddress));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login")
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState(),
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -116,7 +161,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "This GOV.UK One Login user is already connected to this record");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is already connected to this record");
     }
 
     [Fact]
@@ -128,7 +173,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var emailAddress = Faker.Internet.Email();
         await TestData.CreateOneLoginUserAsync(otherPerson, email: Option.Some<string?>(emailAddress));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login")
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState(),
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -140,18 +190,26 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "This GOV.UK One Login user is already connected to another record");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is already connected to another record");
     }
 
     [Fact]
-    public async Task Post_WithValidEmailAndUnmatchedOneLoginUser_RedirectsToMatchPage()
+    public async Task Post_WithValidEmailAndUnmatchedOneLoginUser_CreatesJourneyAndRedirectsToMatchPage()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var emailAddress = Faker.Internet.Email();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(email: Option.Some<string?>(emailAddress));
+        _ = await TestData.CreateOneLoginUserAsync(
+            personId: null,
+            email: Option.Some<string?>(emailAddress),
+            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login")
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState(),
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -164,6 +222,33 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/persons/{person.PersonId}/connect-one-login/match?subject={oneLoginUser.Subject}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetail()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState(),
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?handler=Cancel&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance);
     }
 }
