@@ -8,8 +8,8 @@ public class ResolveOneLoginUserMatchingLinkGenerator(LinkGenerator linkGenerato
     public string Verify(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/Resolve/Verify", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string Evidence(string supportTaskReference) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/Resolve/Verify", handler: "Evidence", routeValues: new { supportTaskReference });
+    public string Evidence(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/Resolve/Verify", handler: "Evidence", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
     public string ConfirmConnect(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/Resolve/ConfirmConnect", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
