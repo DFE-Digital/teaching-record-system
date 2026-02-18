@@ -19,6 +19,8 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
 
     public string? EmailAddress { get; set; }
 
+    public string? Name { get; set; }
+
     public OneLoginIdVerificationRejectReason Reason { get; set; }
 
     public string? AdditionalDetails { get; set; }
@@ -52,7 +54,7 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
         var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
         TempData.SetFlashSuccess(
             "GOV.UK One Login verification request rejected",
-            $"Request closed for {data.StatedFirstName} {data.StatedLastName}.");
+            $"Request closed for {data.StatedFirstName} {data.StatedLastName}. We’ve sent them an email confirming we could not verify their identity.");
 
         return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
     }
@@ -72,8 +74,10 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
         }
 
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var data = _supportTask.GetData<OneLoginUserIdVerificationData>();
 
         EmailAddress = _supportTask.OneLoginUser!.EmailAddress!;
+        Name = $"{data.StatedFirstName} ${data.StatedLastName}";
         Reason = JourneyInstance.State.RejectReason!.Value;
         AdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails;
     }

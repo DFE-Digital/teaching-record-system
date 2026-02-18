@@ -6,7 +6,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.Notify;
 using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 
 namespace TeachingRecordSystem.Core.Services.OneLogin;
@@ -14,7 +13,6 @@ namespace TeachingRecordSystem.Core.Services.OneLogin;
 public class OneLoginService(
     TrsDbContext dbContext,
     IdDbContext idDbContext,
-    INotificationSender notificationSender,
     IEventPublisher eventPublisher,
     IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock)
@@ -22,14 +20,6 @@ public class OneLoginService(
     // ID's database has a user_id column to indicate that a TRN token has been used already.
     // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
     private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
-
-    public Task<string> GetRecordNotFoundEmailContentHtmlAsync(string personName)
-    {
-        return notificationSender.RenderEmailTemplateHtmlAsync(
-            EmailTemplateIds.OneLoginCannotFindRecord,
-            GetOneLoginCannotFindRecordEmailPersonalization(personName),
-            stripLinks: true);
-    }
 
     public async Task EnqueueNotVerifiedEmailAsync(string emailAddress, string personName, string reason, ProcessContext processContext)
     {

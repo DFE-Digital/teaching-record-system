@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
 using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
@@ -1222,7 +1221,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var oneLoginServiceMock = new Mock<OneLoginService>(
             dbContext,
             idDbContext,
-            Mock.Of<INotificationSender>(),
             eventPublisher,
             Mock.Of<IBackgroundJobScheduler>(),
             Clock)

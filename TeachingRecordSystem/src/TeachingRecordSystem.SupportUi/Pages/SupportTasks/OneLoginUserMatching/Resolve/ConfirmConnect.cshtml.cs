@@ -90,14 +90,11 @@ public class ConfirmConnect(
 
         TempData.SetFlashSuccess(
             $"GOV.UK One Login connected to {MatchedPersonName}’s record",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(MatchedPersonId)));
+            $"We’ve sent {MatchedPersonName} an email confirming their GOV.UK One Login has been connected to their teaching record.");
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-        {
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-        }
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+        return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

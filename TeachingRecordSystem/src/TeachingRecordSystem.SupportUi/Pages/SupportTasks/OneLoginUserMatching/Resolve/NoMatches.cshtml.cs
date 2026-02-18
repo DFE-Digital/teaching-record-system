@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
@@ -12,7 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 public class NoMatches(
     SupportUiLinkGenerator linkGenerator,
     OneLoginUserMatchingSupportTaskService supportTaskService,
-    OneLoginService oneLoginService,
     IClock clock) : PageModel
 {
     private SupportTask? _supportTask;
@@ -23,8 +21,6 @@ public class NoMatches(
     public JourneyInstance<ResolveOneLoginUserMatchingState> JourneyInstance { get; set; } = null!;
 
     public string? Name { get; set; }
-
-    public string? EmailContentHtml { get; set; }
 
     public bool? IsRecordMatchingOnly { get; set; }
 
@@ -38,12 +34,9 @@ public class NoMatches(
         {
             await JourneyInstance.DeleteAsync();
 
-            if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-            {
-                return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-            }
-
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+            return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+                linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+                linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
         }
 
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
@@ -51,7 +44,7 @@ public class NoMatches(
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
             await supportTaskService.ResolveVerificationSupportTaskAsync(
-                (VerifiedOnlyWithoutMatchesOutcomeOptions)new()
+                new VerifiedOnlyWithoutMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!
                 },
@@ -62,7 +55,7 @@ public class NoMatches(
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
 
             await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
-                (NoMatchesOutcomeOptions)new()
+                new NoMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!
                 },
@@ -73,14 +66,12 @@ public class NoMatches(
 
         TempData.SetFlashSuccess(
             "Email sent",
-            $"Request closed for {Name}.");
+            $"Request closed for {Name}. " +
+            $"We’ve send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.");
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-        {
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-        }
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+        return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -104,8 +95,6 @@ public class NoMatches(
         // For the time being only display first verified name and dob if there are multiples (but still match on both)
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         Name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
-
-        EmailContentHtml = await oneLoginService.GetRecordNotFoundEmailContentHtmlAsync(Name);
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
