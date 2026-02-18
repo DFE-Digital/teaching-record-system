@@ -137,7 +137,7 @@ public class ConfirmRejectTests(HostFixture hostFixture) : ResolveOneLoginUserMa
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
             "GOV.UK One Login verification request rejected",
-            $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}.");
+            $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}. We’ve sent them an email confirming we could not verify their identity.");
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal("/support-tasks/one-login-user-matching/id-verification", response.Headers.Location?.OriginalString);

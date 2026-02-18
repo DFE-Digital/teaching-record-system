@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.Core.Tests.Services.OneLogin;
@@ -416,5 +415,5 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         WithServiceAsync<OneLoginService, TResult>(action, GetServiceDependencies(arguments));
 
     private object[] GetServiceDependencies(object[] arguments) =>
-        [Mock.Of<INotificationSender>(), Mock.Of<IBackgroundJobScheduler>(), .. arguments];
+        [Mock.Of<IBackgroundJobScheduler>(), .. arguments];
 }

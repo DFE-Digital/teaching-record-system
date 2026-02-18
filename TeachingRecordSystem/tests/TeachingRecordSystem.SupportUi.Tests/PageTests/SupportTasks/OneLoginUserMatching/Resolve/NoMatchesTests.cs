@@ -116,7 +116,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
             "Email sent",
-            $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}.");
+            $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}. We’ve send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.");
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal("/support-tasks/one-login-user-matching/id-verification", response.Headers.Location?.OriginalString);
@@ -163,7 +163,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
             "Email sent",
-            $"Request closed for {firstName} {lastName}.");
+            $"Request closed for {firstName} {lastName}. We’ve send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.");
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal("/support-tasks/one-login-user-matching/record-matching", response.Headers.Location?.OriginalString);
