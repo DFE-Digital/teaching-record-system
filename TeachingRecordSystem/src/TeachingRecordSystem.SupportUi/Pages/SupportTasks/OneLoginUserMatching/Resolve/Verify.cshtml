@@ -43,12 +43,12 @@
                         <div class="govuk-!-margin-top-2">
                             @if (Model.Evidence!.MimeType == "application/pdf")
                             {
-                                <object data="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Evidence(Model.SupportTaskReference!)" type="application/pdf" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="pdf-@Model.Evidence!.FileId">
+                                <object data="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Evidence(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" type="application/pdf" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="pdf-@Model.Evidence!.FileId">
                                 </object>
                             }
                             else
                             {
-                                <img src="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Evidence(Model.SupportTaskReference!)" alt="@Model.Evidence.FileName" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="image-@Model.Evidence!.FileId" />
+                                <img src="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Evidence(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" alt="@Model.Evidence.FileName" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="image-@Model.Evidence!.FileId" />
                             }
                         </div>
                     </govuk-summary-list-row-value>
@@ -57,7 +57,7 @@
 
             <govuk-radios for="Verified" data-testid="reason-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--m" is-page-heading="false">Can you verify this person’s identity?</govuk-radios-fieldset-legend>
+                    <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--m">Can you verify this person’s identity?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes, find a matching record
                     </govuk-radios-item>
