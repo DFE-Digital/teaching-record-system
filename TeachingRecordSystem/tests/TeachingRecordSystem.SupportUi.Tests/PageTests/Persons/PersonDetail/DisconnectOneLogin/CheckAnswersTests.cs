@@ -41,7 +41,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new DisconnectOneLoginState() { DisconnectReason = reason, StayVerified = stayVerified, Detail = details});
+            new DisconnectOneLoginState() { DisconnectReason = reason, StayVerified = stayVerified, Detail = details });
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -66,7 +66,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new DisconnectOneLoginState() { DisconnectReason = reason, StayVerified = stayVerified, Detail = details});
+            new DisconnectOneLoginState() { DisconnectReason = reason, StayVerified = stayVerified, Detail = details });
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");

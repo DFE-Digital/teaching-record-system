@@ -72,7 +72,7 @@ public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext)
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var oneLogin = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == OneLoginSubject);
-        var person = await dbContext.Persons.SingleAsync(x=>x.PersonId == PersonId);
+        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.EmailAddress = oneLogin.EmailAddress;

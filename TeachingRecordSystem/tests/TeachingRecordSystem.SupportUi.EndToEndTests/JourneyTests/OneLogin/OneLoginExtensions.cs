@@ -9,17 +9,17 @@ public static class OneLoginExtensions
         return page.GotoAsync($"/persons/{personId}/disconnect-one-login/{subject}");
     }
 
-    public static Task AssertOnDisconnectOneLoginIndexPageAsync(this IPage page, Guid personId,string subject)
+    public static Task AssertOnDisconnectOneLoginIndexPageAsync(this IPage page, Guid personId, string subject)
     {
         return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}");
     }
 
-    public static Task AssertOnDisconnectOneLoginVerifiedPageAsync(this IPage page, Guid personId,string subject)
+    public static Task AssertOnDisconnectOneLoginVerifiedPageAsync(this IPage page, Guid personId, string subject)
     {
         return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}/verified");
     }
 
-    public static Task AssertOnDisconnectOneLoginCheckYourAnswersPageAsync(this IPage page, Guid personId,string subject)
+    public static Task AssertOnDisconnectOneLoginCheckYourAnswersPageAsync(this IPage page, Guid personId, string subject)
     {
         return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}/check-answers");
     }

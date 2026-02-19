@@ -48,7 +48,7 @@ public class OneLoginUser
         LastCoreIdentityVc = coreIdentityClaimVc;
     }
 
-    public void SetUnverified( )
+    public void SetUnverified()
     {
         VerifiedOn = null;
         VerificationRoute = null;
