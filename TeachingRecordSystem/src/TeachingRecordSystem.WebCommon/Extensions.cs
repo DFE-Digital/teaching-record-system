@@ -57,7 +57,9 @@ public static class Extensions
 
             builder.Services.AddDistributedPostgresCache(options =>
             {
-                options.ConnectionString = builder.Configuration.GetPostgresConnectionString();
+                var connectionStringBuilder = new NpgsqlConnectionStringBuilder(builder.Configuration.GetPostgresConnectionString()) { Enlist = false };
+
+                options.ConnectionString = connectionStringBuilder.ConnectionString;
                 options.SchemaName = "cache";
                 options.TableName = cacheTableName;
                 options.CreateIfNotExists = true;
