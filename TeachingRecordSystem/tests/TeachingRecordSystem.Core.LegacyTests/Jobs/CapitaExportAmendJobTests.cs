@@ -6,10 +6,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
+using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.PersonDetailsUpdatedEventChanges;
+using PersonAttributesChanges = TeachingRecordSystem.Core.Events.Legacy.PersonAttributesChanges;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -141,32 +143,36 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
 
         var personService = new PersonService(
             dbContext,
-            Clock,
+            Mock.Of<OneLoginService>(),
             new TestEventPublisher());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
-        var updateResult = await personService.UpdatePersonDetailsAsync(new(
-            person.PersonId,
-            new()
-            {
-                DateOfBirth = Option.Some<DateOnly?>(updatedDateOfBirth)
-            },
-            null,
-            null),
-            processContext);
+        var oldPersonEventModel = EventModels.PersonDetails.FromModel(trsPerson);
+        await personService.UpdatePersonDetailsAsync(new UpdatePersonDetailsOptions
+        {
+            PersonId = person.PersonId,
+            CreatePreviousName = false,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.Some<DateOnly?>(updatedDateOfBirth),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        }, processContext);
         var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddHours(-1),
             RaisedBy = SystemUser.SystemUserId,
             PersonId = person.PersonId,
-            PersonAttributes = updateResult.PersonDetails.ToEventModel(),
-            OldPersonAttributes = updateResult.OldPersonDetails.ToEventModel(),
+            PersonAttributes = EventModels.PersonDetails.FromModel(trsPerson),
+            OldPersonAttributes = oldPersonEventModel,
             NameChangeReason = "",
             NameChangeEvidenceFile = null,
             DetailsChangeReason = null,
             DetailsChangeReasonDetail = null,
             DetailsChangeEvidenceFile = null,
-            Changes = updateResult.Changes.ToLegacyPersonDetailsUpdatedEventChanges()
+            Changes = PersonDetailsUpdatedEventChanges.DateOfBirth.ToLegacyPersonDetailsUpdatedEventChanges()
         };
         dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
@@ -257,32 +263,36 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
         var personService = new PersonService(
             dbContext,
-            Clock,
+            Mock.Of<OneLoginService>(),
             new TestEventPublisher());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
-        var updateResult = await personService.UpdatePersonDetailsAsync(new(
-            person.PersonId,
-            new()
-            {
-                NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>(updatedNationalInsuranceNumber),
-            },
-            null,
-            null),
-            processContext);
+        var oldPersonEventModel = EventModels.PersonDetails.FromModel(trsPerson);
+        await personService.UpdatePersonDetailsAsync(new UpdatePersonDetailsOptions
+        {
+            PersonId = person.PersonId,
+            CreatePreviousName = false,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>(updatedNationalInsuranceNumber),
+            Gender = Option.None<Gender?>(),
+        }, processContext);
         var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddHours(-1),
             RaisedBy = SystemUser.SystemUserId,
             PersonId = person.PersonId,
-            PersonAttributes = updateResult.PersonDetails.ToEventModel(),
-            OldPersonAttributes = updateResult.OldPersonDetails.ToEventModel(),
+            PersonAttributes = EventModels.PersonDetails.FromModel(trsPerson),
+            OldPersonAttributes = oldPersonEventModel,
             NameChangeReason = "",
             NameChangeEvidenceFile = null,
             DetailsChangeReason = null,
             DetailsChangeReasonDetail = null,
             DetailsChangeEvidenceFile = null,
-            Changes = updateResult.Changes.ToLegacyPersonDetailsUpdatedEventChanges()
+            Changes = PersonDetailsUpdatedEventChanges.NationalInsuranceNumber.ToLegacyPersonDetailsUpdatedEventChanges()
         };
         dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
@@ -373,33 +383,36 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
         var personService = new PersonService(
             dbContext,
-            Clock,
+            Mock.Of<OneLoginService>(),
             new TestEventPublisher());
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow.AddHours(-1), SystemUser.SystemUserId);
-        var updateResult = await personService.UpdatePersonDetailsAsync(new(
-            person.PersonId,
-            new()
-            {
-                DateOfBirth = Option.Some<DateOnly?>(updatedDateOfBirth),
-                NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>(updatedNationalInsuranceNumber),
-            },
-            null,
-            null),
-            processContext);
+        var oldPersonEventModel = EventModels.PersonDetails.FromModel(trsPerson);
+        await personService.UpdatePersonDetailsAsync(new UpdatePersonDetailsOptions
+        {
+            PersonId = person.PersonId,
+            CreatePreviousName = false,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.Some<DateOnly?>(updatedDateOfBirth),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>(updatedNationalInsuranceNumber),
+            Gender = Option.None<Gender?>(),
+        }, processContext);
         var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
             RaisedBy = SystemUser.SystemUserId,
             PersonId = person.PersonId,
-            PersonAttributes = updateResult.PersonDetails.ToEventModel(),
-            OldPersonAttributes = updateResult.OldPersonDetails.ToEventModel(),
+            PersonAttributes = EventModels.PersonDetails.FromModel(trsPerson),
+            OldPersonAttributes = oldPersonEventModel,
             NameChangeReason = "",
             NameChangeEvidenceFile = null,
             DetailsChangeReason = null,
             DetailsChangeReasonDetail = null,
             DetailsChangeEvidenceFile = null,
-            Changes = updateResult.Changes.ToLegacyPersonDetailsUpdatedEventChanges()
+            Changes = (PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber).ToLegacyPersonDetailsUpdatedEventChanges()
         };
         dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();

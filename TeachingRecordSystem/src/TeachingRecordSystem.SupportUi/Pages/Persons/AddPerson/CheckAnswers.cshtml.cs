@@ -63,23 +63,17 @@ public class CheckAnswersModel(
         var processContext = new ProcessContext(ProcessType.PersonCreating, clock.UtcNow, User.GetUserId());
 
         var person = await personService.CreatePersonAsync(
-            new CreatePersonViaSupportUiOptions(
-                new()
-                {
-                    FirstName = FirstName ?? string.Empty,
-                    MiddleName = MiddleName ?? string.Empty,
-                    LastName = LastName ?? string.Empty,
-                    DateOfBirth = DateOfBirth,
-                    EmailAddress = EmailAddress,
-                    NationalInsuranceNumber = NationalInsuranceNumber,
-                    Gender = Gender,
-                },
-                new()
-                {
-                    Reason = Reason!.Value,
-                    ReasonDetail = ReasonDetail,
-                    Evidence = EvidenceFile?.ToFile()
-                }),
+            new CreatePersonOptions
+            {
+                SourceTrnRequest = null,
+                FirstName = FirstName ?? string.Empty,
+                MiddleName = MiddleName ?? string.Empty,
+                LastName = LastName ?? string.Empty,
+                DateOfBirth = DateOfBirth,
+                EmailAddress = EmailAddress,
+                NationalInsuranceNumber = NationalInsuranceNumber,
+                Gender = Gender,
+            },
             processContext);
 
         await JourneyInstance!.CompleteAsync();

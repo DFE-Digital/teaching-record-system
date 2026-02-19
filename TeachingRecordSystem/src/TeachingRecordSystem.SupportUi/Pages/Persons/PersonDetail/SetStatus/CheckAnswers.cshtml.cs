@@ -52,29 +52,13 @@ public class CheckAnswersModel(
         {
             var processContext = new ProcessContext(ProcessType.PersonDeactivating, clock.UtcNow, User.GetUserId());
 
-            await PersonService.DeactivatePersonAsync(new(
-                PersonId,
-                new()
-                {
-                    Reason = DeactivateReason!.Value,
-                    ReasonDetail = DeactivateReasonDetail,
-                    Evidence = EvidenceFile?.ToFile()
-                }
-            ), processContext);
+            await PersonService.DeactivatePersonAsync(PersonId, processContext);
         }
         else
         {
             var processContext = new ProcessContext(ProcessType.PersonReactivating, clock.UtcNow, User.GetUserId());
 
-            await PersonService.ReactivatePersonAsync(new(
-                PersonId,
-                new()
-                {
-                    Reason = ReactivateReason!.Value,
-                    ReasonDetail = ReactivateReasonDetail,
-                    Evidence = EvidenceFile?.ToFile()
-                }
-            ), processContext);
+            await PersonService.ReactivatePersonAsync(PersonId, processContext);
         }
 
         await JourneyInstance!.CompleteAsync();
