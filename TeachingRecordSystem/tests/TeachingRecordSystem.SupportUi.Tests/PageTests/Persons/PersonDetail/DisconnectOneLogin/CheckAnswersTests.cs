@@ -31,6 +31,78 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             response.Headers.Location?.OriginalString);
     }
 
+    [Fact]
+    public async Task Post_RemovingVerification_RemovesPersonAndVerification()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLogin = await TestData.CreateOneLoginUserAsync(person);
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new DisconnectOneLoginState() { DisconnectReason = DisconnectOneLoginReason.NewInformation  , StayVerified = DisconnectOneLoginStayVerified.No });
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Contains($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var oneLoginUpdated = await dbContext.OneLoginUsers.SingleAsync(x => x.Subject == oneLogin.Subject);
+            Assert.NotNull(oneLoginUpdated);
+            Assert.Null(oneLoginUpdated.PersonId);
+            Assert.Null(oneLoginUpdated.VerifiedOn);
+            Assert.Null(oneLoginUpdated.VerificationRoute);
+            Assert.Null(oneLoginUpdated.VerifiedByApplicationUserId);
+            Assert.Null(oneLoginUpdated.VerifiedNames);
+            Assert.Null(oneLoginUpdated.VerifiedDatesOfBirth);
+            Assert.Null(oneLoginUpdated.LastCoreIdentityVc);
+            Assert.Null(oneLoginUpdated.MatchedOn);
+            Assert.Null(oneLoginUpdated.MatchRoute);
+            Assert.Null(oneLoginUpdated.MatchedAttributes);
+        });
+    }
+
+    [Fact]
+    public async Task Post_RemovingVerification_RemovesPersonAndKeepsVerification()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLogin = await TestData.CreateOneLoginUserAsync(person);
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new DisconnectOneLoginState() { DisconnectReason = DisconnectOneLoginReason.NewInformation  , StayVerified = DisconnectOneLoginStayVerified.Yes });
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Contains($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var oneLoginUpdated = await dbContext.OneLoginUsers.SingleAsync(x => x.Subject == oneLogin.Subject);
+            Assert.NotNull(oneLoginUpdated);
+            Assert.Null(oneLoginUpdated.PersonId);
+            Assert.Null(oneLoginUpdated.MatchedOn);
+            Assert.Null(oneLoginUpdated.MatchRoute);
+            Assert.Null(oneLoginUpdated.MatchedAttributes);
+            Assert.NotNull(oneLoginUpdated.VerifiedNames);
+            Assert.NotNull(oneLoginUpdated.VerifiedDatesOfBirth);
+        });
+    }
+
     [Theory]
     [InlineData(DisconnectOneLoginStayVerified.Yes, DisconnectOneLoginReason.NewInformation, null)]
     public async Task Get_RendersCorrectDetails(DisconnectOneLoginStayVerified? stayVerified,
@@ -83,6 +155,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(otherReasonDetails);
         Assert.Equal(details, otherReasonDetails!.TextContent!.Trim());
     }
+
+
 
     private Task<JourneyInstance<DisconnectOneLoginState>> CreateJourneyInstanceAsync(Guid personId,
         DisconnectOneLoginState? state = null) =>
