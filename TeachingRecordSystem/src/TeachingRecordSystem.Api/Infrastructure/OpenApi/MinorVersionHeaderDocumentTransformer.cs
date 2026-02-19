@@ -1,19 +1,18 @@
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.OpenApi;
+using Microsoft.OpenApi;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
 
-public class MinorVersionHeaderDocumentFilter : IDocumentFilter
+public class MinorVersionHeaderDocumentTransformer : IOpenApiDocumentTransformer
 {
-    public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
+    public Task TransformAsync(OpenApiDocument swaggerDoc, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
     {
         var documentVersion = swaggerDoc.Info.Version;
         var isMinorVersion = documentVersion.StartsWith("v3_", StringComparison.Ordinal);
 
         if (!isMinorVersion)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         var minorVersion = documentVersion["v3_".Length..];
@@ -25,7 +24,7 @@ public class MinorVersionHeaderDocumentFilter : IDocumentFilter
             new OpenApiSchema
             {
                 Type = "string",
-                Enum = [new OpenApiString(minorVersion)] // TODO Use const when Swashbuckle supports openapi 3.1
+                Enum = [new OpenApiString(minorVersion)] // TODO Use const when OpenAPI supports openapi 3.1
             });
 
         foreach (var (_, path) in swaggerDoc.Paths)
@@ -44,5 +43,7 @@ public class MinorVersionHeaderDocumentFilter : IDocumentFilter
                 });
             }
         }
+
+        return Task.CompletedTask;
     }
 }

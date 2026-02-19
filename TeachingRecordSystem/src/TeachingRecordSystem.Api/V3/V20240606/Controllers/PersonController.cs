@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -14,15 +13,10 @@ namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-    [HttpGet]
-    [SwaggerOperation(
-        OperationId = "GetCurrentPerson",
-        Summary = "Get the authenticated person's details",
-        Description = "Gets the details for the authenticated person.")]
-    [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
+    [HttpGet]    [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAsync(
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder))] GetPersonRequestIncludes? include)
     {
         var command = new GetPersonCommand(
             Trn: User.FindFirstValue("trn")!,
@@ -40,12 +34,7 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);
     }
 
-    [HttpPost("name-changes")]
-    [SwaggerOperation(
-        OperationId = "CreateNameChange",
-        Summary = "Create name change request",
-        Description = "Creates a name change request for the authenticated teacher.")]
-    [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
+    [HttpPost("name-changes")]    [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     public async Task<IActionResult> CreateNameChangeAsync(
@@ -67,12 +56,7 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
         return result.ToActionResult(r => Ok(mapper.Map<CreateNameChangeResponse>(r)));
     }
 
-    [HttpPost("date-of-birth-changes")]
-    [SwaggerOperation(
-        OperationId = "CreateDobChange",
-        Summary = "Create DOB change request",
-        Description = "Creates a date of birth change request for the authenticated teacher.")]
-    [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
+    [HttpPost("date-of-birth-changes")]    [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     public async Task<IActionResult> CreateDateOfBirthChangeAsync(
