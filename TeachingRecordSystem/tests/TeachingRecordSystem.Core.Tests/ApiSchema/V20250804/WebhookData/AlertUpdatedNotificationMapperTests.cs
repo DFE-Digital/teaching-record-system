@@ -26,14 +26,32 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
             {
                 dbContext.Alerts.Attach(alert);
 
-                alert.Update(
-                    a => a.Details = Faker.Lorem.Paragraph(),
-                    changeReason: null,
-                    changeReasonDetail: null,
-                    evidenceFile: null,
-                    changedBy: SystemUser.SystemUserId,
-                    Clock.UtcNow,
-                    out var updatedEvent);
+                var oldDetails = alert.Details;
+                var newDetails = Faker.Lorem.Paragraph();
+                alert.Details = newDetails;
+                alert.UpdatedOn = Clock.UtcNow;
+
+                var updatedEvent = new LegacyEvents.AlertUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = Clock.UtcNow,
+                    RaisedBy = SystemUser.SystemUserId,
+                    PersonId = alert.PersonId,
+                    Alert = EventModels.Alert.FromModel(alert),
+                    OldAlert = new EventModels.Alert
+                    {
+                        AlertId = alert.AlertId,
+                        AlertTypeId = alert.AlertTypeId,
+                        Details = oldDetails,
+                        ExternalLink = alert.ExternalLink,
+                        StartDate = alert.StartDate,
+                        EndDate = alert.EndDate
+                    },
+                    ChangeReason = null,
+                    ChangeReasonDetail = null,
+                    EvidenceFile = null,
+                    Changes = LegacyEvents.AlertUpdatedEventChanges.Details
+                };
 
                 await dbContext.SaveChangesAsync();
 
@@ -73,14 +91,32 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
             {
                 dbContext.Alerts.Attach(alert);
 
-                alert.Update(
-                    a => a.Details = Faker.Lorem.Paragraph(),
-                    changeReason: null,
-                    changeReasonDetail: null,
-                    evidenceFile: null,
-                    changedBy: SystemUser.SystemUserId,
-                    Clock.UtcNow,
-                    out var updatedEvent);
+                var oldDetails = alert.Details;
+                var newDetails = Faker.Lorem.Paragraph();
+                alert.Details = newDetails;
+                alert.UpdatedOn = Clock.UtcNow;
+
+                var updatedEvent = new LegacyEvents.AlertUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = Clock.UtcNow,
+                    RaisedBy = SystemUser.SystemUserId,
+                    PersonId = alert.PersonId,
+                    Alert = EventModels.Alert.FromModel(alert),
+                    OldAlert = new EventModels.Alert
+                    {
+                        AlertId = alert.AlertId,
+                        AlertTypeId = alert.AlertTypeId,
+                        Details = oldDetails,
+                        ExternalLink = alert.ExternalLink,
+                        StartDate = alert.StartDate,
+                        EndDate = alert.EndDate
+                    },
+                    ChangeReason = null,
+                    ChangeReasonDetail = null,
+                    EvidenceFile = null,
+                    Changes = LegacyEvents.AlertUpdatedEventChanges.Details
+                };
 
                 await dbContext.SaveChangesAsync();
 
@@ -111,14 +147,32 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
             {
                 dbContext.Alerts.Attach(alert);
 
-                alert.Update(
-                    a => a.ExternalLink = Faker.Internet.Url(),
-                    changeReason: null,
-                    changeReasonDetail: null,
-                    evidenceFile: null,
-                    changedBy: SystemUser.SystemUserId,
-                    Clock.UtcNow,
-                    out var updatedEvent);
+                var oldExternalLink = alert.ExternalLink;
+                var newExternalLink = Faker.Internet.Url();
+                alert.ExternalLink = newExternalLink;
+                alert.UpdatedOn = Clock.UtcNow;
+
+                var updatedEvent = new LegacyEvents.AlertUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = Clock.UtcNow,
+                    RaisedBy = SystemUser.SystemUserId,
+                    PersonId = alert.PersonId,
+                    Alert = EventModels.Alert.FromModel(alert),
+                    OldAlert = new EventModels.Alert
+                    {
+                        AlertId = alert.AlertId,
+                        AlertTypeId = alert.AlertTypeId,
+                        Details = alert.Details,
+                        ExternalLink = oldExternalLink,
+                        StartDate = alert.StartDate,
+                        EndDate = alert.EndDate
+                    },
+                    ChangeReason = null,
+                    ChangeReasonDetail = null,
+                    EvidenceFile = null,
+                    Changes = LegacyEvents.AlertUpdatedEventChanges.ExternalLink
+                };
 
                 await dbContext.SaveChangesAsync();
 

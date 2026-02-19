@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 
@@ -12,9 +11,9 @@ public record AlertDeletedNotification : IWebhookMessageData
 }
 
 public class AlertDeletedNotificationMapper(PersonInfoCache personInfoCache, ReferenceDataCache referenceDataCache) :
-    IEventMapper<AlertDeletedEvent, AlertDeletedNotification>
+    IEventMapper<Events.Legacy.AlertDeletedEvent, AlertDeletedNotification>
 {
-    public async Task<AlertDeletedNotification?> MapEventAsync(AlertDeletedEvent @event)
+    public async Task<AlertDeletedNotification?> MapEventAsync(Events.Legacy.AlertDeletedEvent @event)
     {
         if (@event.Alert.AlertTypeId is not Guid alertTypeId)
         {

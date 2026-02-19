@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
@@ -146,9 +146,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
 
         EventObserver.AssertEventsSaved(e =>
         {
-            var actualAlertCreatedEvent = Assert.IsType<AlertCreatedEvent>(e);
+            var actualAlertCreatedEvent = Assert.IsType<LegacyEvents.AlertCreatedEvent>(e);
 
-            var expectedAlertCreatedEvent = new AlertCreatedEvent
+            var expectedAlertCreatedEvent = new LegacyEvents.AlertCreatedEvent
             {
                 EventId = actualAlertCreatedEvent.EventId,
                 CreatedUtc = Clock.UtcNow,
@@ -171,6 +171,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
             };
 
             Assert.Equivalent(expectedAlertCreatedEvent, actualAlertCreatedEvent);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.AlertCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<AlertCreatedEvent>();
+
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal(journeyInstance.State.AddReason!.GetDisplayName(), changeReason.Reason);
+            Assert.Equal(populateOptional ? journeyInstance.State.AddReasonDetail : null, changeReason.Details);
+            Assert.Equal(populateOptional ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel() : null, changeReason.EvidenceFile);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

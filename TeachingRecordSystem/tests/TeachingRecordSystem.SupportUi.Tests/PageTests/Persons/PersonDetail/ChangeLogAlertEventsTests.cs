@@ -529,7 +529,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { StartDate = populateOptional ? null : Clock.Today.AddDays(-30) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.StartDate, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.StartDate, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -564,7 +564,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromTrsAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { StartDate = Clock.Today.AddDays(-31) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.StartDate, createdByUser.UserId, hasReason: populateOptional);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.StartDate, createdByUser.UserId, hasReason: populateOptional);
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertUpdatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
@@ -602,7 +602,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { Details = populateOptional ? null : "Old details" };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.Details, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -638,7 +638,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromTrsAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { StartDate = Clock.Today.AddDays(-31) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByUser.UserId, hasReason: populateOptional);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.Details, createdByUser.UserId, hasReason: populateOptional);
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertUpdatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
@@ -677,7 +677,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromTrsAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { ExternalLink = populateOptional ? null : TestData.GenerateUrl() };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.ExternalLink, createdByUser.UserId, hasReason: populateOptional);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.ExternalLink, createdByUser.UserId, hasReason: populateOptional);
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertUpdatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
@@ -717,7 +717,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional: true, isOpenAlert: changeType == EndDateChangeType.Reopen);
         var oldAlert = alert with { EndDate = changeType == EndDateChangeType.Close ? null : Clock.Today.AddDays(-6) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.EndDate, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.EndDate, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -754,7 +754,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromTrsAsync(person.PersonId, populateOptional: true, isOpenAlert: changeType == EndDateChangeType.Reopen);
         var oldAlert = alert with { EndDate = changeType == EndDateChangeType.Close ? null : Clock.Today.AddDays(-6) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.EndDate, createdByUser.UserId, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.EndDate, createdByUser.UserId, hasReason: false);
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertUpdatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
@@ -790,7 +790,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { DqtSpent = populateOptional ? null : true };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.DqtSpent, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.DqtSpent, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -826,7 +826,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { DqtSpent = populateOptional ? null : true };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.DqtSanctionCode, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.DqtSanctionCode, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -872,7 +872,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional: true, isOpenAlert: true, isDbsAlertType);
         var oldAlert = alert with { Details = "Old details" };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.Details, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -905,7 +905,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { Details = populateOptional ? null : "Old details", DqtSpent = populateOptional ? null : true };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details | AlertUpdatedEventChanges.DqtSpent, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, LegacyEvents.AlertUpdatedEventChanges.Details | LegacyEvents.AlertUpdatedEventChanges.DqtSpent, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -932,11 +932,11 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromDqtAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<LegacyEvents.AlertCreatedEvent> CreateAlertCreatedEventFromDqtAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
 
-        var alertCreatedEvent = new AlertCreatedEvent
+        var alertCreatedEvent = new LegacyEvents.AlertCreatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -957,7 +957,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         return alertCreatedEvent;
     }
 
-    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromTrsAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<LegacyEvents.AlertCreatedEvent> CreateAlertCreatedEventFromTrsAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
         var reason = populateOptional ? AddAlertReasonOption.RoutineNotificationFromStakeholder.GetDisplayName() : null;
@@ -969,7 +969,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
         : null;
 
-        var alertCreatedEvent = new AlertCreatedEvent
+        var alertCreatedEvent = new LegacyEvents.AlertCreatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -990,7 +990,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         return alertCreatedEvent;
     }
 
-    private async Task<AlertDeletedEvent> CreateAlertDeletedEventAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<LegacyEvents.AlertDeletedEvent> CreateAlertDeletedEventAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
         var reasonDetail = populateOptional ? "Reason detail" : null;
@@ -1001,7 +1001,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
         : null;
 
-        var alertDeletedEvent = new AlertDeletedEvent
+        var alertDeletedEvent = new LegacyEvents.AlertDeletedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -1124,9 +1124,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         return alertMigratedEvent;
     }
 
-    private async Task<AlertUpdatedEvent> CreateAlertUpdatedEventAsync(Guid personId, EventModels.Alert alert, EventModels.Alert oldAlert, AlertUpdatedEventChanges changes, RaisedByUserInfo createdByUser, bool hasReason)
+    private async Task<LegacyEvents.AlertUpdatedEvent> CreateAlertUpdatedEventAsync(Guid personId, EventModels.Alert alert, EventModels.Alert oldAlert, LegacyEvents.AlertUpdatedEventChanges changes, RaisedByUserInfo createdByUser, bool hasReason)
     {
-        var alertUpdatedEvent = new AlertUpdatedEvent
+        var alertUpdatedEvent = new LegacyEvents.AlertUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,

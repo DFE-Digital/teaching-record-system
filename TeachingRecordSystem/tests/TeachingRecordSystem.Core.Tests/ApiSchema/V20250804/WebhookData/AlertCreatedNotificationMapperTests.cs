@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
@@ -21,7 +20,7 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
             var alert = person.Alerts.Single();
-            var @event = person.Events.OfType<AlertCreatedEvent>().Single();
+            var @event = person.Events.OfType<LegacyEvents.AlertCreatedEvent>().Single();
 
             // Act
             var notification = await mapper.MapEventAsync(@event);
@@ -51,7 +50,7 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
             var alert = person.Alerts.Single();
-            var @event = person.Events.OfType<AlertCreatedEvent>().Single();
+            var @event = person.Events.OfType<LegacyEvents.AlertCreatedEvent>().Single();
 
             // Act
             var notification = await mapper.MapEventAsync(@event);

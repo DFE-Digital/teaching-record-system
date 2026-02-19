@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 [Journey(JourneyNames.DeleteAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
+    AlertService alertService,
     IClock clock) : PageModel
 {
     public JourneyInstance<DeleteAlertState>? JourneyInstance { get; set; }
@@ -67,16 +68,23 @@ public class CheckAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var alert = HttpContext.GetCurrentAlertFeature().Alert;
-
-        alert.Delete(
-            DeleteReasonDetail,
-            EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
+        var processContext = new ProcessContext(
+            ProcessType.AlertDeleting,
             clock.UtcNow,
-            out var deletedEvent);
+            User.GetUserId(),
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = DeleteReason.GetDisplayName()!,
+                Details = DeleteReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel()
+            });
 
-        await dbContext.AddEventAndBroadcastAsync(deletedEvent);
-        await dbContext.SaveChangesAsync();
+        await alertService.DeleteAlertAsync(
+            new DeleteAlertOptions
+            {
+                AlertId = alert.AlertId
+            },
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert deleted");

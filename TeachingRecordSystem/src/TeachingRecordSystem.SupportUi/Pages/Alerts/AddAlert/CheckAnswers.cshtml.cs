@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
+    AlertService alertService,
     IClock clock) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
@@ -67,25 +67,28 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
-
-        var alert = Alert.Create(
-            AlertTypeId,
-            PersonId,
-            Details,
-            Link,
-            StartDate,
-            endDate: null,
-            AddReason.GetDisplayName(),
-            AddReasonDetail,
-            evidenceFile: EvidenceFile?.ToEventModel(),
+        var processContext = new ProcessContext(
+            ProcessType.AlertCreating,
+            clock.UtcNow,
             User.GetUserId(),
-            now,
-            out var createdEvent);
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = AddReason.GetDisplayName()!,
+                Details = AddReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel()
+            });
 
-        dbContext.Alerts.Add(alert);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
-        await dbContext.SaveChangesAsync();
+        await alertService.CreateAlertAsync(
+            new CreateAlertOptions
+            {
+                PersonId = PersonId,
+                AlertTypeId = AlertTypeId,
+                Details = Details,
+                ExternalLink = Link,
+                StartDate = StartDate,
+                EndDate = null
+            },
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert added");
