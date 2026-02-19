@@ -27,11 +27,9 @@ public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext)
 
     [FromQuery] public bool? FromCheckAnswers { get; set; }
 
-    public string? EmailAddress { get; set; }
-
     public void OnGet()
     {
-        ReasonDetail = JourneyInstance.State.Detail;
+        ReasonDetail = JourneyInstance!.State.Detail;
         Reason = JourneyInstance.State.DisconnectReason;
     }
 

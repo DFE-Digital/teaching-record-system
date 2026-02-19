@@ -8,8 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOn
 
 [Journey(JourneyNames.DisconnectOneLogin), RequireJourneyInstance]
 public class Verified(
-    SupportUiLinkGenerator linkGenerator,
-    IClock clock)
+    SupportUiLinkGenerator linkGenerator)
     : PageModel
 {
     [FromRoute] public required Guid PersonId { get; set; }
