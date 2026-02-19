@@ -26,9 +26,6 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
                 NationalInsuranceNumber = person.NationalInsuranceNumber,
                 Gender = person.Gender
             },
-            CreateReason = null,
-            CreateReasonDetail = null,
-            EvidenceFile = null,
             TrnRequestMetadata = null
         };
 
@@ -245,10 +242,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
-            MergedWithPersonId = null,
-            Reason = null,
-            ReasonDetail = null,
-            EvidenceFile = null
+            MergedWithPersonId = null
         };
 
         var user = SystemUser.Instance;
@@ -278,10 +272,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         var @event = new PersonReactivatedEvent
         {
             EventId = Guid.NewGuid(),
-            PersonId = person.PersonId,
-            Reason = null,
-            ReasonDetail = null,
-            EvidenceFile = null
+            PersonId = person.PersonId
         };
 
         var user = SystemUser.Instance;
@@ -321,10 +312,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
-            MergedWithPersonId = mergedWithPerson.PersonId,
-            Reason = null,
-            ReasonDetail = null,
-            EvidenceFile = null
+            MergedWithPersonId = mergedWithPerson.PersonId
         };
 
         var user = SystemUser.Instance;
@@ -364,10 +352,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
-            MergedWithPersonId = mergedWithPerson.PersonId,
-            Reason = null,
-            ReasonDetail = null,
-            EvidenceFile = null
+            MergedWithPersonId = mergedWithPerson.PersonId
         };
 
         var user = SystemUser.Instance;
