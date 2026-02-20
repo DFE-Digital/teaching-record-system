@@ -44,14 +44,7 @@ public class AlertService(
 
     public async Task DeleteAlertAsync(DeleteAlertOptions options, ProcessContext processContext)
     {
-        var alert = await dbContext.Alerts
-            .Where(a => a.AlertId == options.AlertId)
-            .SingleOrDefaultAsync();
-
-        if (alert is null)
-        {
-            throw new InvalidOperationException($"Alert with ID {options.AlertId} not found.");
-        }
+        var alert = await dbContext.Alerts.FindOrThrowAsync(options.AlertId);
 
         if (alert.DeletedOn is not null)
         {
@@ -77,14 +70,7 @@ public class AlertService(
 
     public async Task<AlertUpdatedEventChanges> UpdateAlertAsync(UpdateAlertOptions options, ProcessContext processContext)
     {
-        var alert = await dbContext.Alerts
-            .Where(a => a.AlertId == options.AlertId)
-            .SingleOrDefaultAsync();
-
-        if (alert is null)
-        {
-            throw new InvalidOperationException($"Alert with ID {options.AlertId} not found.");
-        }
+        var alert = await dbContext.Alerts.FindOrThrowAsync(options.AlertId);
 
         if (alert.DeletedOn is not null)
         {
