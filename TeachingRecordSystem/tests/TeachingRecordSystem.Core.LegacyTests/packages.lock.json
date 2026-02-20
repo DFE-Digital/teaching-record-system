@@ -125,6 +125,11 @@
         "resolved": "2.0.123",
         "contentHash": "RDFF4rBLLmbpi6pwkY7q/M6UXHRJEOerplDGE5jwEkP/JGJnBauAClYavNKJPW1yOTWRPIyfj4is3EaJxQXILQ=="
       },
+      "Dapper.AOT": {
+        "type": "Transitive",
+        "resolved": "1.0.48",
+        "contentHash": "rsLM3yKr4g+YKKox9lhc8D+kz67P7Q9+xdyn1LmCsoYr1kYpJSm+Nt6slo5UrfUrcTiGJ57zUlyO8XUdV7G7iA=="
+      },
       "dbup-core": {
         "type": "Transitive",
         "resolved": "5.0.37",
@@ -828,9 +833,9 @@
           "FluentValidation": "[12.1.0, )",
           "Google.Cloud.Storage.V1": "[4.13.0, )",
           "GovukNotify": "[7.2.0, )",
-          "Hangfire.Core": "[1.8.22, )",
-          "Hangfire.NetCore": "[1.8.22, )",
-          "Hangfire.PostgreSql": "[1.20.13, )",
+          "Hangfire.Core": "[1.8.23, )",
+          "Hangfire.NetCore": "[1.8.23, )",
+          "Hangfire.PostgreSql": "[1.21.1, )",
           "IdentityModel": "[6.2.0, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "Markdig": "[0.45.0, )",
@@ -1015,20 +1020,20 @@
       },
       "Hangfire.Core": {
         "type": "CentralTransitive",
-        "requested": "[1.8.22, )",
-        "resolved": "1.8.22",
-        "contentHash": "fjgEtlfkLNnUcX9IB+fp3gTPtt5G7VJ0PCcoKLEWnXJXn5qTm/mvrm/t3/T+Xj35ZePtbWBm+j2PXE0beFwzbA==",
+        "requested": "[1.8.23, )",
+        "resolved": "1.8.23",
+        "contentHash": "YCOTtF3NNOQI83PlfjeNDDBkofJDfdET2CwhfQsiVBwmsU6lP19QW9NVTIH9epl+MnOsyFC2G1RnlPSGV8F1FQ==",
         "dependencies": {
           "Newtonsoft.Json": "11.0.1"
         }
       },
       "Hangfire.NetCore": {
         "type": "CentralTransitive",
-        "requested": "[1.8.22, )",
-        "resolved": "1.8.22",
-        "contentHash": "I7LiUHpC3ks7k+vLFOdwwCwDHxT83H+Mv6bT+7vkI1SLOc4Vwv2zOWdeeN1K86vddu7R36ho+eKP0gvfYlSZjg==",
+        "requested": "[1.8.23, )",
+        "resolved": "1.8.23",
+        "contentHash": "SmvUJF/u5MCP666R5Y1V+GntqBc4RCWJqn5ztMMN67d53Cx5cuaWR0YNLMrabjylwLarFYJ7EdR9RnGEZzp/dg==",
         "dependencies": {
-          "Hangfire.Core": "[1.8.22]",
+          "Hangfire.Core": "[1.8.23]",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "3.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "3.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "3.0.0"
@@ -1036,11 +1041,12 @@
       },
       "Hangfire.PostgreSql": {
         "type": "CentralTransitive",
-        "requested": "[1.20.13, )",
-        "resolved": "1.20.13",
-        "contentHash": "+JxVOTQINm/gTNstGYgiJQzjP81lGM86COvaSomSyYbbjDExAcqwc5xflsykMVfBKxMP6C/bH0wWgrlhPS0SMQ==",
+        "requested": "[1.21.1, )",
+        "resolved": "1.21.1",
+        "contentHash": "hFNZAxv+1p72/XCZdImnH6ovCzZ2DKAMTOI8CReT0P3yw/k0b0YJP2teA18agNH1ZYInPzhtxGk8hx5n2cxbbQ==",
         "dependencies": {
           "Dapper": "2.0.123",
+          "Dapper.AOT": "1.0.48",
           "Hangfire.Core": "1.8.0",
           "Npgsql": "6.0.11"
         }
