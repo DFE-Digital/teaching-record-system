@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,12 +9,25 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOn
 [Journey(JourneyNames.DisconnectOneLogin), ActivatesJourney, RequireJourneyInstance]
 public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
 {
-    [Required(ErrorMessage = "Select a reason")]
+    private readonly InlineValidator<Index> _validator = new()
+    {
+        v => v.RuleFor(m => m.ReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+            .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+
+        v => v.RuleFor(m => m.Reason)
+            .NotNull()
+            .WithMessage($"Select a reason"),
+
+        v => v.RuleFor(m => m.ReasonDetail)
+            .NotEmpty()
+            .WithMessage("Enter a reason")
+            .When(m => m.Reason == DisconnectOneLoginReason.AnotherReason)
+    };
+
     [BindProperty]
     public DisconnectOneLoginReason? Reason { get; set; }
 
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount,
-        ErrorMessage = $"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     [BindProperty]
     public string? ReasonDetail { get; set; }
 
@@ -27,18 +39,27 @@ public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext)
 
     [FromQuery] public bool? FromCheckAnswers { get; set; }
 
-    public void OnGet()
+    public string? EmailAddress { get; set; }
+
+    public async Task OnGetAsync()
     {
+        var oneLogin = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == OneLoginSubject);
+        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.EmailAddress = oneLogin.EmailAddress;
+            state.OneLoginSubject = OneLoginSubject;
+            state.PersonName = $"{person.FirstName} {person.LastName}";
+        });
+
         ReasonDetail = JourneyInstance!.State.Detail;
         Reason = JourneyInstance.State.DisconnectReason;
+        EmailAddress = oneLogin.EmailAddress;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Reason is not null && Reason == DisconnectOneLoginReason.AnotherReason && ReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(ReasonDetail), "Enter a reason");
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
         if (!ModelState.IsValid)
         {
@@ -65,18 +86,5 @@ public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext)
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        var oneLogin = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == OneLoginSubject);
-        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.EmailAddress = oneLogin.EmailAddress;
-            state.OneLoginSubject = OneLoginSubject;
-            state.PersonName = $"{person.FirstName} {person.LastName}";
-        });
-        await next();
     }
 }

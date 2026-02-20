@@ -14,14 +14,17 @@ public class CheckAnswers(
     : PageModel
 {
     [FromRoute] public required Guid PersonId { get; set; }
+
     [FromRoute] public required string OneLoginSubject { get; set; }
 
     public JourneyInstance<DisconnectOneLoginState>? JourneyInstance { get; set; }
 
-
     public string? EmailAddress { get; set; }
+
     public DisconnectOneLoginReason? Reason { get; set; }
+
     public string? Detail { get; set; }
+
     public DisconnectOneLoginStayVerified? StayVerified { get; set; }
 
     public void OnGet()
@@ -34,7 +37,7 @@ public class CheckAnswers(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisonnecting, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, clock.UtcNow, User.GetUserId());
 
         if (JourneyInstance!.State.StayVerified == DisconnectOneLoginStayVerified.Yes)
         {
@@ -45,6 +48,7 @@ public class CheckAnswers(
             await oneLoginService.SetUserUnverifiedAndUnmatchedAsync(OneLoginSubject, processContext);
 
         }
+
         TempData.SetFlashSuccess($"GOV.UK One Login disconnected from {JourneyInstance.State.PersonName}`s record");
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }

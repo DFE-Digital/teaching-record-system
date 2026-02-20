@@ -16,5 +16,4 @@ public class DisconnectOneLoginState : IRegisterJourney
     public string? Detail { get; set; }
     public string? EmailAddress { get; set; }
     public string? PersonName { get; set; }
-
 }

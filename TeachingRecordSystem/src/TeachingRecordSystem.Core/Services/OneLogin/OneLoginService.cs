@@ -112,10 +112,14 @@ public class OneLoginService(
     public async Task SetUserUnmatchedAsync(string oneLoginSubject, ProcessContext processContext)
     {
         var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject);
+
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         user.SetUnmatched();
+
         await dbContext.SaveChangesAsync();
+
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         var updatedEvent = new OneLoginUserUpdatedEvent
         {
@@ -124,6 +128,7 @@ public class OneLoginService(
             OldOneLoginUser = oneLoginUserEventModel,
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
+
         await eventScope.PublishEventAsync(updatedEvent);
     }
 
@@ -196,8 +201,10 @@ public class OneLoginService(
     public async Task SetUserUnverifiedAndUnmatchedAsync(string oneLoginSubject, ProcessContext processContext)
     {
         var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject);
+
         var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
         user.SetUnverified();
         user.SetUnmatched();
 
@@ -211,6 +218,7 @@ public class OneLoginService(
             OldOneLoginUser = oneLoginUserEventModel,
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
+
         await eventScope.PublishEventAsync(updatedEvent);
     }
 

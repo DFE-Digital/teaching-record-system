@@ -37,5 +37,5 @@ public enum ProcessType
     OneLoginUserRecordMatchingSupportTaskCompleting = 34,
     TeacherSigningIn = 36,
     PersonOneLoginUserConnecting = 37,
-    PersonOneLoginUserDisonnecting = 38
+    PersonOneLoginUserDisconnecting = 38
 }
