@@ -39,8 +39,6 @@ public partial class OneLoginUserMatchingSupportTaskService
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
-        var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
-
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
             {
