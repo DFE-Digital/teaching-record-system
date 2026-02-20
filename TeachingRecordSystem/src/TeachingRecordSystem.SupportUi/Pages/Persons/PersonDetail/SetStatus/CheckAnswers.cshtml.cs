@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -23,6 +24,51 @@ public class CheckAnswersModel(
     public string BackLink => LinkGenerator.Persons.PersonDetail.SetStatus.Reason(PersonId, TargetStatus, JourneyInstance!.InstanceId);
     public string ChangeReasonLink => LinkGenerator.Persons.PersonDetail.SetStatus.Reason(PersonId, TargetStatus, JourneyInstance!.InstanceId, fromCheckAnswers: true);
 
+    public void OnGet()
+    {
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (TargetStatus == PersonStatus.Deactivated)
+        {
+            var processContext = new ProcessContext(
+                ProcessType.PersonDeactivating,
+                clock.UtcNow,
+                User.GetUserId(),
+                new ChangeReasonInfoWithDetailsAndEvidence
+                {
+                    Reason = DeactivateReason?.ToString(),
+                    Details = DeactivateReasonDetail,
+                    EvidenceFile = EvidenceFile?.ToEventModel()
+                });
+
+            await PersonService.DeactivatePersonAsync(PersonId, processContext);
+        }
+        else
+        {
+            var processContext = new ProcessContext(
+                ProcessType.PersonReactivating,
+                clock.UtcNow,
+                User.GetUserId(),
+                new ChangeReasonInfoWithDetailsAndEvidence
+                {
+                    Reason = ReactivateReason?.ToString(),
+                    Details = ReactivateReasonDetail,
+                    EvidenceFile = EvidenceFile?.ToEventModel()
+                });
+
+            await PersonService.ReactivatePersonAsync(PersonId, processContext);
+        }
+
+        await JourneyInstance!.CompleteAsync();
+
+        var action = TargetStatus == PersonStatus.Deactivated ? "deactivated" : "reactivated";
+        TempData.SetFlashSuccess($"{PersonName}\u2019s record has been {action}");
+
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
+    }
+
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         await base.OnPageHandlerExecutingAsync(context);
@@ -40,32 +86,5 @@ public class CheckAnswersModel(
         ReactivateReason = state.ReactivateReason;
         ReactivateReasonDetail = state.ReactivateReasonDetail;
         EvidenceFile = state.Evidence.UploadedEvidenceFile;
-    }
-
-    public void OnGet()
-    {
-    }
-
-    public async Task<IActionResult> OnPostAsync()
-    {
-        if (TargetStatus == PersonStatus.Deactivated)
-        {
-            var processContext = new ProcessContext(ProcessType.PersonDeactivating, clock.UtcNow, User.GetUserId());
-
-            await PersonService.DeactivatePersonAsync(PersonId, processContext);
-        }
-        else
-        {
-            var processContext = new ProcessContext(ProcessType.PersonReactivating, clock.UtcNow, User.GetUserId());
-
-            await PersonService.ReactivatePersonAsync(PersonId, processContext);
-        }
-
-        await JourneyInstance!.CompleteAsync();
-
-        var action = TargetStatus == PersonStatus.Deactivated ? "deactivated" : "reactivated";
-        TempData.SetFlashSuccess($"{PersonName}\u2019s record has been {action}");
-
-        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 }

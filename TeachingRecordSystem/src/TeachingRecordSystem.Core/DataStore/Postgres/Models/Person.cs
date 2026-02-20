@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 

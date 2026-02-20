@@ -1,5 +1,6 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
@@ -10,12 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Se
 public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
     private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
-
-    // TODO: extra BL from ticket:
-    //   * The record must be read-only when deactivated, so we need to confirm if this needs anything further than simply removing and edit/change/add/delete link
-    //   * The record would need to display that it is deactivated, and show the reason (person details page)
-    //   * Check - identified duplicate - you'd need to check with devs if this is still relevant under how trs will deal with these
-    // TODO: End-to-end tests (including manual merge)
 
     [Theory]
     [MemberData(nameof(GetAllStatuses))]
@@ -239,6 +234,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
                 Assert.Equal(ProcessType.PersonReactivating, p.ProcessContext.ProcessType);
                 p.AssertProcessHasEvents<PersonReactivatedEvent>();
             }
+
+            var changeReasonInfo = Assert.IsType<ChangeReasonInfoWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal("Another reason", changeReasonInfo.Reason);
+            Assert.Equal(ChangeReasonDetails, changeReasonInfo.Details);
+            Assert.Equal(evidenceFileId, changeReasonInfo.EvidenceFile?.FileId);
+            Assert.Equal("evidence.pdf", changeReasonInfo.EvidenceFile?.Name);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

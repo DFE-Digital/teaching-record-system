@@ -10,8 +10,8 @@ using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
-using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.PersonDetailsUpdatedEventChanges;
 using PersonAttributesChanges = TeachingRecordSystem.Core.Events.Legacy.PersonAttributesChanges;
+using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.PersonDetailsUpdatedEventChanges;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -60,19 +61,28 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var processContext = new ProcessContext(ProcessType.PersonCreating, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(
+            ProcessType.PersonCreating,
+            clock.UtcNow,
+            User.GetUserId(),
+            new ChangeReasonInfoWithDetailsAndEvidence
+            {
+                Reason = Reason.ToString(),
+                Details = ReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel()
+            });
 
         var person = await personService.CreatePersonAsync(
             new CreatePersonOptions
             {
                 SourceTrnRequest = null,
-                FirstName = FirstName ?? string.Empty,
+                FirstName = FirstName!,
                 MiddleName = MiddleName ?? string.Empty,
-                LastName = LastName ?? string.Empty,
+                LastName = LastName!,
                 DateOfBirth = DateOfBirth,
                 EmailAddress = EmailAddress,
                 NationalInsuranceNumber = NationalInsuranceNumber,
-                Gender = Gender,
+                Gender = Gender
             },
             processContext);
 

@@ -15,7 +15,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
         if (processContext.ProcessType is ProcessType.PersonCreating
             or ProcessType.TeacherPensionsRecordImporting)
         {
-            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.PersonCreatedEvent
             {
@@ -40,7 +40,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.PersonDetailsUpdating)
         {
-            var changeReason = (PersonDetailsChangeReason)processContext.Process.ChangeReason!;
+            var changeReason = (PersonDetailsChangeReasonInfo)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {
@@ -68,7 +68,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.PersonDeactivating)
         {
-            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.PersonStatusUpdatedEvent
             {
@@ -100,7 +100,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
             Debug.Assert(mergedWithPersonUpdatedEvent is null || mergedWithPersonUpdatedEvent.PersonId == @event.MergedWithPersonId);
             var mergedWithPerson = (await dbContext.Persons.FindAsync(mergedWithPersonId))!;
 
-            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var changes = mergedWithPersonUpdatedEvent is null ?
                 LegacyEvents.PersonsMergedEventChanges.None :
@@ -133,7 +133,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.PersonReactivating)
         {
-            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.PersonStatusUpdatedEvent
             {

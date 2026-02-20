@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events.ChangeReasons;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDate;
 
 public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFixture), IAsyncLifetime
