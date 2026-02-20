@@ -1,5 +1,6 @@
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services;
 using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Persons;
@@ -11,29 +12,25 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     public async Task CreatePersonAsync_WithCreatePersonViaSupportUIOptions_CreatesPersonAndPublishesEvent()
     {
         // Arrange
-        var personDetails = new PersonDetails()
-        {
-            FirstName = "Alfred",
-            MiddleName = "The",
-            LastName = "Great",
-            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
-            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
-            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
-            Gender = Gender.Female,
-        };
+        var firstName = "Alfred";
+        var middleName = "The";
+        var lastName = "Great";
+        var dateOfBirth = DateOnly.Parse("1 Feb 1980");
+        var emailAddress = EmailAddress.Parse((string?)"test@test.com");
+        var nationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C");
+        var gender = Gender.Female;
 
-        var justification = new Justification<PersonCreateReason>()
+        var options = new CreatePersonOptions
         {
-            Reason = PersonCreateReason.AnotherReason,
-            ReasonDetail = "Some details",
-            Evidence = new()
-            {
-                FileId = Guid.NewGuid(),
-                Name = "filename.png"
-            }
+            SourceTrnRequest = null,
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = emailAddress,
+            NationalInsuranceNumber = nationalInsuranceNumber,
+            Gender = gender,
         };
-
-        var options = new CreatePersonViaSupportUiOptions(personDetails, justification);
         var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -45,13 +42,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
             Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
-            Assert.Equal(personDetails.FirstName, createdPersonRecord.FirstName);
-            Assert.Equal(personDetails.MiddleName, createdPersonRecord.MiddleName);
-            Assert.Equal(personDetails.LastName, createdPersonRecord.LastName);
-            Assert.Equal(personDetails.DateOfBirth, createdPersonRecord.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), createdPersonRecord.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, createdPersonRecord.Gender);
+            Assert.Equal(firstName, createdPersonRecord.FirstName);
+            Assert.Equal(middleName, createdPersonRecord.MiddleName);
+            Assert.Equal(lastName, createdPersonRecord.LastName);
+            Assert.Equal(dateOfBirth, createdPersonRecord.DateOfBirth);
+            Assert.Equal(emailAddress?.ToString(), createdPersonRecord.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(gender, createdPersonRecord.Gender);
             Assert.Null(createdPersonRecord.SourceTrnRequestId);
             Assert.Null(createdPersonRecord.SourceApplicationUserId);
         });
@@ -60,17 +57,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             var @event = Assert.IsType<PersonCreatedEvent>(e);
             Assert.Equal(person.PersonId, @event.PersonId);
-            Assert.Equal(personDetails.FirstName, @event.Details.FirstName);
-            Assert.Equal(personDetails.MiddleName, @event.Details.MiddleName);
-            Assert.Equal(personDetails.LastName, @event.Details.LastName);
-            Assert.Equal(personDetails.DateOfBirth, @event.Details.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), @event.Details.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, @event.Details.Gender);
-            Assert.Equal(justification.Reason.GetDisplayName(), @event.CreateReason);
-            Assert.Equal(justification.ReasonDetail, @event.CreateReasonDetail);
-            Assert.Equal(justification.Evidence.FileId, @event.EvidenceFile!.FileId);
-            Assert.Equal(justification.Evidence.Name, @event.EvidenceFile.Name);
+            Assert.Equal(firstName, @event.Details.FirstName);
+            Assert.Equal(middleName, @event.Details.MiddleName);
+            Assert.Equal(lastName, @event.Details.LastName);
+            Assert.Equal(dateOfBirth, @event.Details.DateOfBirth);
+            Assert.Equal(emailAddress?.ToString(), @event.Details.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
+            Assert.Equal(gender, @event.Details.Gender);
         });
     }
 
@@ -78,8 +71,11 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     public async Task CreatePersonAsync_WithCreatePersonViaTrnRequestOptions_WhenSourceRequestDoesNotExist_Throws()
     {
         // Arrange
-        var personDetails = new PersonDetails()
+        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
+
+        var options = new CreatePersonOptions
         {
+            SourceTrnRequest = sourceTrnRequest,
             FirstName = "Alfred",
             MiddleName = "The",
             LastName = "Great",
@@ -88,32 +84,27 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
             Gender = Gender.Female,
         };
-        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
-
-        var options = new CreatePersonViaTrnRequestOptions(personDetails, sourceTrnRequest);
         var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.CreatePersonAsync(options, processContext)));
 
         // Assert
-        Assert.IsType<InvalidOperationException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
     public async Task CreatePersonAsync_WithCreatePersonViaTrnRequestOptions_SetsSourceRequestPropertiesOnPersonAndEvent()
     {
         // Arrange
-        var personDetails = new PersonDetails()
-        {
-            FirstName = "Alfred",
-            MiddleName = "The",
-            LastName = "Great",
-            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
-            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
-            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
-            Gender = Gender.Female,
-        };
+        var firstName = "Alfred";
+        var middleName = "The";
+        var lastName = "Great";
+        var dateOfBirth = DateOnly.Parse("1 Feb 1980");
+        var emailAddress = EmailAddress.Parse((string?)"test@test.com");
+        var nationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C");
+        var gender = Gender.Female;
+
         var trnRequestMetadata = new TrnRequestMetadata()
         {
             ApplicationUserId = SystemUser.SystemUserId,
@@ -121,16 +112,16 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             CreatedOn = Clock.UtcNow,
             IdentityVerified = null,
             OneLoginUserSubject = null,
-            Name = new[] { personDetails.FirstName, personDetails.MiddleName, personDetails.LastName }.GetNonEmptyValues(),
-            FirstName = personDetails.FirstName,
-            MiddleName = personDetails.MiddleName,
-            LastName = personDetails.LastName,
+            Name = new[] { firstName, middleName, lastName }.GetNonEmptyValues(),
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
             PreviousFirstName = null,
             PreviousLastName = null,
-            DateOfBirth = personDetails.DateOfBirth!.Value!,
-            EmailAddress = personDetails.EmailAddress?.ToString(),
-            NationalInsuranceNumber = personDetails.NationalInsuranceNumber.ToString(),
-            Gender = personDetails.Gender,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = emailAddress?.ToString(),
+            NationalInsuranceNumber = nationalInsuranceNumber.ToString(),
+            Gender = gender,
         };
         await WithDbContextAsync(async dbContext =>
         {
@@ -138,7 +129,17 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             await dbContext.SaveChangesAsync();
         });
 
-        var options = new CreatePersonViaTrnRequestOptions(personDetails, (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId));
+        var options = new CreatePersonOptions
+        {
+            SourceTrnRequest = (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId),
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = emailAddress,
+            NationalInsuranceNumber = nationalInsuranceNumber,
+            Gender = gender,
+        };
         var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -150,13 +151,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
             Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
-            Assert.Equal(personDetails.FirstName, createdPersonRecord.FirstName);
-            Assert.Equal(personDetails.MiddleName, createdPersonRecord.MiddleName);
-            Assert.Equal(personDetails.LastName, createdPersonRecord.LastName);
-            Assert.Equal(personDetails.DateOfBirth, createdPersonRecord.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), createdPersonRecord.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, createdPersonRecord.Gender);
+            Assert.Equal(firstName, createdPersonRecord.FirstName);
+            Assert.Equal(middleName, createdPersonRecord.MiddleName);
+            Assert.Equal(lastName, createdPersonRecord.LastName);
+            Assert.Equal(dateOfBirth, createdPersonRecord.DateOfBirth);
+            Assert.Equal(emailAddress?.ToString(), createdPersonRecord.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(gender, createdPersonRecord.Gender);
             Assert.Equal(trnRequestMetadata.RequestId, createdPersonRecord.SourceTrnRequestId);
             Assert.Equal(trnRequestMetadata.ApplicationUserId, createdPersonRecord.SourceApplicationUserId);
         });
@@ -165,16 +166,14 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             var @event = Assert.IsType<PersonCreatedEvent>(e);
             Assert.Equal(person.PersonId, @event.PersonId);
-            Assert.Equal(personDetails.FirstName, @event.Details.FirstName);
-            Assert.Equal(personDetails.MiddleName, @event.Details.MiddleName);
-            Assert.Equal(personDetails.LastName, @event.Details.LastName);
-            Assert.Equal(personDetails.DateOfBirth, @event.Details.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), @event.Details.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, @event.Details.Gender);
-            Assert.Null(@event.CreateReason);
-            Assert.Null(@event.CreateReasonDetail);
-            Assert.Null(@event.EvidenceFile);
+            Assert.Equal(firstName, @event.Details.FirstName);
+            Assert.Equal(middleName, @event.Details.MiddleName);
+            Assert.Equal(lastName, @event.Details.LastName);
+            Assert.Equal(dateOfBirth, @event.Details.DateOfBirth);
+            Assert.Equal(emailAddress?.ToString(), @event.Details.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
+            Assert.Equal(gender, @event.Details.Gender);
+            Assert.Null(@event.TrnRequestMetadata);
         });
     }
 
@@ -183,8 +182,12 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     {
         // Arrange
         var trn = "1234567";
-        var personDetails = new PersonDetails()
+        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
+
+        var options = new CreatePersonOptions
         {
+            Trn = Optional.Option.Some(trn),
+            SourceTrnRequest = sourceTrnRequest,
             FirstName = "Alfred",
             MiddleName = "The",
             LastName = "Great",
@@ -193,16 +196,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
             Gender = Gender.Female,
         };
-        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
-
-        var options = new CreatePersonViaTpsImportOptions(trn, personDetails, sourceTrnRequest);
         var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.CreatePersonAsync(options, processContext)));
 
         // Assert
-        Assert.IsType<InvalidOperationException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
@@ -210,16 +210,14 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     {
         // Arrange
         var trn = "1234567";
-        var personDetails = new PersonDetails()
-        {
-            FirstName = "Alfred",
-            MiddleName = "The",
-            LastName = "Great",
-            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
-            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
-            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
-            Gender = Gender.Female,
-        };
+        var firstName = "Alfred";
+        var middleName = "The";
+        var lastName = "Great";
+        var dateOfBirth = DateOnly.Parse("1 Feb 1980");
+        var emailAddress = EmailAddress.Parse((string?)"test@test.com");
+        var nationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C");
+        var gender = Gender.Female;
+
         var trnRequestMetadata = new TrnRequestMetadata()
         {
             ApplicationUserId = SystemUser.SystemUserId,
@@ -227,16 +225,16 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             CreatedOn = Clock.UtcNow,
             IdentityVerified = null,
             OneLoginUserSubject = null,
-            Name = new[] { personDetails.FirstName, personDetails.MiddleName, personDetails.LastName }.GetNonEmptyValues(),
-            FirstName = personDetails.FirstName,
-            MiddleName = personDetails.MiddleName,
-            LastName = personDetails.LastName,
+            Name = new[] { firstName, middleName, lastName }.GetNonEmptyValues(),
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
             PreviousFirstName = null,
             PreviousLastName = null,
-            DateOfBirth = personDetails.DateOfBirth!.Value!,
-            EmailAddress = personDetails.EmailAddress?.ToString(),
-            NationalInsuranceNumber = personDetails.NationalInsuranceNumber.ToString(),
-            Gender = personDetails.Gender,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = emailAddress?.ToString(),
+            NationalInsuranceNumber = nationalInsuranceNumber.ToString(),
+            Gender = gender,
         };
         await WithDbContextAsync(async dbContext =>
         {
@@ -244,7 +242,18 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             await dbContext.SaveChangesAsync();
         });
 
-        var options = new CreatePersonViaTpsImportOptions(trn, personDetails, (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId));
+        var options = new CreatePersonOptions
+        {
+            Trn = Optional.Option.Some(trn),
+            SourceTrnRequest = (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId),
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = emailAddress,
+            NationalInsuranceNumber = nationalInsuranceNumber,
+            Gender = gender,
+        };
         var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -257,13 +266,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             Assert.Equal(trn, createdPersonRecord.Trn);
             Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
             Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
-            Assert.Equal(personDetails.FirstName, createdPersonRecord.FirstName);
-            Assert.Equal(personDetails.MiddleName, createdPersonRecord.MiddleName);
-            Assert.Equal(personDetails.LastName, createdPersonRecord.LastName);
-            Assert.Equal(personDetails.DateOfBirth, createdPersonRecord.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), createdPersonRecord.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, createdPersonRecord.Gender);
+            Assert.Equal(firstName, createdPersonRecord.FirstName);
+            Assert.Equal(middleName, createdPersonRecord.MiddleName);
+            Assert.Equal(lastName, createdPersonRecord.LastName);
+            Assert.Equal(dateOfBirth, createdPersonRecord.DateOfBirth);
+            Assert.Equal(emailAddress?.ToString(), createdPersonRecord.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(gender, createdPersonRecord.Gender);
             Assert.Equal(trnRequestMetadata.RequestId, createdPersonRecord.SourceTrnRequestId);
             Assert.Equal(trnRequestMetadata.ApplicationUserId, createdPersonRecord.SourceApplicationUserId);
         });
@@ -272,16 +281,14 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             var @event = Assert.IsType<PersonCreatedEvent>(e);
             Assert.Equal(person.PersonId, @event.PersonId);
-            Assert.Equal(personDetails.FirstName, @event.Details.FirstName);
-            Assert.Equal(personDetails.MiddleName, @event.Details.MiddleName);
-            Assert.Equal(personDetails.LastName, @event.Details.LastName);
-            Assert.Equal(personDetails.DateOfBirth, @event.Details.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), @event.Details.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, @event.Details.Gender);
-            Assert.Null(@event.CreateReason);
-            Assert.Null(@event.CreateReasonDetail);
-            Assert.Null(@event.EvidenceFile);
+            Assert.Equal(firstName, @event.Details.FirstName);
+            Assert.Equal(middleName, @event.Details.MiddleName);
+            Assert.Equal(lastName, @event.Details.LastName);
+            Assert.Equal(dateOfBirth, @event.Details.DateOfBirth);
+            Assert.Equal(emailAddress?.ToString(), @event.Details.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
+            Assert.Equal(gender, @event.Details.Gender);
+            Assert.Null(@event.TrnRequestMetadata);
         });
     }
 
@@ -289,14 +296,25 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     public async Task UpdatePersonDetailsAsync_PersonDoesNotExist_ThrowsException()
     {
         // Arrange
-        var options = new UpdatePersonDetailsOptions(Guid.NewGuid(), new() { }, null, null);
+        var options = new UpdatePersonDetailsOptions
+        {
+            PersonId = Guid.NewGuid(),
+            CreatePreviousName = false,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.UpdatePersonDetailsAsync(options, processContext)));
 
         // Assert
-        Assert.IsType<TrsPersonNotFoundException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
@@ -311,10 +329,18 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             await dbContext.SaveChangesAsync();
         });
 
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, new()
+        var options = new UpdatePersonDetailsOptions
         {
-            FirstName = Option.Some("Jim")
-        }, null, null);
+            PersonId = personToUpdate.PersonId,
+            CreatePreviousName = false,
+            FirstName = Option.Some("Jim"),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -345,44 +371,26 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Other));
 
-        var personDetails = new PersonDetails
+        var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : personToUpdate.FirstName;
+        var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : personToUpdate.MiddleName;
+        var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Person" : personToUpdate.LastName;
+        var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : personToUpdate.DateOfBirth;
+        var emailAddress = EmailAddress.Parse(changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : personToUpdate.EmailAddress);
+        var nationalInsuranceNumber = NationalInsuranceNumber.Parse(changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : personToUpdate.NationalInsuranceNumber!);
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : personToUpdate.Gender;
+
+        var options = new UpdatePersonDetailsOptions
         {
-            FirstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : personToUpdate.FirstName,
-            MiddleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : personToUpdate.MiddleName,
-            LastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Person" : personToUpdate.LastName,
-            DateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : personToUpdate.DateOfBirth,
-            EmailAddress = EmailAddress.Parse(changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : personToUpdate.EmailAddress),
-            NationalInsuranceNumber = NationalInsuranceNumber.Parse(changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : personToUpdate.NationalInsuranceNumber!),
-            Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : personToUpdate.Gender
+            PersonId = personToUpdate.PersonId,
+            CreatePreviousName = false,
+            FirstName = Option.Some(firstName),
+            MiddleName = Option.Some(middleName),
+            LastName = Option.Some(lastName),
+            DateOfBirth = Option.Some<DateOnly?>(dateOfBirth),
+            EmailAddress = Option.Some<EmailAddress?>(emailAddress),
+            NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>(nationalInsuranceNumber),
+            Gender = Option.Some<Gender?>(gender),
         };
-
-        var nameChangeJustification = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange)
-            ? new Justification<PersonNameChangeReason>()
-            {
-                Reason = PersonNameChangeReason.CorrectingAnError,
-                ReasonDetail = "Some details",
-                Evidence = new()
-                {
-                    FileId = Guid.NewGuid(),
-                    Name = "name-evidence.pdf"
-                }
-            }
-            : null;
-
-        var detailsChangeJustification = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange)
-            ? new Justification<PersonDetailsChangeReason>()
-            {
-                Reason = PersonDetailsChangeReason.AnotherReason,
-                ReasonDetail = "Some more details",
-                Evidence = new()
-                {
-                    FileId = Guid.NewGuid(),
-                    Name = "other-evidence.pdf"
-                }
-            }
-            : null;
-
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetails.UpdateAll(), nameChangeJustification, detailsChangeJustification);
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -393,13 +401,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             var updatedPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == personToUpdate.PersonId);
             Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
-            Assert.Equal(personDetails.FirstName, updatedPersonRecord.FirstName);
-            Assert.Equal(personDetails.MiddleName, updatedPersonRecord.MiddleName);
-            Assert.Equal(personDetails.LastName, updatedPersonRecord.LastName);
-            Assert.Equal(personDetails.DateOfBirth, updatedPersonRecord.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), updatedPersonRecord.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), updatedPersonRecord.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, updatedPersonRecord.Gender);
+            Assert.Equal(firstName, updatedPersonRecord.FirstName);
+            Assert.Equal(middleName, updatedPersonRecord.MiddleName);
+            Assert.Equal(lastName, updatedPersonRecord.LastName);
+            Assert.Equal(dateOfBirth, updatedPersonRecord.DateOfBirth);
+            Assert.Equal(emailAddress?.ToString(), updatedPersonRecord.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber?.ToString(), updatedPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(gender, updatedPersonRecord.Gender);
         });
 
         Events.AssertEventsPublished(e =>
@@ -413,20 +421,14 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             Assert.Equal(personToUpdate.EmailAddress, @event.OldPersonDetails.EmailAddress);
             Assert.Equal(personToUpdate.NationalInsuranceNumber, @event.OldPersonDetails.NationalInsuranceNumber);
             Assert.Equal(personToUpdate.Gender, @event.OldPersonDetails.Gender);
-            Assert.Equal(personDetails.FirstName, @event.PersonDetails.FirstName);
-            Assert.Equal(personDetails.MiddleName, @event.PersonDetails.MiddleName);
-            Assert.Equal(personDetails.LastName, @event.PersonDetails.LastName);
-            Assert.Equal(personDetails.DateOfBirth, @event.PersonDetails.DateOfBirth);
-            Assert.Equal(personDetails.EmailAddress?.ToString(), @event.PersonDetails.EmailAddress);
-            Assert.Equal(personDetails.NationalInsuranceNumber?.ToString(), @event.PersonDetails.NationalInsuranceNumber);
-            Assert.Equal(personDetails.Gender, @event.PersonDetails.Gender);
-            Assert.Equal(nameChangeJustification?.Reason.GetDisplayName(), @event.NameChangeReason);
-            Assert.Equal(nameChangeJustification?.Evidence?.FileId, @event.NameChangeEvidenceFile?.FileId);
-            Assert.Equal(nameChangeJustification?.Evidence?.Name, @event.NameChangeEvidenceFile?.Name);
-            Assert.Equal(detailsChangeJustification?.Reason.GetDisplayName(), @event.DetailsChangeReason);
-            Assert.Equal(detailsChangeJustification?.ReasonDetail, @event.DetailsChangeReasonDetail);
-            Assert.Equal(detailsChangeJustification?.Evidence?.FileId, @event.DetailsChangeEvidenceFile?.FileId);
-            Assert.Equal(detailsChangeJustification?.Evidence?.Name, @event.DetailsChangeEvidenceFile?.Name);
+            Assert.Equal(firstName, @event.PersonDetails.FirstName);
+            Assert.Equal(middleName, @event.PersonDetails.MiddleName);
+            Assert.Equal(lastName, @event.PersonDetails.LastName);
+            Assert.Equal(dateOfBirth, @event.PersonDetails.DateOfBirth);
+            Assert.Equal(emailAddress?.ToString(), @event.PersonDetails.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber?.ToString(), @event.PersonDetails.NationalInsuranceNumber);
+            Assert.Equal(gender, @event.PersonDetails.Gender);
+            Assert.Equal(changes, @event.Changes);
         });
     }
 
@@ -443,21 +445,20 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             .WithPreviousNames(("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate))
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
-        var personDetailsToUpdate = new PersonDetailsToUpdate
+        var personDetailsToUpdate = new UpdatePersonDetailsOptions
         {
+            PersonId = personToUpdate.PersonId,
+            CreatePreviousName = false,
             FirstName = Option.Some("Alfrede"),
             MiddleName = Option.Some("Thee"),
             LastName = Option.Some("Greate"),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
         };
 
-        var nameChangeJustification = new Justification<PersonNameChangeReason>()
-        {
-            Reason = PersonNameChangeReason.CorrectingAnError,
-            ReasonDetail = null,
-            Evidence = null
-        };
-
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetailsToUpdate, nameChangeJustification, null);
+        var options = personDetailsToUpdate;
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -481,10 +482,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         });
     }
 
-    [Theory]
-    [InlineData(PersonNameChangeReason.DeedPollOrOtherLegalProcess)]
-    [InlineData(PersonNameChangeReason.MarriageOrCivilPartnership)]
-    public async Task UpdatePersonDetailsAsync_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames(PersonNameChangeReason reason)
+    [Fact]
+    public async Task UpdatePersonDetailsAsync_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames()
     {
         // Arrange
         var ethelredDate = DateTime.Parse("1 Jan 1990").ToUniversalTime();
@@ -496,21 +495,18 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             .WithPreviousNames(("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate))
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
-        var personDetailsToUpdate = new PersonDetailsToUpdate
+        var options = new UpdatePersonDetailsOptions
         {
+            PersonId = personToUpdate.PersonId,
+            CreatePreviousName = true,
             FirstName = Option.Some("Megan"),
             MiddleName = Option.Some("Thee"),
             LastName = Option.Some("Stallion"),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
         };
-
-        var nameChangeJustification = new Justification<PersonNameChangeReason>()
-        {
-            Reason = reason,
-            ReasonDetail = null,
-            Evidence = null
-        };
-
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetailsToUpdate, nameChangeJustification, null);
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -552,8 +548,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         Clock.Advance();
 
-        var personDetailsToUpdate = new PersonDetailsToUpdate
+        var options = new UpdatePersonDetailsOptions
         {
+            PersonId = personToUpdate.PersonId,
+            CreatePreviousName = false,
             FirstName = Option.None<string>(),
             MiddleName = Option.None<string>(),
             LastName = Option.None<string>(),
@@ -562,8 +560,6 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-
-        var options = new UpdatePersonDetailsOptions(personToUpdate.PersonId, personDetailsToUpdate, null, null);
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -585,14 +581,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     public async Task DeactivatePersonAsync_PersonDoesNotExist_ThrowsException()
     {
         // Arrange
-        var options = new DeactivatePersonOptions(Guid.NewGuid(), new() { Reason = PersonDeactivateReason.AnotherReason });
         var processContext = new ProcessContext(ProcessType.PersonDeactivating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(options, processContext)));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(Guid.NewGuid(), processContext)));
 
         // Assert
-        Assert.IsType<TrsPersonNotFoundException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
@@ -610,10 +605,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         var processContext = new ProcessContext(ProcessType.PersonDeactivating, Clock.UtcNow, SystemUser.SystemUserId);
 
-        var options = new DeactivatePersonOptions(personToDeactivate.PersonId, new() { Reason = PersonDeactivateReason.AnotherReason });
-
         // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(options, processContext)));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(personToDeactivate.PersonId, processContext)));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -628,22 +621,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             .WithMiddleName("The")
             .WithLastName("Pink"));
 
-        var justification = new Justification<PersonDeactivateReason>()
-        {
-            Reason = PersonDeactivateReason.AnotherReason,
-            ReasonDetail = "Some detail",
-            Evidence = new()
-            {
-                FileId = Guid.NewGuid(),
-                Name = "evidence.pdf"
-            }
-        };
-
-        var options = new DeactivatePersonOptions(personToDeactivate.PersonId, justification);
         var processContext = new ProcessContext(ProcessType.PersonDeactivating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.DeactivatePersonAsync(options, processContext));
+        await WithServiceAsync(s => s.DeactivatePersonAsync(personToDeactivate.PersonId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -661,10 +642,6 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
             Assert.Equal(personToDeactivate.PersonId, @event.PersonId);
             Assert.Null(@event.MergedWithPersonId);
-            Assert.Equal(justification?.Reason.GetDisplayName(), @event.Reason);
-            Assert.Equal(justification?.ReasonDetail, @event.ReasonDetail);
-            Assert.Equal(justification?.Evidence?.FileId, @event.EvidenceFile!.FileId);
-            Assert.Equal(justification?.Evidence?.Name, @event.EvidenceFile.Name);
         });
     }
 
@@ -672,14 +649,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     public async Task ReactivatePersonAsync_PersonDoesNotExist_ThrowsException()
     {
         // Arrange
-        var options = new ReactivatePersonOptions(Guid.NewGuid(), new() { Reason = PersonReactivateReason.AnotherReason });
         var processContext = new ProcessContext(ProcessType.PersonDeactivating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.ReactivatePersonAsync(options, processContext)));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.ReactivatePersonAsync(Guid.NewGuid(), processContext)));
 
         // Assert
-        Assert.IsType<TrsPersonNotFoundException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
@@ -687,11 +663,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     {
         // Arrange
         var personToReactivate = await TestData.CreatePersonAsync();
-        var options = new ReactivatePersonOptions(personToReactivate.PersonId, new() { Reason = PersonReactivateReason.AnotherReason });
         var processContext = new ProcessContext(ProcessType.PersonReactivating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.ReactivatePersonAsync(options, processContext)));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.ReactivatePersonAsync(personToReactivate.PersonId, processContext)));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -713,22 +688,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             await dbContext.SaveChangesAsync();
         });
 
-        var justification = new Justification<PersonReactivateReason>()
-        {
-            Reason = PersonReactivateReason.AnotherReason,
-            ReasonDetail = "Some detail",
-            Evidence = new()
-            {
-                FileId = Guid.NewGuid(),
-                Name = "evidence.pdf"
-            }
-        };
-
-        var options = new ReactivatePersonOptions(personToReactivate.PersonId, justification);
         var processContext = new ProcessContext(ProcessType.PersonReactivating, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ReactivatePersonAsync(options, processContext));
+        await WithServiceAsync(s => s.ReactivatePersonAsync(personToReactivate.PersonId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -745,10 +708,6 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             var @event = Assert.IsType<PersonReactivatedEvent>(e);
 
             Assert.Equal(personToReactivate.PersonId, @event.PersonId);
-            Assert.Equal(justification?.Reason.GetDisplayName(), @event.Reason);
-            Assert.Equal(justification?.ReasonDetail, @event.ReasonDetail);
-            Assert.Equal(justification?.Evidence?.FileId, @event.EvidenceFile!.FileId);
-            Assert.Equal(justification?.Evidence?.Name, @event.EvidenceFile.Name);
         });
     }
 
@@ -765,7 +724,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonViaMergeAsync(options, processContext)));
 
         // Assert
-        Assert.IsType<TrsPersonNotFoundException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
@@ -805,7 +764,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonViaMergeAsync(options, processContext)));
 
         // Assert
-        Assert.IsType<TrsPersonNotFoundException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
@@ -870,23 +829,25 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         // Arrange
         var personToRetain = await TestData.CreatePersonAsync();
 
-        var options = new MergePersonsOptions(
-            Guid.NewGuid(),
-            personToRetain.PersonId,
-            personToRetain.Person.Details,
-            new()
-            {
-                FileId = Guid.NewGuid(),
-                Name = "name-evidence.pdf"
-            },
-            "Comments");
+        var options = new MergePersonsOptions
+        {
+            DeactivatingPersonId = Guid.NewGuid(),
+            RetainedPersonId = personToRetain.PersonId,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
         var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
 
         // Assert
-        Assert.IsType<TrsPersonNotFoundException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
@@ -903,16 +864,18 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             await dbContext.SaveChangesAsync();
         });
 
-        var options = new MergePersonsOptions(
-            personToDeactivate.PersonId,
-            personToRetain.PersonId,
-            personToRetain.Person.Details,
-            new()
-            {
-                FileId = Guid.NewGuid(),
-                Name = "name-evidence.pdf"
-            },
-            "Comments");
+        var options = new MergePersonsOptions
+        {
+            DeactivatingPersonId = personToDeactivate.PersonId,
+            RetainedPersonId = personToRetain.PersonId,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
         var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -928,23 +891,25 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         // Arrange
         var personToDeactivate = await TestData.CreatePersonAsync();
 
-        var options = new MergePersonsOptions(
-            personToDeactivate.PersonId,
-            Guid.NewGuid(),
-            personToDeactivate.Person.Details,
-            new()
-            {
-                FileId = Guid.NewGuid(),
-                Name = "name-evidence.pdf"
-            },
-            "Comments");
+        var options = new MergePersonsOptions
+        {
+            DeactivatingPersonId = personToDeactivate.PersonId,
+            RetainedPersonId = Guid.NewGuid(),
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
         var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
 
         // Assert
-        Assert.IsType<TrsPersonNotFoundException>(ex);
+        Assert.IsType<NotFoundException>(ex);
     }
 
     [Fact]
@@ -961,16 +926,18 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             await dbContext.SaveChangesAsync();
         });
 
-        var options = new MergePersonsOptions(
-            personToDeactivate.PersonId,
-            personToRetain.PersonId,
-            personToRetain.Person.Details,
-            new()
-            {
-                FileId = Guid.NewGuid(),
-                Name = "name-evidence.pdf"
-            },
-            "Comments");
+        var options = new MergePersonsOptions
+        {
+            DeactivatingPersonId = personToDeactivate.PersonId,
+            RetainedPersonId = personToRetain.PersonId,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
         var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -993,34 +960,21 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         Clock.Advance();
 
-        var evidenceFileId = Guid.NewGuid();
-        var evidenceFileName = "evidence.jpg";
-        var comments = Faker.Lorem.Paragraph();
-
         // Act
-        var personDetails = new PersonDetails
+        var options = new MergePersonsOptions
         {
-            FirstName = sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.FirstName ? personToDeactivate.FirstName : personToRetain.FirstName,
-            MiddleName = sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.MiddleName ? personToDeactivate.MiddleName : personToRetain.MiddleName,
-            LastName = sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.LastName ? personToDeactivate.LastName : personToRetain.LastName,
-            DateOfBirth = sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.DateOfBirth ? personToDeactivate.DateOfBirth : personToRetain.DateOfBirth,
-            EmailAddress = (sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.EmailAddress ? personToDeactivate.EmailAddress : personToRetain.EmailAddress)
-                is string email ? EmailAddress.Parse(email) : null,
-            NationalInsuranceNumber = (sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? personToDeactivate.NationalInsuranceNumber : personToRetain.NationalInsuranceNumber)
-                is string nino ? NationalInsuranceNumber.Parse(nino) : null,
-            Gender = sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.Gender ? personToDeactivate.Gender : personToRetain.Gender,
+            DeactivatingPersonId = personToDeactivate.PersonId,
+            RetainedPersonId = personToRetain.PersonId,
+            FirstName = Option.Some(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.FirstName ? personToDeactivate.FirstName : personToRetain.FirstName),
+            MiddleName = Option.Some(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.MiddleName ? personToDeactivate.MiddleName : personToRetain.MiddleName),
+            LastName = Option.Some(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.LastName ? personToDeactivate.LastName : personToRetain.LastName),
+            DateOfBirth = Option.Some<DateOnly?>(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.DateOfBirth ? personToDeactivate.DateOfBirth : personToRetain.DateOfBirth),
+            EmailAddress = Option.Some<EmailAddress?>((sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.EmailAddress ? personToDeactivate.EmailAddress : personToRetain.EmailAddress)
+                is string email ? EmailAddress.Parse(email) : null),
+            NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>((sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? personToDeactivate.NationalInsuranceNumber : personToRetain.NationalInsuranceNumber)
+                is string nino ? NationalInsuranceNumber.Parse(nino) : null),
+            Gender = Option.Some<Gender?>(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.Gender ? personToDeactivate.Gender : personToRetain.Gender),
         };
-
-        var options = new MergePersonsOptions(
-            personToDeactivate.PersonId,
-            personToRetain.PersonId,
-            personDetails,
-            new()
-            {
-                FileId = evidenceFileId,
-                Name = evidenceFileName
-            },
-            comments);
         var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -1058,49 +1012,51 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             }
         });
 
-        Events.AssertEventsPublished(e =>
+        var expectedChange = sourcedFromSecondaryPersonAttribute.Attribute switch
         {
-            var actualEvent = Assert.IsType<PersonsMergedEvent>(e);
+            PersonMatchedAttribute.FirstName => PersonDetailsUpdatedEventChanges.FirstName,
+            PersonMatchedAttribute.MiddleName => PersonDetailsUpdatedEventChanges.MiddleName,
+            PersonMatchedAttribute.LastName => PersonDetailsUpdatedEventChanges.LastName,
+            PersonMatchedAttribute.DateOfBirth => PersonDetailsUpdatedEventChanges.DateOfBirth,
+            PersonMatchedAttribute.EmailAddress => PersonDetailsUpdatedEventChanges.EmailAddress,
+            PersonMatchedAttribute.NationalInsuranceNumber => PersonDetailsUpdatedEventChanges.NationalInsuranceNumber,
+            PersonMatchedAttribute.Gender => PersonDetailsUpdatedEventChanges.Gender,
+            PersonMatchedAttribute.FullName => throw new NotImplementedException(),
+            PersonMatchedAttribute.Trn => throw new NotImplementedException(),
+            _ => PersonDetailsUpdatedEventChanges.None
+        };
 
-            Assert.Equal(personToRetain.PersonId, actualEvent.RetainedPersonId);
-            Assert.Equal(personToRetain.Trn, actualEvent.RetainedPersonTrn);
-            Assert.Equal(personToDeactivate.PersonId, actualEvent.DeactivatedPersonId);
-            Assert.Equal(personToDeactivate.Trn, actualEvent.DeactivatedPersonTrn);
-            Assert.Equal(PersonStatus.Deactivated, actualEvent.DeactivatedPersonStatus);
-
-            foreach (var attr in PersonAttributeInfos)
+        Events.AssertEventsPublished(
+            e =>
             {
-                Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromEventPersonDetails(actualEvent.OldRetainedPersonDetails));
-
-                if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
-                {
-                    Assert.Equal(attr.GetValueFromPersonResult(personToDeactivate), attr.GetValueFromEventPersonDetails(actualEvent.RetainedPersonDetails));
-                }
-                else
-                {
-                    Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromEventPersonDetails(actualEvent.RetainedPersonDetails));
-                }
-            }
-
-            Assert.Equal(evidenceFileId, actualEvent.EvidenceFile?.FileId);
-            Assert.Equal(evidenceFileName, actualEvent.EvidenceFile?.Name);
-            Assert.Equal(comments, actualEvent.Comments);
-
-            var expectedChange = sourcedFromSecondaryPersonAttribute.Attribute switch
+                var @event = Assert.IsType<PersonDeactivatedEvent>(e);
+                Assert.Equal(personToDeactivate.PersonId, @event.PersonId);
+                Assert.Equal(personToRetain.PersonId, @event.MergedWithPersonId);
+            },
+            e =>
             {
-                PersonMatchedAttribute.FirstName => PersonsMergedEventChanges.FirstName,
-                PersonMatchedAttribute.MiddleName => PersonsMergedEventChanges.MiddleName,
-                PersonMatchedAttribute.LastName => PersonsMergedEventChanges.LastName,
-                PersonMatchedAttribute.DateOfBirth => PersonsMergedEventChanges.DateOfBirth,
-                PersonMatchedAttribute.EmailAddress => PersonsMergedEventChanges.EmailAddress,
-                PersonMatchedAttribute.NationalInsuranceNumber => PersonsMergedEventChanges.NationalInsuranceNumber,
-                PersonMatchedAttribute.Gender => PersonsMergedEventChanges.Gender,
-                PersonMatchedAttribute.FullName => throw new NotImplementedException(),
-                PersonMatchedAttribute.Trn => throw new NotImplementedException(),
-                _ => PersonsMergedEventChanges.None
-            };
-            Assert.Equal(expectedChange, actualEvent.Changes);
-        });
+                var @event = Assert.IsType<PersonDetailsUpdatedEvent>(e);
+                Assert.Equal(personToRetain.PersonId, @event.PersonId);
+
+                foreach (var attr in PersonAttributeInfos)
+                {
+                    Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromEventPersonDetails(@event.OldPersonDetails));
+                }
+
+                foreach (var attr in PersonAttributeInfos)
+                {
+                    if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
+                    {
+                        Assert.Equal(attr.GetValueFromPersonResult(personToDeactivate), attr.GetValueFromEventPersonDetails(@event.PersonDetails));
+                    }
+                    else
+                    {
+                        Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromEventPersonDetails(@event.PersonDetails));
+                    }
+                }
+
+                Assert.Equal(expectedChange, @event.Changes);
+            });
     }
 
     [Fact]
@@ -1112,20 +1068,19 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: personToDeactivate.PersonId,
             verifiedInfo: ([personToDeactivate.FirstName, personToDeactivate.LastName], personToDeactivate.DateOfBirth));
-        var evidenceFileId = Guid.NewGuid();
-        var evidenceFileName = "evidence.jpg";
-        var comments = Faker.Lorem.Paragraph();
 
-        var options = new MergePersonsOptions(
-            personToDeactivate.PersonId,
-            personToRetain.PersonId,
-            personToRetain.Person.Details,
-            new()
-            {
-                FileId = evidenceFileId,
-                Name = evidenceFileName
-            },
-            comments);
+        var options = new MergePersonsOptions
+        {
+            DeactivatingPersonId = personToDeactivate.PersonId,
+            RetainedPersonId = personToRetain.PersonId,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
 
         var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
 
