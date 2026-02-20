@@ -48,6 +48,24 @@ public class OneLoginUser
         LastCoreIdentityVc = coreIdentityClaimVc;
     }
 
+    public void SetUnverified()
+    {
+        VerifiedOn = null;
+        VerificationRoute = null;
+        VerifiedByApplicationUserId = null;
+        VerifiedNames = null;
+        VerifiedDatesOfBirth = null;
+        LastCoreIdentityVc = null;
+    }
+
+    public void SetUnmatched()
+    {
+        MatchedOn = null;
+        PersonId = null;
+        MatchRoute = null;
+        MatchedAttributes = null;
+    }
+
     public void SetMatched(
         DateTime matchedOn,
         Guid personId,
