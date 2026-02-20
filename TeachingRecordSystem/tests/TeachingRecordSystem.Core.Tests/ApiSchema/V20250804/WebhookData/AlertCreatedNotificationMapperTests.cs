@@ -20,7 +20,18 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
             var alert = person.Alerts.Single();
-            var @event = person.Events.OfType<LegacyEvents.AlertCreatedEvent>().Single();
+
+            var @event = new LegacyEvents.AlertCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = Clock.UtcNow,
+                RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
+                PersonId = person.PersonId,
+                Alert = EventModels.Alert.FromModel(alert),
+                AddReason = null,
+                AddReasonDetail = null,
+                EvidenceFile = null
+            };
 
             // Act
             var notification = await mapper.MapEventAsync(@event);
@@ -50,7 +61,18 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
             var alert = person.Alerts.Single();
-            var @event = person.Events.OfType<LegacyEvents.AlertCreatedEvent>().Single();
+
+            var @event = new LegacyEvents.AlertCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = Clock.UtcNow,
+                RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
+                PersonId = person.PersonId,
+                Alert = EventModels.Alert.FromModel(alert),
+                AddReason = null,
+                AddReasonDetail = null,
+                EvidenceFile = null
+            };
 
             // Act
             var notification = await mapper.MapEventAsync(@event);
