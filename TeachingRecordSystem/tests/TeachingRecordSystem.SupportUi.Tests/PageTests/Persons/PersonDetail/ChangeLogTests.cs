@@ -54,7 +54,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SinglePage_DoesNotShowPagination()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithEvents(1));
+        var person = await CreatePersonWithEventsAsync(1);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -70,7 +70,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PageIsNotLastPage_ShowsNextPageLink()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithEvents(11));
+        var person = await CreatePersonWithEventsAsync(11);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=1");
 
@@ -86,7 +86,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PageIsLastPage_DoesNotShowNextPageLink()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithEvents(11));
+        var person = await CreatePersonWithEventsAsync(11);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
 
@@ -102,7 +102,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PageIsNotFirstPage_ShowsPreviousPageLink()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithEvents(11));
+        var person = await CreatePersonWithEventsAsync(11);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
 
@@ -118,7 +118,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PageIsFirstPage_DoesNotShowPreviousPageLink()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithEvents(11));
+        var person = await CreatePersonWithEventsAsync(11);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=1");
 
@@ -129,17 +129,55 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.DoesNotContain(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "prev");
     }
-}
 
-file static class Extensions
-{
-    public static TestData.CreatePersonBuilder WithEvents(this TestData.CreatePersonBuilder builder, int eventCount)
+    private async Task<TestData.CreatePersonResult> CreatePersonWithEventsAsync(int eventCount)
     {
-        for (int i = 0; i < eventCount; i++)
-        {
-            builder.WithAlert();
-        }
+        var person = await TestData.CreatePersonAsync();
 
-        return builder;
+        await WithDbContextAsync(async dbContext =>
+        {
+            for (int i = 0; i < eventCount; i++)
+            {
+                var @event = new LegacyEvents.PersonDetailsUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = Clock.UtcNow.AddMinutes(-i),
+                    RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
+                    PersonId = person.PersonId,
+                    PersonAttributes = new EventModels.PersonDetails
+                    {
+                        FirstName = person.FirstName,
+                        MiddleName = person.MiddleName,
+                        LastName = person.LastName,
+                        DateOfBirth = person.DateOfBirth,
+                        EmailAddress = person.EmailAddress,
+                        NationalInsuranceNumber = person.NationalInsuranceNumber,
+                        Gender = person.Gender
+                    },
+                    OldPersonAttributes = new EventModels.PersonDetails
+                    {
+                        FirstName = person.FirstName,
+                        MiddleName = person.MiddleName,
+                        LastName = person.LastName,
+                        DateOfBirth = person.DateOfBirth,
+                        EmailAddress = person.EmailAddress,
+                        NationalInsuranceNumber = person.NationalInsuranceNumber,
+                        Gender = person.Gender
+                    },
+                    Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress,
+                    NameChangeReason = null,
+                    NameChangeEvidenceFile = null,
+                    DetailsChangeReason = null,
+                    DetailsChangeReasonDetail = null,
+                    DetailsChangeEvidenceFile = null
+                };
+
+                dbContext.AddEventWithoutBroadcast(@event);
+            }
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        return person;
     }
 }

@@ -36,5 +36,8 @@ public enum ProcessType
     OneLoginUserRecordMatchingSupportTaskSaving = 33,
     OneLoginUserRecordMatchingSupportTaskCompleting = 34,
     TeacherSigningIn = 36,
-    PersonOneLoginUserConnecting = 37
+    PersonOneLoginUserConnecting = 37,
+    AlertCreating = 39,
+    AlertUpdating = 40,
+    AlertDeleting = 41
 }

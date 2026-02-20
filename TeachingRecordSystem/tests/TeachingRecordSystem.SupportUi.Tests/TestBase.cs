@@ -137,10 +137,6 @@ public abstract class TestBase
                 a.WithStartDate(Clock.Today.AddDays(-30));
                 a.WithEndDate(isOpenAlert ? null : Clock.Today.AddDays(-1));
                 a.WithExternalLink(populateOptional ? TestData.GenerateUrl() : null);
-                if (createdByUser is not null)
-                {
-                    a.WithCreatedByUser(createdByUser);
-                }
             }));
 
         return (person, person.Alerts.Single());

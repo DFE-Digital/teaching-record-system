@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
@@ -176,9 +176,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
 
         EventObserver.AssertEventsSaved(e =>
         {
-            var actualAlertDeletedEvent = Assert.IsType<AlertDeletedEvent>(e);
+            var actualAlertDeletedEvent = Assert.IsType<LegacyEvents.AlertDeletedEvent>(e);
 
-            var expectedAlertDeletedEvent = new AlertDeletedEvent
+            var expectedAlertDeletedEvent = new LegacyEvents.AlertDeletedEvent
             {
                 EventId = actualAlertDeletedEvent.EventId,
                 CreatedUtc = Clock.UtcNow,
@@ -199,6 +199,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
 
 
             Assert.Equivalent(expectedAlertDeletedEvent, actualAlertDeletedEvent);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.AlertDeleting, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<AlertDeletedEvent>();
+
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal(journeyInstance.State.DeleteReason!.GetDisplayName(), changeReason.Reason);
+            Assert.Equal(journeyInstance.State.DeleteReasonDetail, changeReason.Details);
+            Assert.Equal(journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel(), changeReason.EvidenceFile);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.ReopenAlert;
 
@@ -200,9 +200,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
 
         EventObserver.AssertEventsSaved(e =>
         {
-            var actualAlertUpdatedEvent = Assert.IsType<AlertUpdatedEvent>(e);
+            var actualAlertUpdatedEvent = Assert.IsType<LegacyEvents.AlertUpdatedEvent>(e);
 
-            var expectedAlertUpdatedEvent = new AlertUpdatedEvent
+            var expectedAlertUpdatedEvent = new LegacyEvents.AlertUpdatedEvent
             {
                 EventId = actualAlertUpdatedEvent.EventId,
                 CreatedUtc = Clock.UtcNow,
@@ -229,10 +229,21 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
                 ChangeReason = journeyInstance.State.ChangeReason!.GetDisplayName(),
                 ChangeReasonDetail = journeyInstance.State.ChangeReasonDetail,
                 EvidenceFile = journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel(),
-                Changes = AlertUpdatedEventChanges.EndDate
+                Changes = LegacyEvents.AlertUpdatedEventChanges.EndDate
             };
 
             Assert.Equivalent(expectedAlertUpdatedEvent, actualAlertUpdatedEvent);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.AlertUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<AlertUpdatedEvent>();
+
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), changeReason.Reason);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail, changeReason.Details);
+            Assert.Equal(journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel(), changeReason.EvidenceFile);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

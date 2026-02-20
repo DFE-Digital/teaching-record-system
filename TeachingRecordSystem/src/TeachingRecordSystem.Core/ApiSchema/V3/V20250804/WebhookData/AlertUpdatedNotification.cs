@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 
@@ -12,11 +11,11 @@ public record AlertUpdatedNotification : IWebhookMessageData
 }
 
 public class AlertUpdatedNotificationMapper(PersonInfoCache personInfoCache, ReferenceDataCache referenceDataCache) :
-    IEventMapper<AlertUpdatedEvent, AlertUpdatedNotification>
+    IEventMapper<Events.Legacy.AlertUpdatedEvent, AlertUpdatedNotification>
 {
-    public async Task<AlertUpdatedNotification?> MapEventAsync(AlertUpdatedEvent @event)
+    public async Task<AlertUpdatedNotification?> MapEventAsync(Events.Legacy.AlertUpdatedEvent @event)
     {
-        if ((@event.Changes & (AlertUpdatedEventChanges.DqtSpent | AlertUpdatedEventChanges.DqtSanctionCode)) != 0)
+        if ((@event.Changes & (LegacyEvents.AlertUpdatedEventChanges.DqtSpent | LegacyEvents.AlertUpdatedEventChanges.DqtSanctionCode)) != 0)
         {
             throw new NotSupportedException("Events originating from DQT are not supported.");
         }
@@ -33,7 +32,7 @@ public class AlertUpdatedNotificationMapper(PersonInfoCache personInfoCache, Ref
         }
 
         // We don't expose 'ExternalLink' so if that's the only thing that's changed then don't create a message
-        if (@event.Changes == AlertUpdatedEventChanges.ExternalLink)
+        if (@event.Changes == LegacyEvents.AlertUpdatedEventChanges.ExternalLink)
         {
             return null;
         }

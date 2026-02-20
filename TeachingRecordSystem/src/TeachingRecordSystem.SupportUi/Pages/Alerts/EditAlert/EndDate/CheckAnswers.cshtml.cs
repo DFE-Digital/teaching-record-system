@@ -1,16 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Optional;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
 [Journey(JourneyNames.EditAlertEndDate), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
+    AlertService alertService,
     IClock clock) : PageModel
 {
     public JourneyInstance<EditAlertEndDateState>? JourneyInstance { get; set; }
@@ -58,21 +60,24 @@ public class CheckAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var alert = HttpContext.GetCurrentAlertFeature().Alert;
-
-        alert.Update(
-            a => a.EndDate = NewEndDate,
-            ChangeReason.GetDisplayName(),
-            ChangeReasonDetail,
-            evidenceFile: EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
+        var processContext = new ProcessContext(
+            ProcessType.AlertUpdating,
             clock.UtcNow,
-            out var updatedEvent);
+            User.GetUserId(),
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = ChangeReason.GetDisplayName()!,
+                Details = ChangeReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel()
+            });
 
-        if (updatedEvent is not null)
-        {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        }
+        var changes = await alertService.UpdateAlertAsync(
+            new UpdateAlertOptions
+            {
+                AlertId = alert.AlertId,
+                EndDate = Option.Some<DateOnly?>(NewEndDate)
+            },
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert changed");

@@ -500,9 +500,8 @@ public partial class TestData
 
                     foreach (var builder in _alertBuilders)
                     {
-                        var (alertId, alertEvents) = await builder.ExecuteAsync(this, testData, dbContext);
+                        var alertId = await builder.ExecuteAsync(this, testData, dbContext);
                         alertIds.Add(alertId);
-                        events.AddRange(alertEvents);
                     }
 
                     return alertIds;
@@ -619,9 +618,6 @@ public partial class TestData
         private Option<string?> _externalLink;
         private Option<DateOnly> _startDate;
         private Option<DateOnly?> _endDate;
-        private Option<string?> _reason;
-        private Option<string?> _reasonDetail;
-        private Option<EventModels.RaisedByUserInfo> _createdByUser;
         private Option<DateTime?> _createdUtc;
 
         public CreatePersonAlertBuilder WithAlertTypeId(Guid? alertTypeId)
@@ -664,26 +660,13 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonAlertBuilder WithAddReason(string? reason, string? reasonDetail)
-        {
-            _reason = Option.Some(reason);
-            _reasonDetail = Option.Some(reasonDetail);
-            return this;
-        }
-
         public CreatePersonAlertBuilder WithCreatedUtc(DateTime? createdUtc)
         {
             _createdUtc = Option.Some(createdUtc);
             return this;
         }
 
-        public CreatePersonAlertBuilder WithCreatedByUser(EventModels.RaisedByUserInfo user)
-        {
-            _createdByUser = Option.Some(user);
-            return this;
-        }
-
-        internal async Task<(Guid AlertId, IReadOnlyCollection<EventBase> Events)> ExecuteAsync(
+        internal async Task<Guid> ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             TestData testData,
             TrsDbContext dbContext)
@@ -695,29 +678,24 @@ public partial class TestData
             var externalLink = _externalLink.ValueOr((string?)null);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr((DateOnly?)null);
-            var reason = _reason.ValueOr("Another reason");
-            var reasonDetail = _reasonDetail.ValueOr(testData.GenerateLoremIpsum());
-            var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(SystemUser.SystemUserId));
-            var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
-            var alert = Alert.Create(
-                alertTypeId!.Value,
-                personId,
-                details,
-                externalLink,
-                startDate,
-                endDate,
-                reason,
-                reasonDetail,
-                evidenceFile: null,
-                createdByUser,
-                createdUtc!.Value,
-                out var createdEvent);
+            var alertId = Guid.NewGuid();
+            var alert = new Alert
+            {
+                AlertId = alertId,
+                PersonId = personId,
+                AlertTypeId = alertTypeId!.Value,
+                Details = details,
+                ExternalLink = externalLink,
+                StartDate = startDate,
+                EndDate = endDate,
+                CreatedOn = _createdUtc.ValueOr(testData.Clock.UtcNow)!.Value,
+                UpdatedOn = _createdUtc.ValueOr(testData.Clock.UtcNow)!.Value
+            };
 
             dbContext.Alerts.Add(alert);
-            dbContext.AddEventWithoutBroadcast(createdEvent);
 
-            return (alert.AlertId, [createdEvent]);
+            return alertId;
         }
     }
 

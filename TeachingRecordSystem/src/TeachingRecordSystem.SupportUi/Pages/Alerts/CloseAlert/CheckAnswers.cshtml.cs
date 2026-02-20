@@ -1,17 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
+using Optional;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
 [Journey(JourneyNames.CloseAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
+    AlertService alertService,
     IClock clock) : PageModel
 {
     public JourneyInstance<CloseAlertState>? JourneyInstance { get; set; }
@@ -70,31 +71,25 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
-
         var alert = HttpContext.GetCurrentAlertFeature().Alert;
+        var processContext = new ProcessContext(
+            ProcessType.AlertUpdating,
+            clock.UtcNow,
+            User.GetUserId(),
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = ChangeReason.GetDisplayName()!,
+                Details = ChangeReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel()
+            });
 
-        var oldAlertEventModel = EventModels.Alert.FromModel(alert);
-        alert.EndDate = EndDate;
-        alert.UpdatedOn = now;
-
-        var updatedEvent = new AlertUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId(),
-            PersonId = PersonId,
-            Alert = EventModels.Alert.FromModel(alert),
-            OldAlert = oldAlertEventModel,
-            ChangeReason = ChangeReason.GetDisplayName(),
-            ChangeReasonDetail = ChangeReasonDetail,
-            EvidenceFile = EvidenceFile?.ToEventModel(),
-            Changes = AlertUpdatedEventChanges.EndDate
-        };
-
-        await dbContext.AddEventAndBroadcastAsync(updatedEvent);
-
-        await dbContext.SaveChangesAsync();
+        var changes = await alertService.UpdateAlertAsync(
+            new UpdateAlertOptions
+            {
+                AlertId = alert.AlertId,
+                EndDate = Option.Some<DateOnly?>(EndDate)
+            },
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert closed");

@@ -26,12 +26,19 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
             {
                 dbContext.Alerts.Attach(alert);
 
-                alert.Delete(
-                    deletionReasonDetail: null,
-                    evidenceFile: null,
-                    deletedBy: SystemUser.SystemUserId,
-                    Clock.UtcNow,
-                    out var deletedEvent);
+                alert.DeletedOn = Clock.UtcNow;
+                alert.UpdatedOn = Clock.UtcNow;
+
+                var deletedEvent = new LegacyEvents.AlertDeletedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = Clock.UtcNow,
+                    RaisedBy = SystemUser.SystemUserId,
+                    PersonId = alert.PersonId,
+                    Alert = EventModels.Alert.FromModel(alert),
+                    DeletionReasonDetail = null,
+                    EvidenceFile = null
+                };
 
                 await dbContext.SaveChangesAsync();
 
@@ -71,12 +78,19 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
             {
                 dbContext.Alerts.Attach(alert);
 
-                alert.Delete(
-                    deletionReasonDetail: null,
-                    evidenceFile: null,
-                    deletedBy: SystemUser.SystemUserId,
-                    Clock.UtcNow,
-                    out var deletedEvent);
+                alert.DeletedOn = Clock.UtcNow;
+                alert.UpdatedOn = Clock.UtcNow;
+
+                var deletedEvent = new LegacyEvents.AlertDeletedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = Clock.UtcNow,
+                    RaisedBy = SystemUser.SystemUserId,
+                    PersonId = alert.PersonId,
+                    Alert = EventModels.Alert.FromModel(alert),
+                    DeletionReasonDetail = null,
+                    EvidenceFile = null
+                };
 
                 await dbContext.SaveChangesAsync();
 
