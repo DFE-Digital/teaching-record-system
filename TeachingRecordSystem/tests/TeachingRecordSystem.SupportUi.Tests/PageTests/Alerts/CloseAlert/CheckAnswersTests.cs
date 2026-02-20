@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events.ChangeReasons;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
 
 public class CheckAnswersTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixture), IAsyncLifetime

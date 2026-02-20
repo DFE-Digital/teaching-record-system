@@ -9,4 +9,15 @@ public record PersonDetails
     public required string? EmailAddress { get; set; }
     public required string? NationalInsuranceNumber { get; set; }
     public required Gender? Gender { get; set; }
+
+    public static PersonDetails FromModel(Core.DataStore.Postgres.Models.Person person) => new()
+    {
+        FirstName = person.FirstName,
+        MiddleName = person.MiddleName,
+        LastName = person.LastName,
+        DateOfBirth = person.DateOfBirth,
+        EmailAddress = person.EmailAddress,
+        NationalInsuranceNumber = person.NationalInsuranceNumber,
+        Gender = person.Gender
+    };
 }

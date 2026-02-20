@@ -1,24 +1,16 @@
+using Optional;
+
 namespace TeachingRecordSystem.Core.Services.Persons;
 
-public abstract record CreatePersonOptions(
-    string? Trn,
-    PersonDetails PersonDetails,
-    (Guid ApplicationUserId, string RequestId)? SourceTrnRequest,
-    Justification<PersonCreateReason>? Justification);
-
-public record CreatePersonViaTrnRequestOptions(
-    PersonDetails PersonDetails,
-    (Guid ApplicationUserId, string RequestId)? SourceTrnRequest)
-    : CreatePersonOptions(null, PersonDetails, SourceTrnRequest, null);
-
-public record CreatePersonViaTpsImportOptions(
-    string? Trn,
-    PersonDetails PersonDetails,
-    (Guid ApplicationUserId, string RequestId)? SourceTrnRequest)
-    : CreatePersonOptions(Trn, PersonDetails, SourceTrnRequest, null);
-
-public record CreatePersonViaSupportUiOptions(
-    PersonDetails PersonDetails,
-    Justification<PersonCreateReason>? Justification)
-    : CreatePersonOptions(null, PersonDetails, null, Justification);
-
+public record CreatePersonOptions
+{
+    public Option<string> Trn { get; init; }  // For TPS records
+    public required (Guid ApplicationUserId, string RequestId)? SourceTrnRequest { get; init; }
+    public required string FirstName { get; init; }
+    public required string MiddleName { get; init; }
+    public required string LastName { get; init; }
+    public required DateOnly? DateOfBirth { get; init; }
+    public required EmailAddress? EmailAddress { get; init; }
+    public required NationalInsuranceNumber? NationalInsuranceNumber { get; init; }
+    public required Gender? Gender { get; init; }
+}

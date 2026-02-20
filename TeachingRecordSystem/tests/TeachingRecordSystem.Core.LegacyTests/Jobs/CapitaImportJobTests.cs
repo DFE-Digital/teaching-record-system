@@ -13,6 +13,7 @@ using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -1847,9 +1848,9 @@ public class CapitaImportJobFixture : IAsyncLifetime
         var dbContext = dbFixture.DbContextFactory.CreateDbContext();
         var eventPublisher = provider.GetRequiredService<IEventPublisher>();
 
-        var personService = new Core.Services.Persons.PersonService(
+        var personService = new Services.Persons.PersonService(
             dbContext,
-            Clock,
+            Mock.Of<OneLoginService>(),
             eventPublisher);
 
         var trnRequestService = new TrnRequestService(

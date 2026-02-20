@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -9,6 +10,7 @@ using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest;
@@ -17,20 +19,19 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditC
 public class AcceptModel(
     TrsDbContext dbContext,
     PersonService personService,
+    SupportTaskService supportTaskService,
     IBackgroundJobScheduler backgroundJobScheduler,
     SupportUiLinkGenerator linkGenerator,
     IClock clock) : PageModel
 {
+    private SupportTask? _supportTask;
+
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
-    public SupportTaskType? ChangeType { get; set; }
+    public SupportTaskType ChangeType { get; set; }
 
     public string? PersonName { get; set; }
-
-    SupportTask? SupportTask { get; set; }
-
-    Person? Person { get; set; }
 
     public NameChangeRequestInfo? NameChangeRequest { get; set; }
 
@@ -38,98 +39,86 @@ public class AcceptModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
-        var changeNameRequestData = ChangeType == SupportTaskType.ChangeNameRequest ? EventModels.ChangeNameRequestData.FromModel((ChangeNameRequestData)SupportTask!.Data) : null;
-        var changeDateOfBirthRequestData = ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? EventModels.ChangeDateOfBirthRequestData.FromModel((ChangeDateOfBirthRequestData)SupportTask!.Data) : null;
-        var oldSupportTask = EventModels.SupportTask.FromModel(SupportTask!);
-        SupportTask!.Status = SupportTaskStatus.Closed;
-        SupportTask.UpdatedOn = now;
+        var changeNameRequestData =
+            ChangeType is SupportTaskType.ChangeNameRequest ? _supportTask!.GetData<ChangeNameRequestData>() : null;
+        var changeDateOfBirthRequestData =
+            ChangeType is SupportTaskType.ChangeDateOfBirthRequest ? _supportTask!.GetData<ChangeDateOfBirthRequestData>() : null;
 
         var processContext = new ProcessContext(
-            ChangeType == SupportTaskType.ChangeNameRequest ? ProcessType.ChangeOfNameRequestApproving : ProcessType.ChangeOfDateOfBirthRequestApproving,
-            now,
+            ChangeType is SupportTaskType.ChangeNameRequest ? ProcessType.ChangeOfNameRequestApproving : ProcessType.ChangeOfDateOfBirthRequestApproving,
+            clock.UtcNow,
             User.GetUserId());
 
-        var updateResult = await personService.UpdatePersonDetailsAsync(new(
-            Person!.PersonId,
-            new()
-            {
-                FirstName = ChangeType == SupportTaskType.ChangeNameRequest ? Option.Some(changeNameRequestData!.FirstName ?? string.Empty) : Option.None<string>(),
-                MiddleName = ChangeType == SupportTaskType.ChangeNameRequest ? Option.Some(changeNameRequestData!.MiddleName ?? string.Empty) : Option.None<string>(),
-                LastName = ChangeType == SupportTaskType.ChangeNameRequest ? Option.Some(changeNameRequestData!.LastName ?? string.Empty) : Option.None<string>(),
-                DateOfBirth = ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? Option.Some<DateOnly?>(changeDateOfBirthRequestData!.DateOfBirth) : Option.None<DateOnly?>(),
-            },
-            null,
-            null),
-            processContext);
+        string? emailAddress = _supportTask!.Person!.EmailAddress;
+        string emailTemplateId;
 
-        string? emailAddress = null;
-        string emailTemplateId = null!;
-        if (ChangeType == SupportTaskType.ChangeNameRequest)
+        if (ChangeType is SupportTaskType.ChangeNameRequest)
         {
-            SupportTask.UpdateData<ChangeNameRequestData>(data => data with
-            {
-                ChangeRequestOutcome = SupportRequestOutcome.Approved
-            });
-
-            var approvedEvent = new LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent()
-            {
-                PersonId = Person!.PersonId,
-                RequestData = changeNameRequestData!,
-                SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
-                OldSupportTask = oldSupportTask,
-                PersonAttributes = updateResult.PersonDetails.ToEventModel(),
-                OldPersonAttributes = updateResult.OldPersonDetails.ToEventModel(),
-                EventId = Guid.NewGuid(),
-                CreatedUtc = now,
-                RaisedBy = User.GetUserId(),
-                Changes = updateResult.Changes.ToLegacyChangeNameRequestSupportTaskApprovedEventChanges()
-            };
-
-            if (approvedEvent.Changes.HasAnyFlag(LegacyEvents.ChangeNameRequestSupportTaskApprovedEventChanges.NameChange))
-            {
-                dbContext.PreviousNames.Add(new PreviousName
+            await personService.UpdatePersonDetailsAsync(
+                new()
                 {
-                    PreviousNameId = Guid.NewGuid(),
-                    PersonId = Person!.PersonId,
-                    FirstName = updateResult.OldPersonDetails.FirstName,
-                    MiddleName = updateResult.OldPersonDetails.MiddleName,
-                    LastName = updateResult.OldPersonDetails.LastName,
-                    CreatedOn = now,
-                    UpdatedOn = now
-                });
+                    PersonId = _supportTask!.Person!.PersonId,
+                    FirstName = Option.Some(changeNameRequestData!.FirstName),
+                    MiddleName = Option.Some(changeNameRequestData.MiddleName),
+                    LastName = Option.Some(changeNameRequestData.LastName),
+                    DateOfBirth = default,
+                    CreatePreviousName = true,
+                    EmailAddress = default,
+                    NationalInsuranceNumber = default,
+                    Gender = default
+                },
+                processContext);
+
+            await supportTaskService.UpdateSupportTaskAsync(
+                new UpdateSupportTaskOptions<ChangeNameRequestData>
+                {
+                    UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Approved },
+                    SupportTaskReference = _supportTask.SupportTaskReference,
+                    Status = SupportTaskStatus.Closed
+                },
+                processContext);
+
+            if (!string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress))
+            {
+                emailAddress = changeDateOfBirthRequestData.EmailAddress;
             }
 
-            emailAddress = string.IsNullOrEmpty(changeNameRequestData!.EmailAddress) ? Person!.EmailAddress : changeNameRequestData.EmailAddress;
             emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation;
-
-            await dbContext.AddEventAndBroadcastAsync(approvedEvent);
         }
-        else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
+        else
         {
-            SupportTask.UpdateData<ChangeDateOfBirthRequestData>(data => data with
-            {
-                ChangeRequestOutcome = SupportRequestOutcome.Approved
-            });
+            Debug.Assert(ChangeType is SupportTaskType.ChangeDateOfBirthRequest);
 
-            var approvedEvent = new LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent()
-            {
-                PersonId = Person!.PersonId,
-                RequestData = changeDateOfBirthRequestData!,
-                SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
-                OldSupportTask = oldSupportTask,
-                PersonAttributes = updateResult.PersonDetails.ToEventModel(),
-                OldPersonAttributes = updateResult.OldPersonDetails.ToEventModel(),
-                EventId = Guid.NewGuid(),
-                CreatedUtc = now,
-                RaisedBy = User.GetUserId(),
-                Changes = updateResult.Changes.ToLegacyChangeDateOfBirthRequestSupportTaskApprovedEventChanges()
-            };
+            await personService.UpdatePersonDetailsAsync(
+                new()
+                {
+                    PersonId = _supportTask!.Person!.PersonId,
+                    FirstName = default,
+                    MiddleName = default,
+                    LastName = default,
+                    DateOfBirth = Option.Some<DateOnly?>(changeDateOfBirthRequestData!.DateOfBirth),
+                    CreatePreviousName = false,
+                    EmailAddress = default,
+                    NationalInsuranceNumber = default,
+                    Gender = default
+                },
+                processContext);
 
-            emailAddress = string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress) ? Person!.EmailAddress : changeDateOfBirthRequestData.EmailAddress;
+            await supportTaskService.UpdateSupportTaskAsync(
+                new UpdateSupportTaskOptions<ChangeDateOfBirthRequestData>
+                {
+                    UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Approved },
+                    SupportTaskReference = _supportTask.SupportTaskReference,
+                    Status = SupportTaskStatus.Closed
+                },
+                processContext);
+
+            if (!string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress))
+            {
+                emailAddress = changeDateOfBirthRequestData.EmailAddress;
+            }
+
             emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation;
-
-            await dbContext.AddEventAndBroadcastAsync(approvedEvent);
         }
 
         if (!string.IsNullOrEmpty(emailAddress))
@@ -138,18 +127,21 @@ public class AcceptModel(
             {
                 EmailId = Guid.NewGuid(),
                 TemplateId = emailTemplateId,
-                EmailAddress = emailAddress!,
-                Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, Person!.FirstName } }
+                EmailAddress = emailAddress,
+                Personalization = new Dictionary<string, string>
+                {
+                    { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, _supportTask.Person.FirstName }
+                }
             };
 
             dbContext.Emails.Add(email);
+            await dbContext.SaveChangesAsync();
+
             await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
         }
 
-        await dbContext.SaveChangesAsync();
-
         TempData.SetFlashSuccess(
-            $"The request has been accepted",
+            "The request has been accepted",
             "The user’s record has been changed and they have been notified.");
 
         return Redirect(linkGenerator.SupportTasks.ChangeRequests.Index());
@@ -157,45 +149,39 @@ public class AcceptModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var person = await dbContext.Persons
-            .SingleOrDefaultAsync(p => p.PersonId == supportTask.PersonId);
-        if (person is null)
-        {
-            context.Result = NotFound();
-            return;
-        }
+        _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
         PersonName = StringHelper.JoinNonEmpty(
             ' ',
-            person.FirstName,
-            person.MiddleName,
-            person.LastName);
+            _supportTask.Person!.FirstName,
+            _supportTask.Person.MiddleName,
+            _supportTask.Person.LastName);
 
-        ChangeType = supportTask.SupportTaskType;
-        SupportTask = supportTask;
-        Person = person;
+        ChangeType = _supportTask.SupportTaskType;
 
-        if (supportTask.SupportTaskType == SupportTaskType.ChangeNameRequest)
+        if (ChangeType is SupportTaskType.ChangeNameRequest)
         {
-            var data = (ChangeNameRequestData)supportTask.Data;
-            NameChangeRequest = new NameChangeRequestInfo()
+            var data = _supportTask.GetData<ChangeNameRequestData>();
+
+            NameChangeRequest = new NameChangeRequestInfo
             {
-                CurrentFirstName = person!.FirstName,
-                CurrentMiddleName = person.MiddleName,
-                CurrentLastName = person.LastName,
+                CurrentFirstName = _supportTask.Person.FirstName,
+                CurrentMiddleName = _supportTask.Person.MiddleName,
+                CurrentLastName = _supportTask.Person.LastName,
                 NewFirstName = data.FirstName,
                 NewMiddleName = data.MiddleName,
                 NewLastName = data.LastName
             };
         }
-
-        if (supportTask.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest)
+        else
         {
-            var data = (ChangeDateOfBirthRequestData)supportTask.Data;
-            DateOfBirthChangeRequest = new DateOfBirthChangeRequestInfo()
+            Debug.Assert(ChangeType is SupportTaskType.ChangeDateOfBirthRequest);
+
+            var data = _supportTask.GetData<ChangeDateOfBirthRequestData>();
+
+            DateOfBirthChangeRequest = new DateOfBirthChangeRequestInfo
             {
-                CurrentDateOfBirth = person.DateOfBirth!.Value,
+                CurrentDateOfBirth = _supportTask.Person.DateOfBirth!.Value,
                 NewDateOfBirth = data.DateOfBirth
             };
         }

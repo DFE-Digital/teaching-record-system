@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.Infrastructure.Json;
 
 namespace TeachingRecordSystem.Core.Events.ChangeReasons;
 
-public interface IChangeReason
+public interface IChangeReasonInfo
 {
     static JsonSerializerOptions SerializerOptions => new()
     {

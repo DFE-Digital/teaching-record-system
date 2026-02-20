@@ -151,7 +151,7 @@ public class ProcessContext
 {
     private readonly List<IEvent> _events = new();
 
-    public ProcessContext(ProcessType processType, DateTime now, EventModels.RaisedByUserInfo raisedBy, IChangeReason? changeReason = null)
+    public ProcessContext(ProcessType processType, DateTime now, EventModels.RaisedByUserInfo raisedBy, IChangeReasonInfo? changeReason = null)
     {
         Now = now;
 

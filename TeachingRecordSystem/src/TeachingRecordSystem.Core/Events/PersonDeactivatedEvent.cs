@@ -7,7 +7,4 @@ public record PersonDeactivatedEvent : IEvent
     string[] IEvent.OneLoginUserSubjects => [];
     public required Guid PersonId { get; init; }
     public required Guid? MergedWithPersonId { get; init; }
-    public required string? Reason { get; init; }
-    public required string? ReasonDetail { get; init; }
-    public required EventModels.File? EvidenceFile { get; init; }
 }

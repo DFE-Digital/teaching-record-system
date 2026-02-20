@@ -73,14 +73,14 @@ public class CheckAnswersModel(
             ProcessType.AlertUpdating,
             clock.UtcNow,
             User.GetUserId(),
-            new ChangeReasonWithDetailsAndEvidence
+            new ChangeReasonInfoWithDetailsAndEvidence
             {
                 Reason = ChangeReason.GetDisplayName()!,
                 Details = ChangeReasonDetail,
                 EvidenceFile = EvidenceFile?.ToEventModel()
             });
 
-        var changes = await alertService.UpdateAlertAsync(
+        await alertService.UpdateAlertAsync(
             new UpdateAlertOptions
             {
                 AlertId = alert.AlertId,
