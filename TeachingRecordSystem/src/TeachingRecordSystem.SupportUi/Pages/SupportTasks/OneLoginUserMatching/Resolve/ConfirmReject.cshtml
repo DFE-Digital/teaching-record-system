@@ -18,7 +18,7 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-inset-text>
-                We’ll send @Model.Name an email confirming we could not verify their identity.
+                We’ll send @Model.Name an email confirming we could not verify their identity@(Model.Reason is OneLoginIdVerificationRejectReason.AnotherReason ? ", including the reason you entered" : "").
             </govuk-inset-text>
 
             <govuk-summary-list>
