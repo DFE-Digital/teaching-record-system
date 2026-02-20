@@ -67,7 +67,7 @@ public class NoMatches(
         TempData.SetFlashSuccess(
             "Email sent",
             $"Request closed for {Name}. " +
-            $"We’ve send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.");
+            $"We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.");
 
         return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
             linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
