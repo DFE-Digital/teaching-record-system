@@ -77,7 +77,7 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
         var data = _supportTask.GetData<OneLoginUserIdVerificationData>();
 
         EmailAddress = _supportTask.OneLoginUser!.EmailAddress!;
-        Name = $"{data.StatedFirstName} ${data.StatedLastName}";
+        Name = $"{data.StatedFirstName} {data.StatedLastName}";
         Reason = JourneyInstance.State.RejectReason!.Value;
         AdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails;
     }
