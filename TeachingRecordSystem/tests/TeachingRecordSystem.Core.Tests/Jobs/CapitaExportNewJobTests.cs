@@ -10,8 +10,7 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
 {
-    private const int EXPECTED_ROW_LENGTH = 86;
-
+    private const int ExpectedRowLength = 86;
 
     [Fact]
     public async Task GetNewPersons_CreatedAfterLastRunDate_ReturnsExpectedRecords()
@@ -49,9 +48,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             Assert.Contains(newPersons, p => p.Trn == person1.Trn);
             Assert.Contains(newPersons, p => p.Trn == person2.Trn);
         });
-
     }
-
 
     [Theory]
     [InlineData(Gender.NotAvailable)]
@@ -86,9 +83,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             // Assert
             Assert.DoesNotContain(newPersons, p => p.Trn == person1.Trn);
         });
-
     }
-
 
     [Fact]
     public async Task GetNewPersons_NoRecordsCreatedAfterLastRunDate_ReturnsExpectedRecords()
@@ -105,9 +100,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             // Assert
             Assert.Empty(newPersons);
         });
-
     }
-
 
     [Fact]
     public async Task GetNewPersons_CreatedAferLastRunDateWithoutTrn_ReturnsExpectedRecords()
@@ -126,9 +119,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             // Assert
             Assert.Empty(newPersons);
         });
-
     }
-
 
     [Theory]
     [InlineData(Gender.Male, "1")]
@@ -164,11 +155,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{"1018Z981"}";
             Assert.NotNull(rowString);
             Assert.Equal(expectedRowString, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Theory]
     [InlineData(Gender.Male, "1")]
@@ -240,11 +229,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{"1018Z981"}";
             Assert.NotNull(rowString);
             Assert.Equal(expectedRowString, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Theory]
     [InlineData("lastName")]
@@ -280,11 +267,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{"1018Z981"}";
             Assert.NotNull(rowString);
             Assert.Equal(expectedRowString, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Fact]
     public async Task GetNewPersonAsStringRow_ValidPersonWithoutDateOfBirth_ReturnsExpectedContent()
@@ -317,11 +302,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{"1018Z981"}";
             Assert.NotNull(rowString);
             Assert.Equal(expectedRowString, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Fact]
     public async Task GetNewPersonAsStringRow_ValidPersonWithoutMiddleName_ReturnsExpectedContent()
@@ -356,11 +339,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{"1018Z981"}";
             Assert.NotNull(rowString);
             Assert.Equal(expectedRowString, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Fact]
     public async Task GetNewPersonAsStringRow_ValidPersonWithoutMiddleName_ReturnsExpectedTrimmedMiddleName()
@@ -395,11 +376,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{"1018Z981"}";
             Assert.NotNull(rowString);
             Assert.Equal(expectedRowString, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Theory]
     [InlineData(Gender.Male)]
@@ -467,11 +446,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{new string(' ', 7)}" +
                 $"{"2018Z981"}";
             Assert.Equal(expectedRow, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Fact]
     public async Task GetNewPersonWithPreviousLastNameAsStringRow_WithoutGender_ReturnsExpectedContent()
@@ -537,11 +514,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{new string(' ', 7)}" +
                 $"{"2018Z981"}";
             Assert.Equal(expectedRow, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Fact]
     public async Task GetNewPersonWithPreviousLastNameAsStringRow_WithLastNameExceedingMaxLength_ReturnsExpectedContent()
@@ -606,11 +581,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{new string(' ', 7)}" +
                 $"{"2018Z981"}";
             Assert.Equal(expectedRow, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Fact]
     public async Task GetNewPersonWithPreviousLastNameAsStringRow_WithMultipleLastNameChanges_ReturnsExpectedContent()
@@ -747,11 +720,9 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 $"{new string(' ', 7)}" +
                 $"{"2018Z981"}";
             Assert.Equal(expectedRow, rowString);
-            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            Assert.Equal(ExpectedRowLength, rowString.Length);
         });
-
     }
-
 
     [Fact]
     public async Task Execute_NewRecordWithNoPreviousName_ReturnsExpectedContent()
@@ -814,16 +785,14 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 Assert.Equal(person1.PersonId, record.PersonId);
                 Assert.Null(record.Duplicate);
                 Assert.NotNull(record.RowData);
-                Assert.Equal(EXPECTED_ROW_LENGTH, record.RowData!.Length);
+                Assert.Equal(ExpectedRowLength, record.RowData!.Length);
                 Assert.Equal(expectedRowContent, record.RowData);
                 Assert.Equal(IntegrationTransactionRecordStatus.Success, record.Status);
 
                 return true;
             });
         });
-
     }
-
 
     [Fact]
     public async Task Execute_WithNoNewRecords_ReturnsExpectedContent()
@@ -864,9 +833,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             Assert.NotEmpty(integrationTransaction.FileName);
             Assert.Empty(integrationTransaction.IntegrationTransactionRecords!);
         });
-
     }
-
 
     [Fact]
     public async Task Execute_NewRecordWithPreviousName_ReturnsExpectedContent()
@@ -961,9 +928,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent, trsPerson));
             Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow, trsPerson));
         });
-
     }
-
 
     [Fact]
     public async Task Execute_MultipleNewRecordsMultiplePreviousNames_ReturnsExpectedContent()
@@ -1128,9 +1093,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent2, trsPerson2));
             Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow2, trsPerson2));
         });
-
     }
-
 
     [Fact]
     public async Task GetFileName_ReturnsExpectedFileName()
@@ -1147,16 +1110,14 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             // Assert
             Assert.Equal(expectedFileName, fileName);
         });
-
     }
-
 
     bool MatchesExpectedRowData(IntegrationTransactionRecord record, string expectedRowData, Person person) =>
         record.PersonId == person.PersonId &&
         record.FailureMessage == string.Empty &&
         record.Duplicate == null &&
         record.RowData != null &&
-        record.RowData.Length == EXPECTED_ROW_LENGTH &&
+        record.RowData.Length == ExpectedRowLength &&
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 

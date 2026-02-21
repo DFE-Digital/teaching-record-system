@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture)
 {
-    private const int EXPECTED_ROW_LENGTH = 86;
+    private const int ExpectedRowLength = 86;
 
     [Fact]
     public async Task Execute_WithNoChanges_ReturnsExpectedCounts()
@@ -44,9 +44,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             Assert.Empty(integrationTransaction.IntegrationTransactionRecords!);
             Assert.Equal(IntegrationTransactionImportStatus.Success, integrationTransaction.ImportStatus);
         });
-
     }
-
 
     [Fact]
     public async Task Execute_WithDobChanges_ReturnsExpectedCounts()
@@ -141,9 +139,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             Assert.NotEmpty(integrationTransaction.FileName);
             Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedRow, trsPerson));
         });
-
     }
-
 
     [Fact]
     public async Task Execute_WithNationalInsuranceNumberChanges_ReturnsExpectedCounts()
@@ -236,9 +232,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             Assert.NotEmpty(integrationTransaction.FileName);
             Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedRow, trsPerson));
         });
-
     }
-
 
     [Fact]
     public async Task Execute_WithNiandDobUpdates_ReturnsExpectedCounts()
@@ -345,9 +339,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNIRow, trsPerson));
             Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedDobRow, trsPerson));
         });
-
     }
-
 
     [Fact]
     public async Task GetPersonAmendedRow_WithLastNameExceedsSixCharacters_ReturnsExpectedContent()
@@ -391,12 +383,10 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
                               $"{new string(' ', 9)}" +
                               $"{new string(' ', 44)}" +
                               $"1211ZE1*";
-            Assert.Equal(EXPECTED_ROW_LENGTH, row.Length);
+            Assert.Equal(ExpectedRowLength, row.Length);
             Assert.Equal(expectedRow, row);
         });
-
     }
-
 
     [Fact]
     public async Task GetPersonAmendedRow_WithLastNameLessThanSixCharacters_ReturnsExpectedContent()
@@ -440,12 +430,10 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
                               $"{new string(' ', 9)}" +
                               $"{new string(' ', 44)}" +
                               $"1211ZE1*";
-            Assert.Equal(EXPECTED_ROW_LENGTH, row.Length);
+            Assert.Equal(ExpectedRowLength, row.Length);
             Assert.Equal(expectedRow, row);
         });
-
     }
-
 
     [Theory]
     [InlineData(Gender.Male)]
@@ -491,12 +479,10 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
                               $"{new string(' ', 9)}" +
                               $"{new string(' ', 44)}" +
                               $"1211ZE1*";
-            Assert.Equal(EXPECTED_ROW_LENGTH, row.Length);
+            Assert.Equal(ExpectedRowLength, row.Length);
             Assert.Equal(expectedRow, row);
         });
-
     }
-
 
     [Theory]
     [InlineData(Gender.Male)]
@@ -543,11 +529,10 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
                               $"{person.NationalInsuranceNumber}" +
                               $"{new string(' ', 44)}" +
                               $" 321ZE2*";
-            Assert.Equal(EXPECTED_ROW_LENGTH, row.Length);
+            Assert.Equal(ExpectedRowLength, row.Length);
             Assert.Equal(expectedRow, row);
         });
     }
-
 
     [Theory]
     [InlineData(CapitaAmendExportType.DateOfBirth, "1211ZE1*")]
@@ -565,9 +550,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             // Assert
             Assert.Equal(expectedUpdateCode, updateCode);
         });
-
     }
-
 
     [Fact]
     public async Task GetFileName_ReturnsExpectedFileName()
@@ -584,16 +567,14 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             // Assert
             Assert.Equal(expectedFileName, fileName);
         });
-
     }
-
 
     bool MatchesExpectedRowData(IntegrationTransactionRecord record, string expectedRowData, Person person) =>
         record.PersonId == person.PersonId &&
         record.FailureMessage == null &&
         record.Duplicate == null &&
         record.RowData != null &&
-        record.RowData.Length == EXPECTED_ROW_LENGTH &&
+        record.RowData.Length == ExpectedRowLength &&
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 
