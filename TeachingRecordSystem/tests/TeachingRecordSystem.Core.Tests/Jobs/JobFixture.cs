@@ -25,7 +25,7 @@ public class JobFixture : ServiceProviderFixture
             .AddEventPublisher()
             .AddPersonService()
             .AddSupportTaskService()
-            .AddTransient<TrnRequestService>()
+            .AddTrnRequestService(configuration)
             .AddSingleton<IGetAnIdentityApiClient>(_ => Mock.Of<IGetAnIdentityApiClient>())
             .AddSingleton(Options.Create(new AccessYourTeachingQualificationsOptions { BaseAddress = "https://aytq.example.com/" }))
             .AddSingleton(Options.Create(new TrnRequestOptions()))
