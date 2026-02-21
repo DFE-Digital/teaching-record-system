@@ -20,9 +20,11 @@ public class JobFixture : ServiceProviderFixture
     {
         services
             .AddLogging()
+            .AddMemoryCache()
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
             .AddEventPublisher()
+            .AddWebhookMessageFactory()
             .AddPersonService()
             .AddSupportTaskService()
             .AddTrnRequestService(configuration)
