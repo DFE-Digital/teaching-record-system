@@ -16,17 +16,13 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 public class JobFixture : ServiceProviderFixture
 {
-    public TestableClock Clock { get; } = new();
-
     protected override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddSingleton<IClock>(Clock)
+            .AddLogging()
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
             .AddEventPublisher()
-            .AddSingleton<EventCapture>()
-            .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>())
             .AddPersonService()
             .AddSupportTaskService()
             .AddTransient<TrnRequestService>()
@@ -35,5 +31,7 @@ public class JobFixture : ServiceProviderFixture
             .AddSingleton(Options.Create(new TrnRequestOptions()))
             .AddSingleton(Options.Create(new CapitaTpsUserOption { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId }))
             .AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (_, _) => Mock.Of<DataLakeServiceClient>());
+
+        TestScopedServices.ConfigureServices(services);
     }
 }
