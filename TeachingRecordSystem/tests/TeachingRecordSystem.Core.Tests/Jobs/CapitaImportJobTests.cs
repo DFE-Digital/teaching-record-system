@@ -1,25 +1,11 @@
 using System.Text;
 using System.Text.Json;
-using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Files.DataLake;
-using Azure.Storage.Files.DataLake.Models;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.SupportTasks;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-[Collection(nameof(DisableParallelization))]
-public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixture<CapitaImportJobFixture>, IAsyncLifetime
+public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
 {
     [Fact]
     public async Task Import_WhenTrnMissing_DoesNothing_ReportsFailureWithValidationError()
@@ -28,7 +14,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(null, "1", "Lastname", "Firstname", "19991201", "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -65,7 +51,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(trn, "1", "Lastname", "Firstname", "19991201", "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -106,7 +92,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, gender, lastName, firstName, dob, nino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -163,7 +149,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, gender, lastName, firstName, dob, nino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -211,7 +197,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildEmptyCsv();
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "EmptyFile.csv");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "EmptyFile.csv"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -244,7 +230,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, gender, lastName, firstName, dob, nino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -299,7 +285,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, "1", "Lastname", "Firstname", "19991201", ni);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -345,7 +331,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, gender, lastName, $"{firstName} {middleName}", dob, nino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -394,7 +380,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", (string?)null, "Lastname", "Firstname", "19991201", "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -431,7 +417,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", gender, "Lastname", "Firstname", "19991201", "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -473,7 +459,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(trn, gender, lastName, firstName, dob, nino, dateOfDeath);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         await AssertNoPersonAsync(trn);
@@ -517,12 +503,12 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, newGender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, existingPerson.NationalInsuranceNumber, dateOfDeath);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         await AssertNoPersonAsync(existingPerson.Trn);
 
-        var evt = await AssertSingleEventAsync<PersonStatusUpdatedEvent>(existingPerson.PersonId);
+        var evt = await AssertSingleEventAsync<LegacyEvents.PersonStatusUpdatedEvent>(existingPerson.PersonId);
         Assert.Equal("Date of death received from capita import", evt.Reason);
         Assert.Equal(PersonStatus.Active, evt.OldStatus);
         Assert.Equal(PersonStatus.Deactivated, evt.Status);
@@ -561,7 +547,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", "Lastname", "Firstname", dateOfBirth, "AB123456D", dateOfDeath);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -598,7 +584,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", "Lastname", "Firstname", dateOfBirth, "AB123456D", dateOfDeath);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -632,7 +618,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", "Lastname", "Firstname", null, "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -668,7 +654,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", "Lastname", "Firstname", dateOfBirth, "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -704,7 +690,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", "Lastname", "Firstname", dateOfBirth, "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -744,7 +730,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var samePerson = await AssertSinglePersonAsync(existingPerson.Trn);
@@ -795,7 +781,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, newLastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var samePerson = await AssertSinglePersonAsync(existingPerson.Trn);
@@ -847,7 +833,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, newLastName, newFirstName, newDob, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var samePerson = await AssertSinglePersonAsync(existingPerson.Trn);
@@ -897,7 +883,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, newLastName, existingPerson.FirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var samePerson = await AssertSinglePersonAsync(existingPerson.Trn);
@@ -947,7 +933,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, existingPerson.Gender, existingPerson.LastName, existingPerson.FirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1003,7 +989,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, existingPerson.Gender, existingPerson.LastName, existingPerson.FirstName, existingPerson.DateOfBirth, null);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1054,7 +1040,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, Gender.Male, "Lastname", "Firstname", existingPerson.DateOfBirth, existingPerson.NationalInsuranceNumber);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var samePerson = await AssertSinglePersonAsync(existingPerson.Trn);
@@ -1099,7 +1085,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(otherPerson.Trn, Gender.Male, existingPerson.LastName, existingPerson.FirstName, existingPerson.DateOfBirth, null);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var samePerson = await AssertSinglePersonAsync(existingPerson.Trn);
@@ -1149,7 +1135,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, existingPerson.Gender, newLastName, newFirstName, newDob, existingPerson.NationalInsuranceNumber);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1207,7 +1193,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, existingPerson.Gender, newLastName, newFirstName, existingPerson.DateOfBirth, existingPerson.NationalInsuranceNumber);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1267,7 +1253,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, newGender, newLastName, newFirstName, existingPerson.DateOfBirth, existingPerson.NationalInsuranceNumber);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1324,7 +1310,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, newGender, newLastName, newFirstName, newDob, existingPerson.NationalInsuranceNumber);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1378,7 +1364,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, existingPerson.Gender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1425,7 +1411,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", Gender.Male, "test", "Test", existingPerson.DateOfBirth, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1469,7 +1455,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, existingPerson.LastName, existingPerson.FirstName, existingPerson.DateOfBirth, existingPerson.NationalInsuranceNumber);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -1505,7 +1491,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(newTrn, "1", "Lastname", "Firstname", "19990101", "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
@@ -1550,7 +1536,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, existingPerson.Gender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var samePerson = await AssertSinglePersonAsync(existingPerson.Trn);
@@ -1601,7 +1587,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, newGender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, newNino);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var samePerson = await AssertSinglePersonAsync(existingPerson.Trn);
@@ -1645,7 +1631,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", null, null, "19991201", "AB123456D");
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync(reader, "SingleFile.txt");
+        var integrationTransactionId = await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
 
         // Assert
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
@@ -1672,24 +1658,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Contains($"Unable to create a new record without a firstname", record.FailureMessage);
         Assert.Contains($"Unable to create a new record without a lastname", record.FailureMessage);
     }
-
-    private DbFixture DbFixture => Fixture.DbFixture;
-
-    private IClock Clock => Fixture.Clock;
-
-    private TestData TestData => Fixture.TestData;
-
-    private CapitaImportJob Job => Fixture.Job;
-
-    private TrsDbContext? DbContext { get; set; }
-
-    async Task IAsyncLifetime.InitializeAsync()
-    {
-        await DbFixture.DbHelper.ClearDataAsync();
-        DbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-    }
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
     private (StreamReader, string) BuildEmptyCsv()
     {
@@ -1723,15 +1691,17 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
     private async Task DeactivatePerson(string? trn)
     {
-        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var selectedPerson = dbContext.Persons.Single(x => x.Trn == trn);
-        selectedPerson.SetStatus(PersonStatus.Deactivated, "de-activate", "de-activated", null, SystemUser.SystemUserId, Clock.UtcNow, out var _);
-        await dbContext.SaveChangesAsync();
+        await WithDbContextAsync(async dbContext =>
+        {
+            var selectedPerson = dbContext.Persons.Single(x => x.Trn == trn);
+            selectedPerson.SetStatus(PersonStatus.Deactivated, "de-activate", "de-activated", null, SystemUser.SystemUserId, Clock.UtcNow, out var _);
+            await dbContext.SaveChangesAsync();
+        });
     }
 
     private async Task<Person> AssertSinglePersonAsync(string? trn)
     {
-        var person = await DbContext!.Persons.SingleOrDefaultAsync(x => x.Trn == trn);
+        var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync(x => x.Trn == trn));
         Assert.NotNull(person);
 
         return person;
@@ -1739,21 +1709,21 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
     private async Task AssertNoPersonAsync(string? trn)
     {
-        var person = await DbContext!.Persons.SingleOrDefaultAsync(x => x.Trn == trn);
+        var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync(x => x.Trn == trn));
         Assert.Null(person);
     }
 
-    private async Task<IntegrationTransaction> AssertSingleIntegrationTransactionAsync(long? integrationTransactionId)
+    private async Task<IntegrationTransaction> AssertSingleIntegrationTransactionAsync(long integrationTransactionId)
     {
-        var transaction = await DbContext!.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleOrDefaultAsync(x => x.IntegrationTransactionId == integrationTransactionId);
+        var transaction = await WithDbContextAsync(dbContext => dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleOrDefaultAsync(x => x.IntegrationTransactionId == integrationTransactionId));
         Assert.NotNull(transaction);
 
         return transaction;
     }
 
-    private async Task<IntegrationTransactionRecord> AssertSingleIntegrationTransactionRecordAsync(long? integrationTransactionId)
+    private async Task<IntegrationTransactionRecord> AssertSingleIntegrationTransactionRecordAsync(long integrationTransactionId)
     {
-        var transaction = await DbContext!.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleOrDefaultAsync(x => x.IntegrationTransactionId == integrationTransactionId);
+        var transaction = await WithDbContextAsync(dbContext => dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleOrDefaultAsync(x => x.IntegrationTransactionId == integrationTransactionId));
         Assert.NotNull(transaction);
         Assert.NotNull(transaction.IntegrationTransactionRecords);
 
@@ -1762,9 +1732,9 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         return record;
     }
 
-    private async Task AssertNoIntegrationTransactionRecordAsync(long? integrationTransactionId)
+    private async Task AssertNoIntegrationTransactionRecordAsync(long integrationTransactionId)
     {
-        var transaction = await DbContext!.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleOrDefaultAsync(x => x.IntegrationTransactionId == integrationTransactionId);
+        var transaction = await WithDbContextAsync(dbContext => dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleOrDefaultAsync(x => x.IntegrationTransactionId == integrationTransactionId));
         Assert.NotNull(transaction);
         Assert.NotNull(transaction.IntegrationTransactionRecords);
 
@@ -1773,7 +1743,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
     private async Task<SupportTask> AssertSingleSupportTaskAsync(SupportTaskType? taskType, Guid? personId)
     {
-        var task = await DbContext!.SupportTasks.SingleOrDefaultAsync(x => x.SupportTaskType == taskType && x.PersonId == personId);
+        var task = await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleOrDefaultAsync(x => x.SupportTaskType == taskType && x.PersonId == personId));
         Assert.NotNull(task);
 
         return task;
@@ -1781,13 +1751,13 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
     private async Task AssertNoSupportTaskAsync(SupportTaskType? taskType, Guid? personId)
     {
-        var task = await DbContext!.SupportTasks.SingleOrDefaultAsync(x => x.SupportTaskType == taskType && x.PersonId == personId);
+        var task = await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleOrDefaultAsync(x => x.SupportTaskType == taskType && x.PersonId == personId));
         Assert.Null(task);
     }
 
     private async Task<TrnRequestMetadata> AssertSingleTrnRequestMetadataAsync(string? trnRequestId)
     {
-        var metadata = await DbContext!.TrnRequestMetadata.SingleOrDefaultAsync(x => x.RequestId == trnRequestId);
+        var metadata = await WithDbContextAsync(dbContext => dbContext.TrnRequestMetadata.SingleOrDefaultAsync(x => x.RequestId == trnRequestId));
         Assert.NotNull(metadata);
 
         return metadata;
@@ -1795,10 +1765,10 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
     private async Task<TEvent> AssertSingleEventAsync<TEvent>(Guid personId)
     {
-        var @event = await DbContext!.Events.SingleOrDefaultAsync(e => e.EventName == typeof(TEvent).Name && e.PersonIds.Contains(personId));
+        var @event = await WithDbContextAsync(dbContext => dbContext.Events.SingleOrDefaultAsync(e => e.EventName == typeof(TEvent).Name && e.PersonIds.Contains(personId)));
         Assert.NotNull(@event);
 
-        var payload = JsonSerializer.Deserialize<TEvent>(@event.Payload);
+        var payload = JsonSerializer.Deserialize<TEvent>(@event.Payload, LegacyEvents.EventBase.JsonSerializerOptions);
         Assert.NotNull(payload);
 
         return payload;
@@ -1813,91 +1783,3 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     }
 }
 
-public class CapitaImportJobFixture : IAsyncLifetime
-{
-    public CapitaImportJobFixture(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        IServiceProvider provider)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
-
-        Logger = new Mock<ILogger<CapitaImportJob>>();
-
-        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
-        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
-        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
-
-        dataLakeServiceClientMock
-            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
-            .Returns(fileSystemClientMock.Object);
-        fileSystemClientMock
-            .Setup(f => f.CreateIfNotExistsAsync(
-                It.IsAny<DataLakeFileSystemCreateOptions>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
-        fileSystemClientMock
-            .Setup(f => f.GetFileClient(It.IsAny<string>()))
-            .Returns(dataLakeFileClientMock.Object);
-        dataLakeFileClientMock
-            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
-
-        var dbContext = dbFixture.DbContextFactory.CreateDbContext();
-        var eventPublisher = provider.GetRequiredService<IEventPublisher>();
-
-        var personService = new Core.Services.Persons.PersonService(
-            dbContext,
-            Clock,
-            eventPublisher);
-
-        var trnRequestService = new TrnRequestService(
-            dbContext,
-            eventPublisher,
-            new SupportTaskService(dbContext, eventPublisher),
-            personService,
-            Mock.Of<IGetAnIdentityApiClient>(),
-            Options.Create(new AccessYourTeachingQualificationsOptions
-            {
-                BaseAddress = "https://example.com",
-            }),
-            Options.Create(new TrnRequestOptions()));
-
-        var user = new CapitaTpsUserOption() { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId };
-        var option = Options.Create(user);
-
-        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(
-            provider,
-            dataLakeServiceClientMock.Object,
-            Logger.Object,
-            dbContext,
-            Clock,
-            trnRequestService,
-            personService,
-            option);
-
-        TestData = new TestData(
-            dbFixture.DbContextFactory,
-            referenceDataCache,
-            Clock);
-    }
-
-    public DbFixture DbFixture { get; }
-
-    public TestData TestData { get; }
-
-    public TestableClock Clock { get; }
-
-    public Mock<ILogger<CapitaImportJob>> Logger { get; }
-
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    public CapitaImportJob Job { get; }
-
-    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
-
-    public Mock<BlobServiceClient> BlobServiceClient { get; } = new Mock<BlobServiceClient>();
-}
