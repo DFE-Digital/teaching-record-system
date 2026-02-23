@@ -33,7 +33,7 @@ public class EventsModel(TrsDbContext dbContext) : PageModel
                 processes
                     .Select(p => new ProcessEventPayload(
                         p.ProcessType.ToString(),
-                        p.Events!.Select(x => new ProcessEventPayloadEvent(x.EventName, x.Payload)).ToArray(),
+                        p.Events!.OrderBy(e => e.CreatedOn).Select(x => new ProcessEventPayloadEvent(x.EventName, x.Payload)).ToArray(),
                         p.CreatedOn)))
             .OrderBy(e => e.Timestamp)
             .ToArray();
