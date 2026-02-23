@@ -9,7 +9,60 @@ namespace TeachingRecordSystem.Core.Tests.Services.Persons;
 public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
-    public async Task CreatePersonAsync_WithCreatePersonViaSupportUIOptions_CreatesPersonAndPublishesEvent()
+    public async Task GetPersonAsync_ActivePerson_ReturnsPerson()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        // Act
+        var result = await WithServiceAsync(s => s.GetPersonAsync(person.PersonId));
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(person.PersonId, result.PersonId);
+    }
+
+    [Fact]
+    public async Task GetPersonAsync_DeactivatedPerson_ReturnsNull()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        // Act
+        var result = await WithServiceAsync(s => s.GetPersonAsync(person.PersonId));
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetPersonAsync_DeactivatedPerson_WhenIncludeDeactivatedPersonsIsTrue_ReturnsPerson()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        // Act
+        var result = await WithServiceAsync(s => s.GetPersonAsync(person.PersonId, includeDeactivatedPersons: true));
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(person.PersonId, result.PersonId);
+    }
+
+    [Fact]
+    public async Task CreatePersonAsync_CreatesPersonAndPublishesEvent()
     {
         // Arrange
         var firstName = "Alfred";
@@ -64,197 +117,30 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             Assert.Equal(emailAddress?.ToString(), @event.Details.EmailAddress);
             Assert.Equal(nationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
             Assert.Equal(gender, @event.Details.Gender);
-        });
-    }
-
-    [Fact]
-    public async Task CreatePersonAsync_WithCreatePersonViaTrnRequestOptions_WhenSourceRequestDoesNotExist_Throws()
-    {
-        // Arrange
-        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
-
-        var options = new CreatePersonOptions
-        {
-            SourceTrnRequest = sourceTrnRequest,
-            FirstName = "Alfred",
-            MiddleName = "The",
-            LastName = "Great",
-            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
-            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
-            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
-            Gender = Gender.Female,
-        };
-        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
-
-        // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.CreatePersonAsync(options, processContext)));
-
-        // Assert
-        Assert.IsType<NotFoundException>(ex);
-    }
-
-    [Fact]
-    public async Task CreatePersonAsync_WithCreatePersonViaTrnRequestOptions_SetsSourceRequestPropertiesOnPersonAndEvent()
-    {
-        // Arrange
-        var firstName = "Alfred";
-        var middleName = "The";
-        var lastName = "Great";
-        var dateOfBirth = DateOnly.Parse("1 Feb 1980");
-        var emailAddress = EmailAddress.Parse((string?)"test@test.com");
-        var nationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C");
-        var gender = Gender.Female;
-
-        var trnRequestMetadata = new TrnRequestMetadata()
-        {
-            ApplicationUserId = SystemUser.SystemUserId,
-            RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = Clock.UtcNow,
-            IdentityVerified = null,
-            OneLoginUserSubject = null,
-            Name = new[] { firstName, middleName, lastName }.GetNonEmptyValues(),
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            PreviousFirstName = null,
-            PreviousLastName = null,
-            DateOfBirth = dateOfBirth,
-            EmailAddress = emailAddress?.ToString(),
-            NationalInsuranceNumber = nationalInsuranceNumber.ToString(),
-            Gender = gender,
-        };
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
-            await dbContext.SaveChangesAsync();
-        });
-
-        var options = new CreatePersonOptions
-        {
-            SourceTrnRequest = (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId),
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            DateOfBirth = dateOfBirth,
-            EmailAddress = emailAddress,
-            NationalInsuranceNumber = nationalInsuranceNumber,
-            Gender = gender,
-        };
-        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
-
-        // Act
-        var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
-
-        // Assert
-        await WithDbContextAsync(async dbContext =>
-        {
-            var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
-            Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
-            Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
-            Assert.Equal(firstName, createdPersonRecord.FirstName);
-            Assert.Equal(middleName, createdPersonRecord.MiddleName);
-            Assert.Equal(lastName, createdPersonRecord.LastName);
-            Assert.Equal(dateOfBirth, createdPersonRecord.DateOfBirth);
-            Assert.Equal(emailAddress?.ToString(), createdPersonRecord.EmailAddress);
-            Assert.Equal(nationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
-            Assert.Equal(gender, createdPersonRecord.Gender);
-            Assert.Equal(trnRequestMetadata.RequestId, createdPersonRecord.SourceTrnRequestId);
-            Assert.Equal(trnRequestMetadata.ApplicationUserId, createdPersonRecord.SourceApplicationUserId);
-        });
-
-        Events.AssertEventsPublished(e =>
-        {
-            var @event = Assert.IsType<PersonCreatedEvent>(e);
-            Assert.Equal(person.PersonId, @event.PersonId);
-            Assert.Equal(firstName, @event.Details.FirstName);
-            Assert.Equal(middleName, @event.Details.MiddleName);
-            Assert.Equal(lastName, @event.Details.LastName);
-            Assert.Equal(dateOfBirth, @event.Details.DateOfBirth);
-            Assert.Equal(emailAddress?.ToString(), @event.Details.EmailAddress);
-            Assert.Equal(nationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
-            Assert.Equal(gender, @event.Details.Gender);
             Assert.Null(@event.TrnRequestMetadata);
         });
     }
 
     [Fact]
-    public async Task CreatePersonAsync_WithCreatePersonViaTpsImportOptions_WhenSourceRequestDoesNotExist_Throws()
+    public async Task CreatePersonAsync_WithTrn_SetsTrnOnPerson()
     {
         // Arrange
         var trn = "1234567";
-        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
+        var trnRequestMetadata = await CreateTrnRequestMetadataAsync();
 
         var options = new CreatePersonOptions
         {
-            Trn = Optional.Option.Some(trn),
-            SourceTrnRequest = sourceTrnRequest,
+            Trn = Option.Some(trn),
+            SourceTrnRequest = (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId),
             FirstName = "Alfred",
             MiddleName = "The",
             LastName = "Great",
             DateOfBirth = DateOnly.Parse("1 Feb 1980"),
-            EmailAddress = EmailAddress.Parse((string?)"test@test.com"),
-            NationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C"),
-            Gender = Gender.Female,
+            EmailAddress = null,
+            NationalInsuranceNumber = null,
+            Gender = null,
         };
-        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
-
-        // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.CreatePersonAsync(options, processContext)));
-
-        // Assert
-        Assert.IsType<NotFoundException>(ex);
-    }
-
-    [Fact]
-    public async Task CreatePersonAsync_WithCreatePersonViaTpsImportOptions_SetsSourceRequestPropertiesOnPersonAndEvent()
-    {
-        // Arrange
-        var trn = "1234567";
-        var firstName = "Alfred";
-        var middleName = "The";
-        var lastName = "Great";
-        var dateOfBirth = DateOnly.Parse("1 Feb 1980");
-        var emailAddress = EmailAddress.Parse((string?)"test@test.com");
-        var nationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C");
-        var gender = Gender.Female;
-
-        var trnRequestMetadata = new TrnRequestMetadata()
-        {
-            ApplicationUserId = SystemUser.SystemUserId,
-            RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = Clock.UtcNow,
-            IdentityVerified = null,
-            OneLoginUserSubject = null,
-            Name = new[] { firstName, middleName, lastName }.GetNonEmptyValues(),
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            PreviousFirstName = null,
-            PreviousLastName = null,
-            DateOfBirth = dateOfBirth,
-            EmailAddress = emailAddress?.ToString(),
-            NationalInsuranceNumber = nationalInsuranceNumber.ToString(),
-            Gender = gender,
-        };
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
-            await dbContext.SaveChangesAsync();
-        });
-
-        var options = new CreatePersonOptions
-        {
-            Trn = Optional.Option.Some(trn),
-            SourceTrnRequest = (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId),
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            DateOfBirth = dateOfBirth,
-            EmailAddress = emailAddress,
-            NationalInsuranceNumber = nationalInsuranceNumber,
-            Gender = gender,
-        };
-        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(ProcessType.TeacherPensionsRecordImporting, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
@@ -264,15 +150,70 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(trn, createdPersonRecord.Trn);
-            Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
-            Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
-            Assert.Equal(firstName, createdPersonRecord.FirstName);
-            Assert.Equal(middleName, createdPersonRecord.MiddleName);
-            Assert.Equal(lastName, createdPersonRecord.LastName);
-            Assert.Equal(dateOfBirth, createdPersonRecord.DateOfBirth);
-            Assert.Equal(emailAddress?.ToString(), createdPersonRecord.EmailAddress);
-            Assert.Equal(nationalInsuranceNumber?.ToString(), createdPersonRecord.NationalInsuranceNumber);
-            Assert.Equal(gender, createdPersonRecord.Gender);
+            Assert.True(createdPersonRecord.CreatedByTps);
+        });
+    }
+
+    [Fact]
+    public async Task CreatePersonAsync_WithSourceTrnRequest_WhenSourceRequestDoesNotExist_ThrowsNotFoundException()
+    {
+        // Arrange
+        var sourceTrnRequest = (SystemUser.SystemUserId, Guid.NewGuid().ToString());
+
+        var options = new CreatePersonOptions
+        {
+            SourceTrnRequest = sourceTrnRequest,
+            FirstName = "Alfred",
+            MiddleName = "The",
+            LastName = "Great",
+            DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+            EmailAddress = null,
+            NationalInsuranceNumber = null,
+            Gender = null,
+        };
+        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.CreatePersonAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<NotFoundException>(ex);
+    }
+
+    [Fact]
+    public async Task CreatePersonAsync_WithSourceTrnRequest_SetsSourceRequestPropertiesOnPersonAndPopulatesEventTrnRequestMetadata()
+    {
+        // Arrange
+        var firstName = "Alfred";
+        var middleName = "The";
+        var lastName = "Great";
+        var dateOfBirth = DateOnly.Parse("1 Feb 1980");
+        var emailAddress = EmailAddress.Parse((string?)"test@test.com");
+        var nationalInsuranceNumber = NationalInsuranceNumber.Parse("AB123456C");
+        var gender = Gender.Female;
+
+        var trnRequestMetadata = await CreateTrnRequestMetadataAsync(firstName, middleName, lastName, dateOfBirth, emailAddress?.ToString(), nationalInsuranceNumber?.ToString(), gender);
+
+        var options = new CreatePersonOptions
+        {
+            SourceTrnRequest = (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId),
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = emailAddress,
+            NationalInsuranceNumber = nationalInsuranceNumber,
+            Gender = gender,
+        };
+        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(trnRequestMetadata.RequestId, createdPersonRecord.SourceTrnRequestId);
             Assert.Equal(trnRequestMetadata.ApplicationUserId, createdPersonRecord.SourceApplicationUserId);
         });
@@ -281,19 +222,14 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             var @event = Assert.IsType<PersonCreatedEvent>(e);
             Assert.Equal(person.PersonId, @event.PersonId);
-            Assert.Equal(firstName, @event.Details.FirstName);
-            Assert.Equal(middleName, @event.Details.MiddleName);
-            Assert.Equal(lastName, @event.Details.LastName);
-            Assert.Equal(dateOfBirth, @event.Details.DateOfBirth);
-            Assert.Equal(emailAddress?.ToString(), @event.Details.EmailAddress);
-            Assert.Equal(nationalInsuranceNumber?.ToString(), @event.Details.NationalInsuranceNumber);
-            Assert.Equal(gender, @event.Details.Gender);
-            Assert.Null(@event.TrnRequestMetadata);
+            Assert.NotNull(@event.TrnRequestMetadata);
+            Assert.Equal(trnRequestMetadata.ApplicationUserId, @event.TrnRequestMetadata.ApplicationUserId);
+            Assert.Equal(trnRequestMetadata.RequestId, @event.TrnRequestMetadata.RequestId);
         });
     }
 
     [Fact]
-    public async Task UpdatePersonDetailsAsync_PersonDoesNotExist_ThrowsException()
+    public async Task UpdatePersonDetailsAsync_PersonDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
         var options = new UpdatePersonDetailsOptions
@@ -308,7 +244,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.UpdatePersonDetailsAsync(options, processContext)));
@@ -341,7 +277,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.UpdatePersonDetailsAsync(options, processContext)));
@@ -391,7 +327,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>(nationalInsuranceNumber),
             Gender = Option.Some<Gender?>(gender),
         };
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.UpdatePersonDetailsAsync(options, processContext));
@@ -433,7 +369,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Fact]
-    public async Task UpdatePersonDetailsAsync_WhenAnyNameFieldChanged_AndNameChangeReasonIsCorrectingAnError_DoesNotUpdatePersonPreviousNames()
+    public async Task UpdatePersonDetailsAsync_WhenNameFieldChanged_AndCreatePreviousNameIsFalse_DoesNotCreatePreviousName()
     {
         // Arrange
         var ethelredDate = DateTime.Parse("1 Jan 1990").ToUniversalTime();
@@ -445,7 +381,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             .WithPreviousNames(("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate))
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
-        var personDetailsToUpdate = new UpdatePersonDetailsOptions
+        var options = new UpdatePersonDetailsOptions
         {
             PersonId = personToUpdate.PersonId,
             CreatePreviousName = false,
@@ -457,9 +393,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-
-        var options = personDetailsToUpdate;
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.UpdatePersonDetailsAsync(options, processContext));
@@ -483,7 +417,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Fact]
-    public async Task UpdatePersonDetailsAsync_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames()
+    public async Task UpdatePersonDetailsAsync_WhenNameFieldChanged_AndCreatePreviousNameIsTrue_CreatesPreviousName()
     {
         // Arrange
         var ethelredDate = DateTime.Parse("1 Jan 1990").ToUniversalTime();
@@ -507,7 +441,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.UpdatePersonDetailsAsync(options, processContext));
@@ -560,7 +494,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.UpdatePersonDetailsAsync(options, processContext));
@@ -578,10 +512,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Fact]
-    public async Task DeactivatePersonAsync_PersonDoesNotExist_ThrowsException()
+    public async Task DeactivatePersonAsync_PersonDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
-        var processContext = new ProcessContext(ProcessType.PersonDeactivating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(Guid.NewGuid(), processContext)));
@@ -603,7 +537,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             await dbContext.SaveChangesAsync();
         });
 
-        var processContext = new ProcessContext(ProcessType.PersonDeactivating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(personToDeactivate.PersonId, processContext)));
@@ -621,7 +555,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             .WithMiddleName("The")
             .WithLastName("Pink"));
 
-        var processContext = new ProcessContext(ProcessType.PersonDeactivating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.DeactivatePersonAsync(personToDeactivate.PersonId, processContext));
@@ -639,17 +573,16 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         Events.AssertEventsPublished(e =>
         {
             var @event = Assert.IsType<PersonDeactivatedEvent>(e);
-
             Assert.Equal(personToDeactivate.PersonId, @event.PersonId);
             Assert.Null(@event.MergedWithPersonId);
         });
     }
 
     [Fact]
-    public async Task ReactivatePersonAsync_PersonDoesNotExist_ThrowsException()
+    public async Task ReactivatePersonAsync_PersonDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
-        var processContext = new ProcessContext(ProcessType.PersonDeactivating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.ReactivatePersonAsync(Guid.NewGuid(), processContext)));
@@ -663,7 +596,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     {
         // Arrange
         var personToReactivate = await TestData.CreatePersonAsync();
-        var processContext = new ProcessContext(ProcessType.PersonReactivating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.ReactivatePersonAsync(personToReactivate.PersonId, processContext)));
@@ -688,7 +621,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             await dbContext.SaveChangesAsync();
         });
 
-        var processContext = new ProcessContext(ProcessType.PersonReactivating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ReactivatePersonAsync(personToReactivate.PersonId, processContext));
@@ -706,19 +639,18 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         Events.AssertEventsPublished(e =>
         {
             var @event = Assert.IsType<PersonReactivatedEvent>(e);
-
             Assert.Equal(personToReactivate.PersonId, @event.PersonId);
         });
     }
 
     [Fact]
-    public async Task DeactivatePersonViaMergeAsync_PersonToDeactivateDoesNotExist_ThrowsException()
+    public async Task DeactivatePersonViaMergeAsync_PersonToDeactivateDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
         var personToRetain = await TestData.CreatePersonAsync();
 
         var options = new DeactivatePersonViaMergeOptions(Guid.NewGuid(), personToRetain.PersonId);
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonViaMergeAsync(options, processContext)));
@@ -742,7 +674,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         });
 
         var options = new DeactivatePersonViaMergeOptions(personToDeactivate.PersonId, personToRetain.PersonId);
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonViaMergeAsync(options, processContext)));
@@ -752,13 +684,13 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Fact]
-    public async Task DeactivatePersonViaMergeAsync_PersonToRetainDoesNotExist_ThrowsException()
+    public async Task DeactivatePersonViaMergeAsync_PersonToRetainDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
         var personToDeactivate = await TestData.CreatePersonAsync();
 
         var options = new DeactivatePersonViaMergeOptions(personToDeactivate.PersonId, Guid.NewGuid());
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonViaMergeAsync(options, processContext)));
@@ -782,7 +714,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         });
 
         var options = new DeactivatePersonViaMergeOptions(personToDeactivate.PersonId, personToRetain.PersonId);
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonViaMergeAsync(options, processContext)));
@@ -798,9 +730,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var personToDeactivate = await TestData.CreatePersonAsync();
         var personToRetain = await TestData.CreatePersonAsync();
 
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
-
         var options = new DeactivatePersonViaMergeOptions(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.DeactivatePersonViaMergeAsync(options, processContext));
@@ -824,7 +755,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Fact]
-    public async Task MergePersonsAsync_PersonToDeactivateDoesNotExist_ThrowsException()
+    public async Task MergePersonsAsync_PersonToDeactivateDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
         var personToRetain = await TestData.CreatePersonAsync();
@@ -841,7 +772,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
@@ -876,7 +807,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
@@ -886,7 +817,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Fact]
-    public async Task MergePersonsAsync_PersonToRetainDoesNotExist_ThrowsException()
+    public async Task MergePersonsAsync_PersonToRetainDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
         var personToDeactivate = await TestData.CreatePersonAsync();
@@ -903,7 +834,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
@@ -938,7 +869,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
@@ -949,70 +880,66 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
     [Theory]
     [MemberData(nameof(GetPersonAttributeInfoData))]
-    public async Task MergePersonsAsync_ValidRequest_UpdatesRetainedPersonAndDeactivatesSecondaryPersonAndPublishesEvent(
-        PersonAttributeInfo sourcedFromSecondaryPersonAttribute,
+    public async Task MergePersonsAsync_ValidRequest_UpdatesRetainedPersonAndDeactivatesDeactivatingPersonAndPublishesEvents(
+        PersonAttributeInfo sourcedFromDeactivatingPersonAttribute,
         bool useNullValues)
     {
         // Arrange
         var (personToRetain, personToDeactivate) = await CreatePersonsWithSingleDifferenceToMatch(
-            sourcedFromSecondaryPersonAttribute.Attribute,
+            sourcedFromDeactivatingPersonAttribute.Attribute,
             useNullValues: useNullValues);
 
         Clock.Advance();
 
-        // Act
         var options = new MergePersonsOptions
         {
             DeactivatingPersonId = personToDeactivate.PersonId,
             RetainedPersonId = personToRetain.PersonId,
-            FirstName = Option.Some(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.FirstName ? personToDeactivate.FirstName : personToRetain.FirstName),
-            MiddleName = Option.Some(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.MiddleName ? personToDeactivate.MiddleName : personToRetain.MiddleName),
-            LastName = Option.Some(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.LastName ? personToDeactivate.LastName : personToRetain.LastName),
-            DateOfBirth = Option.Some<DateOnly?>(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.DateOfBirth ? personToDeactivate.DateOfBirth : personToRetain.DateOfBirth),
-            EmailAddress = Option.Some<EmailAddress?>((sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.EmailAddress ? personToDeactivate.EmailAddress : personToRetain.EmailAddress)
+            FirstName = Option.Some(sourcedFromDeactivatingPersonAttribute.Attribute is PersonMatchedAttribute.FirstName ? personToDeactivate.FirstName : personToRetain.FirstName),
+            MiddleName = Option.Some(sourcedFromDeactivatingPersonAttribute.Attribute is PersonMatchedAttribute.MiddleName ? personToDeactivate.MiddleName : personToRetain.MiddleName),
+            LastName = Option.Some(sourcedFromDeactivatingPersonAttribute.Attribute is PersonMatchedAttribute.LastName ? personToDeactivate.LastName : personToRetain.LastName),
+            DateOfBirth = Option.Some<DateOnly?>(sourcedFromDeactivatingPersonAttribute.Attribute is PersonMatchedAttribute.DateOfBirth ? personToDeactivate.DateOfBirth : personToRetain.DateOfBirth),
+            EmailAddress = Option.Some<EmailAddress?>((sourcedFromDeactivatingPersonAttribute.Attribute is PersonMatchedAttribute.EmailAddress ? personToDeactivate.EmailAddress : personToRetain.EmailAddress)
                 is string email ? EmailAddress.Parse(email) : null),
-            NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>((sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? personToDeactivate.NationalInsuranceNumber : personToRetain.NationalInsuranceNumber)
+            NationalInsuranceNumber = Option.Some<NationalInsuranceNumber?>((sourcedFromDeactivatingPersonAttribute.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? personToDeactivate.NationalInsuranceNumber : personToRetain.NationalInsuranceNumber)
                 is string nino ? NationalInsuranceNumber.Parse(nino) : null),
-            Gender = Option.Some<Gender?>(sourcedFromSecondaryPersonAttribute.Attribute is PersonMatchedAttribute.Gender ? personToDeactivate.Gender : personToRetain.Gender),
+            Gender = Option.Some<Gender?>(sourcedFromDeactivatingPersonAttribute.Attribute is PersonMatchedAttribute.Gender ? personToDeactivate.Gender : personToRetain.Gender),
         };
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
 
         // Assert
-        await WithDbContextAsync(async dbContext =>
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons
+            .IgnoreQueryFilters()
+            .Include(p => p.MergedWithPerson)
+            .SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(PersonStatus.Active, updatedPersonToRetain.Status);
+        Assert.Null(updatedPersonToRetain.MergedWithPersonId);
+        Assert.Equal(Clock.UtcNow, updatedPersonToRetain.UpdatedOn);
+
+        var updatedPersonToDeactivate = await WithDbContextAsync(dbContext => dbContext.Persons
+            .IgnoreQueryFilters()
+            .Include(p => p.MergedWithPerson)
+            .SingleAsync(p => p.PersonId == personToDeactivate.PersonId));
+        Assert.Equal(PersonStatus.Deactivated, updatedPersonToDeactivate.Status);
+        Assert.Equal(updatedPersonToRetain.PersonId, updatedPersonToDeactivate.MergedWithPersonId);
+        Assert.Equal(Clock.UtcNow, updatedPersonToDeactivate.UpdatedOn);
+
+        foreach (var attr in PersonAttributeInfos)
         {
-            var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons
-                .IgnoreQueryFilters()
-                .Include(p => p.MergedWithPerson)
-                .SingleAsync(p => p.PersonId == personToRetain.PersonId));
-            Assert.Equal(PersonStatus.Active, updatedPersonToRetain.Status);
-            Assert.Null(updatedPersonToRetain.MergedWithPersonId);
-            Assert.Equal(Clock.UtcNow, updatedPersonToRetain.UpdatedOn);
-
-            var updatedPersonToDeactivate = await WithDbContextAsync(dbContext => dbContext.Persons
-                .IgnoreQueryFilters()
-                .Include(p => p.MergedWithPerson)
-                .SingleAsync(p => p.PersonId == personToDeactivate.PersonId));
-            Assert.Equal(PersonStatus.Deactivated, updatedPersonToDeactivate.Status);
-            Assert.Equal(updatedPersonToRetain.PersonId, updatedPersonToDeactivate.MergedWithPersonId);
-            Assert.Equal(Clock.UtcNow, updatedPersonToDeactivate.UpdatedOn);
-
-            foreach (var attr in PersonAttributeInfos)
+            if (attr.Attribute == sourcedFromDeactivatingPersonAttribute.Attribute)
             {
-                if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
-                {
-                    Assert.Equal(attr.GetValueFromPersonResult(personToDeactivate), attr.GetValueFromPerson(updatedPersonToRetain));
-                }
-                else
-                {
-                    Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromPerson(updatedPersonToRetain));
-                }
+                Assert.Equal(attr.GetValueFromPersonResult(personToDeactivate), attr.GetValueFromPerson(updatedPersonToRetain));
             }
-        });
+            else
+            {
+                Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromPerson(updatedPersonToRetain));
+            }
+        }
 
-        var expectedChange = sourcedFromSecondaryPersonAttribute.Attribute switch
+        var expectedChange = sourcedFromDeactivatingPersonAttribute.Attribute switch
         {
             PersonMatchedAttribute.FirstName => PersonDetailsUpdatedEventChanges.FirstName,
             PersonMatchedAttribute.MiddleName => PersonDetailsUpdatedEventChanges.MiddleName,
@@ -1045,7 +972,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
                 foreach (var attr in PersonAttributeInfos)
                 {
-                    if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
+                    if (attr.Attribute == sourcedFromDeactivatingPersonAttribute.Attribute)
                     {
                         Assert.Equal(attr.GetValueFromPersonResult(personToDeactivate), attr.GetValueFromEventPersonDetails(@event.PersonDetails));
                     }
@@ -1081,8 +1008,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
             Gender = Option.None<Gender?>(),
         };
-
-        var processContext = new ProcessContext(ProcessType.PersonMerging, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
@@ -1103,6 +1029,43 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
     private Task<TResult> WithServiceAsync<TResult>(Func<PersonService, Task<TResult>> action, params object[] arguments) =>
         WithServiceAsync<PersonService, TResult>(action, arguments);
+
+    private async Task<TrnRequestMetadata> CreateTrnRequestMetadataAsync(
+        string? firstName = null,
+        string? middleName = null,
+        string? lastName = null,
+        DateOnly? dateOfBirth = null,
+        string? emailAddress = null,
+        string? nationalInsuranceNumber = null,
+        Gender? gender = null)
+    {
+        var trnRequestMetadata = new TrnRequestMetadata
+        {
+            ApplicationUserId = SystemUser.SystemUserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = null,
+            OneLoginUserSubject = null,
+            Name = new[] { firstName ?? "Alfred", middleName ?? "The", lastName ?? "Great" }.GetNonEmptyValues(),
+            FirstName = firstName ?? "Alfred",
+            MiddleName = middleName ?? "The",
+            LastName = lastName ?? "Great",
+            PreviousFirstName = null,
+            PreviousLastName = null,
+            DateOfBirth = dateOfBirth ?? DateOnly.Parse("1 Feb 1980"),
+            EmailAddress = emailAddress,
+            NationalInsuranceNumber = nationalInsuranceNumber,
+            Gender = gender,
+        };
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+            await dbContext.SaveChangesAsync();
+        });
+
+        return trnRequestMetadata;
+    }
 
     public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
     [
@@ -1218,5 +1181,4 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         return (personToRetain, personToDeactivate);
     }
-
 }
