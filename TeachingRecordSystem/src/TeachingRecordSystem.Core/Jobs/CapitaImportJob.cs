@@ -172,8 +172,8 @@ public class CapitaImportJob(
                                 MiddleName = trnRequestMetadata.MiddleName,
                                 LastName = trnRequestMetadata.LastName,
                                 DateOfBirth = trnRequestMetadata.DateOfBirth,
-                                EmailAddress = trnRequestMetadata.EmailAddress is var emailAddress ? EmailAddress.Parse(emailAddress) : null,
-                                NationalInsuranceNumber = trnRequestMetadata.NationalInsuranceNumber is var nino ? NationalInsuranceNumber.Parse(nino!) : null,
+                                EmailAddress = trnRequestMetadata.EmailAddress is not null ? EmailAddress.Parse(trnRequestMetadata.EmailAddress) : null,
+                                NationalInsuranceNumber = trnRequestMetadata.NationalInsuranceNumber is not null ? NationalInsuranceNumber.Parse(trnRequestMetadata.NationalInsuranceNumber) : null,
                                 Gender = trnRequestMetadata.Gender
                             },
                             processContext);
