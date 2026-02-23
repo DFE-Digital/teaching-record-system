@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 
@@ -10,7 +11,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOn
 public class CheckAnswers(
     SupportUiLinkGenerator linkGenerator,
     IClock clock,
-    OneLoginService oneLoginService)
+    OneLoginService oneLoginService,
+    TrsDbContext dbContext)
     : PageModel
 {
     [FromRoute] public required Guid PersonId { get; set; }
@@ -27,18 +29,19 @@ public class CheckAnswers(
 
     public DisconnectOneLoginStayVerified? StayVerified { get; set; }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        EmailAddress = JourneyInstance!.State.EmailAddress;
-        Reason = JourneyInstance.State.DisconnectReason;
-        Detail = JourneyInstance.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason ? JourneyInstance.State.Detail : null;
-        StayVerified = JourneyInstance.State.StayVerified;
+        var oneLogin = await dbContext.OneLoginUsers.SingleAsync(x => x.Subject == OneLoginSubject);
+        EmailAddress = oneLogin.EmailAddress;
+        Reason = JourneyInstance!.State.DisconnectReason;
+        Detail = JourneyInstance!.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason ? JourneyInstance.State.Detail : null;
+        StayVerified = JourneyInstance!.State.StayVerified;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
         var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, clock.UtcNow, User.GetUserId());
-
+        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
         if (JourneyInstance!.State.StayVerified == DisconnectOneLoginStayVerified.Yes)
         {
             await oneLoginService.SetUserUnmatchedAsync(OneLoginSubject, processContext);
@@ -49,7 +52,8 @@ public class CheckAnswers(
 
         }
 
-        TempData.SetFlashSuccess($"GOV.UK One Login disconnected from {JourneyInstance.State.PersonName}`s record");
+        var personName = $"{person.FirstName} {person.LastName}";
+        TempData.SetFlashSuccess($"GOV.UK One Login disconnected from {personName}`s record");
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 

@@ -48,14 +48,6 @@ public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext)
     public async Task OnGetAsync()
     {
         var oneLogin = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == OneLoginSubject);
-        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.EmailAddress = oneLogin.EmailAddress;
-            state.OneLoginSubject = OneLoginSubject;
-            state.PersonName = $"{person.FirstName} {person.LastName}";
-        });
-
         ReasonDetail = JourneyInstance!.State.Detail;
         Reason = JourneyInstance.State.DisconnectReason;
         EmailAddress = oneLogin.EmailAddress;

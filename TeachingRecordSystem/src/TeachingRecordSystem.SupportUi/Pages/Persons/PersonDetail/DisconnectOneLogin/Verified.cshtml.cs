@@ -43,7 +43,6 @@ public class Verified(SupportUiLinkGenerator linkGenerator) : PageModel
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.StayVerified = StayVerified;
-            state.OneLoginSubject = OneLoginSubject;
         });
 
         return Redirect(
