@@ -2,7 +2,6 @@ using System.Text;
 using System.Text.Json;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
