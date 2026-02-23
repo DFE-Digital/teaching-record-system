@@ -48,7 +48,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 CreatedUtc = processContext.Now,
                 RaisedBy = processContext.Process.UserId!,
                 PersonId = @event.PersonId,
-                Changes = @event.Changes.ToLegacyPersonDetailsUpdatedEventChanges(),
+                Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)((int)@event.Changes << 16),
                 OldPersonAttributes = @event.OldPersonDetails,
                 PersonAttributes = @event.PersonDetails,
                 NameChangeReason = changeReason.NameChangeReason,
