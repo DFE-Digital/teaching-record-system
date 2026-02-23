@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.OneLogin;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
 public static class OneLoginExtensions
 {
