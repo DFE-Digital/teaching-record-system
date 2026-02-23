@@ -30,7 +30,11 @@
                     <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@user.EmailAddress</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(Model.PersonId, user.Subject, journeyInstanceId: null)">Disconnect</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action
+                            href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(Model.PersonId, user.Subject, journeyInstanceId: null)"
+                            visually-hidden-text="@user.EmailAddress">
+                            Disconnect
+                        </govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             }
