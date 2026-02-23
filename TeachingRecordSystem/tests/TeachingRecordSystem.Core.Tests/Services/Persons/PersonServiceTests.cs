@@ -84,7 +84,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = nationalInsuranceNumber,
             Gender = gender,
         };
-        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
@@ -171,7 +171,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = null,
             Gender = null,
         };
-        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.CreatePersonAsync(options, processContext)));
@@ -205,7 +205,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = nationalInsuranceNumber,
             Gender = gender,
         };
-        var processContext = new ProcessContext(ProcessType.PersonCreating, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
