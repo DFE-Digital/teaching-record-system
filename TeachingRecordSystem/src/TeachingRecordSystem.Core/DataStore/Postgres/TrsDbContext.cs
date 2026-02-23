@@ -140,6 +140,8 @@ public partial class TrsDbContext : DbContext
 
     public DbSet<Process> Processes => Set<Process>();
 
+    public DbSet<ProcessEvent> ProcessEvents => Set<ProcessEvent>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
