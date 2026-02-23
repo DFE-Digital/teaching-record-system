@@ -15,7 +15,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
         if (processContext.ProcessType is ProcessType.PersonCreating
             or ProcessType.TeacherPensionsRecordImporting)
         {
-            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = processContext.Process.ChangeReason as ChangeReasonInfoWithDetailsAndEvidence;
 
             var legacyEvent = new LegacyEvents.PersonCreatedEvent
             {
@@ -24,9 +24,9 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 RaisedBy = processContext.Process.UserId!,
                 PersonId = @event.PersonId,
                 PersonAttributes = @event.Details,
-                CreateReason = changeReason.Reason,
-                CreateReasonDetail = changeReason.Details,
-                EvidenceFile = changeReason.EvidenceFile,
+                CreateReason = changeReason?.Reason,
+                CreateReasonDetail = changeReason?.Details,
+                EvidenceFile = changeReason?.EvidenceFile,
                 TrnRequestMetadata = @event.TrnRequestMetadata
             };
 

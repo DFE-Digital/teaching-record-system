@@ -38,7 +38,7 @@ public class CheckAnswersModel(
                 User.GetUserId(),
                 new ChangeReasonInfoWithDetailsAndEvidence
                 {
-                    Reason = DeactivateReason?.ToString(),
+                    Reason = DeactivateReason?.GetDisplayName(),
                     Details = DeactivateReasonDetail,
                     EvidenceFile = EvidenceFile?.ToEventModel()
                 });
@@ -53,7 +53,7 @@ public class CheckAnswersModel(
                 User.GetUserId(),
                 new ChangeReasonInfoWithDetailsAndEvidence
                 {
-                    Reason = ReactivateReason?.ToString(),
+                    Reason = ReactivateReason?.GetDisplayName(),
                     Details = ReactivateReasonDetail,
                     EvidenceFile = EvidenceFile?.ToEventModel()
                 });

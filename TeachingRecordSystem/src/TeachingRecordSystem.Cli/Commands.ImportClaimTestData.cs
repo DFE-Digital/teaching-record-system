@@ -2,9 +2,12 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -39,11 +42,14 @@ public static partial class Commands
             var outputFile = parseResult.GetRequiredValue(outputOption);
             var connectionString = parseResult.GetRequiredValue(connectionStringOption);
 
+            var environment = new HostingEnvironment { EnvironmentName = Environments.Production };
+
             var services = new ServiceCollection()
                 .AddClock()
                 .AddDatabase(connectionString)
                 .AddTrnRequestService(configuration)
                 .AddPersonService()
+                .AddOneLoginService()
                 .AddSupportTaskService()
                 .AddWebhookOptions(configuration)
                 .AddWebhookDeliveryService(configuration)
@@ -51,9 +57,16 @@ public static partial class Commands
                 .AddMemoryCache()
                 .AddIdentityApi(configuration)
                 .AddEventPublisher()
-                .BuildServiceProvider();
+                .AddBackgroundJobScheduler(environment)
+                .AddHangfire(environment);
 
-            using var scope = services.CreateScope();
+            services.AddDbContext<IdDbContext>(
+                options => options.UseInMemoryDatabase("TeacherAuthId"),
+                contextLifetime: ServiceLifetime.Transient);
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            using var scope = serviceProvider.CreateScope();
             var personService = scope.ServiceProvider.GetRequiredService<PersonService>();
             var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
             var processContext = new ProcessContext(processType: ProcessType.PersonCreating, now: DateTime.UtcNow,

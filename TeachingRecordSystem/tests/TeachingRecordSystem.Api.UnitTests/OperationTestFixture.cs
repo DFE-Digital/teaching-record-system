@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting.Internal;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.UnitTests;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 [assembly: AssemblyFixture(typeof(OperationTestFixture))]
@@ -25,6 +26,10 @@ public class OperationTestFixture : ServiceProviderFixture
             .AddTestTrnGeneration()
             .AddSingleton(_currentUserProviderMock.Object)
             .AddSingleton<INotificationSender, NoopNotificationSender>();
+
+        services.AddDbContext<IdDbContext>(
+            options => options.UseInMemoryDatabase("TeacherAuthId"),
+            contextLifetime: ServiceLifetime.Transient);
 
         // Publish events synchronously
         PublishEventsDbCommandInterceptor.ConfigureServices(services);

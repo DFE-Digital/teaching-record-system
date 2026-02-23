@@ -58,9 +58,9 @@ public class CheckAnswersModel(
             User.GetUserId(),
             new Core.Events.ChangeReasons.PersonDetailsChangeReasonInfo
             {
-                NameChangeReason = NameChangeReason?.ToString(),
+                NameChangeReason = NameChangeReason?.GetDisplayName(),
                 NameChangeEvidenceFile = NameChangeEvidenceFile?.ToEventModel(),
-                Reason = OtherDetailsChangeReason?.ToString(),
+                Reason = OtherDetailsChangeReason?.GetDisplayName(),
                 Details = OtherDetailsChangeReasonDetail,
                 EvidenceFile = OtherDetailsChangeEvidenceFile?.ToEventModel()
             });

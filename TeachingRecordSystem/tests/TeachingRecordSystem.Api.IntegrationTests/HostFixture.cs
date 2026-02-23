@@ -12,6 +12,7 @@ using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
@@ -115,6 +116,10 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton<CurrentApiClientProvider>()
                     .AddSingleton<INotificationSender, NoopNotificationSender>()
                     .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>();
+
+                services.AddDbContext<IdDbContext>(
+                    options => options.UseInMemoryDatabase("TeacherAuthId"),
+                    contextLifetime: ServiceLifetime.Transient);
 
                 services.Configure<GetAnIdentityOptions>(options =>
                 {

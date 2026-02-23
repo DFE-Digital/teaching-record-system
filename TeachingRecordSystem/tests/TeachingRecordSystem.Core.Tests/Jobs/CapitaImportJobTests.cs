@@ -1783,6 +1783,3 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         Assert.EquivalentWithExclusions(expected, actual, excludePropertyNames);
     }
 }
-
-        var personService = new Core.Services.Persons.PersonService(
-            Clock,

@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.ReopenAlert;
 
 public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixture), IAsyncLifetime
@@ -238,7 +240,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
             Assert.Equal(ProcessType.AlertUpdating, p.ProcessContext.ProcessType);
             p.AssertProcessHasEvents<AlertUpdatedEvent>();
 
-            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            var changeReason = Assert.IsType<ChangeReasonInfoWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), changeReason.Reason);
             Assert.Equal(journeyInstance.State.ChangeReasonDetail, changeReason.Details);
             Assert.Equal(journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel(), changeReason.EvidenceFile);

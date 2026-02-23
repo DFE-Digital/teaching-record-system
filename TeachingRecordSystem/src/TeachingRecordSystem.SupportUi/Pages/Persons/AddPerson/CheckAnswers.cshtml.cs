@@ -67,7 +67,7 @@ public class CheckAnswersModel(
             User.GetUserId(),
             new ChangeReasonInfoWithDetailsAndEvidence
             {
-                Reason = Reason.ToString(),
+                Reason = Reason?.GetDisplayName(),
                 Details = ReasonDetail,
                 EvidenceFile = EvidenceFile?.ToEventModel()
             });

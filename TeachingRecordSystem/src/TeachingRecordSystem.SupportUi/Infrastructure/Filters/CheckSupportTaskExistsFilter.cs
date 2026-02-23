@@ -40,6 +40,12 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
                 .Include(t => t.OneLoginUser);
         }
 
+        if (supportTaskTypes.Intersect([SupportTaskType.ChangeDateOfBirthRequest, SupportTaskType.ChangeNameRequest]).Any())
+        {
+            currentSupportTaskQuery = currentSupportTaskQuery
+                .Include(t => t.Person);
+        }
+
         var currentSupportTask = await currentSupportTaskQuery.SingleOrDefaultAsync();
 
         if (currentSupportTask is null ||

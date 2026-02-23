@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
@@ -176,7 +178,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
             Assert.Equal(ProcessType.AlertCreating, p.ProcessContext.ProcessType);
             p.AssertProcessHasEvents<AlertCreatedEvent>();
 
-            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            var changeReason = Assert.IsType<ChangeReasonInfoWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal(journeyInstance.State.AddReason!.GetDisplayName(), changeReason.Reason);
             Assert.Equal(populateOptional ? journeyInstance.State.AddReasonDetail : null, changeReason.Details);
             Assert.Equal(populateOptional ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel() : null, changeReason.EvidenceFile);
