@@ -1,18 +1,26 @@
-using Microsoft.Testing.Platform.Services;
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 [Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
-public abstract class JobTestBase(JobFixture fixture)
+public abstract class JobTestBase
 {
-    protected EventCapture Events => fixture.Services.GetRequiredService<EventCapture>();
+    private readonly JobFixture _fixture;
 
-    protected TestableClock Clock => (TestableClock)fixture.Services.GetRequiredService<IClock>();
+    protected JobTestBase(JobFixture fixture)
+    {
+        _fixture = fixture;
+        TestScopedServices.Reset();
+    }
 
-    protected IDbContextFactory<TrsDbContext> DbContextFactory => fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+    protected EventCapture Events => TestScopedServices.GetCurrent().Events;
 
-    protected TestData TestData => fixture.Services.GetRequiredService<TestData>();
+    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
+
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => _fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+
+    protected TestData TestData => _fixture.Services.GetRequiredService<TestData>();
 
     protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
         DbContextFactory.WithDbContextAsync(action);
@@ -21,8 +29,8 @@ public abstract class JobTestBase(JobFixture fixture)
         DbContextFactory.WithDbContextAsync(action);
 
     protected Task WithServiceAsync<TService>(Func<TService, Task> action, params object[] arguments) where TService : notnull =>
-        fixture.WithServiceAsync(action, arguments);
+        _fixture.WithServiceAsync(action, arguments);
 
     protected Task<TResult> WithServiceAsync<TService, TResult>(Func<TService, Task<TResult>> action, params object[] arguments) where TService : notnull =>
-        fixture.WithServiceAsync(action, arguments);
+        _fixture.WithServiceAsync(action, arguments);
 }
