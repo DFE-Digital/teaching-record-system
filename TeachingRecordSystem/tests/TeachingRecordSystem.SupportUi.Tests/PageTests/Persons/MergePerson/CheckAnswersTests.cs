@@ -243,7 +243,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             Assert.Null(changeReasonInfo.Reason);
             Assert.Equal(comments, changeReasonInfo.Details);
             Assert.Equal(evidenceFileId, changeReasonInfo.EvidenceFile?.FileId);
-            Assert.Equal("evidence.pdf", changeReasonInfo.EvidenceFile?.Name);
+            Assert.Equal("evidence.jpg", changeReasonInfo.EvidenceFile?.Name);
 
             p.AssertProcessHasEvents<PersonDeactivatedEvent, PersonDetailsUpdatedEvent>();
         });

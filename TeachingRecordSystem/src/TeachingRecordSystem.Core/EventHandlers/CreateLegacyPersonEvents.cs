@@ -104,7 +104,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
 
             var changes = mergedWithPersonUpdatedEvent is null ?
                 LegacyEvents.PersonsMergedEventChanges.None :
-                (LegacyEvents.PersonsMergedEventChanges)((int)(mergedWithPersonUpdatedEvent.Changes) >> 16);
+                (LegacyEvents.PersonsMergedEventChanges)((int)(mergedWithPersonUpdatedEvent.Changes) << 16);
 
             var legacyEvent = new LegacyEvents.PersonsMergedEvent
             {

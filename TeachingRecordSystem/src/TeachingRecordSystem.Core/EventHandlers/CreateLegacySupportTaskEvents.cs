@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.EventHandlers;
 
@@ -222,6 +223,54 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
                 PersonAttributes = personAttributes,
                 OldPersonAttributes = oldPersonAttributes,
                 Comments = @event.Comments,
+                EventId = @event.EventId,
+                CreatedUtc = processContext.Now,
+                RaisedBy = processContext.UserId,
+                SupportTask = @event.SupportTask,
+                OldSupportTask = @event.OldSupportTask
+            };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
+        else if (processContext.ProcessType is ProcessType.ChangeOfDateOfBirthRequestApproving)
+        {
+            var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().Single();
+            var supportTask = (await dbContext.SupportTasks.FindAsync(@event.SupportTask.SupportTaskReference))!;
+            var supportTaskData = supportTask.GetData<ChangeDateOfBirthRequestData>();
+
+            var legacyEvent = new LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent
+            {
+                PersonId = personDetailsUpdatedEvent.PersonId,
+                RequestData = EventModels.ChangeDateOfBirthRequestData.FromModel(supportTaskData),
+                Changes = LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEventChanges.DateOfBirth,
+                PersonAttributes = personDetailsUpdatedEvent.PersonDetails,
+                OldPersonAttributes = personDetailsUpdatedEvent.OldPersonDetails,
+                EventId = @event.EventId,
+                CreatedUtc = processContext.Now,
+                RaisedBy = processContext.UserId,
+                SupportTask = @event.SupportTask,
+                OldSupportTask = @event.OldSupportTask
+            };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
+        else if (processContext.ProcessType is ProcessType.ChangeOfNameRequestApproving)
+        {
+            var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().Single();
+            var supportTask = (await dbContext.SupportTasks.FindAsync(@event.SupportTask.SupportTaskReference))!;
+            var supportTaskData = supportTask.GetData<ChangeNameRequestData>();
+
+            var legacyEvent = new LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent
+            {
+                PersonId = personDetailsUpdatedEvent.PersonId,
+                RequestData = EventModels.ChangeNameRequestData.FromModel(supportTaskData),
+                Changes = (LegacyEvents.ChangeNameRequestSupportTaskApprovedEventChanges)((int)personDetailsUpdatedEvent.Changes << 16),
+                PersonAttributes = personDetailsUpdatedEvent.PersonDetails,
+                OldPersonAttributes = personDetailsUpdatedEvent.OldPersonDetails,
                 EventId = @event.EventId,
                 CreatedUtc = processContext.Now,
                 RaisedBy = processContext.UserId,

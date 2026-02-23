@@ -78,9 +78,9 @@ public class AcceptModel(
                 },
                 processContext);
 
-            if (!string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress))
+            if (!string.IsNullOrEmpty(changeNameRequestData.EmailAddress))
             {
-                emailAddress = changeDateOfBirthRequestData.EmailAddress;
+                emailAddress = changeNameRequestData.EmailAddress;
             }
 
             emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation;
@@ -113,7 +113,7 @@ public class AcceptModel(
                 },
                 processContext);
 
-            if (!string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress))
+            if (!string.IsNullOrEmpty(changeDateOfBirthRequestData.EmailAddress))
             {
                 emailAddress = changeDateOfBirthRequestData.EmailAddress;
             }

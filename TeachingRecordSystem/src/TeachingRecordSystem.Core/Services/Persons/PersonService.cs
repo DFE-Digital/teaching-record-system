@@ -286,6 +286,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
         // If the deactivated person was associated with any One Login Users, transfer that association to the retained person
         var oneLoginUsers = await dbContext.OneLoginUsers
+            .Where(o => o.PersonId == options.DeactivatingPersonId)
             .Select(o => o.Subject)
             .ToArrayAsync();
 
