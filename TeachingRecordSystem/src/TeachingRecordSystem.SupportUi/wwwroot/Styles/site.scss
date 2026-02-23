@@ -96,7 +96,7 @@
 
 .trs_checkboxes__wrapper--horizontal {
   display: flex;
-  gap: 1rem;  
+  gap: 1rem;
   align-items: center;
 }
 
@@ -444,4 +444,10 @@
 [aria-sort=descending] button [aria-hidden]:before,
 [aria-sort=ascending] button [aria-hidden]:before {
     content: none;
+}
+
+.trs-event-payload {
+  font-family: monospace;
+  white-space: pre-wrap;
+  font-size: 0.875rem;
 }

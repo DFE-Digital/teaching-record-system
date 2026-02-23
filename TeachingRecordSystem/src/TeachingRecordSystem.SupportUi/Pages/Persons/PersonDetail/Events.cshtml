@@ -1,0 +1,55 @@
+@page "/persons/{personId}/events"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EventsModel
+@{
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonDetailSubNavigationTab.ChangeHistory;
+    var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Index(person.PersonId)">Back to record</govuk-back-link>
+}
+
+<div class="moj-timeline">
+    @foreach (var e in Model.EventPayloads!)
+    {
+        @if (e is EventsModel.LegacyEventPayload legacyEvent)
+        {
+            <div class="moj-timeline__item govuk-!-padding-bottom-2">
+                <div class="moj-timeline__header">
+                    <h2 class="moj-timeline__title">@legacyEvent.EventName</h2>
+                </div>
+                <p class="moj-timeline__date">
+                    <time datetime="@legacyEvent.Timestamp.ToString("O")" data-testid="timeline-item-time">@legacyEvent.Timestamp</time>
+                </p>
+                <div class="moj-timeline__description">
+                    <pre class="trs-event-payload">@legacyEvent.GetFormattedJsonPayload()</pre>
+                </div>
+            </div>
+        }
+        else if (e is EventsModel.ProcessEventPayload processEventPayload)
+        {
+            <div class="moj-timeline__item govuk-!-padding-bottom-2">
+                <div class="moj-timeline__header">
+                    <h2 class="moj-timeline__title">@processEventPayload.ProcessType</h2>
+                </div>
+                <p class="moj-timeline__date">
+                    <time datetime="@processEventPayload.Timestamp.ToString("O")" data-testid="timeline-item-time">@processEventPayload.Timestamp</time>
+                </p>
+                <div class="moj-timeline__description">
+                    @foreach (var x in processEventPayload.Events)
+                    {
+                        <div>
+                            <strong class="govuk-heading-xs">@x.EventName</strong>
+                            <pre class="trs-event-payload">@x.GetFormattedJsonPayload()</pre>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            throw new NotSupportedException($"Unsupported event payload type {e.GetType().FullName}");
+        }
+    }
+</div>
