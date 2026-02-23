@@ -235,7 +235,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
                 p.AssertProcessHasEvents<PersonReactivatedEvent>();
             }
 
-            var changeReasonInfo = Assert.IsType<ChangeReasonInfoWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            var changeReasonInfo = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal("Another reason", changeReasonInfo.Reason);
             Assert.Equal(ChangeReasonDetails, changeReasonInfo.Details);
             Assert.Equal(evidenceFileId, changeReasonInfo.EvidenceFile?.FileId);

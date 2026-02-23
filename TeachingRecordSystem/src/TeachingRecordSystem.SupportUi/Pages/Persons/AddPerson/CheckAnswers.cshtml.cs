@@ -65,7 +65,7 @@ public class CheckAnswersModel(
             ProcessType.PersonCreating,
             clock.UtcNow,
             User.GetUserId(),
-            new ChangeReasonInfoWithDetailsAndEvidence
+            new ChangeReasonWithDetailsAndEvidence
             {
                 Reason = Reason?.GetDisplayName(),
                 Details = ReasonDetail,

@@ -242,7 +242,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(ProcessType.PersonCreating, p.ProcessContext.ProcessType);
             p.AssertProcessHasEvents<PersonCreatedEvent>();
 
-            var changeReasonInfo = Assert.IsType<ChangeReasonInfoWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            var changeReasonInfo = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal("Another reason", changeReasonInfo.Reason);
             Assert.Equal(ChangeReasonDetails, changeReasonInfo.Details);
             Assert.Equal(otherEvidenceFileId, changeReasonInfo.EvidenceFile?.FileId);

@@ -64,7 +64,7 @@ public class CheckAnswersModel(
             ProcessType.AlertUpdating,
             clock.UtcNow,
             User.GetUserId(),
-            new ChangeReasonInfoWithDetailsAndEvidence
+            new ChangeReasonWithDetailsAndEvidence
             {
                 Reason = ChangeReason.GetDisplayName()!,
                 Details = ChangeReasonDetail,

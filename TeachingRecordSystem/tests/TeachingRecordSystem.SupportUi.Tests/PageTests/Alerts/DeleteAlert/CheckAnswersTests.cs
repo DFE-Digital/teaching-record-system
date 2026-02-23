@@ -206,7 +206,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
             Assert.Equal(ProcessType.AlertDeleting, p.ProcessContext.ProcessType);
             p.AssertProcessHasEvents<AlertDeletedEvent>();
 
-            var changeReason = Assert.IsType<ChangeReasonInfoWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal(journeyInstance.State.DeleteReason!.GetDisplayName(), changeReason.Reason);
             Assert.Equal(journeyInstance.State.DeleteReasonDetail, changeReason.Details);
             Assert.Equal(journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel(), changeReason.EvidenceFile);

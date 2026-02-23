@@ -15,7 +15,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
         if (processContext.ProcessType is ProcessType.PersonCreating
             or ProcessType.TeacherPensionsRecordImporting)
         {
-            var changeReason = processContext.Process.ChangeReason as ChangeReasonInfoWithDetailsAndEvidence;
+            var changeReason = processContext.Process.ChangeReason as ChangeReasonWithDetailsAndEvidence;
 
             var legacyEvent = new LegacyEvents.PersonCreatedEvent
             {
@@ -68,7 +68,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.PersonDeactivating)
         {
-            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.PersonStatusUpdatedEvent
             {
@@ -100,7 +100,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
             Debug.Assert(mergedWithPersonUpdatedEvent is null || mergedWithPersonUpdatedEvent.PersonId == @event.MergedWithPersonId);
             var mergedWithPerson = (await dbContext.Persons.FindAsync(mergedWithPersonId))!;
 
-            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var changes = mergedWithPersonUpdatedEvent is null ?
                 LegacyEvents.PersonsMergedEventChanges.None :
@@ -133,7 +133,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.PersonReactivating)
         {
-            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.PersonStatusUpdatedEvent
             {

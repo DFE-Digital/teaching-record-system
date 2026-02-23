@@ -36,7 +36,7 @@ public class CheckAnswersModel(
                 ProcessType.PersonDeactivating,
                 clock.UtcNow,
                 User.GetUserId(),
-                new ChangeReasonInfoWithDetailsAndEvidence
+                new ChangeReasonWithDetailsAndEvidence
                 {
                     Reason = DeactivateReason?.GetDisplayName(),
                     Details = DeactivateReasonDetail,
@@ -51,7 +51,7 @@ public class CheckAnswersModel(
                 ProcessType.PersonReactivating,
                 clock.UtcNow,
                 User.GetUserId(),
-                new ChangeReasonInfoWithDetailsAndEvidence
+                new ChangeReasonWithDetailsAndEvidence
                 {
                     Reason = ReactivateReason?.GetDisplayName(),
                     Details = ReactivateReasonDetail,

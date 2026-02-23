@@ -72,7 +72,7 @@ public class CheckAnswersModel(
             ProcessType.AlertDeleting,
             clock.UtcNow,
             User.GetUserId(),
-            new ChangeReasonInfoWithDetailsAndEvidence
+            new ChangeReasonWithDetailsAndEvidence
             {
                 Reason = DeleteReason.GetDisplayName()!,
                 Details = DeleteReasonDetail,

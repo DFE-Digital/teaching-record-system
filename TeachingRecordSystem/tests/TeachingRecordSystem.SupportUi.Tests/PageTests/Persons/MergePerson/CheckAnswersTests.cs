@@ -239,7 +239,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         {
             Assert.Equal(ProcessType.PersonMerging, p.ProcessContext.ProcessType);
 
-            var changeReasonInfo = Assert.IsType<ChangeReasonInfoWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            var changeReasonInfo = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Null(changeReasonInfo.Reason);
             Assert.Equal(comments, changeReasonInfo.Details);
             Assert.Equal(evidenceFileId, changeReasonInfo.EvidenceFile?.FileId);

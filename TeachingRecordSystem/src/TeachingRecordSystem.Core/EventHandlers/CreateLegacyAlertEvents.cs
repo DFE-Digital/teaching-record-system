@@ -12,7 +12,7 @@ public class CreateLegacyAlertEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.AlertCreating)
         {
-            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.AlertCreatedEvent
             {
@@ -36,7 +36,7 @@ public class CreateLegacyAlertEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.AlertUpdating)
         {
-            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.AlertUpdatedEvent
             {
@@ -62,7 +62,7 @@ public class CreateLegacyAlertEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.AlertDeleting)
         {
-            var changeReason = (ChangeReasonInfoWithDetailsAndEvidence)processContext.Process.ChangeReason!;
+            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
 
             var legacyEvent = new LegacyEvents.AlertDeletedEvent
             {

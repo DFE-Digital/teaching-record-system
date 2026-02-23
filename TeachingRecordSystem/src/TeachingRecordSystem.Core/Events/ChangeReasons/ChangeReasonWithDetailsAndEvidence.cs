@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Events.ChangeReasons;
 
-public record ChangeReasonInfoWithDetailsAndEvidence : IChangeReasonInfo
+public record ChangeReasonWithDetailsAndEvidence : IChangeReasonInfo
 {
     public required string? Reason { get; init; }
     public required string? Details { get; init; }

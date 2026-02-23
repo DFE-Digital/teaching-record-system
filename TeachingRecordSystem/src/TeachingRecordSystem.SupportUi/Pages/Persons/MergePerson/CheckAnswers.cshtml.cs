@@ -128,7 +128,7 @@ public class CheckAnswersModel(
             ProcessType.PersonMerging,
             clock.UtcNow,
             User.GetUserId(),
-            new ChangeReasonInfoWithDetailsAndEvidence
+            new ChangeReasonWithDetailsAndEvidence
             {
                 Reason = null,
                 Details = Comments,
