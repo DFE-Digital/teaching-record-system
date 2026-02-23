@@ -26,3 +26,15 @@ public enum AlertUpdatedEventChanges
     DqtSpent = 1 << 5,
     DqtSanctionCode = 1 << 6
 }
+
+public static class AlertUpdatedEventChangesExtensions
+{
+    public static Events.AlertUpdatedEventChanges ToAlertUpdatedEventChanges(this AlertUpdatedEventChanges changes) =>
+        Events.AlertUpdatedEventChanges.None
+        | (changes.HasFlag(AlertUpdatedEventChanges.Details) ? Events.AlertUpdatedEventChanges.Details : 0)
+        | (changes.HasFlag(AlertUpdatedEventChanges.ExternalLink) ? Events.AlertUpdatedEventChanges.ExternalLink : 0)
+        | (changes.HasFlag(AlertUpdatedEventChanges.StartDate) ? Events.AlertUpdatedEventChanges.StartDate : 0)
+        | (changes.HasFlag(AlertUpdatedEventChanges.EndDate) ? Events.AlertUpdatedEventChanges.EndDate : 0)
+        | (changes.HasFlag(AlertUpdatedEventChanges.DqtSpent) ? Events.AlertUpdatedEventChanges.DqtSpent : 0)
+        | (changes.HasFlag(AlertUpdatedEventChanges.DqtSanctionCode) ? Events.AlertUpdatedEventChanges.DqtSanctionCode : 0);
+}
