@@ -437,13 +437,15 @@
       },
       "Parquet.Net": {
         "type": "Direct",
-        "requested": "[4.24.0, )",
-        "resolved": "4.24.0",
-        "contentHash": "30XaI5kj3llACxFUdCj9TNZkJGqJ3QMjB1ySaHhEMior9cT6C3SygyftzF7eS2I460M07DK6VbGFBWTWRjod8g==",
+        "requested": "[5.5.0, )",
+        "resolved": "5.5.0",
+        "contentHash": "nOHZ9KLfVGWlofTWenoNaEVsvsJoTluqvwCQ8cDqSRha0qLWeyJ/i+UeHEfSgtsXcwP0EW0EHLoRB2ADllbb/A==",
         "dependencies": {
-          "IronCompress": "1.5.2",
-          "Microsoft.Data.Analysis": "0.21.1",
-          "Microsoft.IO.RecyclableMemoryStream": "3.0.0"
+          "CommunityToolkit.HighPerformance": "8.4.0",
+          "K4os.Compression.LZ4": "1.3.8",
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
+          "Snappier": "1.3.0",
+          "ZstdSharp.Port": "0.8.7"
         }
       },
       "Polly.Core": {
@@ -525,11 +527,6 @@
         "resolved": "6.1.0",
         "contentHash": "M5cCC1ZMkZr9jbSQGTHnVkb5TDN67qWCV7AP8TAHdGkvDlu0puT5NzemESNn9+HkYIDpWpocP68/i+/ame2/2w=="
       },
-      "Apache.Arrow": {
-        "type": "Transitive",
-        "resolved": "11.0.0",
-        "contentHash": "Pc5Mh8JKnJrszFUm1i1cwzCcoudY06TNPVy4VnSPAgfwZWReJkIduANjn6wrIekgpH/o9B9HyyraDPQXNXg8Ww=="
-      },
       "Azure.Core": {
         "type": "Transitive",
         "resolved": "1.50.0",
@@ -558,6 +555,11 @@
           "Azure.Core": "1.47.3",
           "System.IO.Hashing": "8.0.0"
         }
+      },
+      "CommunityToolkit.HighPerformance": {
+        "type": "Transitive",
+        "resolved": "8.4.0",
+        "contentHash": "flxspiBs0G/0GMp7IK2J2ijV9bTG6hEwFc/z6ekHqB6nwRJ4Ry2yLdx+TkbCUYFCl4XhABkAwomeKbT6zM2Zlg=="
       },
       "Dapper": {
         "type": "Transitive",
@@ -643,15 +645,6 @@
           "Google.Apis.Auth": "1.69.0"
         }
       },
-      "IronCompress": {
-        "type": "Transitive",
-        "resolved": "1.5.2",
-        "contentHash": "ZjWIOrO1a1/xBcpzp0sOxU0JuuajqRjiuhYuDJn3F5sM8R0vZ5K2pxm8b+ck1+OS8RUW1QxNgG3qtbC8uGXm6A==",
-        "dependencies": {
-          "Snappier": "1.1.6",
-          "ZstdSharp.Port": "0.8.1"
-        }
-      },
       "JWT": {
         "type": "Transitive",
         "resolved": "7.1.0",
@@ -660,6 +653,11 @@
           "Newtonsoft.Json": "9.0.1",
           "System.Reflection.TypeExtensions": "4.7.0"
         }
+      },
+      "K4os.Compression.LZ4": {
+        "type": "Transitive",
+        "resolved": "1.3.8",
+        "contentHash": "LhwlPa7c1zs1OV2XadMtAWdImjLIsqFJPoRcIWAadSRn0Ri1DepK65UbWLPmt4riLqx2d40xjXRk0ogpqNtK7g=="
       },
       "MedallionTopologicalSort": {
         "type": "Transitive",
@@ -752,15 +750,6 @@
           "Microsoft.VisualStudio.SolutionPersistence": "1.0.52",
           "Newtonsoft.Json": "13.0.3",
           "System.Composition": "9.0.0"
-        }
-      },
-      "Microsoft.Data.Analysis": {
-        "type": "Transitive",
-        "resolved": "0.21.1",
-        "contentHash": "bcvvIkthkOWqH2HRdGZEfyxbtZOBq6AK8Oa1prdSefDCyQsPWRSCZRRqt1Txr8oGZgfdxERT0+BXRYUEKKApPQ==",
-        "dependencies": {
-          "Apache.Arrow": "11.0.0",
-          "Microsoft.ML.DataView": "3.0.1"
         }
       },
       "Microsoft.Data.SqlClient.SNI.runtime": {
@@ -1078,13 +1067,8 @@
       },
       "Microsoft.IO.RecyclableMemoryStream": {
         "type": "Transitive",
-        "resolved": "3.0.0",
-        "contentHash": "irv0HuqoH8Ig5i2fO+8dmDNdFdsrO+DoQcedwIlb810qpZHBNQHZLW7C/AHBQDgLLpw2T96vmMAy/aE4Yj55Sg=="
-      },
-      "Microsoft.ML.DataView": {
-        "type": "Transitive",
         "resolved": "3.0.1",
-        "contentHash": "mkZt1r6Nx5CAoD3klhC7VMQFzwWMHHjoYpv3X9u+GMvTMbSRaDdiA88HUoOzT7kCeq4/L1nKctmrByhLK28Xjw=="
+        "contentHash": "s/s20YTVY9r9TPfTrN5g8zPF1YhwxyqO6PxUkrYTGI2B+OGPe9AdajWZrLhFqXIvqIW23fnUE4+ztrUWNU1+9g=="
       },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
@@ -1179,8 +1163,8 @@
       },
       "Snappier": {
         "type": "Transitive",
-        "resolved": "1.1.6",
-        "contentHash": "aLJu7Q0mVk0e9QwjJLEh70tXQ0Url8fHITrHXwqF+eq7N20jGMOhkmTXUUjpPim+rCm0I4fARcVBRzJPSipN+w=="
+        "resolved": "1.3.0",
+        "contentHash": "yYANMXm5MUiF9jzsOI7WH5Cj1HYzcWEIEVI2Ljq8N7hS/zwLCBx+GoGeyc7aJFAvpRcbSIbdNaelVomHqd6UDQ=="
       },
       "StructuredFieldValues": {
         "type": "Transitive",
@@ -1298,8 +1282,8 @@
       },
       "ZstdSharp.Port": {
         "type": "Transitive",
-        "resolved": "0.8.1",
-        "contentHash": "19tNz33kn2EkyViFXuxfVn338UJaRmkwBphVqP2dVJIYQUQgFrgG5h061mxkRRg1Ax6r+6WOj1FxaFZ5qaWqqg=="
+        "resolved": "0.8.7",
+        "contentHash": "+4VpxvzEKaHpfTjsLRMhQHx6brqGBkIA+fjUM3wUW8ZoWpPFAeKrO2Nf4uZDeBjjzNDNxSRvLQH4b3S9Ku4JJQ=="
       },
       "Humanizer.Core": {
         "type": "CentralTransitive",
