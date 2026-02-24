@@ -11,7 +11,7 @@ public static class SearchTextHelper
 
     public static bool IsEmailAddress(string searchText, [NotNullWhen(true)] out string? email)
     {
-        var isEmail = searchText.Contains('@');
+        var isEmail = EmailAddress.TryParse(searchText, out _);
         email = isEmail ? searchText : null;
         return isEmail;
     }
