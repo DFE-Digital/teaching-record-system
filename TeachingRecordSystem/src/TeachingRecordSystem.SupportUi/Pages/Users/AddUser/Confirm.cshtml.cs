@@ -75,7 +75,7 @@ public class ConfirmModel(
 
         dbContext.Users.Add(newUser);
 
-        await dbContext.AddEventAndBroadcastAsync(new UserAddedEvent()
+        dbContext.AddEventWithoutBroadcast(new UserAddedEvent()
         {
             EventId = Guid.NewGuid(),
             User = EventModels.User.FromModel(newUser),

@@ -183,7 +183,7 @@ public class CapitaImportJob(
                             newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, clock.UtcNow, out var @event);
                             if (@event is not null)
                             {
-                                await dbContext.AddEventAndBroadcastAsync(@event);
+                                dbContext.AddEventWithoutBroadcast(@event);
                                 await dbContext.SaveChangesAsync();
                             }
                         }
@@ -210,7 +210,7 @@ public class CapitaImportJob(
                                 out var supportTaskCreatedEvent);
 
                             dbContext.SupportTasks.Add(supportTask);
-                            await dbContext.AddEventAndBroadcastAsync(supportTaskCreatedEvent);
+                            dbContext.AddEventWithoutBroadcast(supportTaskCreatedEvent);
 
                             duplicateRowCount++;
                         }
@@ -230,7 +230,7 @@ public class CapitaImportJob(
                             person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, clock.UtcNow, out var @event);
                             if (@event is not null)
                             {
-                                await dbContext.AddEventAndBroadcastAsync(@event);
+                                dbContext.AddEventWithoutBroadcast(@event);
                                 await dbContext.SaveChangesAsync();
                             }
                         }

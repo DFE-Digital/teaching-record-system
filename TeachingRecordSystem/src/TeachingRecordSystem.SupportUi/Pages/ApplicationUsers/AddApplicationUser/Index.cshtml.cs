@@ -37,7 +37,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         dbContext.ApplicationUsers.Add(newUser);
 
-        await dbContext.AddEventAndBroadcastAsync(new ApplicationUserCreatedEvent()
+        dbContext.AddEventWithoutBroadcast(new ApplicationUserCreatedEvent()
         {
             EventId = Guid.NewGuid(),
             ApplicationUser = EventModels.ApplicationUser.FromModel(newUser),

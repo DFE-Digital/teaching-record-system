@@ -113,7 +113,7 @@ public class CheckAnswersModel(
             @event: out var @event);
 
         dbContext.Qualifications.Add(professionalStatus);
-        await dbContext.AddEventAndBroadcastAsync(@event);
+        dbContext.AddEventWithoutBroadcast(@event);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();

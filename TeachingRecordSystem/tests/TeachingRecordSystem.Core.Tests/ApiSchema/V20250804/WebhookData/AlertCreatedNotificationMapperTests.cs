@@ -21,16 +21,11 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
 
             var alert = person.Alerts.Single();
 
-            var @event = new LegacyEvents.AlertCreatedEvent
+            var @event = new Core.Events.AlertCreatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
-                RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
                 PersonId = person.PersonId,
-                Alert = EventModels.Alert.FromModel(alert),
-                AddReason = null,
-                AddReasonDetail = null,
-                EvidenceFile = null
+                Alert = EventModels.Alert.FromModel(alert)
             };
 
             // Act
@@ -62,16 +57,11 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
 
             var alert = person.Alerts.Single();
 
-            var @event = new LegacyEvents.AlertCreatedEvent
+            var @event = new Core.Events.AlertCreatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
-                RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
                 PersonId = person.PersonId,
-                Alert = EventModels.Alert.FromModel(alert),
-                AddReason = null,
-                AddReasonDetail = null,
-                EvidenceFile = null
+                Alert = EventModels.Alert.FromModel(alert)
             };
 
             // Act
@@ -81,3 +71,5 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
             Assert.Null(notification);
         });
 }
+
+

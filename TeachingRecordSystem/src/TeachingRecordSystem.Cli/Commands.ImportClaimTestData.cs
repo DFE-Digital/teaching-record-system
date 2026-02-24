@@ -167,7 +167,7 @@ public static partial class Commands
                     @event: out var @event);
 
                 dbContext.Qualifications.Add(professionalStatus);
-                await dbContext.AddEventAndBroadcastAsync(@event);
+                dbContext.AddEventWithoutBroadcast(@event);
 
                 if (!string.IsNullOrWhiteSpace(inductionStatusStr))
                 {

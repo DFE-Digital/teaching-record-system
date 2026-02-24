@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
@@ -31,11 +30,9 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.Details = newDetails;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var updatedEvent = new LegacyEvents.AlertUpdatedEvent
+                var updatedEvent = new Core.Events.AlertUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = Clock.UtcNow,
-                    RaisedBy = SystemUser.SystemUserId,
                     PersonId = alert.PersonId,
                     Alert = EventModels.Alert.FromModel(alert),
                     OldAlert = new EventModels.Alert
@@ -47,10 +44,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                         StartDate = alert.StartDate,
                         EndDate = alert.EndDate
                     },
-                    ChangeReason = null,
-                    ChangeReasonDetail = null,
-                    EvidenceFile = null,
-                    Changes = LegacyEvents.AlertUpdatedEventChanges.Details
+                    Changes = Core.Events.AlertUpdatedEventChanges.Details
                 };
 
                 await dbContext.SaveChangesAsync();
@@ -96,11 +90,9 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.Details = newDetails;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var updatedEvent = new LegacyEvents.AlertUpdatedEvent
+                var updatedEvent = new Core.Events.AlertUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = Clock.UtcNow,
-                    RaisedBy = SystemUser.SystemUserId,
                     PersonId = alert.PersonId,
                     Alert = EventModels.Alert.FromModel(alert),
                     OldAlert = new EventModels.Alert
@@ -112,10 +104,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                         StartDate = alert.StartDate,
                         EndDate = alert.EndDate
                     },
-                    ChangeReason = null,
-                    ChangeReasonDetail = null,
-                    EvidenceFile = null,
-                    Changes = LegacyEvents.AlertUpdatedEventChanges.Details
+                    Changes = Core.Events.AlertUpdatedEventChanges.Details
                 };
 
                 await dbContext.SaveChangesAsync();
@@ -152,11 +141,9 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.ExternalLink = newExternalLink;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var updatedEvent = new LegacyEvents.AlertUpdatedEvent
+                var updatedEvent = new Core.Events.AlertUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = Clock.UtcNow,
-                    RaisedBy = SystemUser.SystemUserId,
                     PersonId = alert.PersonId,
                     Alert = EventModels.Alert.FromModel(alert),
                     OldAlert = new EventModels.Alert
@@ -168,10 +155,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                         StartDate = alert.StartDate,
                         EndDate = alert.EndDate
                     },
-                    ChangeReason = null,
-                    ChangeReasonDetail = null,
-                    EvidenceFile = null,
-                    Changes = LegacyEvents.AlertUpdatedEventChanges.ExternalLink
+                    Changes = Core.Events.AlertUpdatedEventChanges.ExternalLink
                 };
 
                 await dbContext.SaveChangesAsync();
@@ -186,3 +170,6 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
             Assert.Null(notification);
         });
 }
+
+
+

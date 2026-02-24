@@ -135,7 +135,7 @@ public class QtsImporter
                            evidenceFile: null,
                            out var routeevent);
 
-                        await _dbContext.AddEventAndBroadcastAsync(routeevent);
+                        _dbContext.AddEventWithoutBroadcast(routeevent);
 
                         _dbContext.RouteToProfessionalStatuses.Add(route);
                     }

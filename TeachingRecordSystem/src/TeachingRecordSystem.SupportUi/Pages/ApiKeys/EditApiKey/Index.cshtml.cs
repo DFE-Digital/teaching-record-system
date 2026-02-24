@@ -49,7 +49,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             OldApiKey = oldApiKey,
             Changes = ApiKeyUpdatedEventChanges.Expires
         };
-        await dbContext.AddEventAndBroadcastAsync(@event);
+        dbContext.AddEventWithoutBroadcast(@event);
 
         await dbContext.SaveChangesAsync();
 

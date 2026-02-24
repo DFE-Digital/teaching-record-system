@@ -57,7 +57,7 @@ public class CheckAnswersModel(
             out var createdEvent);
 
         dbContext.MandatoryQualifications.Add(qualification);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
+        dbContext.AddEventWithoutBroadcast(createdEvent);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();

@@ -11,9 +11,9 @@ public record AlertCreatedNotification : IWebhookMessageData
 }
 
 public class AlertCreatedNotificationMapper(PersonInfoCache personInfoCache, ReferenceDataCache referenceDataCache) :
-    IEventMapper<Events.Legacy.AlertCreatedEvent, AlertCreatedNotification>
+    IEventMapper<Events.AlertCreatedEvent, AlertCreatedNotification>
 {
-    public async Task<AlertCreatedNotification?> MapEventAsync(Events.Legacy.AlertCreatedEvent @event)
+    public async Task<AlertCreatedNotification?> MapEventAsync(Events.AlertCreatedEvent @event)
     {
         if (@event.Alert.AlertTypeId is not Guid alertTypeId)
         {

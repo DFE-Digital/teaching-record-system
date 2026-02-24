@@ -95,7 +95,7 @@ public class RejectModel(
                 };
             }
 
-            await dbContext.AddEventAndBroadcastAsync(cancelledEvent);
+            dbContext.AddEventWithoutBroadcast(cancelledEvent);
         }
         else
         {
@@ -146,7 +146,7 @@ public class RejectModel(
                 emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation;
             }
 
-            await dbContext.AddEventAndBroadcastAsync(rejectedEvent);
+            dbContext.AddEventWithoutBroadcast(rejectedEvent);
 
             if (!string.IsNullOrEmpty(emailAddress))
             {
