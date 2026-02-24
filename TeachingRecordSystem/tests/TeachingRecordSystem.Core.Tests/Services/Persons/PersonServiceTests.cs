@@ -581,7 +581,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             var @event = Assert.IsType<PersonDeactivatedEvent>(e);
             Assert.Equal(personToDeactivate.PersonId, @event.PersonId);
             Assert.Null(@event.MergedWithPersonId);
-            Assert.Equal(PersonDeactivatedEventChanges.None, @event.Changes);
+            Assert.Equal(PersonDeactivatedEventChanges.PersonStatus, @event.Changes);
         });
     }
 
@@ -618,7 +618,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             var @event = Assert.IsType<PersonDeactivatedEvent>(e);
             Assert.Equal(personToDeactivate.PersonId, @event.PersonId);
             Assert.Null(@event.MergedWithPersonId);
-            Assert.Equal(PersonDeactivatedEventChanges.DateOfDeath, @event.Changes);
+            Assert.Equal(PersonDeactivatedEventChanges.PersonStatus | PersonDeactivatedEventChanges.DateOfDeath, @event.Changes);
         });
     }
 
@@ -684,6 +684,49 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             var @event = Assert.IsType<PersonReactivatedEvent>(e);
             Assert.Equal(personToReactivate.PersonId, @event.PersonId);
+            Assert.Equal(PersonReactivatedEventChanges.PersonStatus, @event.Changes);
+        });
+    }
+
+    [Fact]
+    public async Task ReactivatePersonAsync_WithDateOfDeath_ClearsDateOfDeathAndPublishesEvent()
+    {
+        // Arrange
+        var personToReactivate = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Lily")
+            .WithMiddleName("The")
+            .WithLastName("Pink"));
+
+        var dateOfDeath = Clock.Today;
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(personToReactivate.Person);
+            personToReactivate.Person.Status = PersonStatus.Deactivated;
+            personToReactivate.Person.DateOfDeath = dateOfDeath;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ReactivatePersonAsync(personToReactivate.PersonId, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedPersonRecord = await dbContext.Persons
+                .IgnoreQueryFilters()
+                .SingleAsync(p => p.PersonId == personToReactivate.PersonId);
+            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
+            Assert.Equal(PersonStatus.Active, updatedPersonRecord.Status);
+            Assert.Null(updatedPersonRecord.DateOfDeath);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var @event = Assert.IsType<PersonReactivatedEvent>(e);
+            Assert.Equal(personToReactivate.PersonId, @event.PersonId);
+            Assert.Equal(PersonReactivatedEventChanges.PersonStatus | PersonReactivatedEventChanges.DateOfDeath, @event.Changes);
         });
     }
 
