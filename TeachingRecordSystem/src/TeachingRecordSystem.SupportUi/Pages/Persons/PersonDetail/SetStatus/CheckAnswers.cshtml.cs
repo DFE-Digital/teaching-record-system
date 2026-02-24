@@ -43,7 +43,7 @@ public class CheckAnswersModel(
                     EvidenceFile = EvidenceFile?.ToEventModel()
                 });
 
-            await PersonService.DeactivatePersonAsync(PersonId, processContext);
+            await PersonService.DeactivatePersonAsync(new DeactivatePersonOptions(PersonId, DateOfDeath: null), processContext);
         }
         else
         {
