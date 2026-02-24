@@ -26,7 +26,7 @@ public class DisconnectOneLogin(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and disconnect account");
         await page.WaitForURLAsync(new Regex(@"/persons/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));
 
-        await page.AssertFlashMessageAsync($"GOV.UK One Login disconnected from {person.FirstName} {person.LastName}`s record");
+        await page.AssertFlashMessageAsync($"GOV.UK One Login disconnected from {person.FirstName} {person.LastName}’s record");
     }
 
     [Fact]
@@ -50,6 +50,6 @@ public class DisconnectOneLogin(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and disconnect account");
         await page.WaitForURLAsync(new Regex(@"/persons/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));
 
-        await page.AssertFlashMessageAsync($"GOV.UK One Login disconnected from {person.FirstName} {person.LastName}`s record");
+        await page.AssertFlashMessageAsync($"GOV.UK One Login disconnected from {person.FirstName} {person.LastName}’s record");
     }
 }
