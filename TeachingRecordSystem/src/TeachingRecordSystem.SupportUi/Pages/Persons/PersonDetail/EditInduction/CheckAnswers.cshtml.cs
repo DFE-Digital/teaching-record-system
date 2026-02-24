@@ -106,7 +106,7 @@ public class CheckAnswersModel(
 
         if (updatedEvent is not null)
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            DbContext.AddEventWithoutBroadcast(updatedEvent);
             await DbContext.SaveChangesAsync();
         }
 
