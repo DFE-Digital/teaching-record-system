@@ -137,13 +137,13 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             });
     }
 
-    public async Task DeactivatePersonAsync(Guid personId, ProcessContext processContext)
+    public async Task DeactivatePersonAsync(DeactivatePersonOptions options, ProcessContext processContext)
     {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == personId);
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
 
         if (deactivatingPerson is null)
         {
-            throw new NotFoundException(personId, nameof(Person));
+            throw new NotFoundException(options.PersonId, nameof(Person));
         }
 
         if (deactivatingPerson.Status is PersonStatus.Deactivated)
@@ -153,16 +153,21 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
+        deactivatingPerson.DateOfDeath = options.DateOfDeath;
         deactivatingPerson.Status = PersonStatus.Deactivated;
         deactivatingPerson.UpdatedOn = processContext.Now;
 
         await dbContext.SaveChangesAsync();
 
+        var changes = PersonDeactivatedEventChanges.PersonStatus | (options.DateOfDeath.HasValue ? PersonDeactivatedEventChanges.DateOfDeath : 0);
+
         await eventScope.PublishEventAsync(new PersonDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = deactivatingPerson.PersonId,
-            MergedWithPersonId = null
+            Changes = changes,
+            MergedWithPersonId = null,
+            DateOfDeath = options.DateOfDeath
         });
     }
 
@@ -180,17 +185,28 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             throw new InvalidOperationException("Cannot reactivate a person that is already active.");
         }
 
+        if (reactivatingPerson.MergedWithPersonId.HasValue)
+        {
+            throw new InvalidOperationException("Cannot reactivate a person that has been merged with another person.");
+        }
+
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
+        var oldDateOfDeath = reactivatingPerson.DateOfDeath;
+
+        reactivatingPerson.DateOfDeath = null;
         reactivatingPerson.Status = PersonStatus.Active;
         reactivatingPerson.UpdatedOn = processContext.Now;
 
         await dbContext.SaveChangesAsync();
 
+        var changes = PersonReactivatedEventChanges.PersonStatus | (oldDateOfDeath.HasValue ? PersonReactivatedEventChanges.DateOfDeath : 0);
+
         await eventScope.PublishEventAsync(new PersonReactivatedEvent
         {
             EventId = Guid.NewGuid(),
-            PersonId = reactivatingPerson.PersonId
+            PersonId = reactivatingPerson.PersonId,
+            Changes = changes
         });
     }
 
@@ -233,7 +249,9 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             {
                 EventId = Guid.NewGuid(),
                 PersonId = options.DeactivatingPersonId,
-                MergedWithPersonId = options.RetainedPersonId
+                Changes = PersonDeactivatedEventChanges.MergedWithPersonId,
+                MergedWithPersonId = options.RetainedPersonId,
+                DateOfDeath = null
             });
     }
 

@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -9,6 +9,7 @@ public record SetDeceasedCommand(string Trn, DateOnly DateOfDeath) : ICommand<Se
 public record SetDeceasedResult;
 
 public class SetDeceasedHandler(
+    PersonService personService,
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
     IClock clock) :
@@ -25,25 +26,11 @@ public class SetDeceasedHandler(
 
         var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        person.Status = PersonStatus.Deactivated;
-        person.DateOfDeath = command.DateOfDeath;
+        var processContext = new ProcessContext(ProcessType.PersonDeceased, clock.UtcNow, currentUserId);
 
-        var @event = new PersonStatusUpdatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
-            RaisedBy = currentUserId,
-            PersonId = person.PersonId,
-            Status = PersonStatus.Deactivated,
-            OldStatus = PersonStatus.Active,
-            Reason = "Deceased",
-            ReasonDetail = null,
-            EvidenceFile = null,
-            DateOfDeath = command.DateOfDeath
-        };
-        await dbContext.AddEventAndBroadcastAsync(@event);
-
-        await dbContext.SaveChangesAsync();
+        await personService.DeactivatePersonAsync(
+            new DeactivatePersonOptions(person.PersonId, command.DateOfDeath),
+            processContext);
 
         return new SetDeceasedResult();
     }

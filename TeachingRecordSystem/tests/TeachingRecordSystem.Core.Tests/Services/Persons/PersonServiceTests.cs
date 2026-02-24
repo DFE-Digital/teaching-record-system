@@ -517,8 +517,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         // Arrange
         var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
+        var options = new DeactivatePersonOptions(Guid.NewGuid(), DateOfDeath: null);
+
         // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(Guid.NewGuid(), processContext)));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(options, processContext)));
 
         // Assert
         Assert.IsType<NotFoundException>(ex);
@@ -539,8 +541,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
+        var options = new DeactivatePersonOptions(personToDeactivate.PersonId, DateOfDeath: null);
+
         // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(personToDeactivate.PersonId, processContext)));
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.DeactivatePersonAsync(options, processContext)));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -557,8 +561,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
 
+        var options = new DeactivatePersonOptions(personToDeactivate.PersonId, DateOfDeath: null);
+
         // Act
-        await WithServiceAsync(s => s.DeactivatePersonAsync(personToDeactivate.PersonId, processContext));
+        await WithServiceAsync(s => s.DeactivatePersonAsync(options, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -575,6 +581,44 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             var @event = Assert.IsType<PersonDeactivatedEvent>(e);
             Assert.Equal(personToDeactivate.PersonId, @event.PersonId);
             Assert.Null(@event.MergedWithPersonId);
+            Assert.Equal(PersonDeactivatedEventChanges.None, @event.Changes);
+        });
+    }
+
+    [Fact]
+    public async Task DeactivatePersonAsync_WithDateOfDeath_UpdatesPersonStatusAndPublishesEvent()
+    {
+        // Arrange
+        var personToDeactivate = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Lily")
+            .WithMiddleName("The")
+            .WithLastName("Pink"));
+
+        var processContext = new ProcessContext((ProcessType)0, Clock.UtcNow, SystemUser.SystemUserId);
+
+        var dateOfDeath = Clock.Today;
+        var options = new DeactivatePersonOptions(personToDeactivate.PersonId, DateOfDeath: dateOfDeath);
+
+        // Act
+        await WithServiceAsync(s => s.DeactivatePersonAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedPersonRecord = await dbContext.Persons
+                .IgnoreQueryFilters()
+                .SingleAsync(p => p.PersonId == personToDeactivate.PersonId);
+            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
+            Assert.Equal(PersonStatus.Deactivated, updatedPersonRecord.Status);
+            Assert.Equal(dateOfDeath, updatedPersonRecord.DateOfDeath);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var @event = Assert.IsType<PersonDeactivatedEvent>(e);
+            Assert.Equal(personToDeactivate.PersonId, @event.PersonId);
+            Assert.Null(@event.MergedWithPersonId);
+            Assert.Equal(PersonDeactivatedEventChanges.DateOfDeath, @event.Changes);
         });
     }
 
