@@ -7,6 +7,7 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
@@ -163,10 +164,18 @@ public class CapitaImportJob(
 
                         //create person if incoming record is not known in trs
                         var newPerson = await personService.CreatePersonAsync(
-                            new CreatePersonViaTpsImportOptions(
-                                row.TRN!,
-                                trnRequestMetadata.PersonDetails,
-                                (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId)),
+                            new CreatePersonOptions
+                            {
+                                Trn = Option.Some(row.TRN!),
+                                SourceTrnRequest = (trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId),
+                                FirstName = trnRequestMetadata.FirstName,
+                                MiddleName = trnRequestMetadata.MiddleName,
+                                LastName = trnRequestMetadata.LastName,
+                                DateOfBirth = trnRequestMetadata.DateOfBirth,
+                                EmailAddress = trnRequestMetadata.EmailAddress is not null ? EmailAddress.Parse(trnRequestMetadata.EmailAddress) : null,
+                                NationalInsuranceNumber = trnRequestMetadata.NationalInsuranceNumber is not null ? NationalInsuranceNumber.Parse(trnRequestMetadata.NationalInsuranceNumber) : null,
+                                Gender = trnRequestMetadata.Gender
+                            },
                             processContext);
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))

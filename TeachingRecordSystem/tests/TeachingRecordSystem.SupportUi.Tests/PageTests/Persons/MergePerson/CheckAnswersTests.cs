@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
@@ -186,7 +187,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             else
             {
                 Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personA)), FormatValue(attr.GetValueFromPerson(primaryPerson)));
-
             }
         }
 
@@ -233,6 +233,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
                 _ => LegacyEvents.PersonsMergedEventChanges.None
             };
             Assert.Equal(expectedChange, actualEvent.Changes);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonMerging, p.ProcessContext.ProcessType);
+
+            var changeReasonInfo = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Null(changeReasonInfo.Reason);
+            Assert.Equal(comments, changeReasonInfo.Details);
+            Assert.Equal(evidenceFileId, changeReasonInfo.EvidenceFile?.FileId);
+            Assert.Equal("evidence.jpg", changeReasonInfo.EvidenceFile?.Name);
+
+            p.AssertProcessHasEvents<PersonDeactivatedEvent, PersonDetailsUpdatedEvent>();
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);

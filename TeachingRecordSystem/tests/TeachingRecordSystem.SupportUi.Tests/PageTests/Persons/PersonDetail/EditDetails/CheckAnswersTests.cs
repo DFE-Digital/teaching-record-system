@@ -1,5 +1,6 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
@@ -414,8 +415,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(gender, updatedPersonRecord.Gender);
         });
 
-        var raisedBy = GetCurrentUserId();
-
         EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<LegacyEvents.PersonDetailsUpdatedEvent>(e);
@@ -443,6 +442,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Assert.Equal(ProcessType.PersonDetailsUpdating, p.ProcessContext.ProcessType);
             p.AssertProcessHasEvents<PersonDetailsUpdatedEvent>();
+
+            var changeReasonInfo = Assert.IsType<PersonDetailsChangeReasonInfo>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal("Another reason", changeReasonInfo.Reason);
+            Assert.Equal(ChangeReasonDetails, changeReasonInfo.Details);
+            Assert.Equal(otherEvidenceFileId, changeReasonInfo.EvidenceFile?.FileId);
+            Assert.Equal("other-evidence.png", changeReasonInfo.EvidenceFile?.Name);
+            Assert.Equal("Correcting an error", changeReasonInfo.NameChangeReason);
+            Assert.Equal(nameEvidenceFileId, changeReasonInfo.NameChangeEvidenceFile?.FileId);
+            Assert.Equal("name-evidence.pdf", changeReasonInfo.NameChangeEvidenceFile?.Name);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

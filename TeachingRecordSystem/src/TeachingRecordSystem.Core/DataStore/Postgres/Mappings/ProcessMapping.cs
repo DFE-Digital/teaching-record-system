@@ -16,7 +16,7 @@ public class ProcessMapping : IEntityTypeConfiguration<Process>
         builder.Property(p => p.ChangeReason)
             .HasColumnType("jsonb")
             .HasConversion(
-                v => JsonSerializer.Serialize(v, IChangeReason.SerializerOptions),
-                v => JsonSerializer.Deserialize<IChangeReason>(v, IChangeReason.SerializerOptions)!);
+                v => JsonSerializer.Serialize(v, IChangeReasonInfo.SerializerOptions),
+                v => JsonSerializer.Deserialize<IChangeReasonInfo>(v, IChangeReasonInfo.SerializerOptions)!);
     }
 }

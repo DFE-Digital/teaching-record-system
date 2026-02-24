@@ -68,7 +68,7 @@ public class AlertService(
             });
     }
 
-    public async Task<AlertUpdatedEventChanges> UpdateAlertAsync(UpdateAlertOptions options, ProcessContext processContext)
+    public async Task UpdateAlertAsync(UpdateAlertOptions options, ProcessContext processContext)
     {
         var alert = await dbContext.Alerts.FindOrThrowAsync(options.AlertId);
 
@@ -94,7 +94,7 @@ public class AlertService(
 
         if (changes == AlertUpdatedEventChanges.None)
         {
-            return changes;
+            return;
         }
 
         var now = clock.UtcNow;
@@ -111,7 +111,5 @@ public class AlertService(
                 OldAlert = oldAlert,
                 Changes = changes
             });
-
-        return changes;
     }
 }

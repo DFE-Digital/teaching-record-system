@@ -70,7 +70,7 @@ public static class Modifiers
 
     public static void ChangeReasons(JsonTypeInfo typeInfo)
     {
-        if (typeInfo.Type != typeof(IChangeReason))
+        if (typeInfo.Type != typeof(IChangeReasonInfo))
         {
             return;
         }
@@ -81,8 +81,8 @@ public static class Modifiers
             UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
         };
 
-        var changeReasonTypes = typeof(IChangeReason).Assembly.GetTypes()
-            .Where(t => typeof(IChangeReason).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
+        var changeReasonTypes = typeof(IChangeReasonInfo).Assembly.GetTypes()
+            .Where(t => typeof(IChangeReasonInfo).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
 
         foreach (var changeReasonType in changeReasonTypes)
         {

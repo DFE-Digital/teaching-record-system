@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.EventHandlers;
 
@@ -171,7 +172,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
                 RequestData = trnRequestUpdatedEvent.TrnRequest,
                 ChangeReason = LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordKept,
                 Changes = LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.Status,
-                PersonAttributes = resolvedPerson.Details.ToEventModel(),
+                PersonAttributes = EventModels.PersonDetails.FromModel(resolvedPerson),
                 OldPersonAttributes = null,
                 Comments = @event.Comments,
                 EventId = @event.EventId,
@@ -193,10 +194,10 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
             var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
 
             var changes = LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.Status;
-            var personAttributes = resolvedPerson.Details.ToEventModel();
+            var personAttributes = EventModels.PersonDetails.FromModel(resolvedPerson);
             EventModels.PersonDetails? oldPersonAttributes;
 
-            if (personDetailsUpdatedEvent is { })
+            if (personDetailsUpdatedEvent is not null)
             {
                 changes |=
                     (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonFirstName : 0) |
@@ -222,6 +223,54 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
                 PersonAttributes = personAttributes,
                 OldPersonAttributes = oldPersonAttributes,
                 Comments = @event.Comments,
+                EventId = @event.EventId,
+                CreatedUtc = processContext.Now,
+                RaisedBy = processContext.UserId,
+                SupportTask = @event.SupportTask,
+                OldSupportTask = @event.OldSupportTask
+            };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
+        else if (processContext.ProcessType is ProcessType.ChangeOfDateOfBirthRequestApproving)
+        {
+            var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().Single();
+            var supportTask = (await dbContext.SupportTasks.FindAsync(@event.SupportTask.SupportTaskReference))!;
+            var supportTaskData = supportTask.GetData<ChangeDateOfBirthRequestData>();
+
+            var legacyEvent = new LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent
+            {
+                PersonId = personDetailsUpdatedEvent.PersonId,
+                RequestData = EventModels.ChangeDateOfBirthRequestData.FromModel(supportTaskData),
+                Changes = LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEventChanges.DateOfBirth,
+                PersonAttributes = personDetailsUpdatedEvent.PersonDetails,
+                OldPersonAttributes = personDetailsUpdatedEvent.OldPersonDetails,
+                EventId = @event.EventId,
+                CreatedUtc = processContext.Now,
+                RaisedBy = processContext.UserId,
+                SupportTask = @event.SupportTask,
+                OldSupportTask = @event.OldSupportTask
+            };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
+        else if (processContext.ProcessType is ProcessType.ChangeOfNameRequestApproving)
+        {
+            var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().Single();
+            var supportTask = (await dbContext.SupportTasks.FindAsync(@event.SupportTask.SupportTaskReference))!;
+            var supportTaskData = supportTask.GetData<ChangeNameRequestData>();
+
+            var legacyEvent = new LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent
+            {
+                PersonId = personDetailsUpdatedEvent.PersonId,
+                RequestData = EventModels.ChangeNameRequestData.FromModel(supportTaskData),
+                Changes = (LegacyEvents.ChangeNameRequestSupportTaskApprovedEventChanges)((int)personDetailsUpdatedEvent.Changes << 16),
+                PersonAttributes = personDetailsUpdatedEvent.PersonDetails,
+                OldPersonAttributes = personDetailsUpdatedEvent.OldPersonDetails,
                 EventId = @event.EventId,
                 CreatedUtc = processContext.Now,
                 RaisedBy = processContext.UserId,

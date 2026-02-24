@@ -6,7 +6,4 @@ public record PersonReactivatedEvent : IEvent
     Guid[] IEvent.PersonIds => [PersonId];
     string[] IEvent.OneLoginUserSubjects => [];
     public required Guid PersonId { get; init; }
-    public required string? Reason { get; init; }
-    public required string? ReasonDetail { get; init; }
-    public required EventModels.File? EvidenceFile { get; init; }
 }

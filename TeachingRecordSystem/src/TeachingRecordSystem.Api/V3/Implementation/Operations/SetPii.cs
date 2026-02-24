@@ -1,3 +1,4 @@
+using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Persons;
@@ -55,20 +56,19 @@ public class SetPiiHandler(
 
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, now, currentUserId);
 
-        await personService.UpdatePersonDetailsAsync(new(
-            person.PersonId,
-            new PersonDetails()
+        await personService.UpdatePersonDetailsAsync(
+            new UpdatePersonDetailsOptions
             {
-                FirstName = command.FirstName,
-                MiddleName = command.MiddleName ?? string.Empty,
-                LastName = command.LastName,
-                DateOfBirth = command.DateOfBirth,
-                EmailAddress = command.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
-                NationalInsuranceNumber = command.NationalInsuranceNumber is string nino ? NationalInsuranceNumber.Parse(nino) : null,
-                Gender = command.Gender,
-            }.UpdateAll(),
-            null,
-            null),
+                PersonId = person.PersonId,
+                CreatePreviousName = false,
+                FirstName = Option.Some(command.FirstName),
+                MiddleName = Option.Some(command.MiddleName ?? string.Empty),
+                LastName = Option.Some(command.LastName),
+                DateOfBirth = Option.Some<DateOnly?>(command.DateOfBirth),
+                EmailAddress = Option.Some(command.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null),
+                NationalInsuranceNumber = Option.Some(command.NationalInsuranceNumber is string niNumber ? NationalInsuranceNumber.Parse(niNumber) : null),
+                Gender = Option.Some(command.Gender)
+            },
             processContext);
 
         return new SetPiiResult();

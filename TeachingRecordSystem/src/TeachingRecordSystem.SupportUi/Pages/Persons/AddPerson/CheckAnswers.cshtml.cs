@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -60,26 +61,29 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var processContext = new ProcessContext(ProcessType.PersonCreating, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(
+            ProcessType.PersonCreating,
+            clock.UtcNow,
+            User.GetUserId(),
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = Reason?.GetDisplayName(),
+                Details = ReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel()
+            });
 
         var person = await personService.CreatePersonAsync(
-            new CreatePersonViaSupportUiOptions(
-                new()
-                {
-                    FirstName = FirstName ?? string.Empty,
-                    MiddleName = MiddleName ?? string.Empty,
-                    LastName = LastName ?? string.Empty,
-                    DateOfBirth = DateOfBirth,
-                    EmailAddress = EmailAddress,
-                    NationalInsuranceNumber = NationalInsuranceNumber,
-                    Gender = Gender,
-                },
-                new()
-                {
-                    Reason = Reason!.Value,
-                    ReasonDetail = ReasonDetail,
-                    Evidence = EvidenceFile?.ToFile()
-                }),
+            new CreatePersonOptions
+            {
+                SourceTrnRequest = null,
+                FirstName = FirstName!,
+                MiddleName = MiddleName ?? string.Empty,
+                LastName = LastName!,
+                DateOfBirth = DateOfBirth,
+                EmailAddress = EmailAddress,
+                NationalInsuranceNumber = NationalInsuranceNumber,
+                Gender = Gender
+            },
             processContext);
 
         await JourneyInstance!.CompleteAsync();

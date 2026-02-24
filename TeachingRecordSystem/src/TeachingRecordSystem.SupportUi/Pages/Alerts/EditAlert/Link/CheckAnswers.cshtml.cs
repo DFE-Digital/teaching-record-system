@@ -77,11 +77,11 @@ public class CheckAnswersModel(
                 EvidenceFile = EvidenceFile?.ToEventModel()
             });
 
-        var changes = await alertService.UpdateAlertAsync(
+        await alertService.UpdateAlertAsync(
             new UpdateAlertOptions
             {
                 AlertId = alert.AlertId,
-                ExternalLink = Option.Some<string?>(NewLink)
+                ExternalLink = Option.Some(NewLink)
             },
             processContext);
 

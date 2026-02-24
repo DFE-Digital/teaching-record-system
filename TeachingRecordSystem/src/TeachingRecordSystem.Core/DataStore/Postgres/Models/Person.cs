@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -72,21 +71,6 @@ public class Person
     public DateTime? DqtInductionModifiedOn { get; set; }
     public bool DqtAllowTeacherIdentitySignInWithProhibitions { get; set; }
     public DateOnly? DateOfDeath { get; set; }
-
-    public PersonDetails Details => new PersonDetails
-    {
-        FirstName = FirstName!,
-        MiddleName = MiddleName ?? string.Empty,
-        LastName = LastName!,
-        DateOfBirth = DateOfBirth,
-        EmailAddress = EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
-            ? Core.EmailAddress.Parse(emailAddress)
-            : null,
-        NationalInsuranceNumber = NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
-            ? Core.NationalInsuranceNumber.Parse(nationalInsuranceNumber)
-            : null,
-        Gender = Gender
-    };
 
     public void SetStatus(
         PersonStatus targetStatus,
@@ -671,17 +655,3 @@ public class Person
         return routeLevelExemptionIds.Concat(InductionExemptionReasonIds).Distinct().AsReadOnly();
     }
 }
-
-public record CreatePersonResult(
-    Person Person,
-    EventModels.PersonDetails PersonAttributes);
-
-public record UpdatePersonDetailsResult(
-    PersonAttributesChanges Changes,
-    EventModels.PersonDetails PersonAttributes,
-    EventModels.PersonDetails OldPersonAttributes);
-
-public record UpdateStatusResult(
-    PersonAttributesChanges Changes,
-    EventModels.PersonDetails PersonAttributes,
-    EventModels.PersonDetails OldPersonAttributes);

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using NpgsqlTypes;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -111,11 +112,19 @@ public class TrnRequestService(
             publishTrnRequestUpdatedEvent: true,
             processContext);
 
-        await personService.UpdatePersonDetailsAsync(new(
-            person.PersonId,
-            trnRequest.PersonDetails.UpdateFromAttributes(attributesToUpdate),
-            null,
-            null),
+        await personService.UpdatePersonDetailsAsync(
+            new UpdatePersonDetailsOptions
+            {
+                PersonId = person.PersonId,
+                CreatePreviousName = false,
+                FirstName = attributesToUpdate.Contains(PersonMatchedAttribute.FirstName) ? Option.Some(trnRequest.FirstName!) : default,
+                MiddleName = attributesToUpdate.Contains(PersonMatchedAttribute.MiddleName) ? Option.Some(trnRequest.MiddleName ?? string.Empty) : default,
+                LastName = attributesToUpdate.Contains(PersonMatchedAttribute.LastName) ? Option.Some(trnRequest.LastName!) : default,
+                DateOfBirth = attributesToUpdate.Contains(PersonMatchedAttribute.DateOfBirth) ? Option.Some<DateOnly?>(trnRequest.DateOfBirth) : default,
+                EmailAddress = attributesToUpdate.Contains(PersonMatchedAttribute.EmailAddress) ? Option.Some<EmailAddress?>(EmailAddress.Parse(trnRequest.EmailAddress!)) : default,
+                NationalInsuranceNumber = attributesToUpdate.Contains(PersonMatchedAttribute.NationalInsuranceNumber) ? Option.Some<NationalInsuranceNumber?>(NationalInsuranceNumber.Parse(trnRequest.NationalInsuranceNumber!)) : default,
+                Gender = attributesToUpdate.Contains(PersonMatchedAttribute.Gender) ? Option.Some(trnRequest.Gender) : default
+            },
             processContext);
     }
 
@@ -187,9 +196,17 @@ public class TrnRequestService(
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         var person = await personService.CreatePersonAsync(
-            new CreatePersonViaTrnRequestOptions(
-                trnRequest.PersonDetails,
-                (trnRequest.ApplicationUserId, trnRequest.RequestId)),
+            new CreatePersonOptions
+            {
+                SourceTrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId),
+                FirstName = trnRequest.FirstName!,
+                MiddleName = trnRequest.MiddleName ?? string.Empty,
+                LastName = trnRequest.LastName!,
+                DateOfBirth = trnRequest.DateOfBirth,
+                EmailAddress = trnRequest.EmailAddress is not null ? EmailAddress.Parse(trnRequest.EmailAddress) : null,
+                NationalInsuranceNumber = trnRequest.NationalInsuranceNumber is not null ? NationalInsuranceNumber.Parse(trnRequest.NationalInsuranceNumber) : null,
+                Gender = trnRequest.Gender
+            },
             processContext);
 
         trnRequest.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);

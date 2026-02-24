@@ -1782,4 +1782,3 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         Assert.EquivalentWithExclusions(expected, actual, excludePropertyNames);
     }
 }
-

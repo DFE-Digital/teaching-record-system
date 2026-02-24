@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -31,19 +32,60 @@ public class CheckAnswersModel(
 
     public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
-    public string? ChangePersonalDetailsLink =>
+    public string ChangePersonalDetailsLink =>
         GetPageLink(EditDetailsJourneyPage.PersonalDetails, true);
 
-    public string? ChangeNameChangeReasonLink =>
+    public string ChangeNameChangeReasonLink =>
         GetPageLink(EditDetailsJourneyPage.NameChangeReason, true);
 
-    public string? ChangeDetailsChangeReasonLink =>
+    public string ChangeDetailsChangeReasonLink =>
         GetPageLink(EditDetailsJourneyPage.OtherDetailsChangeReason, true);
 
     public string BackLink => GetPageLink(
         OtherDetailsChangeReason is not null
             ? EditDetailsJourneyPage.OtherDetailsChangeReason
             : EditDetailsJourneyPage.NameChangeReason);
+
+    public void OnGet()
+    {
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        var processContext = new ProcessContext(
+            ProcessType.PersonDetailsUpdating,
+            clock.UtcNow,
+            User.GetUserId(),
+            new Core.Events.ChangeReasons.PersonDetailsChangeReasonInfo
+            {
+                NameChangeReason = NameChangeReason?.GetDisplayName(),
+                NameChangeEvidenceFile = NameChangeEvidenceFile?.ToEventModel(),
+                Reason = OtherDetailsChangeReason?.GetDisplayName(),
+                Details = OtherDetailsChangeReasonDetail,
+                EvidenceFile = OtherDetailsChangeEvidenceFile?.ToEventModel()
+            });
+
+        await PersonService.UpdatePersonDetailsAsync(
+            new UpdatePersonDetailsOptions
+            {
+                PersonId = PersonId,
+                CreatePreviousName = NameChangeReason is PersonNameChangeReason.MarriageOrCivilPartnership or PersonNameChangeReason.DeedPollOrOtherLegalProcess,
+                FirstName = Option.Some(FirstName!),
+                MiddleName = Option.Some(MiddleName ?? string.Empty),
+                LastName = Option.Some(LastName!),
+                DateOfBirth = Option.Some(DateOfBirth),
+                EmailAddress = Option.Some(EmailAddress),
+                NationalInsuranceNumber = Option.Some(NationalInsuranceNumber),
+                Gender = Option.Some(Gender)
+            },
+            processContext);
+
+        await JourneyInstance!.CompleteAsync();
+
+        TempData.SetFlashSuccess("Personal details have been updated");
+
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
+    }
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
@@ -73,45 +115,5 @@ public class CheckAnswersModel(
         OtherDetailsChangeReason = JourneyInstance.State.OtherDetailsChangeReason;
         OtherDetailsChangeReasonDetail = JourneyInstance.State.OtherDetailsChangeReasonDetail;
         OtherDetailsChangeEvidenceFile = JourneyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile;
-    }
-
-    public void OnGet()
-    {
-    }
-
-    public async Task<IActionResult> OnPostAsync()
-    {
-        var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, clock.UtcNow, User.GetUserId());
-
-        await PersonService.UpdatePersonDetailsAsync(new(
-            PersonId,
-            new PersonDetails()
-            {
-                FirstName = FirstName ?? string.Empty,
-                MiddleName = MiddleName ?? string.Empty,
-                LastName = LastName ?? string.Empty,
-                DateOfBirth = DateOfBirth,
-                EmailAddress = EmailAddress,
-                NationalInsuranceNumber = NationalInsuranceNumber,
-                Gender = Gender
-            }.UpdateAll(),
-            NameChangeReason is PersonNameChangeReason nameChangeReason ? new()
-            {
-                Reason = nameChangeReason,
-                Evidence = NameChangeEvidenceFile?.ToFile()
-            } : null,
-            OtherDetailsChangeReason is PersonDetailsChangeReason detailsChangeReason ? new()
-            {
-                Reason = detailsChangeReason,
-                ReasonDetail = OtherDetailsChangeReasonDetail,
-                Evidence = OtherDetailsChangeEvidenceFile?.ToFile()
-            } : null
-        ), processContext);
-
-        await JourneyInstance!.CompleteAsync();
-
-        TempData.SetFlashSuccess("Personal details have been updated");
-
-        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 }

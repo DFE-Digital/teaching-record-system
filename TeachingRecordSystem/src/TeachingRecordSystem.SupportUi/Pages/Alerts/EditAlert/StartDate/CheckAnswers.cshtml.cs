@@ -71,7 +71,7 @@ public class CheckAnswersModel(
                 EvidenceFile = EvidenceFile?.ToEventModel()
             });
 
-        var changes = await alertService.UpdateAlertAsync(
+        await alertService.UpdateAlertAsync(
             new UpdateAlertOptions
             {
                 AlertId = alert.AlertId,
