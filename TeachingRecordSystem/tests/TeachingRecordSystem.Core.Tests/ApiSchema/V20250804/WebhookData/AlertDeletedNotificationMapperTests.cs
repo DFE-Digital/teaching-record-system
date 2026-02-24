@@ -28,7 +28,7 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.DeletedOn = Clock.UtcNow;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var deletedEvent = new Core.Events.AlertDeletedEvent
+                var deletedEvent = new AlertDeletedEvent
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = alert.PersonId,
@@ -76,7 +76,7 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.DeletedOn = Clock.UtcNow;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var deletedEvent = new Core.Events.AlertDeletedEvent
+                var deletedEvent = new AlertDeletedEvent
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = alert.PersonId,
@@ -95,5 +95,3 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
             Assert.Null(notification);
         });
 }
-
-

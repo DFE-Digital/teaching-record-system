@@ -30,7 +30,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.Details = newDetails;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var updatedEvent = new Core.Events.AlertUpdatedEvent
+                var updatedEvent = new AlertUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = alert.PersonId,
@@ -44,7 +44,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                         StartDate = alert.StartDate,
                         EndDate = alert.EndDate
                     },
-                    Changes = Core.Events.AlertUpdatedEventChanges.Details
+                    Changes = AlertUpdatedEventChanges.Details
                 };
 
                 await dbContext.SaveChangesAsync();
@@ -90,7 +90,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.Details = newDetails;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var updatedEvent = new Core.Events.AlertUpdatedEvent
+                var updatedEvent = new AlertUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = alert.PersonId,
@@ -104,7 +104,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                         StartDate = alert.StartDate,
                         EndDate = alert.EndDate
                     },
-                    Changes = Core.Events.AlertUpdatedEventChanges.Details
+                    Changes = AlertUpdatedEventChanges.Details
                 };
 
                 await dbContext.SaveChangesAsync();
@@ -141,7 +141,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.ExternalLink = newExternalLink;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var updatedEvent = new Core.Events.AlertUpdatedEvent
+                var updatedEvent = new AlertUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = alert.PersonId,
@@ -155,7 +155,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                         StartDate = alert.StartDate,
                         EndDate = alert.EndDate
                     },
-                    Changes = Core.Events.AlertUpdatedEventChanges.ExternalLink
+                    Changes = AlertUpdatedEventChanges.ExternalLink
                 };
 
                 await dbContext.SaveChangesAsync();
@@ -170,6 +170,3 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
             Assert.Null(notification);
         });
 }
-
-
-

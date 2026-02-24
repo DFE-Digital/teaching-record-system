@@ -16,14 +16,6 @@ public partial class TrsDbContext : DbContext
 {
     public const string ConnectionName = "DefaultConnection";
 
-    private readonly IServiceProvider? _serviceProvider;
-
-    public TrsDbContext(DbContextOptions<TrsDbContext> options, IServiceProvider serviceProvider)
-        : base(options)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
     private TrsDbContext(DbContextOptions<TrsDbContext> options)
         : base(options)
     {

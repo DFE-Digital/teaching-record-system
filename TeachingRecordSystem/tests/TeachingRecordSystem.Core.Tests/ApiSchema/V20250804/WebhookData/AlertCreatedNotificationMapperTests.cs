@@ -21,7 +21,7 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
 
             var alert = person.Alerts.Single();
 
-            var @event = new Core.Events.AlertCreatedEvent
+            var @event = new AlertCreatedEvent
             {
                 EventId = Guid.NewGuid(),
                 PersonId = person.PersonId,
@@ -57,7 +57,7 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
 
             var alert = person.Alerts.Single();
 
-            var @event = new Core.Events.AlertCreatedEvent
+            var @event = new AlertCreatedEvent
             {
                 EventId = Guid.NewGuid(),
                 PersonId = person.PersonId,
@@ -71,5 +71,3 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
             Assert.Null(notification);
         });
 }
-
-

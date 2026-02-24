@@ -219,7 +219,7 @@ public static class Extensions
     public static IServiceCollection AddWebhookMessageFactory(this IServiceCollection services)
     {
         services
-            .AddSingleton<WebhookMessageFactory>()
+            .AddScoped<WebhookMessageFactory>()
             .AddSingleton<EventMapperRegistry>();
 
         return services;
