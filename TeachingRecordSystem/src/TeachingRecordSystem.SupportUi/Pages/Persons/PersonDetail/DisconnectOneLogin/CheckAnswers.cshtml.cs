@@ -53,7 +53,7 @@ public class CheckAnswers(
         }
 
         var personName = $"{person.FirstName} {person.LastName}";
-        TempData.SetFlashSuccess($"GOV.UK One Login disconnected from {personName}`s record");
+        TempData.SetFlashSuccess($"GOV.UK One Login disconnected from {personName}’s record");
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 
