@@ -21,6 +21,9 @@ updates:
       hangfire:
         patterns:
           - 'Hangfire.*'
+      sentry:
+        patterns:
+          - 'Sentry.*'
 
   - package-ecosystem: github-actions
     directory: /
