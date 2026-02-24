@@ -54,7 +54,7 @@ public class IndexModel(TrsDbContext dbContext, IClock clock, SupportUiLinkGener
             RaisedBy = User.GetUserId(),
             ApiKey = EventModels.ApiKey.FromModel(apiKey)
         };
-        await dbContext.AddEventAndBroadcastAsync(@event);
+        dbContext.AddEventWithoutBroadcast(@event);
 
         try
         {

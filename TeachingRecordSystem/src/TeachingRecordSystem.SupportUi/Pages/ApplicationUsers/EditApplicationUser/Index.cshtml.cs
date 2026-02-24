@@ -222,7 +222,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 OldApplicationUser = oldApplicationUser,
                 Changes = changes
             };
-            await dbContext.AddEventAndBroadcastAsync(@event);
+            dbContext.AddEventWithoutBroadcast(@event);
 
             await dbContext.SaveChangesAsync();
 

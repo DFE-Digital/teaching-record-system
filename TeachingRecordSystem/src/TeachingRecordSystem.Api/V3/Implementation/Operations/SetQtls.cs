@@ -73,7 +73,7 @@ public class SetQtlsHandler(
                     @event: out var @event);
 
                 dbContext.Qualifications.Add(professionalStatus);
-                await dbContext.AddEventAndBroadcastAsync(@event);
+                dbContext.AddEventWithoutBroadcast(@event);
             }
             else
             {
@@ -90,7 +90,7 @@ public class SetQtlsHandler(
 
                 if (@event is not null)
                 {
-                    await dbContext.AddEventAndBroadcastAsync(@event);
+                    dbContext.AddEventWithoutBroadcast(@event);
                 }
             }
         }
@@ -105,7 +105,7 @@ public class SetQtlsHandler(
                 now: clock.UtcNow,
                 out var @event);
 
-            await dbContext.AddEventAndBroadcastAsync(@event);
+            dbContext.AddEventWithoutBroadcast(@event);
         }
 
         await dbContext.SaveChangesAsync();

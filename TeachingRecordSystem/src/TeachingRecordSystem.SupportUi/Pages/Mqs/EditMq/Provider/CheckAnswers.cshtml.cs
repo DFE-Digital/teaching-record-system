@@ -73,7 +73,7 @@ public class CheckAnswersModel(
 
         if (updatedEvent is not null)
         {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
+            dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();
         }
 

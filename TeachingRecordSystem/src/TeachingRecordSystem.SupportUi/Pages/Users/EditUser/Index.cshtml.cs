@@ -72,7 +72,7 @@ public class IndexModel(
             _user.Role = Role;
             _user.Name = Name!;
 
-            await dbContext.AddEventAndBroadcastAsync(new UserUpdatedEvent
+            dbContext.AddEventWithoutBroadcast(new UserUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
                 User = EventModels.User.FromModel(_user),
@@ -115,7 +115,7 @@ public class IndexModel(
 
         _user.Active = true;
 
-        await dbContext.AddEventAndBroadcastAsync(new UserActivatedEvent
+        dbContext.AddEventWithoutBroadcast(new UserActivatedEvent
         {
             EventId = Guid.NewGuid(),
             User = EventModels.User.FromModel(_user),

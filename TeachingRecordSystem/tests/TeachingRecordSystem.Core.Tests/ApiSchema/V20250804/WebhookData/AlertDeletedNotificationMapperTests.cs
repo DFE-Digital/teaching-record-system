@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
@@ -29,15 +28,11 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.DeletedOn = Clock.UtcNow;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var deletedEvent = new LegacyEvents.AlertDeletedEvent
+                var deletedEvent = new AlertDeletedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = Clock.UtcNow,
-                    RaisedBy = SystemUser.SystemUserId,
                     PersonId = alert.PersonId,
-                    Alert = EventModels.Alert.FromModel(alert),
-                    DeletionReasonDetail = null,
-                    EvidenceFile = null
+                    Alert = EventModels.Alert.FromModel(alert)
                 };
 
                 await dbContext.SaveChangesAsync();
@@ -81,15 +76,11 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
                 alert.DeletedOn = Clock.UtcNow;
                 alert.UpdatedOn = Clock.UtcNow;
 
-                var deletedEvent = new LegacyEvents.AlertDeletedEvent
+                var deletedEvent = new AlertDeletedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = Clock.UtcNow,
-                    RaisedBy = SystemUser.SystemUserId,
                     PersonId = alert.PersonId,
-                    Alert = EventModels.Alert.FromModel(alert),
-                    DeletionReasonDetail = null,
-                    EvidenceFile = null
+                    Alert = EventModels.Alert.FromModel(alert)
                 };
 
                 await dbContext.SaveChangesAsync();

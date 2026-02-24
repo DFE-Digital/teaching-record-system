@@ -89,7 +89,7 @@ public class CheckAnswersModel(
             out var deletedEvent);
         if (deletedEvent is not null)
         {
-            await dbContext.AddEventAndBroadcastAsync(deletedEvent);
+            dbContext.AddEventWithoutBroadcast(deletedEvent);
             await dbContext.SaveChangesAsync();
         }
 

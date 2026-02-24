@@ -112,7 +112,7 @@ public class InductionImporter
 
                             if (updatedEvent is not null)
                             {
-                                await _dbContext.AddEventAndBroadcastAsync(updatedEvent);
+                                _dbContext.AddEventWithoutBroadcast(updatedEvent);
                             }
                         }
 

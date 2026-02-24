@@ -75,7 +75,7 @@ public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserPr
 
         if (updatedEvent is not null)
         {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
+            dbContext.AddEventWithoutBroadcast(updatedEvent);
         }
 
         await dbContext.SaveChangesAsync();

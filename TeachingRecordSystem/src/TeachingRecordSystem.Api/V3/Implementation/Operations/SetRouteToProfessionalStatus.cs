@@ -213,7 +213,7 @@ public class SetRouteToProfessionalStatusHandler(
 
             if (@event is not null)
             {
-                await dbContext.AddEventAndBroadcastAsync(@event);
+                dbContext.AddEventWithoutBroadcast(@event);
             }
         }
         else
@@ -244,7 +244,7 @@ public class SetRouteToProfessionalStatusHandler(
                 @event: out var @event);
 
             dbContext.RouteToProfessionalStatuses.Add(route);
-            await dbContext.AddEventAndBroadcastAsync(@event);
+            dbContext.AddEventWithoutBroadcast(@event);
         }
 
         await dbContext.SaveChangesAsync();

@@ -88,7 +88,7 @@ public class DeactivateModel(
 
         _user.Active = false;
 
-        await dbContext.AddEventAndBroadcastAsync(new UserDeactivatedEvent
+        dbContext.AddEventWithoutBroadcast(new UserDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
             User = EventModels.User.FromModel(_user),

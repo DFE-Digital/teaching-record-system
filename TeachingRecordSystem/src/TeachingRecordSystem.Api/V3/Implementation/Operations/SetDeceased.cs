@@ -41,7 +41,7 @@ public class SetDeceasedHandler(
             EvidenceFile = null,
             DateOfDeath = command.DateOfDeath
         };
-        await dbContext.AddEventAndBroadcastAsync(@event);
+        dbContext.AddEventWithoutBroadcast(@event);
 
         await dbContext.SaveChangesAsync();
 

@@ -6,12 +6,16 @@ using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Infrastructure.Json;
 
 namespace TeachingRecordSystem.Core.Services.Webhooks;
 
-public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClock clock, IMemoryCache memoryCache)
+public class WebhookMessageFactory(
+    EventMapperRegistry eventMapperRegistry,
+    IClock clock,
+    IMemoryCache memoryCache,
+    TrsDbContext dbContext,
+    IServiceProvider serviceProvider)
 {
     private static readonly TimeSpan _webhookEndpointsCacheDuration = TimeSpan.FromMinutes(1);
 
@@ -27,10 +31,7 @@ public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClo
             }
         };
 
-    public async Task<IEnumerable<WebhookMessage>> CreateMessagesAsync(
-        TrsDbContext dbContext,
-        EventBase @event,
-        IServiceProvider serviceProvider)
+    public async Task<IEnumerable<WebhookMessage>> CreateMessagesAsync(IEvent @event)
     {
         var endpoints = await memoryCache.GetOrCreateAsync(
             CacheKeys.EnabledWebhookEndpoints(),
@@ -120,14 +121,14 @@ public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClo
 
     private interface IEventMapper
     {
-        Task<object?> MapEventAsync(EventBase @event);
+        Task<object?> MapEventAsync(IEvent @event);
     }
 
     private class WrappedMapper<TEvent, TData>(IEventMapper<TEvent, TData> innerMapper) : IEventMapper
-        where TEvent : EventBase
+        where TEvent : IEvent
         where TData : IWebhookMessageData
     {
-        public async Task<object?> MapEventAsync(EventBase @event) =>
+        public async Task<object?> MapEventAsync(IEvent @event) =>
             await innerMapper.MapEventAsync((TEvent)@event);
     }
 }

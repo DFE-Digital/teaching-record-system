@@ -73,7 +73,7 @@ public class CheckAnswersModel(
             clock.UtcNow,
             out var deletedEvent);
 
-        await dbContext.AddEventAndBroadcastAsync(deletedEvent);
+        dbContext.AddEventWithoutBroadcast(deletedEvent);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
