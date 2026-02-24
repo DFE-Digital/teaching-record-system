@@ -242,7 +242,9 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
-            MergedWithPersonId = null
+            Changes = PersonDeactivatedEventChanges.PersonStatus,
+            MergedWithPersonId = null,
+            DateOfDeath = null
         };
 
         var user = SystemUser.Instance;
@@ -272,7 +274,8 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         var @event = new PersonReactivatedEvent
         {
             EventId = Guid.NewGuid(),
-            PersonId = person.PersonId
+            PersonId = person.PersonId,
+            Changes = PersonReactivatedEventChanges.PersonStatus
         };
 
         var user = SystemUser.Instance;
@@ -312,7 +315,9 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
-            MergedWithPersonId = mergedWithPerson.PersonId
+            Changes = PersonDeactivatedEventChanges.PersonStatus | PersonDeactivatedEventChanges.MergedWithPersonId,
+            MergedWithPersonId = mergedWithPerson.PersonId,
+            DateOfDeath = null
         };
 
         var user = SystemUser.Instance;
@@ -352,7 +357,9 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
-            MergedWithPersonId = mergedWithPerson.PersonId
+            Changes = PersonDeactivatedEventChanges.PersonStatus | PersonDeactivatedEventChanges.MergedWithPersonId,
+            MergedWithPersonId = mergedWithPerson.PersonId,
+            DateOfDeath = null
         };
 
         var user = SystemUser.Instance;
