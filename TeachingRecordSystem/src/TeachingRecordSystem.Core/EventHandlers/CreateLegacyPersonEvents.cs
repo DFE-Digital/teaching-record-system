@@ -40,7 +40,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
     {
         if (processContext.ProcessType is ProcessType.PersonDetailsUpdating)
         {
-            var changeReason = (PersonDetailsChangeReasonInfo)processContext.Process.ChangeReason!;
+            var changeReason = processContext.Process.ChangeReason as PersonDetailsChangeReasonInfo;
 
             var legacyEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {
@@ -51,11 +51,11 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 Changes = (LegacyEvents.PersonDetailsUpdatedEventChanges)((int)@event.Changes << 16),
                 OldPersonAttributes = @event.OldPersonDetails,
                 PersonAttributes = @event.PersonDetails,
-                NameChangeReason = changeReason.NameChangeReason,
-                NameChangeEvidenceFile = changeReason.NameChangeEvidenceFile,
-                DetailsChangeReason = changeReason.Reason,
-                DetailsChangeReasonDetail = changeReason.Details,
-                DetailsChangeEvidenceFile = changeReason.EvidenceFile
+                NameChangeReason = changeReason?.NameChangeReason,
+                NameChangeEvidenceFile = changeReason?.NameChangeEvidenceFile,
+                DetailsChangeReason = changeReason?.Reason,
+                DetailsChangeReasonDetail = changeReason?.Details,
+                DetailsChangeEvidenceFile = changeReason?.EvidenceFile
             };
 
             dbContext.AddEventWithoutBroadcast(legacyEvent);
