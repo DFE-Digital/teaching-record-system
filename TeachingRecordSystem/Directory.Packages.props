@@ -87,9 +87,9 @@
     <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.2.0" />
     <PackageVersion Include="Respawn" Version="7.0.0" />
     <PackageVersion Include="Scrutor" Version="7.0.0" />
-    <PackageVersion Include="Sentry.AspNetCore" Version="6.0.0" />
+    <PackageVersion Include="Sentry.AspNetCore" Version="6.1.0" />
     <PackageVersion Include="Sentry.Extensions.Logging" Version="6.1.0" />
-    <PackageVersion Include="Sentry.Serilog" Version="5.16.2" />
+    <PackageVersion Include="Sentry.Serilog" Version="6.1.0" />
     <PackageVersion Include="Serilog" Version="3.1.1" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
