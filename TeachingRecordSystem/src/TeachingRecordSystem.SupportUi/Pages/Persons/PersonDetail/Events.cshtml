@@ -41,10 +41,18 @@
                     </time>
                 </p>
                 <div class="moj-timeline__description">
+                    @if (processEventPayload.GetFormattedChangeReasonJsonPayload() is var changeReasonJsonPayload)
+                    {
+                        <div>
+                            <p class="govuk-body">Change reason</p>
+                            <pre class="trs-event-payload">@changeReasonJsonPayload</pre>
+                        </div>
+                    }
+
                     @foreach (var x in processEventPayload.Events)
                     {
                         <div>
-                            <strong class="govuk-heading-xs">@x.EventName</strong>
+                            <p class="govuk-body">@x.EventName</p>
                             <pre class="trs-event-payload">@x.GetFormattedJsonPayload()</pre>
                         </div>
                     }

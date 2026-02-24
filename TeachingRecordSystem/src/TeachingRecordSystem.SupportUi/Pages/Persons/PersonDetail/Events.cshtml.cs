@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [Authorize(AuthorizationPolicies.AdminOnly)]
+[AllowDeactivatedPerson]
 public class EventsModel(TrsDbContext dbContext) : PageModel
 {
     [FromRoute]
@@ -34,6 +36,7 @@ public class EventsModel(TrsDbContext dbContext) : PageModel
                     .Select(p => new ProcessEventPayload(
                         p.ProcessType.ToString(),
                         p.Events!.OrderBy(e => e.CreatedOn).Select(x => new ProcessEventPayloadEvent(x.EventName, x.Payload)).ToArray(),
+                        p.ChangeReason,
                         p.CreatedOn)))
             .OrderBy(e => e.Timestamp)
             .ToArray();
@@ -55,7 +58,20 @@ public class EventsModel(TrsDbContext dbContext) : PageModel
         }
     }
 
-    public record ProcessEventPayload(string ProcessType, IReadOnlyCollection<ProcessEventPayloadEvent> Events, DateTime Timestamp) : IEventEntry;
+    public record ProcessEventPayload(string ProcessType, IReadOnlyCollection<ProcessEventPayloadEvent> Events, IChangeReasonInfo? ChangeReason, DateTime Timestamp)
+        : IEventEntry
+    {
+        public string? GetFormattedChangeReasonJsonPayload()
+        {
+            if (ChangeReason is null)
+            {
+                return null;
+            }
+
+            var jsonElement = JsonSerializer.SerializeToElement(ChangeReason, IChangeReasonInfo.SerializerOptions);
+            return JsonSerializer.Serialize(jsonElement, IEventEntry.SerializerOptions);
+        }
+    }
 
     public record ProcessEventPayloadEvent(string EventName, IEvent Payload)
     {
