@@ -16,7 +16,7 @@ public partial class TrsDbContext : DbContext
 {
     public const string ConnectionName = "DefaultConnection";
 
-    private TrsDbContext(DbContextOptions<TrsDbContext> options)
+    public TrsDbContext(DbContextOptions<TrsDbContext> options)
         : base(options)
     {
     }
