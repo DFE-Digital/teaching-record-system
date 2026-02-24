@@ -116,6 +116,17 @@ public static class Extensions
             .AddInductionExemptionService()
             .AddOneLoginService();
 
+        if (environment.IsProduction())
+        {
+            services.AddIdDbContext(configuration);
+        }
+        else
+        {
+            services.AddDbContext<IdDbContext>(
+                options => options.UseInMemoryDatabase("TeacherAuthId"),
+                contextLifetime: ServiceLifetime.Transient);
+        }
+
         return services;
     }
 
