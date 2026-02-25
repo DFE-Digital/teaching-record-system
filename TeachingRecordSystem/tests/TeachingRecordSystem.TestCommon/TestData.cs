@@ -16,7 +16,7 @@ public partial class TestData
     public TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         ReferenceDataCache referenceDataCache,
-        IClock clock) :
+        TimeProvider clock) :
         this(dbContextFactory, referenceDataCache, clock, () => new TestTrnGenerator(dbContextFactory).GenerateTrnAsync())
     {
     }
@@ -24,7 +24,7 @@ public partial class TestData
     private TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         ReferenceDataCache referenceDataCache,
-        IClock clock,
+        TimeProvider clock,
         Func<Task<string>> generateTrn)
     {
         DbContextFactory = dbContextFactory;
@@ -45,7 +45,7 @@ public partial class TestData
         0x00, 0x00, 0x00, 0x00, 0xFF, 0xDA, 0x00, 0x08, 0x01, 0x01, 0x00, 0x01, 0x3F, 0x10
     ];
 
-    public IClock Clock { get; }
+    public TimeProvider Clock { get; }
 
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; }
 
@@ -54,7 +54,7 @@ public partial class TestData
     public static TestData CreateWithCustomTrnGeneration(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         ReferenceDataCache referenceDataCache,
-        IClock clock,
+        TimeProvider clock,
         Func<Task<string>> generateTrn)
     {
         return new TestData(dbContextFactory, referenceDataCache, clock, generateTrn);

@@ -9,7 +9,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyCoordinator.JourneyName, Optional = true)]
-public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventPublisher eventPublisher, IClock clock) : PageModel
+public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventPublisher eventPublisher, TimeProvider timeProvider) : PageModel
 {
     [FromQuery(Name = "scheme")]
     public string? AuthenticationScheme { get; set; }
@@ -30,7 +30,7 @@ public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventP
                 HttpContext,
                 async ctx =>
                 {
-                    var processContext = new ProcessContext(ProcessType.TeacherSigningIn, clock.UtcNow, SystemUser.SystemUserId);
+                    var processContext = new ProcessContext(ProcessType.TeacherSigningIn, timeProvider.UtcNow, SystemUser.SystemUserId);
 
                     await eventPublisher.PublishSingleEventAsync(
                         new AuthorizeAccessRequestStartedEvent

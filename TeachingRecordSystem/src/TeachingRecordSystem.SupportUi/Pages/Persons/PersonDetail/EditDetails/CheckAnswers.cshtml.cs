@@ -12,7 +12,7 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     PersonService personService,
     EvidenceUploadManager evidenceUploadManager,
-    IClock clock)
+    TimeProvider timeProvider)
     : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
     private Person? _person;
@@ -54,7 +54,7 @@ public class CheckAnswersModel(
     {
         var processContext = new ProcessContext(
             ProcessType.PersonDetailsUpdating,
-            clock.UtcNow,
+            timeProvider.UtcNow,
             User.GetUserId(),
             new Core.Events.ChangeReasons.PersonDetailsChangeReasonInfo
             {

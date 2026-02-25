@@ -22,7 +22,7 @@ public class AcceptModel(
     SupportTaskService supportTaskService,
     IBackgroundJobScheduler backgroundJobScheduler,
     SupportUiLinkGenerator linkGenerator,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -46,7 +46,7 @@ public class AcceptModel(
 
         var processContext = new ProcessContext(
             ChangeType is SupportTaskType.ChangeNameRequest ? ProcessType.ChangeOfNameRequestApproving : ProcessType.ChangeOfDateOfBirthRequestApproving,
-            clock.UtcNow,
+            timeProvider.UtcNow,
             User.GetUserId());
 
         string? emailAddress = _supportTask!.Person!.EmailAddress;

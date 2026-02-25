@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -11,7 +12,7 @@ public class TestScopedServices
 
     public TestScopedServices(IServiceProvider serviceProvider)
     {
-        Clock = new();
+        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
         Events = new(Clock);
         LegacyEventObserver = new();
         GetAnIdentityApiClient = new();
@@ -33,7 +34,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(new ForwardToTestScopedTimeProvider())
             .AddSingleton<IEventObserver>(new ForwardToTestScopedEventObserver())
             .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
             .AddTestScoped(tss => tss.Events)
@@ -54,7 +55,7 @@ public class TestScopedServices
         return _current.Value = new(serviceProvider);
     }
 
-    public TestableClock Clock { get; }
+    public FakeTimeProvider Clock { get; }
 
     public EventCapture Events { get; }
 
@@ -68,9 +69,9 @@ public class TestScopedServices
 
     public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
 
-    private class ForwardToTestScopedClock : IClock
+    private class ForwardToTestScopedTimeProvider : TimeProvider
     {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
+        public override DateTimeOffset GetUtcNow() => GetCurrent().Clock.GetUtcNow();
     }
 
     private class ForwardToTestScopedEventObserver : IEventObserver

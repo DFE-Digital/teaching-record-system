@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportNewJob> logger, TrsDbContext dbContext, IClock clock)
+public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportNewJob> logger, TrsDbContext dbContext, TimeProvider timeProvider)
 {
     public const string JobSchedule = "0 3 * * *";
     public const string LastRunDateKey = "LastRunDate";
@@ -24,7 +24,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
         var persons = await GetNewPersonsAsync(lastRunDate);
 
         // start job
-        var fileName = GetFileName(clock);
+        var fileName = GetFileName(timeProvider);
         await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, cancellationToken: cancellationToken);
         var integrationJob = new IntegrationTransaction()
         {
@@ -37,7 +37,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
             FailureCount = 0,
             DuplicateCount = 0,
             FileName = fileName,
-            CreatedDate = clock.UtcNow,
+            CreatedDate = timeProvider.UtcNow,
             IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
         };
         dbContext.IntegrationTransactions.Add(integrationJob);
@@ -101,7 +101,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
                 integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                 {
                     IntegrationTransactionRecordId = 0,
-                    CreatedDate = clock.UtcNow,
+                    CreatedDate = timeProvider.UtcNow,
                     RowData = row,
                     Status = string.IsNullOrEmpty(failureMessage) ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
                     PersonId = person.PersonId,
@@ -120,7 +120,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
                     integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                     {
                         IntegrationTransactionRecordId = 0,
-                        CreatedDate = clock.UtcNow,
+                        CreatedDate = timeProvider.UtcNow,
                         RowData = previousNameRow,
                         Status = string.IsNullOrEmpty(failureMessage) ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
                         PersonId = person.PersonId,
@@ -160,7 +160,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
             jobMetaData.Metadata = new Dictionary<string, string>
             {
                 {
-                    LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
+                    LastRunDateKey, timeProvider.UtcNow.ToString("s", CultureInfo.InvariantCulture)
                 }
             };
         }
@@ -173,7 +173,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
                 Metadata = new Dictionary<string, string>
                 {
                     {
-                        LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
+                        LastRunDateKey, timeProvider.UtcNow.ToString("s", CultureInfo.InvariantCulture)
                     }
                 }
             };
@@ -216,7 +216,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
         }
     }
 
-    public string GetFileName(IClock now)
+    public string GetFileName(TimeProvider now)
     {
         var gmt = now.UtcNow.ToGmt();
         return $"Reg01_DTR_{gmt.ToString("yyyyMMdd")}_{gmt.ToString("HHmmss", CultureInfo.InvariantCulture)}_New.txt";

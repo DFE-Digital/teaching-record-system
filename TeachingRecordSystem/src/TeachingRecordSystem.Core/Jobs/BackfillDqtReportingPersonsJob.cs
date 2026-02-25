@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.Jobs;
 
 [AutomaticRetry(Attempts = 0)]
-public class BackfillDqtReportingPersonsJob(IConfiguration configuration, TrsDbContext dbContext, IClock clock)
+public class BackfillDqtReportingPersonsJob(IConfiguration configuration, TrsDbContext dbContext, TimeProvider timeProvider)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -86,8 +86,8 @@ public class BackfillDqtReportingPersonsJob(IConfiguration configuration, TrsDbC
                     e.CreatedOn,
                     e.DeletedOn,
                     e.UpdatedOn,
-                    clock.UtcNow,
-                    clock.UtcNow);
+                    timeProvider.UtcNow,
+                    timeProvider.UtcNow);
             }
 
             await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);

@@ -12,8 +12,8 @@ public class SendAytqInviteEmailJob(
     IEventPublisher eventPublisher,
     IGetAnIdentityApiClient identityApiClient,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptions,
-    IClock clock) :
-    SendEmailJob(dbContext, eventPublisher, notificationSender, clock)
+    TimeProvider timeProvider) :
+    SendEmailJob(dbContext, eventPublisher, notificationSender, timeProvider)
 {
     private const string MagicLinkPersonalizationKey = "link to access your teaching qualifications service";
 

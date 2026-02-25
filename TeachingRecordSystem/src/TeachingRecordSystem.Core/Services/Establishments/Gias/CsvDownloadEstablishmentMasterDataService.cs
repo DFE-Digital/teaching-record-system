@@ -8,14 +8,14 @@ namespace TeachingRecordSystem.Core.Services.Establishments.Gias;
 public class CsvDownloadEstablishmentMasterDataService : IEstablishmentMasterDataService
 {
     private readonly HttpClient _httpClient;
-    private readonly IClock _clock;
+    private readonly TimeProvider _timeProvider;
 
     public CsvDownloadEstablishmentMasterDataService(
         HttpClient httpClient,
-        IClock clock)
+        TimeProvider timeProvider)
     {
         _httpClient = httpClient;
-        _clock = clock;
+        _timeProvider = timeProvider;
     }
 
     public async IAsyncEnumerable<Establishment> GetEstablishmentsAsync()
@@ -60,7 +60,7 @@ public class CsvDownloadEstablishmentMasterDataService : IEstablishmentMasterDat
 
     private string GetLatestEstablishmentsCsvFilename()
     {
-        var filename = $"edubasealldata{_clock.UtcNow:yyyyMMdd}.csv";
+        var filename = $"edubasealldata{_timeProvider.UtcNow:yyyyMMdd}.csv";
         return filename;
     }
 }

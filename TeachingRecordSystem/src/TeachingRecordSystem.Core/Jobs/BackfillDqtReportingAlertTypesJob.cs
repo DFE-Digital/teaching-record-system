@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class BackfillDqtReportingAlertTypesJob(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, IClock clock)
+public class BackfillDqtReportingAlertTypesJob(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, TimeProvider timeProvider)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -33,8 +33,8 @@ public class BackfillDqtReportingAlertTypesJob(IOptions<DqtReportingOptions> dqt
                     ac.AlertCategoryId,
                     ac.Name,
                     ac.DisplayOrder,
-                    clock.UtcNow,
-                    clock.UtcNow);
+                    timeProvider.UtcNow,
+                    timeProvider.UtcNow);
             }
 
             using (var sqlBulkCopy = new SqlBulkCopy(conn))
@@ -76,8 +76,8 @@ public class BackfillDqtReportingAlertTypesJob(IOptions<DqtReportingOptions> dqt
                     at.InternalOnly,
                     at.IsActive,
                     at.DisplayOrder,
-                    clock.UtcNow,
-                    clock.UtcNow);
+                    timeProvider.UtcNow,
+                    timeProvider.UtcNow);
             }
 
             using (var sqlBulkCopy = new SqlBulkCopy(conn))

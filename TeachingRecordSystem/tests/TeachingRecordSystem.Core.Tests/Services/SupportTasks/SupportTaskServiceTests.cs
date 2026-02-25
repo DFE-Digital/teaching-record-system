@@ -275,7 +275,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {

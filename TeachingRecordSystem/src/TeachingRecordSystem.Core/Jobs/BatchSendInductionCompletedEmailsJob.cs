@@ -10,7 +10,7 @@ public class BatchSendInductionCompletedEmailsJob(
     IOptions<BatchSendInductionCompletedEmailsJobOptions> jobOptionsAccessor,
     IDbContextFactory<TrsDbContext> dbContextFactory,
     IBackgroundJobScheduler backgroundJobScheduler,
-    IClock clock)
+    TimeProvider timeProvider)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -22,9 +22,9 @@ public class BatchSendInductionCompletedEmailsJob(
             jobOptionsAccessor.Value.InitialLastPassedEndUtc;
 
         // Look for new induction awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
-        var passedEndUtc = clock.Today.AddDays(-(jobOptionsAccessor.Value.EmailDelayDays + 1)).ToDateTime();
+        var passedEndUtc = timeProvider.Today.AddDays(-(jobOptionsAccessor.Value.EmailDelayDays + 1)).ToDateTime();
 
-        var executed = clock.UtcNow;
+        var executed = timeProvider.UtcNow;
         var startDate = lastPassedEndUtc;
         var endDate = passedEndUtc;
         var inductionCompletedEmailsJobId = Guid.NewGuid();

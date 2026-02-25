@@ -12,7 +12,7 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     AlertService alertService,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
@@ -69,7 +69,7 @@ public class CheckAnswersModel(
     {
         var processContext = new ProcessContext(
             ProcessType.AlertCreating,
-            clock.UtcNow,
+            timeProvider.UtcNow,
             User.GetUserId(),
             new ChangeReasonWithDetailsAndEvidence
             {

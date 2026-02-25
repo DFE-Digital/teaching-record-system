@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.Core.Services.Webhooks;
 public class WebhookDeliveryService(
     IWebhookSender webhookSender,
     IDbContextFactory<TrsDbContext> dbContextFactory,
-    IClock clock,
+    TimeProvider timeProvider,
     ILogger<WebhookDeliveryService> logger) : BackgroundService
 {
     public const int BatchSize = 20;
@@ -69,7 +69,7 @@ public class WebhookDeliveryService(
 
     public async Task<SendMessagesResult> SendMessagesAsync(CancellationToken cancellationToken = default)
     {
-        var startedAt = clock.UtcNow;
+        var startedAt = timeProvider.UtcNow;
 
         await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
         await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, cancellationToken: cancellationToken);
@@ -79,7 +79,7 @@ public class WebhookDeliveryService(
         var messages = await dbContext.WebhookMessages
             .FromSql($"""
                 select * from webhook_messages
-                where next_delivery_attempt <= {clock.UtcNow}
+                where next_delivery_attempt <= {timeProvider.UtcNow}
                 order by next_delivery_attempt
                 limit {BatchSize + 1}
                 for update skip locked
@@ -97,7 +97,7 @@ public class WebhookDeliveryService(
             {
                 ct.ThrowIfCancellationRequested();
 
-                var now = clock.UtcNow;
+                var now = timeProvider.UtcNow;
                 message.DeliveryAttempts.Add(now);
 
                 try

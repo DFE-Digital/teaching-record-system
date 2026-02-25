@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [Authorize(Policy = AuthorizationPolicies.PersonDataEdit)]
-public class AddNote(NoteService noteService, SupportUiLinkGenerator linkGenerator, IFileService fileService, IClock clock) : PageModel
+public class AddNote(NoteService noteService, SupportUiLinkGenerator linkGenerator, IFileService fileService, TimeProvider timeProvider) : PageModel
 {
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -44,7 +44,7 @@ public class AddNote(NoteService noteService, SupportUiLinkGenerator linkGenerat
             fileId = await fileService.UploadFileAsync(stream, File.ContentType);
         }
 
-        var processContext = new ProcessContext(ProcessType.NoteCreating, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.NoteCreating, timeProvider.UtcNow, User.GetUserId());
 
         await noteService.CreateNoteAsync(
             new CreateNoteOptions

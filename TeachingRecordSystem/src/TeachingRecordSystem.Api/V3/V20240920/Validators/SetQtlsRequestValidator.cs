@@ -5,10 +5,10 @@ namespace TeachingRecordSystem.Api.V3.V20240920.Validators;
 
 public class SetQtlsRequestValidator : AbstractValidator<SetQtlsRequest>
 {
-    public SetQtlsRequestValidator(IClock clock)
+    public SetQtlsRequestValidator(TimeProvider timeProvider)
     {
         RuleFor(x => x.QtsDate)
-            .LessThanOrEqualTo(clock.Today)
+            .LessThanOrEqualTo(timeProvider.Today)
             .WithMessage($"Date cannot be in the future.");
     }
 }

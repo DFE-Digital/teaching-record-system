@@ -1,11 +1,12 @@
 using System.Diagnostics;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core.Tests.DataStore.Postgres.Models;
 
 public class PersonTests
 {
-    public TestableClock Clock { get; } = new TestableClock();
+    public FakeTimeProvider Clock { get; } = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
 
     [Fact]
     public void SetInductionStatus_None_UpdatesStatus()
@@ -213,7 +214,7 @@ public class PersonTests
             out _);
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.SetCpdInductionStatus(
@@ -253,7 +254,7 @@ public class PersonTests
             out _);
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.SetCpdInductionStatus(
@@ -298,7 +299,7 @@ public class PersonTests
             Clock.UtcNow,
             out _);
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.TrySetWelshInductionStatus(
@@ -333,7 +334,7 @@ public class PersonTests
             Clock.UtcNow,
             out _);
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.TrySetWelshInductionStatus(
@@ -368,7 +369,7 @@ public class PersonTests
             Clock.UtcNow,
             out _);
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.TrySetWelshInductionStatus(

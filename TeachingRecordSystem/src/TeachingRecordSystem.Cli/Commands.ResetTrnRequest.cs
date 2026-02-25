@@ -47,7 +47,7 @@ public partial class Commands
                 using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
                 using var scope = services.CreateScope();
-                var clock = scope.ServiceProvider.GetRequiredService<IClock>();
+                var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
 
                 var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
 
@@ -74,7 +74,7 @@ public partial class Commands
 
                 var trnRequestService = scope.ServiceProvider.GetRequiredService<TrnRequestService>();
 
-                var now = clock.UtcNow;
+                var now = timeProvider.UtcNow;
 
                 var matchResult = await trnRequestService.MatchPersonsAsync(request);
 

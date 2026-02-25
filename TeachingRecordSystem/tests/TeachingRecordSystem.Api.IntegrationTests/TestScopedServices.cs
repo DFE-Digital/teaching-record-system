@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using JustEat.HttpClientInterception;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -15,7 +16,7 @@ public class TestScopedServices
 
     public TestScopedServices(IServiceProvider serviceProvider)
     {
-        Clock = new();
+        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
         GetAnIdentityApiClientMock = new();
         BlobStorageFileServiceMock = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
@@ -30,7 +31,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(new ForwardToTestScopedTimeProvider())
             .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AccessYourTeachingQualificationsOptions)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
@@ -62,7 +63,7 @@ public class TestScopedServices
         return false;
     }
 
-    public TestableClock Clock { get; }
+    public FakeTimeProvider Clock { get; }
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
@@ -76,9 +77,9 @@ public class TestScopedServices
 
     public HttpClientInterceptorOptions EvidenceFilesHttpClientInterceptorOptions { get; }
 
-    private class ForwardToTestScopedClock : IClock
+    private class ForwardToTestScopedTimeProvider : TimeProvider
     {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
+        public override DateTimeOffset GetUtcNow() => GetCurrent().Clock.GetUtcNow();
     }
 }
 

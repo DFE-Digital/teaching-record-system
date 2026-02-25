@@ -19,7 +19,7 @@ public class CheckAnswersModel(
     SupportTaskService supportTaskService,
     IEventPublisher eventPublisher,
     IFileService fileService,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -99,7 +99,7 @@ public class CheckAnswersModel(
         var state = JourneyInstance!.State;
         var requestId = Guid.NewGuid().ToString();
 
-        var processContext = new ProcessContext(ProcessType.NpqTrnRequestTaskCreating, clock.UtcNow, ApplicationUser.NpqApplicationUserGuid);
+        var processContext = new ProcessContext(ProcessType.NpqTrnRequestTaskCreating, timeProvider.UtcNow, ApplicationUser.NpqApplicationUserGuid);
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 

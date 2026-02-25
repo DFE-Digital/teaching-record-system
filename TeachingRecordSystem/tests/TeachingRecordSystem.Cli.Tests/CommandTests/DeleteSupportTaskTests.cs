@@ -28,7 +28,7 @@ public class DeleteSupportTaskTests(IServiceProvider services) : CommandTestBase
                 .IgnoreQueryFilters()
                 .SingleOrDefaultAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
 
-            Assert.NotNull(updatedTask?.DeletedOn);  // TODO Figure out how to pass TestableClock to Command
+            Assert.NotNull(updatedTask?.DeletedOn);  // TODO Figure out how to pass FakeTimeProvider to Command
         });
     }
 

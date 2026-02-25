@@ -513,7 +513,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             attribute);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var state = new ResolveNpqTrnRequestState

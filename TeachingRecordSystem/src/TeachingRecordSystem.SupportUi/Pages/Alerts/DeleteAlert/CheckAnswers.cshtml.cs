@@ -12,7 +12,7 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     AlertService alertService,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<DeleteAlertState>? JourneyInstance { get; set; }
 
@@ -70,7 +70,7 @@ public class CheckAnswersModel(
         var alert = HttpContext.GetCurrentAlertFeature().Alert;
         var processContext = new ProcessContext(
             ProcessType.AlertDeleting,
-            clock.UtcNow,
+            timeProvider.UtcNow,
             User.GetUserId(),
             new ChangeReasonWithDetailsAndEvidence
             {

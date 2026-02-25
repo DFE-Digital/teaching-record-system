@@ -1,7 +1,7 @@
 @page "/application-users/{userId}"
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @model TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.EditApplicationUser.IndexModel
-@inject IClock Clock
+@inject TimeProvider Clock
 @{
     ViewBag.Title = $"Edit {Model.Name}";
 }

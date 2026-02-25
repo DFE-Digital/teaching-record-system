@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 public class IndexModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<EditAlertStartDateState>? JourneyInstance { get; set; }
 
@@ -39,7 +39,7 @@ public class IndexModel(
         {
             ModelState.AddModelError(nameof(StartDate), "Enter a start date");
         }
-        else if (StartDate > clock.Today)
+        else if (StartDate > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(StartDate), "Start date cannot be in the future");
         }

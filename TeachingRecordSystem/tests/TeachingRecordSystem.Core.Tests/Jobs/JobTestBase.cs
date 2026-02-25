@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -16,7 +17,7 @@ public abstract class JobTestBase
 
     protected EventCapture Events => TestScopedServices.GetCurrent().Events;
 
-    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => _fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 

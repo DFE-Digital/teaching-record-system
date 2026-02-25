@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 public class ConfirmModel(
     TrsDbContext dbContext,
     IAadUserService userService,
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private User? _user;
@@ -80,7 +80,7 @@ public class ConfirmModel(
             EventId = Guid.NewGuid(),
             User = EventModels.User.FromModel(newUser),
             RaisedBy = User.GetUserId(),
-            CreatedUtc = clock.UtcNow
+            CreatedUtc = timeProvider.UtcNow
         });
 
         await dbContext.SaveChangesAsync();

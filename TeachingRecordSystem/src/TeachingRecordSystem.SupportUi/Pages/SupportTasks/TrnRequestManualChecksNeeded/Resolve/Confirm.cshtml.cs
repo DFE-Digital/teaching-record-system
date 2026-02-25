@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded.Resolve;
 
-public class Confirm(TrnRequestService trnRequestService, SupportTaskService supportTaskService, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
+public class Confirm(TrnRequestService trnRequestService, SupportTaskService supportTaskService, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     [FromRoute]
     public string? SupportTaskReference { get; set; }
@@ -20,7 +20,7 @@ public class Confirm(TrnRequestService trnRequestService, SupportTaskService sup
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var trnRequest = supportTask.TrnRequestMetadata!;
 
-        var processContext = new ProcessContext(ProcessType.TrnRequestManualChecksNeededTaskCompleting, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.TrnRequestManualChecksNeededTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
         await trnRequestService.CompleteResolvedTrnRequestAsync(trnRequest, processContext);
 

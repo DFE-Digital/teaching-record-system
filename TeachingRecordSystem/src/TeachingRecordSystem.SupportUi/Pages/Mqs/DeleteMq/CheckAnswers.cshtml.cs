@@ -11,7 +11,7 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
@@ -70,7 +70,7 @@ public class CheckAnswersModel(
             DeletionReasonDetail,
             EvidenceFile?.ToEventModel(),
             User.GetUserId(),
-            clock.UtcNow,
+            timeProvider.UtcNow,
             out var deletedEvent);
 
         dbContext.AddEventWithoutBroadcast(deletedEvent);

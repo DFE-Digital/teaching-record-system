@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class IndexModel(
     TrsDbContext dbContext,
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private Core.DataStore.Postgres.Models.User? _user;
@@ -77,7 +77,7 @@ public class IndexModel(
                 EventId = Guid.NewGuid(),
                 User = EventModels.User.FromModel(_user),
                 RaisedBy = User.GetUserId(),
-                CreatedUtc = clock.UtcNow,
+                CreatedUtc = timeProvider.UtcNow,
                 Changes = changes
             });
 
@@ -120,7 +120,7 @@ public class IndexModel(
             EventId = Guid.NewGuid(),
             User = EventModels.User.FromModel(_user),
             RaisedBy = User.GetUserId(),
-            CreatedUtc = clock.UtcNow
+            CreatedUtc = timeProvider.UtcNow
         });
 
         await dbContext.SaveChangesAsync();

@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.Core.Services.DqtReporting;
 
 public class ReportingHelper(
     IOptions<DqtReportingOptions> optionsAccessor,
-    IClock clock,
+    TimeProvider timeProvider,
     IConfiguration configuration)
 {
     public async Task BackfillTrsTableAsync(string tableName, CancellationToken cancellationToken)
@@ -137,7 +137,7 @@ public class ReportingHelper(
 
             await using (var mergeCmd = new SqlCommand(mergeSql, sqlConnection))
             {
-                mergeCmd.Parameters.Add(new SqlParameter(nowParameterName, clock.UtcNow));
+                mergeCmd.Parameters.Add(new SqlParameter(nowParameterName, timeProvider.UtcNow));
                 mergeCmd.CommandTimeout = 60 * 10;
                 await mergeCmd.ExecuteNonQueryAsync(cancellationToken);
             }

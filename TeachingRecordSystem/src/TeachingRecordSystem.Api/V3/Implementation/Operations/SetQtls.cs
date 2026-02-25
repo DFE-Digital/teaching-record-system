@@ -10,7 +10,7 @@ public class SetQtlsHandler(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     ICurrentUserProvider currentUserProvider,
-    IClock clock) :
+    TimeProvider timeProvider) :
     ICommandHandler<SetQtlsCommand, QtlsResult>
 {
     private static readonly DateOnly QtsCutoff = new(2012, 4, 1);
@@ -66,7 +66,7 @@ public class SetQtlsHandler(
                     degreeTypeId: null,
                     isExemptFromInduction: true,
                     createdBy: currentUserId,
-                    now: clock.UtcNow,
+                    now: timeProvider.UtcNow,
                     changeReason: null,
                     changeReasonDetail: null,
                     evidenceFile: null,
@@ -85,7 +85,7 @@ public class SetQtlsHandler(
                     changeReasonDetail: null,
                     evidenceFile: null,
                     updatedBy: currentUserId,
-                    now: clock.UtcNow,
+                    now: timeProvider.UtcNow,
                     out var @event);
 
                 if (@event is not null)
@@ -102,7 +102,7 @@ public class SetQtlsHandler(
                 deletionReasonDetail: null,
                 evidenceFile: null,
                 deletedBy: currentUserId,
-                now: clock.UtcNow,
+                now: timeProvider.UtcNow,
                 out var @event);
 
             dbContext.AddEventWithoutBroadcast(@event);

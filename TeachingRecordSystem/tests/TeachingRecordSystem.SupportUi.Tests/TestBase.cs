@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
@@ -34,7 +35,7 @@ public abstract class TestBase
 
     protected CaptureEventObserver EventObserver => TestScopedServices.GetCurrent().EventObserver;
 
-    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
 
     protected Mock<IAadUserService> AzureActiveDirectoryUserServiceMock =>
         TestScopedServices.GetCurrent().AzureActiveDirectoryUserServiceMock;

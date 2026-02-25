@@ -38,7 +38,7 @@ public class AddRouteStateBuilder()
         return this;
     }
 
-    public AddRouteStateBuilder WithHoldsStatusFields(IClock clock)
+    public AddRouteStateBuilder WithHoldsStatusFields(TimeProvider clock)
     {
         _trainingStartDate = clock.Today.AddYears(-1);
         _trainingEndDate = clock.Today.AddDays(-1);

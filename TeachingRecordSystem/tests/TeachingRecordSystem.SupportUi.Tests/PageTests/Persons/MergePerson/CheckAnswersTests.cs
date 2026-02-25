@@ -126,7 +126,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             sourcedFromSecondaryPersonAttribute.Attribute,
             useNullValues: useNullValues);
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "evidence.jpg";

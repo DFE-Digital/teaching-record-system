@@ -15,7 +15,7 @@ public class DeactivateModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     TrsDbContext dbContext,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     private Core.DataStore.Postgres.Models.User? _user;
 
@@ -93,7 +93,7 @@ public class DeactivateModel(
             EventId = Guid.NewGuid(),
             User = EventModels.User.FromModel(_user),
             RaisedBy = User.GetUserId(),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = timeProvider.UtcNow,
             DeactivatedReason = HasAdditionalReason is true ? AdditionalReasonDetail : null,
             DeactivatedReasonDetail = HasMoreInformation is true ? MoreInformationDetail : null,
             EvidenceFileId = Evidence.UploadedEvidenceFile?.FileId

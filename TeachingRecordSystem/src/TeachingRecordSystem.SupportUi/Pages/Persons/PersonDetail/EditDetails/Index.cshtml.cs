@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 [Journey(JourneyNames.EditDetails), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(
     PersonService personService,
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
@@ -101,7 +101,7 @@ public class IndexModel(
             ModelState.AddModelError("", "Please change one or more of the person\u2019s details");
         }
 
-        if (DateOfBirth.HasValue && DateOfBirth.Value > clock.Today)
+        if (DateOfBirth.HasValue && DateOfBirth.Value > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(DateOfBirth), "Person\u2019s date of birth must be in the past");
         }

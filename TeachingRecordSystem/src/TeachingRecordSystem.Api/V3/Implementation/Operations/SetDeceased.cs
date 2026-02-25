@@ -12,7 +12,7 @@ public class SetDeceasedHandler(
     PersonService personService,
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
-    IClock clock) :
+    TimeProvider timeProvider) :
     ICommandHandler<SetDeceasedCommand, SetDeceasedResult>
 {
     public async Task<ApiResult<SetDeceasedResult>> ExecuteAsync(SetDeceasedCommand command)
@@ -26,7 +26,7 @@ public class SetDeceasedHandler(
 
         var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        var processContext = new ProcessContext(ProcessType.PersonDeceased, clock.UtcNow, currentUserId);
+        var processContext = new ProcessContext(ProcessType.PersonDeceased, timeProvider.UtcNow, currentUserId);
 
         await personService.DeactivatePersonAsync(
             new DeactivatePersonOptions(person.PersonId, command.DateOfDeath),

@@ -12,7 +12,7 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager,
-    IClock clock)
+    TimeProvider timeProvider)
     : AddRoutePostStatusPageModel(AddRoutePage.CheckAnswers, linkGenerator, referenceDataCache, evidenceUploadManager)
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
@@ -106,7 +106,7 @@ public class CheckAnswersModel(
             degreeTypeId: JourneyInstance.State.DegreeTypeId,
             isExemptFromInduction: JourneyInstance.State.IsExemptFromInduction,
             createdBy: User.GetUserId(),
-            now: clock.UtcNow,
+            now: timeProvider.UtcNow,
             changeReason: JourneyInstance.State.ChangeReason?.GetDisplayName(),
             changeReasonDetail: JourneyInstance.State.ChangeReasonDetail.ChangeReasonDetail,
             evidenceFile: JourneyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),

@@ -1,6 +1,7 @@
 using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
@@ -30,7 +31,7 @@ public abstract class OperationTestBase : IDisposable
 
     public IServiceProvider Services { get; }
 
-    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
 
     protected ICurrentUserProvider CurrentUserProvider => Services.GetRequiredService<ICurrentUserProvider>();
 

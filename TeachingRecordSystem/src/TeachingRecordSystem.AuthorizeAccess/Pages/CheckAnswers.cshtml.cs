@@ -13,7 +13,7 @@ public class CheckAnswersModel(
     SignInJourneyCoordinator coordinator,
     OneLoginUserMatchingSupportTaskService oneLoginUserMatchingSupportTaskService,
     TrsDbContext dbContext,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public bool IdentityVerified => coordinator.State.IdentityVerified;
 
@@ -40,7 +40,7 @@ public class CheckAnswersModel(
         var subject = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
         var email = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, clock.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow);
 
         SupportTask supportTask;
 

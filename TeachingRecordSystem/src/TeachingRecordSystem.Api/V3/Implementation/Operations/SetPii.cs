@@ -22,7 +22,7 @@ public record SetPiiResult;
 public class SetPiiHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
-    IClock clock,
+    TimeProvider timeProvider,
     PersonService personService) :
     ICommandHandler<SetPiiCommand, SetPiiResult>
 {
@@ -52,7 +52,7 @@ public class SetPiiHandler(
             return ApiError.PiiUpdatesForbiddenPersonHasEyts();
         }
 
-        var now = clock.UtcNow;
+        var now = timeProvider.UtcNow;
 
         var processContext = new ProcessContext(ProcessType.PersonDetailsUpdating, now, currentUserId);
 

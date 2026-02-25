@@ -11,7 +11,7 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     PersonService personService,
-    IClock clock)
+    TimeProvider timeProvider)
     : CommonJourneyPage(linkGenerator, evidenceUploadManager)
 {
     public string? FirstName { get; set; }
@@ -63,7 +63,7 @@ public class CheckAnswersModel(
     {
         var processContext = new ProcessContext(
             ProcessType.PersonCreating,
-            clock.UtcNow,
+            timeProvider.UtcNow,
             User.GetUserId(),
             new ChangeReasonWithDetailsAndEvidence
             {
