@@ -15,7 +15,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
     SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
-    IClock clock) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+    TimeProvider timeProvider) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? Reason { get; set; }
 
@@ -44,7 +44,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var trnRequest = supportTask.TrnRequestMetadata!;
 
-        var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, timeProvider.UtcNow, User.GetUserId());
 
         var person = await DbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);
         await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (person.PersonId, person.Trn), processContext);

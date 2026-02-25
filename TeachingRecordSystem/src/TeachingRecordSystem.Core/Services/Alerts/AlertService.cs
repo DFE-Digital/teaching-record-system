@@ -5,14 +5,14 @@ namespace TeachingRecordSystem.Core.Services.Alerts;
 
 public class AlertService(
     TrsDbContext dbContext,
-    IClock clock,
+    TimeProvider timeProvider,
     IEventPublisher eventPublisher)
 {
     public async Task<Alert> CreateAlertAsync(CreateAlertOptions options, ProcessContext processContext)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var now = clock.UtcNow;
+        var now = timeProvider.UtcNow;
         var alertId = Guid.NewGuid();
 
         var alert = new Alert
@@ -53,7 +53,7 @@ public class AlertService(
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var now = clock.UtcNow;
+        var now = timeProvider.UtcNow;
         alert.DeletedOn = now;
         alert.UpdatedOn = now;
 
@@ -97,7 +97,7 @@ public class AlertService(
             return;
         }
 
-        var now = clock.UtcNow;
+        var now = timeProvider.UtcNow;
         alert.UpdatedOn = now;
 
         await dbContext.SaveChangesAsync();

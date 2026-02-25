@@ -12,7 +12,7 @@ public class BatchSendProfessionalStatusEmailsJob(
     IOptions<BatchSendProfessionalStatusEmailsOptions> jobOptionsAccessor,
     IDbContextFactory<TrsDbContext> dbContextFactory,
     IBackgroundJobScheduler backgroundJobScheduler,
-    IClock clock)
+    TimeProvider timeProvider)
 {
     private readonly BatchSendProfessionalStatusEmailsOptions _batchSendQtsAwardedEmailsJobOptions = jobOptionsAccessor.Value;
 
@@ -43,7 +43,7 @@ public class BatchSendProfessionalStatusEmailsJob(
             DateTime.Parse(lastHoldsFromEndStr).ToUniversalTime() :
             DateTime.SpecifyKind(_batchSendQtsAwardedEmailsJobOptions.InitialLastHoldsFromEndUtc, DateTimeKind.Utc);
 
-        var end = clock.Today.AddDays(-_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
+        var end = timeProvider.Today.AddDays(-_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
 
         var eventNames = EventBase.GetEventNamesForBaseType(typeof(IEventWithRouteToProfessionalStatus))
             .Except([nameof(RouteToProfessionalStatusMigratedEvent)])

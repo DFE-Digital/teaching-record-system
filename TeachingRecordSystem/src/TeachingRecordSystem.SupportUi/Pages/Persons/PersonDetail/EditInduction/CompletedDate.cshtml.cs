@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class CompletedDateModel(
     SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    IClock clock,
+    TimeProvider timeProvider,
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
@@ -56,7 +56,7 @@ public class CompletedDateModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (CompletedDate > clock.Today)
+        if (CompletedDate > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(CompletedDate), "The induction completed date cannot be in the future");
         }

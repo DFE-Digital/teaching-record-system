@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 [AllowDeactivatedPerson]
 public class InductionModel(
     TrsDbContext dbContext,
-    IClock clock,
+    TimeProvider timeProvider,
     ReferenceDataCache referenceDataCache,
     IAuthorizationService authorizationService) : PageModel
 {
@@ -74,7 +74,7 @@ public class InductionModel(
             .Where(i => ExemptionReasonIdsHeldOnPerson.Contains(i.InductionExemptionReasonId))
             .Select(i => i.Name)
             .OrderDescending();
-        _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
+        _statusIsManagedByCpd = person.InductionStatusManagedByCpd(timeProvider.Today);
         HasQts = person.QtsDate is not null;
 
         InductionExemptedRoutes = dbContext.RouteToProfessionalStatuses

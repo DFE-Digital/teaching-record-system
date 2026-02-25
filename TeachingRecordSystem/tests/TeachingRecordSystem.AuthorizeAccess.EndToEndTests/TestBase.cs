@@ -13,7 +13,7 @@ public abstract class TestBase(HostFixture hostFixture)
 
     protected HostFixture HostFixture { get; } = hostFixture;
 
-    protected IClock Clock => HostFixture.Services.GetRequiredService<IClock>();
+    protected TimeProvider Clock => HostFixture.Services.GetRequiredService<TimeProvider>();
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 

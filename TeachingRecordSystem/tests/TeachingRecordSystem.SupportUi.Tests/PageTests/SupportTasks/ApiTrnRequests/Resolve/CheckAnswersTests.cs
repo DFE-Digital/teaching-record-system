@@ -583,7 +583,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.MiddleName);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
@@ -667,7 +667,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.MiddleName);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
@@ -748,7 +748,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             matchedPersonHasFlags: false);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
@@ -802,7 +802,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             matchedPersonHasFlags: true);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(

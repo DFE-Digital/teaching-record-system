@@ -12,7 +12,7 @@ public class SendInductionCompletedEmailJob(
     TrsDbContext dbContext,
     IGetAnIdentityApiClient identityApiClient,
     IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions,
-    IClock clock)
+    TimeProvider timeProvider)
 {
     private const string LinkToAccessYourQualificationsServicePersonalisationKey = "link to access your teaching qualifications service";
 
@@ -43,7 +43,7 @@ public class SendInductionCompletedEmailJob(
             InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,
             PersonId = personId,
             EmailAddress = item.EmailAddress,
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = timeProvider.UtcNow,
             RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
         });
 

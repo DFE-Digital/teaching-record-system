@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
@@ -8,7 +9,7 @@ public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
 {
     private TrsDbContext _trsContext = null!;
 
-    public TestableClock Clock { get; } = new();
+    public FakeTimeProvider Clock { get; } = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
 
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 

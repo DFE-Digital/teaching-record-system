@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Cli.Tests;
 using TeachingRecordSystem.TestCommon;
 using Xunit.v3;
@@ -33,7 +34,7 @@ public class CompositionRoot : IAsyncLifetime
             .AddDatabase(configuration)
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
-            .AddSingleton<IClock, TestableClock>()
+            .AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero)))
             .AddTestTrnGeneration();
 
         return services.BuildServiceProvider();

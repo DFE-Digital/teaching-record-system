@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Services;
@@ -13,7 +14,7 @@ public abstract class ServiceTestBase
         TestScopedServices.Reset();
     }
 
-    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => _fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 

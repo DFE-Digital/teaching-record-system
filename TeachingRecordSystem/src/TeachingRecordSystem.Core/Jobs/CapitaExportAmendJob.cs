@@ -13,7 +13,7 @@ using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportAmendJob> logger, TrsDbContext dbContext, IClock clock, IOptions<CapitaTpsUserOption> capitaUser)
+public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportAmendJob> logger, TrsDbContext dbContext, TimeProvider timeProvider, IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 3 * * *";
     public const string LastRunDateKey = "LastRunDate";
@@ -26,7 +26,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
         var persons = await GetUpdatedPersonsAsync(lastRunDate, cancellationToken);
 
         // start job
-        var fileName = GetFileName(clock);
+        var fileName = GetFileName(timeProvider);
         await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, cancellationToken: cancellationToken);
         var integrationJob = new IntegrationTransaction()
         {
@@ -39,7 +39,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
             FailureCount = 0,
             DuplicateCount = 0,
             FileName = fileName,
-            CreatedDate = clock.UtcNow,
+            CreatedDate = timeProvider.UtcNow,
             IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
         };
         dbContext.IntegrationTransactions.Add(integrationJob);
@@ -73,7 +73,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
                     integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                     {
                         IntegrationTransactionRecordId = 0,
-                        CreatedDate = clock.UtcNow,
+                        CreatedDate = timeProvider.UtcNow,
                         RowData = amendedPersonRow,
                         Status = IntegrationTransactionRecordStatus.Success,
                         PersonId = person.Item1.PersonId,
@@ -119,7 +119,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
                     jobMetaData.Metadata = new Dictionary<string, string>
                     {
                         {
-                            LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
+                            LastRunDateKey, timeProvider.UtcNow.ToString("s", CultureInfo.InvariantCulture)
                         }
                     };
                 }
@@ -132,7 +132,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
                         Metadata = new Dictionary<string, string>
                         {
                             {
-                                LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
+                                LastRunDateKey, timeProvider.UtcNow.ToString("s", CultureInfo.InvariantCulture)
                             }
                         }
                     };
@@ -160,7 +160,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
         await fileClient.FlushAsync(memory.Length, cancellationToken: cancellationToken);
     }
 
-    public string GetFileName(IClock now)
+    public string GetFileName(TimeProvider now)
     {
         var gmt = now.UtcNow.ToGmt();
         return $"Reg01_DTR_{gmt.ToString("yyyyMMdd")}_{gmt.ToString("HHmmss", CultureInfo.InvariantCulture)}_Amend.txt";

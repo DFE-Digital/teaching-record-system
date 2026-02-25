@@ -8,18 +8,18 @@ public class ClientCredentialsBearerTokenDelegatingHandler : DelegatingHandler
 {
     private readonly HttpClient _tokenHttpClient;
     private readonly GetAnIdentityOptions _options;
-    private readonly IClock _clock;
+    private readonly TimeProvider _timeProvider;
     private string? _accessToken;
     private DateTime _expiryTime;
 
     public ClientCredentialsBearerTokenDelegatingHandler(
         HttpClient tokenHttpClient,
         IOptions<GetAnIdentityOptions> optionsAccessor,
-        IClock clock)
+        TimeProvider timeProvider)
     {
         _tokenHttpClient = tokenHttpClient;
         _options = optionsAccessor.Value;
-        _clock = clock;
+        _timeProvider = timeProvider;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -46,6 +46,6 @@ public class ClientCredentialsBearerTokenDelegatingHandler : DelegatingHandler
         });
 
         _accessToken = tokenResponse.AccessToken;
-        _expiryTime = _clock.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
+        _expiryTime = _timeProvider.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
     }
 }

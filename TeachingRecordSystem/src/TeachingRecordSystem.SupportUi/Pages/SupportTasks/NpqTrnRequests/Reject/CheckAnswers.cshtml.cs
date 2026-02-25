@@ -13,7 +13,7 @@ public class CheckAnswersModel(
     TrnRequestService trnRequestService,
     SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public string? SourceApplicationUserName { get; set; }
 
@@ -37,7 +37,7 @@ public class CheckAnswersModel(
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var trnRequest = supportTask.TrnRequestMetadata!;
 
-        var processContext = new ProcessContext(ProcessType.NpqTrnRequestRejecting, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.NpqTrnRequestRejecting, timeProvider.UtcNow, User.GetUserId());
 
         await trnRequestService.RejectTrnRequestAsync(trnRequest, processContext);
 

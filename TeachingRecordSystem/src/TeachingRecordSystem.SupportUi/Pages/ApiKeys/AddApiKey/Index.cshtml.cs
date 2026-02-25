@@ -11,7 +11,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.AddApiKey;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     [FromQuery]
     public Guid ApplicationUserId { get; set; }
@@ -38,8 +38,8 @@ public class IndexModel(TrsDbContext dbContext, IClock clock, SupportUiLinkGener
         var apiKey = new ApiKey()
         {
             ApiKeyId = Guid.NewGuid(),
-            CreatedOn = clock.UtcNow,
-            UpdatedOn = clock.UtcNow,
+            CreatedOn = timeProvider.UtcNow,
+            UpdatedOn = timeProvider.UtcNow,
             ApplicationUserId = ApplicationUserId,
             Key = Key!,
             Expires = null
@@ -50,7 +50,7 @@ public class IndexModel(TrsDbContext dbContext, IClock clock, SupportUiLinkGener
         var @event = new ApiKeyCreatedEvent()
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = timeProvider.UtcNow,
             RaisedBy = User.GetUserId(),
             ApiKey = EventModels.ApiKey.FromModel(apiKey)
         };

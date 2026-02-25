@@ -16,7 +16,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.EditApplicationU
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 [BindProperties]
-public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider) : PageModel
 {
     // From PathString
     private static readonly SearchValues<char> _validPathChars =
@@ -216,7 +216,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             var @event = new ApplicationUserUpdatedEvent()
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = clock.UtcNow,
+                CreatedUtc = timeProvider.UtcNow,
                 RaisedBy = User.GetUserId(),
                 ApplicationUser = EventModels.ApplicationUser.FromModel(_user),
                 OldApplicationUser = oldApplicationUser,

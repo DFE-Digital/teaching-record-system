@@ -8,7 +8,7 @@ public class SetMissingHasEypsOnPersonsJob(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IFileService fileService,
-    IClock clock)
+    TimeProvider timeProvider)
 {
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
@@ -38,7 +38,7 @@ public class SetMissingHasEypsOnPersonsJob(
             dbContext.AddEventWithoutBroadcast(new RouteToProfessionalStatusUpdatedEvent()
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = clock.UtcNow,
+                CreatedUtc = timeProvider.UtcNow,
                 PersonId = person.PersonId,
                 RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId,
                 RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
@@ -74,6 +74,6 @@ public class SetMissingHasEypsOnPersonsJob(
         await writer.FlushAsync(cancellationToken);
         stream.Position = 0;
 
-        await fileService.UploadFileAsync($"setmissinghaseyps{clock.UtcNow:yyyyMMddHHmmss}.csv", stream, "text/csv");
+        await fileService.UploadFileAsync($"setmissinghaseyps{timeProvider.UtcNow:yyyyMMddHHmmss}.csv", stream, "text/csv");
     }
 }

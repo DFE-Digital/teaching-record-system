@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, IClock clock)
+public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, TimeProvider timeProvider)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -78,8 +78,8 @@ public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> 
                         e.County,
                         e.Postcode,
                         e.EstablishmentSourceId,
-                        clock.UtcNow,
-                        clock.UtcNow);
+                        timeProvider.UtcNow,
+                        timeProvider.UtcNow);
                 }
 
                 await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
@@ -128,8 +128,8 @@ public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> 
                         e.EmployersName,
                         e.SchoolGiasName,
                         e.SchoolClosedDate,
-                        clock.UtcNow,
-                        clock.UtcNow);
+                        timeProvider.UtcNow,
+                        timeProvider.UtcNow);
                 }
 
                 await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
@@ -194,8 +194,8 @@ public class BackfillDqtReportingWorkforceDataJob(IOptions<DqtReportingOptions> 
                         e.NationalInsuranceNumber,
                         e.PersonPostcode,
                         e.WithdrawalConfirmed,
-                        clock.UtcNow,
-                        clock.UtcNow);
+                        timeProvider.UtcNow,
+                        timeProvider.UtcNow);
                 }
 
                 await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);

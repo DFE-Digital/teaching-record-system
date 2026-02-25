@@ -14,7 +14,7 @@ public class CheckYourAnswersModel(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -123,7 +123,7 @@ public class CheckYourAnswersModel(
             ChangeReasonDetail.ChangeReasonDetail,
             evidenceFile: ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
             User.GetUserId(),
-            clock.UtcNow,
+            timeProvider.UtcNow,
             out var updatedEvent);
 
         if (updatedEvent is not null)

@@ -27,7 +27,7 @@ public class CreateDateOfBirthChangeRequestHandler(
     TrsDbContext dbContext,
     SupportTaskService supportTaskService,
     IFileService fileService,
-    IClock clock,
+    TimeProvider timeProvider,
     ICurrentUserProvider currentUserProvider) :
     ICommandHandler<CreateDateOfBirthChangeRequestCommand, CreateDateOfBirthChangeRequestResult>
 {
@@ -83,7 +83,7 @@ public class CreateDateOfBirthChangeRequestHandler(
 
         var userId = currentUserProvider.GetCurrentApplicationUserId();
 
-        var processContext = new ProcessContext(ProcessType.ChangeOfDateOfBirthRequestCreating, clock.UtcNow, userId);
+        var processContext = new ProcessContext(ProcessType.ChangeOfDateOfBirthRequestCreating, timeProvider.UtcNow, userId);
 
         var supportTask = await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions

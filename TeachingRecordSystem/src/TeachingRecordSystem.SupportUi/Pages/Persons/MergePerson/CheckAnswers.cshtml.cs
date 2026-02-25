@@ -15,7 +15,7 @@ public class CheckAnswersModel(
     PersonService personService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
-    IClock clock,
+    TimeProvider timeProvider,
     PersonChangeableAttributesService changedService)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
@@ -126,7 +126,7 @@ public class CheckAnswersModel(
 
         var processContext = new ProcessContext(
             ProcessType.PersonMerging,
-            clock.UtcNow,
+            timeProvider.UtcNow,
             User.GetUserId(),
             new ChangeReasonWithDetailsAndEvidence
             {

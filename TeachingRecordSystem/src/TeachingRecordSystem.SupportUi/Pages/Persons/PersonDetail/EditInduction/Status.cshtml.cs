@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class StatusModel(
     SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    IClock clock,
+    TimeProvider timeProvider,
     EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
@@ -109,7 +109,7 @@ public class StatusModel(
             return;
         }
 
-        _inductionStatusManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
+        _inductionStatusManagedByCpd = person.InductionStatusManagedByCpd(timeProvider.Today);
         CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
     }
 }

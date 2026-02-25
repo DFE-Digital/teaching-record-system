@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 public class Matches(
     TrsDbContext dbContext,
     SupportTaskService supportTaskService,
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) :
     PageModel
 {
@@ -91,7 +91,7 @@ public class Matches(
             ProcessType.OneLoginUserIdVerificationSupportTaskSaving :
             ProcessType.OneLoginUserRecordMatchingSupportTaskSaving;
 
-        var processContext = new ProcessContext(processType, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(processType, timeProvider.UtcNow, User.GetUserId());
 
         await supportTaskService.UpdateSupportTaskAsync(
             new()

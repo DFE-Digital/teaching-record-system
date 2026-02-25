@@ -37,7 +37,7 @@ public static class NpgsqlExtensions
         this NpgsqlTransaction transaction,
         IReadOnlyCollection<EventBase> events,
         string tempTableSuffix,
-        IClock clock,
+        TimeProvider timeProvider,
         CancellationToken cancellationToken,
         int? timeoutSeconds = null)
     {
@@ -97,7 +97,7 @@ public static class NpgsqlExtensions
 
         using var writer = await transaction.Connection!.BeginBinaryImportAsync(copyStatement, cancellationToken);
 
-        foreach (var e in events.Select(e => Event.FromEventBase(e, inserted: clock.UtcNow)))
+        foreach (var e in events.Select(e => Event.FromEventBase(e, inserted: timeProvider.UtcNow)))
         {
             writer.StartRow();
             writer.WriteValueOrNull(e.EventId, NpgsqlDbType.Uuid);
@@ -121,7 +121,7 @@ public static class NpgsqlExtensions
             {
                 mergeCommand.CommandTimeout = timeoutSeconds.Value;
             }
-            mergeCommand.Parameters.Add(new NpgsqlParameter("@now", clock.UtcNow));
+            mergeCommand.Parameters.Add(new NpgsqlParameter("@now", timeProvider.UtcNow));
             mergeCommand.Transaction = transaction;
             await mergeCommand.ExecuteNonQueryAsync();
         }

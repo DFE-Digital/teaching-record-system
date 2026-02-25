@@ -15,7 +15,7 @@ public class OneLoginService(
     IdDbContext idDbContext,
     IEventPublisher eventPublisher,
     IBackgroundJobScheduler backgroundJobScheduler,
-    IClock clock)
+    TimeProvider timeProvider)
 {
     // ID's database has a user_id column to indicate that a TRN token has been used already.
     // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
@@ -235,8 +235,9 @@ public class OneLoginService(
         // First try and match on TRN Token
         if (trnToken is not null)
         {
+            var utcNow = timeProvider.UtcNow;
             trnTokenModel = await WithIdDbContextAsync(c => c.TrnTokens.SingleOrDefaultAsync(
-                t => t.TrnToken == trnToken && t.ExpiresUtc > clock.UtcNow && t.UserId == null));
+                t => t.TrnToken == trnToken && t.ExpiresUtc > utcNow && t.UserId == null));
             if (trnTokenModel is not null)
             {
                 getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == trnTokenModel.Trn);

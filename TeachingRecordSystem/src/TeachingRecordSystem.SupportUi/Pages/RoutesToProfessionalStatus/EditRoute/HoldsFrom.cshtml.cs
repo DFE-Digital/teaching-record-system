@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
 public class HoldsFromModel(
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager)
@@ -31,7 +31,7 @@ public class HoldsFromModel(
             ModelState.AddModelError(nameof(HoldsFrom), "Enter the date they first held this professional status");
         }
 
-        if (HoldsFrom > clock.Today)
+        if (HoldsFrom > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(HoldsFrom), "The date they first held this professional status must not be in the future");
         }

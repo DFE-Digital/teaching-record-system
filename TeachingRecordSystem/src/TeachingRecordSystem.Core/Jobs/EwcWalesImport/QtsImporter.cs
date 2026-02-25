@@ -15,14 +15,14 @@ public class QtsImporter
     private readonly TrsDbContext _dbContext;
     private readonly ReferenceDataCache _cache;
     private DateOnly _ecDirectiveQualifiedTeacherRegsChangeDate = new DateOnly(2023, 02, 01);
-    private readonly IClock _clock;
+    private readonly TimeProvider _timeProvider;
 
-    public QtsImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, IClock clock)
+    public QtsImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
         _logger = logger;
         _cache = cache;
-        _clock = clock;
+        _timeProvider = timeProvider;
     }
 
     public async Task<QtsImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -65,7 +65,7 @@ public class QtsImporter
             FailureCount = 0,
             DuplicateCount = 0,
             FileName = fileName,
-            CreatedDate = _clock.UtcNow,
+            CreatedDate = _timeProvider.UtcNow,
             IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
         };
         _dbContext.IntegrationTransactions.Add(integrationJob);
@@ -129,7 +129,7 @@ public class QtsImporter
                            degreeTypeId: null,
                            isExemptFromInduction: null,
                            createdBy: SystemUser.SystemUserId,
-                           now: _clock.UtcNow,
+                           now: _timeProvider.UtcNow,
                            changeReason: null,
                            changeReasonDetail: null,
                            evidenceFile: null,
@@ -152,7 +152,7 @@ public class QtsImporter
                 integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                 {
                     IntegrationTransactionRecordId = 0,
-                    CreatedDate = _clock.UtcNow,
+                    CreatedDate = _timeProvider.UtcNow,
                     RowData = ConvertToCsvString(row),
                     Status = validationFailures.Errors.Count == 0 ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
                     PersonId = lookupData.Person != null ? lookupData.Person.PersonId : null,
@@ -278,7 +278,7 @@ public class QtsImporter
             DateOnly.TryParseExact(row.QtsDate, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly qtsDate)
         )
         {
-            if (qtsDate > _clock.Today)
+            if (qtsDate > _timeProvider.Today)
             {
                 errors.Add("Qts date cannot be set in the future");
             }

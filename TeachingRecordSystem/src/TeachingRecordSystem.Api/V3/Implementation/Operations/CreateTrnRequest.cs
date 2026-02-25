@@ -26,7 +26,7 @@ public class CreateTrnRequestHandler(
     TrnRequestService trnRequestService,
     SupportTaskService supportTaskService,
     ICurrentUserProvider currentUserProvider,
-    IClock clock) :
+    TimeProvider timeProvider) :
     ICommandHandler<CreateTrnRequestCommand, TrnRequestInfo>
 {
     public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(CreateTrnRequestCommand command)
@@ -42,7 +42,7 @@ public class CreateTrnRequestHandler(
         var normalizedNino = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber);
         var emailAddress = command.EmailAddresses.FirstOrDefault();
 
-        var processContext = new ProcessContext(ProcessType.ApiTrnRequestCreating, clock.UtcNow, currentApplicationUserId);
+        var processContext = new ProcessContext(ProcessType.ApiTrnRequestCreating, timeProvider.UtcNow, currentApplicationUserId);
 
         var (trnRequest, resolvedPersonTrn) = await trnRequestService.CreateTrnRequestAsync(
             new CreateTrnRequestOptions

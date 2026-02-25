@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -11,12 +12,12 @@ public class TestScopedServices
 
     public TestScopedServices(IServiceProvider serviceProvider)
     {
-        Clock = new();
+        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
         Events = new(Clock);
         BackgroundJobScheduler = new(serviceProvider);
     }
 
-    public TestableClock Clock { get; }
+    public FakeTimeProvider Clock { get; }
 
     public EventCapture Events { get; }
 
@@ -24,7 +25,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(new ForwardToTestScopedTimeProvider())
             .AddTestScoped<EventCapture>(tss => tss.Events)
             .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>())
             .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler);
@@ -54,9 +55,9 @@ public class TestScopedServices
         return false;
     }
 
-    private class ForwardToTestScopedClock : IClock
+    private class ForwardToTestScopedTimeProvider : TimeProvider
     {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
+        public override DateTimeOffset GetUtcNow() => GetCurrent().Clock.GetUtcNow();
     }
 }
 

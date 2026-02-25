@@ -708,7 +708,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth).WithEmailAddress());
         var email2 = TestData.GenerateUniqueEmail();
         await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some<string?>(email2), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 

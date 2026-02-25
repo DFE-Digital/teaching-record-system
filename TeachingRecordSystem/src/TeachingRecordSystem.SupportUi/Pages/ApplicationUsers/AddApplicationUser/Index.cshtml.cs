@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.AddApplicationUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider) : PageModel
 {
     [BindProperty]
     [Required(ErrorMessage = "Enter a name")]
@@ -42,7 +42,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             EventId = Guid.NewGuid(),
             ApplicationUser = EventModels.ApplicationUser.FromModel(newUser),
             RaisedBy = User.GetUserId(),
-            CreatedUtc = clock.UtcNow
+            CreatedUtc = timeProvider.UtcNow
         });
 
         try

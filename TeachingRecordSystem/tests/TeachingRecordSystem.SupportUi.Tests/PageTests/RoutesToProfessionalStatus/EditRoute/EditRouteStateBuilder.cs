@@ -41,7 +41,7 @@ public class EditRouteStateBuilder()
         return this;
     }
 
-    public EditRouteStateBuilder WithHoldsStatusFields(IClock clock)
+    public EditRouteStateBuilder WithHoldsStatusFields(TimeProvider clock)
     {
         _trainingStartDate = clock.Today.AddYears(-1);
         _trainingEndDate = clock.Today.AddDays(-1);

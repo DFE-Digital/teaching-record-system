@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 [Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
 public class ConfirmNotConnecting(
     OneLoginUserMatchingSupportTaskService supportTaskService,
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
@@ -46,7 +46,7 @@ public class ConfirmNotConnecting(
 
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
         {
-            var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
+            var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
             await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedOnlyWithMatchesOutcomeOptions
@@ -59,7 +59,7 @@ public class ConfirmNotConnecting(
         }
         else
         {
-            var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
+            var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
             await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new NotConnectingOutcomeOptions

@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Api.V3.V20240307.Validators;
 
 public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnRequestRequest>
 {
-    public CreateTrnRequestRequestValidator(IClock clock)
+    public CreateTrnRequestRequestValidator(TimeProvider timeProvider)
     {
         RuleFor(r => r.RequestId)
             .Matches(TrnRequest.ValidRequestIdPattern)
@@ -30,7 +30,7 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             .NotEmpty()
             .Custom((value, ctx) =>
             {
-                if (value >= DateOnly.FromDateTime(clock.UtcNow) || value < new DateOnly(1940, 1, 1))
+                if (value >= DateOnly.FromDateTime(timeProvider.UtcNow) || value < new DateOnly(1940, 1, 1))
                 {
                     ctx.AddFailure(ctx.PropertyPath, StringResources.ErrorMessages_BirthDateIsOutOfRange);
                 }

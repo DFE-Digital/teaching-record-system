@@ -480,7 +480,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Other));
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var options = new UpdatePersonDetailsOptions
         {
@@ -976,7 +976,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             sourcedFromDeactivatingPersonAttribute.Attribute,
             useNullValues: useNullValues);
 
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var options = new MergePersonsOptions
         {

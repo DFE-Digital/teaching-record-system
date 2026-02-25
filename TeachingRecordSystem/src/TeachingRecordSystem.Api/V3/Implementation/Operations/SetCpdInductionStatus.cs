@@ -13,7 +13,7 @@ public record SetCpdInductionStatusCommand(
 
 public record SetCpdInductionStatusResult;
 
-public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserProvider currentUserProvider, IClock clock) :
+public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserProvider currentUserProvider, TimeProvider timeProvider) :
     ICommandHandler<SetCpdInductionStatusCommand, SetCpdInductionStatusResult>
 {
     public async Task<ApiResult<SetCpdInductionStatusResult>> ExecuteAsync(SetCpdInductionStatusCommand command)
@@ -70,7 +70,7 @@ public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserPr
             command.CompletedDate,
             command.CpdModifiedOn,
             currentUserId,
-            clock.UtcNow,
+            timeProvider.UtcNow,
             out var updatedEvent);
 
         if (updatedEvent is not null)

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
@@ -24,7 +25,7 @@ public class Startup
                     .AddSingleton<ReferenceDataCache>()
                     .AddSingleton<TestData>()
                     .AddSingleton<PersonInfoCache>()
-                    .AddSingleton<IClock, TestableClock>()
+                    .AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero)))
                     .AddSingleton<WebhookMessageFactory>()
                     .AddSingleton<EventMapperRegistry>()
                     .AddEventPublisher()

@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.Core.Services.WorkforceData;
 public class TpsCsvExtractFileImporter(
     ITpsExtractStorageService tpsExtractStorageService,
     IDbContextFactory<TrsDbContext> dbContextFactory,
-    IClock clock)
+    TimeProvider timeProvider)
 {
     public async Task ImportFileAsync(Guid tpsCsvExtractId, string fileName, CancellationToken cancellationToken)
     {
@@ -34,7 +34,7 @@ public class TpsCsvExtractFileImporter(
             VALUES (
                 '{tpsCsvExtractId}',
                 '{fileNameWithoutFolder}',
-                '{clock.UtcNow}'
+                '{timeProvider.UtcNow}'
             )
             """;
         await using var command = new NpgsqlCommand(insertTpsCsvExtractSql, connection, transaction);
@@ -175,7 +175,7 @@ public class TpsCsvExtractFileImporter(
             writer.Write(row.WithdrawlIndicator, NpgsqlDbType.Varchar);
             writer.Write(row.ExtractDate, NpgsqlDbType.Varchar);
             writer.Write(row.Gender, NpgsqlDbType.Varchar);
-            writer.Write(clock.UtcNow, NpgsqlDbType.TimestampTz);
+            writer.Write(timeProvider.UtcNow, NpgsqlDbType.TimestampTz);
             writer.Write((int)loadErrors, NpgsqlDbType.Integer);
         }
 
@@ -259,7 +259,7 @@ public class TpsCsvExtractFileImporter(
             writer.Write(item.WithdrawalIndicator, NpgsqlDbType.Char);
             writer.Write(DateOnly.ParseExact(item.ExtractDate!, "dd/MM/yyyy"), NpgsqlDbType.Date);
             writer.Write(item.Gender, NpgsqlDbType.Varchar);
-            writer.Write(clock.UtcNow, NpgsqlDbType.TimestampTz);
+            writer.Write(timeProvider.UtcNow, NpgsqlDbType.TimestampTz);
             writer.Write($"{item.Trn}.{item.LocalAuthorityCode}.{item.EstablishmentNumber ?? "NULL"}.{employmentStartDate:yyyyMMdd}", NpgsqlDbType.Varchar);
         }
 

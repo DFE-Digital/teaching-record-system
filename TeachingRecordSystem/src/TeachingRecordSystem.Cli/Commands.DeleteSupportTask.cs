@@ -45,9 +45,9 @@ public partial class Commands
 
                 using var scope = services.CreateScope();
                 var supportTaskService = scope.ServiceProvider.GetRequiredService<SupportTaskService>();
-                var clock = scope.ServiceProvider.GetRequiredService<IClock>();
+                var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
 
-                var processContext = new ProcessContext(ProcessType.SupportTaskDeleting, clock.UtcNow, SystemUser.SystemUserId);
+                var processContext = new ProcessContext(ProcessType.SupportTaskDeleting, timeProvider.UtcNow, SystemUser.SystemUserId);
 
                 try
                 {

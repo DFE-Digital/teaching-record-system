@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class BackfillDqtReportingSupportTasksJob(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, IClock clock)
+public class BackfillDqtReportingSupportTasksJob(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, TimeProvider timeProvider)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -41,8 +41,8 @@ public class BackfillDqtReportingSupportTasksJob(IOptions<DqtReportingOptions> d
                 task.UpdatedOn,
                 task.TrnRequestApplicationUserId,
                 task.TrnRequestId,
-                clock.UtcNow,
-                clock.UtcNow);
+                timeProvider.UtcNow,
+                timeProvider.UtcNow);
         }
 
         using var conn = new SqlConnection(dqtReportingOptionsAccessor.Value.ReportingDbConnectionString);

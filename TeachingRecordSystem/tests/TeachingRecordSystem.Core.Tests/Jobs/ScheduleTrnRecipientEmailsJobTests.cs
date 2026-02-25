@@ -27,7 +27,7 @@ public class ScheduleTrnRecipientEmailsJobTests(JobFixture fixture) : JobTestBas
 
         var options = Options.Create(new ScheduleTrnRecipientEmailsJobOptions
         {
-            EarliestRecordCreationDate = DateOnly.FromDateTime(TestableClock.Initial.AddDays(-1).Date),
+            EarliestRecordCreationDate = DateOnly.FromDateTime(new DateTime(2021, 1, 4, 0, 0, 0, DateTimeKind.Utc).AddDays(-1).Date),
             JobSchedule = Cron.Never(),
             RequestedByUserIds = [applicationUser1.UserId],
             EmailDelayDays = 1

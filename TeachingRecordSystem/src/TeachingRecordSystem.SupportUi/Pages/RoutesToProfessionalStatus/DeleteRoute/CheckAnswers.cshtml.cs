@@ -13,7 +13,7 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<DeleteRouteState>? JourneyInstance { get; set; }
 
@@ -85,7 +85,7 @@ public class CheckAnswersModel(
             ChangeReasonDetail.ChangeReasonDetail,
             ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
             User.GetUserId(),
-            clock.UtcNow,
+            timeProvider.UtcNow,
             out var deletedEvent);
         if (deletedEvent is not null)
         {

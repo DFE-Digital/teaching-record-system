@@ -32,7 +32,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(person);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: user.Subject);
 
@@ -63,7 +63,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(person, email: Option.Some((string?)null));
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 var email = Faker.Internet.Email();
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: user.Subject, email);
@@ -127,7 +127,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 // Arrange
                 var user = await TestData.CreateOneLoginUserAsync();
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(user.Subject);
 
@@ -339,7 +339,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 // Arrange
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: user.Subject);
 
@@ -402,7 +402,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 // Arrange
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(
                     vtr: AuthenticationOnly,
@@ -437,7 +437,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 // Arrange
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 var firstName = Faker.Name.First();
                 var lastName = Faker.Name.Last();
@@ -496,7 +496,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var email = Faker.Internet.Email();
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Medium);
 
@@ -550,7 +550,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var email = Faker.Internet.Email();
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Low,
                     TrnAssociationSource.SupportUi);
@@ -605,7 +605,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var email = Faker.Internet.Email();
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Low,
                     TrnAssociationSource.TrnToken);
@@ -658,7 +658,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Low);
 
@@ -706,7 +706,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Medium);
 
@@ -754,7 +754,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance();
+                Clock.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Medium);
 
@@ -792,7 +792,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!);
 
@@ -847,7 +847,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var trnToken = Guid.NewGuid().ToString();
 
@@ -897,7 +897,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, expires: TimeSpan.FromSeconds(-1));
 
@@ -947,7 +947,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, userId: Guid.NewGuid());
 
@@ -993,7 +993,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!);
 
@@ -1043,7 +1043,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!);
 
@@ -1095,7 +1095,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var verifiedLastName = Faker.Name.Last();
         var verifiedDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
         var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([verifiedFirstName, verifiedLastName], verifiedDateOfBirth));
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
@@ -1141,7 +1141,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var person = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
 
         var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(

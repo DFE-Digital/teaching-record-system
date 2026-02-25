@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher, INotificationSender notificationSender, IClock clock)
+public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher, INotificationSender notificationSender, TimeProvider timeProvider)
 {
     protected TrsDbContext DbContext => dbContext;
 
@@ -13,7 +13,7 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
 
     protected INotificationSender NotificationSender => notificationSender;
 
-    protected IClock Clock => clock;
+    protected TimeProvider TimeProvider => timeProvider;
 
     public virtual Task ExecuteAsync(Guid emailId) => SendEmailAsync(emailId);
 
@@ -24,7 +24,7 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, processId, clock.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, processId, timeProvider.UtcNow);
 
         Guid? personId = processContext.PersonIds.Count != 0 ? processContext.PersonIds.Single() : null;
 
@@ -59,13 +59,13 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
             email.EmailAddress,
             new Dictionary<string, string>(email.Personalization));
 
-        email.SentOn = clock.UtcNow;
+        email.SentOn = timeProvider.UtcNow;
 
         dbContext.AddEventWithoutBroadcast(new LegacyEvents.EmailSentEvent
         {
             EventId = Guid.NewGuid(),
             Email = EventModels.Email.FromModel(email),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = timeProvider.UtcNow,
             RaisedBy = SystemUser.SystemUserId
         });
 

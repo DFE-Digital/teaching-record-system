@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Api.V3.V20250627.Validators;
 
 public class SetRouteToProfessionalStatusRequestValidator : AbstractValidator<SetRouteToProfessionalStatusRequest>
 {
-    public SetRouteToProfessionalStatusRequestValidator(IClock clock)
+    public SetRouteToProfessionalStatusRequestValidator(TimeProvider timeProvider)
     {
         RuleFor(r => r.Status)
             .Cascade(CascadeMode.Stop)
@@ -27,7 +27,7 @@ public class SetRouteToProfessionalStatusRequestValidator : AbstractValidator<Se
             .Null()
             .When(r => r.Status != RouteToProfessionalStatusStatus.Holds, ApplyConditionTo.CurrentValidator)
             .WithMessage(r => $"Holds from date cannot be specified when status is '{r.Status}'.")
-            .LessThanOrEqualTo(clock.Today)
+            .LessThanOrEqualTo(timeProvider.Today)
             .WithMessage("Holds from date cannot be in the future.");
 
         RuleFor(r => r.TrainingStartDate)

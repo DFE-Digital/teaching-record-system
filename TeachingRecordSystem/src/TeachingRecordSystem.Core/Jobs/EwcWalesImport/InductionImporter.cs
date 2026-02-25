@@ -13,13 +13,13 @@ public class InductionImporter
     private const string DateFormat = "dd/MM/yyyy";
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
-    private readonly IClock _clock;
+    private readonly TimeProvider _timeProvider;
 
-    public InductionImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, IClock clock)
+    public InductionImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
         _logger = logger;
-        _clock = clock;
+        _timeProvider = timeProvider;
     }
 
     public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -42,7 +42,7 @@ public class InductionImporter
                 FailureCount = 0,
                 DuplicateCount = 0,
                 FileName = fileName,
-                CreatedDate = _clock.UtcNow,
+                CreatedDate = _timeProvider.UtcNow,
                 IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
             };
             _dbContext.IntegrationTransactions.Add(integrationJob);
@@ -107,7 +107,7 @@ public class InductionImporter
                                  startDate,
                                  awardedDate,
                                   SystemUser.SystemUserId,
-                                 _clock.UtcNow,
+                                 _timeProvider.UtcNow,
                                  out var updatedEvent);
 
                             if (updatedEvent is not null)
@@ -139,7 +139,7 @@ public class InductionImporter
                     integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                     {
                         IntegrationTransactionRecordId = 0,
-                        CreatedDate = _clock.UtcNow,
+                        CreatedDate = _timeProvider.UtcNow,
                         RowData = ConvertToCsvString(row),
                         Status = validationFailures.Errors.Count == 0 ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
                         PersonId = lookupData.Person != null ? lookupData.Person!.PersonId : null,

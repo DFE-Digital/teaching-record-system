@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -17,7 +18,7 @@ public class TestScopedServices
 
     public TestScopedServices(IServiceProvider serviceProvider)
     {
-        Clock = new();
+        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
         AzureActiveDirectoryUserServiceMock = new();
         EventObserver = new();
         Events = new(Clock);
@@ -41,7 +42,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(new ForwardToTestScopedTimeProvider())
             .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
             .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AzureActiveDirectoryUserServiceMock.Object)
@@ -67,7 +68,7 @@ public class TestScopedServices
         return _current.Value = new(serviceProvider);
     }
 
-    public TestableClock Clock { get; }
+    public FakeTimeProvider Clock { get; }
 
     public Mock<IAadUserService> AzureActiveDirectoryUserServiceMock { get; }
 
@@ -89,9 +90,9 @@ public class TestScopedServices
 
     public CurrentUserProvider CurrentUserProvider { get; }
 
-    private class ForwardToTestScopedClock : IClock
+    private class ForwardToTestScopedTimeProvider : TimeProvider
     {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
+        public override DateTimeOffset GetUtcNow() => GetCurrent().Clock.GetUtcNow();
     }
 
     private class ForwardToTestScopedEventObserver : IEventObserver

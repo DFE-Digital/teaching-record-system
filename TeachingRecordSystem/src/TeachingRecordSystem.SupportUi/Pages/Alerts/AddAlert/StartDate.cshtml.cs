@@ -7,12 +7,12 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
-public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager, IClock clock) : PageModel
+public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager, TimeProvider timeProvider) : PageModel
 {
     private readonly InlineValidator<StartDateModel> _validator = new()
     {
         v => v.RuleFor(m => m.StartDate).AlertStartDate(
-            clock.Today,
+            timeProvider.Today,
             requiredMessage: "Enter a start date",
             dateInFutureMessage: "Start date cannot be in the future")
     };

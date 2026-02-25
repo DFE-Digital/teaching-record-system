@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 [Journey(JourneyNames.AddPerson), ActivatesJourney, RequireJourneyInstance]
 public class PersonalDetailsModel(
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(linkGenerator, evidenceUploadManager)
@@ -70,7 +70,7 @@ public class PersonalDetailsModel(
             return BadRequest();
         }
 
-        if (DateOfBirth.HasValue && DateOfBirth.Value > clock.Today)
+        if (DateOfBirth.HasValue && DateOfBirth.Value > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(DateOfBirth), "Person\u2019s date of birth must be in the past");
         }
