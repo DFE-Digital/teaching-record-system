@@ -5,7 +5,7 @@ public record OneLoginUserUpdatedNotification : IWebhookMessageData
     public static string CloudEventType { get; } = "one_login_user.updated";
 
     public required OneLoginUserInfo OneLoginUser { get; init; }
-    public required ConnectedPersonInfo? ConnectedPerson { get; init; }
+    public required OneLoginUserConnectedPersonInfo? ConnectedPerson { get; init; }
 }
 
 public record OneLoginUserInfo
@@ -14,7 +14,7 @@ public record OneLoginUserInfo
     public required string? EmailAddress { get; init; }
 }
 
-public record ConnectedPersonInfo
+public record OneLoginUserConnectedPersonInfo
 {
     public required string Trn { get; init; }
 }
@@ -32,11 +32,11 @@ public class OneLoginUserUpdatedNotificationMapper(PersonInfoCache personInfoCac
             return null;
         }
 
-        ConnectedPersonInfo? connectedPerson = null;
+        OneLoginUserConnectedPersonInfo? connectedPerson = null;
         if (@event.OneLoginUser.PersonId is Guid personId)
         {
             var person = await personInfoCache.GetRequiredPersonInfoAsync(personId);
-            connectedPerson = new ConnectedPersonInfo
+            connectedPerson = new OneLoginUserConnectedPersonInfo
             {
                 Trn = person.Trn
             };
