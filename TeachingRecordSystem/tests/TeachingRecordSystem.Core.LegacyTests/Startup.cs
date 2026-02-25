@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.Webhooks;
-using TeachingRecordSystem.Core.Tests.Jobs;
 
 namespace TeachingRecordSystem.Core.Tests;
 
@@ -25,7 +24,6 @@ public class Startup
                     .AddSingleton<ReferenceDataCache>()
                     .AddSingleton<TestData>()
                     .AddSingleton<PersonInfoCache>()
-                    .AddSingleton<NightlyEmailJobFixture>()
                     .AddSingleton<IClock, TestableClock>()
                     .AddSingleton<WebhookMessageFactory>()
                     .AddSingleton<EventMapperRegistry>()

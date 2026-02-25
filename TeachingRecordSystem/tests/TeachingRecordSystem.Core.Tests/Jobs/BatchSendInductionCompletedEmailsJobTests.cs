@@ -7,7 +7,7 @@ using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUse
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture dbFixture) : NightlyEmailJobTestBase(dbFixture)
+public class BatchSendInductionCompletedEmailsJobTests(JobFixture fixture) : JobTestBase(fixture)
 {
     [Fact]
     public async Task Execute_EnqueuesEmailForInductionCompletees()
@@ -31,7 +31,7 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
             .WithQts()
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
-        await Fixture.DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(inductionCompletee1.Person);
 
@@ -55,17 +55,14 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
 
         Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
-        var job = new BatchSendInductionCompletedEmailsJob(
-            jobOptions,
-            Fixture.DbFixture.DbContextFactory,
-            backgroundJobScheduler.Object,
-            Clock);
-
         // Act
-        await job.ExecuteAsync(CancellationToken.None);
+        await WithServiceAsync<BatchSendInductionCompletedEmailsJob>(
+            job => job.ExecuteAsync(CancellationToken.None),
+            jobOptions,
+            backgroundJobScheduler.Object);
 
         // Assert
-        var jobItem = await DbFixture.WithDbContextAsync(dbContext => dbContext.InductionCompletedEmailsJobItems.SingleOrDefaultAsync(
+        var jobItem = await WithDbContextAsync(dbContext => dbContext.InductionCompletedEmailsJobItems.SingleOrDefaultAsync(
             i => i.PersonId == inductionCompletee1.PersonId));
         Assert.NotNull(jobItem);
         Assert.Equal(inductionCompletee1.Trn, jobItem.Trn);
