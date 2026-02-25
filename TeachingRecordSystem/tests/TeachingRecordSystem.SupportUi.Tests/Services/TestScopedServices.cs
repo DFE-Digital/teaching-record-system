@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Time.Testing;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Services;
 
@@ -8,17 +9,17 @@ public class TestScopedServices
 
     public TestScopedServices()
     {
-        Clock = new();
+        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
         Events = new(Clock);
     }
 
-    public TestableClock Clock { get; }
+    public FakeTimeProvider Clock { get; }
 
     public EventCapture Events { get; }
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<TimeProvider>(new ForwardToTestScopedTimeProvider())
             .AddSingleton<EventCapture>()
             .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>());
 
@@ -47,9 +48,9 @@ public class TestScopedServices
         return false;
     }
 
-    private class ForwardToTestScopedClock : IClock
+    private class ForwardToTestScopedTimeProvider : TimeProvider
     {
-        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
+        public override DateTimeOffset GetUtcNow() => GetCurrent().Clock.GetUtcNow();
     }
 }
 

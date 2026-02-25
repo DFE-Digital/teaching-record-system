@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 public class NoMatches(
     SupportUiLinkGenerator linkGenerator,
     OneLoginUserMatchingSupportTaskService supportTaskService,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -41,7 +41,7 @@ public class NoMatches(
 
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
         {
-            var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
+            var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
             await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedOnlyWithoutMatchesOutcomeOptions
@@ -52,7 +52,7 @@ public class NoMatches(
         }
         else
         {
-            var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
+            var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
             await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new NoMatchesOutcomeOptions

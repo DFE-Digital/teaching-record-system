@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -49,7 +50,7 @@ public abstract class TestBase
 
     protected Guid ApplicationUserId { get; } = HostFixture.DefaultApplicationUserId;
 
-    protected TestableClock Clock => _testServices.Clock;
+    protected FakeTimeProvider Clock => _testServices.Clock;
 
     protected Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;
 

@@ -29,18 +29,18 @@ public class DqtReportingService : BackgroundService
         .Build();
 
     private readonly DqtReportingOptions _options;
-    private readonly IClock _clock;
+    private readonly TimeProvider _timeProvider;
     private readonly IConfiguration _configuration;
     private readonly ILogger<DqtReportingService> _logger;
 
     public DqtReportingService(
         IOptions<DqtReportingOptions> optionsAccessor,
-        IClock clock,
+        TimeProvider timeProvider,
         IConfiguration configuration,
         ILogger<DqtReportingService> logger)
     {
         _options = optionsAccessor.Value;
-        _clock = clock;
+        _timeProvider = timeProvider;
         _configuration = configuration;
         _logger = logger;
     }
@@ -255,7 +255,7 @@ public class DqtReportingService : BackgroundService
             ;
             """";
 
-        parameters.Add(new SqlParameter(nowParameterName, _clock.UtcNow));
+        parameters.Add(new SqlParameter(nowParameterName, _timeProvider.UtcNow));
 
         using var conn = new SqlConnection(_options.ReportingDbConnectionString);
         await conn.OpenAsync();

@@ -19,7 +19,7 @@ public class CapitaImportJob(
     [FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient,
     ILogger<CapitaImportJob> logger,
     TrsDbContext dbContext,
-    IClock clock,
+    TimeProvider timeProvider,
     TrnRequestService trnRequestService,
     PersonService personService,
     IOptions<CapitaTpsUserOption> capitaUser)
@@ -103,13 +103,13 @@ public class CapitaImportJob(
             FailureCount = 0,
             DuplicateCount = 0,
             FileName = fileName,
-            CreatedDate = clock.UtcNow,
+            CreatedDate = timeProvider.UtcNow,
             IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
         };
         dbContext.IntegrationTransactions.Add(integrationJob);
         await dbContext.SaveChangesAsync();
         var integrationId = integrationJob.IntegrationTransactionId;
-        var now = clock.UtcNow;
+        var now = timeProvider.UtcNow;
 
         foreach (var row in records)
         {
@@ -180,7 +180,7 @@ public class CapitaImportJob(
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
-                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, timeProvider.UtcNow, out var @event);
                             if (@event is not null)
                             {
                                 dbContext.AddEventWithoutBroadcast(@event);
@@ -227,7 +227,7 @@ public class CapitaImportJob(
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
                             person.DateOfDeath = dateOfDeath;
-                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, timeProvider.UtcNow, out var @event);
                             if (@event is not null)
                             {
                                 dbContext.AddEventWithoutBroadcast(@event);
@@ -276,7 +276,7 @@ public class CapitaImportJob(
                 integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                 {
                     IntegrationTransactionRecordId = 0,
-                    CreatedDate = clock.UtcNow,
+                    CreatedDate = timeProvider.UtcNow,
                     RowData = row.ToString(),
                     Status = recordStatus,
                     PersonId = personId,
@@ -357,7 +357,7 @@ public class CapitaImportJob(
             {
                 errors.Add("Validation Failed: Invalid Date of Birth");
             }
-            else if (dateOfBirth > clock.Today)
+            else if (dateOfBirth > timeProvider.Today)
             {
                 errors.Add("Validation Failed: Date of Birth cannot be in the future");
             }
@@ -369,7 +369,7 @@ public class CapitaImportJob(
             {
                 errors.Add("Validation Failed: Invalid Date of death");
             }
-            else if (dateOfDeath > clock.Today)
+            else if (dateOfDeath > timeProvider.Today)
             {
                 errors.Add("Validation Failed: Date of death cannot be in the future");
             }

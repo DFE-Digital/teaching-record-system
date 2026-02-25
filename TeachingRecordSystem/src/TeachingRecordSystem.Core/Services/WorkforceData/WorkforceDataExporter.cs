@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData.Google;
 namespace TeachingRecordSystem.Core.Services.WorkforceData;
 
 public class WorkforceDataExporter(
-    IClock clock,
+    TimeProvider timeProvider,
     IDbContextFactory<TrsDbContext> dbContextFactory,
     IOptions<WorkforceDataExportOptions> optionsAccessor,
     IStorageClientProvider storageClientProvider)
@@ -55,7 +55,7 @@ public class WorkforceDataExporter(
             		establishment_sources s ON s.establishment_source_id = e.establishment_source_id
             """;
 
-        var fileDateTime = clock.UtcNow.ToString("yyyyMMddHHmm");
+        var fileDateTime = timeProvider.UtcNow.ToString("yyyyMMddHHmm");
         var tempDirectory = Path.Combine(Path.GetTempPath(), $"workforce_data_{fileDateTime}");
         Directory.CreateDirectory(tempDirectory);
 
@@ -85,7 +85,7 @@ public class WorkforceDataExporter(
         using var stream = new MemoryStream();
         var merger = new FileMerger(new DirectoryInfo(tempDirectory));
         await merger.MergeFilesAsync(stream, cancellationToken: cancellationToken);
-        await UploadFileAsync(stream, $"workforce_data_{clock.UtcNow:yyyyMMddHHmm}.parquet", cancellationToken);
+        await UploadFileAsync(stream, $"workforce_data_{timeProvider.UtcNow:yyyyMMddHHmm}.parquet", cancellationToken);
         Directory.Delete(tempDirectory, true);
     }
 

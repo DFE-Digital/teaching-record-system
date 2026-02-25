@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.TestCommon;
 
@@ -7,7 +8,7 @@ namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 [Collection(nameof(DisableParallelization))]
 public abstract class CommandTestBase(IServiceProvider services)
 {
-    protected IClock Clock => services.GetRequiredService<IClock>();
+    protected FakeTimeProvider Clock => (FakeTimeProvider)services.GetRequiredService<TimeProvider>();
 
     protected DbHelper DbHelper => services.GetRequiredService<DbHelper>();
 

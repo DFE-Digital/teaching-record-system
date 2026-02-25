@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.EditApiKey;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider) : PageModel
 {
     private ApiKey? _apiKey;
 
@@ -38,12 +38,12 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         var oldApiKey = EventModels.ApiKey.FromModel(_apiKey!);
 
-        _apiKey!.Expires = clock.UtcNow;
+        _apiKey!.Expires = timeProvider.UtcNow;
 
         var @event = new ApiKeyUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = timeProvider.UtcNow,
             RaisedBy = User.GetUserId(),
             ApiKey = EventModels.ApiKey.FromModel(_apiKey),
             OldApiKey = oldApiKey,

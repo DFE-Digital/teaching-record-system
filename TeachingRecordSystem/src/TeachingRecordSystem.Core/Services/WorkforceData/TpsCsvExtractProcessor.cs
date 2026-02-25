@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Services.WorkforceData;
 
 public class TpsCsvExtractProcessor(
     IDbContextFactory<TrsDbContext> dbContextFactory,
-    IClock clock)
+    TimeProvider timeProvider)
 {
     private const string TempEventsTableSuffix = "tps_extract_events";
 
@@ -221,8 +221,8 @@ public class TpsCsvExtractProcessor(
                 )
             SELECT
                 *,
-                {clock.UtcNow} as created_on,
-                {clock.UtcNow} as updated_on
+                {timeProvider.UtcNow} as created_on,
+                {timeProvider.UtcNow} as updated_on
             FROM
                 new_tps_employments
             RETURNING
@@ -282,14 +282,14 @@ public class TpsCsvExtractProcessor(
                     EventId = Guid.NewGuid(),
                     PersonId = item.PersonId,
                     TpsEmployment = EventModels.TpsEmployment.FromModel(personEmployment),
-                    CreatedUtc = clock.UtcNow,
+                    CreatedUtc = timeProvider.UtcNow,
                     RaisedBy = SystemUser.SystemUserId
                 };
 
                 events.Add(createdEvent);
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
@@ -384,7 +384,7 @@ public class TpsCsvExtractProcessor(
                 person_email_address = changes.new_person_email_address,
                 employer_postcode = changes.new_employer_postcode,
                 employer_email_address = changes.new_employer_email_address,
-                updated_on = {clock.UtcNow}
+                updated_on = {timeProvider.UtcNow}
             FROM
                 changes
             WHERE
@@ -483,7 +483,7 @@ public class TpsCsvExtractProcessor(
                             Key = item.Key
                         },
                         Changes = changes,
-                        CreatedUtc = clock.UtcNow,
+                        CreatedUtc = timeProvider.UtcNow,
                         RaisedBy = SystemUser.SystemUserId
                     };
 
@@ -491,7 +491,7 @@ public class TpsCsvExtractProcessor(
                 }
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
@@ -554,7 +554,7 @@ public class TpsCsvExtractProcessor(
                 tps_employments te
             SET
                 establishment_id = changes.new_establishment_id,
-                updated_on = {clock.UtcNow}
+                updated_on = {timeProvider.UtcNow}
             FROM
                 (SELECT
                     ec.tps_employment_id,
@@ -646,14 +646,14 @@ public class TpsCsvExtractProcessor(
                         Key = item.Key
                     },
                     Changes = TpsEmploymentUpdatedEventChanges.EstablishmentId,
-                    CreatedUtc = clock.UtcNow,
+                    CreatedUtc = timeProvider.UtcNow,
                     RaisedBy = SystemUser.SystemUserId
                 };
 
                 events.Add(updatedEvent);
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
@@ -685,7 +685,7 @@ public class TpsCsvExtractProcessor(
                 tps_employments te
             SET
                 end_date = new_end_date,
-                updated_on = {clock.UtcNow}
+                updated_on = {timeProvider.UtcNow}
             FROM
                 changes
             WHERE
@@ -761,14 +761,14 @@ public class TpsCsvExtractProcessor(
                         Key = item.Key
                     },
                     Changes = TpsEmploymentUpdatedEventChanges.EndDate,
-                    CreatedUtc = clock.UtcNow,
+                    CreatedUtc = timeProvider.UtcNow,
                     RaisedBy = SystemUser.SystemUserId
                 };
 
                 events.Add(updatedEvent);
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
@@ -801,7 +801,7 @@ public class TpsCsvExtractProcessor(
                     tps_employments te
                 SET
                     employer_email_address = changes.new_employer_email_address,
-                    updated_on = {clock.UtcNow}
+                    updated_on = {timeProvider.UtcNow}
                 FROM
                     changes
                 WHERE
@@ -882,7 +882,7 @@ public class TpsCsvExtractProcessor(
                             Key = item.Key
                         },
                         Changes = changes,
-                        CreatedUtc = clock.UtcNow,
+                        CreatedUtc = timeProvider.UtcNow,
                         RaisedBy = SystemUser.SystemUserId
                     };
 
@@ -890,7 +890,7 @@ public class TpsCsvExtractProcessor(
                 }
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }

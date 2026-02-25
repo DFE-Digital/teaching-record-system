@@ -19,7 +19,7 @@ public class CheckAnswersModel(
     TrnRequestService trnRequestService,
     SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
-    IClock clock,
+    TimeProvider timeProvider,
     PersonChangeableAttributesService changedService,
     IBackgroundJobScheduler backgroundJobScheduler) : ResolveNpqTrnRequestPageModel(dbContext)
 {
@@ -69,7 +69,7 @@ public class CheckAnswersModel(
 
         NpqTrnRequestDataPersonAttributes? selectedPersonAttributes;
 
-        var processContext = new ProcessContext(ProcessType.NpqTrnRequestApproving, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.NpqTrnRequestApproving, timeProvider.UtcNow, User.GetUserId());
 
         string? newTrn = null;
         if (CreatingNewRecord)

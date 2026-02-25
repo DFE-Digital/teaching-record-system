@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -17,7 +18,7 @@ public abstract class ServiceTestBase
 
     protected DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler => TestScopedServices.GetCurrent().BackgroundJobScheduler;
 
-    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => _fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 

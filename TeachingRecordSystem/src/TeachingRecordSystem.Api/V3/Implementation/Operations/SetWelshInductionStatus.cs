@@ -10,7 +10,7 @@ public record SetWelshInductionStatusResult;
 public class SetWelshInductionStatusHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
-    IClock clock) :
+    TimeProvider timeProvider) :
     ICommandHandler<SetWelshInductionStatusCommand, SetWelshInductionStatusResult>
 {
     public async Task<ApiResult<SetWelshInductionStatusResult>> ExecuteAsync(SetWelshInductionStatusCommand command)
@@ -36,7 +36,7 @@ public class SetWelshInductionStatusHandler(
             !command.Passed ? command.StartDate : null,
             !command.Passed ? command.CompletedDate : null,
             currentUserId,
-            clock.UtcNow,
+            timeProvider.UtcNow,
             out var updatedEvent);
 
         if (updatedEvent is not null)

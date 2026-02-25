@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 public class IndexModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<CloseAlertState>? JourneyInstance { get; set; }
 
@@ -39,7 +39,7 @@ public class IndexModel(
         {
             ModelState.AddModelError(nameof(EndDate), "Enter an end date");
         }
-        else if (EndDate > clock.Today)
+        else if (EndDate > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(EndDate), "End date cannot be in the future");
         }

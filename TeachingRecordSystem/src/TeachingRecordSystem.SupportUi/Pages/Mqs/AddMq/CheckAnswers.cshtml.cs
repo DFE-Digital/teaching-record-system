@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
-    IClock clock,
+    TimeProvider timeProvider,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
@@ -53,7 +53,7 @@ public class CheckAnswersModel(
             AddReasonDetail,
             evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
-            clock.UtcNow,
+            timeProvider.UtcNow,
             out var createdEvent);
 
         dbContext.MandatoryQualifications.Add(qualification);

@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.Core.Services.Webhooks;
 
 public class WebhookMessageFactory(
     EventMapperRegistry eventMapperRegistry,
-    IClock clock,
+    TimeProvider timeProvider,
     IMemoryCache memoryCache,
     TrsDbContext dbContext,
     IServiceProvider serviceProvider)
@@ -91,10 +91,10 @@ public class WebhookMessageFactory(
                     WebhookEndpointId = epId,
                     CloudEventId = id.ToString(),
                     CloudEventType = cloudEventType,
-                    Timestamp = clock.UtcNow,
+                    Timestamp = timeProvider.UtcNow,
                     ApiVersion = version,
                     Data = serializedPayload,
-                    NextDeliveryAttempt = clock.UtcNow,
+                    NextDeliveryAttempt = timeProvider.UtcNow,
                     Delivered = null,
                     DeliveryAttempts = [],
                     DeliveryErrors = []

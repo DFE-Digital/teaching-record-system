@@ -11,7 +11,7 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
-    IClock clock) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<EditMqStartDateState>? JourneyInstance { get; set; }
 
@@ -61,7 +61,7 @@ public class CheckAnswersModel(
             ChangeReasonDetail,
             evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
-            clock.UtcNow,
+            timeProvider.UtcNow,
             out var updatedEvent);
 
         if (updatedEvent is not null)

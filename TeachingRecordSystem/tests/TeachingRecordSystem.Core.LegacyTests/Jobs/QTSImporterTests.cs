@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Files;
@@ -14,7 +15,7 @@ public class QtsImporterTests : IAsyncLifetime
       IServiceProvider provider)
     {
         DbFixture = dbFixture;
-        Clock = new();
+        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
 
         TestData = new TestData(
             dbFixture.DbContextFactory,
@@ -28,7 +29,7 @@ public class QtsImporterTests : IAsyncLifetime
 
     private TestData TestData { get; }
 
-    private TestableClock Clock { get; }
+    private FakeTimeProvider Clock { get; }
 
     Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
 

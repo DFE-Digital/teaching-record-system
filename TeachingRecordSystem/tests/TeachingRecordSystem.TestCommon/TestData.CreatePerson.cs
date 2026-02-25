@@ -370,7 +370,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<CreatePersonResult> ExecuteAsync(TestData testData, IClock clock)
+        internal async Task<CreatePersonResult> ExecuteAsync(TestData testData, TimeProvider clock)
         {
             var statedFirstName = _firstName ?? testData.GenerateFirstName();
             var statedMiddleName = _middleName ?? testData.GenerateMiddleName();

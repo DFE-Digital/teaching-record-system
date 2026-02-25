@@ -3,6 +3,7 @@ using GovUk.OneLogin.AspNetCore;
 using GovUk.Questions.AspNetCore;
 using GovUk.Questions.AspNetCore.Testing;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -36,7 +37,7 @@ public abstract class TestBase
 
     protected CaptureEventObserver LegacyEventPublisher => _testServices.LegacyEventObserver;
 
-    protected TestableClock Clock => _testServices.Clock;
+    protected FakeTimeProvider Clock => _testServices.Clock;
 
     protected HttpClient HttpClient { get; }
 

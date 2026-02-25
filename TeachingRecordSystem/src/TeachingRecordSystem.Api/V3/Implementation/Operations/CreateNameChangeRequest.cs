@@ -29,7 +29,7 @@ public class CreateNameChangeRequestHandler(
     TrsDbContext dbContext,
     SupportTaskService supportTaskService,
     IFileService fileService,
-    IClock clock,
+    TimeProvider timeProvider,
     ICurrentUserProvider currentUserProvider) :
     ICommandHandler<CreateNameChangeRequestCommand, CreateNameChangeRequestResult>
 {
@@ -87,7 +87,7 @@ public class CreateNameChangeRequestHandler(
 
         var userId = currentUserProvider.GetCurrentApplicationUserId();
 
-        var processContext = new ProcessContext(ProcessType.ChangeOfNameRequestCreating, clock.UtcNow, userId);
+        var processContext = new ProcessContext(ProcessType.ChangeOfNameRequestCreating, timeProvider.UtcNow, userId);
 
         var supportTask = await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions

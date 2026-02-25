@@ -51,7 +51,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
         var note1 = await TestData.CreateNoteFromDqtAsync(person.PersonId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var note2 = await TestData.CreateNoteFromDqtAsync(person.PersonId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");

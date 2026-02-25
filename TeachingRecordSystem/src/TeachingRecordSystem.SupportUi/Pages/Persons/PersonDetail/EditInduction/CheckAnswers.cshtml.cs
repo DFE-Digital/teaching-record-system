@@ -12,7 +12,7 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager,
-    IClock clock,
+    TimeProvider timeProvider,
     TrsDbContext dbContext)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
@@ -101,7 +101,7 @@ public class CheckAnswersModel(
             ChangeReasonDetail,
             EvidenceFile?.ToEventModel(),
             User.GetUserId(),
-            clock.UtcNow,
+            timeProvider.UtcNow,
             out var updatedEvent);
 
         if (updatedEvent is not null)

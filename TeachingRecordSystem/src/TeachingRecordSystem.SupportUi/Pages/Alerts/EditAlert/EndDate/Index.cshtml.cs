@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
 [Journey(JourneyNames.EditAlertEndDate), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController, IClock clock) : PageModel
+public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController, TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<EditAlertEndDateState>? JourneyInstance { get; set; }
 
@@ -38,7 +38,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         {
             ModelState.AddModelError(nameof(EndDate), "Enter an end date");
         }
-        else if (EndDate > clock.Today)
+        else if (EndDate > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(EndDate), "End date cannot be in the future");
         }

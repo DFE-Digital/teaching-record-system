@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class StartDateModel(
     SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    IClock clock,
+    TimeProvider timeProvider,
     EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
@@ -63,7 +63,7 @@ public class StartDateModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (StartDate > clock.Today)
+        if (StartDate > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(StartDate), "The induction start date cannot be in the future");
         }

@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
 [Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
-public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskService, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
+public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskService, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -38,7 +38,7 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
             return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
         }
 
-        var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
         await supportTaskService.ResolveVerificationSupportTaskAsync(
             new NotVerifiedOutcomeOptions

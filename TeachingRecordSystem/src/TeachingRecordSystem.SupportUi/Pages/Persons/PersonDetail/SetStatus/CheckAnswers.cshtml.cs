@@ -12,7 +12,7 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     PersonService personService,
     EvidenceUploadManager evidenceController,
-    IClock clock)
+    TimeProvider timeProvider)
     : CommonJourneyPage(personService, linkGenerator, evidenceController)
 {
     public PersonDeactivateReason? DeactivateReason { get; set; }
@@ -34,7 +34,7 @@ public class CheckAnswersModel(
         {
             var processContext = new ProcessContext(
                 ProcessType.PersonDeactivating,
-                clock.UtcNow,
+                timeProvider.UtcNow,
                 User.GetUserId(),
                 new ChangeReasonWithDetailsAndEvidence
                 {
@@ -49,7 +49,7 @@ public class CheckAnswersModel(
         {
             var processContext = new ProcessContext(
                 ProcessType.PersonReactivating,
-                clock.UtcNow,
+                timeProvider.UtcNow,
                 User.GetUserId(),
                 new ChangeReasonWithDetailsAndEvidence
                 {

@@ -4,6 +4,7 @@ using Azure.Storage.Files.DataLake;
 using Azure.Storage.Files.DataLake.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Files;
 
@@ -19,7 +20,7 @@ public partial class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFix
 
     private DbFixture DbFixture => Fixture.DbFixture;
 
-    private IClock Clock => Fixture.Clock;
+    private FakeTimeProvider Clock => Fixture.Clock;
 
     private TestData TestData => Fixture.TestData;
 
@@ -77,7 +78,7 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
         IServiceProvider provider)
     {
         DbFixture = dbFixture;
-        Clock = new();
+        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
 
         var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
         var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
@@ -112,7 +113,7 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
 
     public TestData TestData { get; }
 
-    public TestableClock Clock { get; }
+    public FakeTimeProvider Clock { get; }
 
     public Mock<ILogger<EwcWalesImportJob>> Logger { get; }
 

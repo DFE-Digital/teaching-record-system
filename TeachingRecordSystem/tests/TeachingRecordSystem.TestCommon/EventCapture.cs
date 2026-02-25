@@ -3,7 +3,7 @@ using Xunit.Sdk;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class EventCapture(IClock clock) : IEventHandler
+public class EventCapture(TimeProvider clock) : IEventHandler
 {
     private readonly Dictionary<Guid, ProcessAndEvents> _processes = [];
 

@@ -21,7 +21,7 @@ public class CheckAnswersModel(
     PersonService personService,
     SupportTaskService supportTaskService,
     EvidenceUploadManager evidenceController,
-    IClock clock,
+    TimeProvider timeProvider,
     PersonChangeableAttributesService changedService) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? SourceApplicationUserName { get; set; }
@@ -132,7 +132,7 @@ public class CheckAnswersModel(
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var trnRequest = supportTask.TrnRequestMetadata!;
 
-        var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, timeProvider.UtcNow, User.GetUserId());
 
         var existingPersonId = JourneyInstance!.State.PersonId!.Value;
         var teacherPensionPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);

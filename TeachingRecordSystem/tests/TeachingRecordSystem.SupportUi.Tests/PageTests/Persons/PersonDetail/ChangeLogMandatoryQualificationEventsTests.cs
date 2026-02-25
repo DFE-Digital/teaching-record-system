@@ -17,7 +17,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.UtcNow = nows.SingleRandom();
+        Clock.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
     }
 
     [Theory]
@@ -225,7 +225,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var deactivatedByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         await DeactivateMq(mq.QualificationId, deactivatedByDqtUser);
 
@@ -256,7 +256,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq, legacyProvider) = await CreateMqWithLegacyProvider();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var deactivatedByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         await DeactivateMq(mq.QualificationId, deactivatedByDqtUser);
 
@@ -278,7 +278,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateMqWithoutProvider();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var deactivatedByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         await DeactivateMq(mq.QualificationId, deactivatedByDqtUser);
 
@@ -325,10 +325,10 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq, legacyProvider) = await CreateMqWithLegacyProvider();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var dqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         await DeactivateMq(mq.QualificationId, dqtUser);
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -394,7 +394,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -439,7 +439,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -482,7 +482,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
                 .WithDqtMqEstablishment(establishmentWithProviderMapping.Value)));
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var migratedProvider = await WithDbContextAsync(async dbContext =>
         {
@@ -535,7 +535,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             .WithMandatoryQualification(q => q
                 .WithSpecialism(specialism)
                 .WithDqtMqEstablishment(establishmentWithSpecialismMapping.Value)));
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
 
         var migratedSpecialism = await WithDbContextAsync(async dbContext =>
         {
@@ -585,7 +585,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var changeReason = "Update from provider";
         var changeReasonDetail = "More information";
@@ -626,7 +626,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -658,7 +658,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldProviderId = mq.ProviderId!.Value;
         var oldProvider = MandatoryQualificationProvider.GetById(oldProviderId);
@@ -687,7 +687,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -714,7 +714,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldSpecialism = mq.Specialism!.Value;
 
@@ -742,7 +742,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -769,7 +769,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldStartDate = mq.StartDate!.Value;
 
@@ -797,7 +797,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -824,7 +824,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldStatus = mq.Status!.Value;
 
@@ -856,7 +856,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -883,7 +883,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance();
+        Clock.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldEndDate = mq.EndDate!.Value;
 

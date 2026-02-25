@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 public class ConfirmConnect(
     OneLoginUserMatchingSupportTaskService supportTaskService,
     TrsDbContext dbContext,
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
@@ -61,7 +61,7 @@ public class ConfirmConnect(
 
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
         {
-            var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, clock.UtcNow, User.GetUserId());
+            var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
             await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedAndConnectedOutcomeOptions
@@ -74,7 +74,7 @@ public class ConfirmConnect(
         }
         else
         {
-            var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, clock.UtcNow, User.GetUserId());
+            var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
             await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new ConnectedOutcomeOptions

@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLo
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     OneLoginService oneLoginService,
-    IClock clock,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<CheckAnswersModel> _validator = new()
@@ -70,7 +70,7 @@ public class CheckAnswersModel(
             .Where(p => p.PersonId == PersonId)
             .SingleAsync();
 
-        var processContext = new ProcessContext(ProcessType.PersonOneLoginUserConnecting, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.PersonOneLoginUserConnecting, timeProvider.UtcNow, User.GetUserId());
 
         var matchedPerson = JourneyInstance!.State.MatchedPerson!;
 

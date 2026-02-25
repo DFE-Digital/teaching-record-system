@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.Core.Jobs;
 public class ScheduleTrnRecipientEmailsJob(
     IDbContextFactory<TrsDbContext> dbContextFactory,
     IBackgroundJobScheduler backgroundJobScheduler,
-    IClock clock,
+    TimeProvider timeProvider,
     IOptions<ScheduleTrnRecipientEmailsJobOptions> optionsAccessor)
 {
     private const string JobName = nameof(ScheduleTrnRecipientEmailsJob);
@@ -33,7 +33,7 @@ public class ScheduleTrnRecipientEmailsJob(
             ? lastMaxCreatedOn.ToUniversalTime()
             : DateTime.SpecifyKind(options.EarliestRecordCreationDate.ToDateTime(new TimeOnly(0, 0)), DateTimeKind.Utc);
 
-        var maxCreatedOn = clock.Today.AddDays(-options.EmailDelayDays).ToDateTime();
+        var maxCreatedOn = timeProvider.Today.AddDays(-options.EmailDelayDays).ToDateTime();
 
         outerDbContext.Database.SetCommandTimeout(0);
 

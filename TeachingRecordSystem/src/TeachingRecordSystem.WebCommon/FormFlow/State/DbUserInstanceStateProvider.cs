@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.WebCommon.FormFlow.State;
 public class DbUserInstanceStateProvider(
     TrsDbContext dbContext,
     ICurrentUserIdProvider currentUserIdProvider,
-    IClock clock,
+    TimeProvider timeProvider,
     IOptions<JsonOptions> jsonOptionsAccessor) :
     IUserInstanceStateProvider
 {
@@ -25,7 +25,7 @@ public class DbUserInstanceStateProvider(
             throw new InvalidOperationException("Instance is already completed.");
         }
 
-        instance.Completed = clock.UtcNow;
+        instance.Completed = timeProvider.UtcNow;
         await dbContext.SaveChangesAsync();
     }
 
@@ -39,8 +39,8 @@ public class DbUserInstanceStateProvider(
             InstanceId = instanceId,
             UserId = userId,
             State = serializedState,
-            Created = clock.UtcNow,
-            Updated = clock.UtcNow
+            Created = timeProvider.UtcNow,
+            Updated = timeProvider.UtcNow
         };
         dbContext.JourneyStates.Add(instance);
         await dbContext.SaveChangesAsync();
@@ -84,7 +84,7 @@ public class DbUserInstanceStateProvider(
 
         var serializedState = SerializeState(stateType, state);
         instance.State = serializedState;
-        instance.Updated = clock.UtcNow;
+        instance.Updated = timeProvider.UtcNow;
         await dbContext.SaveChangesAsync();
     }
 

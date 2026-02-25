@@ -19,7 +19,7 @@ public class OAuth2Controller(
     TrsDbContext dbContext,
     IJourneyInstanceProvider journeyInstanceProvider,
     IEventPublisher eventPublisher,
-    IClock clock,
+    TimeProvider timeProvider,
     IOpenIddictAuthorizationManager authorizationManager,
     IOpenIddictScopeManager scopeManager) : Controller
 {
@@ -70,7 +70,7 @@ public class OAuth2Controller(
                 HttpContext,
                 async ctx =>
                 {
-                    var processContext = new ProcessContext(ProcessType.TeacherSigningIn, clock.UtcNow, SystemUser.SystemUserId);
+                    var processContext = new ProcessContext(ProcessType.TeacherSigningIn, timeProvider.UtcNow, SystemUser.SystemUserId);
 
                     await eventPublisher.PublishSingleEventAsync(
                         new AuthorizeAccessRequestStartedEvent
@@ -136,7 +136,7 @@ public class OAuth2Controller(
         identity.SetAuthorizationId(await authorizationManager.GetIdAsync(authorization));
         identity.SetDestinations(GetDestinations);
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, ((SignInJourneyState)coordinator!.State).SigningInProcessId, clock.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, ((SignInJourneyState)coordinator!.State).SigningInProcessId, timeProvider.UtcNow);
 
         await eventPublisher.PublishSingleEventAsync(
             new AuthorizeAccessRequestCompletedEvent { EventId = Guid.NewGuid() },

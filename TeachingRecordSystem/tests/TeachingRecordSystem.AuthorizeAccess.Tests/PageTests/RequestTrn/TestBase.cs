@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.WebCommon.FormFlow;
@@ -28,7 +29,7 @@ public abstract class TestBase : IDisposable
 
     public CaptureEventObserver LegacyEventObserver => _testServices.LegacyEventObserver;
 
-    public TestableClock Clock => _testServices.Clock;
+    public FakeTimeProvider Clock => _testServices.Clock;
 
     public HttpClient HttpClient { get; }
 

@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOn
 [Journey(JourneyNames.DisconnectOneLogin), RequireJourneyInstance]
 public class CheckAnswers(
     SupportUiLinkGenerator linkGenerator,
-    IClock clock,
+    TimeProvider timeProvider,
     OneLoginService oneLoginService,
     TrsDbContext dbContext)
     : PageModel
@@ -40,7 +40,7 @@ public class CheckAnswers(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, timeProvider.UtcNow, User.GetUserId());
         var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
         if (JourneyInstance!.State.StayVerified == DisconnectOneLoginStayVerified.Yes)
         {

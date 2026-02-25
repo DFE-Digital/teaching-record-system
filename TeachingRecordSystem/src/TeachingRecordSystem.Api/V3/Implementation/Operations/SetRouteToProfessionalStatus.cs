@@ -31,7 +31,7 @@ public class SetRouteToProfessionalStatusHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
     ReferenceDataCache referenceDataCache,
-    IClock clock) :
+    TimeProvider timeProvider) :
     ICommandHandler<SetRouteToProfessionalStatusCommand, SetRouteToProfessionalStatusResult>
 {
     private static readonly IReadOnlyCollection<Guid> _permittedRouteTypeIds =
@@ -208,7 +208,7 @@ public class SetRouteToProfessionalStatusHandler(
                 changeReasonDetail: null,
                 evidenceFile: null,
                 currentUserId,
-                clock.UtcNow,
+                timeProvider.UtcNow,
                 out var @event);
 
             if (@event is not null)
@@ -237,7 +237,7 @@ public class SetRouteToProfessionalStatusHandler(
                 degreeTypeId: degreeTypeId,
                 isExemptFromInduction: command.IsExemptFromInduction,
                 createdBy: currentUserId,
-                now: clock.UtcNow,
+                now: timeProvider.UtcNow,
                 changeReason: null,
                 changeReasonDetail: null,
                 evidenceFile: null,

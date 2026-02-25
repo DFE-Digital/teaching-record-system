@@ -16,7 +16,7 @@ public class CheckAnswers(
     TrnRequestService trnRequestService,
     SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator,
-    IClock clock,
+    TimeProvider timeProvider,
     PersonChangeableAttributesService changedService) :
     ResolveApiTrnRequestPageModel(dbContext)
 {
@@ -73,7 +73,7 @@ public class CheckAnswers(
 
         ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
 
-        var processContext = new ProcessContext(ProcessType.ApiTrnRequestResolving, clock.UtcNow, User.GetUserId());
+        var processContext = new ProcessContext(ProcessType.ApiTrnRequestResolving, timeProvider.UtcNow, User.GetUserId());
 
         if (CreatingNewRecord)
         {

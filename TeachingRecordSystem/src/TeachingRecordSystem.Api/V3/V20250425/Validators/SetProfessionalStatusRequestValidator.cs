@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Api.V3.V20250425.Validators;
 
 public class SetProfessionalStatusRequestValidator : AbstractValidator<SetProfessionalStatusRequest>
 {
-    public SetProfessionalStatusRequestValidator(IClock clock)
+    public SetProfessionalStatusRequestValidator(TimeProvider timeProvider)
     {
         RuleFor(r => r.Status)
             .Cascade(CascadeMode.Stop)
@@ -33,7 +33,7 @@ public class SetProfessionalStatusRequestValidator : AbstractValidator<SetProfes
             .Null()
             .When(r => r.Status != ProfessionalStatusStatus.Awarded && r.Status != ProfessionalStatusStatus.Approved, ApplyConditionTo.CurrentValidator)
             .WithMessage(r => $"Awarded date cannot be specified when status is '{r.Status}'.")
-            .LessThanOrEqualTo(clock.Today)
+            .LessThanOrEqualTo(timeProvider.Today)
             .WithMessage("Awarded date cannot be in the future.");
 
         RuleFor(r => r.TrainingStartDate)

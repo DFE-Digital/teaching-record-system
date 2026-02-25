@@ -20,7 +20,7 @@ public class SignInJourneyCoordinator(
     TrsDbContext dbContext,
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
-    IClock clock) :
+    TimeProvider timeProvider) :
     JourneyCoordinator<SignInJourneyState>
 {
     public const string JourneyName = "SignInJourney";
@@ -74,7 +74,7 @@ public class SignInJourneyCoordinator(
         var sub = ticket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
         var email = ticket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, clock.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow);
 
         var oneLoginUser = await oneLoginService.OnSignInAsync(sub, email, processContext);
         var trn = oneLoginUser.Person?.Trn;
@@ -123,7 +123,7 @@ public class SignInJourneyCoordinator(
         var sub = State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
         var email = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, clock.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow);
 
         await oneLoginService.SetUserVerifiedAsync(
             new SetUserVerifiedOptions
@@ -266,7 +266,7 @@ public class SignInJourneyCoordinator(
         {
             var subject = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
 
-            var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, clock.UtcNow);
+            var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow);
 
             await oneLoginService.SetUserMatchedAsync(
                 new SetUserMatchedOptions
