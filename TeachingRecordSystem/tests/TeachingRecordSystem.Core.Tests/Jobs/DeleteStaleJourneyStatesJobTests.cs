@@ -1,22 +1,10 @@
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifetime
+public class DeleteStaleJourneyStatesJobTests(JobFixture fixture) : JobTestBase(fixture)
 {
-    private TrsDbContext _trsContext = null!;
-
-    public TestableClock Clock { get; } = new();
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    public async Task InitializeAsync()
-    {
-        _trsContext = await dbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-    }
-
     [Fact]
     public async Task DeleteStaleJourneyStatesJob_RemovesJourneyStatesOlderThanOneDay_UpdatesMetadataLastRunDate()
     {
@@ -46,19 +34,20 @@ public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
             Updated = Clock.UtcNow.AddMinutes(Random.Shared.Next(-60, 0))
         };
 
-        _trsContext.JourneyStates.Add(journeyState1);
-        _trsContext.JourneyStates.Add(journeyState2);
-        _trsContext.JourneyStates.Add(journeyState3);
-        await _trsContext.SaveChangesAsync();
-
-        var job = new DeleteStaleJourneyStatesJob(_trsContext, Clock);
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.JourneyStates.Add(journeyState1);
+            dbContext.JourneyStates.Add(journeyState2);
+            dbContext.JourneyStates.Add(journeyState3);
+            await dbContext.SaveChangesAsync();
+        });
 
         // Act
-        await job.ExecuteAsync(CancellationToken.None);
+        await WithServiceAsync<DeleteStaleJourneyStatesJob>(job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         var expected = new JourneyState[] { journeyState2, journeyState3 };
-        var remainingJourneyStates = await _trsContext.JourneyStates.ToListAsync();
+        var remainingJourneyStates = await WithDbContextAsync(dbContext => dbContext.JourneyStates.ToListAsync());
         Assert.All(remainingJourneyStates, s => Assert.Contains(s.InstanceId, expected.Select(e => e.InstanceId)));
         Assert.Equal(2, remainingJourneyStates.Count);
     }
