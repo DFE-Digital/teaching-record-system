@@ -1,41 +1,24 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-[Collection(nameof(DisableParallelization))]
-public class QtsImporterTests : IAsyncLifetime
+public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
 {
-    public QtsImporterTests(
-      DbFixture dbFixture,
-      ReferenceDataCache referenceDataCache,
-      IServiceProvider provider)
-    {
-        DbFixture = dbFixture;
-        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
-
-        TestData = new TestData(
-            dbFixture.DbContextFactory,
-            referenceDataCache,
+    private Task<QtsImporter.QtsImportLookupData> GetLookupDataAsync(EwcWalesQtsFileImportData row) =>
+        WithServiceAsync<QtsImporter, QtsImporter.QtsImportLookupData>(
+            importer => importer.GetLookupDataAsync(row),
             Clock);
 
-        Importer = ActivatorUtilities.CreateInstance<QtsImporter>(provider, Clock);
-    }
-
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private FakeTimeProvider Clock { get; }
-
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    public QtsImporter Importer { get; }
+    private Task<(List<string> ValidationFailures, List<string> Errors)> ValidateAsync(EwcWalesQtsFileImportData row) =>
+        WithServiceAsync<QtsImporter, (List<string>, List<string>)>(
+            async importer =>
+            {
+                var lookups = await importer.GetLookupDataAsync(row);
+                return importer.Validate(row, lookups);
+            },
+            Clock);
 
     public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 
@@ -49,10 +32,8 @@ public class QtsImporterTests : IAsyncLifetime
             return x;
         });
 
-        var lookups = await Importer.GetLookupDataAsync(row);
-
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Teacher with TRN {row.QtsRefNo} was not found."));
@@ -70,10 +51,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.QtsDate = "";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains("Missing QTS Ref Number"));
@@ -92,10 +72,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.DateOfBirth = "67/13/2025";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains("Validation Failed: Invalid Date of Birth"));
@@ -112,10 +91,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.QtsDate = "67/13/2025";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains("Validation Failed: Invalid QTS Date"));
@@ -132,10 +110,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.DateOfBirth = "01/06/1999";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"For TRN {row.QtsRefNo} Date of Birth does not match with the existing record."));
@@ -152,10 +129,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.DateOfBirth = person.DateOfBirth.ToString()!;
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.DoesNotContain(failures, item => item.Contains($"Country with PQ Country Code {row.Country} was not found."));
@@ -180,10 +156,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.QtsDate = holdsDate.ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"{person.Trn} already holds welshr route with holdsfrom {holdsDate}"));
@@ -209,10 +184,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.QtsStatus = "71";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.DoesNotContain(errors, item => item.Contains($"{person.Trn} already holds welshr route with holdsfrom {holdsDate}"));
@@ -233,10 +207,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.QtsDate = "01/05/2025";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains("Qts Status can only be 71 or 49 when qts date is on or past 01/02/2023"));
@@ -255,10 +228,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.QtsDate = Clock.UtcNow.AddDays(1).ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains("Qts date cannot be set in the future"));
@@ -278,10 +250,9 @@ public class QtsImporterTests : IAsyncLifetime
             x.QtsDate = "01/01/2023";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.DoesNotContain(errors, item => item.Contains("Qualified Teacher: under the EC Directive must be before 01/02/2023"));
@@ -300,7 +271,7 @@ public class QtsImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.PersonMatchStatus);
@@ -324,7 +295,7 @@ public class QtsImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.TeacherStatusMatchStatus);
@@ -346,7 +317,7 @@ public class QtsImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.TeacherStatusMatchStatus);
@@ -365,7 +336,9 @@ public class QtsImporterTests : IAsyncLifetime
         var expectedJson = $"{row.QtsRefNo},{row.Forename},{row.Surname},{row.DateOfBirth},{row.QtsStatus},{row.QtsDate},{row.IttStartMonth},{row.IttStartYear},{row.IttEndDate},{row.ITTCourseLength},{row.IttEstabLeaCode},{row.IttEstabCode},{row.IttQualCode},{row.IttClassCode},{row.IttSubjectCode1},{row.IttSubjectCode2},{row.IttMinAgeRange},{row.IttMaxAgeRange},{row.IttMinSpAgeRange},{row.IttMaxSpAgeRange},{row.PqCourseLength},{row.PqYearOfAward},{row.Country},{row.PqEstabCode},{row.PqQualCode},{row.Honours},{row.PqClassCode},{row.PqSubjectCode1},{row.PqSubjectCode2},{row.PqSubjectCode3}";
 
         // Act
-        var json = Importer.ConvertToCsvString(row);
+        var json = await WithServiceAsync<QtsImporter, string>(
+            importer => Task.FromResult(importer.ConvertToCsvString(row)),
+            Clock);
 
         // Assert
         Assert.Contains(expectedJson, json);
@@ -387,7 +360,7 @@ public class QtsImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.True(lookups.HasActiveAlerts);
@@ -412,7 +385,7 @@ public class QtsImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.NotNull(lookups.Person);

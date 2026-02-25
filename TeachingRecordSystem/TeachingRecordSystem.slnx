@@ -32,7 +32,6 @@
     <Project Path="tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests.csproj" />
     <Project Path="tests/TeachingRecordSystem.AuthorizeAccess.Tests/TeachingRecordSystem.AuthorizeAccess.Tests.csproj" />
     <Project Path="tests/TeachingRecordSystem.Cli.Tests/TeachingRecordSystem.Cli.Tests.csproj" />
-    <Project Path="tests/TeachingRecordSystem.Core.LegacyTests/TeachingRecordSystem.Core.LegacyTests.csproj" />
     <Project Path="tests/TeachingRecordSystem.Core.Tests/TeachingRecordSystem.Core.Tests.csproj" />
     <Project Path="tests/TeachingRecordSystem.SupportUi.EndToEndTests/TeachingRecordSystem.SupportUi.EndToEndTests.csproj" />
     <Project Path="tests/TeachingRecordSystem.SupportUi.Tests/TeachingRecordSystem.SupportUi.Tests.csproj" />
