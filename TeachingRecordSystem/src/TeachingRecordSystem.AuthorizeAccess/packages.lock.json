@@ -173,11 +173,11 @@
       },
       "EFCore.BulkExtensions.Core": {
         "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "nKtjTES+tQdbA9cZDbeV8K/nOc/gZG9UwICPTXsFCGiUlqeuR3yM7URCrnaDgVEFVH/iNC2Nf4j5f68L2gr+0Q==",
+        "resolved": "10.0.1",
+        "contentHash": "D++Wd1Qy6RM+yMy4nQ3r0nc/cSA0T+AdlFBEuKDhwl6r5bwuBQpluP5h2rvQ3i+CetUGppef6JNH9grg8lo+Bw==",
         "dependencies": {
           "MedallionTopologicalSort": "1.0.0",
-          "Microsoft.EntityFrameworkCore.Relational": "10.0.1",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.3",
           "NetTopologySuite": "2.6.0"
         }
       },
@@ -886,7 +886,7 @@
           "CloudNative.CloudEvents": "[2.8.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[33.1.0, )",
-          "EFCore.BulkExtensions.PostgreSql": "[10.0.0, )",
+          "EFCore.BulkExtensions.PostgreSql": "[10.0.1, )",
           "EFCore.NamingConventions": "[10.0.0, )",
           "EntityFrameworkCore.Projectables": "[5.0.2, )",
           "FluentValidation": "[12.1.0, )",
@@ -1030,11 +1030,11 @@
       },
       "EFCore.BulkExtensions.PostgreSql": {
         "type": "CentralTransitive",
-        "requested": "[10.0.0, )",
-        "resolved": "10.0.0",
-        "contentHash": "QqjE3SDR9U0bFDegc7mBrNjZC3pNwLqnrxE7PuCoOMy7dtBW5Qx1XR3BAebGtb3eHj3kMrdk7WWhdTAYeIR06g==",
+        "requested": "[10.0.1, )",
+        "resolved": "10.0.1",
+        "contentHash": "iZCay5ghyULm4kA0ET6BOrL9J7AhVlgBqILpy4TUBm6yaGALIwcGc/qe6EO/VS+k9/RwJdO4qsRqWiTNrxF1Aw==",
         "dependencies": {
-          "EFCore.BulkExtensions.Core": "10.0.0",
+          "EFCore.BulkExtensions.Core": "10.0.1",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0"
         }
       },

@@ -20,7 +20,7 @@
     <PackageVersion Include="DartSassBuilder" Version="1.1.0" />
     <PackageVersion Include="dbup-sqlserver" Version="5.0.37" />
     <PackageVersion Include="Dfe.Analytics" Version="0.3.0" />
-    <PackageVersion Include="EFCore.BulkExtensions.PostgreSql" Version="10.0.0" />
+    <PackageVersion Include="EFCore.BulkExtensions.PostgreSql" Version="10.0.1" />
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.0" />
     <PackageVersion Include="EntityFrameworkCore.Projectables" Version="5.0.2" />
     <PackageVersion Include="Faker.Net" Version="2.0.163" />
