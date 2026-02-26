@@ -785,7 +785,7 @@
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.3, )",
           "Microsoft.Extensions.Options.DataAnnotations": "[10.0.3, )",
           "NSign.Client": "[1.2.3, )",
-          "NSign.SignatureProviders": "[1.2.1, )",
+          "NSign.SignatureProviders": "[1.2.3, )",
           "Npgsql.DependencyInjection": "[10.0.0, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
           "OneOf": "[3.0.271, )",
@@ -1195,11 +1195,11 @@
       },
       "NSign.SignatureProviders": {
         "type": "CentralTransitive",
-        "requested": "[1.2.1, )",
-        "resolved": "1.2.1",
-        "contentHash": "XWqtAV0ZV80R4TYkDFw3jAObtmWmq0qL+yr2uItZn0VHNP9gSnjrgKLI4vct+dDD5DnKmOZGATZ9Uhvc4o34uQ==",
+        "requested": "[1.2.3, )",
+        "resolved": "1.2.3",
+        "contentHash": "6C33NTJNxzi3E6IdZ4VdLSgaYMNypiJssHS6uqoEAGKg9SDLWp2QxuQJXtzHf3gtMoXapzULhpirHccPxtDs5g==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.1"
+          "NSign.Abstractions": "1.2.3"
         }
       },
       "OneOf": {
