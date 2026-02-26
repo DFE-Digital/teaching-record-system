@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-namespace TeachingRecordSystem.Core.ApiSchema.V3.V20260225.WebhookData;
+namespace TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData;
 
 public record TrnRequestCompletedNotification : IWebhookMessageData
 {

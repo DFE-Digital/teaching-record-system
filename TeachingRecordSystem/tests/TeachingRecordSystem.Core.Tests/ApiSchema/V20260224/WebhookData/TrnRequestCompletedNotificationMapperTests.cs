@@ -1,7 +1,7 @@
-using TeachingRecordSystem.Core.ApiSchema.V3.V20260225.WebhookData;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData;
 using TeachingRecordSystem.Core.Tests.Services;
 
-namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20260225.WebhookData;
+namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20260224.WebhookData;
 
 public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
