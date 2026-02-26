@@ -1,49 +1,32 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-[Collection(nameof(DisableParallelization))]
-public class InductionImporterTests : IAsyncLifetime
+public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
 {
-    public InductionImporterTests(
-      DbFixture dbFixture,
-      ReferenceDataCache referenceDataCache,
-      IServiceProvider provider)
-    {
-        DbFixture = dbFixture;
-        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
-
-        TestData = new TestData(
-            dbFixture.DbContextFactory,
-            referenceDataCache,
+    private Task<InductionImporter.InductionImportLookupData> GetLookupDataAsync(EwcWalesInductionImportData row) =>
+        WithServiceAsync<InductionImporter, InductionImporter.InductionImportLookupData>(
+            importer => importer.GetLookupDataAsync(row),
             Clock);
 
-        Importer = ActivatorUtilities.CreateInstance<InductionImporter>(provider, Clock);
-    }
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private FakeTimeProvider Clock { get; }
-
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    public InductionImporter Importer { get; }
+    private Task<(List<string> ValidationFailures, List<string> Errors)> ValidateAsync(EwcWalesInductionImportData row) =>
+        WithServiceAsync<InductionImporter, (List<string>, List<string>)>(
+            async importer =>
+            {
+                var lookups = await importer.GetLookupDataAsync(row);
+                return importer.Validate(row, lookups);
+            },
+            Clock);
 
     [Fact]
     public async Task Validate_MissingReferenceNumber_ReturnsError()
     {
         // Arrange
         var row = GetDefaultRow();
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Missing Reference No"));
@@ -58,10 +41,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.DateOfBirth = "";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Missing Date of Birth"));
@@ -76,10 +58,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.DateOfBirth = "45/11/19990";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Validation Failed: Invalid Date of Birth"));
@@ -94,10 +75,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.StartDate = "";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Missing Induction Start date"));
@@ -113,10 +93,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = "01/01/2021";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Induction passed date cannot be before start date"));
@@ -144,10 +123,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = person1AwardedDate.AddDays(-8).ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Induction passed date cannot be before Qts Date."));
@@ -177,10 +155,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = person1AwardedDate.AddDays(-8).ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Induction start date cannot be before qts date"));
@@ -195,17 +172,16 @@ public class InductionImporterTests : IAsyncLifetime
             x.StartDate = "55/13/20001111";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Validation Failed: Invalid Induction start date"));
     }
 
     [Fact]
-    public async Task Validate_MissinPassedDate_ReturnsError()
+    public async Task Validate_MissingPassedDate_ReturnsError()
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -213,10 +189,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = "";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Missing Induction passed date"));
@@ -231,10 +206,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = "25/13/20001";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Validation Failed: Invalid Induction passed date"));
@@ -249,10 +223,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.ReferenceNumber = "NONE EXISTENT";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Teacher with TRN {row.ReferenceNumber} was not found."));
@@ -276,10 +249,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Teacher with TRN {row.ReferenceNumber} completed induction already or is progress."));
@@ -307,10 +279,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.EmployerCode = accountNumber;
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Empty(errors);
@@ -329,7 +300,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(ContactLookupResult.NoMatch, lookups.PersonMatchStatus);
@@ -353,7 +324,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.True(lookups.HasActiveAlerts);
@@ -372,7 +343,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(ContactLookupResult.NoAssociatedQts, lookups.PersonMatchStatus);
@@ -396,7 +367,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(ContactLookupResult.TeacherHasQts, lookups.PersonMatchStatus);
@@ -420,10 +391,9 @@ public class InductionImporterTests : IAsyncLifetime
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = await ValidateAsync(row);
 
         // Assert
         Assert.Empty(errors);

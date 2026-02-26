@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.OneLogin;
@@ -38,7 +39,9 @@ public class JobFixture : ServiceProviderFixture
             .AddSingleton(Options.Create(new AccessYourTeachingQualificationsOptions { BaseAddress = "https://aytq.example.com/" }))
             .AddSingleton(Options.Create(new TrnRequestOptions()))
             .AddSingleton(Options.Create(new CapitaTpsUserOption { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId }))
-            .AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (_, _) => Mock.Of<DataLakeServiceClient>());
+            .AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (_, _) => Mock.Of<DataLakeServiceClient>())
+            .AddTransient<InductionImporter>()
+            .AddTransient<QtsImporter>();
 
         TestScopedServices.ConfigureServices(services);
     }
