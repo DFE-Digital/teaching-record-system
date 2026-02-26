@@ -59,7 +59,7 @@ public class AcceptModel(
                 {
                     PersonId = _supportTask!.Person!.PersonId,
                     FirstName = Option.Some(changeNameRequestData!.FirstName),
-                    MiddleName = Option.Some(changeNameRequestData.MiddleName),
+                    MiddleName = Option.Some(changeNameRequestData.MiddleName ?? string.Empty),
                     LastName = Option.Some(changeNameRequestData.LastName),
                     DateOfBirth = default,
                     CreatePreviousName = true,
