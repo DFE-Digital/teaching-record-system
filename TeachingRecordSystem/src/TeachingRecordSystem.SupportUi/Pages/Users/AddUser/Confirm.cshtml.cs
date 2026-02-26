@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -17,6 +16,15 @@ public class ConfirmModel(
     TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private readonly InlineValidator<ConfirmModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Name)
+            .NotEmpty().WithMessage("Enter a name")
+            .MaximumLength(Core.DataStore.Postgres.Models.UserBase.NameMaxLength).WithMessage("Name must be 200 characters or less"),
+        v => v.RuleFor(m => m.Role)
+            .NotEmpty().WithMessage("Select a role")
+    };
+
     private User? _user;
 
     [BindProperty(SupportsGet = true)]
@@ -25,12 +33,9 @@ public class ConfirmModel(
     public string? Email { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Enter a name")]
-    [MaxLength(Core.DataStore.Postgres.Models.UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a role")]
     public string? Role { get; set; }
 
     public string? AzureAdUserId { get; set; }
@@ -58,10 +63,7 @@ public class ConfirmModel(
             return BadRequest();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         var newUser = new Core.DataStore.Postgres.Models.User()
         {

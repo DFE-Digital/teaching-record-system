@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,13 +12,18 @@ public class MatchesModel(
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
+    private readonly InlineValidator<MatchesModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.PrimaryPersonId)
+            .NotNull().WithMessage("Select primary record")
+    };
+
     public string BackLink => GetPageLink(FromCheckAnswers ? MergePersonJourneyPage.CheckAnswers : MergePersonJourneyPage.EnterTrn);
 
     public string? CannotMergeReason { get; private set; }
 
     public IReadOnlyList<PotentialDuplicate>? PotentialDuplicates { get; private set; }
 
-    [Required(ErrorMessage = "Select primary record")]
     [BindProperty]
     public Guid? PrimaryPersonId { get; set; }
 
@@ -77,10 +81,7 @@ public class MatchesModel(
             return BadRequest();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

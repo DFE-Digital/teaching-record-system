@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,6 +8,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 [Journey(JourneyNames.EditMqSpecialism), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Specialism)
+            .NotNull().WithMessage("Select a specialism")
+    };
+
     public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -19,7 +24,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     public IReadOnlyCollection<MandatoryQualificationSpecialismInfo>? Specialisms { get; set; }
@@ -35,6 +39,8 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         {
             ModelState.AddModelError(nameof(Specialism), "Select a valid specialism");
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

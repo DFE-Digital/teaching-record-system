@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.Services.Persons;
@@ -13,12 +12,23 @@ public class OtherDetailsChangeReasonModel(
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
+    private readonly InlineValidator<OtherDetailsChangeReasonModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Reason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.ReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+        v => v.RuleFor(m => m.ReasonDetail)
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.Reason == PersonDetailsChangeReason.AnotherReason),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason")]
     public PersonDetailsChangeReason? Reason { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ReasonDetail { get; set; }
 
     [BindProperty]
@@ -46,12 +56,8 @@ public class OtherDetailsChangeReasonModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Reason is PersonDetailsChangeReason.AnotherReason && ReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(ReasonDetail), "Enter a reason");
-        }
-
         await EvidenceUploadManager.ValidateAndUploadAsync<OtherDetailsChangeReasonModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

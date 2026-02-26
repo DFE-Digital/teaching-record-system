@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.Services.Persons;
@@ -12,12 +11,23 @@ public class ReasonModel(
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(linkGenerator, evidenceUploadManager)
 {
+    private readonly InlineValidator<ReasonModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Reason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.ReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+        v => v.RuleFor(m => m.ReasonDetail)
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.Reason == PersonCreateReason.AnotherReason),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason")]
     public PersonCreateReason? Reason { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ReasonDetail { get; set; }
 
     [BindProperty]
@@ -50,12 +60,8 @@ public class ReasonModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Reason is not null && Reason.Value == PersonCreateReason.AnotherReason && ReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(ReasonDetail), "Enter a reason");
-        }
-
         await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -10,6 +9,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
+    private readonly InlineValidator<MatchesModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.PersonId)
+            .NotNull().WithMessage("Select a record")
+    };
+
     public TrnRequestMetadata? RequestData { get; set; }
 
     public SupportTask? SupportTask { get; set; }
@@ -17,7 +22,6 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a record")]
     public Guid? PersonId { get; set; }
 
     public string? Trn { get; set; }
@@ -36,10 +40,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
             return BadRequest();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

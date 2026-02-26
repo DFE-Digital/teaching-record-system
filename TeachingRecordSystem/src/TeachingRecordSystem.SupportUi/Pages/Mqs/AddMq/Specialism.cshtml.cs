@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +10,12 @@ public class SpecialismModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<SpecialismModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Specialism)
+            .NotNull().WithMessage("Select a specialism")
+    };
+
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -22,7 +27,6 @@ public class SpecialismModel(
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     public IReadOnlyCollection<MandatoryQualificationSpecialismInfo>? Specialisms { get; set; }
@@ -38,6 +42,8 @@ public class SpecialismModel(
         {
             ModelState.AddModelError(nameof(Specialism), "Select a valid specialism");
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

@@ -12,6 +12,10 @@ public class MergeModel(
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
+    private readonly InlineValidator<MergeModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
     public string BackLink => GetPageLink(FromCheckAnswers ? MergePersonJourneyPage.CheckAnswers : MergePersonJourneyPage.Matches);
 
     public PersonAttribute<string>? Trn { get; set; }
@@ -182,6 +186,7 @@ public class MergeModel(
         }
 
         await EvidenceUploadManager.ValidateAndUploadAsync<MergeModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.Services.Persons;
@@ -13,8 +12,14 @@ public class NameChangeReasonModel(
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
+    private readonly InlineValidator<NameChangeReasonModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Reason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason")]
     public PersonNameChangeReason? Reason { get; set; }
 
     [BindProperty]
@@ -42,6 +47,7 @@ public class NameChangeReasonModel(
     public async Task<IActionResult> OnPostAsync()
     {
         await EvidenceUploadManager.ValidateAndUploadAsync<NameChangeReasonModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

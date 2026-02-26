@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -14,9 +13,14 @@ public class CompletedDateModel(
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
+    private readonly InlineValidator<CompletedDateModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.CompletedDate)
+            .NotNull().WithMessage("Enter an induction completed date")
+    };
+
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Completed date")]
-    [Required(ErrorMessage = "Enter an induction completed date")]
     public DateOnly? CompletedDate { get; set; }
 
     public InductionJourneyPage NextPage
@@ -64,6 +68,8 @@ public class CompletedDateModel(
         {
             ModelState.AddModelError(nameof(CompletedDate), "The induction completed date cannot be before the induction start date");
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

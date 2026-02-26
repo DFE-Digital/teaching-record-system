@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -14,12 +13,20 @@ public class EnterTrnModel(
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
+    private readonly InlineValidator<EnterTrnModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.OtherTrn)
+            .NotEmpty().WithMessage("Enter a TRN"),
+        v => v.RuleFor(m => m.OtherTrn)
+            .Matches(@"^\d+$").WithMessage("TRN must be a number")
+            .When(m => !string.IsNullOrEmpty(m.OtherTrn)),
+        v => v.RuleFor(m => m.OtherTrn)
+            .Length(Person.TrnExactLength).WithMessage("TRN must be 7 digits long")
+            .When(m => !string.IsNullOrEmpty(m.OtherTrn))
+    };
+
     public string? ThisTrn { get; set; }
 
-    [Required(ErrorMessage = "Enter a TRN")]
-    [RegularExpression(@"^\d+$", ErrorMessage = "TRN must be a number")]
-    [MaxLength(Person.TrnExactLength, ErrorMessage = "TRN must be 7 digits long")]
-    [MinLength(Person.TrnExactLength, ErrorMessage = "TRN must be 7 digits long")]
     [BindProperty]
     public string? OtherTrn { get; set; }
 
@@ -48,16 +55,16 @@ public class EnterTrnModel(
             return BadRequest();
         }
 
+        _validator.ValidateAndThrow(this);
+
         if (OtherTrn == ThisTrn)
         {
             ModelState.AddModelError(nameof(OtherTrn), "TRN must be for a different record");
         }
 
-        var otherPerson = OtherTrn is null
-            ? null
-            : await DbContext.Persons
-                .IgnoreQueryFilters()
-                .SingleOrDefaultAsync(p => p.Trn == OtherTrn);
+        var otherPerson = await DbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(p => p.Trn == OtherTrn);
 
         if (otherPerson is null)
         {

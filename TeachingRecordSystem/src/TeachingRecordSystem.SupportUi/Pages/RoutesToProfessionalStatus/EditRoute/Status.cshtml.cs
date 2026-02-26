@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,9 +11,16 @@ public class StatusModel(
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache) : PageModel
 {
+    private readonly InlineValidator<StatusModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Status)
+            .IsInEnum().WithMessage("Select a route status")
+    };
+
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
+
     public RouteToProfessionalStatusType Route { get; set; } = null!;
 
     public ProfessionalStatusStatusInfo[] Statuses { get; set; } = [];
@@ -26,7 +32,6 @@ public class StatusModel(
     public Guid QualificationId { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a route status")]
     public RouteToProfessionalStatusStatus Status { get; set; }
 
     public void OnGet()
@@ -36,10 +41,7 @@ public class StatusModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         if (CompletingRoute) // if user has set the status to 'holds' from another status
         {

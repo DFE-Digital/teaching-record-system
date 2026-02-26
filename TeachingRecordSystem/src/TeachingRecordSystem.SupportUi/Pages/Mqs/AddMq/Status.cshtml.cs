@@ -11,6 +11,12 @@ public class StatusModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<StatusModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Status)
+            .NotNull().WithMessage("Select a status")
+    };
+
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -22,7 +28,6 @@ public class StatusModel(
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a status")]
     public MandatoryQualificationStatus? Status { get; set; }
 
     [BindProperty]
@@ -50,6 +55,8 @@ public class StatusModel(
                 ModelState.AddModelError(nameof(EndDate), "End date must be after start date");
             }
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

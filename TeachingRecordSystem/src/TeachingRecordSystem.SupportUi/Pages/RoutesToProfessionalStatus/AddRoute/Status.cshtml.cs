@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -13,6 +12,12 @@ public class StatusModel(
     EvidenceUploadManager evidenceController)
     : AddRouteCommonPageModel(AddRoutePage.Status, linkGenerator, referenceDataCache, evidenceController)
 {
+    private readonly InlineValidator<StatusModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Status)
+            .NotNull().WithMessage("Select a route status")
+    };
+
     public override AddRoutePage? NextPage => PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckAnswers;
     public override AddRoutePage? PreviousPage => AddRoutePage.Route;
 
@@ -21,7 +26,6 @@ public class StatusModel(
     public ProfessionalStatusStatusInfo[] Statuses { get; set; } = [];
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a route status")]
     public RouteToProfessionalStatusStatus? Status { get; set; }
 
     public void OnGet()
@@ -31,10 +35,7 @@ public class StatusModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

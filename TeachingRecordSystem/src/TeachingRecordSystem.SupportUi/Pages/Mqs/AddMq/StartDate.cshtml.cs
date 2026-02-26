@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +10,12 @@ public class StartDateModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<StartDateModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.StartDate)
+            .NotNull().WithMessage("Enter a start date")
+    };
+
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -22,7 +27,6 @@ public class StartDateModel(
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Enter a start date")]
     public DateOnly? StartDate { get; set; }
 
     public void OnGet()
@@ -36,6 +40,8 @@ public class StartDateModel(
         {
             ModelState.AddModelError(nameof(StartDate), "Start date must be after end date");
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

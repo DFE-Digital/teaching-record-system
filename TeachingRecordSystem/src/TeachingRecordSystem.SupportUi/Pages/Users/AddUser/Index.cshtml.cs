@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,7 +13,12 @@ public class IndexModel(
     IAadUserService userService,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    [Required(ErrorMessage = "Enter an email address")]
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Email)
+            .NotEmpty().WithMessage("Enter an email address")
+    };
+
     [BindProperty]
     public string? Email { get; set; }
 
@@ -24,10 +28,7 @@ public class IndexModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         var email = Email!;
         if (!email.Contains('@'))

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -13,15 +12,20 @@ namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.AddApiKey;
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Key)
+            .NotEmpty().WithMessage("Enter a key")
+            .MaximumLength(ApiKey.KeyMaxLength).WithMessage("Key must be 100 characters or less")
+            .MinimumLength(ApiKey.KeyMinLength).WithMessage("Key must be at least 16 characters")
+    };
+
     [FromQuery]
     public Guid ApplicationUserId { get; set; }
 
     public string? ApplicationUserName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Enter a key")]
-    [MaxLength(ApiKey.KeyMaxLength, ErrorMessage = "Key must be 100 characters or less")]
-    [MinLength(ApiKey.KeyMinLength, ErrorMessage = "Key must be at least 16 characters")]
     public string? Key { get; set; }
 
     public void OnGet()
@@ -30,10 +34,7 @@ public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, Suppo
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         var apiKey = new ApiKey()
         {

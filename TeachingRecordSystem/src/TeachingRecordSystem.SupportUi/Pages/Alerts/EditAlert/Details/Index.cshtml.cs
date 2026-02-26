@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,6 +9,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
     public const int DetailsMaxLength = 4000;
+
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Details)
+            .NotEmpty().WithMessage("Enter details")
+            .MaximumLength(DetailsMaxLength).WithMessage("Details must be 4000 characters or less")
+    };
 
     public JourneyInstance<EditAlertDetailsState>? JourneyInstance { get; set; }
 
@@ -24,9 +30,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Enter details")]
-    [Display(Description = "")]
-    [MaxLength(DetailsMaxLength, ErrorMessage = "Details must be 4000 characters or less")]
     public string? Details { get; set; }
 
     public string? CurrentDetails { get; set; }
@@ -43,10 +46,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
             ModelState.AddModelError(nameof(Details), "Enter changed details");
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
