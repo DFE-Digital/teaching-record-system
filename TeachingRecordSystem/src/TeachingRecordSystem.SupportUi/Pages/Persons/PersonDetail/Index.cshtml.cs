@@ -24,6 +24,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
     public bool CanChangeDetails { get; set; }
     public bool CanMerge { get; set; }
     public bool CanSetStatus { get; set; }
+    public bool CanConnectOneLogin { get; set; }
 
     public ConnectedOneLoginUserInfo[]? ConnectedOneLoginUsers { get; set; }
 
@@ -67,6 +68,8 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
         CanSetStatus =
             canEditNonPersonOrAlertData &&
             !personWasDeactivatedAsPartOfAMerge;
+
+        CanConnectOneLogin = Person.IsActive;
     }
 
     private PersonProfessionalStatusInfo? GetPersonStatusInfo(Person person)
