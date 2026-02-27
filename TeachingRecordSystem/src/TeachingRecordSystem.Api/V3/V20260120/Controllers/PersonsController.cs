@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
@@ -12,10 +13,9 @@ namespace TeachingRecordSystem.Api.V3.V20260120.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
-    [SwaggerOperation(
-        OperationId = "GetPersonByTrn",
-        Summary = "Get person details by TRN",
-        Description = "Gets the details of the person corresponding to the given TRN.")]
+    [EndpointName("GetPersonByTrn"),
+        EndpointSummary("Get person details by TRN"),
+        EndpointDescription("Gets the details of the person corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status308PermanentRedirect)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -24,9 +24,9 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = $"{ApiRoles.GetPerson},{ApiRoles.AppropriateBody}")]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified nationalInsuranceNumber, if provided.")] string? nationalInsuranceNumber)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), Description("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
+        [FromQuery, Description("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
+        [FromQuery, Description("Adds an additional check that the record has the specified nationalInsuranceNumber, if provided.")] string? nationalInsuranceNumber)
     {
         include ??= GetPersonRequestIncludes.None;
 

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
@@ -12,18 +13,17 @@ namespace TeachingRecordSystem.Api.V3.V20240920.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
-    [SwaggerOperation(
-        OperationId = "GetPersonByTrn",
-        Summary = "Get person details by TRN",
-        Description = "Gets the details of the person corresponding to the given TRN.")]
+    [EndpointName("GetPersonByTrn"),
+        EndpointSummary("Get person details by TRN"),
+        EndpointDescription("Gets the details of the person corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = $"{ApiRoles.GetPerson},{ApiRoles.AppropriateBody}")]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), Description("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
+        [FromQuery, Description("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth)
     {
         include ??= GetPersonRequestIncludes.None;
 
@@ -47,10 +47,9 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     }
 
     [HttpPost("find")]
-    [SwaggerOperation(
-        OperationId = "FindPersons",
-        Summary = "Find persons",
-        Description = "Finds persons matching the specified criteria.")]
+    [EndpointName("FindPersons"),
+        EndpointSummary("Find persons"),
+        EndpointDescription("Finds persons matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
@@ -62,10 +61,9 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     }
 
     [HttpGet("")]
-    [SwaggerOperation(
-        OperationId = "FindPerson",
-        Summary = "Find person",
-        Description = "Finds a person matching the specified criteria.")]
+    [EndpointName("FindPerson"),
+        EndpointSummary("Find person"),
+        EndpointDescription("Finds a person matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
@@ -84,10 +82,9 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     }
 
     [HttpPut("deceased/{trn}")]
-    [SwaggerOperation(
-        OperationId = "SetDeceased",
-        Summary = "Mark person as deceased",
-        Description = "Marks a person as deceased.")]
+    [EndpointName("SetDeceased"),
+        EndpointSummary("Mark person as deceased"),
+        EndpointDescription("Marks a person as deceased.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]

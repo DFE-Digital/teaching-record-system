@@ -11,10 +11,9 @@ namespace TeachingRecordSystem.Api.V3.V20240814.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpPost("find")]
-    [SwaggerOperation(
-        OperationId = "FindPersons",
-        Summary = "Find persons",
-        Description = "Finds persons matching the specified criteria.")]
+    [EndpointName("FindPersons"),
+        EndpointSummary("Find persons"),
+        EndpointDescription("Finds persons matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
@@ -26,10 +25,9 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     }
 
     [HttpGet("")]
-    [SwaggerOperation(
-        OperationId = "FindPerson",
-        Summary = "Find person",
-        Description = "Finds a person matching the specified criteria.")]
+    [EndpointName("FindPerson"),
+        EndpointSummary("Find person"),
+        EndpointDescription("Finds a person matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
