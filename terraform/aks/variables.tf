@@ -162,6 +162,9 @@ variable "run_as_non_root" {
   description = "Whether to enforce that containers must run as non-root user"
 }
 
+# pg_airbyte_enabled used in the postgres module
+variable "pg_airbyte_enabled" { default = false }
+
 locals {
   app_name_suffix = var.app_name == null ? var.environment_name : var.app_name
 
