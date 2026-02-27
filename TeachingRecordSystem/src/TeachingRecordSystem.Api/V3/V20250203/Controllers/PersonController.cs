@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,14 +15,13 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
 {
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     [HttpGet]
-    [SwaggerOperation(
-        OperationId = "GetCurrentPerson",
-        Summary = "Get the authenticated person's details",
-        Description = "Gets the details for the authenticated person.")]
+    [EndpointName("GetCurrentPerson"),
+        EndpointSummary("Get the authenticated person's details"),
+        EndpointDescription("Gets the details for the authenticated person.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAsync(
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), Description("The additional properties to include in the response.")] GetPersonRequestIncludes? include)
     {
         var command = new GetPersonCommand(
             Trn: User.FindFirstValue("trn")!,

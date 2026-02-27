@@ -10,10 +10,9 @@ namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPut("{trn}/welsh-induction")]
-    [SwaggerOperation(
-        OperationId = "SetPersonWelshInductionStatus",
-        Summary = "Set person induction status",
-        Description = "Sets the induction details of the person with the given TRN.")]
+    [EndpointName("SetPersonWelshInductionStatus"),
+        EndpointSummary("Set person induction status"),
+        EndpointDescription("Sets the induction details of the person with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

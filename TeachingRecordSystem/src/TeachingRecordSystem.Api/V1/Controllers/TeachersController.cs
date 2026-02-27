@@ -19,10 +19,9 @@ public class TeachersController : ControllerBase
     }
 
     [HttpGet("{trn}")]
-    [SwaggerOperation(
-        OperationId = "GetTeacher",
-        Summary = "Get teacher",
-        Description = "Gets a teacher by their DOB and either TRN or NINO")]
+    [EndpointName("GetTeacher"),
+        EndpointSummary("Get teacher"),
+        EndpointDescription("Gets a teacher by their DOB and either TRN or NINO")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
