@@ -203,8 +203,8 @@ public class TrnRequestService(
                 MiddleName = trnRequest.MiddleName ?? string.Empty,
                 LastName = trnRequest.LastName!,
                 DateOfBirth = trnRequest.DateOfBirth,
-                EmailAddress = trnRequest.EmailAddress is not null ? EmailAddress.Parse(trnRequest.EmailAddress) : null,
-                NationalInsuranceNumber = trnRequest.NationalInsuranceNumber is not null ? NationalInsuranceNumber.Parse(trnRequest.NationalInsuranceNumber) : null,
+                EmailAddress = !string.IsNullOrEmpty(trnRequest.EmailAddress) ? EmailAddress.Parse(trnRequest.EmailAddress) : null,
+                NationalInsuranceNumber = !string.IsNullOrEmpty(trnRequest.NationalInsuranceNumber) ? NationalInsuranceNumber.Parse(trnRequest.NationalInsuranceNumber) : null,
                 Gender = trnRequest.Gender
             },
             processContext);
