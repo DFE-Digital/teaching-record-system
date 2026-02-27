@@ -573,12 +573,12 @@
       },
       "NSign.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.2.2",
-        "contentHash": "2KHIAmj7N0gYZ8kqq56+P7jgmIl1f5bk1wyOf8UX0ZTqll3NLcV+7Ct4psaNAV5UnDSdqda6MbaHopszw1YRHQ==",
+        "resolved": "1.2.3",
+        "contentHash": "kyWbdsFJkVD+o9GeEJUs1HzubHsIadElflyUTFBzTtYQ/pV0H9qarYsUpimOe+ep5XODubmjEltPfjlC+A1b6A==",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.0",
-          "Microsoft.Extensions.Options": "10.0.0",
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
+          "Microsoft.Extensions.Options": "10.0.3",
+          "Microsoft.Extensions.Options.DataAnnotations": "10.0.3",
           "StructuredFieldValues": "0.7.6"
         }
       },
@@ -756,7 +756,7 @@
           "Microsoft.Extensions.Http": "[10.0.3, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.3, )",
           "Microsoft.Extensions.Options.DataAnnotations": "[10.0.3, )",
-          "NSign.Client": "[1.2.2, )",
+          "NSign.Client": "[1.2.3, )",
           "NSign.SignatureProviders": "[1.2.1, )",
           "Npgsql.DependencyInjection": "[10.0.0, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
@@ -1191,14 +1191,14 @@
       },
       "NSign.Client": {
         "type": "CentralTransitive",
-        "requested": "[1.2.2, )",
-        "resolved": "1.2.2",
-        "contentHash": "196JuWJWRYJ44Ag0PPEz7GnAVBndcHdmmS53pkD9kzNI7ieSynb8f2nF5gioCenfZ0XhzycVlsoKE3o/FBsu8A==",
+        "requested": "[1.2.3, )",
+        "resolved": "1.2.3",
+        "contentHash": "XjX7xhiE3Unw0C0ygJ6NSkekt/hAIOSQdWPJ8AODOwhu9rekNnW3NRP+SVMPcqB1kOtoMXpRyTFqmB1VLA8ikA==",
         "dependencies": {
-          "Microsoft.Extensions.Http": "10.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.0",
-          "Microsoft.Extensions.Options": "10.0.0",
-          "NSign.Abstractions": "1.2.2",
+          "Microsoft.Extensions.Http": "10.0.3",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.3",
+          "Microsoft.Extensions.Options": "10.0.3",
+          "NSign.Abstractions": "1.2.3",
           "StructuredFieldValues": "0.7.6"
         }
       },
