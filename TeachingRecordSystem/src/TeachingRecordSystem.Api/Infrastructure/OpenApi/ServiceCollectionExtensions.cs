@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using Constants = TeachingRecordSystem.Api.Infrastructure.ApplicationModel.Constants;
@@ -13,100 +11,68 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IApiDescriptionProvider, HybridBodyApiDescriptionProvider>();
 
-        services.AddSwaggerGen(options =>
+        foreach (var (majorVersion, minorVersion) in VersionRegistry.GetAllVersions(configuration))
         {
-            options.EnableAnnotations();
+            var documentName = OpenApiDocumentHelper.GetDocumentName(majorVersion, minorVersion);
 
-            options.DocInclusionPredicate((docName, apiDescription) =>
+            services.AddOpenApi(documentName, options =>
             {
-                var properties = apiDescription.ActionDescriptor.Properties;
-
-                if (properties.TryGetValue(Constants.VersionPropertyKey, out var versionObj) &&
-                    versionObj is int version)
+                options.AddDocumentTransformer((doc, _, _) =>
                 {
-                    if (properties.TryGetValue(Constants.MinorVersionsPropertyKey, out var minorVersionsObj) &&
-                        minorVersionsObj is ApiMinorVersionsMetadata minorVersionsMetadata)
-                    {
-                        foreach (var minorVersion in minorVersionsMetadata.MinorVersions)
-                        {
-                            if (docName == OpenApiDocumentHelper.GetDocumentName(version, minorVersion))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        return docName == OpenApiDocumentHelper.GetDocumentName(version, minorVersion: null);
-                    }
+                    doc.Info.Title = OpenApiDocumentHelper.Title;
+                    doc.Info.Version = documentName;
+
+                    doc.Servers = null;
+                    doc.Tags?.Clear();
+
+                    return Task.CompletedTask;
+                });
+
+                options.AddDocumentTransformer(new AddSecuritySchemesTransformer(configuration));
+                options.AddOperationTransformer(new AddSecurityRequirementsTransformer());
+                options.AddOperationTransformer(new RemoveOperationTagsTransformer());
+                options.AddOperationTransformer(new SetContentTypesTransformer());
+
+                if (minorVersion is not null)
+                {
+                    options.AddDocumentTransformer(new AddWebhookMessagesTransformer(minorVersion));
+                    options.AddDocumentTransformer(new AddMinorVersionHeaderTransformer(minorVersion));
                 }
 
-                return false;
-            });
+                // Only include endpoints in the OpenAPI document that match the major and minor version of the document
+                options.ShouldInclude = apiDescription =>
+                {
+                    var properties = apiDescription.ActionDescriptor.Properties;
 
-            options.AddSecurityDefinition(SecuritySchemes.ApiKey, new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Name = "Authorization",
-                Scheme = "Bearer",
-                Type = SecuritySchemeType.Http
-            });
-
-            options.AddSecurityDefinition(SecuritySchemes.GetAnIdentityAccessToken, new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Scheme = "Bearer",
-                Type = SecuritySchemeType.OpenIdConnect,
-                OpenIdConnectUrl = new Uri(configuration.GetRequiredValue("GetAnIdentity:BaseAddress") + ".well-known/openid-configuration")
-            });
-
-            options.SupportNonNullableReferenceTypes();
-            options.SchemaFilter<RemoveExcludedEnumOptionsSchemaFilter>();
-            options.SchemaFilter<RemoveEnumValuesForFlagsEnumSchemaFilter>();
-            options.OperationFilter<ContentTypesOperationFilter>();
-            options.OperationFilter<AddSecuritySchemeOperationFilter>();
-            options.DocumentFilter<MinorVersionHeaderDocumentFilter>();
-            options.DocumentFilter<AddWebHookMessagesDocumentFilter>();
-
-            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions(configuration))
-            {
-                options.SwaggerDoc(
-                    OpenApiDocumentHelper.GetDocumentName(version, minorVersion),
-                    new OpenApiInfo
+                    if (properties.TryGetValue(Constants.VersionPropertyKey, out var versionObj) && versionObj is int apiMajorVersion)
                     {
-                        Version = OpenApiDocumentHelper.GetVersionName(version, minorVersion),
-                        Title = OpenApiDocumentHelper.Title
-                    });
-            }
-        });
+                        if (apiMajorVersion != majorVersion)
+                        {
+                            return false;
+                        }
 
-        services.Decorate<ISerializerDataContractResolver, UnwrapOptionSerializerDataContractResolver>();
-        services.Decorate<ISerializerDataContractResolver, OneOfSerializerDataContractResolver>();
+                        if (properties.TryGetValue(Constants.MinorVersionsPropertyKey, out var minorVersionsObj) &&
+                            minorVersionsObj is ApiMinorVersionsMetadata minorVersionsMetadata)
+                        {
+                            foreach (var apiMinorVersion in minorVersionsMetadata.MinorVersions)
+                            {
+                                if (apiMinorVersion == minorVersion)
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
 
-        services.AddSingleton<IStartupFilter, OpenApiEndpointsStartupFilter>();
+                    return false;
+                };
+            });
+        }
 
         return services;
     }
-}
-
-public class OpenApiEndpointsStartupFilter(IConfiguration configuration) : IStartupFilter
-{
-    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
-    {
-        next(app);
-
-        app.UseSwagger(o => o.RouteTemplate = OpenApiDocumentHelper.DocumentRouteTemplate);
-
-        app.UseSwaggerUI(options =>
-        {
-            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions(configuration).Reverse())
-            {
-                var documentName = OpenApiDocumentHelper.GetDocumentName(version, minorVersion);
-                options.SwaggerEndpoint(OpenApiDocumentHelper.DocumentRouteTemplate.Replace("{documentName}", documentName), documentName);
-            }
-
-            options.EnablePersistAuthorization();
-            options.EnableTryItOutByDefault();
-        });
-    };
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using TeachingRecordSystem.Api;
 using TeachingRecordSystem.Api.Endpoints;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
@@ -46,6 +47,17 @@ if (builder.Environment.IsProduction())
     // (i.e. everywhere except health check, status endpoints etc.)
     app.UseWhen(ctx => ctx.User.Identity?.IsAuthenticated == true, x => x.UseRateLimiter());
 }
+
+app.MapOpenApi();
+app.MapScalarApiReference("/docs", options =>
+{
+    foreach (var (major, minor) in VersionRegistry.GetAllVersions(builder.Configuration).Reverse())
+    {
+        options.AddDocument(OpenApiDocumentHelper.GetDocumentName(major, minor));
+    }
+});
+app.MapGet("/swagger", () => Results.Redirect("/docs"));
+app.MapGet("/", () => Results.Redirect("/docs"));
 
 app.MapWebhookJwks();
 
