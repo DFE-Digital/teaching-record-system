@@ -78,7 +78,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 PersonId = @event.PersonId,
                 OldStatus = PersonStatus.Active,
                 Status = PersonStatus.Deactivated,
-                DateOfDeath = null,
+                DateOfDeath = @event.DateOfDeath,
                 Reason = changeReason.Reason,
                 ReasonDetail = changeReason.Details,
                 EvidenceFile = changeReason.EvidenceFile
