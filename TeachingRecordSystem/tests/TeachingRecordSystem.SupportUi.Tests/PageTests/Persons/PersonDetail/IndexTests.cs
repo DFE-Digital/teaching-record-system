@@ -664,6 +664,79 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(setStatusButton);
     }
 
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    public async Task Get_PersonStatus_ShowsConnectOneLoginButtonAsExpected(PersonStatus currentStatus, bool expectConnectButtonToBeShown)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        if (currentStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContextAsync(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var connectButton = doc.GetElementByTestId("connect-one-login-button");
+        if (expectConnectButtonToBeShown)
+        {
+            Assert.NotNull(connectButton);
+        }
+        else
+        {
+            Assert.Null(connectButton);
+        }
+    }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    public async Task Get_PersonWithConnectedOneLoginUser_ShowsDisconnectLinkAsExpected(PersonStatus currentStatus, bool expectDisconnectLinkToBeShown)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(new DateOnly(1990, 1, 1)).WithEmailAddress());
+        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+
+        if (currentStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContextAsync(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var disconnectLink = doc.QuerySelector($"a[href*='disconnect-one-login']");
+        if (expectDisconnectLinkToBeShown)
+        {
+            Assert.NotNull(disconnectLink);
+        }
+        else
+        {
+            Assert.Null(disconnectLink);
+        }
+    }
+
     [Fact]
     public async Task Get_WithoutOneLoginUser_DoesNotDisplayOneLoginSummaryCard()
     {
