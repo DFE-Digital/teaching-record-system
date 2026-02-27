@@ -10,37 +10,33 @@ public class CertificatesController : ControllerBase
 {
     [HttpGet]
     [Route("qts")]
-    [SwaggerOperation(
-        OperationId = "GetQtsCertificate",
-        Summary = "Get QTS Certificate",
-        Description = "Returns a PDF of the QTS Certificate for the authenticated teacher.")]
+    [EndpointName("GetQtsCertificate"),
+        EndpointSummary("Get QTS Certificate"),
+        EndpointDescription("Returns a PDF of the QTS Certificate for the authenticated teacher.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status410Gone)]
     public IActionResult GetQts() => StatusCode(StatusCodes.Status410Gone);
 
     [HttpGet]
     [Route("eyts")]
-    [SwaggerOperation(
-        OperationId = "GetEytsCertificate",
-        Summary = "Get EYTS Certificate",
-        Description = "Returns a PDF of the EYTS Certificate for the authenticated teacher.")]
+    [EndpointName("GetEytsCertificate"),
+        EndpointSummary("Get EYTS Certificate"),
+        EndpointDescription("Returns a PDF of the EYTS Certificate for the authenticated teacher.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status410Gone)]
     public IActionResult GetEyts() => StatusCode(StatusCodes.Status410Gone);
 
     [HttpGet]
     [Route("induction")]
-    [SwaggerOperation(
-        OperationId = "GetInductionCertificate",
-        Summary = "Induction Certificate",
-        Description = "Returns a PDF of the Induction Certificate for the authenticated teacher.")]
+    [EndpointName("GetInductionCertificate"),
+        EndpointSummary("Induction Certificate"),
+        EndpointDescription("Returns a PDF of the Induction Certificate for the authenticated teacher.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status410Gone)]
     public IActionResult GetInduction() => StatusCode(StatusCodes.Status410Gone);
 
     [HttpGet]
     [Route("npq/{qualificationId}")]
-    [SwaggerOperation(
-        OperationId = "GetNpqCertificate",
-        Summary = "NPQ Certificate",
-        Description = "Returns a PDF of the NPQ Certificate associated with the provided qualification ID.")]
+    [EndpointName("GetNpqCertificate"),
+        EndpointSummary("NPQ Certificate"),
+        EndpointDescription("Returns a PDF of the NPQ Certificate associated with the provided qualification ID.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status410Gone)]
     public IActionResult GetNpq() => StatusCode(StatusCodes.Status410Gone);
 }
