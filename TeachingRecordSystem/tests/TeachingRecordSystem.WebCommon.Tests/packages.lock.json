@@ -722,7 +722,8 @@
           "Respawn": "[7.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "Testcontainers.PostgreSql": "[4.10.0, )",
-          "xunit.v3.assert": "[3.2.0, )"
+          "xunit.v3.assert": "[3.2.0, )",
+          "xunit.v3.extensibility.core": "[3.2.0, )"
         }
       },
       "teachingrecordsystem.webcommon": {
