@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using TeachingRecordSystem.Api.Endpoints;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Middleware;
@@ -53,6 +54,20 @@ public class Program
             // (i.e. everywhere except health check, status endpoints etc.)
             app.UseWhen(ctx => ctx.User.Identity?.IsAuthenticated == true, x => x.UseRateLimiter());
         }
+
+        // Webhook messages link to their schema at DocumentRouteTemplate via ce-dataschema, so don't use the default route
+        app.MapOpenApi(OpenApiDocumentHelper.DocumentRouteTemplate);
+        app.MapScalarApiReference("/docs", options =>
+        {
+            options.WithOpenApiRoutePattern(OpenApiDocumentHelper.DocumentRouteTemplate);
+
+            foreach (var (majorVersion, minorVersion) in VersionRegistry.GetAllVersions(builder.Configuration).Reverse())
+            {
+                options.AddDocument(OpenApiDocumentHelper.GetDocumentName(majorVersion, minorVersion));
+            }
+        });
+        app.MapGet("/swagger", () => Results.Redirect("/docs"));
+        app.MapGet("/", () => Results.Redirect("/docs"));
 
         app.MapWebhookJwks();
 

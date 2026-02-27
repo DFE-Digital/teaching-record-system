@@ -1,4 +1,3 @@
-using Swashbuckle.AspNetCore.Annotations;
 using Gender = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.Gender;
 
 namespace TeachingRecordSystem.Api.V3.V20250425.Requests;

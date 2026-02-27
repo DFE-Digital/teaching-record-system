@@ -1,4 +1,3 @@
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240307.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20240307.Requests;

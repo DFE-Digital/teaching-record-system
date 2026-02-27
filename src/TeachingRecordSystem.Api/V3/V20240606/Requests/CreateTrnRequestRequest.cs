@@ -1,5 +1,3 @@
-using Swashbuckle.AspNetCore.Annotations;
-
 namespace TeachingRecordSystem.Api.V3.V20240606.Requests;
 
 public record CreateTrnRequestRequest
