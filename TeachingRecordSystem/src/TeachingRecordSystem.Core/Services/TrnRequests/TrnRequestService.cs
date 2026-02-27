@@ -121,8 +121,8 @@ public class TrnRequestService(
                 MiddleName = attributesToUpdate.Contains(PersonMatchedAttribute.MiddleName) ? Option.Some(trnRequest.MiddleName ?? string.Empty) : default,
                 LastName = attributesToUpdate.Contains(PersonMatchedAttribute.LastName) ? Option.Some(trnRequest.LastName!) : default,
                 DateOfBirth = attributesToUpdate.Contains(PersonMatchedAttribute.DateOfBirth) ? Option.Some<DateOnly?>(trnRequest.DateOfBirth) : default,
-                EmailAddress = attributesToUpdate.Contains(PersonMatchedAttribute.EmailAddress) ? Option.Some<EmailAddress?>(EmailAddress.Parse(trnRequest.EmailAddress!)) : default,
-                NationalInsuranceNumber = attributesToUpdate.Contains(PersonMatchedAttribute.NationalInsuranceNumber) ? Option.Some<NationalInsuranceNumber?>(NationalInsuranceNumber.Parse(trnRequest.NationalInsuranceNumber!)) : default,
+                EmailAddress = attributesToUpdate.Contains(PersonMatchedAttribute.EmailAddress) && !string.IsNullOrEmpty(trnRequest.EmailAddress) ? Option.Some<EmailAddress?>(EmailAddress.Parse(trnRequest.EmailAddress)) : default,
+                NationalInsuranceNumber = attributesToUpdate.Contains(PersonMatchedAttribute.NationalInsuranceNumber) && !string.IsNullOrEmpty(trnRequest.NationalInsuranceNumber) ? Option.Some<NationalInsuranceNumber?>(NationalInsuranceNumber.Parse(trnRequest.NationalInsuranceNumber)) : default,
                 Gender = attributesToUpdate.Contains(PersonMatchedAttribute.Gender) ? Option.Some(trnRequest.Gender) : default
             },
             processContext);
