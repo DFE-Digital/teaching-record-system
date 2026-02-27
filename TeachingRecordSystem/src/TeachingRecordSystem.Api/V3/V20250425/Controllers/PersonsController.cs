@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Optional.Unsafe;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20250425.Requests;
@@ -14,10 +13,9 @@ namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpPut("{trn}/professional-statuses/{reference}")]
-    [SwaggerOperation(
-        OperationId = "SetProfessionalStatus",
-        Summary = "Sets a professional status",
-        Description = "Sets a professional status for the person with the given TRN.")]
+    [EndpointName("SetProfessionalStatus"),
+        EndpointSummary("Sets a professional status"),
+        EndpointDescription("Sets a professional status for the person with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetProfessionalStatus)]
@@ -53,10 +51,9 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     }
 
     [HttpPut("{trn}")]
-    [SwaggerOperation(
-        OperationId = "Set PII",
-        Summary = "Set a persons PII",
-        Description = "Sets a persons personally identifiable information with the given TRN.")]
+    [EndpointName("Set PII"),
+        EndpointSummary("Set a persons PII"),
+        EndpointDescription("Sets a persons personally identifiable information with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]

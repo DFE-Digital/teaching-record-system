@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20250425.Requests;
@@ -14,10 +13,9 @@ namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpPost("")]
-    [SwaggerOperation(
-        OperationId = "CreateTrnRequest",
-        Summary = "Creates a TRN request",
-        Description = """
+    [EndpointName("CreateTrnRequest"),
+        EndpointSummary("Creates a TRN request"),
+        EndpointDescription("""
         Creates a new TRN request using the personally identifiable information in the request body.
         If the request can be fulfilled immediately the response's status property will be 'Completed' and a TRN will also be returned.
         Otherwise, the response's status property will be 'Pending' and the GET endpoint should be polled until a 'Completed' status is returned.
@@ -49,10 +47,9 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper
     }
 
     [HttpGet("")]
-    [SwaggerOperation(
-        OperationId = "GetTrnRequest",
-        Summary = "Get the TRN request's details",
-        Description = """
+    [EndpointName("GetTrnRequest"),
+        EndpointSummary("Get the TRN request's details"),
+        EndpointDescription("""
                       Gets the TRN request for the requestId specified in the query string.
                       If the request's status is 'Completed' a TRN will also be returned.
                       """)]

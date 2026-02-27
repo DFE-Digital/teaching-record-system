@@ -29,7 +29,7 @@ X-Api-Version: 20240101
 
 Wherever possible you should call the latest version.
 
-You can view the API specifications for each version by visiting `/swagger` (see [Environments](#environments) below for the base addresses).
+You can view the API specifications for each version by visiting `/docs` (see [Environments](#environments) below for the base addresses).
 
 An API key is required for calling the API; speak to one of the developers to get one. The key must be passed in an `Authorization` header e.g.
 ```

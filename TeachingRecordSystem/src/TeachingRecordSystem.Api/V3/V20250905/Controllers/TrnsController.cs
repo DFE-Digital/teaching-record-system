@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -11,10 +10,9 @@ public class TrnsController(ICommandDispatcher commandDispatcher) : ControllerBa
 {
     [HttpGet("{trn}")]
     [ActionName("GetTrn")]
-    [SwaggerOperation(
-        OperationId = "GetTrn",
-        Summary = "Get a TRN",
-        Description = "Checks if the specified TRN exists.")]
+    [EndpointName("GetTrn"),
+        EndpointSummary("Get a TRN"),
+        EndpointDescription("Checks if the specified TRN exists.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status308PermanentRedirect)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
