@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,6 +8,21 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 [Journey(JourneyNames.ReopenAlert), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.ChangeReason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+            .NotNull().WithMessage("Select yes if you want to add more information about why you’re removing the end date"),
+        v => v.RuleFor(m => m.ChangeReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+        v => v.RuleFor(m => m.ChangeReasonDetail)
+            .NotEmpty().WithMessage("Enter additional detail")
+            .When(m => m.HasAdditionalReasonDetail == true),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     public JourneyInstance<ReopenAlertState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -22,15 +36,12 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason")]
     public ReopenAlertReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re removing the end date")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -46,12 +57,8 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (HasAdditionalReasonDetail == true && ChangeReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
-        }
-
         await evidenceUploadManager.ValidateAndUploadAsync<IndexModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -47,6 +46,14 @@ public class ReasonModel(
             .WithMessage("Enter a reason")
             .When(x => x.ProvideMoreInformation == ProvideMoreInformationOption.Yes && x.TargetStatus == PersonStatus.Active),
 
+        v => v.RuleFor(m => m.DeactivateReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
+            .When(m => m.TargetStatus == PersonStatus.Deactivated),
+        v => v.RuleFor(m => m.ReactivateReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
+            .When(m => m.TargetStatus == PersonStatus.Active),
         // Make sure to take into account evidence models validation rules.
         v => v.RuleFor(x => x.Evidence).Evidence()
     };
@@ -58,14 +65,12 @@ public class ReasonModel(
     public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? DeactivateReasonDetail { get; set; }
 
     [BindProperty]
     public PersonReactivateReason? ReactivateReason { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ReactivateReasonDetail { get; set; }
 
     [BindProperty]

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -15,29 +14,38 @@ public class IndexModel(
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.FirstName)
+            .NotEmpty().WithMessage("Enter the person’s first name")
+            .MaximumLength(Person.FirstNameMaxLength).WithMessage("Person’s first name must be 100 characters or less"),
+        v => v.RuleFor(m => m.MiddleName)
+            .MaximumLength(Person.FirstNameMaxLength).WithMessage("Person’s middle name must be 100 characters or less"),
+        v => v.RuleFor(m => m.LastName)
+            .NotEmpty().WithMessage("Enter the person’s last name")
+            .MaximumLength(Person.FirstNameMaxLength).WithMessage("Person’s last name must be 100 characters or less"),
+        v => v.RuleFor(m => m.DateOfBirth)
+            .NotNull().WithMessage("Enter the person’s date of birth"),
+        v => v.RuleFor(m => m.EmailAddress)
+            .MaximumLength(Person.EmailAddressMaxLength).WithMessage("Person’s email address must be 100 characters or less")
+    };
+
     private Person? _person;
 
     [BindProperty]
-    [Required(ErrorMessage = "Enter the person\u2019s first name")]
-    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Person\u2019s first name must be 100 characters or less")]
     public string? FirstName { get; set; }
 
     [BindProperty]
-    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Person\u2019s middle name must be 100 characters or less")]
     public string? MiddleName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Enter the person\u2019s last name")]
-    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Person\u2019s last name must be 100 characters or less")]
     public string? LastName { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Person\u2019s date of birth")]
-    [Required(ErrorMessage = "Enter the person\u2019s date of birth")]
     public DateOnly? DateOfBirth { get; set; }
 
     [BindProperty]
-    [MaxLength(Person.EmailAddressMaxLength, ErrorMessage = $"Person\u2019s email address must be 100 characters or less")]
     public string? EmailAddress { get; set; }
 
     [BindProperty]
@@ -117,6 +125,8 @@ public class IndexModel(
         {
             ModelState.AddModelError(nameof(EmailAddress), "Enter a valid email address");
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

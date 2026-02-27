@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -12,8 +11,13 @@ public class InductionExemptionModel(
     EvidenceUploadManager evidenceUploadManager)
     : AddRoutePostStatusPageModel(AddRoutePage.InductionExemption, linkGenerator, referenceDataCache, evidenceUploadManager)
 {
+    private readonly InlineValidator<InductionExemptionModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.IsExemptFromInduction)
+            .NotNull().WithMessage("Select yes if this route provides an induction exemption")
+    };
+
     [BindProperty]
-    [Required(ErrorMessage = "Select yes if this route provides an induction exemption")]
     public bool? IsExemptFromInduction { get; set; }
 
     public IActionResult OnGet()
@@ -24,10 +28,7 @@ public class InductionExemptionModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

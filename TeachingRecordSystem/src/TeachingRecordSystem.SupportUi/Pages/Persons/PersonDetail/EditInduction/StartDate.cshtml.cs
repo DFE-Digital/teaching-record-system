@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -15,13 +14,18 @@ public class StartDateModel(
     EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
+    private readonly InlineValidator<StartDateModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.StartDate)
+            .NotNull().WithMessage("Enter an induction start date")
+    };
+
     private InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
 
     public DateOnly? CompletedDate => JourneyInstance!.State.CompletedDate;
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
-    [Required(ErrorMessage = "Enter an induction start date")]
     public DateOnly? StartDate { get; set; }
 
     public string NextPage
@@ -71,6 +75,8 @@ public class StartDateModel(
         {
             ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString(WebConstants.DateOnlyDisplayFormat)}");
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

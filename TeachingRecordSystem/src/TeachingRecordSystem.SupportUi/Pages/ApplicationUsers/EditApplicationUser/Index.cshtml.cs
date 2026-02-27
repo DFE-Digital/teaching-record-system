@@ -1,5 +1,4 @@
 using System.Buffers;
-using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,13 +21,39 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     private static readonly SearchValues<char> _validPathChars =
         SearchValues.Create("!$&'()*+,-./0123456789:;=@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~");
 
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Name)
+            .NotEmpty().WithMessage("Enter a name")
+            .MaximumLength(UserBase.NameMaxLength).WithMessage("Name must be 200 characters or less"),
+        v => v.RuleFor(m => m.ClientId)
+            .NotEmpty().WithMessage("Enter a client ID").When(m => m.IsOidcClient)
+            .MaximumLength(ApplicationUser.ClientIdMaxLength).WithMessage("Client ID must be 50 characters or less").When(m => m.IsOidcClient),
+        v => v.RuleFor(m => m.ClientSecret)
+            .NotEmpty().WithMessage("Enter a client secret").When(m => m.IsOidcClient)
+            .MinimumLength(ApplicationUser.ClientSecretMinLength).WithMessage("Client secret must be at least 16 characters").When(m => m.IsOidcClient)
+            .MaximumLength(ApplicationUser.ClientSecretMaxLength).WithMessage("Client secret must be 200 characters or less").When(m => m.IsOidcClient),
+        v => v.RuleFor(m => m.OneLoginAuthenticationSchemeName)
+            .NotEmpty().WithMessage("Enter an authentication scheme name").When(m => m.IsOidcClient)
+            .MaximumLength(ApplicationUser.AuthenticationSchemeNameMaxLength).WithMessage("Authentication scheme name must be 50 characters or less").When(m => m.IsOidcClient),
+        v => v.RuleFor(m => m.OneLoginClientId)
+            .NotEmpty().WithMessage("Enter the One Login client ID").When(m => m.IsOidcClient)
+            .MaximumLength(ApplicationUser.OneLoginClientIdMaxLength).WithMessage("One Login client ID must be 50 characters or less").When(m => m.IsOidcClient),
+        v => v.RuleFor(m => m.UseSharedOneLoginSigningKeys)
+            .NotNull().WithMessage("Select whether to use shared One Login signing keys").When(m => m.IsOidcClient),
+        v => v.RuleFor(m => m.OneLoginRedirectUriPath)
+            .NotEmpty().WithMessage("Enter the One Login redirect URI").When(m => m.IsOidcClient)
+            .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login redirect URI must be 100 characters or less").When(m => m.IsOidcClient),
+        v => v.RuleFor(m => m.OneLoginPostLogoutRedirectUriPath)
+            .NotEmpty().WithMessage("Enter the One Login post logout redirect URI").When(m => m.IsOidcClient)
+            .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login post logout redirect URI must be 100 characters or less").When(m => m.IsOidcClient)
+    };
+
     private ApplicationUser? _user;
 
     [FromRoute]
     public Guid UserId { get; set; }
 
-    [Required(ErrorMessage = "Enter a name")]
-    [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
     public string[]? ApiRoles { get; set; }
@@ -38,13 +63,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public bool IsOidcClient { get; set; }
 
-    [Required(ErrorMessage = "Enter a client ID")]
-    [MaxLength(ApplicationUser.ClientIdMaxLength, ErrorMessage = "Client ID must be 50 characters or less")]
     public string? ClientId { get; set; }
 
-    [Required(ErrorMessage = "Enter a client secret")]
-    [MinLength(ApplicationUser.ClientSecretMinLength, ErrorMessage = "Client secret must be at least 16 characters")]
-    [MaxLength(ApplicationUser.ClientSecretMaxLength, ErrorMessage = "Client secret must be 200 characters or less")]
     public string? ClientSecret { get; set; }
 
     [ModelBinder(BinderType = typeof(MultiLineStringModelBinder))]
@@ -53,25 +73,16 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [ModelBinder(BinderType = typeof(MultiLineStringModelBinder))]
     public string[]? PostLogoutRedirectUris { get; set; }
 
-    [Required(ErrorMessage = "Enter an authentication scheme name")]
-    [MaxLength(ApplicationUser.AuthenticationSchemeNameMaxLength, ErrorMessage = "Authentication scheme name must be 50 characters or less")]
     public string? OneLoginAuthenticationSchemeName { get; set; }
 
-    [Required(ErrorMessage = "Enter the One Login client ID")]
-    [MaxLength(ApplicationUser.OneLoginClientIdMaxLength, ErrorMessage = "One Login client ID must be 50 characters or less")]
     public string? OneLoginClientId { get; set; }
 
-    [Required(ErrorMessage = "Select whether to use shared One Login signing keys")]
     public bool? UseSharedOneLoginSigningKeys { get; set; }
 
     public string? OneLoginPrivateKeyPem { get; set; }
 
-    [Required(ErrorMessage = "Enter the One Login redirect URI")]
-    [MaxLength(ApplicationUser.RedirectUriPathMaxLength, ErrorMessage = "One Login redirect URI must be 100 characters or less")]
     public string? OneLoginRedirectUriPath { get; set; }
 
-    [Required(ErrorMessage = "Enter the One Login post logout redirect URI")]
-    [MaxLength(ApplicationUser.RedirectUriPathMaxLength, ErrorMessage = "One Login post logout redirect URI must be 100 characters or less")]
     public string? OneLoginPostLogoutRedirectUriPath { get; set; }
 
     public void OnGet()
@@ -136,7 +147,12 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                     }
                 }
             }
+        }
 
+        _validator.ValidateAndThrow(this);
+
+        if (IsOidcClient)
+        {
             if (ModelState[nameof(OneLoginRedirectUriPath)]!.Errors.Count == 0 &&
                 !OneLoginRedirectUriPath!.All(c => _validPathChars.Contains(c)))
             {
@@ -147,18 +163,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 !OneLoginPostLogoutRedirectUriPath!.All(c => _validPathChars.Contains(c)))
             {
                 ModelState.AddModelError(nameof(OneLoginPostLogoutRedirectUriPath), "Enter a valid post logout redirect URI path");
-            }
-        }
-        else
-        {
-            // Clear any errors for any OIDC-related fields (since we're not saving them if IsOidcClient is false)
-            foreach (var key in ModelState.Keys)
-            {
-                if (key.StartsWith("OneLogin", StringComparison.Ordinal) ||
-                    key is nameof(ClientId) or nameof(ClientSecret) or nameof(RedirectUris) or nameof(PostLogoutRedirectUris))
-                {
-                    ModelState.Remove(key);
-                }
             }
         }
 

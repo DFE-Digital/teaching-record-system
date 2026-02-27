@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,11 +7,16 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChec
 
 public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private readonly InlineValidator<Index> _validator = new()
+    {
+        v => v.RuleFor(m => m.ChecksCompleted)
+            .NotNull().WithMessage("You must complete all checks before confirming")
+    };
+
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "You must complete all checks before confirming")]
     public bool? ChecksCompleted { get; set; }
 
     public string? FirstName { get; set; }
@@ -43,10 +47,7 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 
     public IActionResult OnPost()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         if (ChecksCompleted == false)
         {

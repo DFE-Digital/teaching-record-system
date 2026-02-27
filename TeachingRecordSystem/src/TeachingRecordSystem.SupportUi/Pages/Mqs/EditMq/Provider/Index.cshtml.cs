@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,6 +9,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 [Journey(JourneyNames.EditMqProvider), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.ProviderId)
+            .NotNull().WithMessage("Select a training provider")
+    };
+
     public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -20,7 +25,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a training provider")]
     public Guid? ProviderId { get; set; }
 
     public ProviderInfo[]? Providers { get; set; }
@@ -32,10 +36,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state => state.ProviderId = ProviderId);
 

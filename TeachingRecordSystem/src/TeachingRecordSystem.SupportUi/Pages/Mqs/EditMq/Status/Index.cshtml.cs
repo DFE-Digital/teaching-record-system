@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,6 +8,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 [Journey(JourneyNames.EditMqStatus), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Status)
+            .NotNull().WithMessage("Select a status")
+    };
+
     public JourneyInstance<EditMqStatusState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -19,7 +24,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a status")]
     public MandatoryQualificationStatus? Status { get; set; }
 
     [BindProperty]
@@ -46,6 +50,8 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
                 ModelState.AddModelError(nameof(EndDate), "End date must be after start date");
             }
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

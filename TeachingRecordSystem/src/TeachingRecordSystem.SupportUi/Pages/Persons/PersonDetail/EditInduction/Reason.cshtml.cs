@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Persons;
@@ -13,16 +12,28 @@ public class ReasonModel(
     EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
+    private readonly InlineValidator<ReasonModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.ChangeReason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+            .NotNull().WithMessage("Select yes if you want to add more information about why you’re changing the induction details"),
+        v => v.RuleFor(m => m.ChangeReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+        v => v.RuleFor(m => m.ChangeReasonDetail)
+            .NotEmpty().WithMessage("Enter additional detail")
+            .When(m => m.HasAdditionalReasonDetail == true),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason")]
     public PersonInductionChangeReason? ChangeReason { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re changing the induction details")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -60,12 +71,8 @@ public class ReasonModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (HasAdditionalReasonDetail == true && ChangeReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
-        }
-
         await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

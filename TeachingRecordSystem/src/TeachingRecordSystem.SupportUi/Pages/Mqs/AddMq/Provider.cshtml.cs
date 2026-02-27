@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,6 +11,12 @@ public class ProviderModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<ProviderModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.ProviderId)
+            .NotNull().WithMessage("Select a training provider")
+    };
+
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -23,7 +28,6 @@ public class ProviderModel(
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a training provider")]
     public Guid? ProviderId { get; set; }
 
     public ProviderInfo[]? Providers { get; set; }
@@ -35,10 +39,7 @@ public class ProviderModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state => state.ProviderId = ProviderId);
 

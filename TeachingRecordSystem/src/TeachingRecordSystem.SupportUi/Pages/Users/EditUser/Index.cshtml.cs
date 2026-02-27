@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -15,6 +14,15 @@ public class IndexModel(
     TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Name)
+            .NotEmpty().WithMessage("Enter a name")
+            .MaximumLength(Core.DataStore.Postgres.Models.UserBase.NameMaxLength).WithMessage("Name must be 200 characters or less"),
+        v => v.RuleFor(m => m.Role)
+            .NotEmpty().WithMessage("Select a role")
+    };
+
     private Core.DataStore.Postgres.Models.User? _user;
 
     [FromRoute]
@@ -23,12 +31,9 @@ public class IndexModel(
     public string? Email { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Enter a name")]
-    [MaxLength(Core.DataStore.Postgres.Models.UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a role")]
     public string? Role { get; set; }
 
     public bool IsActiveUser { get; set; }
@@ -58,10 +63,7 @@ public class IndexModel(
             return BadRequest();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         var changes = UserUpdatedEventChanges.None |
             (_user!.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |

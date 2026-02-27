@@ -20,6 +20,12 @@ public class RejectModel(
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider) : PageModel
 {
+    private readonly InlineValidator<RejectModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.RejectionReasonChoice)
+            .NotNull().WithMessage("Select the reason for rejecting this change")
+    };
+
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
@@ -33,15 +39,11 @@ public class RejectModel(
 
     [BindProperty]
     [Display(Name = " ")]
-    [Required(ErrorMessage = "Select the reason for rejecting this change")]
     public CaseRejectionReasonOption? RejectionReasonChoice { get; set; }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         var requestStatus = "rejected";
         var flashMessage = "The user’s record has not been changed and they have been notified.";

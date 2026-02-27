@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -8,16 +7,28 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class ReasonModel(SupportUiLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache, EvidenceUploadManager evidenceUploadManager)
     : AddRoutePostStatusPageModel(AddRoutePage.ChangeReason, linkGenerator, referenceDataCache, evidenceUploadManager)
 {
+    private readonly InlineValidator<ReasonModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.ChangeReason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+            .NotNull().WithMessage("Select yes if you want to add more information about why you\u2019re adding this route"),
+        v => v.RuleFor(m => m.ChangeReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+        v => v.RuleFor(m => m.ChangeReasonDetail)
+            .NotEmpty().WithMessage("Enter additional detail")
+            .When(m => m.HasAdditionalReasonDetail == true),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason")]
     public ChangeReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to add more information about why you\u2019re adding this route")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -33,12 +44,8 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, ReferenceDataCach
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (HasAdditionalReasonDetail == true && ChangeReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
-        }
-
         await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

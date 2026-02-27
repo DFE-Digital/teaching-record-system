@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -10,6 +9,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resol
 [Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance]
 public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveApiTrnRequestPageModel(dbContext)
 {
+    private readonly InlineValidator<Matches> _validator = new()
+    {
+        v => v.RuleFor(m => m.PersonId)
+            .NotNull().WithMessage("Select a record")
+    };
+
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
@@ -25,7 +30,6 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a record")]
     public Guid? PersonId { get; set; }
 
     public void OnGet()
@@ -42,10 +46,7 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
             return BadRequest();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

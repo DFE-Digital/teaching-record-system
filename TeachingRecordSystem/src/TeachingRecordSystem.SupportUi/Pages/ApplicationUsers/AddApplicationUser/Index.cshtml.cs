@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,9 +11,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.AddApplicationUs
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider) : PageModel
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Name)
+            .NotEmpty().WithMessage("Enter a name")
+            .MaximumLength(UserBase.NameMaxLength).WithMessage("Name must be 200 characters or less")
+    };
+
     [BindProperty]
-    [Required(ErrorMessage = "Enter a name")]
-    [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
     public void OnGet()
@@ -23,10 +27,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        _validator.ValidateAndThrow(this);
 
         var newUser = new ApplicationUser()
         {

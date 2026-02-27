@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,6 +8,21 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 [Journey(JourneyNames.DeleteMq), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.DeletionReason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+            .NotNull().WithMessage("Select yes if you want to add more information"),
+        v => v.RuleFor(m => m.DeletionReasonDetail)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+        v => v.RuleFor(m => m.DeletionReasonDetail)
+            .NotEmpty().WithMessage("Enter additional detail")
+            .When(m => m.HasAdditionalReasonDetail == true),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -21,15 +35,12 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason")]
     public MqDeletionReasonOption? DeletionReason { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to add more information")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [MaxLength(UiDefaults.ReasonDetailsMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")]
     public string? DeletionReasonDetail { get; set; }
 
     [BindProperty]
@@ -55,6 +66,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public async Task<IActionResult> OnPostAsync()
     {
         await evidenceUploadManager.ValidateAndUploadAsync<IndexModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

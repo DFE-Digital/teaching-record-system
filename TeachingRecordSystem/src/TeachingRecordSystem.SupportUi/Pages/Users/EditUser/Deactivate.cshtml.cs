@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -17,20 +16,33 @@ public class DeactivateModel(
     TrsDbContext dbContext,
     TimeProvider timeProvider) : PageModel
 {
+    private readonly InlineValidator<DeactivateModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.HasAdditionalReason)
+            .NotNull().WithMessage("Select a reason for deactivating this user"),
+        v => v.RuleFor(m => m.AdditionalReasonDetail)
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.HasAdditionalReason == true),
+        v => v.RuleFor(m => m.HasMoreInformation)
+            .NotNull().WithMessage("Select yes if you want to provide more details"),
+        v => v.RuleFor(m => m.MoreInformationDetail)
+            .NotEmpty().WithMessage("Enter more details")
+            .When(m => m.HasMoreInformation == true),
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     private Core.DataStore.Postgres.Models.User? _user;
 
     [FromRoute]
     public Guid UserId { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason for deactivating this user")]
     public bool? HasAdditionalReason { get; set; }
 
     [BindProperty]
     public string? AdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to provide more details")]
     public bool? HasMoreInformation { get; set; }
 
     [BindProperty]
@@ -69,17 +81,8 @@ public class DeactivateModel(
             return BadRequest();
         }
 
-        if (HasAdditionalReason == true && AdditionalReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(AdditionalReasonDetail), "Enter a reason");
-        }
-
-        if (HasMoreInformation == true && MoreInformationDetail is null)
-        {
-            ModelState.AddModelError(nameof(MoreInformationDetail), "Enter more details");
-        }
-
         await evidenceUploadManager.ValidateAndUploadAsync<DeactivateModel>(m => m.Evidence, ViewData);
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {

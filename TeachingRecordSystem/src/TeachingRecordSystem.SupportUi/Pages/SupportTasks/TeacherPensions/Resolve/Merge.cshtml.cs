@@ -10,6 +10,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
+    private readonly InlineValidator<MergeModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Evidence).Evidence()
+    };
+
     public string? PersonName { get; set; }
 
     public string? SourceApplicationUserName { get; set; }
@@ -155,6 +160,8 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         {
             ModelState.AddModelError(nameof(GenderSource), "Select a gender");
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {
