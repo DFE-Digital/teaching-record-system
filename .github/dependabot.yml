@@ -24,6 +24,9 @@ updates:
       sentry:
         patterns:
           - 'Sentry.*'
+      nsign:
+        patterns:
+          - 'NSign.*'
 
   - package-ecosystem: github-actions
     directory: /
