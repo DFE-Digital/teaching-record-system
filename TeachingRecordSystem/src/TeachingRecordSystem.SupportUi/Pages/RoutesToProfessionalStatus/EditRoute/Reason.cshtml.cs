@@ -15,7 +15,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
         v => v.RuleFor(m => m.ChangeReason)
             .NotNull().WithMessage("Select a reason"),
         v => v.RuleFor(m => m.HasAdditionalReasonDetail)
-            .NotNull().WithMessage("Select yes if you want to add more information about why you\'re editing this route"),
+            .NotNull().WithMessage("Select yes if you want to add more information about why you’re editing this route"),
         v => v.RuleFor(m => m.ChangeReasonDetail)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),

@@ -48,6 +48,11 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
         _validator.ValidateAndThrow(this);
 
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.Details = Details;

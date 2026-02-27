@@ -135,7 +135,6 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     public async Task<IActionResult> OnPostAsync()
     {
         await evidenceUploadManager.ValidateAndUploadAsync<MergeModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
 
         if (DateOfBirth!.Different && DateOfBirthSource is null)
         {
@@ -161,6 +160,8 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         {
             ModelState.AddModelError(nameof(GenderSource), "Select a gender");
         }
+
+        _validator.ValidateAndThrow(this);
 
         if (!ModelState.IsValid)
         {
