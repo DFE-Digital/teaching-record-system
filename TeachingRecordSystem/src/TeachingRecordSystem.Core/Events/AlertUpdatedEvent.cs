@@ -22,15 +22,3 @@ public enum AlertUpdatedEventChanges
     DqtSpent = 1 << 5,
     DqtSanctionCode = 1 << 6
 }
-
-public static class AlertUpdatedEventExtensions
-{
-    public static LegacyEvents.AlertUpdatedEventChanges ToLegacyAlertUpdatedEventChanges(this AlertUpdatedEventChanges changes) =>
-        LegacyEvents.AlertUpdatedEventChanges.None
-        | (changes.HasFlag(AlertUpdatedEventChanges.Details) ? LegacyEvents.AlertUpdatedEventChanges.Details : 0)
-        | (changes.HasFlag(AlertUpdatedEventChanges.ExternalLink) ? LegacyEvents.AlertUpdatedEventChanges.ExternalLink : 0)
-        | (changes.HasFlag(AlertUpdatedEventChanges.StartDate) ? LegacyEvents.AlertUpdatedEventChanges.StartDate : 0)
-        | (changes.HasFlag(AlertUpdatedEventChanges.EndDate) ? LegacyEvents.AlertUpdatedEventChanges.EndDate : 0)
-        | (changes.HasFlag(AlertUpdatedEventChanges.DqtSpent) ? LegacyEvents.AlertUpdatedEventChanges.DqtSpent : 0)
-        | (changes.HasFlag(AlertUpdatedEventChanges.DqtSanctionCode) ? LegacyEvents.AlertUpdatedEventChanges.DqtSanctionCode : 0);
-}

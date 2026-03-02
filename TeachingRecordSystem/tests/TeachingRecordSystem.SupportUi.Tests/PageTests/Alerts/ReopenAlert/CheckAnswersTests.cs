@@ -198,43 +198,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
             Assert.Null(updatedAlert!.EndDate);
         });
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualAlertUpdatedEvent = Assert.IsType<LegacyEvents.AlertUpdatedEvent>(e);
-
-            var expectedAlertUpdatedEvent = new LegacyEvents.AlertUpdatedEvent
-            {
-                EventId = actualAlertUpdatedEvent.EventId,
-                CreatedUtc = Clock.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                Alert = new()
-                {
-                    AlertId = alert.AlertId,
-                    AlertTypeId = alert.AlertTypeId,
-                    Details = alert.Details,
-                    ExternalLink = alert.ExternalLink,
-                    StartDate = alert.StartDate,
-                    EndDate = null
-                },
-                OldAlert = new()
-                {
-                    AlertId = alert.AlertId,
-                    AlertTypeId = alert.AlertTypeId,
-                    Details = alert.Details,
-                    ExternalLink = alert.ExternalLink,
-                    StartDate = alert.StartDate,
-                    EndDate = alert.EndDate
-                },
-                ChangeReason = journeyInstance.State.ChangeReason!.GetDisplayName(),
-                ChangeReasonDetail = journeyInstance.State.ChangeReasonDetail,
-                EvidenceFile = journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel(),
-                Changes = LegacyEvents.AlertUpdatedEventChanges.EndDate
-            };
-
-            Assert.Equivalent(expectedAlertUpdatedEvent, actualAlertUpdatedEvent);
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.AlertUpdating, p.ProcessContext.ProcessType);

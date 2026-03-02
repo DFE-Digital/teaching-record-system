@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -7,6 +8,7 @@ public partial class TestData
     public Task<Process> CreateProcessAsync(
         ProcessType processType,
         Guid? userId = null,
+        IChangeReasonInfo? changeReason = null,
         params IEvent[] events)
     {
         if (events.Length == 0)
@@ -26,7 +28,7 @@ public partial class TestData
                 DqtUserId = null,
                 DqtUserName = null,
                 PersonIds = events.SelectMany(e => e.PersonIds).Distinct().ToList(),
-                ChangeReason = null
+                ChangeReason = changeReason
             };
 
             dbContext.Processes.Add(process);

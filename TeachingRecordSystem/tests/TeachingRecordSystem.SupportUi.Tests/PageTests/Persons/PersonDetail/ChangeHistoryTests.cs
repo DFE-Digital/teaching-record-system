@@ -4,7 +4,7 @@ using Xunit.Sdk;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
+public partial class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithPersonCreatingInDqtProcess_RendersExpectedEntry()
@@ -30,7 +30,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var user = await TestData.CreateUserAsync();
-        var process = await TestData.CreateProcessAsync(ProcessType.PersonCreatingInDqt, user.UserId, @event);
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonCreatingInDqt, user.UserId, changeReason: null, @event);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -89,7 +89,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var user = SystemUser.Instance;
-        var process = await TestData.CreateProcessAsync(ProcessType.PersonImportingIntoDqt, user.UserId, @event);
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonImportingIntoDqt, user.UserId, changeReason: null, @event);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -177,7 +177,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var user = SystemUser.Instance;
-        var process = await TestData.CreateProcessAsync(ProcessType.PersonUpdatingInDqt, user.UserId, @event);
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonUpdatingInDqt, user.UserId, changeReason: null, @event);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -248,7 +248,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var user = SystemUser.Instance;
-        var process = await TestData.CreateProcessAsync(ProcessType.PersonDeactivatingInDqt, user.UserId, @event);
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonDeactivatingInDqt, user.UserId, changeReason: null, @event);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -279,7 +279,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var user = SystemUser.Instance;
-        var process = await TestData.CreateProcessAsync(ProcessType.PersonReactivatingInDqt, user.UserId, @event);
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonReactivatingInDqt, user.UserId, changeReason: null, @event);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -321,7 +321,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var user = SystemUser.Instance;
-        var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, @event);
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, changeReason: null, @event);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -363,7 +363,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var user = SystemUser.Instance;
-        var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, @event);
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, changeReason: null, @event);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{mergedWithPerson.PersonId}/change-history");
 
@@ -381,7 +381,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 }
 
-file static class Extensions
+internal static class ChangeHistoryTestExtensions
 {
     public static void AssertHasChangeHistoryEntry(
         this IHtmlDocument doc,
@@ -437,11 +437,10 @@ file static class Extensions
 
         if (expectedPreviousDataSummaryListRows.Count > 0)
         {
-            var previousDetails = changeHistoryItem.GetElementsByClassName("govuk-details").SingleOrDefault()?
-                .GetElementsByClassName("govuk-summary-list").SingleOrDefault();
+            var previousDetails = changeHistoryItem.GetElementByTestId("previous-data")?.GetElementsByClassName("govuk-summary-list").SingleOrDefault();
             if (previousDetails is null)
             {
-                throw new XunitException("Cannot find Previous Details.");
+                throw new XunitException("Cannot find Previous Details summary list.");
             }
 
             previousDetails.AssertSummaryListHasRows(

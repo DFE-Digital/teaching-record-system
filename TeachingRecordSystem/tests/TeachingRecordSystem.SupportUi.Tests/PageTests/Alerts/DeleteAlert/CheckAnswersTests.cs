@@ -174,33 +174,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
             Assert.False(alertExists);
         });
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualAlertDeletedEvent = Assert.IsType<LegacyEvents.AlertDeletedEvent>(e);
-
-            var expectedAlertDeletedEvent = new LegacyEvents.AlertDeletedEvent
-            {
-                EventId = actualAlertDeletedEvent.EventId,
-                CreatedUtc = Clock.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                Alert = new()
-                {
-                    AlertId = alert.AlertId,
-                    AlertTypeId = alert.AlertTypeId,
-                    Details = alert.Details,
-                    ExternalLink = alert.ExternalLink,
-                    StartDate = alert.StartDate,
-                    EndDate = alert.EndDate
-                },
-                DeletionReasonDetail = journeyInstance.State.DeleteReasonDetail,
-                EvidenceFile = journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel()
-            };
-
-
-            Assert.Equivalent(expectedAlertDeletedEvent, actualAlertDeletedEvent);
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.AlertDeleting, p.ProcessContext.ProcessType);

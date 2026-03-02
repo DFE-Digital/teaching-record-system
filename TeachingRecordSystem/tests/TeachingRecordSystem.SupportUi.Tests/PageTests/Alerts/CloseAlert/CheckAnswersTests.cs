@@ -199,45 +199,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : CloseAlertTestBase(hos
             Assert.Equal(journeyInstance.State.EndDate, updatedAlert!.EndDate);
         });
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualAlertUpdatedEvent = Assert.IsType<LegacyEvents.AlertUpdatedEvent>(e);
-
-            var expectedAlertUpdatedEvent = new LegacyEvents.AlertUpdatedEvent
-            {
-                EventId = actualAlertUpdatedEvent.EventId,
-                CreatedUtc = Clock.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                Alert = new()
-                {
-                    AlertId = alert.AlertId,
-                    AlertTypeId = alert.AlertTypeId,
-                    Details = alert.Details,
-                    ExternalLink = alert.ExternalLink,
-                    StartDate = alert.StartDate,
-                    EndDate = journeyInstance.State.EndDate
-                },
-                OldAlert = new()
-                {
-                    AlertId = alert.AlertId,
-                    AlertTypeId = alert.AlertTypeId,
-                    Details = alert.Details,
-                    ExternalLink = alert.ExternalLink,
-                    StartDate = alert.StartDate,
-                    EndDate = null
-                },
-                ChangeReason = journeyInstance.State.ChangeReason!.GetDisplayName(),
-                ChangeReasonDetail = populateOptional ? journeyInstance.State.ChangeReasonDetail : null,
-                EvidenceFile = populateOptional
-                    ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel()
-                    : null,
-                Changes = LegacyEvents.AlertUpdatedEventChanges.EndDate
-            };
-
-            Assert.Equivalent(expectedAlertUpdatedEvent, actualAlertUpdatedEvent);
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.AlertUpdating, p.ProcessContext.ProcessType);
