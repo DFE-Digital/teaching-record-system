@@ -144,35 +144,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert added");
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualAlertCreatedEvent = Assert.IsType<LegacyEvents.AlertCreatedEvent>(e);
-
-            var expectedAlertCreatedEvent = new LegacyEvents.AlertCreatedEvent
-            {
-                EventId = actualAlertCreatedEvent.EventId,
-                CreatedUtc = Clock.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                Alert = new()
-                {
-                    AlertId = actualAlertCreatedEvent.Alert.AlertId,
-                    AlertTypeId = journeyInstance.State.AlertTypeId,
-                    Details = journeyInstance.State.Details,
-                    ExternalLink = journeyInstance.State.Link,
-                    StartDate = journeyInstance.State.StartDate,
-                    EndDate = null
-                },
-                AddReason = journeyInstance.State.AddReason!.GetDisplayName(),
-                AddReasonDetail = populateOptional ? journeyInstance.State.AddReasonDetail : null,
-                EvidenceFile = populateOptional
-                    ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel()
-                    : null
-            };
-
-            Assert.Equivalent(expectedAlertCreatedEvent, actualAlertCreatedEvent);
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.AlertCreating, p.ProcessContext.ProcessType);

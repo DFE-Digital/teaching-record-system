@@ -6,7 +6,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Processes;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
@@ -51,9 +50,6 @@ public class ChangeHistoryModel(
             nameof(MandatoryQualificationCreatedEvent),
             nameof(MandatoryQualificationDqtImportedEvent),
             nameof(MandatoryQualificationMigratedEvent),
-            nameof(LegacyEvents.AlertCreatedEvent),
-            nameof(LegacyEvents.AlertUpdatedEvent),
-            nameof(LegacyEvents.AlertDeletedEvent),
             nameof(AlertMigratedEvent),
             nameof(AlertDqtDeactivatedEvent),
             nameof(AlertDqtImportedEvent),
@@ -152,7 +148,10 @@ public class ChangeHistoryModel(
             ProcessType.PersonUpdatingInDqt,
             ProcessType.PersonDeactivatingInDqt,
             ProcessType.PersonReactivatingInDqt,
-            ProcessType.PersonMergingInDqt
+            ProcessType.PersonMergingInDqt,
+            ProcessType.AlertCreating,
+            ProcessType.AlertUpdating,
+            ProcessType.AlertDeleting
         };
 
         var processes = await dbContext.Processes
@@ -161,7 +160,29 @@ public class ChangeHistoryModel(
             .Include(p => p.Events).AsSplitQuery()
             .ToListAsync();
 
-        var personInfo = await processes
+        // Filter alert processes by alert type permissions
+        var alertProcessTypes = new[] { ProcessType.AlertCreating, ProcessType.AlertUpdating, ProcessType.AlertDeleting };
+        var filteredProcesses = processes.Where(p =>
+        {
+            if (!alertProcessTypes.Contains(p.ProcessType))
+            {
+                return true;
+            }
+
+            var alertEvent = p.Events!.First(e => e.Payload is Core.Events.AlertCreatedEvent or Core.Events.AlertUpdatedEvent or Core.Events.AlertDeletedEvent);
+            (Guid? alertTypeId, EventModels.AlertDqtSanctionCode? dqtSanctionCode) = alertEvent.Payload switch
+            {
+                Core.Events.AlertCreatedEvent created => (created.Alert.AlertTypeId, created.Alert.DqtSanctionCode),
+                Core.Events.AlertUpdatedEvent updated => (updated.Alert.AlertTypeId, updated.Alert.DqtSanctionCode),
+                Core.Events.AlertDeletedEvent deleted => (deleted.Alert.AlertTypeId, deleted.Alert.DqtSanctionCode),
+                _ => (null, null)
+            };
+
+            return (alertTypeId.HasValue && alertTypeIdsWithReadPermission.Contains(alertTypeId.Value))
+                || (dqtSanctionCode is not null && dqtSanctionCodesWithReadPermission.Contains(dqtSanctionCode.Value));
+        }).ToList();
+
+        var personInfo = await filteredProcesses
             .SelectMany(p => p.PersonIds)
             .Distinct()
             .ToAsyncEnumerable()
@@ -170,7 +191,7 @@ public class ChangeHistoryModel(
             .ToDictionaryAsync(i => i!.PersonId, i => i!);
 
         var allResults = eventsWithUser.Select(MapTimelineEvent)
-            .Concat(processes.Select(p => MapTimelineProcess(p, personInfo)))
+            .Concat(filteredProcesses.Select(p => MapTimelineProcess(p, personInfo)))
             .ToArray();
 
         TimelineItems = allResults
@@ -198,7 +219,7 @@ public class ChangeHistoryModel(
     {
         var @event = EventBase.Deserialize(eventWithUser.EventPayload, eventWithUser.EventName);
 
-        RaisedByUserInfo raisedByUser = new()
+        Timeline.RaisedByUserInfo raisedByUser = new()
         {
             Name = eventWithUser.TrsUserName ?? eventWithUser.DqtUserName!
         };
@@ -219,7 +240,7 @@ public class ChangeHistoryModel(
             TimelineItemType.Process,
             PersonId,
             process.CreatedOn.ToGmt(),
-            new TimelineProcess(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }, personInfo));
+            new TimelineProcess(process, new Timeline.RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }, personInfo));
 
     /// <summary>
     /// Flattened out record to allow Event, TRS User and DQT User to be returned in a single SQL query

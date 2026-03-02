@@ -1,0 +1,68 @@
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineProcess>
+@{
+    var deletedEvent = Model.ItemModel.GetEvent<AlertDeletedEvent>();
+    var alert = deletedEvent.Alert;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
+    var changeReason = Model.ItemModel.Process.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Alert deleted</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span>By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            @if (alertType is not null)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@alertType.Name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            else
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT sanction code</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@alert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT sanction name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@alert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>
+
+        @if (changeReason is not null)
+        {
+            <govuk-details class="govuk-!-margin-bottom-2">
+                <govuk-details-summary>Reason for deletion</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-summary-list>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Deletion details</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    </govuk-summary-list>
+                </govuk-details-text>
+            </govuk-details>
+        }
+    </div>
+</div>

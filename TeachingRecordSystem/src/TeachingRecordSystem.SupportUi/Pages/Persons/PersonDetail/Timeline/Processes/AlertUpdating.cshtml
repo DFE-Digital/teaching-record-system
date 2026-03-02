@@ -1,17 +1,15 @@
-@using TeachingRecordSystem.Core.Events.Legacy
-@using LegacyAlertUpdatedEventChanges = TeachingRecordSystem.Core.Events.Legacy.AlertUpdatedEventChanges
-@using TeachingRecordSystem.Core.Services.Files
-@inject IFileService FileService
+@using TeachingRecordSystem.Core.Events.ChangeReasons
 @inject ReferenceDataCache ReferenceDataCache
-@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.AlertUpdatedEvent>>
+@model TimelineItem<TimelineProcess>
 @{
-    var updatedEvent = Model.ItemModel.Event;
+    var updatedEvent = Model.ItemModel.GetEvent<AlertUpdatedEvent>();
     var alert = updatedEvent.Alert;
-    TrsUriHelper.TryCreateWebsiteUri(alert.ExternalLink, out var externalLinkUri);
     var oldAlert = updatedEvent.OldAlert;
+    TrsUriHelper.TryCreateWebsiteUri(alert.ExternalLink, out var externalLinkUri);
     TrsUriHelper.TryCreateWebsiteUri(oldAlert.ExternalLink, out var oldExternalLinkUri);
     var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
-    var evidenceFileUrl = updatedEvent.EvidenceFile is not null ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+    var changeReason = Model.ItemModel.Process.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+
     var heading = "changed";
     var hasMultipleChanges = (updatedEvent.Changes & (updatedEvent.Changes - 1)) != 0;
     if (!hasMultipleChanges)
@@ -43,24 +41,16 @@
                 heading = "end date changed";
             }
         }
-        else if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))
-        {
-            heading = "DQT spent changed";
-        }
-        else if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSanctionCode))
-        {
-            heading = "DQT sanction code changed";
-        }
     }
 }
 
-<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-updated-event">
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">
     <div class="moj-timeline__header">
-        <h2 class="moj-timeline__title" data-testid="heading">Alert @heading</h2>
+        <h2 class="moj-timeline__title">Alert @heading</h2>
     </div>
     <p class="moj-timeline__date">
-        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+        <span>By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list>
@@ -68,34 +58,33 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="alert-type" use-empty-fallback>@alertType?.Name</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@alertType.Name</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             else
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>DQT sanction code</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="sanction-code" use-empty-fallback>@alert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@alert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>DQT sanction name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="sanction-name" use-empty-fallback>@alert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@alert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback data-testid="details">
+                    <govuk-summary-list-row-value use-empty-fallback>
                         @Html.ConvertNewlinesToLineBreaks(alert.Details)
                     </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.ExternalLink))
             {
                 <govuk-summary-list-row>
@@ -103,64 +92,64 @@
                     <govuk-summary-list-row-value>
                         @if (alert.ExternalLink is not null)
                         {
-                            <a href="@externalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="external-link">@($"{alert.ExternalLink} (opens in new tab)")</a>
+                            <a href="@externalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{alert.ExternalLink} (opens in new tab)")</a>
                         }
                         else
                         {
-                            <span data-testid="external-link" use-empty-fallback></span>
+                            <span use-empty-fallback></span>
                         }
                     </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.EndDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@alert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@alert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>DQT spent</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="dqt-spent" use-empty-fallback>@alert.DqtSpent</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@alert.DqtSpent</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSanctionCode))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>DQT sanction code</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="dqt-sanction-code" use-empty-fallback>@alert.DqtSanctionCode</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@alert.DqtSanctionCode</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
         </govuk-summary-list>
 
-        <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
-            <govuk-details-text>
-                <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@updatedEvent.ChangeReason</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="reason-detail" use-empty-fallback>
-                            @Html.ConvertNewlinesToLineBreaks(updatedEvent.ChangeReasonDetail)
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            <vc:event-evidence-file-link evidence-file="@updatedEvent.EvidenceFile" />
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                </govuk-summary-list>
-            </govuk-details-text>
-        </govuk-details>
+        @if (changeReason is not null)
+        {
+            <govuk-details class="govuk-!-margin-bottom-2">
+                <govuk-details-summary>Reason for change</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-summary-list>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@changeReason.Reason</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    </govuk-summary-list>
+                </govuk-details-text>
+            </govuk-details>
+        }
 
         @if (heading != "closed")
         {
@@ -172,20 +161,18 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldAlert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldAlert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback data-testid="old-details">
+                                <govuk-summary-list-row-value use-empty-fallback>
                                     @Html.ConvertNewlinesToLineBreaks(oldAlert.Details)
                                 </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.ExternalLink))
                         {
                             <govuk-summary-list-row>
@@ -193,41 +180,34 @@
                                 <govuk-summary-list-row-value>
                                     @if (oldAlert.ExternalLink is not null)
                                     {
-                                        <a href="@oldExternalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="old-external-link">@($"{oldAlert.ExternalLink} (opens in new tab)")</a>
+                                        <a href="@oldExternalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{oldAlert.ExternalLink} (opens in new tab)")</a>
                                     }
                                     else
                                     {
-                                        <span data-testid="old-external-link" use-empty-fallback></span>
+                                        <span use-empty-fallback></span>
                                     }
                                 </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.EndDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="old-end-date" use-empty-fallback>@oldAlert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldAlert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>DQT spent</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="old-dqt-spent" use-empty-fallback>@oldAlert.DqtSpent</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldAlert.DqtSpent</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSanctionCode))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>DQT sanction code</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="old-sanction-code" use-empty-fallback>@oldAlert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>DQT sanction name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="old-sanction-name" use-empty-fallback>@oldAlert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldAlert.DqtSanctionCode</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                     </govuk-summary-list>

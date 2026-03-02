@@ -190,46 +190,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert changed");
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualAlertUpdatedEvent = Assert.IsType<LegacyEvents.AlertUpdatedEvent>(e);
-
-            var expectedAlertUpdatedEvent = new LegacyEvents.AlertUpdatedEvent
-            {
-                EventId = actualAlertUpdatedEvent.EventId,
-                CreatedUtc = Clock.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                Alert = new()
-                {
-                    AlertId = alert.AlertId,
-                    AlertTypeId = alert.AlertTypeId,
-                    Details = journeyInstance.State.Details,
-                    ExternalLink = alert.ExternalLink,
-                    StartDate = alert.StartDate,
-                    EndDate = alert.EndDate
-                },
-                OldAlert = new()
-                {
-                    AlertId = alert.AlertId,
-                    AlertTypeId = alert.AlertTypeId,
-                    Details = alert.Details,
-                    ExternalLink = alert.ExternalLink,
-                    StartDate = alert.StartDate,
-                    EndDate = alert.EndDate
-                },
-                ChangeReason = journeyInstance.State.ChangeReason!.GetDisplayName(),
-                ChangeReasonDetail = populateOptional ? journeyInstance.State.ChangeReasonDetail : null,
-                EvidenceFile = populateOptional
-                    ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel()
-                    : null,
-                Changes = LegacyEvents.AlertUpdatedEventChanges.Details
-            };
-
-
-            Assert.Equivalent(expectedAlertUpdatedEvent with { EventId = actualAlertUpdatedEvent.EventId }, actualAlertUpdatedEvent);
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.AlertUpdating, p.ProcessContext.ProcessType);
