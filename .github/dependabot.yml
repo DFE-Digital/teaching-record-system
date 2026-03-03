@@ -27,6 +27,9 @@ updates:
       nsign:
         patterns:
           - 'NSign.*'
+      xunit:
+        patterns:
+          - 'xunit.*'
 
   - package-ecosystem: github-actions
     directory: /
