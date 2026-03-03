@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
-    <ProjectReference Include="..\TeachingRecordSystem.TestCommon.XUnit3\TeachingRecordSystem.TestCommon.XUnit3.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
   </ItemGroup>
 

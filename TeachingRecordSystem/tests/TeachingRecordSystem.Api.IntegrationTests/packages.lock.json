@@ -799,14 +799,7 @@
           "Respawn": "[7.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "Testcontainers.PostgreSql": "[4.10.0, )",
-          "xunit.v3.assert": "[3.2.0, )"
-        }
-      },
-      "teachingrecordsystem.testcommon.xunit3": {
-        "type": "Project",
-        "dependencies": {
-          "JetBrains.Annotations": "[2025.2.4, )",
-          "TeachingRecordSystem.TestCommon": "[1.0.0, )",
+          "xunit.v3.assert": "[3.2.0, )",
           "xunit.v3.extensibility.core": "[3.2.0, )"
         }
       },
