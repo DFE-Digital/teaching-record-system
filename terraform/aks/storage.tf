@@ -21,48 +21,48 @@ resource "azurerm_storage_account" "app_storage" {
 
 resource "azurerm_storage_container" "certificates" {
   name                  = "certificates"
-  storage_account_name  = azurerm_storage_account.app_storage.name
+  storage_account_id    = azurerm_storage_account.app_storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "locks" {
   name                  = "locks"
-  storage_account_name  = azurerm_storage_account.app_storage.name
+  storage_account_id    = azurerm_storage_account.app_storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "keys" {
   name                  = "keys"
-  storage_account_name  = azurerm_storage_account.app_storage.name
+  storage_account_id    = azurerm_storage_account.app_storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "uploads" {
   name                  = "uploads"
-  storage_account_name  = azurerm_storage_account.app_storage.name
+  storage_account_id    = azurerm_storage_account.app_storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "dqt-integrations" {
   name                  = "dqt-integrations"
-  storage_account_name  = azurerm_storage_account.app_storage.name
+  storage_account_id    = azurerm_storage_account.app_storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "dqtaudits" {
   name                  = "dqtaudits"
-  storage_account_name  = azurerm_storage_account.app_storage.name
+  storage_account_id    = azurerm_storage_account.app_storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "cpd-inductions" {
   name                  = "cpd-inductions"
-  storage_account_name  = azurerm_storage_account.app_storage.name
+  storage_account_id    = azurerm_storage_account.app_storage.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "dqt-note-attachments" {
   name                  = "dqt-note-attachments"
-  storage_account_name  = azurerm_storage_account.app_storage.name
+  storage_account_id    = azurerm_storage_account.app_storage.id
   container_access_type = "private"
 }
