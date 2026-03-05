@@ -28,6 +28,6 @@ resource "azurerm_security_center_storage_defender" "safe_storage" {
 
 resource "azurerm_storage_container" "safe_uploads" {
   name                  = "uploads"
-  storage_account_name  = azurerm_storage_account.safe_storage.name
+  storage_account_id    = azurerm_storage_account.safe_storage.id
   container_access_type = "private"
 }
