@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;
@@ -20,10 +19,9 @@ public class TeachersController : ControllerBase
     }
 
     [HttpGet("{trn}")]
-    [SwaggerOperation(
-        OperationId = "GetTeacher",
-        Summary = "Get teacher",
-        Description = "Gets a teacher by their DOB and either TRN or NINO")]
+    [EndpointName("GetTeacher"),
+        EndpointSummary("Get teacher"),
+        EndpointDescription("Gets a teacher by their DOB and either TRN or NINO")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]

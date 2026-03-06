@@ -1,6 +1,6 @@
+using System.ComponentModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -13,17 +13,16 @@ namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 public class TeachersController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
-    [SwaggerOperation(
-        OperationId = "GetTeacherByTrn",
-        Summary = "Get teacher details by TRN",
-        Description = "Gets the details of the teacher corresponding to the given TRN.")]
+    [EndpointName("GetTeacherByTrn"),
+        EndpointSummary("Get teacher details by TRN"),
+        EndpointDescription("Gets the details of the teacher corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), Description("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
     {
         var command = new GetPersonCommand(
             trn,
@@ -44,10 +43,9 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
     }
 
     [HttpPost("name-changes")]
-    [SwaggerOperation(
-        OperationId = "CreateNameChange",
-        Summary = "Create name change request",
-        Description = "Creates a name change request for the teacher with the given TRN.")]
+    [EndpointName("CreateNameChange"),
+        EndpointSummary("Create name change request"),
+        EndpointDescription("Creates a name change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
@@ -71,10 +69,9 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
     }
 
     [HttpPost("date-of-birth-changes")]
-    [SwaggerOperation(
-        OperationId = "CreateDobChange",
-        Summary = "Create DOB change request",
-        Description = "Creates a date of birth change request for the teacher with the given TRN.")]
+    [EndpointName("CreateDobChange"),
+        EndpointSummary("Create DOB change request"),
+        EndpointDescription("Creates a date of birth change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
@@ -96,10 +93,9 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
     }
 
     [HttpGet("")]
-    [SwaggerOperation(
-        OperationId = "FindTeachers",
-        Summary = "Find teachers",
-        Description = "Finds teachers with a TRN matching the specified criteria.")]
+    [EndpointName("FindTeachers"),
+        EndpointSummary("Find teachers"),
+        EndpointDescription("Finds teachers with a TRN matching the specified criteria.")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
