@@ -22,6 +22,7 @@ public class ServiceFixture : ServiceProviderFixture
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
             .AddSingleton<PersonInfoCache>()
+            .AddWebhookMessageFactory()
             .AddEventPublisher()
             .AddOneLoginService()
             .AddSupportTaskService()

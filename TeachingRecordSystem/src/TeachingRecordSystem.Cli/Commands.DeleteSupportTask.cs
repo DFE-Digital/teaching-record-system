@@ -37,6 +37,7 @@ public partial class Commands
                 var services = new ServiceCollection()
                     .AddClock()
                     .AddDatabase(connectionString)
+                    .AddWebhookMessageFactory()
                     .AddEventPublisher()
                     .AddSupportTaskService()
                     .BuildServiceProvider();
