@@ -14,6 +14,8 @@ public class EventPipelineFixture : ServiceProviderFixture
         services
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
+            .AddMemoryCache()
+            .AddWebhookMessageFactory()
             .AddEventPublisher();
 
         PublishEventsDbCommandInterceptor.ConfigureServices(services);

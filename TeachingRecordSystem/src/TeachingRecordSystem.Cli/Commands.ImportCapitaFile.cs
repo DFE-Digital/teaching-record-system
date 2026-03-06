@@ -52,6 +52,8 @@ public static partial class Commands
                 .AddClock()
                 .AddLogging()
                 .AddDatabase(connectionString)
+                .AddMemoryCache()
+                .AddWebhookMessageFactory()
                 .AddEventPublisher()
                 .AddPersonService()
                 .AddSupportTaskService()
