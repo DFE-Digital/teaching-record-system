@@ -1,3 +1,4 @@
+using Optional;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -180,6 +181,197 @@ public class CheckAnswers : TestBase
     }
 
     [Fact]
+    public async Task Post_ValidData_ClosesTaskAndAndMovesOneLoginAccountsToPrimaryPerson()
+    {
+        // Arrange
+        var oneLoginEmail1 = Faker.Internet.Email();
+        var oneLoginEmail2 = Faker.Internet.Email();
+        var mergeComments = "merging because evidence has been provided";
+        var fileName = "test.txt";
+        long integrationTransactionId = 1;
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender(Gender.Male));
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(oneLoginEmail1));
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(oneLoginEmail2));
+
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender(Gender.Female));
+        var user = await TestData.CreateUserAsync();
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            user.UserId,
+            s =>
+            {
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
+                s.WithLastName(person.LastName);
+                s.WithFirstName(person.FirstName);
+                s.WithMiddleName(person.MiddleName);
+                s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
+                s.WithGender(person.Gender);
+                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithSupportTaskData(fileName, integrationTransactionId);
+                s.WithCreatedOn(Clock.UtcNow);
+                s.WithStatus(SupportTaskStatus.Open);
+            });
+
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            TeachersPensionPersonId = person.PersonId,
+            FirstNameSource = PersonAttributeSource.TrnRequest,
+            MiddleNameSource = PersonAttributeSource.TrnRequest,
+            LastNameSource = PersonAttributeSource.TrnRequest,
+            DateOfBirthSource = PersonAttributeSource.TrnRequest,
+            GenderSource = PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
+            PersonId = duplicatePerson1.PersonId,
+            PersonAttributeSourcesSet = true,
+            Evidence = new()
+            {
+                UploadEvidence = false
+            },
+            MergeComments = mergeComments
+        };
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        EventObserver.Clear();
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
+        await WithDbContextAsync(async dbContext =>
+        {
+            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters().Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == person.PersonId);
+            var updatedPersonRecord = await dbContext.Persons.Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == duplicatePerson1.PersonId);
+            Assert.Equal(person.FirstName, updatedPersonRecord.FirstName);
+            Assert.Equal(person.LastName, updatedPersonRecord.LastName);
+            Assert.Equal(person.NationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(person.DateOfBirth, updatedPersonRecord.DateOfBirth);
+
+            // Assert that one login is associated with the primary person
+            var oneLoginUser1 = updatedPersonRecord.OneLoginUsers!.FirstOrDefault(x => x.EmailAddress == oneLoginEmail1);
+            var oneLoginUser2 = updatedPersonRecord.OneLoginUsers!.FirstOrDefault(x => x.EmailAddress == oneLoginEmail2);
+            Assert.NotNull(oneLoginUser1);
+            Assert.NotNull(oneLoginUser2);
+
+            // Assert primary account is de-activated and has no one login users
+            Assert.NotNull(deactivatedPersonRecord);
+            Assert.Equal(PersonStatus.Deactivated, deactivatedPersonRecord.Status);
+            Assert.Empty(deactivatedPersonRecord.OneLoginUsers!);
+
+            var updatedSupportTask = await dbContext
+                .SupportTasks
+                .Include(st => st.TrnRequestMetadata)
+                .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+        });
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
+    }
+
+    [Fact]
+    public async Task Post_ValidData_MovesOneLoginAccountsToPrimaryPersonWithExistingOneLoginAccount()
+    {
+        // Arrange
+        var oneLoginEmail1 = Faker.Internet.Email();
+        var oneLoginEmail2 = Faker.Internet.Email();
+        var oneLoginEmail3 = Faker.Internet.Email();
+        var mergeComments = "merging because evidence has been provided";
+        var fileName = "test.txt";
+        long integrationTransactionId = 1;
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender(Gender.Male));
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(oneLoginEmail1));
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(oneLoginEmail2));
+
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender(Gender.Female));
+        await TestData.CreateOneLoginUserAsync(duplicatePerson1, email: Option.Some<string?>(oneLoginEmail3));
+        var user = await TestData.CreateUserAsync();
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            user.UserId,
+            s =>
+            {
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
+                s.WithLastName(person.LastName);
+                s.WithFirstName(person.FirstName);
+                s.WithMiddleName(person.MiddleName);
+                s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
+                s.WithGender(person.Gender);
+                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithSupportTaskData(fileName, integrationTransactionId);
+                s.WithCreatedOn(Clock.UtcNow);
+                s.WithStatus(SupportTaskStatus.Open);
+            });
+
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            TeachersPensionPersonId = person.PersonId,
+            FirstNameSource = PersonAttributeSource.TrnRequest,
+            MiddleNameSource = PersonAttributeSource.TrnRequest,
+            LastNameSource = PersonAttributeSource.TrnRequest,
+            DateOfBirthSource = PersonAttributeSource.TrnRequest,
+            GenderSource = PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
+            PersonId = duplicatePerson1.PersonId,
+            PersonAttributeSourcesSet = true,
+            Evidence = new()
+            {
+                UploadEvidence = false
+            },
+            MergeComments = mergeComments
+        };
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        EventObserver.Clear();
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
+        await WithDbContextAsync(async dbContext =>
+        {
+            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters().Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == person.PersonId);
+            var updatedPersonRecord = await dbContext.Persons.Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == duplicatePerson1.PersonId);
+            Assert.Equal(person.FirstName, updatedPersonRecord.FirstName);
+            Assert.Equal(person.LastName, updatedPersonRecord.LastName);
+            Assert.Equal(person.NationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(person.DateOfBirth, updatedPersonRecord.DateOfBirth);
+
+            // Assert that one login is associated with the primary person
+            Assert.NotEmpty(updatedPersonRecord.OneLoginUsers!);
+            var oneLoginUser1 = updatedPersonRecord.OneLoginUsers!.FirstOrDefault(x => x.EmailAddress == oneLoginEmail1);
+            var oneLoginUser2 = updatedPersonRecord.OneLoginUsers!.FirstOrDefault(x => x.EmailAddress == oneLoginEmail2);
+            var oneLoginUser3 = updatedPersonRecord.OneLoginUsers!.FirstOrDefault(x => x.EmailAddress == oneLoginEmail3);
+            Assert.NotNull(oneLoginUser1);
+            Assert.NotNull(oneLoginUser2);
+            Assert.NotNull(oneLoginUser3);
+
+            // Assert primary account is de-activated and has no one login users
+            Assert.NotNull(deactivatedPersonRecord);
+            Assert.Equal(PersonStatus.Deactivated, deactivatedPersonRecord.Status);
+            Assert.Empty(deactivatedPersonRecord.OneLoginUsers!);
+
+            var updatedSupportTask = await dbContext
+                .SupportTasks
+                .Include(st => st.TrnRequestMetadata)
+                .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+        });
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
+    }
+
+    [Fact]
     public async Task Post_ValidData_ClosesTaskAndRedirectsToTeacherPensionsWithUpdatedDetails()
     {
         // Arrange
@@ -237,11 +429,16 @@ public class CheckAnswers : TestBase
         Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
         await WithDbContextAsync(async dbContext =>
         {
+            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters().SingleAsync(x => x.PersonId == person.PersonId);
             var updatedPersonRecord = await dbContext.Persons.SingleAsync(x => x.PersonId == duplicatePerson1.PersonId);
             Assert.Equal(person.FirstName, updatedPersonRecord.FirstName);
             Assert.Equal(person.LastName, updatedPersonRecord.LastName);
             Assert.Equal(person.NationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
             Assert.Equal(person.DateOfBirth, updatedPersonRecord.DateOfBirth);
+
+            // Teacher pensions record is de-activated
+            Assert.NotNull(deactivatedPersonRecord);
+            Assert.Equal(PersonStatus.Deactivated, deactivatedPersonRecord.Status);
 
             var updatedSupportTask = await dbContext
                 .SupportTasks

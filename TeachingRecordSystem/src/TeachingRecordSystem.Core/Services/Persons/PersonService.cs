@@ -242,6 +242,25 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
         deactivatingPerson.MergedWithPersonId = options.RetainedPersonId;
         deactivatingPerson.UpdatedOn = processContext.Now;
 
+        // If the deactivated person was associated with any One Login Users, transfer that association to the retained person
+        var oneLoginUsers = await dbContext.OneLoginUsers
+            .Where(o => o.PersonId == options.DeactivatingPersonId)
+            .Select(o => o.Subject)
+            .ToArrayAsync();
+
+        foreach (var user in oneLoginUsers)
+        {
+            await oneLoginService.SetUserMatchedAsync(
+                new SetUserMatchedOptions
+                {
+                    OneLoginUserSubject = user,
+                    MatchedPersonId = retainedPerson.PersonId,
+                    MatchRoute = OneLoginUserMatchRoute.SupportUi,
+                    MatchedAttributes = null
+                },
+                processContext);
+        }
+
         await dbContext.SaveChangesAsync();
 
         await eventScope.PublishEventAsync(

@@ -30,9 +30,13 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
     public string? Trn { get; set; }
 
+    public string[]? OneLoginEmails { get; set; } = Array.Empty<string>();
+
     public void OnGet()
     {
         PersonId = JourneyInstance!.State.PersonId;
+        OneLoginEmails = DbContext.OneLoginUsers.Where(x => x.PersonId == SupportTask!.PersonId).Select(x => x.EmailAddress!)
+            .ToArray();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -83,7 +87,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
         SupportTask = GetSupportTask();
         RequestData = SupportTask!.TrnRequestMetadata!;
 
-        var person = await DbContext.Persons.SingleOrDefaultAsync(x => x.PersonId == SupportTask!.PersonId);
+        var person = await DbContext.Persons.Include(x => x.OneLoginUsers).SingleOrDefaultAsync(x => x.PersonId == SupportTask!.PersonId);
         if (person != null)
         {
             Trn = person.Trn;
@@ -94,7 +98,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
                 mp => mp.MatchedAttributes);
         var matchedPersonIds = JourneyInstance!.State.MatchedPersons.Select(p => p.PersonId).ToArray();
 
-        PotentialDuplicates = (await DbContext.Persons
+        PotentialDuplicates = (await DbContext.Persons.Include(x => x.OneLoginUsers)
             .Where(p => matchedPersonIds.Contains(p.PersonId))
             .Select(p => new PotentialDuplicate
             {
