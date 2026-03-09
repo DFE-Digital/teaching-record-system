@@ -699,7 +699,7 @@
           "OpenIddict.EntityFrameworkCore": "[7.2.0, )",
           "Optional": "[4.0.0, )",
           "Parquet.Net": "[4.24.0, )",
-          "Polly.Core": "[8.6.5, )",
+          "Polly.Core": "[8.6.6, )",
           "Scrutor": "[7.0.0, )",
           "Sentry.Serilog": "[6.1.0, )",
           "Serilog.Expressions": "[5.0.0, )",
@@ -1124,9 +1124,9 @@
       },
       "Polly.Core": {
         "type": "CentralTransitive",
-        "requested": "[8.6.5, )",
-        "resolved": "8.6.5",
-        "contentHash": "t+sUVrIwvo7UmsgHGgOG9F0GDZSRIm47u2ylH17Gvcv1q5hNEwgD5GoBlFyc0kh/pebmPyrAgvGsR/65ZBaXlg=="
+        "requested": "[8.6.6, )",
+        "resolved": "8.6.6",
+        "contentHash": "lCBL9mmhF9TZxHG3beVRkyjlLohkIC464xIAq7J7Y59C+z42hmsdUaeCKl2SIAYertOUU5TeBXyQDLDQGIKePQ=="
       },
       "prometheus-net.AspNetCore": {
         "type": "CentralTransitive",
