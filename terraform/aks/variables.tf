@@ -112,7 +112,7 @@ variable "postgres_enable_high_availability" {
 
 variable "postgres_server_version" {
   type    = string
-  default = "14"
+  default = "17"
 }
 
 variable "postgres_azure_storage_mb" {
