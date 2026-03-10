@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
@@ -62,7 +63,9 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var fileName = "test.txt";
         long integrationTransactionId = 1;
+        var oneLoginEmail = Faker.Internet.Email();
         var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender().WithPreviousNames());
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(oneLoginEmail));
         var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithMiddleName(person.MiddleName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
         var duplicatePerson2 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithMiddleName(person.MiddleName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
         var user = await TestData.CreateUserAsync();
@@ -117,6 +120,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueByKey("Gender"));
+        Assert.Contains(oneLoginEmail, requestDetails.GetSummaryListValueByKey("Connected One Login details"));
     }
 
     [Fact]
