@@ -56,6 +56,7 @@ public sealed record ApiError
         public static int RecordIsMerged => 10059;
         public static int OpenNameChangeRequestAlreadyExists => 10060;
         public static int OpenDateOfBirthChangeRequestAlreadyExists => 10061;
+        public static int UnsupportedTrnRequestStatus => 10062;
     }
 
     public static class DataKeys
@@ -175,6 +176,9 @@ public sealed record ApiError
 
     public static ApiError OpenChangeDateOfBirthRequestAlreadyExists() =>
         new(ErrorCodes.OpenDateOfBirthChangeRequestAlreadyExists, "An open date of birth change request already exists.");
+
+    public static ApiError UnsupportedTrnRequestStatus(string requestId) =>
+        new(ErrorCodes.UnsupportedTrnRequestStatus, "Unsupported TRN request status.", $"TRN request ID: '{requestId}'");
 
     public IActionResult ToActionResult(int statusCode = 400)
     {
