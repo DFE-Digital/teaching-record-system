@@ -283,7 +283,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(JourneyUrls.RequestSubmitted(coordinator.InstanceId), response.Headers.Location?.OriginalString);
 
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
-                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirst(AuthorizeAccess.ClaimTypes.TrnRequestId);
+                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirst(AuthorizeAccessClaimTypes.TrnRequestId);
                 Assert.NotNull(trnRequestIdClaim);
 
                 var trnRequest = await WithDbContextAsync(dbContext =>

@@ -447,7 +447,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
                 // Assert
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
-                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirstValue(ClaimTypes.TrnRequestId);
+                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirstValue(AuthorizeAccessClaimTypes.TrnRequestId);
                 Assert.Equal(trnRequestId, trnRequestIdClaim);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -506,7 +506,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
                 // Assert
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
-                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirstValue(ClaimTypes.TrnRequestId);
+                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirstValue(AuthorizeAccessClaimTypes.TrnRequestId);
                 Assert.NotNull(trnRequestIdClaim);
 
                 var trnRequest = await WithDbContextAsync(dbContext =>
@@ -570,7 +570,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
                 // Assert
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
-                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirstValue(ClaimTypes.TrnRequestId);
+                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirstValue(AuthorizeAccessClaimTypes.TrnRequestId);
                 Assert.Equal(trnRequestId, trnRequestIdClaim);
                 var trnRequestCount = await WithDbContextAsync(dbContext =>
                     dbContext.TrnRequestMetadata.CountAsync(tr => tr.OneLoginUserSubject == subject));
@@ -1392,7 +1392,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotEmpty(user.MatchedAttributes);
 
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
-                Assert.Equal(person.Trn, coordinator.State.AuthenticationTicket.Principal.FindFirstValue(ClaimTypes.Trn));
+                Assert.Equal(person.Trn, coordinator.State.AuthenticationTicket.Principal.FindFirstValue(AuthorizeAccessClaimTypes.Trn));
             });
     }
 

@@ -65,7 +65,7 @@ public abstract class TestBase
 
     protected Mock<IFileService> BlobStorageFileService => _testServices.BlobStorageFileServiceMock;
 
-    protected virtual HttpClient GetHttpClient(string? version = null)
+    protected HttpClient GetHttpClient(string? version = null)
     {
         var client = HostFixture.CreateClient(new()
         {
@@ -80,20 +80,47 @@ public abstract class TestBase
         return client;
     }
 
-    protected virtual HttpClient GetHttpClientWithApiKey(string? version = null)
+    protected HttpClient GetHttpClientWithApiKey(string? version = null)
     {
         var client = GetHttpClient(version);
         client.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run
         return client;
     }
 
+    protected HttpClient GetHttpClientWithAuthorizeAccessToken(string trn, string version)
+    {
+        Claim[] claims = [
+            new("scope", "teaching_record"),
+            new("trn", trn)
+        ];
+
+        return GetHttpClientWithJwtAccessToken(claims, version);
+    }
+
+    protected HttpClient GetHttpClientWithAuthorizeAccessTokenForTrnRequest(Guid applicationUserId, string trnRequestId, string version)
+    {
+        Claim[] claims = [
+            new("scope", "teaching_record"),
+            new("trn_request_id", trnRequestId),
+            new("trs_user_id", applicationUserId.ToString())
+        ];
+
+        return GetHttpClientWithJwtAccessToken(claims, version);
+    }
+
     protected HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read", string? version = null)
     {
-        // The actual access tokens contain many more claims than this but these are the two we care about
-        var subject = new ClaimsIdentity([
-            new Claim("scope", scope),
-            new Claim("trn", trn)
-        ]);
+        Claim[] claims = [
+            new("scope", scope),
+            new("trn", trn)
+        ];
+
+        return GetHttpClientWithJwtAccessToken(claims, version);
+    }
+
+    private HttpClient GetHttpClientWithJwtAccessToken(IEnumerable<Claim> claims, string? version = null)
+    {
+        var subject = new ClaimsIdentity(claims);
 
         var jwtHandler = new JwtSecurityTokenHandler { MapInboundClaims = false };
 

@@ -5,6 +5,10 @@
 The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
 
+## 20260416
+
+An endpoint has been added to activate a dormant TRN request: `PUT /v3/trn-requests/active/<request_id>`.
+
 ## 20260120
 
 The `GET /v3/trns/<trn>` endpoint has been revised to behave in the same was as `GET /v3/trns/<trn>` with respect to deactivated records:

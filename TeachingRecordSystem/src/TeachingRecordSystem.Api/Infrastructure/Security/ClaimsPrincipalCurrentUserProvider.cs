@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 
 namespace TeachingRecordSystem.Api.Infrastructure.Security;
@@ -9,7 +10,7 @@ public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContext
         var principal = httpContext.User;
 
         // If there's a TRN claim then it's either an access token from ID or from Teacher Auth (i.e. AuthorizeAccess).
-        if (principal.HasClaim(c => c.Type == "trn"))
+        if (principal.HasClaim(c => c.Type is "trn" or "trn_request_id"))
         {
             if (principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("dqt:read")))
             {
@@ -48,5 +49,19 @@ public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContext
         }
 
         return userId;
+    }
+
+    public bool TryGetTrnRequestId([NotNullWhen(true)] out string? trnRequestId)
+    {
+        var httpContext = httpContextAccessor.HttpContext ?? throw new Exception("No HttpContext.");
+
+        if (httpContext.User.FindFirst(AuthorizeAccessClaimTypes.TrnRequestId) is { Value: var claimTrnRequestId })
+        {
+            trnRequestId = claimTrnRequestId;
+            return true;
+        }
+
+        trnRequestId = null;
+        return false;
     }
 }

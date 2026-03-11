@@ -80,8 +80,8 @@ public static class TestAppConfigurationExtensions
         options.Scope.Add("offline_access");
         options.Scope.Add(CustomScopes.TeachingRecord);
 
-        options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.VerifiedName));
-        options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.VerifiedDateOfBirth));
+        options.ClaimActions.Add(new MapJsonClaimAction(AuthorizeAccessClaimTypes.VerifiedName));
+        options.ClaimActions.Add(new MapJsonClaimAction(AuthorizeAccessClaimTypes.VerifiedDateOfBirth));
 
         options.Events.OnRedirectToIdentityProvider = ctx =>
         {

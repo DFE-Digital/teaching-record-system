@@ -349,7 +349,7 @@ public class SignInJourneyCoordinator(
             throw new InvalidOperationException("User is not authenticated with One Login.");
         }
 
-        var specificClaims = new[] { new Claim(ClaimTypes.Trn, trn) };
+        var specificClaims = new[] { new Claim(AuthorizeAccessClaimTypes.Trn, trn) };
         CreateAuthenticationTicket(state, specificClaims);
     }
 
@@ -360,7 +360,7 @@ public class SignInJourneyCoordinator(
             throw new InvalidOperationException("User is not authenticated with One Login.");
         }
 
-        var specificClaims = new[] { new Claim(ClaimTypes.TrnRequestId, trnRequestId) };
+        var specificClaims = new[] { new Claim(AuthorizeAccessClaimTypes.TrnRequestId, trnRequestId) };
         CreateAuthenticationTicket(state, specificClaims);
     }
 
@@ -406,7 +406,7 @@ public class SignInJourneyCoordinator(
             },
             processContext);
 
-        var specificClaims = new[] { new Claim(ClaimTypes.TrnRequestId, trnRequestInfo.TrnRequest.RequestId) };
+        var specificClaims = new[] { new Claim(AuthorizeAccessClaimTypes.TrnRequestId, trnRequestInfo.TrnRequest.RequestId) };
         CreateAuthenticationTicket(state, specificClaims);
 
         return requestId;
@@ -419,10 +419,10 @@ public class SignInJourneyCoordinator(
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
-            new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
-            new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken),
-            new Claim(ClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
+            new Claim(AuthorizeAccessClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
+            new Claim(AuthorizeAccessClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
+            new Claim(AuthorizeAccessClaimTypes.OneLoginIdToken, oneLoginIdToken),
+            new Claim(AuthorizeAccessClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
         };
 
         claims.AddRange(specificClaims);
@@ -430,7 +430,7 @@ public class SignInJourneyCoordinator(
         var teachingRecordIdentity = new ClaimsIdentity(
             claims,
             authenticationType: "Authorize access to a teaching record",
-            nameType: ClaimTypes.Subject,
+            nameType: AuthorizeAccessClaimTypes.Subject,
             roleType: null);
 
         var principal = new ClaimsPrincipal(teachingRecordIdentity);

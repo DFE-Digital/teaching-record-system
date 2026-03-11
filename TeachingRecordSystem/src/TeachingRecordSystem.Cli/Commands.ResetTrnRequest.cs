@@ -93,7 +93,8 @@ public partial class Commands
                 await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
                 var oldTrnRequest = EventModels.TrnRequestMetadata.FromModel(request);
-                request.Reset();
+                request.ResolvedPersonId = null;
+                request.Status = TrnRequestStatus.Pending;
 
                 var changes = (oldTrnRequest.Status != request.Status ? TrnRequestUpdatedChanges.Status : 0) |
                     (oldTrnRequest.ResolvedPersonId != request.ResolvedPersonId ? TrnRequestUpdatedChanges.ResolvedPersonId : 0);
