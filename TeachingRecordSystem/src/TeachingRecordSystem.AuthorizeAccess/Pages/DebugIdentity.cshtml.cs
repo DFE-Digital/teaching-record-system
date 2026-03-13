@@ -52,15 +52,27 @@ public class DebugIdentityModel(
     [BindProperty]
     public bool DetachPerson { get; set; }
 
+    public bool IsAlreadyVerified { get; set; }
+
     public void OnGet()
     {
         AttemptedIdentityVerification = coordinator.State.AttemptedIdentityVerification;
-        IdentityVerified = coordinator.State.IdentityVerified;
+        IdentityVerified = coordinator.State.IdentityVerified || IsAlreadyVerified;
 
         if (IdentityVerified)
         {
-            VerifiedNames = string.Join("\n", coordinator.State.VerifiedNames!.Select(name => string.Join(" ", name)));
-            VerifiedDatesOfBirth = string.Join("\n", coordinator.State.VerifiedDatesOfBirth!.Select(dob => dob.ToString("dd/MM/yyyy")));
+            if (IsAlreadyVerified)
+            {
+                // Use stored verified info from database
+                VerifiedNames = string.Join("\n", _oneLoginUser!.VerifiedNames!.Select(name => string.Join(" ", name)));
+                VerifiedDatesOfBirth = string.Join("\n", _oneLoginUser!.VerifiedDatesOfBirth!.Select(dob => dob.ToString("dd/MM/yyyy")));
+            }
+            else
+            {
+                // Use verified info from journey state
+                VerifiedNames = string.Join("\n", coordinator.State.VerifiedNames!.Select(name => string.Join(" ", name)));
+                VerifiedDatesOfBirth = string.Join("\n", coordinator.State.VerifiedDatesOfBirth!.Select(dob => dob.ToString("dd/MM/yyyy")));
+            }
         }
     }
 
@@ -69,7 +81,13 @@ public class DebugIdentityModel(
         string[][]? verifiedNames;
         DateOnly[]? verifiedDatesOfBirth;
 
-        if (IdentityVerified)
+        // Skip validation if already verified (fields are disabled)
+        if (IsAlreadyVerified)
+        {
+            verifiedNames = _oneLoginUser!.VerifiedNames;
+            verifiedDatesOfBirth = _oneLoginUser!.VerifiedDatesOfBirth;
+        }
+        else if (IdentityVerified)
         {
             verifiedNames = (VerifiedNames ?? string.Empty).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray())
@@ -121,14 +139,14 @@ public class DebugIdentityModel(
             _oneLoginUser.ClearMatchedPerson();
         }
 
-        if (IdentityVerified)
+        // Don't re-verify if already verified in database (checkbox is disabled so can't change)
+        if (IdentityVerified && !IsAlreadyVerified)
         {
             await coordinator.OnUserVerifiedCoreAsync(verifiedNames!, verifiedDatesOfBirth!, coreIdentityClaimVc: null);
         }
-        else
+        else if (!IdentityVerified)
         {
             _oneLoginUser.ClearVerifiedInfo();
-
             coordinator.UpdateState(state => state.ClearVerified());
 
             if (AttemptedIdentityVerification)
@@ -170,6 +188,9 @@ public class DebugIdentityModel(
         {
             Person = new(person.PersonId, person.Trn, person.FirstName, person.LastName, person.DateOfBirth, person.NationalInsuranceNumber);
         }
+
+        // Check if user already has verified identity in database
+        IsAlreadyVerified = _oneLoginUser?.VerifiedOn is not null;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

@@ -15,12 +15,16 @@ public class SignedInModel : PageModel
     [Display(Name = "Access token")]
     public string? AccessToken { get; set; }
 
+    [Display(Name = "Refresh token")]
+    public string? RefreshToken { get; set; }
+
     [Display(Name = "Claims")]
     public string? ClaimsJson { get; set; }
 
     public async Task OnGetAsync()
     {
         AccessToken = await HttpContext.GetTokenAsync(TestAppConfiguration.AuthenticationSchemeName, TokenTypes.AccessToken);
+        RefreshToken = await HttpContext.GetTokenAsync(TestAppConfiguration.AuthenticationSchemeName, TokenTypes.RefreshToken);
 
         ClaimsJson = JsonSerializer.Serialize(
             User.Claims.ToDictionary(c => c.Type, c => c.Value),
