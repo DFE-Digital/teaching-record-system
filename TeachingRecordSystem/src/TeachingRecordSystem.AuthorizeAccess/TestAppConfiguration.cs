@@ -41,6 +41,7 @@ public static class TestAppConfiguration
                     options.Scope.Add("openid");
                     options.Scope.Add("email");
                     options.Scope.Add("profile");
+                    options.Scope.Add("offline_access");
                     options.Scope.Add(CustomScopes.TeachingRecord);
 
                     options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.VerifiedName));
@@ -52,6 +53,17 @@ public static class TestAppConfiguration
                         {
                             ctx.ProtocolMessage.SetParameter("trn_token", trnToken);
                         }
+
+                        return Task.CompletedTask;
+                    };
+
+                    options.Events.OnTokenResponseReceived = ctx =>
+                    {
+                        // Set a breakpoint here to inspect tokens
+                        // ctx.TokenEndpointResponse contains access_token, refresh_token, id_token, etc.
+                        var accessToken = ctx.TokenEndpointResponse.AccessToken;
+                        var refreshToken = ctx.TokenEndpointResponse.RefreshToken;
+                        var idToken = ctx.TokenEndpointResponse.IdToken;
 
                         return Task.CompletedTask;
                     };

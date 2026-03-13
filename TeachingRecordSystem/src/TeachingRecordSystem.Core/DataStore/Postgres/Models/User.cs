@@ -124,9 +124,11 @@ public class ApplicationUser : UserBase
             Permissions.Endpoints.Token,
             Permissions.Endpoints.EndSession,
             Permissions.GrantTypes.AuthorizationCode,
+            Permissions.GrantTypes.RefreshToken,
             Permissions.ResponseTypes.Code,
             Permissions.Scopes.Email,
             Permissions.Scopes.Profile,
+            $"{Permissions.Prefixes.Scope}offline_access",
             $"{Permissions.Prefixes.Scope}teaching_record");
         app.RedirectUris = CreateJsonArray(RedirectUris!.ToArray());
         app.PostLogoutRedirectUris = CreateJsonArray(PostLogoutRedirectUris!.ToArray());
