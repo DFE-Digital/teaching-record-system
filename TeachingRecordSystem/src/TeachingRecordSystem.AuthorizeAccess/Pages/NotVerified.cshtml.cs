@@ -10,5 +10,13 @@ public class NotVerifiedModel(SignInJourneyCoordinator coordinator) : PageModel
     {
     }
 
-    public IActionResult OnPost() => coordinator.AdvanceTo(links => links.Name());
+    public IActionResult OnPost(bool tryAgain)
+    {
+        if (tryAgain)
+        {
+            return coordinator.VerifyIdentityWithOneLogin().ToActionResult();
+        }
+
+        return coordinator.AdvanceTo(links => links.Name());
+    }
 }

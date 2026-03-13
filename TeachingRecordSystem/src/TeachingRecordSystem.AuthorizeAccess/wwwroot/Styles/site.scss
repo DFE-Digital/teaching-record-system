@@ -24,3 +24,13 @@
 .trs-empty-fallback {
   color: govuk-colour("dark-grey");
 }
+
+.trs-panel--interruption__link-button {
+  @extend .govuk-link;
+  @extend .govuk-body;
+  background: none;
+  border: 0;
+  color: govuk-colour("white") !important;
+  cursor: pointer;
+  @include govuk-font($size: 19, $line-height: 19px);
+}

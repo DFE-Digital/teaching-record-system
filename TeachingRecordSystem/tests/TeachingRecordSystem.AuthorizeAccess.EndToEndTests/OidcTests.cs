@@ -17,7 +17,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/oidc-test");
-        await page.ClickButtonAsync("Start");
+        await page.ClickGovUkButtonAsync("Start");
         await page.WaitForUrlPathAsync("/oidc-test/signed-in");
 
         string[][] expectedVerifiedNames = [[person.FirstName, person.LastName]];
