@@ -23,9 +23,12 @@ public class ApplicationManager : OpenIddictApplicationManager<OpenIddictEntityF
     protected override ValueTask<bool> ValidateClientSecretAsync(string secret, string comparand, CancellationToken cancellationToken = default) =>
         ValueTask.FromResult(secret.Equals(comparand, StringComparison.Ordinal));
 
-    public override ValueTask<bool> ValidatePostLogoutRedirectUriAsync(OpenIddictEntityFrameworkCoreApplication<Guid> application, string address, CancellationToken cancellationToken = default)
+    public override ValueTask<bool> ValidatePostLogoutRedirectUriAsync(
+        OpenIddictEntityFrameworkCoreApplication<Guid> application,
+        string uri,
+        CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(application?.PostLogoutRedirectUris) || string.IsNullOrEmpty(address))
+        if (string.IsNullOrEmpty(application?.PostLogoutRedirectUris) || string.IsNullOrEmpty(uri))
         {
             return ValueTask.FromResult(false);
         }
@@ -42,7 +45,7 @@ public class ApplicationManager : OpenIddictApplicationManager<OpenIddictEntityF
 
         foreach (var pattern in allowed)
         {
-            if (MatchUriPattern(pattern, address, ignorePath: false))
+            if (MatchUriPattern(pattern, uri, ignorePath: false))
             {
                 return ValueTask.FromResult(true);
             }
