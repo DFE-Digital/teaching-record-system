@@ -1,0 +1,59 @@
+@page "/oidc-test/refresh-token"
+@using TeachingRecordSystem.AuthorizeAccess.Pages.OidcTest
+@model RefreshTokenModel
+
+@section Styles {
+    <style type="text/css" asp-add-nonce="true">
+        .token-json {
+            font-family: monospace !important;
+            height: 260px;
+            white-space: pre-wrap;
+        }
+
+        .token {
+            font-family: monospace !important;
+        }
+    </style>
+}
+
+<h1 class="govuk-heading-l">Test Refresh Token</h1>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="govuk-error-summary">
+        <h2 class="govuk-error-summary__title">Error</h2>
+        <div class="govuk-error-summary__body">
+            <p>@Model.ErrorMessage</p>
+        </div>
+    </div>
+}
+
+<form method="post">
+    <input type="hidden" asp-for="CurrentAccessToken" />
+    <input type="hidden" asp-for="CurrentRefreshToken" />
+
+    <govuk-input for="CurrentAccessToken" input-class="token" disabled="true" />
+
+    <govuk-input for="CurrentRefreshToken" input-class="token" disabled="true" />
+
+    @if (!string.IsNullOrEmpty(Model.OldAccessToken))
+    {
+        <govuk-input for="OldAccessToken" input-class="token" disabled="true" />
+    }
+
+    @if (!string.IsNullOrEmpty(Model.OldRefreshToken))
+    {
+        <govuk-input for="OldRefreshToken" input-class="token" disabled="true" />
+    }
+
+    @if (!string.IsNullOrEmpty(Model.TokenResponseJson))
+    {
+        <govuk-textarea for="TokenResponseJson" textarea-class="token-json" disabled="true" />
+    }
+
+    <govuk-button type="submit">Exchange refresh token for new access token</govuk-button>
+</form>
+
+<p class="govuk-body">
+    <a href="/oidc-test/signed-in" class="govuk-link">Back to signed in page</a>
+</p>

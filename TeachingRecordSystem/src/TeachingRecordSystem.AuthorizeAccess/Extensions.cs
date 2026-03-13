@@ -111,12 +111,14 @@ public static class Extensions
 
                 options.SetIssuer(configuration.GetRequiredValue("AuthorizeAccessIssuer"));
 
-                options.RegisterScopes(OpenIddictConstants.Scopes.Email, OpenIddictConstants.Scopes.Profile, CustomScopes.TeachingRecord);
+                options.RegisterScopes(OpenIddictConstants.Scopes.Email, OpenIddictConstants.Scopes.Profile, OpenIddictConstants.Scopes.OfflineAccess, CustomScopes.TeachingRecord);
 
                 options.AllowAuthorizationCodeFlow();
+                options.AllowRefreshTokenFlow();
 
                 options.DisableAccessTokenEncryption();
                 options.SetAccessTokenLifetime(TimeSpan.FromHours(1));
+                options.SetRefreshTokenLifetime(TimeSpan.FromDays(10));
 
                 if (environment.IsProduction())
                 {
