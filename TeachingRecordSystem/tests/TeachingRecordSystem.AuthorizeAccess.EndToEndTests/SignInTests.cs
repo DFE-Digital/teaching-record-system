@@ -38,15 +38,15 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButtonAsync("Find your teaching record");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('National Insurance number')", person.NationalInsuranceNumber!);
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickButtonAsync("Access your teaching record");
+        await page.ClickGovUkButtonAsync("Access your teaching record");
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -67,20 +67,20 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButtonAsync("Find your teaching record");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('Teacher reference number')", person.Trn);
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickButtonAsync("Access your teaching record");
+        await page.ClickGovUkButtonAsync("Access your teaching record");
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -101,19 +101,19 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButtonAsync("Find your teaching record");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=No");
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('Teacher reference number')", person.Trn);
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickButtonAsync("Access your teaching record");
+        await page.ClickGovUkButtonAsync("Access your teaching record");
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -134,23 +134,23 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButtonAsync("Find your teaching record");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrnAsync());
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");
-        await page.ClickButtonAsync("Check your answers");
+        await page.ClickGovUkButtonAsync("Check your answers");
 
         await page.WaitForUrlPathAsync("/check-answers");
-        await page.ClickButtonAsync("Submit support request");
+        await page.ClickGovUkButtonAsync("Submit support request");
 
         await page.WaitForUrlPathAsync("/request-submitted");
     }
@@ -171,15 +171,15 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButtonAsync("Find your teaching record");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=No");
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("label:text-is('No')");
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/no-trn");
     }
@@ -428,28 +428,28 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/not-verified");
-        await page.ClickButtonAsync("Continue");
+        await page.ClickButtonAsync("Verify using my personal details");
 
         await page.WaitForUrlPathAsync("/name");
         await page.FillAsync("label:text-is('First name')", TestData.GenerateFirstName());
         await page.FillAsync("label:text-is('Last name')", TestData.GenerateLastName());
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/date-of-birth");
         await page.FillAsync("label:text-is('Day')", "15");
         await page.FillAsync("label:text-is('Month')", "06");
         await page.FillAsync("label:text-is('Year')", "1990");
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrnAsync());
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/proof-of-identity");
         await page
@@ -461,10 +461,10 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
                     MimeType = "image/jpeg",
                     Buffer = TestData.JpegImage
                 });
-        await page.ClickButtonAsync("Continue");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/check-answers");
-        await page.ClickButtonAsync("Submit support request");
+        await page.ClickGovUkButtonAsync("Submit support request");
 
         await page.WaitForUrlPathAsync("/request-submitted");
     }
