@@ -678,7 +678,9 @@ public class TpsCsvExtractProcessor(
                     tps_employments
                 WHERE
                     end_date IS NULL
-                    AND AGE(last_extract_date, last_known_tps_employed_date) > INTERVAL '5 months'
+                    AND last_known_tps_employed_date < (
+                        (SELECT MAX(last_extract_date) FROM tps_employments) - INTERVAL '5 months'
+                    )
                 LIMIT 1000
             )
             UPDATE
