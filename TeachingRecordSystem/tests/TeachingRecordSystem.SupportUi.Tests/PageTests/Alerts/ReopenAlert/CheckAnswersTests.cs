@@ -190,7 +190,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert re-opened");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert re-opened");
 
         await WithDbContextAsync(async dbContext =>
         {

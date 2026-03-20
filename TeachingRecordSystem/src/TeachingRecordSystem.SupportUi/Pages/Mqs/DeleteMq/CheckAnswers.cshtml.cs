@@ -77,7 +77,7 @@ public class CheckAnswersModel(
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Mandatory qualification deleted");
+        TempData.SetFlashNotificationBanner("Mandatory qualification deleted");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

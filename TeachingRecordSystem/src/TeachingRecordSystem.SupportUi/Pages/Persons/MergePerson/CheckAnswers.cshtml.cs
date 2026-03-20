@@ -150,7 +150,7 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId)));
 

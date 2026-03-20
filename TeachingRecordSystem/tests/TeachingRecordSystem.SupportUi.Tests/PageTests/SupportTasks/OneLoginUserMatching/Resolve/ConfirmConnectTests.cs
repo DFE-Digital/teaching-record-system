@@ -138,7 +138,7 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserM
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"GOV.UK One Login connected to {matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}’s record");
 
@@ -184,7 +184,7 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserM
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"GOV.UK One Login connected to {matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}’s record");
 

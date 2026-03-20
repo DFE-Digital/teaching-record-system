@@ -211,6 +211,6 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "The request has been accepted");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "The request has been accepted");
     }
 }

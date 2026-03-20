@@ -56,7 +56,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             return this.PageWithErrors();
         }
 
-        TempData.SetFlashSuccess("Application user added");
+        TempData.SetFlashNotificationBanner("Application user added");
         return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(newUser.UserId));
     }
 }

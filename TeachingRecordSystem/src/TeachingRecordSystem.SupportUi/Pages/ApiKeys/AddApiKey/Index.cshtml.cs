@@ -67,7 +67,7 @@ public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, Suppo
             return this.PageWithErrors();
         }
 
-        TempData.SetFlashSuccess("API key added");
+        TempData.SetFlashNotificationBanner("API key added");
         return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(ApplicationUserId));
     }
 

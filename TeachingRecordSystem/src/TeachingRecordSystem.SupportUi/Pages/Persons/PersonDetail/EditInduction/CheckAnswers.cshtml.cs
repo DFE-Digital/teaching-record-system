@@ -112,7 +112,7 @@ public class CheckAnswersModel(
 
         await JourneyInstance!.CompleteAsync();
 
-        TempData.SetFlashSuccess("Induction details have been updated");
+        TempData.SetFlashNotificationBanner("Induction details have been updated");
 
         return Redirect(LinkGenerator.Persons.PersonDetail.Induction(PersonId));
     }

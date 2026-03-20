@@ -95,7 +95,7 @@ public class CheckAnswersModel(
 
         await JourneyInstance!.CompleteAsync();
 
-        TempData.SetFlashSuccess("Route to professional status deleted");
+        TempData.SetFlashNotificationBanner("Route to professional status deleted");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

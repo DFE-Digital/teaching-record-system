@@ -91,7 +91,7 @@ public class CheckAnswersModel(
             processContext);
 
         await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Alert added");
+        TempData.SetFlashNotificationBanner("Alert added");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }

@@ -142,7 +142,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert added");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert added");
 
         Events.AssertProcessesCreated(p =>
         {

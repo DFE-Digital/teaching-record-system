@@ -204,7 +204,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification added");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification added");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);

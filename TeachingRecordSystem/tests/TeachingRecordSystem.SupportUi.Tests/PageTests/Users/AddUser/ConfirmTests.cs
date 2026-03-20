@@ -407,7 +407,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, $"{newName} has been added as a record manager.");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, $"{newName} has been added as a record manager.");
     }
 
     private void ConfigureUserServiceMock(string userId, User? user) =>

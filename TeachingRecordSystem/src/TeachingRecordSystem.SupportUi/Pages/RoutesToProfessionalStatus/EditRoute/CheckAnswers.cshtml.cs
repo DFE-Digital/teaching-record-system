@@ -134,7 +134,7 @@ public class CheckYourAnswersModel(
 
         await JourneyInstance!.CompleteAsync();
 
-        TempData.SetFlashSuccess("Route to professional status updated");
+        TempData.SetFlashNotificationBanner("Route to professional status updated");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

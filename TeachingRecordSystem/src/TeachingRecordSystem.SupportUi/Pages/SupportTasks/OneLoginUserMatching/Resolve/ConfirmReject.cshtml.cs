@@ -52,9 +52,10 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
         await JourneyInstance.DeleteAsync();
 
         var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             "GOV.UK One Login verification request rejected",
-            $"Request closed for {data.StatedFirstName} {data.StatedLastName}. We’ve sent them an email confirming we could not verify their identity.");
+            $"Request closed for {data.StatedFirstName} {data.StatedLastName}. We’ve sent them an email confirming we could not verify their identity.",
+            notificationBannerType: NotificationBannerType.Default);
 
         return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
     }

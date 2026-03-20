@@ -113,7 +113,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "Email sent",
             $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}. We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.");
@@ -160,7 +160,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "Email sent",
             $"Request closed for {firstName} {lastName}. We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.");

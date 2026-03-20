@@ -202,7 +202,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
 
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "Teachers’ Pensions duplicate task completed",
             $"The records were not merged.");
@@ -288,7 +288,7 @@ public class ConfirmKeepRecordSeparateReasonTests : TestBase
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
 
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "Teachers’ Pensions duplicate task completed",
             $"The records were not merged.");

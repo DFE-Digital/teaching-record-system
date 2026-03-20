@@ -33,7 +33,7 @@ public class Confirm(TrnRequestService trnRequestService, SupportTaskService sup
             },
             processContext);
 
-        TempData.SetFlashSuccess($"TRN request for {trnRequest.FirstName} {trnRequest.MiddleName} {trnRequest.LastName} completed");
+        TempData.SetFlashNotificationBanner($"TRN request for {trnRequest.FirstName} {trnRequest.MiddleName} {trnRequest.LastName} completed");
 
         return Redirect(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index());
     }

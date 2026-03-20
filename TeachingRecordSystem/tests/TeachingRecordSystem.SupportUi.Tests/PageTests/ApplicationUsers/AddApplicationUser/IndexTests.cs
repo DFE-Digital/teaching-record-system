@@ -139,6 +139,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Application user added");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Application user added");
     }
 }

@@ -400,7 +400,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: "Personal details have been updated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -490,7 +490,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: "Personal details have been updated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -544,7 +544,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: "Personal details have been updated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
 
         await WithDbContextAsync(async dbContext =>
         {

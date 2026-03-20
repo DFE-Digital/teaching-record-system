@@ -82,7 +82,7 @@ public class CheckAnswersModel(
 
         await JourneyInstance!.CompleteAsync();
 
-        TempData.SetFlashSuccess("Personal details have been updated");
+        TempData.SetFlashNotificationBanner("Personal details have been updated");
 
         return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
     }

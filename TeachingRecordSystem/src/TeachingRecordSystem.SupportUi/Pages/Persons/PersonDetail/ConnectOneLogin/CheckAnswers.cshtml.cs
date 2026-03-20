@@ -108,7 +108,7 @@ public class CheckAnswersModel(
         }
 
         var personName = StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);
-        TempData.SetFlashSuccess($"Record connected to {personName}’s GOV.UK One Login");
+        TempData.SetFlashNotificationBanner($"Record connected to {personName}’s GOV.UK One Login");
 
         await JourneyInstance!.CompleteAsync();
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));

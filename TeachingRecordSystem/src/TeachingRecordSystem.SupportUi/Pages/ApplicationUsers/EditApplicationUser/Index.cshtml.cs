@@ -239,7 +239,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             await dbContext.Database.ExecuteSqlRawAsync($"NOTIFY {ChannelNames.OneLoginClient}");
         }
 
-        TempData.SetFlashSuccess("Application user updated");
+        TempData.SetFlashNotificationBanner("Application user updated");
         return Redirect(linkGenerator.ApplicationUsers.Index());
     }
 

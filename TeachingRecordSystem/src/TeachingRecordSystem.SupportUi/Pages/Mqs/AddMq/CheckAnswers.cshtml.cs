@@ -61,7 +61,7 @@ public class CheckAnswersModel(
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Mandatory qualification added");
+        TempData.SetFlashNotificationBanner("Mandatory qualification added");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

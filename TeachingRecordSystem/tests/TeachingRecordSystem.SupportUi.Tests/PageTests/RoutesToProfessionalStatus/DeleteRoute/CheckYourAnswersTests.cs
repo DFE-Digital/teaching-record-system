@@ -215,7 +215,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Route to professional status deleted");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Route to professional status deleted");
 
         await WithDbContextAsync(async dbContext => Assert.Null(await dbContext.RouteToProfessionalStatuses.FirstOrDefaultAsync(p => p.QualificationId == qualificationId)));
 

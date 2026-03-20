@@ -192,7 +192,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert changed");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert changed");
 
         await WithDbContextAsync(async dbContext =>
         {

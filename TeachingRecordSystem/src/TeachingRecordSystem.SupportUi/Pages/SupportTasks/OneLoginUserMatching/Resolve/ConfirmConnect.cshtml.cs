@@ -88,7 +88,7 @@ public class ConfirmConnect(
 
         await JourneyInstance.DeleteAsync();
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             $"GOV.UK One Login connected to {MatchedPersonName}’s record",
             $"We’ve sent {MatchedPersonName} an email confirming their GOV.UK One Login has been connected to their teaching record.");
 

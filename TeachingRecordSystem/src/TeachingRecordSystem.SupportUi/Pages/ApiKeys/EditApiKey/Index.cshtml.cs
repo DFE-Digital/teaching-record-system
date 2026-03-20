@@ -53,7 +53,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         await dbContext.SaveChangesAsync();
 
-        TempData.SetFlashSuccess("API key expired");
+        TempData.SetFlashNotificationBanner("API key expired");
         return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(ApplicationUserId));
     }
 

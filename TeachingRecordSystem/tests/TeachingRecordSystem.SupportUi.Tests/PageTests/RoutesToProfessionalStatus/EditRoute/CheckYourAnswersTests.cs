@@ -468,7 +468,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Route to professional status updated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Route to professional status updated");
 
         await WithDbContextAsync(async dbContext =>
         {
