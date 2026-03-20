@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <IsPublishable>false</IsPublishable>
@@ -119,6 +119,7 @@
     <None Remove="Services\DqtReporting\Migrations\0099_Users.sql" />
     <None Remove="Services\DqtReporting\Migrations\0100_ProcessTimestamps.sql" />
     <None Remove="Services\DqtReporting\Migrations\0101_RemoveUserShortName.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0106_UserRecordMatchingPolicy.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -271,6 +272,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0103_UserUseSharedOneLoginSigningKeys.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0104_ProcessChangeReason.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0105_ProcessEventsOneLoginUserSubjects.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0106_UserRecordMatchingPolicy.sql" />
   </ItemGroup>
 
   <ItemGroup>
