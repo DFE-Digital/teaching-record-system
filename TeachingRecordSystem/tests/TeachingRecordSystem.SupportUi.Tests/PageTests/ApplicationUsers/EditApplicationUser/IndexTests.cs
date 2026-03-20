@@ -322,7 +322,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Application user updated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Application user updated");
     }
 
     public static (string ClientId,

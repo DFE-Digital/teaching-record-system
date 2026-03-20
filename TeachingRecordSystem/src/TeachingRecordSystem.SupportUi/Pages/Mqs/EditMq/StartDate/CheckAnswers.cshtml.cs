@@ -71,7 +71,7 @@ public class CheckAnswersModel(
         }
 
         await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Mandatory qualification changed");
+        TempData.SetFlashNotificationBanner("Mandatory qualification changed");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

@@ -100,7 +100,7 @@ public class CheckAnswersModel(
             await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
         }
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed and the user has been notified by email",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value)));
 

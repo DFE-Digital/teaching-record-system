@@ -220,7 +220,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "The request has been rejected");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "The request has been rejected");
     }
 
     [Theory]
@@ -295,6 +295,6 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "The request has been cancelled");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "The request has been cancelled");
     }
 }

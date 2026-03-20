@@ -52,7 +52,7 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             $"TRN request for {PersonName} rejected");
 
         await JourneyInstance!.CompleteAsync();

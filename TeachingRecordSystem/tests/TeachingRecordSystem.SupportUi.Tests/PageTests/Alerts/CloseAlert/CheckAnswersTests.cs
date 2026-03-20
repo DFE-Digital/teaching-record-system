@@ -191,7 +191,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : CloseAlertTestBase(hos
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert closed");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert closed");
 
         await WithDbContextAsync(async dbContext =>
         {

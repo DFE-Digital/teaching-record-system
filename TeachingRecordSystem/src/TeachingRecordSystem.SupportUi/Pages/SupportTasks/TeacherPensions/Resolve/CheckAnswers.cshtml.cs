@@ -166,7 +166,7 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             "Teachers’ Pensions duplicate task completed",
             buildMessageHtml: b =>
             {

@@ -547,7 +547,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Induction details have been updated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Induction details have been updated");
 
         await WithDbContextAsync(async dbContext =>
         {

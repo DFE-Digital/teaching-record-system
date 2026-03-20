@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.AuthorizeAccess.Pages.CheckAnswersModel
 @{
-    ViewBag.Title = "Check your answers";
+    ViewBag.Title = "Check your details before sending support request";
 }
 
 <div class="govuk-grid-row">
@@ -11,7 +11,7 @@
         <form method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <h2 class="govuk-heading-m">GOV.UK One Login</h2>
+            <h2 class="govuk-heading-m">GOV.UK One Login details</h2>
 
             <govuk-summary-list>
                 <govuk-summary-list-row>
@@ -71,7 +71,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>
-                        Teacher reference number
+                        TRN
                     </govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>

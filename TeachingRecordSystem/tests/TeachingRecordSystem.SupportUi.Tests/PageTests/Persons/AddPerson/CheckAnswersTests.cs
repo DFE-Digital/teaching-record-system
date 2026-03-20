@@ -202,7 +202,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: "Record created for Alfred The Great");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Record created for Alfred The Great");
 
         await WithDbContextAsync(async dbContext =>
         {

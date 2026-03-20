@@ -166,7 +166,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert deleted");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert deleted");
 
         await WithDbContextAsync(async dbContext =>
         {

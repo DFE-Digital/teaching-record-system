@@ -218,6 +218,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "API key added");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "API key added");
     }
 }

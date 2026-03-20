@@ -469,7 +469,7 @@ public class CheckAnswers : TestBase
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
 
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "Teachers’ Pensions duplicate task completed");
 

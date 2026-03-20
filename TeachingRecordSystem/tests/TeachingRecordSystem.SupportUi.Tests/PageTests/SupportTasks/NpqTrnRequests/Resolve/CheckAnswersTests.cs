@@ -644,7 +644,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"TRN request for {StringHelper.JoinNonEmpty(' ', matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName)} completed");
 

@@ -75,9 +75,10 @@ public class ConfirmNotConnecting(
 
         var data = _supportTask!.GetData<IOneLoginUserMatchingData>();
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             "GOV.UK One Login not connected to a record",
-            $"Request closed for {firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}.");
+            $"Request closed for {firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}.",
+            notificationBannerType: NotificationBannerType.Default);
 
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
         {

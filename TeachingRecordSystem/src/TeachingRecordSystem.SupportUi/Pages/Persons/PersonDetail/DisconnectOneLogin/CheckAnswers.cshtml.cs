@@ -53,7 +53,7 @@ public class CheckAnswers(
         }
 
         var personName = $"{person.FirstName} {person.LastName}";
-        TempData.SetFlashSuccess($"GOV.UK One Login disconnected from {personName}’s record");
+        TempData.SetFlashNotificationBanner($"GOV.UK One Login disconnected from {personName}’s record");
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 
@@ -67,7 +67,7 @@ public class CheckAnswers(
     {
         if (!JourneyInstance!.State.DisconnectReason.HasValue || !JourneyInstance.State.StayVerified.HasValue)
         {
-            context.Result = Redirect(linkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(PersonId, OneLoginSubject, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(PersonId, OneLoginSubject, JourneyInstance.InstanceId));
             return;
         }
     }

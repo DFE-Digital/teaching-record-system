@@ -52,9 +52,9 @@ public static partial class AssertEx
         }
     }
 
-    public static void HtmlDocumentHasFlashSuccess(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
+    public static void HtmlDocumentHasFlashNotificationBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
     {
-        var banner = doc.GetElementsByClassName("govuk-notification-banner--success").SingleOrDefault();
+        var banner = doc.GetElementsByClassName("govuk-notification-banner").SingleOrDefault();
 
         if (banner is null)
         {

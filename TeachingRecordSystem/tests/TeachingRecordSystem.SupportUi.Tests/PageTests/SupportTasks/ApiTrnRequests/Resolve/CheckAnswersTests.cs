@@ -651,7 +651,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
     }
@@ -730,7 +730,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"Records merged for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
     }

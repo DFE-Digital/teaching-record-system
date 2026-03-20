@@ -63,7 +63,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
             },
             processContext);
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             "Teachers’ Pensions duplicate task completed",
             "The records were not merged.");
 

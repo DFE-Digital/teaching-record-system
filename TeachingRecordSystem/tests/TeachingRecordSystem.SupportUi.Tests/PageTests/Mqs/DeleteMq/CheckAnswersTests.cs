@@ -184,7 +184,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification deleted");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification deleted");
 
         EventObserver.AssertEventsSaved(e =>
         {

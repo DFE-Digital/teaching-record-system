@@ -188,7 +188,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : LinkTestBase(hostFixtu
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert changed");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert changed");
 
         Events.AssertProcessesCreated(p =>
         {

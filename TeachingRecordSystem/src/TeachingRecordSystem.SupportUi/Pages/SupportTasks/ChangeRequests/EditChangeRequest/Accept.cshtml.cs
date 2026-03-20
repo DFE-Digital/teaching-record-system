@@ -140,7 +140,7 @@ public class AcceptModel(
             await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
         }
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             "The request has been accepted",
             "The user’s record has been changed and they have been notified.");
 

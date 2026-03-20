@@ -171,7 +171,7 @@ public class RejectModel(
 
         await dbContext.SaveChangesAsync();
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             $"The request has been {requestStatus}",
             flashMessage);
 

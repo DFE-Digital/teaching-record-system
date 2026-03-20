@@ -596,7 +596,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
     [Fact]
@@ -645,7 +645,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
     [Fact]
@@ -695,7 +695,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
     [Fact]
@@ -745,7 +745,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}/deactivate";

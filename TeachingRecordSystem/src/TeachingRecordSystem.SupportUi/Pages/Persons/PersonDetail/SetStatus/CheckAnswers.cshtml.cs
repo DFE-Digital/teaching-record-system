@@ -64,7 +64,7 @@ public class CheckAnswersModel(
         await JourneyInstance!.CompleteAsync();
 
         var action = TargetStatus == PersonStatus.Deactivated ? "deactivated" : "reactivated";
-        TempData.SetFlashSuccess($"{PersonName}\u2019s record has been {action}");
+        TempData.SetFlashNotificationBanner($"{PersonName}\u2019s record has been {action}");
 
         return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
     }

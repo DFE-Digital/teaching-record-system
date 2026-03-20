@@ -118,7 +118,7 @@ public class CheckAnswersModel(
 
         await JourneyInstance!.CompleteAsync();
 
-        TempData.SetFlashSuccess("Route to professional status added");
+        TempData.SetFlashNotificationBanner("Route to professional status added");
 
         return await ContinueAsync();
     }

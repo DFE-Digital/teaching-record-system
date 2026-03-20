@@ -284,7 +284,7 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "GOV.UK One Login not connected to a record",
             $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}.");
@@ -341,7 +341,7 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "GOV.UK One Login not connected to a record",
             $"Request closed for {firstName} {lastName}.");

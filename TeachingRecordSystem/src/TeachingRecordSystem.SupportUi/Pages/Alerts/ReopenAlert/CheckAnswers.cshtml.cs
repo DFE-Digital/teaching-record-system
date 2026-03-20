@@ -89,7 +89,7 @@ public class CheckAnswersModel(
             processContext);
 
         await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Alert re-opened");
+        TempData.SetFlashNotificationBanner("Alert re-opened");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }

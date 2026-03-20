@@ -29,7 +29,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 // Assert
                 var doc = await AssertEx.HtmlResponseAsync(response);
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
-                Assert.Equal(trn, doc.GetSummaryListValueByKey("Teacher reference number"));
+                Assert.Equal(trn, doc.GetSummaryListValueByKey("TRN"));
             });
 
     [Fact]
@@ -70,7 +70,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal($"{firstName} {lastName}", doc.GetSummaryListValueByKey("Name"));
                 Assert.Equal(dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
-                Assert.Equal(trn, doc.GetSummaryListValueByKey("Teacher reference number"));
+                Assert.Equal(trn, doc.GetSummaryListValueByKey("TRN"));
                 Assert.Equal(proofOfIdentityFileName, doc.GetSummaryListValueByKey("Proof of identity"));
             });
 

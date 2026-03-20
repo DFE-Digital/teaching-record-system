@@ -64,10 +64,11 @@ public class NoMatches(
 
         await JourneyInstance.DeleteAsync();
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             "Email sent",
             $"Request closed for {Name}. " +
-            $"We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.");
+            $"We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.",
+            notificationBannerType: NotificationBannerType.Default);
 
         return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
             linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :

@@ -193,7 +193,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var expectedMessage = targetStatus == PersonStatus.Deactivated
             ? "Lily The Pink\u2019s record has been deactivated"
             : "Lily The Pink\u2019s record has been reactivated";
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage);
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedMessage);
 
         await WithDbContextAsync(async dbContext =>
         {

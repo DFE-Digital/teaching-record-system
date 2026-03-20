@@ -116,7 +116,7 @@ public class CheckAnswers(
             },
             processContext);
 
-        TempData.SetFlashSuccess(
+        TempData.SetFlashNotificationBanner(
             $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(trnRequest.ResolvedPersonId!.Value)));
 

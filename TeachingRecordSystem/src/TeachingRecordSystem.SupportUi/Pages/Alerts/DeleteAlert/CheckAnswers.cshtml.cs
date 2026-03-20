@@ -87,7 +87,7 @@ public class CheckAnswersModel(
             processContext);
 
         await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Alert deleted");
+        TempData.SetFlashNotificationBanner("Alert deleted");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }

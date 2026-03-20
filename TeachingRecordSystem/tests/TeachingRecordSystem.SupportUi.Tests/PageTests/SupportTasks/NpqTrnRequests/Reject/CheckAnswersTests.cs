@@ -148,7 +148,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
 
-        AssertEx.HtmlDocumentHasFlashSuccess(
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"TRN request for {StringHelper.JoinNonEmpty(' ', requestMetadata.FirstName, requestMetadata.MiddleName, requestMetadata.LastName)} rejected");
 

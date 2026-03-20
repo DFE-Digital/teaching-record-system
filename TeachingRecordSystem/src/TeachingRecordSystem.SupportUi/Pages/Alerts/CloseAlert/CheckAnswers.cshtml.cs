@@ -92,7 +92,7 @@ public class CheckAnswersModel(
             processContext);
 
         await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Alert closed");
+        TempData.SetFlashNotificationBanner("Alert closed");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
