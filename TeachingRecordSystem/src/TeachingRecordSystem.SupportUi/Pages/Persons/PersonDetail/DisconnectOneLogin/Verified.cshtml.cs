@@ -28,7 +28,7 @@ public class Verified(SupportUiLinkGenerator linkGenerator) : PageModel
     public string BackLink => FromCheckAnswers == true
         ? linkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers(PersonId, OneLoginSubject!,
             JourneyInstance!.InstanceId)
-        : linkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(PersonId,
+        : linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(PersonId,
             OneLoginSubject!, JourneyInstance!.InstanceId);
 
     public void OnGet()
@@ -63,7 +63,7 @@ public class Verified(SupportUiLinkGenerator linkGenerator) : PageModel
         if (!JourneyInstance!.State.DisconnectReason.HasValue)
         {
             context.Result = Redirect(
-                linkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(
+                linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(
                     PersonId,
                     OneLoginSubject,
                     JourneyInstance.InstanceId));

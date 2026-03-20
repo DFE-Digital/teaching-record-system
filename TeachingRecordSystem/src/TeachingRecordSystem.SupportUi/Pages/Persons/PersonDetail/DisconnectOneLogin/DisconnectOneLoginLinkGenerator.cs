@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOn
 
 public class DisconnectOneLoginLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string DisconnectOneLoginSubject(Guid personId, string oneLoginSubject, JourneyInstanceId? journeyInstanceId,
+    public string Index(Guid personId, string oneLoginSubject, JourneyInstanceId? journeyInstanceId,
         bool? fromCheckAnswers = null) =>
         linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/DisconnectOneLogin/Index",
             routeValues: new { personId, oneLoginSubject, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);

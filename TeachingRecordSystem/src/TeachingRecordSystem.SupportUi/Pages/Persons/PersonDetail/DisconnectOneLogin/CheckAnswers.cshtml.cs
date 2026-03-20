@@ -67,7 +67,7 @@ public class CheckAnswers(
     {
         if (!JourneyInstance!.State.DisconnectReason.HasValue || !JourneyInstance.State.StayVerified.HasValue)
         {
-            context.Result = Redirect(linkGenerator.Persons.PersonDetail.DisconnectOneLogin.DisconnectOneLoginSubject(PersonId, OneLoginSubject, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(PersonId, OneLoginSubject, JourneyInstance.InstanceId));
             return;
         }
     }
