@@ -56,28 +56,15 @@ public class TrnRequestService(
             WorkEmailAddress = options.WorkEmailAddress
         };
 
-        var matchResult = await MatchPersonsAsync(trnRequest);
-
         dbContext.TrnRequestMetadata.Add(trnRequest);
 
         await dbContext.SaveChangesAsync();
 
-        string? trn = null;
+        var result = new TrnRequestInfo(trnRequest, ResolvedPersonTrn: null);
+
         if (options.TryResolve)
         {
-            if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
-            {
-                trn = matchResult.Trn;
-                await ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), publishTrnRequestUpdatedEvent: false, processContext);
-            }
-            else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
-            {
-                trn = await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: false, processContext);
-            }
-            else
-            {
-                Debug.Assert(matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches);
-            }
+            result = await TryResolveAsync(trnRequest, processContext);
         }
 
         await eventScope.PublishEventAsync(
@@ -87,7 +74,7 @@ public class TrnRequestService(
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest)
             });
 
-        return new TrnRequestInfo(trnRequest, trn);
+        return result;
     }
 
     public Task ResolveTrnRequestWithMatchedPersonAsync(
@@ -294,13 +281,9 @@ public class TrnRequestService(
 
     public async Task<TrnRequestInfo?> GetTrnRequestAsync(Guid applicationUserId, string requestId)
     {
-        // TODO Use LeftJoin when we've moved to EF Core 10
-        var result = await (
-                from m in dbContext.TrnRequestMetadata
-                join person in dbContext.Persons on m.ResolvedPersonId equals person.PersonId into pg
-                from p in pg.DefaultIfEmpty()
-                where m.ApplicationUserId == applicationUserId && m.RequestId == requestId
-                select new { TrnRequest = m, Trn = p.Trn })
+        var result = await dbContext.TrnRequestMetadata
+            .Where(m => m.ApplicationUserId == applicationUserId && m.RequestId == requestId)
+            .LeftJoin(dbContext.Persons, m => m.ResolvedPersonId, p => p.PersonId, (m, p) => new { TrnRequest = m, Trn = p!.Trn })
             .SingleOrDefaultAsync();
 
         if (result is null)
@@ -436,6 +419,50 @@ public class TrnRequestService(
                 .Select(r => r.potentialMatch));
     }
 
+    public async Task<TrnRequestInfo> ActivateTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    {
+        if (trnRequest.Status is not TrnRequestStatus.Dormant)
+        {
+            throw new InvalidOperationException($"Only {TrnRequestStatus.Dormant} requests can be activated.");
+        }
+
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
+        var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
+
+        var result = await TryResolveAsync(trnRequest, processContext);
+
+        if (result.TrnRequest.Status is TrnRequestStatus.Pending)
+        {
+            await supportTaskService.CreateSupportTaskAsync(
+                new CreateSupportTaskOptions
+                {
+                    SupportTaskType = SupportTaskType.ApiTrnRequest,
+                    Data = new ApiTrnRequestData(),
+                    PersonId = null,
+                    OneLoginUserSubject = null,
+                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
+                },
+                processContext);
+        }
+
+        var changes = TrnRequestUpdatedChanges.Status | (trnRequest.ResolvedPersonId is not null ? TrnRequestUpdatedChanges.ResolvedPersonId : 0);
+
+        await eventScope.PublishEventAsync(
+            new TrnRequestUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SourceApplicationUserId = trnRequest.ApplicationUserId,
+                RequestId = trnRequest.RequestId,
+                Changes = changes,
+                TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
+                OldTrnRequest = oldTrnRequestEventModel,
+                ReasonDetails = null
+            });
+
+        return result;
+    }
+
     private Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request, Guid? personId = null)
     {
         // Find all Active records with a TRN that match on:
@@ -531,6 +558,28 @@ public class TrnRequestService(
         .Where(a => a is not null)
         .Select(a => a!.Value)
         .ToArray();
+
+    private async Task<TrnRequestInfo> TryResolveAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    {
+        string? trn = null;
+        var matchResult = await MatchPersonsAsync(trnRequest);
+
+        if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
+        {
+            trn = matchResult.Trn;
+            await ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), publishTrnRequestUpdatedEvent: false, processContext);
+        }
+        else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
+        {
+            trn = await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: false, processContext);
+        }
+        else
+        {
+            Debug.Assert(matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches);
+        }
+
+        return new TrnRequestInfo(trnRequest, trn);
+    }
 
 #pragma warning disable IDE1006 // Naming Styles
     private record TrnRequestMatchQueryResult(

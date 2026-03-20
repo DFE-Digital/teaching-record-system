@@ -63,4 +63,9 @@ public class TrnRequestMetadata
 
         Status = TrnRequestStatus.Completed;
     }
+
+    public void SetDormant()
+    {
+        Status = TrnRequestStatus.Dormant;
+    }
 }
