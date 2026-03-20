@@ -141,15 +141,14 @@
                             <govuk-radios-fieldset>
                                 <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
                                     Record matching policy
-                                </govuk-radios-fieldset-legend>
-                                <govuk-radios-hint>Determines whether users must be matched to a teaching record to authenticate</govuk-radios-hint>
+                                </govuk-radios-fieldset-legend>                                
                                 <govuk-radios-item value="@RecordMatchingPolicy.Required">
                                     Required
-                                    <govuk-radios-item-hint>Users must have a matched teaching record to authenticate</govuk-radios-item-hint>
+                                    <govuk-radios-item-hint>Users must be matched to a teaching record to sign in</govuk-radios-item-hint>
                                 </govuk-radios-item>
                                 <govuk-radios-item value="@RecordMatchingPolicy.Deferred">
                                     Deferred
-                                    <govuk-radios-item-hint>Users can authenticate without a matched teaching record; matching can be completed later</govuk-radios-item-hint>
+                                    <govuk-radios-item-hint>Users can sign in without a teaching record and be allocated one later</govuk-radios-item-hint>
                                 </govuk-radios-item>
                             </govuk-radios-fieldset>
                         </govuk-radios>
