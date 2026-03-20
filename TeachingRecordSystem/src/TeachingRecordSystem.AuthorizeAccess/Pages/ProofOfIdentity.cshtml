@@ -10,6 +10,13 @@
         <form method="post" enctype="multipart/form-data" name="proof-of-identity-form">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
+            <govuk-file-upload for="File" input-accept=".pdf, .jpg, .jpeg, .png">
+                <govuk-file-upload-label class="govuk-label--s">Upload a file</govuk-file-upload-label>
+                <govuk-file-upload-hint>
+                    You can upload a PDF, JPG or PNG file no larger than @(ProofOfIdentity.MaxFileSizeMb)MB
+                </govuk-file-upload-hint>
+            </govuk-file-upload>
+
             <govuk-details>
                 <govuk-details-summary>Documents we accept</govuk-details-summary>
                 <govuk-details-text>
@@ -21,13 +28,6 @@
                     </ul>
                 </govuk-details-text>
             </govuk-details>
-
-            <govuk-file-upload for="File" input-accept=".pdf, .jpg, .jpeg, .png">
-                <govuk-file-upload-label class="govuk-label--s">Upload a file</govuk-file-upload-label>
-                <govuk-file-upload-hint>
-                    You can upload a PDF, JPG or PNG file no larger than @(ProofOfIdentity.MaxFileSizeMb)MB
-                </govuk-file-upload-hint>
-            </govuk-file-upload>
 
             <govuk-button type="submit">Continue</govuk-button>
         </form>
