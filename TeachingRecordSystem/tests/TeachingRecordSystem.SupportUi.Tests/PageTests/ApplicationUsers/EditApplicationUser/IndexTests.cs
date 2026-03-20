@@ -248,7 +248,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
                 { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
-                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath }
+                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath },
+                { "RecordMatchingPolicy", RecordMatchingPolicy.Deferred.ToString() }
             }
         };
 
@@ -299,6 +300,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(oneLoginAuthenticationSchemeName, applicationUserUpdatedEvent.ApplicationUser.OneLoginAuthenticationSchemeName);
                 Assert.Equal(oneLoginRedirectUriPath, applicationUserUpdatedEvent.ApplicationUser.OneLoginRedirectUriPath);
                 Assert.Equal(oneLoginPostLogoutRedirectUriPath, applicationUserUpdatedEvent.ApplicationUser.OneLoginPostLogoutRedirectUriPath);
+                Assert.Equal(RecordMatchingPolicy.Required, applicationUserUpdatedEvent.OldApplicationUser.RecordMatchingPolicy);
+                Assert.Equal(RecordMatchingPolicy.Deferred, applicationUserUpdatedEvent.ApplicationUser.RecordMatchingPolicy);
                 Assert.Equal(
                     ApplicationUserUpdatedEventChanges.ApiRoles |
                         ApplicationUserUpdatedEventChanges.Name |
@@ -312,7 +315,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem |
                         ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName |
                         ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath |
-                        ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath,
+                        ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath |
+                        ApplicationUserUpdatedEventChanges.RecordMatchingPolicy,
                     applicationUserUpdatedEvent.Changes);
             });
 

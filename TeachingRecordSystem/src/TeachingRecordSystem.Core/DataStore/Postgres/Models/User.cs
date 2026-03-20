@@ -65,6 +65,7 @@ public class ApplicationUser : UserBase
     public string? OneLoginAuthenticationSchemeName { get; set; }
     public string? OneLoginRedirectUriPath { get; set; }
     public string? OneLoginPostLogoutRedirectUriPath { get; set; }
+    public RecordMatchingPolicy RecordMatchingPolicy { get; set; } = RecordMatchingPolicy.Required;
 
     [MemberNotNull(
         nameof(OneLoginClientId),

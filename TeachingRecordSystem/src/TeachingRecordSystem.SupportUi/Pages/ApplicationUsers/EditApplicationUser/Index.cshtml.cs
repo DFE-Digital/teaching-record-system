@@ -85,6 +85,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public string? OneLoginPostLogoutRedirectUriPath { get; set; }
 
+    public RecordMatchingPolicy RecordMatchingPolicy { get; set; }
+
     public void OnGet()
     {
         Name = _user!.Name;
@@ -100,6 +102,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         OneLoginPrivateKeyPem = _user.OneLoginPrivateKeyPem;
         OneLoginRedirectUriPath = _user.OneLoginRedirectUriPath;
         OneLoginPostLogoutRedirectUriPath = _user.OneLoginPostLogoutRedirectUriPath;
+        RecordMatchingPolicy = _user.RecordMatchingPolicy;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -188,7 +191,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 (OneLoginAuthenticationSchemeName != _user.OneLoginAuthenticationSchemeName ? ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName : 0) |
                 (OneLoginRedirectUriPath != _user.OneLoginRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath : 0) |
                 (OneLoginPostLogoutRedirectUriPath != _user.OneLoginPostLogoutRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath : 0) |
-                (UseSharedOneLoginSigningKeys != _user.UseSharedOneLoginSigningKeys ? ApplicationUserUpdatedEventChanges.UseSharedOneLoginSigningKeys : 0);
+                (UseSharedOneLoginSigningKeys != _user.UseSharedOneLoginSigningKeys ? ApplicationUserUpdatedEventChanges.UseSharedOneLoginSigningKeys : 0) |
+                (RecordMatchingPolicy != _user.RecordMatchingPolicy ? ApplicationUserUpdatedEventChanges.RecordMatchingPolicy : 0);
         }
 
         if (changes != ApplicationUserUpdatedEventChanges.None)
@@ -215,6 +219,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 }
                 _user.OneLoginRedirectUriPath = OneLoginRedirectUriPath;
                 _user.OneLoginPostLogoutRedirectUriPath = OneLoginPostLogoutRedirectUriPath;
+                _user.RecordMatchingPolicy = RecordMatchingPolicy;
             }
 
             var @event = new ApplicationUserUpdatedEvent()

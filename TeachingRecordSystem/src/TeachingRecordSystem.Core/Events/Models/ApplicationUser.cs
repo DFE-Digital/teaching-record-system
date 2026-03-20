@@ -17,6 +17,7 @@ public record ApplicationUser
     public required string? OneLoginRedirectUriPath { get; init; }
     public required string? OneLoginPostLogoutRedirectUriPath { get; init; }
     public string? ShortName { get; init; }
+    public required Core.Models.RecordMatchingPolicy RecordMatchingPolicy { get; init; }
 
     public static ApplicationUser FromModel(DataStore.Postgres.Models.ApplicationUser user) => new()
     {
@@ -33,6 +34,7 @@ public record ApplicationUser
         OneLoginPrivateKeyPem = user.OneLoginPrivateKeyPem,
         OneLoginAuthenticationSchemeName = user.OneLoginAuthenticationSchemeName,
         OneLoginRedirectUriPath = user.OneLoginRedirectUriPath,
-        OneLoginPostLogoutRedirectUriPath = user.OneLoginPostLogoutRedirectUriPath
+        OneLoginPostLogoutRedirectUriPath = user.OneLoginPostLogoutRedirectUriPath,
+        RecordMatchingPolicy = user.RecordMatchingPolicy
     };
 }
