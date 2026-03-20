@@ -76,6 +76,7 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.FillAsync("text=One Login private key", newOneLoginPrivateKeyPem);
         await page.FillAsync("text=One Login redirect URI path", newOneLoginRedirectUri);
         await page.FillAsync("text=One Login post logout redirect URI path", newOneLoginPostLogoutRedirectUri);
+        await page.CheckAsync("input[value='Deferred']:below(legend:has-text('Record matching policy'))");
 
         await page.ClickButtonAsync("Save changes");
 

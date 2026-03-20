@@ -43,6 +43,7 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
         builder.Property(e => e.OneLoginAuthenticationSchemeName).HasMaxLength(ApplicationUser.AuthenticationSchemeNameMaxLength);
         builder.Property(e => e.OneLoginRedirectUriPath).HasMaxLength(ApplicationUser.RedirectUriPathMaxLength);
         builder.Property(e => e.OneLoginPostLogoutRedirectUriPath).HasMaxLength(ApplicationUser.RedirectUriPathMaxLength);
+        builder.Property(e => e.RecordMatchingPolicy).IsRequired().HasDefaultValue(RecordMatchingPolicy.Required);
         builder.HasIndex(e => e.OneLoginAuthenticationSchemeName).IsUnique().HasDatabaseName(ApplicationUser.OneLoginAuthenticationSchemeNameUniqueIndexName)
             .HasFilter("one_login_authentication_scheme_name is not null");
         builder.HasIndex(e => e.ClientId).IsUnique().HasDatabaseName(ApplicationUser.ClientIdUniqueIndexName).HasFilter("client_id is not null");

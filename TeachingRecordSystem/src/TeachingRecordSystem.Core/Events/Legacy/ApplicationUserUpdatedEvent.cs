@@ -25,5 +25,6 @@ public enum ApplicationUserUpdatedEventChanges
     RedirectUris = 1 << 10,
     PostLogoutRedirectUris = 1 << 11,
     ShortName = 1 << 12,
-    UseSharedOneLoginSigningKeys = 1 << 13
+    UseSharedOneLoginSigningKeys = 1 << 13,
+    RecordMatchingPolicy = 1 << 14
 }
