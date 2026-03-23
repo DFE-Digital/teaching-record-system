@@ -1,5 +1,8 @@
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
@@ -20,6 +23,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         var service = new WebhookDeliveryService(
             senderMock.Object,
             DbContextFactory,
+            CreateDummyOptions(),
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -51,6 +55,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         var service = new WebhookDeliveryService(
             senderMock.Object,
             DbContextFactory,
+            CreateDummyOptions(),
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -76,6 +81,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         var service = new WebhookDeliveryService(
             senderMock.Object,
             DbContextFactory,
+            CreateDummyOptions(),
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -98,6 +104,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         var service = new WebhookDeliveryService(
             senderMock.Object,
             DbContextFactory,
+            CreateDummyOptions(),
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -128,6 +135,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         var service = new WebhookDeliveryService(
             senderMock.Object,
             DbContextFactory,
+            CreateDummyOptions(),
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -182,6 +190,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         var service = new WebhookDeliveryService(
             senderMock.Object,
             DbContextFactory,
+            CreateDummyOptions(),
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -278,4 +287,23 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
 
             return message;
         });
+
+    private static IOptions<WebhookOptions> CreateDummyOptions()
+    {
+        var sigingKey = ECDsa.Create(ECCurve.NamedCurves.nistP384);
+        var certRequest = new CertificateRequest("CN=Tests", sigingKey, HashAlgorithmName.SHA384);
+        var certificate = certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddDays(1));
+        var certificatePem = certificate.ExportCertificatePem();
+        var keyPem = sigingKey.ExportECPrivateKeyPem();
+
+        return Options.Create(new WebhookOptions
+        {
+            CanonicalDomain = "https://dummy",
+            SigningKeyId = "key",
+            Keys =
+            [
+                new WebhookOptionsKey { KeyId = "key", CertificatePem = certificatePem, PrivateKeyPem = keyPem }
+            ]
+        });
+    }
 }

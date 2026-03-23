@@ -28,6 +28,8 @@ public class WebhookOptions
 
     public int MessageExpirySeconds { get; set; } = 5 * 60;  // 5 minutes
 
+    public bool CaptureFailedRequests { get; set; }
+
     public JsonWebKeySet GetJsonWebKeySet()
     {
         return _jsonWebKeySet ??= CreateJsonWebKeySet();
