@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Polly;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
@@ -8,6 +9,7 @@ namespace TeachingRecordSystem.Core.Services.Webhooks;
 public class WebhookDeliveryService(
     IWebhookSender webhookSender,
     IDbContextFactory<TrsDbContext> dbContextFactory,
+    IOptions<WebhookOptions> webhookOptionsAccessor,
     TimeProvider timeProvider,
     ILogger<WebhookDeliveryService> logger) : BackgroundService
 {
@@ -115,6 +117,15 @@ public class WebhookDeliveryService(
                     logger.Log(logLevel, ex, "Failed delivering webhook message.");
 
                     message.DeliveryErrors.Add(ex.Message);
+
+                    if (webhookOptionsAccessor.Value.CaptureFailedRequests)
+                    {
+                        var failedRequestMessage = ex is WebhookMessageDeliveryException { RawRequest: not null } wmde
+                            ? wmde.RawRequest
+                            : "[No request captured]";
+
+                        message.FailedRequests.Add(failedRequestMessage);
+                    }
 
                     if (message.DeliveryAttempts.Count <= RetryIntervals.Length)
                     {

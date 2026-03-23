@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using CloudNative.CloudEvents;
 using CloudNative.CloudEvents.Http;
 using CloudNative.CloudEvents.SystemTextJson;
@@ -19,7 +21,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
     public const string TagName = "trs-webhooks";
     private const string DataContentType = "application/json; charset=utf-8";
     private const string SignatureName = "sig1";
-    private const string UserAgent = "Teaching Record System";
+    private const string UserAgent = "TeachingRecordSystem";
     private const int TimeoutSeconds = 30;
 
     private readonly CloudEventFormatter _formatter = new JsonEventFormatter();
@@ -34,7 +36,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
 
         var source = new Uri(optionsAccessor.Value.CanonicalDomain);
 
-        var cloudEvent = new CloudEvent()
+        var cloudEvent = new CloudEvent
         {
             Id = message.CloudEventId,
             Source = source,
@@ -47,11 +49,18 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
 
         var request = new HttpRequestMessage(HttpMethod.Post, message.WebhookEndpoint.Address)
         {
-            Content = cloudEvent.ToHttpContent(ContentMode.Binary, _formatter)
+            Content = cloudEvent.ToHttpContent(ContentMode.Binary, _formatter),
+            Version = HttpVersion.Version11
         };
 
         var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
-        response.EnsureSuccessStatusCode();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new WebhookMessageDeliveryException(
+                response,
+                optionsAccessor.Value.CaptureFailedRequests ? await GetRawRequestMessageAsync(request) : null);
+        }
     }
 
     public static void Register(IServiceCollection services, Func<HttpMessageHandler>? getPrimaryHandler = null)
@@ -64,7 +73,8 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
 
         IOptions<MessageSigningOptions> GetMessageSigningOptions(IServiceProvider serviceProvider)
         {
-            var keyId = serviceProvider.GetRequiredService<IOptions<WebhookOptions>>().Value.SigningKeyId;
+            var webhookOptions = serviceProvider.GetRequiredService<IOptions<WebhookOptions>>().Value;
+            var keyId = webhookOptions.SigningKeyId;
 
             var options = new MessageSigningOptions();
 
@@ -80,7 +90,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
                 .SetParameters = signingOptions => signingOptions
                     .WithTag(TagName)
                     .WithCreatedNow()
-                    .WithExpires(DateTimeOffset.UtcNow.AddMinutes(5))
+                    .WithExpires(DateTimeOffset.UtcNow.AddSeconds(webhookOptions.MessageExpirySeconds))
                     .WithAlgorithm(SignatureAlgorithm.EcdsaP384Sha384)
                     .WithKeyId(keyId)
                     .WithNonce(Guid.NewGuid().ToString("N"));
@@ -115,7 +125,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
             {
                 client.Timeout = TimeSpan.FromSeconds(TimeoutSeconds);
                 client.DefaultRequestHeaders.ExpectContinue = false;
-                client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
+                client.DefaultRequestHeaders.UserAgent.TryParseAdd(UserAgent);
             })
             .AddHttpMessageHandler(sp =>
                 ActivatorUtilities.CreateInstance<AddContentDigestHandler>(
@@ -132,5 +142,34 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
         {
             httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() => getPrimaryHandler());
         }
+    }
+
+    private async Task<string> GetRawRequestMessageAsync(HttpRequestMessage request)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine($"{request.Method} {request.RequestUri} HTTP/{request.Version}");
+
+        foreach (var header in request.Headers)
+        {
+            sb.AppendLine($"{header.Key}: {string.Join(", ", header.Value)}");
+        }
+
+        if (request.Content is not null)
+        {
+            foreach (var header in request.Content.Headers)
+            {
+                sb.AppendLine($"{header.Key}: {string.Join(", ", header.Value)}");
+            }
+
+            sb.AppendLine();
+            sb.AppendLine(await request.Content.ReadAsStringAsync());
+        }
+        else
+        {
+            sb.AppendLine();
+        }
+
+        return sb.ToString();
     }
 }

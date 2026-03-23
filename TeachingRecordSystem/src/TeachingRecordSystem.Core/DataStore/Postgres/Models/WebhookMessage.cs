@@ -16,4 +16,5 @@ public class WebhookMessage
     public DateTime? Delivered { get; set; }
     public List<DateTime> DeliveryAttempts { get; set; } = [];
     public List<string> DeliveryErrors { get; set; } = [];
+    public List<string> FailedRequests { get; set; } = [];
 }

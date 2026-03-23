@@ -7,6 +7,8 @@ namespace TeachingRecordSystem.Core.Services.Webhooks;
 
 public class WebhookOptions
 {
+    private JsonWebKeySet? _jsonWebKeySet;
+
     [Required]
     public required string CanonicalDomain { get; set; }
 
@@ -14,37 +16,52 @@ public class WebhookOptions
     public required string SigningKeyId { get; set; }
 
     [Required]
-    public required WebhookOptionsKey[] Keys { get; set; }
+    public required WebhookOptionsKey[] Keys
+    {
+        get;
+        set
+        {
+            _jsonWebKeySet = null;  // Clear the cached JsonWebKeySet if the keys are changed
+            field = value;
+        }
+    }
+
+    public int MessageExpirySeconds { get; set; } = 5 * 60;  // 5 minutes
+
+    public bool CaptureFailedRequests { get; set; }
 
     public JsonWebKeySet GetJsonWebKeySet()
     {
-        // FUTURE memoize this
+        return _jsonWebKeySet ??= CreateJsonWebKeySet();
 
-        var keySet = new JsonWebKeySet();
-
-        foreach (var key in Keys)
+        JsonWebKeySet CreateJsonWebKeySet()
         {
-            using var certificate = X509Certificate2.CreateFromPem(key.CertificatePem);
-            var securityKey = new ECDsaSecurityKey(certificate.GetECDsaPublicKey());
+            var keySet = new JsonWebKeySet();
 
-            var jsonWebKey = JsonWebKeyConverter.ConvertFromECDsaSecurityKey(securityKey);
-            jsonWebKey.Use = "sig";
-            jsonWebKey.Alg = "ES384";
-            jsonWebKey.KeyId = key.KeyId;
+            foreach (var key in Keys)
+            {
+                using var certificate = X509Certificate2.CreateFromPem(key.CertificatePem);
+                var securityKey = new ECDsaSecurityKey(certificate.GetECDsaPublicKey());
 
-            var certChain = certificate.ExportCertificatePem().Split("\n")
-                .Skip(1)  // Remove -----BEGIN CERTIFICATE-----
-                .SkipLast(1)  // Remove -----END CERTIFICATE-----
-                .Aggregate((l, r) => l + r);
+                var jsonWebKey = JsonWebKeyConverter.ConvertFromECDsaSecurityKey(securityKey);
+                jsonWebKey.Use = "sig";
+                jsonWebKey.Alg = "ES384";
+                jsonWebKey.KeyId = key.KeyId;
 
-            jsonWebKey.X5c.Add(certChain);
+                var certChain = certificate.ExportCertificatePem().Split("\n")
+                    .Skip(1) // Remove -----BEGIN CERTIFICATE-----
+                    .SkipLast(1) // Remove -----END CERTIFICATE-----
+                    .Aggregate((l, r) => l + r);
 
-            Debug.Assert(!jsonWebKey.HasPrivateKey);
+                jsonWebKey.X5c.Add(certChain);
 
-            keySet.Keys.Add(jsonWebKey);
+                Debug.Assert(!jsonWebKey.HasPrivateKey);
+
+                keySet.Keys.Add(jsonWebKey);
+            }
+
+            return keySet;
         }
-
-        return keySet;
     }
 }
 
