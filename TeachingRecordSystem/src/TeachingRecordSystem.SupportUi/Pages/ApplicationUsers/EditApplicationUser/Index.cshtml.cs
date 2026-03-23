@@ -43,10 +43,10 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             .NotNull().WithMessage("Select whether to use shared One Login signing keys").When(m => m.IsOidcClient),
         v => v.RuleFor(m => m.OneLoginRedirectUriPath)
             .NotEmpty().WithMessage("Enter the One Login redirect URI").When(m => m.IsOidcClient)
-            .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login redirect URI must be 100 characters or less").When(m => m.IsOidcClient),
+            .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login redirect URI must be 150 characters or less").When(m => m.IsOidcClient),
         v => v.RuleFor(m => m.OneLoginPostLogoutRedirectUriPath)
             .NotEmpty().WithMessage("Enter the One Login post logout redirect URI").When(m => m.IsOidcClient)
-            .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login post logout redirect URI must be 100 characters or less").When(m => m.IsOidcClient)
+            .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login post logout redirect URI must be 150 characters or less").When(m => m.IsOidcClient)
     };
 
     private ApplicationUser? _user;

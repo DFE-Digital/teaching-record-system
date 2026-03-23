@@ -40,7 +40,7 @@ public class ApplicationUser : UserBase
     }
 
     public const int AuthenticationSchemeNameMaxLength = 50;
-    public const int RedirectUriPathMaxLength = 100;
+    public const int RedirectUriPathMaxLength = 150;
     public const int ClientIdMaxLength = 50;
     public const int ClientSecretMaxLength = 200;
     public const int ClientSecretMinLength = 16;
