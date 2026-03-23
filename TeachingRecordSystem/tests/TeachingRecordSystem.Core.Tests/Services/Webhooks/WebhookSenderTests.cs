@@ -115,11 +115,11 @@ public sealed class WebhookReceiver : IDisposable
 
         builder.WebHost.UseTestServer();
 
-        var sigingKey = ECDsa.Create(ECCurve.NamedCurves.nistP384);
-        var certRequest = new CertificateRequest("CN=Tests", sigingKey, HashAlgorithmName.SHA384);
+        var signingKey = ECDsa.Create(ECCurve.NamedCurves.nistP384);
+        var certRequest = new CertificateRequest("CN=Tests", signingKey, HashAlgorithmName.SHA384);
         var certificate = certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddDays(1));
         var certificatePem = certificate.ExportCertificatePem();
-        var keyPem = sigingKey.ExportECPrivateKeyPem();
+        var keyPem = signingKey.ExportECPrivateKeyPem();
 
         builder.Services.Configure<WebhookOptions>(options =>
         {
