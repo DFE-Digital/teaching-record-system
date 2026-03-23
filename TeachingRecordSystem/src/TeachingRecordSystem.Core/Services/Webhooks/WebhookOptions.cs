@@ -16,6 +16,8 @@ public class WebhookOptions
     [Required]
     public required WebhookOptionsKey[] Keys { get; set; }
 
+    public int MessageExpirySeconds { get; set; } = 5 * 60;  // 5 minutes
+
     public JsonWebKeySet GetJsonWebKeySet()
     {
         // FUTURE memoize this

@@ -64,7 +64,8 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
 
         IOptions<MessageSigningOptions> GetMessageSigningOptions(IServiceProvider serviceProvider)
         {
-            var keyId = serviceProvider.GetRequiredService<IOptions<WebhookOptions>>().Value.SigningKeyId;
+            var webhookOptions = serviceProvider.GetRequiredService<IOptions<WebhookOptions>>().Value;
+            var keyId = webhookOptions.SigningKeyId;
 
             var options = new MessageSigningOptions();
 
@@ -80,7 +81,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
                 .SetParameters = signingOptions => signingOptions
                     .WithTag(TagName)
                     .WithCreatedNow()
-                    .WithExpires(DateTimeOffset.UtcNow.AddMinutes(5))
+                    .WithExpires(DateTimeOffset.UtcNow.AddSeconds(webhookOptions.MessageExpirySeconds))
                     .WithAlgorithm(SignatureAlgorithm.EcdsaP384Sha384)
                     .WithKeyId(keyId)
                     .WithNonce(Guid.NewGuid().ToString("N"));
