@@ -615,8 +615,8 @@
       },
       "Npgsql": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "XyUcxEfqlFomhNTG/ZdGlec+uSOQArKz0Mzz8jYKP/Jj9GM2YabU5CVZtp0yiC4f9hRp+tRZTnHMatJeJ3rwgw==",
+        "resolved": "10.0.2",
+        "contentHash": "q5RfBI+wywJSFUNDE1L4ZbHEHCFTblo8Uf6A6oe4feOUFYiUQXyAf9GBh5qEZpvJaHiEbpBPkQumjEhXCJxdrg==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "10.0.0"
         }
@@ -864,7 +864,7 @@
           "Microsoft.Extensions.Options.DataAnnotations": "[10.0.5, )",
           "NSign.Client": "[1.2.3, )",
           "NSign.SignatureProviders": "[1.2.3, )",
-          "Npgsql.DependencyInjection": "[10.0.0, )",
+          "Npgsql.DependencyInjection": "[10.0.2, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
           "OneOf": "[3.0.271, )",
           "OpenIddict.EntityFrameworkCore": "[7.2.0, )",
@@ -1366,12 +1366,12 @@
       },
       "Npgsql.DependencyInjection": {
         "type": "CentralTransitive",
-        "requested": "[10.0.0, )",
-        "resolved": "10.0.0",
-        "contentHash": "htuxMDQ7nHgadPxoO6XXVvSgYcVierLrhzOoamyUchvC4oHnYdD05zZ0dYsq80DN0vco9t/Vp+ZxYvnfJxbhIg==",
+        "requested": "[10.0.2, )",
+        "resolved": "10.0.2",
+        "contentHash": "/Efri6iP5Z2kj3amM/WPMoa0pzOBaIM+C+uMXltaBMu2hVZciNluuK51Mn2FmWKhqwTcMZdwHYUfbm8LbKRJMQ==",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
-          "Npgsql": "10.0.0"
+          "Npgsql": "10.0.2"
         }
       },
       "Npgsql.EntityFrameworkCore.PostgreSQL": {

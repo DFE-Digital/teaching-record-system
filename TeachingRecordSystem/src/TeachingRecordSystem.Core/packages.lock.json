@@ -371,12 +371,12 @@
       },
       "Npgsql.DependencyInjection": {
         "type": "Direct",
-        "requested": "[10.0.0, )",
-        "resolved": "10.0.0",
-        "contentHash": "htuxMDQ7nHgadPxoO6XXVvSgYcVierLrhzOoamyUchvC4oHnYdD05zZ0dYsq80DN0vco9t/Vp+ZxYvnfJxbhIg==",
+        "requested": "[10.0.2, )",
+        "resolved": "10.0.2",
+        "contentHash": "/Efri6iP5Z2kj3amM/WPMoa0pzOBaIM+C+uMXltaBMu2hVZciNluuK51Mn2FmWKhqwTcMZdwHYUfbm8LbKRJMQ==",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
-          "Npgsql": "10.0.0"
+          "Npgsql": "10.0.2"
         }
       },
       "Npgsql.EntityFrameworkCore.PostgreSQL": {
@@ -1129,8 +1129,8 @@
       },
       "Npgsql": {
         "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "xZAYhPOU2rUIFpV48xsqhCx9vXs6Y+0jX2LCoSEfDFYMw9jtAOUk3iQsCnDLrFIv9NT3JGMihn7nnuZsPKqJmA==",
+        "resolved": "10.0.2",
+        "contentHash": "q5RfBI+wywJSFUNDE1L4ZbHEHCFTblo8Uf6A6oe4feOUFYiUQXyAf9GBh5qEZpvJaHiEbpBPkQumjEhXCJxdrg==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "10.0.0"
         }
