@@ -25,11 +25,8 @@ provider "statuscake" {
 }
 
 provider "airbyte" {
-  # Configuration options
   server_url = var.airbyte_enabled ? "https://airbyte-${var.namespace}.${module.cluster_data.ingress_domain}/api/public/v1" : ""
 
-  # client_id = var.airbyte_enabled ? data.azurerm_key_vault_secret.airbyte_client_id[0].value : ""
-  # client_secret = var.airbyte_enabled ? data.azurerm_key_vault_secret.airbyte_client_secret[0].value: ""
   client_id     = var.airbyte_enabled ? module.infrastructure_secrets.map.AIRBYTE-CLIENT-ID : ""
-  client_secret = var.airbyte_enabled ? module.infrastructure_secrets.map.AIRBYTE-CLIENT-SECRET: ""
+  client_secret = var.airbyte_enabled ? module.infrastructure_secrets.map.AIRBYTE-CLIENT-SECRET : ""
 }
