@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,11 +8,11 @@ public class TrainingSubjectMapping : IEntityTypeConfiguration<TrainingSubject>
 {
     public void Configure(EntityTypeBuilder<TrainingSubject> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("training_subjects");
         builder.HasKey(x => x.TrainingSubjectId);
         builder.Property(x => x.Reference).IsRequired().HasMaxLength(10);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(200);
         builder.Property(x => x.IsActive).IsRequired();
-
     }
 }

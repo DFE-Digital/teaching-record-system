@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,6 +8,7 @@ public class RouteToProfessionalStatusTypeMapping : IEntityTypeConfiguration<Rou
 {
     public void Configure(EntityTypeBuilder<RouteToProfessionalStatusType> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("route_to_professional_status_types");
         builder.Property(x => x.ProfessionalStatusType).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();

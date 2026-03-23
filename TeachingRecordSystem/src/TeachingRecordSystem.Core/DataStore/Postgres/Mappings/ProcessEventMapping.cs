@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -8,13 +9,15 @@ public class ProcessEventMapping : IEntityTypeConfiguration<ProcessEvent>
 {
     public void Configure(EntityTypeBuilder<ProcessEvent> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("process_events");
         builder.Property(e => e.EventName).HasMaxLength(200);
         builder.Property(e => e.Payload)
             .HasColumnType("jsonb")
             .HasConversion(
                 v => JsonSerializer.Serialize(v, IEvent.SerializerOptions),
-                v => JsonSerializer.Deserialize<IEvent>(v, IEvent.SerializerOptions)!);
+                v => JsonSerializer.Deserialize<IEvent>(v, IEvent.SerializerOptions)!)
+            .ConfigureAnalyticsSync(hidden: true);
         builder.Property(e => e.OneLoginUserSubjects).HasColumnType("varchar(255)[]");
         builder.HasOne<Process>().WithMany(a => a.Events).HasForeignKey(ae => ae.ProcessId).HasConstraintName("fk_process_events_process_process_id");
         builder.HasIndex(e => new { e.PersonIds, e.EventName }).HasMethod("GIN").IsCreatedConcurrently();

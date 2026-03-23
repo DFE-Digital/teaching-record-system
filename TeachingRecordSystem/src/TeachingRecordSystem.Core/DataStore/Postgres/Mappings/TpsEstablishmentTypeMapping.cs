@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,12 +8,12 @@ public class TpsEstablishmentTypeMapping : IEntityTypeConfiguration<TpsEstablish
 {
     public void Configure(EntityTypeBuilder<TpsEstablishmentType> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("tps_establishment_types");
         builder.HasKey(e => e.TpsEstablishmentTypeId);
         builder.Property(e => e.EstablishmentRangeFrom).HasMaxLength(4).IsFixedLength().IsRequired();
         builder.Property(e => e.EstablishmentRangeTo).HasMaxLength(4).IsFixedLength().IsRequired();
         builder.Property(e => e.Description).HasMaxLength(300).IsRequired();
         builder.Property(e => e.ShortDescription).HasMaxLength(120).IsRequired();
-
     }
 }

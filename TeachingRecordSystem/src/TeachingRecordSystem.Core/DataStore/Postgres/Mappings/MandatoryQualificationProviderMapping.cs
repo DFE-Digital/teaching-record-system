@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,6 +8,7 @@ public class MandatoryQualificationProviderMapping : IEntityTypeConfiguration<Ma
 {
     public void Configure(EntityTypeBuilder<MandatoryQualificationProvider> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("mandatory_qualification_providers");
         builder.HasKey(p => p.MandatoryQualificationProviderId);
         builder.Property(p => p.Name).HasMaxLength(200);

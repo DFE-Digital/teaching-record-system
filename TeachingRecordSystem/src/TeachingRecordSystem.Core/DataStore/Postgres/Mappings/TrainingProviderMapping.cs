@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,6 +8,7 @@ public class TrainingProviderMapping : IEntityTypeConfiguration<TrainingProvider
 {
     public void Configure(EntityTypeBuilder<TrainingProvider> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("training_providers");
         builder.HasKey(x => x.TrainingProviderId);
         builder.HasIndex(x => x.Ukprn).HasDatabaseName(TrainingProvider.UkprnIndexName).IsUnique();

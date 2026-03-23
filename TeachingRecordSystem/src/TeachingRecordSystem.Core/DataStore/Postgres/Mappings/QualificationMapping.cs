@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,6 +8,7 @@ public class QualificationMapping : IEntityTypeConfiguration<Qualification>
 {
     public void Configure(EntityTypeBuilder<Qualification> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("qualifications");
         builder.HasKey(q => q.QualificationId);
         builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(Qualification.DeletedOn)) == null);

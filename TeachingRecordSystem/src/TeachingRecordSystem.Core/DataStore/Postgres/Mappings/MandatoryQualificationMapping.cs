@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,6 +8,7 @@ public class MandatoryQualificationMapping : IEntityTypeConfiguration<MandatoryQ
 {
     public void Configure(EntityTypeBuilder<MandatoryQualification> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.HasOne(q => q.Provider).WithMany().HasForeignKey(p => p.ProviderId).HasConstraintName("fk_qualifications_mandatory_qualification_provider");
         builder.Navigation(q => q.Provider).AutoInclude();
         builder.Property(q => q.ProviderId).HasColumnName("mq_provider_id");

@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,12 +8,13 @@ public class AlertMapping : IEntityTypeConfiguration<Alert>
 {
     public void Configure(EntityTypeBuilder<Alert> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("alerts");
         builder.HasKey(x => x.AlertId);
         builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(Alert.DeletedOn)) == null);
         builder.Property(x => x.AlertTypeId).IsRequired();
         builder.Property(x => x.PersonId).IsRequired();
-        builder.Property(x => x.Details);
+        builder.Property(x => x.Details).ConfigureAnalyticsSync(hidden: true);
         builder.HasIndex(x => x.AlertTypeId).HasDatabaseName(Alert.AlertTypeIdIndexName);
         builder.HasOne(x => x.AlertType).WithMany().HasForeignKey(x => x.AlertTypeId).HasConstraintName(Alert.AlertTypeForeignKeyName);
         builder.Navigation(x => x.AlertType).AutoInclude();
