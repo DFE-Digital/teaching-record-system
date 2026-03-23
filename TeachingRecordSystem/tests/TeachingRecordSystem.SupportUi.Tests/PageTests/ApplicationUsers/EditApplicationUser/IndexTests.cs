@@ -423,10 +423,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "client_id",
             _privateKeyPem,
             Guid.NewGuid().ToString(),
-            new string('x', 101),  // OneLoginRedirectUriPath
+            new string('x', 151),  // OneLoginRedirectUriPath
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginRedirectUriPath",
-            "One Login redirect URI must be 100 characters or less"
+            "One Login redirect URI must be 150 characters or less"
         ),
         (
             Guid.NewGuid().ToString(),
@@ -437,9 +437,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             _privateKeyPem,
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
-            new string('x', 101),  // OneLoginPostLogoutRedirectUriPath
+            new string('x', 151),  // OneLoginPostLogoutRedirectUriPath
             "OneLoginPostLogoutRedirectUriPath",
-            "One Login post logout redirect URI must be 100 characters or less"
+            "One Login post logout redirect URI must be 150 characters or less"
         ),
         (
             "",
