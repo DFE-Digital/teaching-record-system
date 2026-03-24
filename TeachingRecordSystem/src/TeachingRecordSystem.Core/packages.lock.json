@@ -63,13 +63,12 @@
       },
       "DfeAnalytics.EFCore": {
         "type": "Direct",
-        "requested": "[0.4.2-alpha.0.2, )",
-        "resolved": "0.4.2-alpha.0.2",
-        "contentHash": "d+ywMwvtAOZmg/+8jwrx0cIehdpCVTCgJFfJ2ndb8Il4DltEdALW/MCdi43tLD9h12OCNI6KApBvTCZHEfxGgQ==",
+        "requested": "[0.4.2, )",
+        "resolved": "0.4.2",
+        "contentHash": "+cnQSlFfS98/94KsKDuj7rQrsqEPU+5CJu1g+xoSjM4j2jeht/mARdAjbH6emJspu5DaqmsbtV+rMZCjh8vl0g==",
         "dependencies": {
-          "DfeAnalytics.Core": "0.4.2-alpha.0.2",
+          "DfeAnalytics.Core": "0.4.2",
           "Microsoft.EntityFrameworkCore": "10.0.0",
-          "Microsoft.EntityFrameworkCore.Design": "10.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "10.0.0",
           "Microsoft.Extensions.Http": "8.0.0",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0",
@@ -591,8 +590,8 @@
       },
       "DfeAnalytics.Core": {
         "type": "Transitive",
-        "resolved": "0.4.2-alpha.0.2",
-        "contentHash": "2utvUzmCpLn1nupVXie7XlA0UNX/WWRLgDgGbdq81OGVMjAjB9ZDsFCNi/tYWbl6mtNrCsOU6LkjcI6GN/INfA==",
+        "resolved": "0.4.2",
+        "contentHash": "/XADpdLhar8PAaCX3t9S0Z7+UkupsmfoC2r3UGDIegQ8sJkwzvvbrB4j0VgifeKXIegtDKMLrGsoPNodK3N0Sg==",
         "dependencies": {
           "Google.Apis.Auth": "1.71.0",
           "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",

@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,6 +8,7 @@ public class InductionStatusInfoMapping : IEntityTypeConfiguration<InductionStat
 {
     public void Configure(EntityTypeBuilder<InductionStatusInfo> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("induction_statuses");
         builder.HasKey(s => s.InductionStatus);
         builder.Property(s => s.Name).HasMaxLength(200);

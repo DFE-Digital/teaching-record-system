@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,9 +8,9 @@ public class EstablishmentSourceMapping : IEntityTypeConfiguration<Establishment
 {
     public void Configure(EntityTypeBuilder<EstablishmentSource> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("establishment_sources");
         builder.HasKey(e => e.EstablishmentSourceId);
         builder.Property(e => e.Name).HasMaxLength(50).UseCollation(Collations.CaseInsensitive).IsRequired();
-
     }
 }

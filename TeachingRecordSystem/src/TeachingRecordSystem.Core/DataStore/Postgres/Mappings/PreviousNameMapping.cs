@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,8 +8,11 @@ public class PreviousNameMapping : IEntityTypeConfiguration<PreviousName>
 {
     public void Configure(EntityTypeBuilder<PreviousName> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: true);
         builder.ToTable("previous_names");
         builder.HasKey(p => p.PreviousNameId);
+        builder.Property(p => p.PreviousNameId).ConfigureAnalyticsSync(hidden: false);
+        builder.Property(p => p.PersonId).ConfigureAnalyticsSync(hidden: false);
         builder.Property(p => p.FirstName).HasMaxLength(Person.FirstNameMaxLength).UseCollation(Collations.CaseInsensitive);
         builder.Property(p => p.MiddleName).HasMaxLength(Person.MiddleNameMaxLength).UseCollation(Collations.CaseInsensitive);
         builder.Property(p => p.LastName).HasMaxLength(Person.LastNameMaxLength).UseCollation(Collations.CaseInsensitive);

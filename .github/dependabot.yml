@@ -30,6 +30,9 @@ updates:
       xunit:
         patterns:
           - 'xunit.*'
+      dfeanalytics:
+        patterns:
+          - 'DfeAnalytics.*'
 
   - package-ecosystem: github-actions
     directory: /

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -9,6 +10,7 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
 {
     public void Configure(EntityTypeBuilder<SupportTask> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("support_tasks");
         builder.HasKey(p => p.SupportTaskReference);
         builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(SupportTask.DeletedOn)) == null);
@@ -22,13 +24,15 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
             .IsRequired()
             .HasConversion(
                 v => JsonSerializer.Serialize(v, ISupportTaskData.SerializerOptions),
-                v => JsonSerializer.Deserialize<ISupportTaskData>(v, ISupportTaskData.SerializerOptions)!);
+                v => JsonSerializer.Deserialize<ISupportTaskData>(v, ISupportTaskData.SerializerOptions)!)
+            .ConfigureAnalyticsSync(hidden: true);
         builder.HasOne(t => t.TrnRequestMetadata).WithMany().HasForeignKey(p => new { p.TrnRequestApplicationUserId, p.TrnRequestId });
         builder.HasOne<SupportTaskTypeInfo>().WithMany().HasForeignKey(t => t.SupportTaskType);
         builder.Property(t => t.ResolveJourneySavedState)
             .HasColumnType("jsonb")
             .HasConversion(
                 v => JsonSerializer.Serialize(v, SavedJourneyState.SerializerOptions),
-                v => JsonSerializer.Deserialize<SavedJourneyState>(v, SavedJourneyState.SerializerOptions));
+                v => JsonSerializer.Deserialize<SavedJourneyState>(v, SavedJourneyState.SerializerOptions))
+            .ConfigureAnalyticsSync(included: false);
     }
 }

@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
@@ -8,6 +9,7 @@ public class EstablishmentMapping : IEntityTypeConfiguration<Establishment>
 {
     public void Configure(EntityTypeBuilder<Establishment> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("establishments");
         builder.HasKey(e => e.EstablishmentId);
         builder.Property(e => e.EstablishmentSourceId).IsRequired().HasDefaultValue(1);

@@ -1,3 +1,4 @@
+using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,6 +8,7 @@ public class AlertCategoryMapping : IEntityTypeConfiguration<AlertCategory>
 {
     public void Configure(EntityTypeBuilder<AlertCategory> builder)
     {
+        builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("alert_categories");
         builder.HasKey(x => x.AlertCategoryId);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(AlertCategory.NameMaxLength).UseCollation(Collations.CaseInsensitive);
