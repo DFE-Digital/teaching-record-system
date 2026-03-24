@@ -67,12 +67,12 @@
       },
       "Microsoft.Extensions.Caching.Postgres": {
         "type": "Direct",
-        "requested": "[1.2.1, )",
-        "resolved": "1.2.1",
-        "contentHash": "Obi3nthAZsB62UefTjqA54rCqb/kv9Y1Fh73oGC0sTpX6jyEGqYvC0QtHu0OWP1RLxrKCDxFlt0StG1htDfQbQ==",
+        "requested": "[1.2.2, )",
+        "resolved": "1.2.2",
+        "contentHash": "IWc8MmruXykho2yT7sQ5kgqsB9y6j1V5LPQDOv6yvfiU8c6XeQStju+Ufddzxvc5BthVEVBgUI9BEfr9cxPi5g==",
         "dependencies": {
-          "Microsoft.Bcl.TimeProvider": "10.0.1",
-          "Npgsql": "10.0.1"
+          "Microsoft.Bcl.TimeProvider": "10.0.5",
+          "Npgsql": "10.0.2"
         }
       },
       "Microsoft.VisualStudio.Threading.Analyzers": {
@@ -309,8 +309,8 @@
       },
       "Microsoft.Bcl.TimeProvider": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "8HOsGatv7IgK54r1Dn8ZxnHm+K2dRWiUNRPdtJCQY78olD8m5T1iMVzi4gdUyle8zNn5FVAgx7hHoyyJEDy1Qw=="
+        "resolved": "10.0.5",
+        "contentHash": "LtRd4Zq2yXONwWDDigM3zkLmhyt07QwZZNzSZn3HkQ61oHkgraz+eq1+IljcXKEwdgldXP8LxDph0fMZ1ZP3sg=="
       },
       "Microsoft.Build.Framework": {
         "type": "Transitive",
