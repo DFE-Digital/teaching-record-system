@@ -1,5 +1,5 @@
-using Dfe.Analytics;
 using Dfe.Analytics.AspNetCore;
+using Dfe.Analytics.Events;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Middleware;
 
