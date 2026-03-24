@@ -1793,7 +1793,7 @@
       },
       "Microsoft.IdentityModel.Protocols.OpenIdConnect": {
         "type": "CentralTransitive",
-        "requested": "[8.14.0, )",
+        "requested": "[8.15.0, )",
         "resolved": "8.0.1",
         "contentHash": "AQDbfpL+yzuuGhO/mQhKNsp44pm5Jv8/BI4KiFXR7beVGZoSH35zMV3PrmcfvSTsyI6qrcR898NzUauD6SRigg==",
         "dependencies": {
