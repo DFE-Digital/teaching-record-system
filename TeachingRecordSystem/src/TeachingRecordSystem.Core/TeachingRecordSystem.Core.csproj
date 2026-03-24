@@ -283,6 +283,7 @@
     <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" />
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="dbup-sqlserver" />
+    <PackageReference Include="DfeAnalytics.EFCore" />
     <PackageReference Include="EFCore.BulkExtensions.PostgreSql" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="EntityFrameworkCore.Projectables" />
@@ -295,10 +296,7 @@
     <PackageReference Include="IdentityModel" />
     <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <PackageReference Include="Microsoft.Extensions.Azure" />

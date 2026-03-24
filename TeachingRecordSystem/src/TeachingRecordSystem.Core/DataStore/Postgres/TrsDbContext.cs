@@ -12,17 +12,11 @@ using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
-public partial class TrsDbContext : DbContext
+public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbContext(options)
 {
     public const string ConnectionName = "DefaultConnection";
 
-    public TrsDbContext(DbContextOptions<TrsDbContext> options)
-        : base(options)
-    {
-    }
-
-    public static TrsDbContext Create(string connectionString, int? commandTimeout = null) =>
-        new TrsDbContext(CreateOptions(connectionString, commandTimeout));
+    public static TrsDbContext Create(string? connectionString, int? commandTimeout = null) => new(CreateOptions(connectionString, commandTimeout));
 
     public DbSet<TrnRequest> TrnRequests => Set<TrnRequest>();
 
@@ -192,7 +186,7 @@ public partial class TrsDbContext : DbContext
         }
     }
 
-    private static DbContextOptions<TrsDbContext> CreateOptions(string connectionString, int? commandTimeout)
+    private static DbContextOptions<TrsDbContext> CreateOptions(string? connectionString, int? commandTimeout)
     {
         var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
         ConfigureOptions(optionsBuilder, connectionString, commandTimeout);
