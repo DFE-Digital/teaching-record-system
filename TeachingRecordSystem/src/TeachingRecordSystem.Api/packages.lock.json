@@ -80,11 +80,11 @@
       },
       "Swashbuckle.AspNetCore.Annotations": {
         "type": "Direct",
-        "requested": "[6.6.2, )",
-        "resolved": "6.6.2",
-        "contentHash": "itEYQwWam7FT/8qUEMmC+BDt38J4w52NDod9yUeWpIKA7pM1xo+FbGSjXR6Q9oLOTT1PiJ+zYVf5Ij6pVX99tw==",
+        "requested": "[10.1.6, )",
+        "resolved": "10.1.6",
+        "contentHash": "oZYnYfJ/5IZvQVeFIqcF0TElN9+fWFdSMyfIv14ycrbu67zhMIITtg2jsGX2VCYu4JYsifHbsdD4aMf/jqQxLw==",
         "dependencies": {
-          "Swashbuckle.AspNetCore.SwaggerGen": "6.6.2"
+          "Swashbuckle.AspNetCore.SwaggerGen": "10.1.6"
         }
       },
       "System.IdentityModel.Tokens.Jwt": {
@@ -487,8 +487,8 @@
       },
       "Microsoft.OpenApi": {
         "type": "Transitive",
-        "resolved": "1.6.14",
-        "contentHash": "tTaBT8qjk3xINfESyOPE2rIellPvB7qpVqiWiyA/lACVvz+xOGiXhFUfohcx82NLbi5avzLW0lx+s6oAqQijfw=="
+        "resolved": "2.4.1",
+        "contentHash": "u7QhXCISMQuab3flasb1hoaiERmUqyWsW7tmQODyILoQ7mJV5IRGM+2KKZYo0QUfC13evEOcHAb6TPWgqEQtrw=="
       },
       "Microsoft.SqlServer.Server": {
         "type": "Transitive",
@@ -627,18 +627,18 @@
       },
       "Swashbuckle.AspNetCore.Swagger": {
         "type": "Transitive",
-        "resolved": "6.6.2",
-        "contentHash": "ovgPTSYX83UrQUWiS5vzDcJ8TEX1MAxBgDFMK45rC24MorHEPQlZAHlaXj/yth4Zf6xcktpUgTEBvffRQVwDKA==",
+        "resolved": "10.1.6",
+        "contentHash": "XkzyhvZilKQvfky9HJKCtOHAHB7S0qswIu8nkKa6c2w/y2o3nQR3hNP896iprsX9uGh6U2l9XvAk+7cUXvxALQ==",
         "dependencies": {
-          "Microsoft.OpenApi": "1.6.14"
+          "Microsoft.OpenApi": "2.4.1"
         }
       },
       "Swashbuckle.AspNetCore.SwaggerGen": {
         "type": "Transitive",
-        "resolved": "6.6.2",
-        "contentHash": "zv4ikn4AT1VYuOsDCpktLq4QDq08e7Utzbir86M5/ZkRaLXbCPF11E1/vTmOiDzRTl0zTZINQU2qLKwTcHgfrA==",
+        "resolved": "10.1.6",
+        "contentHash": "x2miNZnMl5yK0rprSAWgl5a6KlJsbNxmry1YDzh0h7l7TW3GsZhF8szqmaP5/SlWI/vCK8pF4CqQefrFim80sw==",
         "dependencies": {
-          "Swashbuckle.AspNetCore.Swagger": "6.6.2"
+          "Swashbuckle.AspNetCore.Swagger": "10.1.6"
         }
       },
       "Swashbuckle.AspNetCore.SwaggerUI": {
