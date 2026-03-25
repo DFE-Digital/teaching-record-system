@@ -3,7 +3,7 @@ module "airbyte" {
 
   count = var.airbyte_enabled ? 1 : 0
 
-  environment           = local.app_name_suffix
+  environment           = local.airbyte_environment
   azure_resource_prefix = var.azure_resource_prefix
   service_short         = var.service_short_name
   service_name          = var.service_name
@@ -43,5 +43,6 @@ module "airbyte" {
 }
 
 locals {
-  gcp_dataset_name = replace("${var.service_short_name}_airbyte_${local.app_name_suffix}", "-", "_")
+  gcp_dataset_name    = replace("${var.service_short_name}_airbyte_${local.app_name_suffix}", "-", "_")
+  airbyte_environment = coalesce(var.airbyte_environment, local.app_name_suffix)
 }
