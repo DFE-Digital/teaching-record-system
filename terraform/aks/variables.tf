@@ -173,6 +173,12 @@ variable "airbyte_connection_status" {
   description = "Connection status, either active or inactive"
 }
 
+variable "airbyte_environment" {
+  type        = string
+  default     = null
+  description = "Overrides the environment name used for Airbyte. If not set, environment_name will be used"
+}
+
 locals {
   app_name_suffix = var.app_name == null ? var.environment_name : var.app_name
 
