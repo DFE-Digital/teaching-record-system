@@ -62,8 +62,15 @@
 @RenderBody()
 
 @section Footer {
-    <govuk-footer />
+    <govuk-footer>
+        <govuk-footer-meta>
+            <govuk-footer-meta-items>
+                <govuk-footer-meta-item href="https://accessibility-statements.education.gov.uk/s/40">Accessibility statement</govuk-footer-meta-item>
+            </govuk-footer-meta-items>
+        </govuk-footer-meta>
+    </govuk-footer>
 }
+
 
 @section BodyEnd {
     @Html.GovUkFrontendScriptImports(cspNonce: NonceService.GetNonce())
