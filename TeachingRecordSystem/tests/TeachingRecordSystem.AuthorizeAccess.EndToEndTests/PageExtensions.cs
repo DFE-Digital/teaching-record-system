@@ -25,6 +25,12 @@ public static class PageExtensions
         Assert.Equal(trn, await page.GetByTestId("trn").InnerTextAsync());
     }
 
+    public static async Task AssertSignedInWithDormantTrnRequestAsync(this IPage page, string expectedTrnRequestId)
+    {
+        await page.WaitForUrlPathAsync("/test");
+        Assert.Equal(expectedTrnRequestId, await page.GetByTestId("trn-request-id").InnerTextAsync());
+    }
+
     public static async Task FillDateInputAsync(this IPage page, DateOnly date)
     {
         await page.FillAsync("label:text-is('Day')", date.Day.ToString());

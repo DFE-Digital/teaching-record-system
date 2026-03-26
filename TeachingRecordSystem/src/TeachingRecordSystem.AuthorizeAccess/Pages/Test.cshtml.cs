@@ -4,12 +4,17 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyCoordinator.JourneyName, Optional = true)]
-public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventPublisher eventPublisher, TimeProvider timeProvider) : PageModel
+public class TestModel(
+    IJourneyInstanceProvider journeyInstanceProvider,
+    IEventPublisher eventPublisher,
+    TimeProvider timeProvider,
+    TrsDbContext dbContext) : PageModel
 {
     [FromQuery(Name = "scheme")]
     public string? AuthenticationScheme { get; set; }
@@ -26,6 +31,11 @@ public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventP
 
         if (User.Identity?.IsAuthenticated != true)
         {
+            var testAppUser = await dbContext.ApplicationUsers
+                .Where(u => u.ClientId == TestAppConfiguration.ClientId)
+                .Select(u => new { u.UserId, u.ClientId })
+                .SingleOrDefaultAsync();
+
             var signInJourneyCoordinator = (SignInJourneyCoordinator?)await journeyInstanceProvider.TryCreateNewInstanceAsync(
                 HttpContext,
                 async ctx =>
@@ -36,8 +46,8 @@ public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventP
                         new AuthorizeAccessRequestStartedEvent
                         {
                             EventId = Guid.NewGuid(),
-                            ApplicationUserId = Guid.Empty,
-                            ClientId = string.Empty,
+                            ApplicationUserId = testAppUser!.UserId,
+                            ClientId = testAppUser.ClientId!,
                             JourneyInstanceId = ctx.InstanceId.ToString()
                         },
                         processContext);
@@ -50,7 +60,7 @@ public class TestModel(IJourneyInstanceProvider journeyInstanceProvider, IEventP
                         "Test service",
                         serviceUrl: Request.GetEncodedUrl(),
                         AuthenticationScheme,
-                        clientApplicationUserId: Guid.Empty,
+                        clientApplicationUserId: testAppUser.UserId,
                         TrnToken);
 
                     return state;

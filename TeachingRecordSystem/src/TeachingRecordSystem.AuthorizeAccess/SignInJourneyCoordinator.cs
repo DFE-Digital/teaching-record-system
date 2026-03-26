@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
@@ -19,6 +20,7 @@ public class SignInJourneyCoordinator(
     OneLoginService oneLoginService,
     TrsDbContext dbContext,
     AuthorizeAccessLinkGenerator linkGenerator,
+    TrnRequestService trnRequestService,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     TimeProvider timeProvider) :
     JourneyCoordinator<SignInJourneyState>
@@ -331,6 +333,68 @@ public class SignInJourneyCoordinator(
         state.AuthenticationTicket = new AuthenticationTicket(principal, properties: null, AuthenticationSchemes.MatchToTeachingRecord);
     }
 
+    public async Task<string> CompleteWithDeferredMatchingAsync(SignInJourneyState state)
+    {
+        if (state.OneLoginAuthenticationTicket is null)
+        {
+            throw new InvalidOperationException("User is not authenticated with One Login.");
+        }
+
+        if (!state.IdentityVerified)
+        {
+            throw new InvalidOperationException("User identity must be verified before creating a dormant TRN request.");
+        }
+
+        var oneLoginPrincipal = state.OneLoginAuthenticationTicket.Principal;
+        var sub = oneLoginPrincipal.FindFirstValue("sub")!;
+        var email = oneLoginPrincipal.FindFirstValue("email")!;
+        var oneLoginIdToken = state.OneLoginAuthenticationTicket.Properties.GetTokenValue(OpenIdConnectParameterNames.IdToken)!;
+
+        var firstName = state.VerifiedNames!.First().First();
+        var lastName = state.VerifiedNames!.First().Last();
+        var dateOfBirth = state.VerifiedDatesOfBirth!.First();
+
+        var requestId = Guid.NewGuid().ToString();
+
+        var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow);
+
+        // Create a dormant TRN request
+        var trnRequestInfo = await trnRequestService.CreateTrnRequestAsync(
+            new CreateTrnRequestOptions
+            {
+                TryResolve = false,
+                ApplicationUserId = state.ClientApplicationUserId,
+                RequestId = requestId,
+                OneLoginUserInfo = new CreateTrnRequestOptionsOneLoginUserInfo(sub, IdentityVerified: true),
+                EmailAddress = email,
+                FirstName = firstName,
+                MiddleName = null,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                NationalInsuranceNumber = state.NationalInsuranceNumber,
+                Gender = null
+            },
+            processContext);
+
+        var teachingRecordIdentity = new ClaimsIdentity(
+            [
+                new Claim(ClaimTypes.Subject, sub),
+                new Claim(ClaimTypes.TrnRequestId, trnRequestInfo.TrnRequest.RequestId),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken),
+                new Claim(ClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
+            ],
+            authenticationType: "Authorize access with deferred teaching record matching",
+            nameType: ClaimTypes.Subject,
+            roleType: null);
+
+        var principal = new ClaimsPrincipal(teachingRecordIdentity);
+
+        state.AuthenticationTicket = new AuthenticationTicket(principal, properties: null, AuthenticationSchemes.MatchToTeachingRecord);
+
+        return requestId;
+    }
+
     private IResult OneLoginChallenge(string vtr)
     {
         var delegatedProperties = new AuthenticationProperties();
@@ -365,6 +429,8 @@ public class SignInJourneyCoordinator(
         public string DateOfBirth(string? returnUrl = null) => linkGenerator.DateOfBirth(instanceId, returnUrl);
 
         public string NoTrn() => linkGenerator.NoTrn(instanceId);
+
+        public string TrnDeferred() => linkGenerator.TrnDeferred(instanceId);
 
         public string PendingSupportRequest() => linkGenerator.PendingSupportRequest(instanceId);
 

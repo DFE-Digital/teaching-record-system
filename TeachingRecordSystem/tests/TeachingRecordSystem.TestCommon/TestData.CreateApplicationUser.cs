@@ -9,13 +9,15 @@ public partial class TestData
     public async Task<ApplicationUser> CreateApplicationUserAsync(
         string? name = null,
         string[]? apiRoles = null,
-        bool? isOidcClient = false)
+        bool? isOidcClient = false,
+        RecordMatchingPolicy? recordMatchingPolicy = null)
     {
         var user = await WithDbContextAsync(async dbContext =>
         {
             name ??= GenerateApplicationUserName();
             apiRoles ??= [];
             isOidcClient ??= false;
+            recordMatchingPolicy ??= RecordMatchingPolicy.Required;
             string? clientId = null;
             string? clientSecret = null;
             List<string>? redirectUris = null;
@@ -53,7 +55,8 @@ public partial class TestData
                 OneLoginPrivateKeyPem = oneLoginPrivateKeyPem,
                 OneLoginAuthenticationSchemeName = oneLoginAuthenticationSchemeName,
                 OneLoginRedirectUriPath = oneLoginRedirectUriPath,
-                OneLoginPostLogoutRedirectUriPath = oneLoginPostLogoutRedirectUriPath
+                OneLoginPostLogoutRedirectUriPath = oneLoginPostLogoutRedirectUriPath,
+                RecordMatchingPolicy = recordMatchingPolicy.Value
             };
 
             dbContext.ApplicationUsers.Add(user);

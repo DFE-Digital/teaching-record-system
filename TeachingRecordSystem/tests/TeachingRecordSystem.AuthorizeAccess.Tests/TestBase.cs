@@ -224,6 +224,7 @@ public abstract class TestBase
         public const string Name = "/name";
         public const string DateOfBirth = "/date-of-birth";
         public const string NoTrn = "/no-trn";
+        public const string TrnDeferred = "/trn-deferred";
         public const string PendingSupportRequest = "/pending-support-request";
         public const string ProofOfIdentity = "/proof-of-identity";
     }
@@ -262,6 +263,9 @@ public abstract class TestBase
 
         public static string NoTrn(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.NoTrn);
+
+        public static string TrnDeferred(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.TrnDeferred);
 
         public static string PendingSupportRequest(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.PendingSupportRequest);
