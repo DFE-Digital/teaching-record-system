@@ -10,7 +10,7 @@ public class TrnDeferredModel(SignInJourneyCoordinator coordinator) : PageModel
     {
         await coordinator.UpdateStateAsync(async state =>
         {
-            _ = await coordinator.CompleteWithDeferredMatchingAsync(state);
+            await coordinator.CompleteWithDeferredMatchingAsync(state);
         });
         return coordinator.GetNextPage().ToActionResult();
     }

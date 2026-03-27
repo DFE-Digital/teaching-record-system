@@ -33,8 +33,13 @@ public class TestModel(
         {
             var testAppUser = await dbContext.ApplicationUsers
                 .Where(u => u.ClientId == TestAppConfiguration.ClientId)
-                .Select(u => new { u.UserId, u.ClientId })
+                .Select(u => new { u.UserId, u.ClientId, u.RecordMatchingPolicy })
                 .SingleOrDefaultAsync();
+
+            if (testAppUser == null)
+            {
+                return BadRequest("Test application user not found");
+            }
 
             var signInJourneyCoordinator = (SignInJourneyCoordinator?)await journeyInstanceProvider.TryCreateNewInstanceAsync(
                 HttpContext,
@@ -46,8 +51,8 @@ public class TestModel(
                         new AuthorizeAccessRequestStartedEvent
                         {
                             EventId = Guid.NewGuid(),
-                            ApplicationUserId = testAppUser!.UserId,
-                            ClientId = testAppUser.ClientId!,
+                            ApplicationUserId = testAppUser.UserId,
+                            ClientId = testAppUser.ClientId,
                             JourneyInstanceId = ctx.InstanceId.ToString()
                         },
                         processContext);
@@ -61,6 +66,7 @@ public class TestModel(
                         serviceUrl: Request.GetEncodedUrl(),
                         AuthenticationScheme,
                         clientApplicationUserId: testAppUser.UserId,
+                        recordMatchingPolicy: testAppUser.RecordMatchingPolicy,
                         TrnToken);
 
                     return state;

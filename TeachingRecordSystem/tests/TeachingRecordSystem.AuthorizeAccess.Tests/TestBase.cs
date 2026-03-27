@@ -10,6 +10,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
+using RecordMatchingPolicy = TeachingRecordSystem.Core.Models.RecordMatchingPolicy;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -167,7 +168,8 @@ public abstract class TestBase
         string redirectUriBase,
         Guid clientApplicationUserId = default,
         string? trnToken = null,
-        string? trnTokenTrn = null)
+        string? trnTokenTrn = null,
+        RecordMatchingPolicy recordMatchingPolicy = RecordMatchingPolicy.Required)
     {
         var redirectUri = journeyInstanceId.EnsureUrlHasKey(redirectUriBase);
 
@@ -178,6 +180,7 @@ public abstract class TestBase
             serviceUrl: "https://service",
             oneLoginAuthenticationScheme: "dummy",
             clientApplicationUserId,
+            recordMatchingPolicy,
             trnToken)
         {
             TrnTokenTrn = trnTokenTrn

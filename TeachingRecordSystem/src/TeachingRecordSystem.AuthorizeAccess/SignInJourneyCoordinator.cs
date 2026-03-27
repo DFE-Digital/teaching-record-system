@@ -313,24 +313,8 @@ public class SignInJourneyCoordinator(
             throw new InvalidOperationException("User is not authenticated with One Login.");
         }
 
-        var oneLoginPrincipal = state.OneLoginAuthenticationTicket.Principal;
-        var oneLoginIdToken = state.OneLoginAuthenticationTicket.Properties.GetTokenValue(OpenIdConnectParameterNames.IdToken)!;
-
-        var teachingRecordIdentity = new ClaimsIdentity(
-            [
-                new Claim(ClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
-                new Claim(ClaimTypes.Trn, trn),
-                new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
-                new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken),
-                new Claim(ClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
-            ],
-            authenticationType: "Authorize access to a teaching record",
-            nameType: ClaimTypes.Subject,
-            roleType: null);
-
-        var principal = new ClaimsPrincipal(teachingRecordIdentity);
-
-        state.AuthenticationTicket = new AuthenticationTicket(principal, properties: null, AuthenticationSchemes.MatchToTeachingRecord);
+        var specificClaims = new[] { new Claim(ClaimTypes.Trn, trn) };
+        CreateAuthenticationTicket(state, specificClaims);
     }
 
     public async Task<string> CompleteWithDeferredMatchingAsync(SignInJourneyState state)
@@ -348,7 +332,6 @@ public class SignInJourneyCoordinator(
         var oneLoginPrincipal = state.OneLoginAuthenticationTicket.Principal;
         var sub = oneLoginPrincipal.FindFirstValue("sub")!;
         var email = oneLoginPrincipal.FindFirstValue("email")!;
-        var oneLoginIdToken = state.OneLoginAuthenticationTicket.Properties.GetTokenValue(OpenIdConnectParameterNames.IdToken)!;
 
         var firstName = state.VerifiedNames!.First().First();
         var lastName = state.VerifiedNames!.First().Last();
@@ -376,23 +359,36 @@ public class SignInJourneyCoordinator(
             },
             processContext);
 
+        var specificClaims = new[] { new Claim(ClaimTypes.TrnRequestId, trnRequestInfo.TrnRequest.RequestId) };
+        CreateAuthenticationTicket(state, specificClaims);
+
+        return requestId;
+    }
+
+    private void CreateAuthenticationTicket(SignInJourneyState state, Claim[] specificClaims)
+    {
+        var oneLoginPrincipal = state.OneLoginAuthenticationTicket!.Principal;
+        var oneLoginIdToken = state.OneLoginAuthenticationTicket.Properties.GetTokenValue(OpenIdConnectParameterNames.IdToken)!;
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
+            new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
+            new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken),
+            new Claim(ClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
+        };
+
+        claims.AddRange(specificClaims);
+
         var teachingRecordIdentity = new ClaimsIdentity(
-            [
-                new Claim(ClaimTypes.Subject, sub),
-                new Claim(ClaimTypes.TrnRequestId, trnRequestInfo.TrnRequest.RequestId),
-                new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken),
-                new Claim(ClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
-            ],
-            authenticationType: "Authorize access with deferred teaching record matching",
+            claims,
+            authenticationType: "Authorize access to a teaching record",
             nameType: ClaimTypes.Subject,
             roleType: null);
 
         var principal = new ClaimsPrincipal(teachingRecordIdentity);
 
         state.AuthenticationTicket = new AuthenticationTicket(principal, properties: null, AuthenticationSchemes.MatchToTeachingRecord);
-
-        return requestId;
     }
 
     private IResult OneLoginChallenge(string vtr)

@@ -1,12 +1,11 @@
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyCoordinator.JourneyName)]
-public partial class TrnModel(SignInJourneyCoordinator coordinator, TrsDbContext dbContext) : PageModel
+public partial class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
 {
     [GeneratedRegex(@"\A\D*0{7}\D*\Z")]
     private static partial Regex TrnPattern();
@@ -45,14 +44,9 @@ public partial class TrnModel(SignInJourneyCoordinator coordinator, TrsDbContext
 
         coordinator.UpdateState(state => state.SetTrn(HaveTrn!.Value, Trn));
 
-        var clientApplicationUser = await dbContext.ApplicationUsers
-                .Where(u => u.UserId == coordinator.State.ClientApplicationUserId)
-                .Select(u => new { u.RecordMatchingPolicy })
-                .SingleAsync();
-
         if (HaveTrn is false)
         {
-            return clientApplicationUser.RecordMatchingPolicy == RecordMatchingPolicy.Required
+            return coordinator.State.RecordMatchingPolicy == RecordMatchingPolicy.Required
                 ? coordinator.AdvanceTo(links => links.NoTrn())
                 : coordinator.State.IdentityVerified
                     ? coordinator.AdvanceTo(links => links.TrnDeferred())

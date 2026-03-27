@@ -177,7 +177,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: RecordMatchingPolicy.Deferred);
 
         await WithJourneyCoordinatorAsync(
-            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId),
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId, recordMatchingPolicy: RecordMatchingPolicy.Deferred),
             async coordinator =>
             {
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
@@ -324,7 +324,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: RecordMatchingPolicy.Deferred);
 
         await WithJourneyCoordinatorAsync(
-            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId),
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId, recordMatchingPolicy: RecordMatchingPolicy.Deferred),
             async coordinator =>
             {
                 var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
