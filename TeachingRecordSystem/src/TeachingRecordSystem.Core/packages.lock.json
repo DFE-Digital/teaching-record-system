@@ -185,9 +185,9 @@
       },
       "Markdig": {
         "type": "Direct",
-        "requested": "[0.45.0, )",
-        "resolved": "0.45.0",
-        "contentHash": "ObNLcA1b+0lpNNoEg256g9faMeJZi35wZW0AnKJ4nGPJe+5qkwnV26kUvQTHuanFnSX9SdvPzOO41BVJ6XarAg=="
+        "requested": "[1.1.2, )",
+        "resolved": "1.1.2",
+        "contentHash": "mXh6Ah5p/jtryn7o96B2knDDJVgZ775HnFLObcVxuyWcfeHlsI95WUjiJH0m7ZOYGdCLvwRTwMhv023jUZoEAA=="
       },
       "Microsoft.Data.SqlClient": {
         "type": "Direct",
