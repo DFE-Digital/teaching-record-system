@@ -503,11 +503,11 @@
       },
       "Microsoft.Identity.Web.GraphServiceClient": {
         "type": "Transitive",
-        "resolved": "4.0.1",
-        "contentHash": "R/sbJO39OSrGZ0rjKghDnFmP+7ArGsvQVx8tgVRoXikYUTwdMdWE0XUm4cg6YqXebnXLlSierwWIPYeSn8g90g==",
+        "resolved": "4.6.0",
+        "contentHash": "PacuM8zqzJB+XLqvjhcEG/+m1jtDHclDqSm8pmGyC6HbmEyQRw8N27kaCYz2K0PwiFAWJ6iUFTsE6Q3Myv160g==",
         "dependencies": {
           "Microsoft.Graph": "5.51.0",
-          "Microsoft.Identity.Web.TokenAcquisition": "4.0.1"
+          "Microsoft.Identity.Web.TokenAcquisition": "4.6.0"
         }
       },
       "Microsoft.Identity.Web.TokenAcquisition": {
@@ -1103,7 +1103,7 @@
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.5, )",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[10.0.5, )",
           "Microsoft.Identity.Web": "[4.6.0, )",
-          "Microsoft.Identity.Web.GraphServiceClientBeta": "[4.0.1, )",
+          "Microsoft.Identity.Web.GraphServiceClientBeta": "[4.6.0, )",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "[8.15.0, )",
           "Microsoft.Web.LibraryManager.Build": "[3.0.71, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
@@ -1532,13 +1532,13 @@
       },
       "Microsoft.Identity.Web.GraphServiceClientBeta": {
         "type": "CentralTransitive",
-        "requested": "[4.0.1, )",
-        "resolved": "4.0.1",
-        "contentHash": "Oy3nCf4iMXMe6E0q7w5BZ2Qc0/U8eM5WIsL5B0Kv7Nx0zKs3Rex0kZNzAtqAdlwKen3BkSfpcW+sPIRD/y7iZA==",
+        "requested": "[4.6.0, )",
+        "resolved": "4.6.0",
+        "contentHash": "6BhAXFtBFG7zY4i2AHiM99H3TxTIKJUHF55X0/ylZj2Tbzkn/jSKj2rf/3q88mfTDDMWMz9P8tEcn0k8+pUbOA==",
         "dependencies": {
           "Microsoft.Graph.Beta": "5.56.0-preview",
-          "Microsoft.Identity.Web.GraphServiceClient": "4.0.1",
-          "Microsoft.Identity.Web.TokenAcquisition": "4.0.1"
+          "Microsoft.Identity.Web.GraphServiceClient": "4.6.0",
+          "Microsoft.Identity.Web.TokenAcquisition": "4.6.0"
         }
       },
       "Microsoft.IdentityModel.Protocols.OpenIdConnect": {
