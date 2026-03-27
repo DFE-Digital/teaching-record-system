@@ -52,7 +52,7 @@ public class TestModel(
                         {
                             EventId = Guid.NewGuid(),
                             ApplicationUserId = testAppUser.UserId,
-                            ClientId = testAppUser.ClientId,
+                            ClientId = testAppUser.ClientId!,
                             JourneyInstanceId = ctx.InstanceId.ToString()
                         },
                         processContext);
