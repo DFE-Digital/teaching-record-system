@@ -1,0 +1,19 @@
+@page "/trn-deferred"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.TrnDeferredModel
+@{
+    ViewBag.Title = "Continue your registration";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <p class="govuk-body">
+                You'll be given a teacher reference number (TRN) once you've enrolled on a course.
+            </p>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

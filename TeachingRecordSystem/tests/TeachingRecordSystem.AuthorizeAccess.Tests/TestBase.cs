@@ -10,6 +10,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
+using RecordMatchingPolicy = TeachingRecordSystem.Core.Models.RecordMatchingPolicy;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -167,7 +168,8 @@ public abstract class TestBase
         string redirectUriBase,
         Guid clientApplicationUserId = default,
         string? trnToken = null,
-        string? trnTokenTrn = null)
+        string? trnTokenTrn = null,
+        RecordMatchingPolicy recordMatchingPolicy = RecordMatchingPolicy.Required)
     {
         var redirectUri = journeyInstanceId.EnsureUrlHasKey(redirectUriBase);
 
@@ -178,6 +180,7 @@ public abstract class TestBase
             serviceUrl: "https://service",
             oneLoginAuthenticationScheme: "dummy",
             clientApplicationUserId,
+            recordMatchingPolicy,
             trnToken)
         {
             TrnTokenTrn = trnTokenTrn
@@ -224,6 +227,7 @@ public abstract class TestBase
         public const string Name = "/name";
         public const string DateOfBirth = "/date-of-birth";
         public const string NoTrn = "/no-trn";
+        public const string TrnDeferred = "/trn-deferred";
         public const string PendingSupportRequest = "/pending-support-request";
         public const string ProofOfIdentity = "/proof-of-identity";
     }
@@ -262,6 +266,9 @@ public abstract class TestBase
 
         public static string NoTrn(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.NoTrn);
+
+        public static string TrnDeferred(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.TrnDeferred);
 
         public static string PendingSupportRequest(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.PendingSupportRequest);

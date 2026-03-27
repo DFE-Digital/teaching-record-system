@@ -91,6 +91,7 @@ public class OAuth2Controller(
                         serviceUrl,
                         client.OneLoginAuthenticationSchemeName!,
                         client.UserId,
+                        client.RecordMatchingPolicy,
                         trnToken);
 
                     return state;

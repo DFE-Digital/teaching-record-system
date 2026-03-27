@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
@@ -19,6 +20,7 @@ public class SignInJourneyCoordinator(
     OneLoginService oneLoginService,
     TrsDbContext dbContext,
     AuthorizeAccessLinkGenerator linkGenerator,
+    TrnRequestService trnRequestService,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     TimeProvider timeProvider) :
     JourneyCoordinator<SignInJourneyState>
@@ -311,17 +313,75 @@ public class SignInJourneyCoordinator(
             throw new InvalidOperationException("User is not authenticated with One Login.");
         }
 
+        var specificClaims = new[] { new Claim(ClaimTypes.Trn, trn) };
+        CreateAuthenticationTicket(state, specificClaims);
+    }
+
+    public async Task<string> CompleteWithDeferredMatchingAsync(SignInJourneyState state)
+    {
+        if (state.OneLoginAuthenticationTicket is null)
+        {
+            throw new InvalidOperationException("User is not authenticated with One Login.");
+        }
+
+        if (!state.IdentityVerified)
+        {
+            throw new InvalidOperationException("User identity must be verified before creating a dormant TRN request.");
+        }
+
         var oneLoginPrincipal = state.OneLoginAuthenticationTicket.Principal;
+        var sub = oneLoginPrincipal.FindFirstValue("sub")!;
+        var email = oneLoginPrincipal.FindFirstValue("email")!;
+
+        var firstName = state.VerifiedNames!.First().First();
+        var lastName = state.VerifiedNames!.First().Last();
+        var dateOfBirth = state.VerifiedDatesOfBirth!.First();
+
+        var requestId = Guid.NewGuid().ToString();
+
+        var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow);
+
+        // Create a dormant TRN request
+        var trnRequestInfo = await trnRequestService.CreateTrnRequestAsync(
+            new CreateTrnRequestOptions
+            {
+                TryResolve = false,
+                ApplicationUserId = state.ClientApplicationUserId,
+                RequestId = requestId,
+                OneLoginUserInfo = new CreateTrnRequestOptionsOneLoginUserInfo(sub, IdentityVerified: true),
+                EmailAddress = email,
+                FirstName = firstName,
+                MiddleName = null,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                NationalInsuranceNumber = state.NationalInsuranceNumber,
+                Gender = null
+            },
+            processContext);
+
+        var specificClaims = new[] { new Claim(ClaimTypes.TrnRequestId, trnRequestInfo.TrnRequest.RequestId) };
+        CreateAuthenticationTicket(state, specificClaims);
+
+        return requestId;
+    }
+
+    private void CreateAuthenticationTicket(SignInJourneyState state, Claim[] specificClaims)
+    {
+        var oneLoginPrincipal = state.OneLoginAuthenticationTicket!.Principal;
         var oneLoginIdToken = state.OneLoginAuthenticationTicket.Properties.GetTokenValue(OpenIdConnectParameterNames.IdToken)!;
 
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
+            new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
+            new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken),
+            new Claim(ClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
+        };
+
+        claims.AddRange(specificClaims);
+
         var teachingRecordIdentity = new ClaimsIdentity(
-            [
-                new Claim(ClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
-                new Claim(ClaimTypes.Trn, trn),
-                new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
-                new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken),
-                new Claim(ClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
-            ],
+            claims,
             authenticationType: "Authorize access to a teaching record",
             nameType: ClaimTypes.Subject,
             roleType: null);
@@ -365,6 +425,8 @@ public class SignInJourneyCoordinator(
         public string DateOfBirth(string? returnUrl = null) => linkGenerator.DateOfBirth(instanceId, returnUrl);
 
         public string NoTrn() => linkGenerator.NoTrn(instanceId);
+
+        public string TrnDeferred() => linkGenerator.TrnDeferred(instanceId);
 
         public string PendingSupportRequest() => linkGenerator.PendingSupportRequest(instanceId);
 

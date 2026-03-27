@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
+using RecordMatchingPolicy = TeachingRecordSystem.Core.Models.RecordMatchingPolicy;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
@@ -13,6 +14,7 @@ public class SignInJourneyState(
     string serviceUrl,
     string oneLoginAuthenticationScheme,
     Guid clientApplicationUserId,
+    RecordMatchingPolicy recordMatchingPolicy,
     string? trnToken = null)
 {
     public Guid SigningInProcessId { get; } = signingInProcessId;
@@ -26,6 +28,8 @@ public class SignInJourneyState(
     public string OneLoginAuthenticationScheme { get; } = oneLoginAuthenticationScheme;
 
     public Guid ClientApplicationUserId { get; } = clientApplicationUserId;
+
+    public RecordMatchingPolicy RecordMatchingPolicy { get; } = recordMatchingPolicy;
 
     public string? TrnToken { get; } = trnToken;
 

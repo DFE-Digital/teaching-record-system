@@ -44,9 +44,16 @@ public partial class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
 
         coordinator.UpdateState(state => state.SetTrn(HaveTrn!.Value, Trn));
 
-        return
-            HaveTrn is false ? coordinator.AdvanceTo(links => links.NoTrn()) :
-            await coordinator.TryMatchToTeachingRecordAsync() ??
+        if (HaveTrn is false)
+        {
+            return coordinator.State.RecordMatchingPolicy == RecordMatchingPolicy.Required
+                ? coordinator.AdvanceTo(links => links.NoTrn())
+                : coordinator.State.IdentityVerified
+                    ? coordinator.AdvanceTo(links => links.TrnDeferred())
+                    : coordinator.AdvanceTo(links => links.ProofOfIdentity());
+        }
+
+        return await coordinator.TryMatchToTeachingRecordAsync() ??
             (coordinator.State.IdentityVerified
                 ? coordinator.AdvanceTo(links => links.NotFound())
                 : coordinator.AdvanceTo(links => links.ProofOfIdentity()));

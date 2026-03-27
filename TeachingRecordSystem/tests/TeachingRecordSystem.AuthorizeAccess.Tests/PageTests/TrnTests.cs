@@ -138,12 +138,15 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
 
     [Fact]
-    public Task Post_NoTrnSpecifiedForVerifiedUser_UpdatesStateAndRedirectsToNoTrnPage() =>
-        WithJourneyCoordinatorAsync(
-            CreateSignInJourneyState,
+    public async Task Post_NoTrnSpecifiedForVerifiedUserWithRequiredRecordMatchingPolicy_UpdatesStateAndRedirectsToNoTrnPage()
+    {
+        // Arrange
+        var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: RecordMatchingPolicy.Required);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId),
             async coordinator =>
             {
-                // Arrange
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
@@ -165,14 +168,53 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Null(state.Trn);
                 Assert.Null(state.AuthenticationTicket);
             });
+    }
 
     [Fact]
-    public Task Post_ValidTrnButLookupFailedForVerifiedUser_UpdatesStateAndRedirectsToNotFoundPage() =>
-        WithJourneyCoordinatorAsync(
-            CreateSignInJourneyState,
+    public async Task Post_NoTrnSpecifiedForVerifiedUserWithDeferredRecordMatchingPolicy_UpdatesStateAndRedirectsToTrnDeferredPage()
+    {
+        // Arrange
+        var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: RecordMatchingPolicy.Deferred);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId, recordMatchingPolicy: RecordMatchingPolicy.Deferred),
             async coordinator =>
             {
-                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
+                {
+                    Content = new FormUrlEncodedContentBuilder { { "HaveTrn", bool.FalseString } }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.TrnDeferred(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+
+                var state = coordinator.State;
+                Assert.False(state.HaveTrn);
+                Assert.Null(state.Trn);
+                Assert.Null(state.AuthenticationTicket);
+            });
+    }
+
+    [Theory]
+    [InlineData(RecordMatchingPolicy.Required)]
+    [InlineData(RecordMatchingPolicy.Deferred)]
+    public async Task Post_ValidTrnButLookupFailedForVerifiedUser_UpdatesStateAndRedirectsToNotFoundPage(RecordMatchingPolicy recordMatchingPolicy)
+    {
+        // Arrange
+        var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: recordMatchingPolicy);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId),
+            async coordinator =>
+            {
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
@@ -196,14 +238,20 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(trn, state.Trn);
                 Assert.Null(state.AuthenticationTicket);
             });
+    }
 
-    [Fact]
-    public Task Post_ValidTrnAndLookupSucceeded_UpdatesStateUpdatesOneLoginUserCompletesAuthenticationAndRedirectsToFoundPage() =>
-        WithJourneyCoordinatorAsync(
-            CreateSignInJourneyState,
+    [Theory]
+    [InlineData(RecordMatchingPolicy.Required)]
+    [InlineData(RecordMatchingPolicy.Deferred)]
+    public async Task Post_ValidTrnAndLookupSucceeded_UpdatesStateUpdatesOneLoginUserCompletesAuthenticationAndRedirectsToFoundPage(RecordMatchingPolicy recordMatchingPolicy)
+    {
+        // Arrange
+        var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: recordMatchingPolicy);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId),
             async coordinator =>
             {
-                // Arrange
                 var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(
                     personId: null,
@@ -233,14 +281,18 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 oneLoginUser = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
                 Assert.Equal(person.PersonId, oneLoginUser.PersonId);
             });
+    }
 
     [Fact]
-    public Task Post_NoTrnSpecifiedForUnverified_UpdatesStateAndRedirectsToNoTrnPage() =>
-        WithJourneyCoordinatorAsync(
-            CreateSignInJourneyState,
+    public async Task Post_NoTrnSpecifiedForUnverifiedUserWithRequiredRecordMatchingPolicy_UpdatesStateAndRedirectsToNoTrnPage()
+    {
+        // Arrange
+        var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: RecordMatchingPolicy.Required);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId),
             async coordinator =>
             {
-                // Arrange
                 var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: null);
 
@@ -263,15 +315,54 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Null(state.Trn);
                 Assert.Null(state.AuthenticationTicket);
             });
-
+    }
 
     [Fact]
-    public Task Post_ValidTrnForUnverifiedUser_UpdatesStateAndRedirectsToProofOfIdentity() =>
-        WithJourneyCoordinatorAsync(
-            CreateSignInJourneyState,
+    public async Task Post_NoTrnSpecifiedForUnverifiedUserWithDeferredRecordMatchingPolicy_UpdatesStateAndRedirectsToProofOfIdentity()
+    {
+        // Arrange
+        var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: RecordMatchingPolicy.Deferred);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId, recordMatchingPolicy: RecordMatchingPolicy.Deferred),
             async coordinator =>
             {
-                // Arrange
+                var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: null);
+
+                await SetupInstanceForUnverifiedUserStateAsync(coordinator, oneLoginUser, person.NationalInsuranceNumber!);
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
+                {
+                    Content = new FormUrlEncodedContentBuilder { { "HaveTrn", bool.FalseString } }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.ProofOfIdentity(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+
+                var state = coordinator.State;
+                Assert.False(state.HaveTrn);
+                Assert.Null(state.Trn);
+                Assert.Null(state.AuthenticationTicket);
+            });
+    }
+
+    [Theory]
+    [InlineData(RecordMatchingPolicy.Required)]
+    [InlineData(RecordMatchingPolicy.Deferred)]
+    public async Task Post_ValidTrnForUnverifiedUser_UpdatesStateAndRedirectsToProofOfIdentity(RecordMatchingPolicy recordMatchingPolicy)
+    {
+        // Arrange
+        var clientApplicationUser = await TestData.CreateApplicationUserAsync(recordMatchingPolicy: recordMatchingPolicy);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId),
+            async coordinator =>
+            {
                 var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: null);
 
@@ -296,6 +387,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(trn, state.Trn);
                 Assert.Null(state.AuthenticationTicket);
             });
+    }
 
     private async Task SetupInstanceForVerifiedUserStateAsync(
         SignInJourneyCoordinator coordinator,

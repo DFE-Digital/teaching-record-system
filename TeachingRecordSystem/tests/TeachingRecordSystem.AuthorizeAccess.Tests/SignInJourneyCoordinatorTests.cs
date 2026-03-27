@@ -12,6 +12,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
 using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
+using RecordMatchingPolicy = TeachingRecordSystem.Core.Models.RecordMatchingPolicy;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -26,7 +27,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -57,7 +59,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -90,7 +93,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -122,7 +126,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -154,7 +159,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -189,7 +195,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -225,7 +232,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -262,7 +270,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -297,7 +306,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -334,7 +344,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -365,7 +376,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -397,7 +409,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -432,7 +445,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -489,7 +503,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -543,7 +558,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -598,7 +614,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -652,7 +669,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -700,7 +718,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -748,7 +767,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 // Arrange
@@ -808,6 +828,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required,
                 trnToken: trnToken),
             async coordinator =>
             {
@@ -863,6 +884,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required,
                 trnToken: trnToken),
             async coordinator =>
             {
@@ -913,6 +935,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required,
                 trnToken: trnToken),
             async coordinator =>
             {
@@ -959,6 +982,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required,
                 trnToken: trnToken),
             async coordinator =>
             {
@@ -1009,6 +1033,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required,
                 trnToken: trnToken),
             async coordinator =>
             {
@@ -1059,6 +1084,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required,
                 trnToken: trnToken),
             async coordinator =>
             {
@@ -1104,7 +1130,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             m => m
                 .Setup(mock => mock.MatchPersonAsync(It.IsAny<MatchPersonOptions>()))
                 .ReturnsAsync(value: null),
@@ -1150,7 +1177,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default),
+                clientApplicationUserId: default,
+                recordMatchingPolicy: RecordMatchingPolicy.Required),
             m => m
                 .Setup(mock => mock.MatchPersonAsync(It.IsAny<MatchPersonOptions>()))
                 .ReturnsAsync(new MatchPersonResult(

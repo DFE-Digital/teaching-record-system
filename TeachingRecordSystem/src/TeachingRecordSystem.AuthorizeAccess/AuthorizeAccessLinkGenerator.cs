@@ -43,6 +43,9 @@ public abstract class AuthorizeAccessLinkGenerator
     public string NoTrn(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/NoTrn", journeyInstanceId: journeyInstanceId);
 
+    public string TrnDeferred(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/TrnDeferred", journeyInstanceId: journeyInstanceId);
+
     public string PendingSupportRequest(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/PendingSupportRequest", journeyInstanceId: journeyInstanceId);
 
