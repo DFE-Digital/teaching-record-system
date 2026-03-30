@@ -11,12 +11,18 @@ public static class PageExtensions
             return asUri.LocalPath == path;
         }, new PageWaitForURLOptions { WaitUntil = WaitUntilState.Commit });
 
-    public static async Task GoToTestStartPageAsync(this IPage page, string? trnToken = null)
+    public static async Task GoToTestStartPageAsync(this IPage page, string? trnToken = null, bool deferred = false)
     {
-        await page.GotoAsync(
-            $"/test" +
+        var url = $"/test" +
             $"?scheme={Uri.EscapeDataString(HostFixture.FakeOneLoginAuthenticationScheme)}" +
-            $"&trn_token={Uri.EscapeDataString(trnToken ?? "")}");
+            $"&trn_token={Uri.EscapeDataString(trnToken ?? "")}";
+
+        if (deferred)
+        {
+            url += "&deferred=true";
+        }
+
+        await page.GotoAsync(url);
     }
 
     public static async Task AssertSignedInAsync(this IPage page, string trn)

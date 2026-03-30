@@ -25,6 +25,7 @@ public sealed class HostFixture : InitializeDbFixture
 {
     public const string BaseUrl = "http://localhost:55649";
     public const string FakeOneLoginAuthenticationScheme = "FakeOneLogin";
+    public const string DeferredFakeOneLoginAuthenticationScheme = "DeferredFakeOneLogin";
 
     private bool _initialized;
     private bool _disposed;
@@ -76,10 +77,19 @@ public sealed class HostFixture : InitializeDbFixture
                     services.Configure<AuthenticationOptions>(options =>
                     {
                         options.AddScheme(FakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
+                        options.AddScheme(DeferredFakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
                     });
 
                     services.Configure<OpenIdConnectOptions>(
                         TestAppConfiguration.AuthenticationSchemeName,
+                        options =>
+                        {
+                            options.Authority = BaseUrl;
+                            options.RequireHttpsMetadata = false;
+                        });
+
+                    services.Configure<OpenIdConnectOptions>(
+                        DeferredTestAppConfiguration.AuthenticationSchemeName,
                         options =>
                         {
                             options.Authority = BaseUrl;
@@ -160,6 +170,7 @@ public sealed class HostFixture : InitializeDbFixture
     {
         await using var dbContext = await Services.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
 
+        // Add the default test app with Required record matching policy
         dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
         {
             UserId = Guid.NewGuid(),
@@ -169,7 +180,22 @@ public sealed class HostFixture : InitializeDbFixture
             ClientSecret = TestAppConfiguration.ClientSecret,
             RedirectUris = [BaseUrl + TestAppConfiguration.RedirectUriPath],
             PostLogoutRedirectUris = [BaseUrl + TestAppConfiguration.PostLogoutRedirectUriPath],
-            OneLoginAuthenticationSchemeName = FakeOneLoginAuthenticationScheme
+            OneLoginAuthenticationSchemeName = FakeOneLoginAuthenticationScheme,
+            RecordMatchingPolicy = RecordMatchingPolicy.Required
+        });
+
+        // Add the deferred test app with Deferred record matching policy
+        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        {
+            UserId = Guid.NewGuid(),
+            Name = "Test App (Deferred Matching)",
+            IsOidcClient = true,
+            ClientId = DeferredTestAppConfiguration.ClientId,
+            ClientSecret = DeferredTestAppConfiguration.ClientSecret,
+            RedirectUris = [BaseUrl + DeferredTestAppConfiguration.RedirectUriPath],
+            PostLogoutRedirectUris = [BaseUrl + DeferredTestAppConfiguration.PostLogoutRedirectUriPath],
+            OneLoginAuthenticationSchemeName = DeferredFakeOneLoginAuthenticationScheme,
+            RecordMatchingPolicy = RecordMatchingPolicy.Deferred
         });
 
         await dbContext.SaveChangesAsync();

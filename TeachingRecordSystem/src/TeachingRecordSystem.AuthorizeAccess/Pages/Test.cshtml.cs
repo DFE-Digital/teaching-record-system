@@ -22,6 +22,9 @@ public class TestModel(
     [FromQuery(Name = "trn_token")]
     public string? TrnToken { get; set; }
 
+    [FromQuery(Name = "deferred")]
+    public bool Deferred { get; set; }
+
     public async Task<IActionResult> OnGetAsync()
     {
         if (string.IsNullOrEmpty(AuthenticationScheme))
@@ -31,14 +34,16 @@ public class TestModel(
 
         if (User.Identity?.IsAuthenticated != true)
         {
+            var clientId = Deferred ? DeferredTestAppConfiguration.ClientId : TestAppConfiguration.ClientId;
+
             var testAppUser = await dbContext.ApplicationUsers
-                .Where(u => u.ClientId == TestAppConfiguration.ClientId)
+                .Where(u => u.ClientId == clientId)
                 .Select(u => new { u.UserId, u.ClientId, u.RecordMatchingPolicy })
                 .SingleOrDefaultAsync();
 
             if (testAppUser == null)
             {
-                return BadRequest("Test application user not found");
+                return BadRequest($"Test application user not found for {(Deferred ? "deferred" : "required")} matching policy");
             }
 
             var signInJourneyCoordinator = (SignInJourneyCoordinator?)await journeyInstanceProvider.TryCreateNewInstanceAsync(

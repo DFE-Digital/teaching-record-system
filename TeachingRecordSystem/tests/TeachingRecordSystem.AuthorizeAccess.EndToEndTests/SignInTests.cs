@@ -472,67 +472,46 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_VerifiedUserWithDeferredRecordMatchingPolicyAndNoTrn_CreatesDormantTrnRequestAndSignsIn()
     {
-        await WithDbContextAsync(async dbContext =>
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(
+            TestData.GenerateFirstName(),
+            TestData.GenerateLastName(),
+            TestData.GenerateDateOfBirth());
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPageAsync(deferred: true);
+
+        await page.WaitForUrlPathAsync("/connect");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
+
+        await page.WaitForUrlPathAsync("/national-insurance-number");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/trn");
+        await page.CheckAsync("label:text-is('No')");
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/trn-deferred");
+
+        await page.ClickGovUkButtonAsync("Continue");
+
+        var trnRequestId = await WithDbContextAsync(async dbContext =>
         {
-            var applicationUser = await dbContext.ApplicationUsers
-                .SingleAsync(u => u.ClientId == TestAppConfiguration.ClientId);
-            applicationUser.RecordMatchingPolicy = RecordMatchingPolicy.Deferred;
-            await dbContext.SaveChangesAsync();
+            var trnRequest = await dbContext.TrnRequestMetadata
+                .Where(r => r.OneLoginUserSubject == subject)
+                .OrderByDescending(r => r.CreatedOn)
+                .FirstOrDefaultAsync();
+
+            Assert.NotNull(trnRequest);
+            return trnRequest.RequestId;
         });
 
-        try
-        {
-            var subject = TestData.CreateOneLoginUserSubject();
-            var email = Faker.Internet.Email();
-            var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(
-                TestData.GenerateFirstName(),
-                TestData.GenerateLastName(),
-                TestData.GenerateDateOfBirth());
-            SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
-
-            await using var context = await HostFixture.CreateBrowserContext();
-            var page = await context.NewPageAsync();
-
-            await page.GoToTestStartPageAsync();
-
-            await page.WaitForUrlPathAsync("/connect");
-            await page.ClickGovUkButtonAsync("Find your teaching record");
-
-            await page.WaitForUrlPathAsync("/national-insurance-number");
-            await page.CheckAsync("text=Yes");
-            await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
-            await page.ClickGovUkButtonAsync("Continue");
-
-            await page.WaitForUrlPathAsync("/trn");
-            await page.CheckAsync("label:text-is('No')");
-            await page.ClickGovUkButtonAsync("Continue");
-
-            await page.WaitForUrlPathAsync("/trn-deferred");
-
-            await page.ClickGovUkButtonAsync("Continue");
-
-            var trnRequestId = await WithDbContextAsync(async dbContext =>
-            {
-                var trnRequest = await dbContext.TrnRequestMetadata
-                    .Where(r => r.OneLoginUserSubject == subject)
-                    .OrderByDescending(r => r.CreatedOn)
-                    .FirstOrDefaultAsync();
-
-                Assert.NotNull(trnRequest);
-                return trnRequest.RequestId;
-            });
-
-            await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
-        }
-        finally
-        {
-            await WithDbContextAsync(async dbContext =>
-            {
-                var applicationUser = await dbContext.ApplicationUsers
-                    .SingleAsync(u => u.ClientId == TestAppConfiguration.ClientId);
-                applicationUser.RecordMatchingPolicy = RecordMatchingPolicy.Required;
-                await dbContext.SaveChangesAsync();
-            });
-        }
+        await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
     }
 }
