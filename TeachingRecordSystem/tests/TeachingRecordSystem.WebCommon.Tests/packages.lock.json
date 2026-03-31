@@ -594,8 +594,8 @@
       },
       "Sentry": {
         "type": "Transitive",
-        "resolved": "6.2.0",
-        "contentHash": "kZkHnj9NvQTjf5e8VmVQUT2HdVSmph9MhSm6U+vGoB4vq2uR1a+ZRHpAksNJNl7EjaGbYp55cOWqx5Nh0jQc8w=="
+        "resolved": "6.3.0",
+        "contentHash": "PwcF5yIzcKuhd/3BOxU3QHJA5/xYiuSNSaSpXi2kR3x7ONKel73xi49GfYvRg4mbMN1gRjxduqxQL6iRNNWqBA=="
       },
       "Serilog.Extensions.Logging": {
         "type": "Transitive",
@@ -857,7 +857,7 @@
           "Parquet.Net": "[4.24.0, )",
           "Polly.Core": "[8.6.6, )",
           "Scrutor": "[7.0.0, )",
-          "Sentry.Serilog": "[6.2.0, )",
+          "Sentry.Serilog": "[6.3.0, )",
           "Serilog.Expressions": "[5.0.0, )",
           "Serilog.Formatting.Compact": "[3.0.0, )",
           "Serilog.Settings.Configuration": "[10.0.0, )",
@@ -894,7 +894,8 @@
           "JetBrains.Annotations": "[2025.2.4, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[10.0.5, )",
           "Microsoft.Extensions.Caching.Postgres": "[1.2.2, )",
-          "Sentry.AspNetCore": "[6.2.0, )",
+          "Sentry.AspNetCore": "[6.3.0, )",
+          "Sentry.Serilog": "[6.3.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "prometheus-net.AspNetCore": "[8.2.1, )"
@@ -1346,29 +1347,29 @@
       },
       "Sentry.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[6.2.0, )",
-        "resolved": "6.2.0",
-        "contentHash": "vXY3kBhPlFuXrCkkyILnHnzxYlqvF0ijmRYFMQ/XzaUDhsmH0/QFLhUA36zPay6OEyK7kjHXs1zzVu7U6+hdfg==",
+        "requested": "[6.3.0, )",
+        "resolved": "6.3.0",
+        "contentHash": "0SfIEd6emJdwnORqeyCUYjqWNPwcj3mXnho7Lq32h00+wxws8jVexpqsCesorYZClkzMNrO29q4sCBfJnEl7oA==",
         "dependencies": {
-          "Sentry.Extensions.Logging": "6.2.0"
+          "Sentry.Extensions.Logging": "6.3.0"
         }
       },
       "Sentry.Extensions.Logging": {
         "type": "CentralTransitive",
-        "requested": "[6.2.0, )",
-        "resolved": "6.2.0",
-        "contentHash": "8DLncLmwyBHjG7JSeyn5OGR5vBJPxAe22FkJjTX86vCA7cmmDQ8a79bhLiJUDe6lnT22XniqQWYu18iCbezdRA==",
+        "requested": "[6.3.0, )",
+        "resolved": "6.3.0",
+        "contentHash": "ktCsDYeM1lygBvJ9nMuNgwGuXAsjTx3Nzz9togTrgwU00p4IWdZyy0+hI1GbQTqyXjd3L6VszawqUa9Bq+3Pvg==",
         "dependencies": {
-          "Sentry": "6.2.0"
+          "Sentry": "6.3.0"
         }
       },
       "Sentry.Serilog": {
         "type": "CentralTransitive",
-        "requested": "[6.2.0, )",
-        "resolved": "6.2.0",
-        "contentHash": "NEbMGCa1LqjCse/gdx1ZT0JKsok/+H0ygyZVBbBA4Y3w/z5hj95hQgFI7TbsbzZeYKKeeLVTf2KBWvpBenCQdQ==",
+        "requested": "[6.3.0, )",
+        "resolved": "6.3.0",
+        "contentHash": "OBkpANny9Gh7MlSBxWieWlixst2QWUV6KtQ3zTZdorQUcGfxrmVDOAy5OD/hHWtZzkDjRuo0EF4+BmHuqZYYXg==",
         "dependencies": {
-          "Sentry": "6.2.0",
+          "Sentry": "6.3.0",
           "Serilog": "2.10.0"
         }
       },
