@@ -100,7 +100,6 @@ public class TrnRequestService(
             publishTrnRequestUpdatedEvent: true,
             processContext);
 
-
     public async Task ResolveTrnRequestWithMatchedPersonAsync(
         Guid applicationUserId,
         string requestId,
