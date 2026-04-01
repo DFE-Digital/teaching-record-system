@@ -50,16 +50,16 @@ public class HostFixture : InitializeDbFixture
 
     public HttpClient CreateClient(WebApplicationFactoryClientOptions options) => _webApplicationFactory.CreateClient(options);
 
-    public static void AddApplicationUsers(TrsDbContext dbContext)
+    public static void EnsureApplicationUsers(TrsDbContext dbContext)
     {
-        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        AddOrUpdateUser(new Core.DataStore.Postgres.Models.ApplicationUser
         {
             UserId = DefaultApplicationUserId,
             Name = "Tests",
             ApiRoles = ApiRoles.All.ToArray()
         });
 
-        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        AddOrUpdateUser(new Core.DataStore.Postgres.Models.ApplicationUser
         {
             UserId = GetAnIdentityApplicationUserId,
             Name = "Get an identity",
@@ -67,6 +67,17 @@ public class HostFixture : InitializeDbFixture
         });
 
         dbContext.SaveChanges();
+
+        void AddOrUpdateUser(Core.DataStore.Postgres.Models.ApplicationUser user)
+        {
+            var exists = dbContext.ApplicationUsers.Any(u => u.UserId == user.UserId);
+            dbContext.ApplicationUsers.Add(user);
+
+            if (exists)
+            {
+                dbContext.Entry(user).State = EntityState.Modified;
+            }
+        }
     }
 
     public override async ValueTask InitializeAsync()
@@ -74,7 +85,7 @@ public class HostFixture : InitializeDbFixture
         await InitializeDbAsync();
 
         using var dbContext = DbHelper.Instance.DbContextFactory.CreateDbContext();
-        AddApplicationUsers(dbContext);
+        EnsureApplicationUsers(dbContext);
 
         _ = Services;  // Start the server
     }
@@ -140,7 +151,7 @@ public class HostFixture : InitializeDbFixture
                     options.CanonicalDomain = "http://localhost";
                     options.SigningKeyId = "testkey";
                     options.Keys = [
-                        new WebhookOptionsKey()
+                        new WebhookOptionsKey
                         {
                             KeyId = "testkey",
                             CertificatePem = certPem,
