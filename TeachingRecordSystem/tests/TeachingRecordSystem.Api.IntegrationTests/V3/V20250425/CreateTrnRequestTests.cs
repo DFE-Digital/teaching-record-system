@@ -169,7 +169,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_RequestWithExistingRequestInCrm_ReturnsConflict()
+    public async Task Post_WithExistingRequestId_ReturnsConflict()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -180,66 +180,7 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var existingContact = await TestData.CreatePersonAsync(p => p
-            .WithTrnRequest(ApplicationUserId, requestId)
-            .WithFirstName(firstName)
-            .WithMiddleName(middleName)
-            .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmailAddress(email)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
-
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.Add(new TrnRequest()
-            {
-                ClientId = ApplicationUserId.ToString(),
-                RequestId = requestId,
-                TeacherId = existingContact.PersonId
-            });
-
-            await dbContext.SaveChangesAsync();
-        });
-
-        var requestBody = CreateJsonContent(CreateDummyRequest() with
-        {
-            RequestId = requestId,
-            Person = new()
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                EmailAddresses = [email],
-                NationalInsuranceNumber = nationalInsuranceNumber
-            }
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
-        {
-            Content = requestBody
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
-    }
-
-    [Fact]
-    public async Task Post_RequestWithExistingRequestInDb_ReturnsConflict()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var existingContact = await TestData.CreatePersonAsync(p => p
+        await TestData.CreatePersonAsync(p => p
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -286,7 +227,7 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var invalidNino = "IvalidNi";
 
-        var existingContact = await TestData.CreatePersonAsync(p => p
+        var existingPerson = await TestData.CreatePersonAsync(p => p
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -300,7 +241,7 @@ public class CreateTrnRequestTests : TestBase
             {
                 ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
-                TeacherId = existingContact.PersonId
+                TeacherId = existingPerson.PersonId
             });
 
             await dbContext.SaveChangesAsync();
@@ -426,7 +367,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_PotentialDuplicateContact_ReturnsPendingStatus()
+    public async Task Post_PotentialDuplicatePerson_ReturnsPendingStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();

@@ -10,6 +10,6 @@ public class ClearDbBeforeTestAttribute : TeachingRecordSystem.TestCommon.ClearD
         base.Before(methodUnderTest, test);
 
         using var dbContext = DbHelper.Instance.DbContextFactory.CreateDbContext();
-        HostFixture.AddApplicationUsers(dbContext);
+        HostFixture.EnsureApplicationUsers(dbContext);
     }
 }
