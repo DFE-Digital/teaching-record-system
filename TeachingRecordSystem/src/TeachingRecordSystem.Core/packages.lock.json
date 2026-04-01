@@ -484,11 +484,11 @@
       },
       "Sentry.Serilog": {
         "type": "Direct",
-        "requested": "[6.2.0, )",
-        "resolved": "6.2.0",
-        "contentHash": "NEbMGCa1LqjCse/gdx1ZT0JKsok/+H0ygyZVBbBA4Y3w/z5hj95hQgFI7TbsbzZeYKKeeLVTf2KBWvpBenCQdQ==",
+        "requested": "[6.3.0, )",
+        "resolved": "6.3.0",
+        "contentHash": "OBkpANny9Gh7MlSBxWieWlixst2QWUV6KtQ3zTZdorQUcGfxrmVDOAy5OD/hHWtZzkDjRuo0EF4+BmHuqZYYXg==",
         "dependencies": {
-          "Sentry": "6.2.0",
+          "Sentry": "6.3.0",
           "Serilog": "2.10.0"
         }
       },
@@ -1224,8 +1224,8 @@
       },
       "Sentry": {
         "type": "Transitive",
-        "resolved": "6.2.0",
-        "contentHash": "kZkHnj9NvQTjf5e8VmVQUT2HdVSmph9MhSm6U+vGoB4vq2uR1a+ZRHpAksNJNl7EjaGbYp55cOWqx5Nh0jQc8w=="
+        "resolved": "6.3.0",
+        "contentHash": "PwcF5yIzcKuhd/3BOxU3QHJA5/xYiuSNSaSpXi2kR3x7ONKel73xi49GfYvRg4mbMN1gRjxduqxQL6iRNNWqBA=="
       },
       "Snappier": {
         "type": "Transitive",
