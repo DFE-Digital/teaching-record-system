@@ -146,6 +146,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         {
             SupportTask = supportTask,
             MatchedPersonId = matchedPerson.PersonId,
+            Trn = matchedPerson.Trn!,
             MatchedAttributes =
             [
                 KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
@@ -174,6 +175,124 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
         Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
         Assert.NotNull(updatedOneLoginUser.MatchedAttributes);
+
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails, e => Assert.Equal(EmailTemplateIds.OneLoginRecordMatched, e.TemplateId));
+
+        Events.AssertEventsPublished(
+            e => Assert.IsType<EmailSentEvent>(e),
+            e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e));
+    }
+
+    [Fact]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithConnectedOutcomeAndTrnRequest_ResolvesTrnRequestAndDoesNotEmailUser()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+        var trnRequestId = Guid.NewGuid().ToString();
+
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
+                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedTrn(matchedPerson.Trn!)
+                .WithTrnRequest(trnRequestId));
+
+        var options = new ConnectedOutcomeOptions
+        {
+            SupportTask = supportTask,
+            MatchedPersonId = matchedPerson.PersonId,
+            Trn = matchedPerson.Trn!,
+            MatchedAttributes =
+            [
+                KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
+            ]
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
+
+        // Assert
+        var updatedSupportTask =
+            await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
+        var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
+        Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.NotNull(updatedData.PersonId);
+        Assert.Equal(OneLoginUserRecordMatchingOutcome.Connected, updatedData.Outcome);
+
+        var updatedOneLoginUser =
+            await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
+        Assert.Equal(matchedPerson.PersonId, updatedOneLoginUser.PersonId);
+        Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
+        Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
+        Assert.NotNull(updatedOneLoginUser.MatchedAttributes);
+
+        var updatedTrnRequest =
+            await WithDbContextAsync(dbContext => dbContext.TrnRequestMetadata.SingleAsync(r => r.RequestId == trnRequestId));
+        Assert.Equal(matchedPerson.PersonId, updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
+
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Empty(emails);
+
+        Events.AssertEventsPublished(
+            e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
+            e => Assert.IsType<SupportTaskUpdatedEvent>(e),
+            e => Assert.IsType<TrnRequestUpdatedEvent>(e));
+    }
+
+    [Fact]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithConnectedOutcomeAndNoTrnRequest_SendsEmailToUser()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
+                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedTrn(matchedPerson.Trn!));
+
+        var options = new ConnectedOutcomeOptions
+        {
+            SupportTask = supportTask,
+            MatchedPersonId = matchedPerson.PersonId,
+            Trn = matchedPerson.Trn!,
+            MatchedAttributes =
+            [
+                KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName)
+            ]
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
+
+        // Assert
+        var updatedSupportTask =
+            await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
+        var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
+        Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.NotNull(updatedData.PersonId);
+        Assert.Equal(OneLoginUserRecordMatchingOutcome.Connected, updatedData.Outcome);
+
+        var updatedOneLoginUser =
+            await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
+        Assert.Equal(matchedPerson.PersonId, updatedOneLoginUser.PersonId);
 
         await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
         var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());

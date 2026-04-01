@@ -81,6 +81,7 @@ public class ConfirmConnect(
                 {
                     SupportTask = _supportTask!,
                     MatchedPersonId = MatchedPersonId,
+                    Trn = matchedPerson.Trn,
                     MatchedAttributes = matchedPerson.MatchedAttributes
                 },
                 processContext);

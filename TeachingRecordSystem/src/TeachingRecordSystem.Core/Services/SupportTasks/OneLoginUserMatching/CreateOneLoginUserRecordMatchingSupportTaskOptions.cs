@@ -10,4 +10,5 @@ public record CreateOneLoginUserRecordMatchingSupportTaskOptions
     public required string? StatedTrn { get; init; }
     public required Guid ClientApplicationUserId { get; init; }
     public required string? TrnTokenTrn { get; init; }
+    public string? TrnRequestId { get; init; }
 }

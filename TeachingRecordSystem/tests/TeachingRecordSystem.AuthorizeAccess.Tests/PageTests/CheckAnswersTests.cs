@@ -252,6 +252,100 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
     }
 
+    [Fact]
+    public async Task Post_ValidRequestForVerifiedUserWithDeferredRecordMatchingPolicy_CreatesDormantTrnRequestAndSupportTicket()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var trnToken = await CreateTrnTokenAsync(person.Trn);
+        var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true, recordMatchingPolicy: RecordMatchingPolicy.Deferred);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", applicationUser.UserId, trnToken.TrnToken, trnToken.Trn, RecordMatchingPolicy.Deferred),
+            async coordinator =>
+            {
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+                var trn = await TestData.GenerateTrnAsync();
+
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
+
+                LegacyEventPublisher.Clear();
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.CheckAnswers(coordinator.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.RequestSubmitted(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+
+                Assert.NotNull(coordinator.State.AuthenticationTicket);
+                var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirst(AuthorizeAccess.ClaimTypes.TrnRequestId);
+                Assert.NotNull(trnRequestIdClaim);
+
+                var trnRequest = await WithDbContextAsync(dbContext =>
+                    dbContext.TrnRequestMetadata.SingleAsync(r => r.RequestId == trnRequestIdClaim.Value));
+                Assert.NotNull(trnRequest);
+                Assert.Equal(applicationUser.UserId, trnRequest.ApplicationUserId);
+                Assert.Equal(oneLoginUser.Subject, trnRequest.OneLoginUserSubject);
+                Assert.True(trnRequest.IdentityVerified);
+
+                var supportTask = await WithDbContextAsync(dbContext =>
+                    dbContext.SupportTasks.SingleAsync(t => t.OneLoginUserSubject == oneLoginUser.Subject));
+                Assert.NotNull(supportTask);
+                Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTask.SupportTaskType);
+                Assert.Equal(applicationUser.UserId, supportTask.TrnRequestApplicationUserId);
+                Assert.Equal(trnRequestIdClaim.Value, supportTask.TrnRequestId);
+
+                var data = Assert.IsType<OneLoginUserRecordMatchingData>(supportTask.Data);
+                Assert.Equal(nationalInsuranceNumber, data.StatedNationalInsuranceNumber);
+                Assert.Equal(trn, data.StatedTrn);
+            });
+    }
+
+    [Fact]
+    public async Task Post_ValidRequestForVerifiedUserWithRequiredRecordMatchingPolicy_DoesNotCreateDormantTrnRequest()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var trnToken = await CreateTrnTokenAsync(person.Trn);
+        var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true, recordMatchingPolicy: RecordMatchingPolicy.Required);
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", applicationUser.UserId, trnToken.TrnToken, trnToken.Trn, RecordMatchingPolicy.Required),
+            async coordinator =>
+            {
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+                var trn = await TestData.GenerateTrnAsync();
+
+                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.CheckAnswers(coordinator.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+                Assert.Null(coordinator.State.AuthenticationTicket);
+
+                var trnRequestCount = await WithDbContextAsync(dbContext =>
+                    dbContext.TrnRequestMetadata.CountAsync(r => r.ApplicationUserId == applicationUser.UserId));
+                Assert.Equal(0, trnRequestCount);
+
+                var supportTask = await WithDbContextAsync(dbContext =>
+                    dbContext.SupportTasks.SingleAsync(t => t.OneLoginUserSubject == oneLoginUser.Subject));
+                Assert.Null(supportTask.TrnRequestApplicationUserId);
+                Assert.Null(supportTask.TrnRequestId);
+            });
+    }
+
     private async Task SetupInstanceStateForVerifiedUserAsync(
         SignInJourneyCoordinator coordinator,
         OneLoginUser oneLoginUser,
