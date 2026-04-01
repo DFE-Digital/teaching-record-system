@@ -37,7 +37,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(oneLoginUser.Subject, claims.GetValueOrDefault("sub"));
         Assert.Equal(person.Trn, claims.GetValueOrDefault("trn"));
         Assert.Equal(oneLoginUser.EmailAddress, claims.GetValueOrDefault("email"));
-        Assert.NotEmpty(claims.GetValueOrDefault("onelogin_id") ?? "");
+        Assert.NotEmpty(claims.GetValueOrDefault("_ta_olidt") ?? "");
         Assert.Equal(expectedVerifiedName, JsonSerializer.Deserialize<string[]>(claims.GetValueOrDefault("verified_name") ?? "[]"));
         Assert.Equal(expectedVerifiedDateOfBirth, DateOnly.Parse(claims.GetValueOrDefault("verified_date_of_birth") ?? "0001-01-01"));
 
