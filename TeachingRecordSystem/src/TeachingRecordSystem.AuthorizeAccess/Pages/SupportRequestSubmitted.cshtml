@@ -14,7 +14,7 @@
                     5 working days
                 </div>
                 <div>
-                    Your reference number is:<br/>
+                    Your reference number:<br/>
                     <strong>@Model.SupportTaskReference</strong>
                 </div>
             </govuk-panel-body>
@@ -22,14 +22,17 @@
 
         <h2 class="govuk-heading-m">What happens next</h2>
         <p class="govuk-body">
-            We’ll contact you when we have an update.
+            We’ll contact you when we have an update. Please do not submit another support request before then.
         </p>
         <p class="govuk-body">
             You’ll need your reference number if you need to contact support about your request.
         </p>
-        <p class="govuk-body">
-            We’ll email you once your request has been completed.
-            Please do not submit another support request before then.
-        </p>
+
+        @if (Model.CanReturnToService)
+        {
+            <form action="" method="post">
+                <govuk-button type="submit">You can return to the @Model.ServiceName service.</govuk-button>
+            </form>
+        }
     </div>
 </div>

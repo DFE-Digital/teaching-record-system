@@ -514,4 +514,70 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
     }
+
+    [Fact]
+    public async Task SignIn_VerifiedUserWithDeferredRecordMatchingPolicyAndUnmatchedTrn_CreatesSupportTaskWithDormantTrnRequestAndSignsIn()
+    {
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(
+            TestData.GenerateFirstName(),
+            TestData.GenerateLastName(),
+            TestData.GenerateDateOfBirth());
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPageAsync(deferred: true);
+
+        await page.WaitForUrlPathAsync("/connect");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
+
+        await page.WaitForUrlPathAsync("/national-insurance-number");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/trn");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrnAsync());
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/not-found");
+        await page.ClickGovUkButtonAsync("Check your answers");
+
+        await page.WaitForUrlPathAsync("/check-answers");
+        await page.ClickGovUkButtonAsync("Submit support request");
+
+        await page.WaitForUrlPathAsync("/request-submitted");
+
+        var trnRequestId = await WithDbContextAsync(async dbContext =>
+        {
+            var trnRequest = await dbContext.TrnRequestMetadata
+                .Where(r => r.OneLoginUserSubject == subject)
+                .OrderByDescending(r => r.CreatedOn)
+                .FirstOrDefaultAsync();
+
+            Assert.NotNull(trnRequest);
+            Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+
+            var supportTask = await dbContext.SupportTasks
+                .Where(st => st.OneLoginUserSubject == subject)
+                .OrderByDescending(st => st.CreatedOn)
+                .FirstOrDefaultAsync();
+
+            Assert.NotNull(supportTask);
+            Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTask.SupportTaskType);
+            Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+            Assert.Equal(trnRequest.RequestId, supportTask.TrnRequestId);
+            Assert.Equal(trnRequest.ApplicationUserId, supportTask.TrnRequestApplicationUserId);
+
+            return trnRequest.RequestId;
+        });
+
+        await page.ClickGovUkButtonAsync("You can return to the Test service service.");
+
+        await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
+    }
 }

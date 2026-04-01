@@ -43,9 +43,19 @@ public class CheckAnswersModel(
         var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow);
 
         SupportTask supportTask;
+        string? trnRequestId = null;
 
         if (IdentityVerified)
         {
+            if (state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
+            {
+                await coordinator.UpdateStateAsync(async state =>
+                {
+                    trnRequestId = await coordinator.CompleteWithDeferredMatchingAsync(state);
+                    return state;
+                });
+            }
+
             supportTask = await oneLoginUserMatchingSupportTaskService.CreateRecordMatchingSupportTaskAsync(
                 new CreateOneLoginUserRecordMatchingSupportTaskOptions
                 {
@@ -56,7 +66,8 @@ public class CheckAnswersModel(
                     StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
                     StatedTrn = state.Trn,
                     ClientApplicationUserId = state.ClientApplicationUserId,
-                    TrnTokenTrn = state.TrnTokenTrn
+                    TrnTokenTrn = state.TrnTokenTrn,
+                    TrnRequestId = trnRequestId
                 },
                 processContext);
         }

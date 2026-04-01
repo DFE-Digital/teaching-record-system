@@ -10,6 +10,10 @@ public partial class OneLoginUserMatchingSupportTaskService
         CreateOneLoginUserRecordMatchingSupportTaskOptions options,
         ProcessContext processContext)
     {
+        var trnRequest = options.TrnRequestId is not null
+            ? (options.ClientApplicationUserId, options.TrnRequestId)
+            : ((Guid ApplicationUserId, string RequestId)?)null;
+
         var supportTask = await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
             {
@@ -27,7 +31,7 @@ public partial class OneLoginUserMatchingSupportTaskService
                 },
                 PersonId = null,
                 OneLoginUserSubject = options.OneLoginUserSubject,
-                TrnRequest = null
+                TrnRequest = trnRequest
             },
             processContext);
 
@@ -95,10 +99,6 @@ public partial class OneLoginUserMatchingSupportTaskService
             },
             processContext);
 
-        var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
-        var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
-        await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
-
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
             {
@@ -111,5 +111,21 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
+
+        if (supportTask.TrnRequestId is not null)
+        {
+            await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
+                supportTask.TrnRequestApplicationUserId!.Value,
+                supportTask.TrnRequestId,
+                (options.MatchedPersonId, options.Trn),
+                options.MatchedAttributes.Select(kvp => kvp.Key).ToArray(),
+                processContext);
+        }
+        else
+        {
+            var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
+            var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
+            await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
+        }
     }
 }

@@ -27,6 +27,7 @@ public partial class TestData
         private Option<Guid> _clientApplicationUserId;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
+        private Option<string> _trnRequestId;
 
         public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithEmailAddress(string emailAddress)
         {
@@ -82,19 +83,27 @@ public partial class TestData
             return this;
         }
 
-        public Task<SupportTask> ExecuteAsync(TestData testData) =>
-            testData.WithDbContextAsync(async dbContext =>
-            {
-                var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail());
-                var verifiedNames = _verifiedNames.ValueOr([[testData.GenerateFirstName(), testData.GenerateLastName()]]);
-                var verifiedDateOfBirth = _verifiedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
-                var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
-                var statedTrn = _statedTrn.ValueOr(await testData.GenerateTrnAsync());
-                var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
-                var clientApplicationUserId = _clientApplicationUserId.ValueOrDefault();
-                var status = _status.ValueOr(SupportTaskStatus.Open);
-                var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithTrnRequest(string trnRequestId)
+        {
+            _trnRequestId = Option.Some(trnRequestId);
+            return this;
+        }
 
+        public async Task<SupportTask> ExecuteAsync(TestData testData)
+        {
+            var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail());
+            var verifiedNames = _verifiedNames.ValueOr([[testData.GenerateFirstName(), testData.GenerateLastName()]]);
+            var verifiedDateOfBirth = _verifiedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
+            var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
+            var statedTrn = _statedTrn.ValueOr(await testData.GenerateTrnAsync());
+            var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
+            var clientApplicationUserId = _clientApplicationUserId.ValueOr(Guid.NewGuid());
+            var status = _status.ValueOr(SupportTaskStatus.Open);
+            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+            var trnRequestId = _trnRequestId.ValueOrDefault();
+
+            return await testData.WithDbContextAsync(async dbContext =>
+            {
                 var data = new OneLoginUserRecordMatchingData()
                 {
                     OneLoginUserSubject = oneLoginUserSubject,
@@ -107,13 +116,64 @@ public partial class TestData
                     TrnTokenTrn = trnTokenTrn
                 };
 
+                if (trnRequestId is not null)
+                {
+                    var applicationUser = await dbContext.ApplicationUsers.SingleOrDefaultAsync(u => u.UserId == clientApplicationUserId);
+
+                    if (applicationUser is null)
+                    {
+                        applicationUser = new ApplicationUser()
+                        {
+                            Name = testData.GenerateApplicationUserName(),
+                            UserId = clientApplicationUserId,
+                            ApiRoles = [],
+                            IsOidcClient = false,
+                            RecordMatchingPolicy = RecordMatchingPolicy.Deferred
+                        };
+
+                        dbContext.ApplicationUsers.Add(applicationUser);
+                    }
+
+                    var firstName = verifiedNames.First().First();
+                    var lastName = verifiedNames.First().LastOrDefault() ?? testData.GenerateLastName();
+
+                    var trnRequestMetadata = new TrnRequestMetadata
+                    {
+                        ApplicationUserId = clientApplicationUserId,
+                        RequestId = trnRequestId,
+                        CreatedOn = createdOn,
+                        IdentityVerified = true,
+                        EmailAddress = emailAddress,
+                        OneLoginUserSubject = oneLoginUserSubject,
+                        FirstName = firstName,
+                        MiddleName = null,
+                        LastName = lastName,
+                        PreviousFirstName = null,
+                        PreviousLastName = null,
+                        Name = [firstName, lastName],
+                        DateOfBirth = verifiedDateOfBirth,
+                        PotentialDuplicate = false,
+                        NationalInsuranceNumber = statedNationalInsuranceNumber,
+                        Gender = null,
+                        AddressLine1 = null,
+                        AddressLine2 = null,
+                        AddressLine3 = null,
+                        City = null,
+                        Postcode = null,
+                        Country = null,
+                        TrnToken = null
+                    };
+
+                    dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+                }
+
                 var supportTask = SupportTask.Create(
                     supportTaskType: SupportTaskType.OneLoginUserRecordMatching,
                     data: data,
                     personId: null,
                     oneLoginUserSubject: oneLoginUserSubject,
-                    trnRequestApplicationUserId: null,
-                    trnRequestId: null,
+                    trnRequestApplicationUserId: trnRequestId is not null ? clientApplicationUserId : null,
+                    trnRequestId: trnRequestId,
                     createdBy: SystemUser.SystemUserId,
                     now: createdOn,
                     out var createdEvent);
@@ -123,7 +183,12 @@ public partial class TestData
                 dbContext.AddEventWithoutBroadcast(createdEvent);
                 await dbContext.SaveChangesAsync();
 
-                return await dbContext.SupportTasks.Include(t => t.OneLoginUser).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+                return await dbContext.SupportTasks
+                    .Include(t => t.OneLoginUser)
+                    .Include(t => t.TrnRequestMetadata)
+                    .ThenInclude(m => m!.ApplicationUser)
+                    .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             });
+        }
     }
 }

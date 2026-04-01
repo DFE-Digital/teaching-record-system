@@ -25,7 +25,8 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
                  SupportTaskType.ApiTrnRequest,
                  SupportTaskType.TrnRequestManualChecksNeeded,
                  SupportTaskType.NpqTrnRequest,
-                 SupportTaskType.TeacherPensionsPotentialDuplicate
+                 SupportTaskType.TeacherPensionsPotentialDuplicate,
+                 SupportTaskType.OneLoginUserRecordMatching
             ])
             .Any())
         {
