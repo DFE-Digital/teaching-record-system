@@ -201,6 +201,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(professionalStatusEmailJobOptions.JobSchedule));
 
+            recurringJobManager.AddOrUpdate<BackfillAlertsInReportingDb>(
+                nameof(BackfillAlertsInReportingDb),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.RemoveIfExists("BackfillAlertProcessesJob (dry-run)");
             recurringJobManager.RemoveIfExists("BackfillAlertProcessesJob");
             recurringJobManager.RemoveIfExists("CreateDqtAnnotationAuditEventsJob");
