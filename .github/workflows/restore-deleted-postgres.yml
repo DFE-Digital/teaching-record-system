@@ -42,7 +42,9 @@ jobs:
     name: Recover Deleted Postgres
     if: ${{ inputs.environment != 'production' || (inputs.environment == 'production' && github.event.inputs.confirm-production == 'true' )  }}
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment:
+      name: ${{ inputs.environment }}
+      deployment: false
     concurrency: deploy_${{ inputs.environment }}
 
     steps:
