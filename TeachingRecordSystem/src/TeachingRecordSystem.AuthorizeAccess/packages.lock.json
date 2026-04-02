@@ -19,13 +19,11 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[3.5.1, )",
-        "resolved": "3.5.1",
-        "contentHash": "G96jb/L5+jWFcWmFsA8xoFTUz0yVYD4ArR0A7H8m27qucUyoDdvLUjqY8E5BU+XqvRDhZKiKmFJ3lO8f0Z2g3g==",
+        "requested": "[4.0.0, )",
+        "resolved": "4.0.0",
+        "contentHash": "+cZC2/XonZ0Qq+YqINht1Dn1PW3HTYYxUEn+cqpnjsxEFJHoQpsMWv/nCqc+yGb7P6nv8rZKcswdkwCyp8VeLg==",
         "dependencies": {
-          "Fluid.Core": "[2.15.0, 3.0.0)",
-          "HtmlAgilityPack": "1.12.0",
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.23"
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.25"
         }
       },
       "GovUk.OneLogin.AspNetCore": {
@@ -202,15 +200,6 @@
           "FluentValidation": "11.11.0"
         }
       },
-      "Fluid.Core": {
-        "type": "Transitive",
-        "resolved": "2.15.0",
-        "contentHash": "J0x83Z99D2WwtUuMuD21w5b31T1P960IkK3MYvlwDiPUEWtqD5tndHguthI+JCkzlMgnfR4R9d3CQUmEwCNTAg==",
-        "dependencies": {
-          "Parlot": "1.2.2",
-          "TimeZoneConverter": "6.1.0"
-        }
-      },
       "Google.Api.Gax": {
         "type": "Transitive",
         "resolved": "4.9.0",
@@ -281,11 +270,6 @@
           "Google.Api.Gax.Rest": "[4.0.0, 5.0.0)",
           "Google.Apis.Bigquery.v2": "[1.57.0.2704, 2.0.0)"
         }
-      },
-      "HtmlAgilityPack": {
-        "type": "Transitive",
-        "resolved": "1.12.0",
-        "contentHash": "VHtVZmfoYhQyA/POvZRLuTpCz1zhzIDrdYRJIRV73e9wKAzjW71biYNOHOWx8MxEX3TE4TWVfx1QDRoZcj2AWw=="
       },
       "IronCompress": {
         "type": "Transitive",
@@ -458,8 +442,8 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "8.0.23",
-        "contentHash": "r4LEloHJISvha0lZs26rUAGZr/zSTSuT1GeDLgmi3Ow4z7mZ7L48jtvGJCknAX4nlAaJH9YZvfc8RqkixJ38Ew=="
+        "resolved": "8.0.25",
+        "contentHash": "LBlxUQTtVrAH7gcUyEpqHwQ0ASx2/rbNIht/DWj+ofux4UH7PMUjyPodx1pGlb+Zdi03ItUZQFT8mRzi0Tiewg=="
       },
       "Microsoft.Extensions.Http.Diagnostics": {
         "type": "Transitive",
@@ -803,11 +787,6 @@
           "OpenIddict.Validation": "7.4.0"
         }
       },
-      "Parlot": {
-        "type": "Transitive",
-        "resolved": "1.2.2",
-        "contentHash": "Vz4SFXeF5BKiQ8jjnkYxw3B8ZVXrl/TcT6RM9hH8+HGLeSqpnWmYi1BidUlchwVFlliW6lorv4TAcGPFvhPj0Q=="
-      },
       "Pipelines.Sockets.Unofficial": {
         "type": "Transitive",
         "resolved": "2.2.8",
@@ -995,11 +974,6 @@
         "type": "Transitive",
         "resolved": "9.0.4",
         "contentHash": "o94k2RKuAce3GeDMlUvIXlhVa1kWpJw95E6C9LwW0KlG0nj5+SgCiIxJ2Eroqb9sLtG1mEMbFttZIBZ13EJPvQ=="
-      },
-      "TimeZoneConverter": {
-        "type": "Transitive",
-        "resolved": "6.1.0",
-        "contentHash": "UGdtyKWJqXXinyvGB9X6NVoIYbTAidoZYmn3aXzxeEYC9+OL8vF36eDt1qjb6RqBkWDl4v7iE84ecI+dFhA80A=="
       },
       "UUID": {
         "type": "Transitive",
