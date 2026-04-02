@@ -78,4 +78,69 @@ public class GetTrnRequestTests : OperationTestBase
         Assert.Equal(person.Trn, success.Trn);
         Assert.NotNull(success.AccessYourTeachingQualificationsLink);
     }
+
+    [Fact]
+    public async Task HandleAsync_RequestIsRejected_ReturnsError()
+    {
+        // Arrange
+        var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
+
+        var task = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.SupportTasks.Attach(task.SupportTask);
+            dbContext.TrnRequestMetadata.Attach(task.TrnRequest);
+
+            task.SupportTask.Status = SupportTaskStatus.Closed;
+            task.TrnRequest.SetRejected();
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        var command = new GetTrnRequestCommand(task.TrnRequest.RequestId);
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        AssertError(result, ApiError.ErrorCodes.UnsupportedTrnRequestStatus);
+    }
+
+    [Fact]
+    public async Task HandleAsync_RequestIsDormantAndDormantRequestsNotSupported_ReturnsError()
+    {
+        // Arrange
+        var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
+
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUserId);
+
+        var command = new GetTrnRequestCommand(trnRequest.RequestId, GetTrnRequestCommandOptions.None);
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        AssertError(result, ApiError.ErrorCodes.UnsupportedTrnRequestStatus);
+    }
+
+    [Fact]
+    public async Task HandleAsync_RequestIsDormantAndDormantRequestsAreSupported_ReturnsDormantStatus()
+    {
+        // Arrange
+        var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
+
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUserId);
+
+        var command = new GetTrnRequestCommand(trnRequest.RequestId, GetTrnRequestCommandOptions.SupportsDormantRequests);
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = result.GetSuccess();
+        Assert.Equal(TrnRequestStatus.Dormant, success.Status);
+        Assert.Null(success.Trn);
+        Assert.Null(success.AccessYourTeachingQualificationsLink);
+    }
 }
