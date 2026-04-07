@@ -320,10 +320,11 @@ public class OneLoginService(
                 options.Trn,
                 options.TrnTokenTrnHint));
 
-        if (suggestedMatches.Count == 1)
+        var candidates = new List<MatchPersonResult>();
+
+        foreach (var match in suggestedMatches)
         {
-            var singleMatch = suggestedMatches.Single();
-            var matchedAttributes = singleMatch.MatchedAttributes;
+            var matchedAttributes = match.MatchedAttributes;
             var matchedAttributeTypes = matchedAttributes.Select(kvp => kvp.Key).ToArray();
 
             var requiredAttributeTypes = new[]
@@ -337,11 +338,16 @@ public class OneLoginService(
                 (matchedAttributeTypes.Contains(PersonMatchedAttribute.NationalInsuranceNumber) ||
                  matchedAttributeTypes.Contains(PersonMatchedAttribute.Trn)))
             {
-                return new MatchPersonResult(
-                    singleMatch.PersonId,
-                    singleMatch.Trn,
-                    singleMatch.MatchedAttributes);
+                candidates.Add(new MatchPersonResult(
+                    match.PersonId,
+                    match.Trn,
+                    match.MatchedAttributes));
             }
+        }
+
+        if (candidates is [var singleCandidate])
+        {
+            return singleCandidate;
         }
 
         return null;
