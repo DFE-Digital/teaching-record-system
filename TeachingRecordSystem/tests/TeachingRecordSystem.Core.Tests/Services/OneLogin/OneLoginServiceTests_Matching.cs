@@ -140,6 +140,36 @@ public partial class OneLoginServiceTests
     }
 
     [Fact]
+    public async Task MatchPersonAsync_SingleCompleteMatchAndOtherPartialMatches_ReturnsCompleteMatch()
+    {
+        // Arrange
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+
+        // Person who matches on name, DOB, TRN, NINO
+        var person1 = await TestData.CreatePersonAsync(
+            p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithEmailAddress());
+
+        // Person who matches on name and DOB only
+        var person2 = await TestData.CreatePersonAsync(
+            p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+
+        string[][] names = [[person1.FirstName, person1.LastName]];
+        DateOnly[] datesOfBirth = [person1.DateOfBirth];
+        var nationalInsuranceNumber = person1.NationalInsuranceNumber!;
+        var trn = person1.Trn;
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.MatchPersonAsync(new(names, datesOfBirth, EmailAddress: null, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(person1.PersonId, result.PersonId);
+    }
+
+    [Fact]
     public async Task GetSuggestedPersonMatchesAsync_ReturnsExpectedEmailMatchedAttribute()
     {
         // Arrange

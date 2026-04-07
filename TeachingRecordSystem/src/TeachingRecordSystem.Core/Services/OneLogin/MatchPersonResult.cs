@@ -4,3 +4,4 @@ public record MatchPersonResult(
     Guid PersonId,
     string Trn,
     IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>> MatchedAttributes);
+
