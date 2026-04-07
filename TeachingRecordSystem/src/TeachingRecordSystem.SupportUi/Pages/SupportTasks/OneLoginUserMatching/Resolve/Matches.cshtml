@@ -53,7 +53,9 @@
                     <govuk-summary-list>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@match.HasNameMismatch">@($"{match.FirstName} {match.LastName}")</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@match.HasNameMismatch">
+                                @match.FirstName @match.MiddleName @match.LastName
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         @if (match.PreviousNames!.Count > 0)
                         {
