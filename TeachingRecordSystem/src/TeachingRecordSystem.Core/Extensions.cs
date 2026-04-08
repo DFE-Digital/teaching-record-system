@@ -230,9 +230,7 @@ public static class Extensions
         IConfiguration configuration,
         IServiceProvider services)
     {
-        config
-            .ReadFrom.Configuration(configuration)
-            .WriteTo.Sentry(o => o.InitializeSdk = false);
+        config.ReadFrom.Configuration(configuration);
 
         if (environment.IsProduction())
         {
