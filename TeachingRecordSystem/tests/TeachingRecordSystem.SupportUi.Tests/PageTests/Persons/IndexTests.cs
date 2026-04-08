@@ -154,7 +154,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var emailResults = doc.GetAllElementsByTestId("one-login-emails");
         Assert.Single(emailResults);
         Assert.Contains(emailAddress, emailResults.Single().TextContent);
-    }    
+    }
 
     [Fact]
     public async Task Get_WithIncludeActiveFilter_DisplaysOnlyActivePersons()
