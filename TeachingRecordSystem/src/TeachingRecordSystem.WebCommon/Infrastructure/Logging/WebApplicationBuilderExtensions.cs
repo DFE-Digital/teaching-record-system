@@ -12,6 +12,8 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder, Action<LoggerConfiguration, IServiceProvider>? configureLogger = null)
     {
+        builder.Logging.ClearProviders();
+
         if (builder.Environment.IsProduction())
         {
             builder.WebHost.UseSentry(dsn: builder.Configuration.GetRequiredValue("Sentry:Dsn"));
@@ -20,9 +22,6 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
 
         builder.Services.AddTransient<RemoveRedactedUrlParametersEnricher>();
-
-        // We want all logging to go through Serilog so that our filters are always applied
-        builder.Logging.ClearProviders();
 
         builder.Host.UseSerilog((ctx, services, config) =>
         {

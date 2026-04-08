@@ -8,6 +8,8 @@ public static class HostApplicationBuilderExtensions
 {
     public static HostApplicationBuilder ConfigureLogging(this HostApplicationBuilder builder)
     {
+        builder.Logging.ClearProviders();
+
         if (builder.Environment.IsProduction())
         {
             SentrySdk.Init(options =>
@@ -16,9 +18,6 @@ public static class HostApplicationBuilderExtensions
                 options.IsGlobalModeEnabled = true;
             });
         }
-
-        // We want all logging to go through Serilog so that our filters are always applied
-        builder.Logging.ClearProviders();
 
         builder.Services.AddSerilog((services, config) => config.ConfigureSerilog(builder.Environment, builder.Configuration, services));
 

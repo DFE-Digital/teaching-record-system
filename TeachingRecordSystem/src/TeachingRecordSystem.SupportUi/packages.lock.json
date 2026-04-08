@@ -978,7 +978,6 @@
           "Parquet.Net": "[4.24.0, )",
           "Polly.Core": "[8.6.6, )",
           "Scrutor": "[7.0.0, )",
-          "Sentry.Serilog": "[6.3.0, )",
           "Serilog.Expressions": "[5.0.0, )",
           "Serilog.Formatting.Compact": "[3.0.0, )",
           "Serilog.Settings.Configuration": "[10.0.0, )",
@@ -1002,7 +1001,6 @@
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[10.0.5, )",
           "Microsoft.Extensions.Caching.Postgres": "[1.2.2, )",
           "Sentry.AspNetCore": "[6.3.0, )",
-          "Sentry.Serilog": "[6.3.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "prometheus-net.AspNetCore": "[8.2.1, )"
@@ -1425,16 +1423,6 @@
         "contentHash": "ktCsDYeM1lygBvJ9nMuNgwGuXAsjTx3Nzz9togTrgwU00p4IWdZyy0+hI1GbQTqyXjd3L6VszawqUa9Bq+3Pvg==",
         "dependencies": {
           "Sentry": "6.3.0"
-        }
-      },
-      "Sentry.Serilog": {
-        "type": "CentralTransitive",
-        "requested": "[6.3.0, )",
-        "resolved": "6.3.0",
-        "contentHash": "OBkpANny9Gh7MlSBxWieWlixst2QWUV6KtQ3zTZdorQUcGfxrmVDOAy5OD/hHWtZzkDjRuo0EF4+BmHuqZYYXg==",
-        "dependencies": {
-          "Sentry": "6.3.0",
-          "Serilog": "2.10.0"
         }
       },
       "Serilog": {
