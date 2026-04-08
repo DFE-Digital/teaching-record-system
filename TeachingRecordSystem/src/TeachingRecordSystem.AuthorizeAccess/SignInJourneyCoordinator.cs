@@ -83,7 +83,24 @@ public class SignInJourneyCoordinator(
 
         var pendingSupportTaskReference = await oneLoginService.GetPendingSupportTaskReferenceByUserAsync(oneLoginUser.Subject);
 
-        UpdateState(state =>
+        string? existingTrnRequestId = null;
+
+        if (trn is null && State.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
+        {
+            var existingTrnRequest = await dbContext.TrnRequestMetadata
+                .Where(tr => tr.OneLoginUserSubject == sub)
+                .OrderByDescending(tr => tr.CreatedOn)
+                .FirstOrDefaultAsync();
+
+            if (existingTrnRequest is not null)
+            {
+                existingTrnRequestId = existingTrnRequest.RequestId;
+            }
+        }
+
+        var hasClosedIdVerificationSupportTask = await oneLoginService.HasClosedIdVerificationSupportTaskAsync(sub);
+
+        await UpdateStateAsync(async state =>
         {
             state.Reset();
             state.OneLoginAuthenticationTicket = ticket;
@@ -99,6 +116,19 @@ public class SignInJourneyCoordinator(
             if (trn is not null && !ShowDebugPages)
             {
                 Complete(state, trn);
+            }
+            else if (existingTrnRequestId is not null && !ShowDebugPages)
+            {
+                CompleteWithExistingTrnRequest(state, existingTrnRequestId);
+            }
+            else if (trn is null &&
+                existingTrnRequestId is null &&
+                pendingSupportTaskReference is null &&
+                hasClosedIdVerificationSupportTask &&
+                state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred &&
+                !ShowDebugPages)
+            {
+                await CompleteWithDeferredMatchingAsync(state, processContext);
             }
         });
     }
@@ -317,7 +347,18 @@ public class SignInJourneyCoordinator(
         CreateAuthenticationTicket(state, specificClaims);
     }
 
-    public async Task<string> CompleteWithDeferredMatchingAsync(SignInJourneyState state)
+    public void CompleteWithExistingTrnRequest(SignInJourneyState state, string trnRequestId)
+    {
+        if (state.OneLoginAuthenticationTicket is null)
+        {
+            throw new InvalidOperationException("User is not authenticated with One Login.");
+        }
+
+        var specificClaims = new[] { new Claim(ClaimTypes.TrnRequestId, trnRequestId) };
+        CreateAuthenticationTicket(state, specificClaims);
+    }
+
+    public async Task<string> CompleteWithDeferredMatchingAsync(SignInJourneyState state, ProcessContext? processContext = null)
     {
         if (state.OneLoginAuthenticationTicket is null)
         {
@@ -339,7 +380,7 @@ public class SignInJourneyCoordinator(
 
         var requestId = Guid.NewGuid().ToString();
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow);
+        processContext ??= await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow);
 
         // Create a dormant TRN request
         var trnRequestInfo = await trnRequestService.CreateTrnRequestAsync(

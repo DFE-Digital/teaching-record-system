@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 
 namespace TeachingRecordSystem.Core.Services.OneLogin;
@@ -471,6 +472,17 @@ public class OneLoginService(
             .FirstOrDefaultAsync();
 
         return task?.SupportTaskReference;
+    }
+
+    public async Task<bool> HasClosedIdVerificationSupportTaskAsync(string oneLoginUserSubject)
+    {
+        var closedIdVerificationTasks = await dbContext.SupportTasks
+            .Where(t => t.OneLoginUserSubject == oneLoginUserSubject &&
+                       t.Status == SupportTaskStatus.Closed &&
+                       t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
+            .ToListAsync();
+
+        return closedIdVerificationTasks.Any(t => ((OneLoginUserIdVerificationData)t.Data).Outcome != OneLoginUserIdVerificationOutcome.NotVerified);
     }
 
     public async Task<OneLoginUser> OnSignInAsync(string sub, string email, ProcessContext processContext)
