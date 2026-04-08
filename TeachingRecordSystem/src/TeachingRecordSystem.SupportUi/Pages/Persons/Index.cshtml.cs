@@ -67,6 +67,14 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 Pagination = PaginationViewModel.Create(
                     SearchResults,
                     pageNumber => linkGenerator.Persons.Index(Search, IncludeActive, IncludeDeactivated, IncludeOneLoginUser, SortBy, SortDirection, pageNumber));
+
+                Facets = new Dictionary<string, IReadOnlyDictionary<object, int>>
+                {
+                    [nameof(IncludeActive)] = new Dictionary<object, int> { [true] = 0 },
+                    [nameof(IncludeDeactivated)] = new Dictionary<object, int> { [true] = 0 },
+                    [nameof(IncludeOneLoginUser)] = new Dictionary<object, int> { [true] = 0 }
+                };
+
                 return Page();
             }
 
