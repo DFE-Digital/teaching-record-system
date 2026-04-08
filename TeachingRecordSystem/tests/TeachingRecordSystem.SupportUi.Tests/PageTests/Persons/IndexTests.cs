@@ -41,6 +41,29 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_WithSearchThatLooksLikeAnEmailAddressWithNoMatch_DisplaysNoMatches()
+    {
+        // Arrange
+        var emailAddress = Faker.Internet.Email();
+        var search = emailAddress;
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var searchInput = doc.GetElementByLabel("Search");
+        Assert.NotNull(searchInput);
+        Assert.Equal(search, searchInput.GetAttribute("value"));
+
+        var noMatches = doc.GetElementByTestId("no-matches");
+        Assert.NotNull(noMatches);
+    }
+
+    [Fact]
     public async Task Get_WithSearchThatLooksLikeADate_DisplaysMatchesOnDateOfBirth()
     {
         // Arrange
