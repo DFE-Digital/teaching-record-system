@@ -215,6 +215,33 @@ public sealed class OneLoginAuthenticationSchemeProvider(
             }
         };
 
+        options.Events.OnRemoteFailure = async context =>
+        {
+            if (context.Failure?.Message is "Correlation failed.")
+            {
+                // This can happen if users use the browser Back button to return to One Login after they've already returned to us
+                // (and we've invalidated the CSRF and/or nonce).
+                // In such a case, check if the user is signed in (they should be) and redirect onwards if they are.
+                // If they're not signed in, let the error bubble up.
+
+                var journeyInstanceProvider = context.HttpContext.RequestServices.GetRequiredService<IJourneyInstanceProvider>();
+                var coordinator = journeyInstanceProvider.GetSignInJourneyCoordinator(context.HttpContext);
+
+                if (coordinator is null)
+                {
+                    return;
+                }
+
+                if (coordinator.State.OneLoginAuthenticationTicket is not null)
+                {
+                    context.HandleResponse();
+
+                    var result = coordinator.GetNextPage();
+                    await result.ExecuteAsync(context.HttpContext);
+                }
+            }
+        };
+
         options.VectorsOfTrust = ["Cl.Cm.P2"];
 
         options.Claims.Add(OneLoginClaimTypes.CoreIdentity);
