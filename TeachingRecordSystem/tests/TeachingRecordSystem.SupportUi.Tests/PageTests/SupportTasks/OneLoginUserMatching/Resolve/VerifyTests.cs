@@ -158,6 +158,39 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
     }
 
     [Fact]
+    public async Task Post_VerifiedIsTrueAndNoTrnProvided_UpdatesStateAndRedirectsToNoMatchesPage()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject,
+            t => t.WithStatedTrn(null));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Verified", "True" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.State.Verified);
+        Assert.Empty(journeyInstance.State.MatchedPersons);
+    }
+
+    [Fact]
     public async Task Post_VerifiedIsTrueAndMatches_UpdatesStateAndRedirectsToMatchesPage()
     {
         // Arrange

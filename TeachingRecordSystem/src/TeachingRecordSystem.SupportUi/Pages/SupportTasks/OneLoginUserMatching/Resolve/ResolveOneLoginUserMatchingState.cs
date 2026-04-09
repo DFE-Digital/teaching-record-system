@@ -48,13 +48,22 @@ public class ResolveOneLoginUserMatchingStateFactory(OneLoginService oneLoginSer
         var requestData = supportTask.GetData<IOneLoginUserMatchingData>();
         var emailAddress = supportTask.OneLoginUser!.EmailAddress;
 
-        var suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
-            Names: requestData.VerifiedOrStatedNames!,
-            DatesOfBirth: requestData.VerifiedOrStatedDatesOfBirth!,
-            NationalInsuranceNumber: requestData.StatedNationalInsuranceNumber,
-            EmailAddress: emailAddress,
-            Trn: requestData.StatedTrn,
-            TrnTokenTrnHint: requestData.TrnTokenTrn));
+        IReadOnlyCollection<MatchPersonResult> suggestedMatches;
+
+        if (string.IsNullOrWhiteSpace(requestData.StatedTrn))
+        {
+            suggestedMatches = [];
+        }
+        else
+        {
+            suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
+                Names: requestData.VerifiedOrStatedNames!,
+                DatesOfBirth: requestData.VerifiedOrStatedDatesOfBirth!,
+                NationalInsuranceNumber: requestData.StatedNationalInsuranceNumber,
+                EmailAddress: emailAddress,
+                Trn: requestData.StatedTrn,
+                TrnTokenTrnHint: requestData.TrnTokenTrn));
+        }
 
         return supportTask.ResolveJourneySavedState?.GetState<ResolveOneLoginUserMatchingState>() is { } existingState ?
             existingState with { MatchedPersons = suggestedMatches, SavedJourneyState = supportTask.ResolveJourneySavedState } :
