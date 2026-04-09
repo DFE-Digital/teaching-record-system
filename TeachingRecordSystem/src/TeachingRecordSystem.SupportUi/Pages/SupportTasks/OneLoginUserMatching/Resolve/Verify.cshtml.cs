@@ -51,6 +51,8 @@ public class VerifyModel(ISafeFileService safeFileService, SupportUiLinkGenerato
 
         return Redirect(Verified is false ?
             linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Reject(SupportTaskReference!, JourneyInstance!.InstanceId) :
+            string.IsNullOrWhiteSpace(Trn) ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NoMatches(SupportTaskReference!, JourneyInstance!.InstanceId) :
             JourneyInstance.State.MatchedPersons.Count > 0 ?
             linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId) :
             linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NoMatches(SupportTaskReference!, JourneyInstance!.InstanceId));

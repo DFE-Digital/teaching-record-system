@@ -22,7 +22,7 @@ public partial class TestData
         private Option<string> _statedLastName;
         private Option<DateOnly> _statedDateOfBirth;
         private Option<string?> _statedNationalInsuranceNumber;
-        private Option<string> _statedTrn;
+        private Option<string?> _statedTrn;
         private Option<Guid> _evidenceFileId;
         private Option<string> _evidenceFileName;
         private Option<string?> _trnTokenTrn;
@@ -54,7 +54,7 @@ public partial class TestData
             return this;
         }
 
-        public CreateOneLoginUserIdVerificationSupportTaskBuilder WithStatedTrn(string statedTrn)
+        public CreateOneLoginUserIdVerificationSupportTaskBuilder WithStatedTrn(string? statedTrn)
         {
             _statedTrn = Option.Some(statedTrn);
             return this;
@@ -103,7 +103,7 @@ public partial class TestData
                 var statedLastName = _statedLastName.ValueOr(testData.GenerateLastName);
                 var statedDateOfBirth = _statedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
                 var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
-                var statedTrn = _statedTrn.ValueOr(await testData.GenerateTrnAsync());
+                var statedTrn = _statedTrn.HasValue ? _statedTrn.ValueOrDefault() : await testData.GenerateTrnAsync();
                 var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid());
                 var evidenceFileName = _evidenceFileName.ValueOr("evidence.pdf");
                 var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
