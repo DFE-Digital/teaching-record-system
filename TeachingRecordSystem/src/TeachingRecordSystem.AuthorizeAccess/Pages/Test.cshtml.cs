@@ -22,9 +22,6 @@ public class TestModel(
     [FromQuery(Name = "trn_token")]
     public string? TrnToken { get; set; }
 
-    [FromQuery(Name = "deferred")]
-    public bool Deferred { get; set; }
-
     public async Task<IActionResult> OnGetAsync()
     {
         if (string.IsNullOrEmpty(AuthenticationScheme))
@@ -34,16 +31,14 @@ public class TestModel(
 
         if (User.Identity?.IsAuthenticated != true)
         {
-            var clientId = Deferred ? DeferredTestAppConfiguration.ClientId : TestAppConfiguration.ClientId;
-
-            var testAppUser = await dbContext.ApplicationUsers
-                .Where(u => u.ClientId == clientId)
-                .Select(u => new { u.UserId, u.ClientId, u.RecordMatchingPolicy })
+            var applicationUser = await dbContext.ApplicationUsers
+                .Where(u => u.OneLoginAuthenticationSchemeName == AuthenticationScheme)
+                .Select(u => new { u.UserId, u.ClientId, u.RecordMatchingPolicy, u.Name })
                 .SingleOrDefaultAsync();
 
-            if (testAppUser == null)
+            if (applicationUser is null)
             {
-                return BadRequest($"Test application user not found for {(Deferred ? "deferred" : "required")} matching policy");
+                return BadRequest($"Application user not found for authentication scheme: {AuthenticationScheme}.");
             }
 
             var signInJourneyCoordinator = (SignInJourneyCoordinator?)await journeyInstanceProvider.TryCreateNewInstanceAsync(
@@ -56,8 +51,8 @@ public class TestModel(
                         new AuthorizeAccessRequestStartedEvent
                         {
                             EventId = Guid.NewGuid(),
-                            ApplicationUserId = testAppUser.UserId,
-                            ClientId = testAppUser.ClientId!,
+                            ApplicationUserId = applicationUser.UserId,
+                            ClientId = applicationUser.ClientId!,
                             JourneyInstanceId = ctx.InstanceId.ToString()
                         },
                         processContext);
@@ -67,11 +62,11 @@ public class TestModel(
                     var state = new SignInJourneyState(
                         processContext.ProcessId,
                         redirectUri,
-                        "Test service",
+                        applicationUser.Name,
                         serviceUrl: Request.GetEncodedUrl(),
                         AuthenticationScheme,
-                        clientApplicationUserId: testAppUser.UserId,
-                        recordMatchingPolicy: testAppUser.RecordMatchingPolicy,
+                        clientApplicationUserId: applicationUser.UserId,
+                        recordMatchingPolicy: applicationUser.RecordMatchingPolicy,
                         TrnToken);
 
                     return state;

@@ -13,14 +13,11 @@ public static class PageExtensions
 
     public static async Task GoToTestStartPageAsync(this IPage page, string? trnToken = null, bool deferred = false)
     {
-        var url = $"/test" +
-            $"?scheme={Uri.EscapeDataString(HostFixture.FakeOneLoginAuthenticationScheme)}" +
-            $"&trn_token={Uri.EscapeDataString(trnToken ?? "")}";
+        var scheme = deferred ? HostFixture.DeferredFakeOneLoginAuthenticationScheme : HostFixture.FakeOneLoginAuthenticationScheme;
 
-        if (deferred)
-        {
-            url += "&deferred=true";
-        }
+        var url = $"/test" +
+            $"?scheme={Uri.EscapeDataString(scheme)}" +
+            $"&trn_token={Uri.EscapeDataString(trnToken ?? "")}";
 
         await page.GotoAsync(url);
     }
