@@ -18,7 +18,8 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateResetTrnRequestCommand(configuration),
     Commands.CreateImportCapitaFileCommand(configuration),
     Commands.CreateImportClaimTestDataCommand(configuration),
-    Commands.CorrectQualificationStartDate(configuration)
+    Commands.CorrectQualificationStartDate(configuration),
+    Commands.MarkDeceasedCommand(configuration)
 };
 
 var parseResult = rootCommand.Parse(args);
