@@ -172,7 +172,7 @@ jobs:
     needs: [tests]
     if: always()
     steps:
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         with:
           script: |
             const testsStepResult = '${{ needs.tests.result }}';
