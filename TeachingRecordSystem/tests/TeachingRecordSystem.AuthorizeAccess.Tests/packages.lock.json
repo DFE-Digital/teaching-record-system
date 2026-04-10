@@ -1103,7 +1103,7 @@
           "DartSassBuilder": "[1.1.0, )",
           "DfeAnalytics.AspNetCore": "[0.4.2, )",
           "GovUk.Frontend.AspNetCore": "[3.5.1, )",
-          "GovUk.OneLogin.AspNetCore": "[0.4.0, )",
+          "GovUk.OneLogin.AspNetCore": "[0.4.2, )",
           "GovUk.Questions.AspNetCore": "[0.1.0-alpha.0.94, )",
           "Humanizer.Core": "[3.0.10, )",
           "JetBrains.Annotations": "[2025.2.4, )",
@@ -1404,11 +1404,11 @@
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[0.4.0, )",
-        "resolved": "0.4.0",
-        "contentHash": "xmddqVvAp7m9B47sk9mczdGk/IjKca5dbnClcJCAOf/D4/sGbKbjavR2szu1uXWEIHU5v+TgegEia48LFed0IA==",
+        "requested": "[0.4.2, )",
+        "resolved": "0.4.2",
+        "contentHash": "q4jHwl6gJZnxoj0XBwj6WpJIDqdH7wwqYVwWysIMKM2qKV0+Y6S7qR9alOOkSzTYkMlaKwtS/gIYb1ehBqfUWw==",
         "dependencies": {
-          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.16"
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.25"
         }
       },
       "GovUk.Questions.AspNetCore": {
