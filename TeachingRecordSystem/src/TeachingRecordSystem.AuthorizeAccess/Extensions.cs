@@ -46,7 +46,9 @@ public static class Extensions
             options.DefaultFileUploadJavaScriptEnhancements = true;
         });
 
-        services.AddSession();
+        // One Login has a one hour timeout on IDV journeys; we need to make sure our session cookies last that long too
+        // otherwise callbacks will fail due to the missing journey.
+        services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(1));
 
         services.AddGovUkQuestions();
 

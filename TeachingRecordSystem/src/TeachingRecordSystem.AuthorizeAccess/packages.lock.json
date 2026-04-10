@@ -30,11 +30,11 @@
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "Direct",
-        "requested": "[0.4.0, )",
-        "resolved": "0.4.0",
-        "contentHash": "xmddqVvAp7m9B47sk9mczdGk/IjKca5dbnClcJCAOf/D4/sGbKbjavR2szu1uXWEIHU5v+TgegEia48LFed0IA==",
+        "requested": "[0.4.2, )",
+        "resolved": "0.4.2",
+        "contentHash": "q4jHwl6gJZnxoj0XBwj6WpJIDqdH7wwqYVwWysIMKM2qKV0+Y6S7qR9alOOkSzTYkMlaKwtS/gIYb1ehBqfUWw==",
         "dependencies": {
-          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.16"
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.25"
         }
       },
       "GovUk.Questions.AspNetCore": {
