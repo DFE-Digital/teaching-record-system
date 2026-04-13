@@ -242,7 +242,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
 
         var options = new VerifiedOnlyWithoutMatchesOutcomeOptions
         {
-            SupportTask = supportTask
+            SupportTask = supportTask,
+            EmailTemplateId = null
         };
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);

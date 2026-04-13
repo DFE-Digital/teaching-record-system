@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Dfe.Analytics.EFCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -49,6 +50,11 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
         builder.Property(e => e.OneLoginRedirectUriPath).HasMaxLength(ApplicationUser.RedirectUriPathMaxLength);
         builder.Property(e => e.OneLoginPostLogoutRedirectUriPath).HasMaxLength(ApplicationUser.RedirectUriPathMaxLength);
         builder.Property(e => e.RecordMatchingPolicy).IsRequired().HasDefaultValue(RecordMatchingPolicy.Required);
+        builder.Property(e => e.AppContent)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => v == null ? null : JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => v == null ? null : JsonSerializer.Deserialize<TeachingRecordSystem.Core.Models.AppContent>(v, (JsonSerializerOptions?)null));
         builder.HasIndex(e => e.OneLoginAuthenticationSchemeName).IsUnique().HasDatabaseName(ApplicationUser.OneLoginAuthenticationSchemeNameUniqueIndexName)
             .HasFilter("one_login_authentication_scheme_name is not null");
         builder.HasIndex(e => e.ClientId).IsUnique().HasDatabaseName(ApplicationUser.ClientIdUniqueIndexName).HasFilter("client_id is not null");

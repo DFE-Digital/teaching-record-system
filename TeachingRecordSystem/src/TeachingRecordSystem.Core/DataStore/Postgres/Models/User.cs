@@ -66,6 +66,7 @@ public class ApplicationUser : UserBase
     public string? OneLoginRedirectUriPath { get; set; }
     public string? OneLoginPostLogoutRedirectUriPath { get; set; }
     public RecordMatchingPolicy RecordMatchingPolicy { get; set; } = RecordMatchingPolicy.Required;
+    public TeachingRecordSystem.Core.Models.AppContent? AppContent { get; set; }
 
     [MemberNotNull(
         nameof(OneLoginClientId),

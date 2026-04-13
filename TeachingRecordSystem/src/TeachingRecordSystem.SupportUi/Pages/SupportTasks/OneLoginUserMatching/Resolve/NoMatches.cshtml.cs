@@ -24,6 +24,8 @@ public class NoMatches(
 
     public bool? IsRecordMatchingOnly { get; set; }
 
+    public string? NoMatchesPageContent { get; set; }
+
     public void OnGet()
     {
     }
@@ -46,7 +48,8 @@ public class NoMatches(
             await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedOnlyWithoutMatchesOutcomeOptions
                 {
-                    SupportTask = _supportTask!
+                    SupportTask = _supportTask!,
+                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId
                 },
                 processContext);
         }
@@ -57,7 +60,8 @@ public class NoMatches(
             await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new NoMatchesOutcomeOptions
                 {
-                    SupportTask = _supportTask!
+                    SupportTask = _supportTask!,
+                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId
                 },
                 processContext);
         }
@@ -96,6 +100,8 @@ public class NoMatches(
         // For the time being only display first verified name and dob if there are multiples (but still match on both)
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         Name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
+
+        NoMatchesPageContent = JourneyInstance.State.AppContent?.OneLoginNoMatchesPageContentHtml;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

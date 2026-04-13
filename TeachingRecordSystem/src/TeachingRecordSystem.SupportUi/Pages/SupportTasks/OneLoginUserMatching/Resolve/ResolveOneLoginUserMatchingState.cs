@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
@@ -30,10 +31,14 @@ public record ResolveOneLoginUserMatchingState : IRegisterJourney, IJourneyWithS
     public OneLoginUserNotConnectingReason? NotConnectingReason { get; set; }
 
     public string? NotConnectingAdditionalDetails { get; set; }
+
+    public TeachingRecordSystem.Core.Models.AppContent? AppContent { get; set; }
 }
 
 [UsedImplicitly]
-public class ResolveOneLoginUserMatchingStateFactory(OneLoginService oneLoginService) :
+public class ResolveOneLoginUserMatchingStateFactory(
+    OneLoginService oneLoginService,
+    TrsDbContext dbContext) :
     IJourneyStateFactory<ResolveOneLoginUserMatchingState>
 {
     public Task<ResolveOneLoginUserMatchingState> CreateAsync(CreateJourneyStateContext context)
@@ -65,12 +70,29 @@ public class ResolveOneLoginUserMatchingStateFactory(OneLoginService oneLoginSer
                 TrnTokenTrnHint: requestData.TrnTokenTrn));
         }
 
+        AppContent? appContent = null;
+        Guid clientApplicationUserId = requestData switch
+        {
+            OneLoginUserIdVerificationData idVerificationData => idVerificationData.ClientApplicationUserId,
+            OneLoginUserRecordMatchingData recordMatchingData => recordMatchingData.ClientApplicationUserId,
+            _ => Guid.Empty
+        };
+
+        if (clientApplicationUserId != Guid.Empty)
+        {
+            appContent = await dbContext.ApplicationUsers
+                .Where(u => u.UserId == clientApplicationUserId)
+                .Select(u => u.AppContent)
+                .FirstOrDefaultAsync();
+        }
+
         return supportTask.ResolveJourneySavedState?.GetState<ResolveOneLoginUserMatchingState>() is { } existingState ?
-            existingState with { MatchedPersons = suggestedMatches, SavedJourneyState = supportTask.ResolveJourneySavedState } :
+            existingState with { MatchedPersons = suggestedMatches, AppContent = appContent, SavedJourneyState = supportTask.ResolveJourneySavedState } :
             new ResolveOneLoginUserMatchingState
             {
                 MatchedPersons = suggestedMatches,
-                Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching ? true : null
+                Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching ? true : null,
+                AppContent = appContent
             };
     }
 }

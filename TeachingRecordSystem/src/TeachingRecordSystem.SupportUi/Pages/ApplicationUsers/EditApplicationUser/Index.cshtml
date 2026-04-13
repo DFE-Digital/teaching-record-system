@@ -152,6 +152,18 @@
                                 </govuk-radios-item>
                             </govuk-radios-fieldset>
                         </govuk-radios>
+
+                        <h3 class="govuk-heading-s">App Content</h3>
+
+                        <govuk-input for="OneLoginCannotFindRecordEmailTemplateId" input-class="trs-monospace" spellcheck="false">
+                            <govuk-input-label class="govuk-label--s">One Login - Cannot Find Record Email Template ID</govuk-input-label>
+                            <govuk-input-hint>Leave blank to use default template</govuk-input-hint>
+                        </govuk-input>
+
+                        <govuk-textarea for="OneLoginNoMatchesPageContentHtml" textarea-class="govuk-!-width-full trs-monospace" rows="10" spellcheck="false">
+                            <govuk-textarea-label class="govuk-label--s">One Login - No Matches Page Content</govuk-textarea-label>
+                            <govuk-textarea-hint>HTML content shown on the No Matches page when a user cannot be matched to a teaching record. Leave blank to use default content.</govuk-textarea-hint>
+                        </govuk-textarea>
                     </govuk-checkboxes-item-conditional>
                 </govuk-checkboxes-item>
             </govuk-checkboxes>
