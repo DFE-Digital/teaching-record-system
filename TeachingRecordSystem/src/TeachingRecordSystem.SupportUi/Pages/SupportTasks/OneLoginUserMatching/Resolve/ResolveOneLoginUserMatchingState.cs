@@ -69,7 +69,7 @@ public class ResolveOneLoginUserMatchingStateFactory(
                 Trn: requestData.StatedTrn,
                 TrnTokenTrnHint: requestData.TrnTokenTrn));
         }
-        
+
         AppContent? appContent = null;
         Guid clientApplicationUserId = requestData switch
         {

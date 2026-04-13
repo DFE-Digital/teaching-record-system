@@ -5,5 +5,5 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 public record VerifiedOnlyWithoutMatchesOutcomeOptions
 {
     public required SupportTask SupportTask { get; init; }
-    public string? EmailTemplateId { get; init; }
+    public required string? EmailTemplateId { get; init; }
 }

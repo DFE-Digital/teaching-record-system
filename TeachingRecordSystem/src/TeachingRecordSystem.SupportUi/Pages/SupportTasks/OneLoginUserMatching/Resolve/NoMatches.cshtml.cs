@@ -101,7 +101,7 @@ public class NoMatches(
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         Name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
 
-        NoMatchesPageContent = JourneyInstance.State.AppContent?.OneLoginNoMatchesPageContent;
+        NoMatchesPageContent = JourneyInstance.State.AppContent?.OneLoginNoMatchesPageContentHtml;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

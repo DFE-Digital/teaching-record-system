@@ -227,7 +227,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
             appContent: new AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = customEmailTemplateId,
-                OneLoginNoMatchesPageContent = customPageContent
+                OneLoginNoMatchesPageContentHtml = customPageContent
             });
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: !isRecordMatchingOnlySupportTask);

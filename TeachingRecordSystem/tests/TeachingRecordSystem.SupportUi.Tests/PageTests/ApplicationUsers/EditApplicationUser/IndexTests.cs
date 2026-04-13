@@ -370,7 +370,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == applicationUser.UserId);
             Assert.NotNull(applicationUser.AppContent);
             Assert.Equal(emailTemplateId, applicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
-            Assert.Equal(pageContent, applicationUser.AppContent.OneLoginNoMatchesPageContent);
+            Assert.Equal(pageContent, applicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
         });
 
         EventObserver.AssertEventsSaved(
@@ -379,7 +379,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
                 Assert.NotNull(applicationUserUpdatedEvent.ApplicationUser.AppContent);
                 Assert.Equal(emailTemplateId, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
-                Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContent);
+                Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.AppContent);
                 Assert.True(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent));
             });
@@ -399,7 +399,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             appContent: new AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = emailTemplateId,
-                OneLoginNoMatchesPageContent = pageContent
+                OneLoginNoMatchesPageContentHtml = pageContent
             });
 
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
@@ -442,7 +442,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(ApplicationUserUpdatedEventChanges.Name, applicationUserUpdatedEvent.Changes); // Only Name changed
                 Assert.False(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent)); // AppContent flag NOT set
                 Assert.Equal(emailTemplateId, applicationUserUpdatedEvent.ApplicationUser.AppContent!.OneLoginCannotFindRecordEmailTemplateId);
-                Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContent);
+                Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
             });
     }
 
@@ -455,7 +455,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             appContent: new AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString(),
-                OneLoginNoMatchesPageContent = "<p>Old content</p>"
+                OneLoginNoMatchesPageContentHtml = "<p>Old content</p>"
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
@@ -494,7 +494,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == applicationUser.UserId);
             Assert.NotNull(applicationUser.AppContent);
             Assert.Null(applicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
-            Assert.Null(applicationUser.AppContent.OneLoginNoMatchesPageContent);
+            Assert.Null(applicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
         });
 
         EventObserver.AssertEventsSaved(
