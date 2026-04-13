@@ -862,8 +862,8 @@
       },
       "Sentry": {
         "type": "Transitive",
-        "resolved": "6.3.0",
-        "contentHash": "PwcF5yIzcKuhd/3BOxU3QHJA5/xYiuSNSaSpXi2kR3x7ONKel73xi49GfYvRg4mbMN1gRjxduqxQL6iRNNWqBA=="
+        "resolved": "6.3.1",
+        "contentHash": "EomIkD+OmI9xCupBNVmKYUbxLnhzP5kRFAuDY52nEHXbOLt327eC2kScmO6HntkT+LVI4k6RnP3RmYpTSKo2Pw=="
       },
       "Serilog.Extensions.Logging": {
         "type": "Transitive",
@@ -1199,7 +1199,7 @@
           "JetBrains.Annotations": "[2025.2.4, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[10.0.5, )",
           "Microsoft.Extensions.Caching.Postgres": "[1.2.2, )",
-          "Sentry.AspNetCore": "[6.3.0, )",
+          "Sentry.AspNetCore": "[6.3.1, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "prometheus-net.AspNetCore": "[8.2.1, )"
@@ -1740,20 +1740,20 @@
       },
       "Sentry.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[6.3.0, )",
-        "resolved": "6.3.0",
-        "contentHash": "0SfIEd6emJdwnORqeyCUYjqWNPwcj3mXnho7Lq32h00+wxws8jVexpqsCesorYZClkzMNrO29q4sCBfJnEl7oA==",
+        "requested": "[6.3.1, )",
+        "resolved": "6.3.1",
+        "contentHash": "t5vozmTQ5pp+jT1OCKbFr/FpO793KeAxO2YMr63IP588kni4GNpXNW1377lZLIYWy2dFNyZJbJKH/VkEB7JIbA==",
         "dependencies": {
-          "Sentry.Extensions.Logging": "6.3.0"
+          "Sentry.Extensions.Logging": "6.3.1"
         }
       },
       "Sentry.Extensions.Logging": {
         "type": "CentralTransitive",
-        "requested": "[6.3.0, )",
-        "resolved": "6.3.0",
-        "contentHash": "ktCsDYeM1lygBvJ9nMuNgwGuXAsjTx3Nzz9togTrgwU00p4IWdZyy0+hI1GbQTqyXjd3L6VszawqUa9Bq+3Pvg==",
+        "requested": "[6.3.1, )",
+        "resolved": "6.3.1",
+        "contentHash": "p5rPxBzzpNR0K6AS1LXMYiJqQq/GYUUEko4VPjhlaQiUXVTDNDAZyap6wdYMq4b8LIxBpVt/Ff9nbEsrMvgI7w==",
         "dependencies": {
-          "Sentry": "6.3.0"
+          "Sentry": "6.3.1"
         }
       },
       "Serilog": {
