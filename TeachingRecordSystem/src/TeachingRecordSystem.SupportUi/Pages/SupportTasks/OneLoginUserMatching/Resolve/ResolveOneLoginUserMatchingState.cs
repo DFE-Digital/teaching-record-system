@@ -86,7 +86,7 @@ public class ResolveOneLoginUserMatchingStateFactory(
             var applicationUser = await dbContext.ApplicationUsers
                 .Where(u => u.UserId == clientApplicationUserId)
                 .Select(u => new { u.AppContent, u.RecordMatchingPolicy })
-                .FirstOrDefaultAsync();
+                .SingleAsync();
 
             appContent = applicationUser?.AppContent;
             recordMatchingPolicy = applicationUser?.RecordMatchingPolicy;
