@@ -86,7 +86,14 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
-            state => state.Verified = true,
+            state =>
+            {
+                state.Verified = true;
+                state.AppContent = new Core.Models.AppContent
+                {
+                    OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString()
+                };
+            },
             matchedPersons: []);
 
         var request = new HttpRequestMessage(
@@ -136,7 +143,14 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
-            state => state.Verified = true,
+            state =>
+            {
+                state.Verified = true;
+                state.AppContent = new AppContent
+                {
+                    OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString()
+                };
+            },
             matchedPersons: []);
 
         var request = new HttpRequestMessage(
@@ -258,7 +272,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
 
         Assert.Contains("This is custom HTML content for this service.", doc.Body!.TextContent);
         Assert.Contains("Please contact us if you need help.", doc.Body!.TextContent);
-        Assert.DoesNotContain("We'll send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.", doc.Body!.TextContent);
+        Assert.DoesNotContain("We’ll send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.", doc.Body!.TextContent);
     }
 
     [Theory]
@@ -292,5 +306,104 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
 
         Assert.Contains("send them an email", doc.Body!.TextContent);
         Assert.Contains("could not find a teaching record", doc.Body!.TextContent);
+    }
+
+    [Fact]
+    public async Task Post_IdVerificationSupportTaskWithCustomFlashMessage_UsesCustomFlashMessage()
+    {
+        // Arrange
+        var customFlashMessage = "Request closed for {0}. We’ve sent them an email with a link to continue their national professional qualification (NPQ) registration.";
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+        var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            state =>
+            {
+                state.Verified = true;
+                state.AppContent = new AppContent
+                {
+                    OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString(),
+                    OneLoginNoMatchesEmailSentFlashMessage = customFlashMessage
+                };
+            },
+            matchedPersons: []);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+            nextPageDoc,
+            "Email sent",
+            string.Format(customFlashMessage, $"{supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}"));
+    }
+
+    [Fact]
+    public async Task Post_IdVerificationSupportTaskWithoutAppContent_UsesDefaultTemplateAndSendsEmail()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+        var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            state => state.Verified = true,
+            matchedPersons: []);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+            nextPageDoc,
+            "Email sent",
+            $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}. We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.");
+    }
+
+    [Fact]
+    public async Task Post_RecordMatchingSupportTaskWithoutAppContent_UsesDefaultTemplateAndSendsEmail()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithVerifiedNames([firstName, lastName]));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            state => state.Verified = true,
+            matchedPersons: []);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+            nextPageDoc,
+            "Email sent",
+            $"Request closed for {firstName} {lastName}. We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.");
     }
 }

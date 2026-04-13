@@ -32,7 +32,9 @@ public record ResolveOneLoginUserMatchingState : IRegisterJourney, IJourneyWithS
 
     public string? NotConnectingAdditionalDetails { get; set; }
 
-    public TeachingRecordSystem.Core.Models.AppContent? AppContent { get; set; }
+    public AppContent? AppContent { get; set; }
+
+    public RecordMatchingPolicy? RecordMatchingPolicy { get; set; }
 }
 
 [UsedImplicitly]
@@ -71,6 +73,7 @@ public class ResolveOneLoginUserMatchingStateFactory(
         }
 
         AppContent? appContent = null;
+        RecordMatchingPolicy? recordMatchingPolicy = null;
         Guid clientApplicationUserId = requestData switch
         {
             OneLoginUserIdVerificationData idVerificationData => idVerificationData.ClientApplicationUserId,
@@ -80,19 +83,23 @@ public class ResolveOneLoginUserMatchingStateFactory(
 
         if (clientApplicationUserId != Guid.Empty)
         {
-            appContent = await dbContext.ApplicationUsers
+            var applicationUser = await dbContext.ApplicationUsers
                 .Where(u => u.UserId == clientApplicationUserId)
-                .Select(u => u.AppContent)
+                .Select(u => new { u.AppContent, u.RecordMatchingPolicy })
                 .FirstOrDefaultAsync();
+
+            appContent = applicationUser?.AppContent;
+            recordMatchingPolicy = applicationUser?.RecordMatchingPolicy;
         }
 
         return supportTask.ResolveJourneySavedState?.GetState<ResolveOneLoginUserMatchingState>() is { } existingState ?
-            existingState with { MatchedPersons = suggestedMatches, AppContent = appContent, SavedJourneyState = supportTask.ResolveJourneySavedState } :
+            existingState with { MatchedPersons = suggestedMatches, AppContent = appContent, RecordMatchingPolicy = recordMatchingPolicy, SavedJourneyState = supportTask.ResolveJourneySavedState } :
             new ResolveOneLoginUserMatchingState
             {
                 MatchedPersons = suggestedMatches,
                 Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching ? true : null,
-                AppContent = appContent
+                AppContent = appContent,
+                RecordMatchingPolicy = recordMatchingPolicy
             };
     }
 }

@@ -49,7 +49,7 @@ public class NoMatches(
                 new VerifiedOnlyWithoutMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!,
-                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId
+                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId ?? EmailTemplateIds.OneLoginCannotFindRecord
                 },
                 processContext);
         }
@@ -57,21 +57,31 @@ public class NoMatches(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
+            var emailTemplateId = JourneyInstance.State.RecordMatchingPolicy == RecordMatchingPolicy.Deferred
+                ? null
+                : JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId ?? EmailTemplateIds.OneLoginCannotFindRecord;
+
             await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new NoMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!,
-                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId
+                    EmailTemplateId = emailTemplateId
                 },
                 processContext);
         }
 
         await JourneyInstance.DeleteAsync();
 
+        var emailSent = _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification ||
+            JourneyInstance.State.RecordMatchingPolicy != RecordMatchingPolicy.Deferred;
+
+        var emailSentMessage = JourneyInstance.State.AppContent?.OneLoginNoMatchesEmailSentFlashMessage is not null
+            ? string.Format(JourneyInstance.State.AppContent.OneLoginNoMatchesEmailSentFlashMessage, Name)
+            : $"Request closed for {Name}. We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.";
+
         TempData.SetFlashNotificationBanner(
-            "Email sent",
-            $"Request closed for {Name}. " +
-            $"We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.",
+            emailSent ? "Email sent" : "Request closed",
+            emailSent ? emailSentMessage : $"Request closed for {Name}.",
             notificationBannerType: NotificationBannerType.Default);
 
         return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
