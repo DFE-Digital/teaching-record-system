@@ -221,7 +221,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var originalName = applicationUser.Name;
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
         var newRoles = new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson };
-        var clientId = "client-id";
+        var clientId = Guid.NewGuid().ToString();
         var clientSecret = "Secret0123456789";
         var redirectUris = "http://localhost/callback";
         var postLogoutRedirectUris = "http://localhost/logout-callback";
@@ -353,7 +353,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "OneLoginPostLogoutRedirectUriPath", applicationUser.OneLoginPostLogoutRedirectUriPath! },
                 { "RecordMatchingPolicy", applicationUser.RecordMatchingPolicy.ToString() },
                 { "OneLoginCannotFindRecordEmailTemplateId", emailTemplateId },
-                { "OneLoginNoMatchesPageContent", pageContent }
+                { "OneLoginNoMatchesPageContentHtml", pageContent }
             }
         };
 
@@ -423,7 +423,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "OneLoginPostLogoutRedirectUriPath", applicationUser.OneLoginPostLogoutRedirectUriPath! },
                 { "RecordMatchingPolicy", applicationUser.RecordMatchingPolicy.ToString() },
                 { "OneLoginCannotFindRecordEmailTemplateId", emailTemplateId },
-                { "OneLoginNoMatchesPageContent", pageContent }
+                { "OneLoginNoMatchesPageContentHtml", pageContent }
             }
         };
 
@@ -477,7 +477,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "OneLoginPostLogoutRedirectUriPath", applicationUser.OneLoginPostLogoutRedirectUriPath! },
                 { "RecordMatchingPolicy", applicationUser.RecordMatchingPolicy.ToString() },
                 { "OneLoginCannotFindRecordEmailTemplateId", "" },
-                { "OneLoginNoMatchesPageContent", "" }
+                { "OneLoginNoMatchesPageContentHtml", "" }
             }
         };
 
