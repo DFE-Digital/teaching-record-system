@@ -89,7 +89,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public string? OneLoginCannotFindRecordEmailTemplateId { get; set; }
 
-    public string? OneLoginCannotFindRecordPageContent { get; set; }
+    public string? OneLoginNoMatchesPageContent { get; set; }
 
     public void OnGet()
     {
@@ -108,7 +108,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         OneLoginPostLogoutRedirectUriPath = _user.OneLoginPostLogoutRedirectUriPath;
         RecordMatchingPolicy = _user.RecordMatchingPolicy;
         OneLoginCannotFindRecordEmailTemplateId = _user.AppContent?.OneLoginCannotFindRecordEmailTemplateId;
-        OneLoginCannotFindRecordPageContent = _user.AppContent?.OneLoginCannotFindRecordPageContent;
+        OneLoginNoMatchesPageContent = _user.AppContent?.OneLoginNoMatchesPageContent;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -193,10 +193,10 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             newAppContent = new TeachingRecordSystem.Core.Models.AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = OneLoginCannotFindRecordEmailTemplateId,
-                OneLoginCannotFindRecordPageContent = OneLoginCannotFindRecordPageContent
+                OneLoginNoMatchesPageContent = OneLoginNoMatchesPageContent
             };
             var appContentChanged = oldAppContent?.OneLoginCannotFindRecordEmailTemplateId != newAppContent.OneLoginCannotFindRecordEmailTemplateId ||
-                                   oldAppContent?.OneLoginCannotFindRecordPageContent != newAppContent.OneLoginCannotFindRecordPageContent;
+                                   oldAppContent?.OneLoginNoMatchesPageContent != newAppContent.OneLoginNoMatchesPageContent;
 
             changes |=
                 (ClientId != _user.ClientId ? ApplicationUserUpdatedEventChanges.ClientId : 0) |

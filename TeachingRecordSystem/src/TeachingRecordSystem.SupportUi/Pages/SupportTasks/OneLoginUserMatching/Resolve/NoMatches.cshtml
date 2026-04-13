@@ -20,9 +20,16 @@
                 You’ve verified @(Model.Name)’s identity, but we could not match their details to an existing teaching record.
             </p>
 
-            <p class="govuk-body">
-                We’ll send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.
-            </p>
+            @if (!string.IsNullOrWhiteSpace(Model.NoMatchesPageContent))
+            {
+                @Html.Raw(Model.NoMatchesPageContent)
+            }
+            else
+            {
+                <p class="govuk-body">
+                    We’ll send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.
+                </p>
+            }
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Send email</govuk-button>

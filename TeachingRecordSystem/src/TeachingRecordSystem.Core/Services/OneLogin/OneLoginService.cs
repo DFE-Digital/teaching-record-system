@@ -38,12 +38,12 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task EnqueueRecordNotFoundEmailAsync(string emailAddress, string personName, ProcessContext processContext)
+    public async Task EnqueueRecordNotFoundEmailAsync(string emailAddress, string personName, ProcessContext processContext, string? templateId = null)
     {
         var email = new Email
         {
             EmailId = Guid.NewGuid(),
-            TemplateId = EmailTemplateIds.OneLoginCannotFindRecord,
+            TemplateId = templateId ?? EmailTemplateIds.OneLoginCannotFindRecord,
             EmailAddress = emailAddress,
             Personalization = GetOneLoginCannotFindRecordEmailPersonalization(personName).ToDictionary()
         };

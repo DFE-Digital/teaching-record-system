@@ -325,6 +325,186 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Application user updated");
     }
 
+    [Fact]
+    public async Task Post_ValidRequestWithAppContent_UpdatesAppContentAndCreatesEvent()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true);
+        var newName = applicationUser.Name;
+        var emailTemplateId = Guid.NewGuid().ToString();
+        var pageContent = "<p>Custom content for this app</p>";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", newName },
+                { "ApiRoles", applicationUser.ApiRoles ?? [] },
+                { "IsOidcClient", bool.TrueString },
+                { "ClientId", applicationUser.ClientId! },
+                { "ClientSecret", applicationUser.ClientSecret! },
+                { "RedirectUris", applicationUser.RedirectUris ?? [] },
+                { "PostLogoutRedirectUris", applicationUser.PostLogoutRedirectUris ?? [] },
+                { "OneLoginClientId", applicationUser.OneLoginClientId! },
+                { "UseSharedOneLoginSigningKeys", applicationUser.UseSharedOneLoginSigningKeys!.Value.ToString() },
+                { "OneLoginPrivateKeyPem", applicationUser.OneLoginPrivateKeyPem! },
+                { "OneLoginAuthenticationSchemeName", applicationUser.OneLoginAuthenticationSchemeName! },
+                { "OneLoginRedirectUriPath", applicationUser.OneLoginRedirectUriPath! },
+                { "OneLoginPostLogoutRedirectUriPath", applicationUser.OneLoginPostLogoutRedirectUriPath! },
+                { "RecordMatchingPolicy", applicationUser.RecordMatchingPolicy.ToString() },
+                { "OneLoginCannotFindRecordEmailTemplateId", emailTemplateId },
+                { "OneLoginNoMatchesPageContent", pageContent }
+            }
+        };
+
+        EventObserver.Clear();
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == applicationUser.UserId);
+            Assert.NotNull(applicationUser.AppContent);
+            Assert.Equal(emailTemplateId, applicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
+            Assert.Equal(pageContent, applicationUser.AppContent.OneLoginNoMatchesPageContent);
+        });
+
+        EventObserver.AssertEventsSaved(
+            e =>
+            {
+                var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
+                Assert.NotNull(applicationUserUpdatedEvent.ApplicationUser.AppContent);
+                Assert.Equal(emailTemplateId, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
+                Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContent);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.AppContent);
+                Assert.True(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent));
+            });
+    }
+
+    [Fact]
+    public async Task Post_AppContentUnchanged_DoesNotSetAppContentChangeFlag()
+    {
+        // Arrange
+        var originalName = "Original Name";
+        var emailTemplateId = Guid.NewGuid().ToString();
+        var pageContent = "<p>Existing content</p>";
+
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            name: originalName,
+            isOidcClient: true,
+            appContent: new AppContent
+            {
+                OneLoginCannotFindRecordEmailTemplateId = emailTemplateId,
+                OneLoginNoMatchesPageContent = pageContent
+            });
+
+        var newName = TestData.GenerateChangedApplicationUserName(originalName);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", newName },
+                { "ApiRoles", applicationUser.ApiRoles ?? [] },
+                { "IsOidcClient", bool.TrueString },
+                { "ClientId", applicationUser.ClientId! },
+                { "ClientSecret", applicationUser.ClientSecret! },
+                { "RedirectUris", applicationUser.RedirectUris ?? [] },
+                { "PostLogoutRedirectUris", applicationUser.PostLogoutRedirectUris ?? [] },
+                { "OneLoginClientId", applicationUser.OneLoginClientId! },
+                { "UseSharedOneLoginSigningKeys", applicationUser.UseSharedOneLoginSigningKeys!.Value.ToString() },
+                { "OneLoginPrivateKeyPem", applicationUser.OneLoginPrivateKeyPem! },
+                { "OneLoginAuthenticationSchemeName", applicationUser.OneLoginAuthenticationSchemeName! },
+                { "OneLoginRedirectUriPath", applicationUser.OneLoginRedirectUriPath! },
+                { "OneLoginPostLogoutRedirectUriPath", applicationUser.OneLoginPostLogoutRedirectUriPath! },
+                { "RecordMatchingPolicy", applicationUser.RecordMatchingPolicy.ToString() },
+                { "OneLoginCannotFindRecordEmailTemplateId", emailTemplateId },
+                { "OneLoginNoMatchesPageContent", pageContent }
+            }
+        };
+
+        EventObserver.Clear();
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        EventObserver.AssertEventsSaved(
+            e =>
+            {
+                var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
+                Assert.Equal(ApplicationUserUpdatedEventChanges.Name, applicationUserUpdatedEvent.Changes); // Only Name changed
+                Assert.False(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent)); // AppContent flag NOT set
+                Assert.Equal(emailTemplateId, applicationUserUpdatedEvent.ApplicationUser.AppContent!.OneLoginCannotFindRecordEmailTemplateId);
+                Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContent);
+            });
+    }
+
+    [Fact]
+    public async Task Post_ClearingAppContent_UpdatesToNullAndCreatesEvent()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            isOidcClient: true,
+            appContent: new AppContent
+            {
+                OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString(),
+                OneLoginNoMatchesPageContent = "<p>Old content</p>"
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", applicationUser.Name },
+                { "ApiRoles", applicationUser.ApiRoles ?? [] },
+                { "IsOidcClient", bool.TrueString },
+                { "ClientId", applicationUser.ClientId! },
+                { "ClientSecret", applicationUser.ClientSecret! },
+                { "RedirectUris", applicationUser.RedirectUris ?? [] },
+                { "PostLogoutRedirectUris", applicationUser.PostLogoutRedirectUris ?? [] },
+                { "OneLoginClientId", applicationUser.OneLoginClientId! },
+                { "UseSharedOneLoginSigningKeys", applicationUser.UseSharedOneLoginSigningKeys!.Value.ToString() },
+                { "OneLoginPrivateKeyPem", applicationUser.OneLoginPrivateKeyPem! },
+                { "OneLoginAuthenticationSchemeName", applicationUser.OneLoginAuthenticationSchemeName! },
+                { "OneLoginRedirectUriPath", applicationUser.OneLoginRedirectUriPath! },
+                { "OneLoginPostLogoutRedirectUriPath", applicationUser.OneLoginPostLogoutRedirectUriPath! },
+                { "RecordMatchingPolicy", applicationUser.RecordMatchingPolicy.ToString() },
+                { "OneLoginCannotFindRecordEmailTemplateId", "" },
+                { "OneLoginNoMatchesPageContent", "" }
+            }
+        };
+
+        EventObserver.Clear();
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == applicationUser.UserId);
+            Assert.NotNull(applicationUser.AppContent);
+            Assert.Null(applicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
+            Assert.Null(applicationUser.AppContent.OneLoginNoMatchesPageContent);
+        });
+
+        EventObserver.AssertEventsSaved(
+            e =>
+            {
+                var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
+                Assert.True(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent));
+            });
+    }
+
     public static (string ClientId,
         string ClientSecret,
         string RedirectUris,

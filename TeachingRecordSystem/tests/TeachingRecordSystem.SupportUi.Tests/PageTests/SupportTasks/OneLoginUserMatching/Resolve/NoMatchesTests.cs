@@ -212,4 +212,85 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_WithCustomAppContent_DisplaysCustomPageContent(bool isRecordMatchingOnlySupportTask)
+    {
+        // Arrange
+        var customEmailTemplateId = Guid.NewGuid().ToString();
+        var customPageContent = "<p class='govuk-body'>This is custom HTML content for this service.</p><p class='govuk-body'>Please contact us if you need help.</p>";
+
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            isOidcClient: true,
+            appContent: new AppContent
+            {
+                OneLoginCannotFindRecordEmailTemplateId = customEmailTemplateId,
+                OneLoginNoMatchesPageContent = customPageContent
+            });
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: !isRecordMatchingOnlySupportTask);
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var supportTask = isRecordMatchingOnlySupportTask ?
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+                oneLoginUser.Subject,
+                t => t.WithVerifiedNames([firstName, lastName])
+                      .WithClientApplicationUserId(applicationUser.UserId)) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+                oneLoginUser.Subject,
+                t => t.WithClientApplicationUserId(applicationUser.UserId));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask,
+            state => state.Verified = true);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+
+        Assert.Contains("This is custom HTML content for this service.", doc.Body!.TextContent);
+        Assert.Contains("Please contact us if you need help.", doc.Body!.TextContent);
+        Assert.DoesNotContain("We'll send them an email confirming we could not find a teaching record matching their GOV.UK One Login and asking them to check their details.", doc.Body!.TextContent);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_WithoutCustomAppContent_DisplaysDefaultPageContent(bool isRecordMatchingOnlySupportTask)
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: !isRecordMatchingOnlySupportTask);
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var supportTask = isRecordMatchingOnlySupportTask ?
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+                oneLoginUser.Subject,
+                t => t.WithVerifiedNames([firstName, lastName])) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask,
+            state => state.Verified = true);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+
+        Assert.Contains("send them an email", doc.Body!.TextContent);
+        Assert.Contains("could not find a teaching record", doc.Body!.TextContent);
+    }
 }

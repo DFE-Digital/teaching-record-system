@@ -5,4 +5,5 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 public record NoMatchesOutcomeOptions
 {
     public required SupportTask SupportTask { get; init; }
+    public string? EmailTemplateId { get; init; }
 }

@@ -10,7 +10,8 @@ public partial class TestData
         string? name = null,
         string[]? apiRoles = null,
         bool? isOidcClient = false,
-        RecordMatchingPolicy? recordMatchingPolicy = null)
+        RecordMatchingPolicy? recordMatchingPolicy = null,
+        AppContent? appContent = null)
     {
         var user = await WithDbContextAsync(async dbContext =>
         {
@@ -52,11 +53,13 @@ public partial class TestData
                 RedirectUris = redirectUris,
                 PostLogoutRedirectUris = postLogoutRedirectUris,
                 OneLoginClientId = oneLoginClientId,
+                UseSharedOneLoginSigningKeys = isOidcClient == true ? false : null,
                 OneLoginPrivateKeyPem = oneLoginPrivateKeyPem,
                 OneLoginAuthenticationSchemeName = oneLoginAuthenticationSchemeName,
                 OneLoginRedirectUriPath = oneLoginRedirectUriPath,
                 OneLoginPostLogoutRedirectUriPath = oneLoginPostLogoutRedirectUriPath,
-                RecordMatchingPolicy = recordMatchingPolicy.Value
+                RecordMatchingPolicy = recordMatchingPolicy.Value,
+                AppContent = appContent
             };
 
             dbContext.ApplicationUsers.Add(user);
