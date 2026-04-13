@@ -9,6 +9,8 @@ namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Oidc;
 
 public class ApplicationManager : OpenIddictApplicationManager<OpenIddictEntityFrameworkCoreApplication<Guid>>
 {
+    private const string RedirectUriWildcardPlaceholder = "__";
+
     public ApplicationManager(
         IOpenIddictApplicationCache<OpenIddictEntityFrameworkCoreApplication<Guid>> cache,
         ILogger<OpenIddictApplicationManager<OpenIddictEntityFrameworkCoreApplication<Guid>>> logger,
@@ -81,7 +83,7 @@ public class ApplicationManager : OpenIddictApplicationManager<OpenIddictEntityF
         return ValueTask.FromResult(false);
     }
 
-    private static bool MatchUriPattern(string pattern, string uri, bool ignorePath)
+    public static bool MatchUriPattern(string pattern, string uri, bool ignorePath)
     {
         if (!Uri.TryCreate(pattern, UriKind.Absolute, out _))
         {
@@ -96,16 +98,14 @@ public class ApplicationManager : OpenIddictApplicationManager<OpenIddictEntityF
         var normalizedPattern = ignorePath ? RemovePathAndQuery(pattern) : pattern;
         var normalizedUri = ignorePath ? RemovePathAndQuery(uri) : uri;
 
-        if (normalizedPattern.Equals(normalizedUri, StringComparison.OrdinalIgnoreCase))
+        if (normalizedPattern.Equals(normalizedUri, StringComparison.Ordinal))
         {
             return true;
         }
 
-        if (normalizedPattern.Contains('*'))
+        if (normalizedPattern.Contains(RedirectUriWildcardPlaceholder))
         {
-            // Escape pattern then replace escaped '*' with '.*' to allow wildcard matches.
-            var escaped = Regex.Escape(normalizedPattern).Replace("\\*", ".*");
-            return Regex.IsMatch(normalizedUri, $"^{escaped}$", RegexOptions.IgnoreCase);
+            return Regex.IsMatch(normalizedUri, $"^{Regex.Escape(normalizedPattern).Replace(RedirectUriWildcardPlaceholder, ".*")}$");
         }
 
         return false;
