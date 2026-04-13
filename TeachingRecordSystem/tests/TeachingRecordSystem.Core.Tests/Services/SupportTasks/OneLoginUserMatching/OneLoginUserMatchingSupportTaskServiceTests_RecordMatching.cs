@@ -103,7 +103,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
 
         var options = new NoMatchesOutcomeOptions
         {
-            SupportTask = supportTask
+            SupportTask = supportTask,
+            EmailTemplateId = null
         };
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
