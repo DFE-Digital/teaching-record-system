@@ -11,7 +11,8 @@ public partial class TestData
         string[]? apiRoles = null,
         bool? isOidcClient = false,
         RecordMatchingPolicy? recordMatchingPolicy = null,
-        AppContent? appContent = null)
+        AppContent? appContent = null,
+        string? shortName = null)
     {
         var user = await WithDbContextAsync(async dbContext =>
         {
@@ -45,6 +46,7 @@ public partial class TestData
             var user = new ApplicationUser()
             {
                 Name = name,
+                ShortName = shortName,
                 UserId = Guid.NewGuid(),
                 ApiRoles = apiRoles,
                 IsOidcClient = isOidcClient.Value,

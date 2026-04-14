@@ -15,11 +15,17 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     {
         v => v.RuleFor(m => m.Name)
             .NotEmpty().WithMessage("Enter a name")
-            .MaximumLength(UserBase.NameMaxLength).WithMessage("Name must be 200 characters or less")
+            .MaximumLength(UserBase.NameMaxLength).WithMessage("Name must be 200 characters or less"),
+
+        v => v.RuleFor(m => m.ShortName)
+            .MaximumLength(ApplicationUser.ShortNameMaxLength).WithMessage("Short name must be 25 characters or less")
     };
 
     [BindProperty]
     public string? Name { get; set; }
+
+    [BindProperty]
+    public string? ShortName { get; set; }
 
     public void OnGet()
     {
@@ -33,7 +39,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         {
             ApiRoles = [],
             Name = Name!,
-            UserId = Guid.NewGuid()
+            UserId = Guid.NewGuid(),
+            ShortName = ShortName
         };
 
         dbContext.ApplicationUsers.Add(newUser);

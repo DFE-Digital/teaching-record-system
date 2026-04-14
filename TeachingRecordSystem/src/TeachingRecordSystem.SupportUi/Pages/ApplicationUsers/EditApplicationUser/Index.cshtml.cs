@@ -46,7 +46,9 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login redirect URI must be 150 characters or less").When(m => m.IsOidcClient),
         v => v.RuleFor(m => m.OneLoginPostLogoutRedirectUriPath)
             .NotEmpty().WithMessage("Enter the One Login post logout redirect URI").When(m => m.IsOidcClient)
-            .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login post logout redirect URI must be 150 characters or less").When(m => m.IsOidcClient)
+            .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login post logout redirect URI must be 150 characters or less").When(m => m.IsOidcClient),
+        v => v.RuleFor(m => m.ShortName)
+            .MaximumLength(ApplicationUser.ShortNameMaxLength).WithMessage("Short name must be 25 characters or less")
     };
 
     private ApplicationUser? _user;
@@ -91,6 +93,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public string? OneLoginNoMatchesPageContentHtml { get; set; }
 
+    public string? ShortName { get; set; }
+
     public void OnGet()
     {
         Name = _user!.Name;
@@ -109,6 +113,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         RecordMatchingPolicy = _user.RecordMatchingPolicy;
         OneLoginCannotFindRecordEmailTemplateId = _user.AppContent?.OneLoginCannotFindRecordEmailTemplateId;
         OneLoginNoMatchesPageContentHtml = _user.AppContent?.OneLoginNoMatchesPageContentHtml;
+        ShortName = _user.ShortName;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -182,6 +187,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         var changes = ApplicationUserUpdatedEventChanges.None |
             (Name != _user!.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
+            (ShortName != _user!.ShortName ? ApplicationUserUpdatedEventChanges.ShortName : 0) |
             (!new HashSet<string>(_user.ApiRoles ?? []).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
             (IsOidcClient != _user.IsOidcClient ? ApplicationUserUpdatedEventChanges.IsOidcClient : 0);
 
@@ -220,6 +226,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             _user.Name = Name!;
             _user.ApiRoles = newApiRoles;
             _user.IsOidcClient = IsOidcClient;
+            _user.ShortName = ShortName;
 
             if (IsOidcClient)
             {

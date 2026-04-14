@@ -99,16 +99,41 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_ValidRequest_CreatesApplicationUserCreatesEventAndRedirectsWithFlashMessage()
+    public async Task Post_ShortNameTooLong_RendersError()
     {
         // Arrange
-        var name = TestData.GenerateApplicationUserName();
+        var name = Faker.Name.First();
+        var shortName = new string('a', ApplicationUser.ShortNameMaxLength + 1);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
         {
             Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", name },
+                { "ShortName", shortName }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ShortName", "Short name must be 25 characters or less");
+    }
+
+    [Fact]
+    public async Task Post_ValidRequest_CreatesApplicationUserCreatesEventAndRedirectsWithFlashMessage()
+    {
+        // Arrange
+        var name = TestData.GenerateApplicationUserName();
+        var shortName = TestData.GenerateApplicationUserShortName();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", name },
+                { "ShortName", shortName }
             }
         };
 
@@ -122,6 +147,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var applicationUser = await dbContext.ApplicationUsers.SingleAsync(a => a.Name == name);
             Assert.NotNull(applicationUser);
+            Assert.Equal(shortName, applicationUser.ShortName);
 
             return applicationUser;
         });
@@ -135,6 +161,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(Clock.UtcNow, applicationUserCreatedEvent.CreatedUtc);
                 Assert.Equal(GetCurrentUserId(), applicationUserCreatedEvent.RaisedBy.UserId);
                 Assert.Equal(name, applicationUserCreatedEvent.ApplicationUser.Name);
+                Assert.Equal(shortName, applicationUserCreatedEvent.ApplicationUser.ShortName);
             });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);

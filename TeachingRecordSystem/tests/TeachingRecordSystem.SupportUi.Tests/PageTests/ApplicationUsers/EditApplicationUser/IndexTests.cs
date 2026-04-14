@@ -168,6 +168,31 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
+    [Fact]
+    public async Task Post_ShortNameTooLong_RendersError()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: []);
+        var newName = "xxxx";
+        var newShortName = new string('x', ApplicationUser.ShortNameMaxLength + 1);
+
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", newName },
+                { "ShortName", newShortName }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ShortName", "Short name must be 25 characters or less");
+    }
+
     [Theory]
     [MemberData(nameof(GetInvalidOidcDetailsData))]
     public async Task Post_WithOidcClientButInvalidDetails_RendersExpectedError(
@@ -220,6 +245,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: [], isOidcClient: false);
         var originalName = applicationUser.Name;
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
+        var newShortName = TestData.GenerateApplicationUserShortName();
         var newRoles = new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson };
         var clientId = Guid.NewGuid().ToString();
         var clientSecret = "Secret0123456789";
@@ -236,6 +262,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName },
+                { "ShortName", newShortName },
                 { "ApiRoles", newRoles },
                 { "IsOidcClient", bool.TrueString },
                 { "ClientId", clientId },
@@ -276,6 +303,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(GetCurrentUserId(), applicationUserUpdatedEvent.RaisedBy.UserId);
                 Assert.Equal(originalName, applicationUserUpdatedEvent.OldApplicationUser.Name);
                 Assert.Equal(newName, applicationUserUpdatedEvent.ApplicationUser.Name);
+                Assert.Equal(newShortName, applicationUserUpdatedEvent.ApplicationUser.ShortName);
                 Assert.True((applicationUserUpdatedEvent.ApplicationUser.ApiRoles ?? []).SequenceEqual(newRoles));
                 Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.ApiRoles ?? []);
                 Assert.False(applicationUserUpdatedEvent.OldApplicationUser.IsOidcClient);
@@ -305,6 +333,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(
                     ApplicationUserUpdatedEventChanges.ApiRoles |
                         ApplicationUserUpdatedEventChanges.Name |
+                        ApplicationUserUpdatedEventChanges.ShortName |
                         ApplicationUserUpdatedEventChanges.IsOidcClient |
                         ApplicationUserUpdatedEventChanges.ClientId |
                         ApplicationUserUpdatedEventChanges.ClientSecret |
