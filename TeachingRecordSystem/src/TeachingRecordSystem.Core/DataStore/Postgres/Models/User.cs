@@ -48,6 +48,7 @@ public class ApplicationUser : UserBase
     public const string NameUniqueIndexName = "ix_users_application_user_name";
     public const string ClientIdUniqueIndexName = "ix_users_client_id";
     public const string OneLoginAuthenticationSchemeNameUniqueIndexName = "ix_users_one_login_authentication_scheme_name";
+    public const int ShortNameMaxLength = 25;
 
     public static Guid NpqApplicationUserGuid { get; } = new("0F18F1EC-A102-4023-843F-1CADEF3E6E14");
     public static Guid CapitaTpsImportGuid { get; } = new("14e1fa20-b364-446d-805d-699525671111");
@@ -67,6 +68,7 @@ public class ApplicationUser : UserBase
     public string? OneLoginPostLogoutRedirectUriPath { get; set; }
     public RecordMatchingPolicy RecordMatchingPolicy { get; set; } = RecordMatchingPolicy.Required;
     public TeachingRecordSystem.Core.Models.AppContent? AppContent { get; set; }
+    public string? ShortName { get; set; }
 
     [MemberNotNull(
         nameof(OneLoginClientId),

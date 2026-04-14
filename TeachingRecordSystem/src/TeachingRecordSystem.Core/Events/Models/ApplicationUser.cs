@@ -37,6 +37,7 @@ public record ApplicationUser
         OneLoginRedirectUriPath = user.OneLoginRedirectUriPath,
         OneLoginPostLogoutRedirectUriPath = user.OneLoginPostLogoutRedirectUriPath,
         RecordMatchingPolicy = user.RecordMatchingPolicy,
-        AppContent = user.AppContent
+        AppContent = user.AppContent,
+        ShortName = user.ShortName
     };
 }
