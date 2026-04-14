@@ -308,6 +308,9 @@ public sealed class OneLoginAuthenticationSchemeProvider(
                         await conn.WaitAsync(cancellationToken);
                     }
                 }
+                catch (OperationCanceledException ex) when (ex.CancellationToken == cancellationToken)
+                {
+                }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, $"Failed waiting for notifications from {ChannelNames.OneLoginClient}.");
