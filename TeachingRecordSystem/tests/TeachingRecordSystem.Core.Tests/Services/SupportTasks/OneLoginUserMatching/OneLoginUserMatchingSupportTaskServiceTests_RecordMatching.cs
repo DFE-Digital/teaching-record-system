@@ -92,8 +92,10 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Events.AssertEventsPublished(e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
 
-    [Fact]
-    public async Task ResolveRecordMatchingSupportTaskAsync_WithNoMatchesOutcome_ClosesSupportTaskSetsOutcomeAsExpectedAndEmailsUser()
+    [Theory]
+    [InlineData(null)]
+    [InlineData(EmailTemplateIds.OneLoginCannotFindRecord)]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNoMatchesOutcome_ClosesSupportTaskSetsOutcomeAsExpected(string? emailTemplateId)
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
@@ -104,7 +106,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var options = new NoMatchesOutcomeOptions
         {
             SupportTask = supportTask,
-            EmailTemplateId = null
+            EmailTemplateId = emailTemplateId
         };
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
@@ -122,11 +124,20 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
 
         await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
         var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
-        Assert.Collection(emails, e => Assert.Equal(EmailTemplateIds.OneLoginCannotFindRecord, e.TemplateId));
 
-        Events.AssertEventsPublished(
-            e => Assert.IsType<EmailSentEvent>(e),
-            e => Assert.IsType<SupportTaskUpdatedEvent>(e));
+        if (emailTemplateId is not null)
+        {
+            Assert.Collection(emails, e => Assert.Equal(emailTemplateId, e.TemplateId));
+            Events.AssertEventsPublished(
+                e => Assert.IsType<EmailSentEvent>(e),
+                e => Assert.IsType<SupportTaskUpdatedEvent>(e));
+        }
+        else
+        {
+            Assert.Empty(emails);
+            Events.AssertEventsPublished(
+                e => Assert.IsType<SupportTaskUpdatedEvent>(e));
+        }
     }
 
     [Fact]
