@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Prometheus;
+using Serilog;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
 using TeachingRecordSystem.WebCommon.ModelBinding;
@@ -95,6 +96,8 @@ public static class Extensions
 
         app.MapMetrics();
         app.UseHttpMetrics();
+
+        app.UseSerilogRequestLogging();
 
         return app;
     }
