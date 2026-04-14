@@ -4,21 +4,6 @@
 
 .trs-panel--left {
   text-align: left;
-
-  .govuk-body, .govuk-body-l {
-    color: govuk-colour("white");
-  }
-
-  .govuk-button,
-  .govuk-button:disabled:hover {
-    color: $govuk-text-colour;
-    background-color: govuk-colour("white");
-    box-shadow: 0 2px 0 govuk-colour("dark-grey");
-  }
-
-  .govuk-button:hover {
-    background-color: govuk-colour("mid-grey");
-  }
 }
 
 .trs-empty-fallback {
@@ -27,10 +12,10 @@
 
 .trs-panel--interruption__link-button {
   @extend .govuk-link;
-  @extend .govuk-body;
+  @extend .govuk-link--inverse;
   background: none;
   border: 0;
-  color: govuk-colour("white") !important;
   cursor: pointer;
-  @include govuk-font($size: 19, $line-height: 19px);
+  padding: 0;
+  @include govuk-font($size: 19);
 }
