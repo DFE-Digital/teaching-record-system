@@ -77,9 +77,12 @@ public partial class OneLoginUserMatchingSupportTaskService
             },
             processContext);
 
-        var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
-        var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
-        await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId);
+        if (options.EmailTemplateId is not null)
+        {
+            var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
+            var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
+            await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId);
+        }
     }
 
     public async Task ResolveRecordMatchingSupportTaskAsync(ConnectedOutcomeOptions options, ProcessContext processContext)
