@@ -647,7 +647,7 @@ public class Person
 
         var routeLevelExemptionIds = holdsRoutes
             .Where(r => r.ExemptFromInduction == true)
-            .Select(r => r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value)
+            .Select(r => r.RouteToProfessionalStatusType!.InductionExemptionReasonId ?? InductionExemptionReason.ExemptId)
             .Concat(holdsRoutes
                 .Where(r => r.ExemptFromInductionDueToQtsDate == true)
                 .Select(_ => InductionExemptionReason.QualifiedBefore7May2000Id));
