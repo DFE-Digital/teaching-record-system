@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Serilog;
+using Serilog.Events;
 using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -231,6 +232,8 @@ public static class Extensions
         IServiceProvider services)
     {
         config.ReadFrom.Configuration(configuration);
+
+        config.MinimumLevel.Override("Serilog.AspNetCore.RequestLoggingMiddleware", LogEventLevel.Information);
 
         if (environment.IsProduction())
         {
