@@ -5,5 +5,6 @@ public enum OneLoginUserIdVerificationSupportTasksSortByOption
     SupportTaskReference,
     Name,
     Email,
-    RequestedOn
+    RequestedOn,
+    Source
 }

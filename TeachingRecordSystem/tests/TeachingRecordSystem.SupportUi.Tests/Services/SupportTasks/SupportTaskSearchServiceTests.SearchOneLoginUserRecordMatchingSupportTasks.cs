@@ -12,22 +12,29 @@ public partial class SupportTaskSearchServiceTests
     [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Email, SortDirection.Ascending)]
     [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending)]
     [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Source, SortDirection.Ascending)]
     [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.SupportTaskReference, SortDirection.Descending)]
     [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Email, SortDirection.Descending)]
     [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Descending)]
     [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Source, SortDirection.Descending)]
     public async Task SearchOneLoginUserRecordMatchingSupportTasks_ReturnsOrderedResults(OneLoginUserRecordMatchingSupportTasksSortByOption sortBy, SortDirection sortDirection)
     {
         // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequestId1 = Guid.NewGuid().ToString();
+        var trnRequestId2 = Guid.NewGuid().ToString();
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var oneLoginUsers = new OneLoginUser[] { oneLoginUser1, oneLoginUser2 };
 
         var supportTasks = new SupportTask[] {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser1.Subject, configure =>
-                configure.WithCreatedOn(new DateTime(2000,10,10,1,1,1, DateTimeKind.Utc))),
+                configure.WithCreatedOn(new DateTime(2000,10,10,1,1,1, DateTimeKind.Utc))
+                    .WithTrnRequest(trnRequestId1).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser2.Subject, configure =>
-                configure.WithCreatedOn(new DateTime(2000,10,11,1,1,1, DateTimeKind.Utc)))
+                configure.WithCreatedOn(new DateTime(2000,10,11,1,1,1, DateTimeKind.Utc))
+                    .WithTrnRequest(trnRequestId2).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: null, sortBy, sortDirection);
@@ -42,7 +49,8 @@ public partial class SupportTaskSearchServiceTests
                     FirstName = ((OneLoginUserRecordMatchingData)task.Data)!.VerifiedNames!.First().First(),
                     LastName = ((OneLoginUserRecordMatchingData)task.Data)!.VerifiedNames!.First().Last(),
                     task.CreatedOn,
-                    user.EmailAddress
+                    user.EmailAddress,
+                    ShortName = task.TrnRequestMetadata!.ApplicationUser!.ShortName ?? task.TrnRequestMetadata!.ApplicationUser!.Name
                 });
         var paginationOptions = new PaginationOptions(PageNumber: 1);
 
@@ -65,6 +73,9 @@ public partial class SupportTaskSearchServiceTests
             OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.CreatedOn)
                 : expectedResults.OrderByDescending(s => s.CreatedOn),
+            OneLoginUserRecordMatchingSupportTasksSortByOption.Source => sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.ShortName)
+                : expectedResults.OrderByDescending(s => s.ShortName),
             _ => expectedResults
         }).ToArray();
 
@@ -74,6 +85,7 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(expectedResultsOrdered.Select(r => r.CreatedOn), results.SearchResults.Select(r => r.CreatedOn));
         Assert.Equal(expectedResultsOrdered.Select(r => r.FirstName), results.SearchResults.Select(r => r.FirstName));
         Assert.Equal(expectedResultsOrdered.Select(r => r.LastName), results.SearchResults.Select(r => r.LastName));
+        Assert.Equal(expectedResultsOrdered.Select(r => r.ShortName), results.SearchResults.Select(r => r.SourceApplicationName));
     }
 
     [Theory]
@@ -83,20 +95,31 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchOneLoginUserRecordMatchingSupportTasks_ReturnsPagedResults(int pageNumber, int expectedResultCount, string[] expectedRecords)
     {
         // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequestId1 = Guid.NewGuid().ToString();
+        var trnRequestId2 = Guid.NewGuid().ToString();
+        var trnRequestId3 = Guid.NewGuid().ToString();
+        var trnRequestId4 = Guid.NewGuid().ToString();
+        var trnRequestId5 = Guid.NewGuid().ToString();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,10,1,1,1,1))),
+                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,10,1,1,1,1))
+                    .WithTrnRequest(trnRequestId1).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,9,1,1,2,1))),
+                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,9,1,1,2,1))
+                    .WithTrnRequest(trnRequestId2).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,8,1,1,3,1))),
+                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,8,1,1,3,1))
+                    .WithTrnRequest(trnRequestId3).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["David", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,11,1,1,4,1))),
+                configure.WithVerifiedNames(["David", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,11,1,1,4,1))
+                    .WithTrnRequest(trnRequestId4).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Edward", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,10,1,1,5,1)))
+                configure.WithVerifiedNames(["Edward", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,10,1,1,5,1))
+                    .WithTrnRequest(trnRequestId5).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: null, OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending);
@@ -119,19 +142,30 @@ public partial class SupportTaskSearchServiceTests
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequestId1 = Guid.NewGuid().ToString();
+        var trnRequestId2 = Guid.NewGuid().ToString();
+        var trnRequestId3 = Guid.NewGuid().ToString();
+        var trnRequestId4 = Guid.NewGuid().ToString();
+        var trnRequestId5 = Guid.NewGuid().ToString();
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", "Smith"]).WithCreatedOn(new DateTime(2000,10,1,1,1,1))),
+                configure.WithVerifiedNames(["Alphie", "Smith"]).WithCreatedOn(new DateTime(2000,10,1,1,1,1))
+                    .WithTrnRequest(trnRequestId1).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,9,1,1,2,1))),
+                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,9,1,1,2,1))
+                    .WithTrnRequest(trnRequestId2).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Colin", "Smith"]).WithCreatedOn(new DateTime(2000,8,1,1,3,1))),
+                configure.WithVerifiedNames(["Colin", "Smith"]).WithCreatedOn(new DateTime(2000,8,1,1,3,1))
+                    .WithTrnRequest(trnRequestId3).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["David", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,11,1,1,4,1))),
+                configure.WithVerifiedNames(["David", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2000,11,1,1,4,1))
+                    .WithTrnRequest(trnRequestId4).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Edward", "Smith"]).WithCreatedOn(new DateTime(2000,10,1,1,5,1)))
+                configure.WithVerifiedNames(["Edward", "Smith"]).WithCreatedOn(new DateTime(2000,10,1,1,5,1))
+                    .WithTrnRequest(trnRequestId5).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: search, OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending);
@@ -161,15 +195,22 @@ public partial class SupportTaskSearchServiceTests
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequestId1 = Guid.NewGuid().ToString();
+        var trnRequestId2 = Guid.NewGuid().ToString();
+        var trnRequestId3 = Guid.NewGuid().ToString();
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2025,1,20))),
+                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2025,1,20))
+                    .WithTrnRequest(trnRequestId1).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2025,1,20))),
+                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2025,1,20))
+                    .WithTrnRequest(trnRequestId2).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2025,1,21)))
+                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()]).WithCreatedOn(new DateTime(2025,1,21))
+                    .WithTrnRequest(trnRequestId3).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: searchText, OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending);
@@ -193,15 +234,22 @@ public partial class SupportTaskSearchServiceTests
         // Arrange
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("alphie@example.com"), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequestId1 = Guid.NewGuid().ToString();
+        var trnRequestId2 = Guid.NewGuid().ToString();
+        var trnRequestId3 = Guid.NewGuid().ToString();
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser1.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()])),
+                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId1).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser2.Subject, configure =>
-                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()])),
+                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId2).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser2.Subject, configure =>
-                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()]))
+                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId3).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: searchText, OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending);
@@ -229,15 +277,22 @@ public partial class SupportTaskSearchServiceTests
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequestId1 = Guid.NewGuid().ToString();
+        var trnRequestId2 = Guid.NewGuid().ToString();
+        var trnRequestId3 = Guid.NewGuid().ToString();
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", "Smith"])),
+                configure.WithVerifiedNames(["Alphie", "Smith"])
+                    .WithTrnRequest(trnRequestId1).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", "Jones"], ["Alfy", "Jonas"])),
+                configure.WithVerifiedNames(["Alphie", "Jones"], ["Alfy", "Jonas"])
+                    .WithTrnRequest(trnRequestId2).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Colin", "Jones"]))
+                configure.WithVerifiedNames(["Colin", "Jones"])
+                    .WithTrnRequest(trnRequestId3).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: searchText, OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending);
@@ -257,15 +312,22 @@ public partial class SupportTaskSearchServiceTests
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequestId1 = Guid.NewGuid().ToString();
+        var trnRequestId2 = Guid.NewGuid().ToString();
+        var trnRequestId3 = Guid.NewGuid().ToString();
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()])),
+                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId1).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()])),
+                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId2).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()]))
+                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId3).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         foreach (var task in supportTasksList)
@@ -290,15 +352,22 @@ public partial class SupportTaskSearchServiceTests
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequestId1 = Guid.NewGuid().ToString();
+        var trnRequestId2 = Guid.NewGuid().ToString();
+        var trnRequestId3 = Guid.NewGuid().ToString();
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()])),
+                configure.WithVerifiedNames(["Alphie", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId1).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()])),
+                configure.WithVerifiedNames(["Bert", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId2).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()]))
+                configure.WithVerifiedNames(["Colin", TestData.GenerateLastName()])
+                    .WithTrnRequest(trnRequestId3).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var search = "TASK-123";
