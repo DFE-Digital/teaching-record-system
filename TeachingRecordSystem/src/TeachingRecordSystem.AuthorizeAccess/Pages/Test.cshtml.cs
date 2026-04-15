@@ -24,6 +24,7 @@ public class TestModel(
 
     public async Task<IActionResult> OnGetAsync()
     {
+
         if (string.IsNullOrEmpty(AuthenticationScheme))
         {
             return BadRequest();
@@ -33,7 +34,7 @@ public class TestModel(
         {
             var applicationUser = await dbContext.ApplicationUsers
                 .Where(u => u.OneLoginAuthenticationSchemeName == AuthenticationScheme)
-                .Select(u => new { u.UserId, u.ClientId, u.RecordMatchingPolicy, u.Name })
+                .Select(u => new { u.UserId, u.ClientId, u.RecordMatchingPolicy, u.Name, u.AppContent })
                 .SingleOrDefaultAsync();
 
             if (applicationUser is null)
@@ -67,7 +68,8 @@ public class TestModel(
                         AuthenticationScheme,
                         clientApplicationUserId: applicationUser.UserId,
                         recordMatchingPolicy: applicationUser.RecordMatchingPolicy,
-                        TrnToken);
+                        TrnToken,
+                        applicationUser.AppContent);
 
                     return state;
                 });

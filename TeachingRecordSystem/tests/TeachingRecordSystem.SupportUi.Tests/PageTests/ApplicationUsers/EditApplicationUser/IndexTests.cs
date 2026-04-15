@@ -362,6 +362,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newName = applicationUser.Name;
         var emailTemplateId = Guid.NewGuid().ToString();
         var pageContent = "<p>Custom content for this app</p>";
+        var flashMessage = "Request closed for {0}. We've sent them an email with a link to continue their NPQ registration.";
+        var foundPageLinkText = "<p class=\"govuk-body\">You can return to the <a href=\"{0}\" class=\"govuk-link\">Register for a national professional qualification</a> service.</p>";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
@@ -382,7 +384,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "OneLoginPostLogoutRedirectUriPath", applicationUser.OneLoginPostLogoutRedirectUriPath! },
                 { "RecordMatchingPolicy", applicationUser.RecordMatchingPolicy.ToString() },
                 { "OneLoginCannotFindRecordEmailTemplateId", emailTemplateId },
-                { "OneLoginNoMatchesPageContentHtml", pageContent }
+                { "OneLoginNoMatchesPageContentHtml", pageContent },
+                { "OneLoginNoMatchesEmailSentFlashMessage", flashMessage },
+                { "OneLoginFoundPageLinkText", foundPageLinkText }
             }
         };
 
@@ -400,6 +404,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.NotNull(applicationUser.AppContent);
             Assert.Equal(emailTemplateId, applicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
             Assert.Equal(pageContent, applicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
+            Assert.Equal(flashMessage, applicationUser.AppContent.OneLoginNoMatchesEmailSentFlashMessage);
+            Assert.Equal(foundPageLinkText, applicationUser.AppContent.OneLoginFoundPageLinkText);
         });
 
         EventObserver.AssertEventsSaved(
@@ -409,6 +415,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.NotNull(applicationUserUpdatedEvent.ApplicationUser.AppContent);
                 Assert.Equal(emailTemplateId, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
                 Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
+                Assert.Equal(flashMessage, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesEmailSentFlashMessage);
+                Assert.Equal(foundPageLinkText, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginFoundPageLinkText);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.AppContent);
                 Assert.True(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent));
             });

@@ -263,6 +263,12 @@ public class SignInJourneyCoordinator(
             return Path.Steps.Last();
         }
 
+        // Allow continue to application to be accessed from Found page
+        if (HttpContext.Request.GetEncodedPathAndQuery() == Links.ContinueToApplication())
+        {
+            return Path.Steps.Last();
+        }
+
         return base.GetCurrentStep();
     }
 
@@ -456,6 +462,8 @@ public class SignInJourneyCoordinator(
         public string SupportRequestSubmitted() => linkGenerator.SupportRequestSubmitted(instanceId);
 
         public string Found() => linkGenerator.Found(instanceId);
+
+        public string ContinueToApplication() => linkGenerator.ContinueToApplication(instanceId);
 
         public string NotFound() => linkGenerator.NotFound(instanceId);
 

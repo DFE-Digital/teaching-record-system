@@ -15,7 +15,8 @@ public class SignInJourneyState(
     string oneLoginAuthenticationScheme,
     Guid clientApplicationUserId,
     RecordMatchingPolicy recordMatchingPolicy,
-    string? trnToken = null)
+    string? trnToken = null,
+    AppContent? appContent = null)
 {
     public Guid SigningInProcessId { get; } = signingInProcessId;
 
@@ -32,6 +33,8 @@ public class SignInJourneyState(
     public RecordMatchingPolicy RecordMatchingPolicy { get; } = recordMatchingPolicy;
 
     public string? TrnToken { get; } = trnToken;
+
+    public AppContent? AppContent { get; } = appContent;
 
     public string? TrnTokenTrn { get; set; }
 

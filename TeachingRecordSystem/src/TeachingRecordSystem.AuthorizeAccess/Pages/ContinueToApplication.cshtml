@@ -1,0 +1,19 @@
+@page "/continue-to-application"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.ContinueToApplicationModel
+@{
+    ViewBag.Title = "Continue to application";
+}
+
+@section BeforeContent {}
+
+<form method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </div>
+    </div>
+</form>
+
+<script asp-add-nonce="true">document.forms[0].submit();</script>
