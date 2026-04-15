@@ -16,14 +16,14 @@
       },
       "Sentry.Extensions.Logging": {
         "type": "Direct",
-        "requested": "[6.3.1, )",
-        "resolved": "6.3.1",
-        "contentHash": "p5rPxBzzpNR0K6AS1LXMYiJqQq/GYUUEko4VPjhlaQiUXVTDNDAZyap6wdYMq4b8LIxBpVt/Ff9nbEsrMvgI7w==",
+        "requested": "[6.3.2, )",
+        "resolved": "6.3.2",
+        "contentHash": "rr1W5tSwv6S+J3ZdPu0YEEo80zRcLjFGsEqqEnEBOz19XO9k8e2viIw7MzSuHHc6mnelKZAOyVBlzWwoSvbt1g==",
         "dependencies": {
           "Microsoft.Extensions.Configuration.Binder": "10.0.0",
           "Microsoft.Extensions.Http": "10.0.0",
           "Microsoft.Extensions.Logging.Configuration": "10.0.0",
-          "Sentry": "6.3.1"
+          "Sentry": "6.3.2"
         }
       },
       "Serilog.Extensions.Hosting": {
@@ -729,8 +729,8 @@
       },
       "Sentry": {
         "type": "Transitive",
-        "resolved": "6.3.1",
-        "contentHash": "EomIkD+OmI9xCupBNVmKYUbxLnhzP5kRFAuDY52nEHXbOLt327eC2kScmO6HntkT+LVI4k6RnP3RmYpTSKo2Pw=="
+        "resolved": "6.3.2",
+        "contentHash": "HxLkmGsq5TxcEipmB7xlJ3Qd5RyVv2Lo0aT1Qx3khwQ40SASn5Q4kzM+HmRlbL4G3cmFj5DBIi5YTatzaafWcw=="
       },
       "Serilog.Extensions.Logging": {
         "type": "Transitive",
