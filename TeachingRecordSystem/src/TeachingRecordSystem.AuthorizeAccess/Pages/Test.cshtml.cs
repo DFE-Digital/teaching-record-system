@@ -24,7 +24,6 @@ public class TestModel(
 
     public async Task<IActionResult> OnGetAsync()
     {
-
         if (string.IsNullOrEmpty(AuthenticationScheme))
         {
             return BadRequest();
