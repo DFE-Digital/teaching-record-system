@@ -50,6 +50,27 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <_ContentIncludedByDefault Remove="wwwroot\govuk-one-login-service-header\init-service-header.js" />
     <_ContentIncludedByDefault Remove="wwwroot\govuk-one-login-service-header\service-header.js" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\Address.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\CheckAnswers.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\DateOfBirth.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\EmailInUse.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\Identity.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\Name.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\NationalInsuranceNumber.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\NotEligible.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\NpqApplication.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\NpqCheck.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\NpqName.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\NpqTrainingProvider.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\PersonalEmail.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\PreviousName.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\SchoolOrEducationalSetting.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\Submitted.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\TakingNpq.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\WorkEmail.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\_Layout.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\RequestTrn\_ViewImports.cshtml" />
   </ItemGroup>
 
 </Project>
