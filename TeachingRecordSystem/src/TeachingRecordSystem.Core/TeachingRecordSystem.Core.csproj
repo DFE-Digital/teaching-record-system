@@ -121,6 +121,7 @@
     <None Remove="Services\DqtReporting\Migrations\0101_RemoveUserShortName.sql" />
     <None Remove="Services\DqtReporting\Migrations\0106_UserRecordMatchingPolicy.sql" />
     <None Remove="Services\DqtReporting\Migrations\0107_UserShortName.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0108_UserAppContent.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -275,6 +276,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0105_ProcessEventsOneLoginUserSubjects.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0106_UserRecordMatchingPolicy.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0107_UserShortName.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0108_UserAppContent.sql" />
   </ItemGroup>
 
   <ItemGroup>
