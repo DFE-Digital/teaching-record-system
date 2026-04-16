@@ -169,7 +169,8 @@ public abstract class TestBase
         Guid clientApplicationUserId = default,
         string? trnToken = null,
         string? trnTokenTrn = null,
-        RecordMatchingPolicy recordMatchingPolicy = RecordMatchingPolicy.Required)
+        RecordMatchingPolicy recordMatchingPolicy = RecordMatchingPolicy.Required,
+        Core.Models.AppContent? appContent = null)
     {
         var redirectUri = journeyInstanceId.EnsureUrlHasKey(redirectUriBase);
 
@@ -181,7 +182,8 @@ public abstract class TestBase
             oneLoginAuthenticationScheme: "dummy",
             clientApplicationUserId,
             recordMatchingPolicy,
-            trnToken)
+            trnToken,
+            appContent)
         {
             TrnTokenTrn = trnTokenTrn
         };
@@ -221,6 +223,7 @@ public abstract class TestBase
         public const string NationalInsuranceNumber = "/national-insurance-number";
         public const string Trn = "/trn";
         public const string Found = "/found";
+        public const string ContinueToApplication = "/continue-to-application";
         public const string NotFound = "/not-found";
         public const string CheckAnswers = "/check-answers";
         public const string RequestSubmitted = "/request-submitted";
@@ -248,6 +251,9 @@ public abstract class TestBase
 
         public static string Found(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.Found);
+
+        public static string ContinueToApplication(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.ContinueToApplication);
 
         public static string NotFound(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.NotFound);

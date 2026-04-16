@@ -93,6 +93,10 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public string? OneLoginNoMatchesPageContentHtml { get; set; }
 
+    public string? OneLoginNoMatchesEmailSentFlashMessage { get; set; }
+
+    public string? OneLoginFoundPageLinkText { get; set; }
+
     public string? ShortName { get; set; }
 
     public void OnGet()
@@ -113,6 +117,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         RecordMatchingPolicy = _user.RecordMatchingPolicy;
         OneLoginCannotFindRecordEmailTemplateId = _user.AppContent?.OneLoginCannotFindRecordEmailTemplateId;
         OneLoginNoMatchesPageContentHtml = _user.AppContent?.OneLoginNoMatchesPageContentHtml;
+        OneLoginNoMatchesEmailSentFlashMessage = _user.AppContent?.OneLoginNoMatchesEmailSentFlashMessage;
+        OneLoginFoundPageLinkText = _user.AppContent?.OneLoginFoundPageLinkText;
         ShortName = _user.ShortName;
     }
 
@@ -199,10 +205,14 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             newAppContent = new TeachingRecordSystem.Core.Models.AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = OneLoginCannotFindRecordEmailTemplateId,
-                OneLoginNoMatchesPageContentHtml = OneLoginNoMatchesPageContentHtml
+                OneLoginNoMatchesPageContentHtml = OneLoginNoMatchesPageContentHtml,
+                OneLoginNoMatchesEmailSentFlashMessage = OneLoginNoMatchesEmailSentFlashMessage,
+                OneLoginFoundPageLinkText = OneLoginFoundPageLinkText
             };
             var appContentChanged = oldAppContent?.OneLoginCannotFindRecordEmailTemplateId != newAppContent.OneLoginCannotFindRecordEmailTemplateId ||
-                                   oldAppContent?.OneLoginNoMatchesPageContentHtml != newAppContent.OneLoginNoMatchesPageContentHtml;
+                                   oldAppContent?.OneLoginNoMatchesPageContentHtml != newAppContent.OneLoginNoMatchesPageContentHtml ||
+                                   oldAppContent?.OneLoginNoMatchesEmailSentFlashMessage != newAppContent.OneLoginNoMatchesEmailSentFlashMessage ||
+                                   oldAppContent?.OneLoginFoundPageLinkText != newAppContent.OneLoginFoundPageLinkText;
 
             changes |=
                 (ClientId != _user.ClientId ? ApplicationUserUpdatedEventChanges.ClientId : 0) |

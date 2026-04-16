@@ -46,7 +46,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickGovUkButtonAsync("Access your teaching record");
+        await page.ClickAsync("[data-testid='continue-link']");
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -80,7 +80,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickGovUkButtonAsync("Access your teaching record");
+        await page.ClickAsync("[data-testid='continue-link']");
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -113,7 +113,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickGovUkButtonAsync("Access your teaching record");
+        await page.ClickAsync("[data-testid='continue-link']");
 
         await page.AssertSignedInAsync(person.Trn);
     }

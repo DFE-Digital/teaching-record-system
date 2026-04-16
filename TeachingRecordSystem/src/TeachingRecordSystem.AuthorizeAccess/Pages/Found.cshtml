@@ -4,17 +4,25 @@
     ViewBag.Title = "Your GOV.UK One Login is connected to your teaching record";
 }
 
-<form method="post">
-    <govuk-panel class="govuk-panel govuk-panel--interruption trs-panel--left">
-        <govuk-panel-title>
-            @ViewBag.Title
-        </govuk-panel-title>
-        <govuk-panel-body>
-            <p class="govuk-body">
-                You won’t need to do this again.
-            </p>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <govuk-panel>
+            <govuk-panel-title>
+                @ViewBag.Title
+            </govuk-panel-title>
+        </govuk-panel>
 
-            <govuk-button type="submit" class="govuk-!-margin-bottom-0">Access your teaching record</govuk-button>
-        </govuk-panel-body>
-    </govuk-panel>
-</form>
+        <h2 class="govuk-heading-m">What happens next</h2>
+
+        @if (Model.LinkText is not null)
+        {
+            @Html.Raw(string.Format(Model.LinkText, Model.ContinueToApplicationUrl))
+        }
+        else
+        {
+            <p class="govuk-body">
+                You can now <a href="@Model.ContinueToApplicationUrl" class="govuk-link" data-testid="continue-link">access your teaching record</a>.
+            </p>
+        }
+    </div>
+</div>

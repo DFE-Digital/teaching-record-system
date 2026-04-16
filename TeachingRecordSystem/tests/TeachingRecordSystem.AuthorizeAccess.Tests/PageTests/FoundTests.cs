@@ -28,7 +28,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
 
     [Fact]
-    public Task Post_ValidRequest_RedirectsToStateRedirectUri() =>
+    public Task Get_WithoutAppContent_RendersDefaultLinkText() =>
         WithJourneyCoordinatorAsync(
             CreateSignInJourneyState,
             async coordinator =>
@@ -39,14 +39,49 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 await SetupInstanceStateAsync(coordinator, oneLoginUser, person.NationalInsuranceNumber!);
 
-                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Found(coordinator.InstanceId));
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.Found(coordinator.InstanceId));
 
                 // Act
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-                Assert.Equal(coordinator.GetRedirectUri(), response.Headers.Location?.OriginalString);
+                var doc = await AssertEx.HtmlResponseAsync(response);
+                var continueLink = doc.GetElementByTestId("continue-link");
+                Assert.NotNull(continueLink);
+                Assert.Contains("access your teaching record", continueLink.TextContent);
+                Assert.Equal(JourneyUrls.ContinueToApplication(coordinator.InstanceId), continueLink.GetAttribute("href"));
+            });
+
+    [Fact]
+    public Task Get_WithCustomAppContent_RendersCustomLinkTextAndReplacesPlaceholderWithUrl() =>
+        WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(
+                instanceId,
+                processId,
+                "/",
+                appContent: new AppContent
+                {
+                    OneLoginFoundPageLinkText = "<p class=\"govuk-body\">You can return to the <a href=\"{0}\" class=\"govuk-link\" data-testid=\"custom-link\">Register for a national professional qualification</a> service.</p>"
+                }),
+            async coordinator =>
+            {
+                // Arrange
+                var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
+
+                await SetupInstanceStateAsync(coordinator, oneLoginUser, person.NationalInsuranceNumber!);
+
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.Found(coordinator.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                var doc = await AssertEx.HtmlResponseAsync(response);
+                var customLink = doc.GetElementByTestId("custom-link");
+                Assert.NotNull(customLink);
+                Assert.Contains("Register for a national professional qualification", customLink.TextContent);
+                Assert.Equal(JourneyUrls.ContinueToApplication(coordinator.InstanceId), customLink.GetAttribute("href"));
             });
 
     private async Task SetupInstanceStateAsync(
