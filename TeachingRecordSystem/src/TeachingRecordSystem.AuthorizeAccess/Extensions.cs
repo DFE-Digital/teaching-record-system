@@ -13,18 +13,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.EntityFrameworkCore.Models;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Oidc;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
-using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.Filters;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
@@ -161,16 +157,9 @@ public static class Extensions
 
         services
             .AddTransient<AuthorizeAccessLinkGenerator, RoutingAuthorizeAccessLinkGenerator>()
-            .AddTransient<RequestTrnLinkGenerator, RoutingRequestTrnLinkGenerator>()
             .AddTransient<JourneySignInHandler>()
             .AddTransient<MatchToTeachingRecordAuthenticationHandler>()
             .AddHttpContextAccessor()
-            .AddSingleton<IStartupFilter, FormFlowSessionMiddlewareStartupFilter>()
-            .AddFormFlow(options =>
-            {
-                options.JourneyRegistry.RegisterJourney(RequestTrnJourneyState.JourneyDescriptor);
-            })
-            .AddSingleton<ICurrentUserIdProvider, FormFlowSessionCurrentUserIdProvider>()
             .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
             .AddTransient<SignInJourneyCoordinator.LinkHelper>(sp => sp.GetRequiredService<SignInJourneyCoordinator>().Links);
 
