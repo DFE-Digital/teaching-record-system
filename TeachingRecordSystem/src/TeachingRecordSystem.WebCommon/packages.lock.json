@@ -1116,7 +1116,7 @@
       },
       "Sentry.Extensions.Logging": {
         "type": "CentralTransitive",
-        "requested": "[6.3.1, )",
+        "requested": "[6.3.2, )",
         "resolved": "6.3.2",
         "contentHash": "rr1W5tSwv6S+J3ZdPu0YEEo80zRcLjFGsEqqEnEBOz19XO9k8e2viIw7MzSuHHc6mnelKZAOyVBlzWwoSvbt1g==",
         "dependencies": {
