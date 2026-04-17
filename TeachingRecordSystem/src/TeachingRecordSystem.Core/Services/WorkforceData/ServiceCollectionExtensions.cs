@@ -1,7 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Services.Establishments.Tps;
-using TeachingRecordSystem.Core.Services.WorkforceData.Google;
 
 namespace TeachingRecordSystem.Core.Services.WorkforceData;
 
@@ -13,9 +11,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<TpsCsvExtractFileImporter>();
         services.AddSingleton<TpsCsvExtractProcessor>();
         services.AddSingleton<TpsEstablishmentRefresher>();
-        services.AddSingleton<IConfigureOptions<WorkforceDataExportOptions>, WorkforceDataExportConfigureOptions>();
-        services.AddSingleton<IStorageClientProvider, OptionsStorageClientProvider>();
-        services.AddSingleton<WorkforceDataExporter>();
 
         return services;
     }
