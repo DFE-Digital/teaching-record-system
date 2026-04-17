@@ -55,7 +55,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         IQueryable<Person> query;
 
-        if (SearchTextIsEmail())
+        if (SearchTextHelper.IsEmailAddress(Search, out _))
         {
             var oneLoginUser = await dbContext.OneLoginUsers
                 .Where(o => o.EmailAddress == Search && o.PersonId != null)
@@ -82,11 +82,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 .IgnoreQueryFilters()
                 .Where(p => p.PersonId == oneLoginUser.PersonId);
         }
-        else if (SearchTextIsDate(out var dateOfBirth))
+        else if (SearchTextHelper.IsDate(Search, out var dateOfBirth))
         {
             query = dbContext.Persons.IgnoreQueryFilters().Where(p => p.DateOfBirth == dateOfBirth);
         }
-        else if (SearchTextIsTrn())
+        else if (SearchTextHelper.IsTrn(Search))
         {
             query = dbContext.Persons.IgnoreQueryFilters().Where(p => p.Trn == Search);
         }
@@ -204,14 +204,6 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             pageNumber => linkGenerator.Persons.Index(Search, IncludeActive, IncludeDeactivated, IncludeOneLoginUser, SortBy, SortDirection, pageNumber));
 
         return Page();
-
-        bool SearchTextIsDate(out DateOnly date) =>
-            DateOnly.TryParseExact(Search, WebConstants.DateOnlyDisplayFormat, out date) ||
-            DateOnly.TryParseExact(Search, "d/M/yyyy", out date);
-
-        bool SearchTextIsTrn() => Search.Length == 7 && Search.All(Char.IsAsciiDigit);
-
-        bool SearchTextIsEmail() => EmailAddress.TryParse(Search, out _);
     }
 
     public record PersonInfo
