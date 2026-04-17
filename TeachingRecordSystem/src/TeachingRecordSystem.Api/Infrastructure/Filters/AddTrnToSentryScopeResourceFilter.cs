@@ -10,7 +10,7 @@ public class AddTrnToSentryScopeResourceFilter(IAuthorizationService authorizati
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
         var user = context.HttpContext.User;
-        var identityUserAuthorizeResult = await authorizationService.AuthorizeAsync(user, AuthorizationPolicies.IdentityUserWithTrn);
+        var identityUserAuthorizeResult = await authorizationService.AuthorizeAsync(user, AuthorizationPolicies.TeacherAuthAccessToken);
 
         if (identityUserAuthorizeResult.Succeeded)
         {

@@ -34,7 +34,7 @@ public class AddSecuritySchemeOperationFilter : IOperationFilter
                 }
             };
         }
-        else if (authorizationPolicy == AuthorizationPolicies.IdentityUserWithTrn)
+        else if (authorizationPolicy == AuthorizationPolicies.TeacherAuthAccessToken)
         {
             requirement = new OpenApiSecurityRequirement
             {

@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 [Route("person")]
 public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
-    [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+    [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [HttpGet]
     [SwaggerOperation(
         OperationId = "GetCurrentPerson",
@@ -47,7 +47,7 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
         Description = "Creates a name change request for the authenticated teacher.")]
     [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+    [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     public async Task<IActionResult> CreateNameChangeAsync(
         [FromBody] CreateNameChangeRequestRequest request)
     {
@@ -74,7 +74,7 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
         Description = "Creates a date of birth change request for the authenticated teacher.")]
     [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+    [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     public async Task<IActionResult> CreateDateOfBirthChangeAsync(
         [FromBody] CreateDateOfBirthChangeRequestRequest request)
     {

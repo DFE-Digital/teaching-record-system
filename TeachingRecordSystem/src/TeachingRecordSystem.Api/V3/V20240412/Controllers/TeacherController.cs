@@ -19,7 +19,7 @@ public class TeacherController(ICommandDispatcher commandDispatcher, IMapper map
         Description = "Creates a name change request for the authenticated teacher.")]
     [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+    [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     public async Task<IActionResult> CreateNameChangeAsync([FromBody] CreateNameChangeRequestRequest request)
     {
         var command = new CreateNameChangeRequestCommand()
@@ -45,7 +45,7 @@ public class TeacherController(ICommandDispatcher commandDispatcher, IMapper map
         Description = "Creates a date of birth change request for the authenticated teacher.")]
     [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+    [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     public async Task<IActionResult> CreateDateOfBirthChangeAsync([FromBody] CreateDateOfBirthChangeRequestRequest request)
     {
         var command = new CreateDateOfBirthChangeRequestCommand()

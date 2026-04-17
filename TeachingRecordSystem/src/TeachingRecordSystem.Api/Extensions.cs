@@ -115,14 +115,15 @@ public static class Extensions
                     .RequireClaim(ClaimTypes.Name));
 
             options.AddPolicy(
-                AuthorizationPolicies.IdentityUserWithTrn,
+                AuthorizationPolicies.TeacherAuthAccessToken,
                 policy => policy
                     .AddAuthenticationSchemes(AuthenticationSchemeNames.IdAccessToken, AuthenticationSchemeNames.AuthorizeAccessAccessToken)
                     .RequireAssertion(ctx =>
                     {
                         var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        var isIdUser = scopes.Contains("dqt:read") && ctx.User.HasClaim(c => c.Type == "trn");
-                        var isAuthorizeAccessUser = scopes.Contains("teaching_record");
+                        var hasRequiredClaim = ctx.User.HasClaim(c => c.Type is "trn" or "trn_request_id");
+                        var isIdUser = scopes.Contains("dqt:read") && hasRequiredClaim;
+                        var isAuthorizeAccessUser = scopes.Contains("teaching_record") && hasRequiredClaim;
                         return isIdUser || isAuthorizeAccessUser;
                     }));
         });

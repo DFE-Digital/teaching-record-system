@@ -1,5 +1,7 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData;
 using TeachingRecordSystem.Core.Tests.Services;
+using CoreTrnRequestStatus = TeachingRecordSystem.Core.Models.TrnRequestStatus;
+using DtoTrnRequestStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestStatus;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20260224.WebhookData;
 
@@ -27,7 +29,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             await WithDbContextAsync(async dbContext =>
             {
                 trnRequestMetadata.ResolvedPersonId = person.PersonId;
-                trnRequestMetadata.Status = TrnRequestStatus.Completed;
+                trnRequestMetadata.Status = CoreTrnRequestStatus.Completed;
                 trnRequestMetadata.TrnToken = Guid.NewGuid().ToString();
                 await dbContext.SaveChangesAsync();
             });
@@ -41,7 +43,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
                 RequestId = trnRequest.RequestId,
                 Changes = TrnRequestUpdatedChanges.Status,
                 TrnRequest = trnRequest,
-                OldTrnRequest = trnRequest with { Status = TrnRequestStatus.Pending },
+                OldTrnRequest = trnRequest with { Status = CoreTrnRequestStatus.Pending },
                 ReasonDetails = null
             };
 
@@ -52,7 +54,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             Assert.NotNull(notification);
             Assert.Equal(trnRequest.RequestId, notification.TrnRequest.RequestId);
             Assert.Equal(person.Trn, notification.TrnRequest.Trn);
-            Assert.Equal(TrnRequestStatus.Completed, notification.TrnRequest.Status);
+            Assert.Equal(DtoTrnRequestStatus.Completed, notification.TrnRequest.Status);
             Assert.False(notification.TrnRequest.PotentialDuplicate);
             Assert.NotNull(notification.TrnRequest.AccessYourTeachingQualificationsLink);
         });
@@ -79,7 +81,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             await WithDbContextAsync(async dbContext =>
             {
                 trnRequestMetadata.ResolvedPersonId = person.PersonId;
-                trnRequestMetadata.Status = TrnRequestStatus.Completed;
+                trnRequestMetadata.Status = CoreTrnRequestStatus.Completed;
                 trnRequestMetadata.TrnToken = Guid.NewGuid().ToString();
                 await dbContext.SaveChangesAsync();
             });
@@ -93,7 +95,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
                 RequestId = trnRequest.RequestId,
                 Changes = TrnRequestUpdatedChanges.Status,
                 TrnRequest = trnRequest,
-                OldTrnRequest = trnRequest with { Status = TrnRequestStatus.Pending },
+                OldTrnRequest = trnRequest with { Status = CoreTrnRequestStatus.Pending },
                 ReasonDetails = null
             };
 
@@ -104,7 +106,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             Assert.NotNull(notification);
             Assert.Equal(trnRequest.RequestId, notification.TrnRequest.RequestId);
             Assert.Equal(person.Trn, notification.TrnRequest.Trn);
-            Assert.Equal(TrnRequestStatus.Completed, notification.TrnRequest.Status);
+            Assert.Equal(DtoTrnRequestStatus.Completed, notification.TrnRequest.Status);
             Assert.True(notification.TrnRequest.PotentialDuplicate);
             Assert.NotNull(notification.TrnRequest.AccessYourTeachingQualificationsLink);
         });
@@ -121,7 +123,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
 
             await WithDbContextAsync(async dbContext =>
             {
-                trnRequestMetadata.Status = TrnRequestStatus.Rejected;
+                trnRequestMetadata.Status = CoreTrnRequestStatus.Rejected;
                 await dbContext.SaveChangesAsync();
             });
 
@@ -134,7 +136,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
                 RequestId = trnRequest.RequestId,
                 Changes = TrnRequestUpdatedChanges.Status,
                 TrnRequest = trnRequest,
-                OldTrnRequest = trnRequest with { Status = TrnRequestStatus.Pending },
+                OldTrnRequest = trnRequest with { Status = CoreTrnRequestStatus.Pending },
                 ReasonDetails = null
             };
 
@@ -167,7 +169,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             await WithDbContextAsync(async dbContext =>
             {
                 trnRequestMetadata.ResolvedPersonId = person.PersonId;
-                trnRequestMetadata.Status = TrnRequestStatus.Completed;
+                trnRequestMetadata.Status = CoreTrnRequestStatus.Completed;
                 trnRequestMetadata.TrnToken = Guid.NewGuid().ToString();
                 await dbContext.SaveChangesAsync();
             });

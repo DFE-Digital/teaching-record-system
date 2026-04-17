@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -11,9 +10,9 @@ using TeachingRecordSystem.Api.V3.V20250627.Responses;
 namespace TeachingRecordSystem.Api.V3.V20250627.Controllers;
 
 [Route("person")]
-public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
 {
-    [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+    [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [HttpGet]
     [SwaggerOperation(
         OperationId = "GetCurrentPerson",
@@ -24,8 +23,14 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
     public async Task<IActionResult> GetAsync(
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include)
     {
+        var trn = await currentUserProvider.GetTrnAsync();
+        if (trn is null)
+        {
+            return Forbid();
+        }
+
         var command = new GetPersonCommand(
-            Trn: User.FindFirstValue("trn")!,
+            Trn: trn,
             include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
             DateOfBirth: null,
             NationalInsuranceNumber: null);
