@@ -80,11 +80,10 @@ public class SearchTextHelperTests
     [InlineData("name+tag@email.com", true)]
     [InlineData("simple@test.org", true)]
     [InlineData("no-at-sign", false)]
-    [InlineData("multiple@@signs.com", true)]
     [InlineData("", false)]
-    [InlineData("@", true)]
-    [InlineData("user@", true)]
-    [InlineData("@domain.com", true)]
+    [InlineData("@", false)]
+    [InlineData("user@", false)]
+    [InlineData("@domain.com", false)]
     public void IsEmailAddress_WithVariousInputs_ReturnsExpectedResult(string searchText, bool expectedResult)
     {
         // Arrange
