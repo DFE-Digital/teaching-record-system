@@ -292,7 +292,6 @@
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="EntityFrameworkCore.Projectables" />
     <PackageReference Include="FluentValidation" />
-    <PackageReference Include="Google.Cloud.Storage.V1" />
     <PackageReference Include="GovukNotify" />
     <PackageReference Include="Hangfire.Core" />
     <PackageReference Include="Hangfire.NetCore" />
@@ -320,7 +319,6 @@
     <PackageReference Include="OneOf" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
     <PackageReference Include="Optional" />
-    <PackageReference Include="Parquet.Net" />
     <PackageReference Include="Polly.Core" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="Serilog.Formatting.Compact" />

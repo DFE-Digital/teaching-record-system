@@ -106,10 +106,7 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<ExportWorkforceDataJob>(
-                nameof(ExportWorkforceDataJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("ExportWorkforceDataJob");
 
             recurringJobManager.AddOrUpdate<BackfillDqtReportingAlertTypesJob>(
                 nameof(BackfillDqtReportingAlertTypesJob),

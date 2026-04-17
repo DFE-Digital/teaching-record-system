@@ -14,11 +14,6 @@
         "resolved": "17.14.15",
         "contentHash": "mXQPJsbuUD2ydq4/ffd8h8tSOFCXec+2xJOVNCvXjuMOq/+5EKHq3D2m2MC2+nUaXeFMSt66VS/J4HdKBixgcw=="
       },
-      "Apache.Arrow": {
-        "type": "Transitive",
-        "resolved": "11.0.0",
-        "contentHash": "Pc5Mh8JKnJrszFUm1i1cwzCcoudY06TNPVy4VnSPAgfwZWReJkIduANjn6wrIekgpH/o9B9HyyraDPQXNXg8Ww=="
-      },
       "Azure.Core": {
         "type": "Transitive",
         "resolved": "1.50.0",
@@ -122,20 +117,20 @@
       },
       "Google.Api.Gax": {
         "type": "Transitive",
-        "resolved": "4.9.0",
-        "contentHash": "fjHHYcQ99u0ztqwT537rvVtJMdDy6G2VHBZ+F1cBjDGYNVZfrpk40DMQ/OpUGToT9ZGHVirhh3eJ73bw2ANVPQ==",
+        "resolved": "4.0.0",
+        "contentHash": "2Q4RruOjUawrtjTazANpp+MNB1M2E8nj2A1kweU1zF0OoNDKUnAIlMbDXs3d+kgcuj/zUVa89/nYot5UZICBWA==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
-          "Newtonsoft.Json": "13.0.3"
+          "Newtonsoft.Json": "13.0.1"
         }
       },
       "Google.Api.Gax.Rest": {
         "type": "Transitive",
-        "resolved": "4.9.0",
-        "contentHash": "xzHvOe8WzmSWVurtRFG+uSMWIKPHAAyhGdnGfBNSr4xSBzHsx7G5rWjjZhGcyeCYc0ZdaKEVyidtQS7A2OD2mg==",
+        "resolved": "4.0.0",
+        "contentHash": "YFoxv4UNP7Hn8Eask0FqwMbCAfBs5hUlzronJgFGVXcStohtKc0Mi+2YqgGN82nynx75jVWEF7siSLBwkmZsHA==",
         "dependencies": {
-          "Google.Api.Gax": "4.9.0",
-          "Google.Apis.Auth": "1.68.0",
+          "Google.Api.Gax": "4.0.0",
+          "Google.Apis.Auth": "[1.57.0, 2.0.0)",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0"
         }
       },
@@ -174,15 +169,6 @@
           "Newtonsoft.Json": "13.0.3"
         }
       },
-      "Google.Apis.Storage.v1": {
-        "type": "Transitive",
-        "resolved": "1.69.0.3707",
-        "contentHash": "XzNH0Xx4w+11o9rR71tVpVq3Ji+BFB9621PtNOScrm4f3I8pU3/vKRaKo2JAKRiX6fi1TpJgI5nfHbYJtc88BQ==",
-        "dependencies": {
-          "Google.Apis": "1.69.0",
-          "Google.Apis.Auth": "1.69.0"
-        }
-      },
       "Google.Cloud.BigQuery.V2": {
         "type": "Transitive",
         "resolved": "3.0.0",
@@ -190,15 +176,6 @@
         "dependencies": {
           "Google.Api.Gax.Rest": "[4.0.0, 5.0.0)",
           "Google.Apis.Bigquery.v2": "[1.57.0.2704, 2.0.0)"
-        }
-      },
-      "IronCompress": {
-        "type": "Transitive",
-        "resolved": "1.5.2",
-        "contentHash": "ZjWIOrO1a1/xBcpzp0sOxU0JuuajqRjiuhYuDJn3F5sM8R0vZ5K2pxm8b+ck1+OS8RUW1QxNgG3qtbC8uGXm6A==",
-        "dependencies": {
-          "Snappier": "1.1.6",
-          "ZstdSharp.Port": "0.8.1"
         }
       },
       "JWT": {
@@ -330,15 +307,6 @@
           "Microsoft.VisualStudio.SolutionPersistence": "1.0.52",
           "Newtonsoft.Json": "13.0.3",
           "System.Composition": "9.0.0"
-        }
-      },
-      "Microsoft.Data.Analysis": {
-        "type": "Transitive",
-        "resolved": "0.21.1",
-        "contentHash": "bcvvIkthkOWqH2HRdGZEfyxbtZOBq6AK8Oa1prdSefDCyQsPWRSCZRRqt1Txr8oGZgfdxERT0+BXRYUEKKApPQ==",
-        "dependencies": {
-          "Apache.Arrow": "11.0.0",
-          "Microsoft.ML.DataView": "3.0.1"
         }
       },
       "Microsoft.Data.SqlClient.SNI.runtime": {
@@ -675,16 +643,6 @@
           "Microsoft.IdentityModel.Logging": "8.16.0"
         }
       },
-      "Microsoft.IO.RecyclableMemoryStream": {
-        "type": "Transitive",
-        "resolved": "3.0.0",
-        "contentHash": "irv0HuqoH8Ig5i2fO+8dmDNdFdsrO+DoQcedwIlb810qpZHBNQHZLW7C/AHBQDgLLpw2T96vmMAy/aE4Yj55Sg=="
-      },
-      "Microsoft.ML.DataView": {
-        "type": "Transitive",
-        "resolved": "3.0.1",
-        "contentHash": "mkZt1r6Nx5CAoD3klhC7VMQFzwWMHHjoYpv3X9u+GMvTMbSRaDdiA88HUoOzT7kCeq4/L1nKctmrByhLK28Xjw=="
-      },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
         "resolved": "1.1.0",
@@ -819,11 +777,6 @@
         "type": "Transitive",
         "resolved": "1.4.2",
         "contentHash": "yjj+3zgz8zgXpiiC3ZdF/iyTBbz2fFvMxZFEBPUcwZjIvXOf37Ylm+K58hqMfIBt5JgU/Z2uoUS67JmTLe973A=="
-      },
-      "Snappier": {
-        "type": "Transitive",
-        "resolved": "1.1.6",
-        "contentHash": "aLJu7Q0mVk0e9QwjJLEh70tXQ0Url8fHITrHXwqF+eq7N20jGMOhkmTXUUjpPim+rCm0I4fARcVBRzJPSipN+w=="
       },
       "SSH.NET": {
         "type": "Transitive",
@@ -985,11 +938,6 @@
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0"
         }
       },
-      "ZstdSharp.Port": {
-        "type": "Transitive",
-        "resolved": "0.8.1",
-        "contentHash": "19tNz33kn2EkyViFXuxfVn338UJaRmkwBphVqP2dVJIYQUQgFrgG5h061mxkRRg1Ax6r+6WOj1FxaFZ5qaWqqg=="
-      },
       "teachingrecordsystem.core": {
         "type": "Project",
         "dependencies": {
@@ -1004,7 +952,6 @@
           "EFCore.NamingConventions": "[10.0.0, )",
           "EntityFrameworkCore.Projectables": "[6.0.2, )",
           "FluentValidation": "[12.1.0, )",
-          "Google.Cloud.Storage.V1": "[4.13.0, )",
           "GovukNotify": "[7.2.0, )",
           "Hangfire.Core": "[1.8.23, )",
           "Hangfire.NetCore": "[1.8.23, )",
@@ -1033,7 +980,6 @@
           "OneOf": "[3.0.271, )",
           "OpenIddict.EntityFrameworkCore": "[7.4.0, )",
           "Optional": "[4.0.0, )",
-          "Parquet.Net": "[4.24.0, )",
           "Polly.Core": "[8.6.6, )",
           "Scrutor": "[7.0.0, )",
           "Serilog.Formatting.Compact": "[3.0.0, )",
@@ -1245,16 +1191,6 @@
         "dependencies": {
           "FluentValidation": "11.11.0",
           "FluentValidation.DependencyInjectionExtensions": "11.11.0"
-        }
-      },
-      "Google.Cloud.Storage.V1": {
-        "type": "CentralTransitive",
-        "requested": "[4.13.0, )",
-        "resolved": "4.13.0",
-        "contentHash": "TMHPYZM3o9YtwkvdNqMciECtXzgptFCJUGa8r4MQuY8Y+uBKLvv3/PfijJhATESJw7dQdFcMGm+TOKJfKBfeWA==",
-        "dependencies": {
-          "Google.Api.Gax.Rest": "[4.9.0, 5.0.0)",
-          "Google.Apis.Storage.v1": "[1.69.0.3707, 2.0.0)"
         }
       },
       "GovukNotify": {
@@ -1632,17 +1568,6 @@
         "requested": "[4.0.0, )",
         "resolved": "4.0.0",
         "contentHash": "Q9NdZ39K/tPuV8JDs6ntRxW3idN9J4jSoBK/2ovld+Gh8if4Yhs+OTPvI84mN5YGAI3pzbhLcNUrm+VFKutC3Q=="
-      },
-      "Parquet.Net": {
-        "type": "CentralTransitive",
-        "requested": "[4.24.0, )",
-        "resolved": "4.24.0",
-        "contentHash": "30XaI5kj3llACxFUdCj9TNZkJGqJ3QMjB1ySaHhEMior9cT6C3SygyftzF7eS2I460M07DK6VbGFBWTWRjod8g==",
-        "dependencies": {
-          "IronCompress": "1.5.2",
-          "Microsoft.Data.Analysis": "0.21.1",
-          "Microsoft.IO.RecyclableMemoryStream": "3.0.0"
-        }
       },
       "Polly.Core": {
         "type": "CentralTransitive",
