@@ -27,8 +27,8 @@ public class TrnRequestMetadata
     public string? Postcode { get; init; }
     public string? Country { get; init; }
     public string? TrnToken { get; set; }
-    public Guid? ResolvedPersonId { get; private set; }
-    public TrnRequestStatus Status { get; private set; } = TrnRequestStatus.Pending;
+    public Guid? ResolvedPersonId { get; set; }
+    public TrnRequestStatus Status { get; set; } = TrnRequestStatus.Pending;
     public bool? NpqWorkingInEducationalSetting { get; init; }
     public string? NpqApplicationId { get; init; }
     public string? NpqName { get; init; }
@@ -36,31 +36,4 @@ public class TrnRequestMetadata
     public Guid? NpqEvidenceFileId { get; init; }
     public string? NpqEvidenceFileName { get; init; }
     public string? WorkEmailAddress { get; init; }
-
-    public void Reset()
-    {
-        ResolvedPersonId = null;
-        Status = TrnRequestStatus.Pending;
-    }
-
-    public void SetRejected()
-    {
-        Status = TrnRequestStatus.Rejected;
-    }
-
-    public void SetResolvedPerson(Guid personId, TrnRequestStatus requestStatus)
-    {
-        ResolvedPersonId = personId;
-        Status = requestStatus;
-    }
-
-    public void SetCompleted()
-    {
-        if (ResolvedPersonId is null)
-        {
-            throw new InvalidOperationException($"{nameof(ResolvedPersonId)} is not set.");
-        }
-
-        Status = TrnRequestStatus.Completed;
-    }
 }

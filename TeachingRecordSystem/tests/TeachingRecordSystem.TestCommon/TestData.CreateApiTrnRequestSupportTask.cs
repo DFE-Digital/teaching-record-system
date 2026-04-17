@@ -258,7 +258,8 @@ public partial class TestData
 
             if (_resolvedPersonId.ValueOrDefault() is Guid personId)
             {
-                metadata.SetResolvedPerson(personId, _trnRequestStatus.ValueOr(TrnRequestStatus.Completed));
+                metadata.ResolvedPersonId = personId;
+                metadata.Status = _trnRequestStatus.ValueOr(TrnRequestStatus.Completed);
             }
 
             var status = _status.ValueOr(() => SupportTaskStatus.Open);

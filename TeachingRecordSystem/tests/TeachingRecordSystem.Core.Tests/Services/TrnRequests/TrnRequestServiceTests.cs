@@ -33,7 +33,6 @@ public partial class TrnRequestServiceTests : ServiceTestBase
 
     private Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
-
     private IOptions<AccessYourTeachingQualificationsOptions> AytqOptionsAccessor { get; }
 
     private IOptions<TrnRequestOptions> TrnRequestOptionsAccessor { get; }
@@ -238,6 +237,200 @@ public partial class TrnRequestServiceTests : ServiceTestBase
     }
 
     [Fact]
+    public async Task CreateTrnRequest_WithTryResolveFalse_DoesNotCreateSupportTaskForPotentialMatches()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        TrnRequestOptionsAccessor.Value.FlagFurtherChecksRequiredFromUserIds = [applicationUser.UserId];
+
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+
+        var options = GetCreateTrnRequestOptions(applicationUser.UserId, tryResolve: false) with
+        {
+            FirstName = firstName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth
+        };
+
+        var potentialMatch = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(firstName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithAlert());
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var supportTask = await dbContext.SupportTasks
+                .SingleOrDefaultAsync(t => t.PersonId == potentialMatch.PersonId && t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded);
+
+            Assert.Null(supportTask);
+        });
+    }
+
+    [Fact]
+    public async Task CreateTrnRequest_WithTryResolveFalse_DoesNotResolveWithExistingPersonForDefiniteMatch()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+
+        var options = GetCreateTrnRequestOptions(applicationUser.UserId, tryResolve: false) with
+        {
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
+
+        var definiteMatch = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
+
+        // Assert
+        var trnRequest = await WithDbContextAsync(dbContext =>
+            dbContext.TrnRequestMetadata.SingleAsync(m => m.ApplicationUserId == applicationUser.UserId && m.RequestId == options.RequestId));
+
+        Assert.Null(trnRequest.ResolvedPersonId);
+        Assert.NotEqual(TrnRequestStatus.Completed, trnRequest.Status);
+    }
+
+    [Fact]
+    public async Task CreateTrnRequest_WithTryResolveFalse_DoesNotResolveWithNewPersonForNoMatches()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var options = GetCreateTrnRequestOptions(applicationUser.UserId, tryResolve: false);
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
+
+        // Assert
+        var trnRequest = await WithDbContextAsync(dbContext =>
+            dbContext.TrnRequestMetadata.SingleAsync(m => m.ApplicationUserId == applicationUser.UserId && m.RequestId == options.RequestId));
+
+        Assert.Null(trnRequest.ResolvedPersonId);
+
+        var newPerson = await WithDbContextAsync(dbContext =>
+            dbContext.Persons.SingleOrDefaultAsync(p =>
+                p.SourceApplicationUserId == applicationUser.UserId && p.SourceTrnRequestId == options.RequestId));
+
+        Assert.Null(newPerson);
+    }
+
+    [Fact]
+    public async Task ActivateTrnRequestAsync_TrnRequestIsNotDormant_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
+        trnRequest.Status = TrnRequestStatus.Pending;
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() =>
+            WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task ActivateTrnRequestAsync_WithDefiniteMatch_AssignsPersonIdAndSetsStatusToComplete()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
+
+        var definiteMatch = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(trnRequest.DateOfBirth)
+            .WithNationalInsuranceNumber(trnRequest.NationalInsuranceNumber!));
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+
+        // Assert
+        Assert.Equal(definiteMatch.PersonId, trnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+    }
+
+    [Fact]
+    public async Task ActivateTrnRequestAsync_WithNoMatch_CreatesNewPersonAndSetsStatusToComplete()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+
+        // Assert
+        Assert.NotNull(trnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var person = await dbContext.Persons.SingleOrDefaultAsync(p =>
+                p.PersonId == trnRequest.ResolvedPersonId);
+            Assert.NotNull(person);
+        });
+    }
+
+    [Fact]
+    public async Task ActivateTrnRequestAsync_WithPotentialMatches_CreatesSupportTaskAndSetsStatusToPending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
+
+        // Create a potential (but not definite) match: same name + DOB, different NINO
+        var potentialMatch = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(trnRequest.FirstName!)
+            .WithMiddleName(trnRequest.MiddleName)
+            .WithLastName(trnRequest.LastName!)
+            .WithDateOfBirth(trnRequest.DateOfBirth));
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+
+        // Assert
+        Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var supportTask = await dbContext.SupportTasks
+                .SingleOrDefaultAsync(t =>
+                    t.TrnRequestApplicationUserId == applicationUser.UserId &&
+                    t.TrnRequestId == trnRequest.RequestId &&
+                    t.SupportTaskType == SupportTaskType.ApiTrnRequest);
+            Assert.NotNull(supportTask);
+            Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+        });
+    }
+
+    [Fact]
     public async Task ResolveTrnRequestWithMatchedPersonAsync_FurtherChecksNotRequired_AssignsResolvedPersonAndTrnTokenAndSetsStatusToCompleted()
     {
         // Arrange
@@ -250,7 +443,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
-            (matchedPerson.PersonId, matchedPerson.Trn!),
+            (matchedPerson.PersonId, matchedPerson.Trn),
             processContext));
 
         // Assert
@@ -273,7 +466,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
-            (matchedPerson.PersonId, matchedPerson.Trn!),
+            (matchedPerson.PersonId, matchedPerson.Trn),
             processContext));
 
         // Assert
@@ -333,7 +526,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
-        trnRequest.SetRejected();
+        trnRequest.Status = TrnRequestStatus.Rejected;
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
@@ -354,7 +547,8 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
-        trnRequest.SetResolvedPerson(matchingPerson.PersonId, TrnRequestStatus.Completed);
+        trnRequest.ResolvedPersonId = matchingPerson.PersonId;
+        trnRequest.Status = TrnRequestStatus.Completed;
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
@@ -399,7 +593,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
-        trnRequest.SetRejected();
+        trnRequest.Status = TrnRequestStatus.Rejected;
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
@@ -420,7 +614,8 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
-        trnRequest.SetResolvedPerson(matchingPerson.PersonId, TrnRequestStatus.Completed);
+        trnRequest.ResolvedPersonId = matchingPerson.PersonId;
+        trnRequest.Status = TrnRequestStatus.Completed;
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
@@ -441,7 +636,8 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
-        trnRequest.SetResolvedPerson(matchingPerson.PersonId, TrnRequestStatus.Pending);
+        trnRequest.ResolvedPersonId = matchingPerson.PersonId;
+        trnRequest.Status = TrnRequestStatus.Pending;
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
 
@@ -481,7 +677,8 @@ public partial class TrnRequestServiceTests : ServiceTestBase
 
         var (trnRequest, matchedPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
 
-        trnRequest.SetResolvedPerson(matchedPerson.PersonId, TrnRequestStatus.Completed);
+        trnRequest.ResolvedPersonId = matchedPerson.PersonId;
+        trnRequest.Status = TrnRequestStatus.Completed;
         Debug.Assert(trnRequest.TrnToken is null);
 
         // Act
@@ -505,7 +702,8 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         {
             dbContext.Attach(trnRequest);
 
-            trnRequest.SetResolvedPerson(matchedPerson.PersonId, TrnRequestStatus.Completed);
+            trnRequest.ResolvedPersonId = matchedPerson.PersonId;
+            trnRequest.Status = TrnRequestStatus.Completed;
             Debug.Assert(trnRequest.TrnToken is null);
 
             await dbContext.SaveChangesAsync();
@@ -615,7 +813,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         Debug.Assert(trnRequest.Status is not TrnRequestStatus.Completed);
 
         // Act
-        var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn!));
+        var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn));
 
         // Assert
         VerifyTrnTokenApiNotCalled();
@@ -631,10 +829,11 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             applicationUser.UserId,
             configureOptions: r => r with { EmailAddress = null! });
 
-        trnRequest.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
+        trnRequest.ResolvedPersonId = person.PersonId;
+        trnRequest.Status = TrnRequestStatus.Completed;
 
         // Act
-        var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn!));
+        var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn));
 
         // Assert
         VerifyTrnTokenApiNotCalled();
@@ -650,11 +849,12 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             applicationUser.UserId,
             configureOptions: r => r with { EmailAddress = emailAddress });
 
-        trnRequest.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
+        trnRequest.ResolvedPersonId = person.PersonId;
+        trnRequest.Status = TrnRequestStatus.Completed;
         var initialToken = trnRequest.TrnToken = Guid.NewGuid().ToString();
 
         // Act
-        var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn!));
+        var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn));
 
         // Assert
         VerifyTrnTokenApiNotCalled();
@@ -672,16 +872,19 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             configureOptions: r => r with { EmailAddress = emailAddress });
 
         Debug.Assert(trnRequest.TrnToken is null);
-        trnRequest.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
+        trnRequest.ResolvedPersonId = person.PersonId;
+        trnRequest.Status = TrnRequestStatus.Completed;
         Debug.Assert(trnRequest.Status is TrnRequestStatus.Completed);
 
         // Act
-        var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn!));
+        var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn));
 
         // Assert
-        VerifyTrnTokenApiCalled(trnRequest.EmailAddress!, person.Trn!);
+        VerifyTrnTokenApiCalled(trnRequest.EmailAddress!, person.Trn);
         Assert.NotNull(trnRequest.TrnToken);
     }
+
+    //...
 
     private async Task<(TrnRequestMetadata TrnRequest, Person Person)> CreatePendingTrnRequestAndMatchingPerson(
         Guid applicationUserId,

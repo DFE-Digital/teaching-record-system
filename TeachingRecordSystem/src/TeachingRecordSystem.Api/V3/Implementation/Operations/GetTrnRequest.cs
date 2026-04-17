@@ -5,7 +5,14 @@ using TrnRequestInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.TrnReques
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record GetTrnRequestCommand(string RequestId) : ICommand<TrnRequestInfo>;
+[Flags]
+public enum GetTrnRequestCommandOptions
+{
+    None = 0,
+    SupportsDormantRequests = 1 << 0
+}
+
+public record GetTrnRequestCommand(string RequestId, GetTrnRequestCommandOptions Options = GetTrnRequestCommandOptions.None) : ICommand<TrnRequestInfo>;
 
 public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider) :
     ICommandHandler<GetTrnRequestCommand, TrnRequestInfo>
@@ -24,6 +31,16 @@ public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentU
         var trnRequest = trnRequestInfo.TrnRequest;
         var status = trnRequest.Status;
         var trn = status == TrnRequestStatus.Completed ? trnRequestInfo.ResolvedPersonTrn : null;
+
+        if (status is TrnRequestStatus.Rejected)
+        {
+            return ApiError.UnsupportedTrnRequestStatus(command.RequestId);
+        }
+
+        if (!command.Options.HasFlag(GetTrnRequestCommandOptions.SupportsDormantRequests) && status is TrnRequestStatus.Dormant)
+        {
+            return ApiError.UnsupportedTrnRequestStatus(command.RequestId);
+        }
 
         return new TrnRequestInfo()
         {

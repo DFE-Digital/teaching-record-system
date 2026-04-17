@@ -42,7 +42,7 @@ public class SignOutModel(TrsDbContext dbContext) : PageModel
         {
             RedirectUri = HttpContext.Response.Headers.Location
         };
-        var oneLoginIdToken = _authenticateResult!.Principal!.FindFirstValue(ClaimTypes.OneLoginIdToken)!;
+        var oneLoginIdToken = _authenticateResult!.Principal!.FindFirstValue(AuthorizeAccessClaimTypes.OneLoginIdToken)!;
         authenticationProperties.SetParameter(OpenIdConnectParameterNames.IdToken, oneLoginIdToken);
 
         return SignOut(authenticationProperties, _client!.OneLoginAuthenticationSchemeName!);

@@ -1,6 +1,6 @@
-namespace TeachingRecordSystem.AuthorizeAccess;
+namespace TeachingRecordSystem.Core;
 
-public static class ClaimTypes
+public static class AuthorizeAccessClaimTypes
 {
     public const string Email = "email";
     public const string Subject = "sub";

@@ -56,7 +56,7 @@ public static class Extensions
         services.AddDfeAnalytics()
             .AddAspNetCoreIntegration(options =>
             {
-                options.UserIdClaimType = ClaimTypes.Subject;
+                options.UserIdClaimType = AuthorizeAccessClaimTypes.Subject;
 
                 options.RequestFilter = ctx =>
                     ctx.Request.Path != "/status" &&

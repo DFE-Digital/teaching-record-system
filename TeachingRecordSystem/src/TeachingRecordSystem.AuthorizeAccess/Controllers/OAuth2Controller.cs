@@ -108,8 +108,8 @@ public class OAuth2Controller(
         }
 
         var user = authenticateResult.Principal;
-        var subject = user.FindFirstValue(ClaimTypes.Subject) ??
-            throw new InvalidOperationException($"Principal does not contain a '{ClaimTypes.Subject}' claim.");
+        var subject = user.FindFirstValue(AuthorizeAccessClaimTypes.Subject) ??
+            throw new InvalidOperationException($"Principal does not contain a '{AuthorizeAccessClaimTypes.Subject}' claim.");
 
         var authorizations = await authorizationManager.FindAsync(
             subject: subject,
@@ -121,7 +121,7 @@ public class OAuth2Controller(
         var identity = new ClaimsIdentity(
             claims: user.Claims,
             authenticationType: TokenValidationParameters.DefaultAuthenticationType,
-            nameType: ClaimTypes.Subject,
+            nameType: AuthorizeAccessClaimTypes.Subject,
             roleType: null);
 
         identity.SetScopes(request.GetScopes());
@@ -162,7 +162,7 @@ public class OAuth2Controller(
             var identity = new ClaimsIdentity(
                 result.Principal!.Claims,
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
-                nameType: ClaimTypes.Subject,
+                nameType: AuthorizeAccessClaimTypes.Subject,
                 roleType: null);
 
             identity.SetDestinations(GetDestinations);
@@ -179,11 +179,11 @@ public class OAuth2Controller(
     [Produces("application/json")]
     public async Task<IActionResult> UserInfoAsync()
     {
-        var subject = User.GetClaim(ClaimTypes.Subject)!;
+        var subject = User.GetClaim(AuthorizeAccessClaimTypes.Subject)!;
 
         var claims = new Dictionary<string, object>(StringComparer.Ordinal)
         {
-            [ClaimTypes.Subject] = subject
+            [AuthorizeAccessClaimTypes.Subject] = subject
         };
 
         var oneLoginUser = await dbContext.OneLoginUsers
@@ -192,16 +192,16 @@ public class OAuth2Controller(
 
         if (oneLoginUser.Person is Person p)
         {
-            claims.Add(ClaimTypes.Trn, p.Trn);
+            claims.Add(AuthorizeAccessClaimTypes.Trn, p.Trn);
         }
 
         if (User.HasScope(Scopes.Email))
         {
-            claims.Add(ClaimTypes.Email, oneLoginUser.EmailAddress!);
+            claims.Add(AuthorizeAccessClaimTypes.Email, oneLoginUser.EmailAddress!);
         }
 
-        claims.Add(ClaimTypes.VerifiedName, oneLoginUser.VerifiedNames!.First());
-        claims.Add(ClaimTypes.VerifiedDateOfBirth, oneLoginUser.VerifiedDatesOfBirth!.First());
+        claims.Add(AuthorizeAccessClaimTypes.VerifiedName, oneLoginUser.VerifiedNames!.First());
+        claims.Add(AuthorizeAccessClaimTypes.VerifiedDateOfBirth, oneLoginUser.VerifiedDatesOfBirth!.First());
 
         return Ok(claims);
     }
@@ -210,13 +210,13 @@ public class OAuth2Controller(
     {
         switch (claim.Type)
         {
-            case ClaimTypes.Subject:
-            case ClaimTypes.Trn:
+            case AuthorizeAccessClaimTypes.Subject:
+            case AuthorizeAccessClaimTypes.Trn:
                 yield return Destinations.AccessToken;
                 yield return Destinations.IdentityToken;
                 yield break;
 
-            case ClaimTypes.Email:
+            case AuthorizeAccessClaimTypes.Email:
                 if (claim.Subject!.HasScope(Scopes.Email))
                 {
                     yield return Destinations.IdentityToken;
@@ -224,11 +224,11 @@ public class OAuth2Controller(
 
                 yield break;
 
-            case ClaimTypes.OneLoginIdToken:
+            case AuthorizeAccessClaimTypes.OneLoginIdToken:
                 yield return Destinations.IdentityToken;
                 yield break;
 
-            case ClaimTypes.TrsUserId:
+            case AuthorizeAccessClaimTypes.TrsUserId:
                 yield return Destinations.AccessToken;
                 yield break;
 

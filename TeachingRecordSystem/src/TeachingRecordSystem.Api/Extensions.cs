@@ -121,9 +121,10 @@ public static class Extensions
                     .RequireAssertion(ctx =>
                     {
                         var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        return scopes.Contains("dqt:read") || scopes.Contains("teaching_record");
-                    })
-                    .RequireClaim("trn"));
+                        var isIdUser = scopes.Contains("dqt:read") && ctx.User.HasClaim(c => c.Type == "trn");
+                        var isAuthorizeAccessUser = scopes.Contains("teaching_record");
+                        return isIdUser || isAuthorizeAccessUser;
+                    }));
         });
 
         services

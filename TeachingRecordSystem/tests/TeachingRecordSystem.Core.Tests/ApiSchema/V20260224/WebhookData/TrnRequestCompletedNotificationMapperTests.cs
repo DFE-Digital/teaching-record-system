@@ -26,7 +26,8 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
 
             await WithDbContextAsync(async dbContext =>
             {
-                trnRequestMetadata.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
+                trnRequestMetadata.ResolvedPersonId = person.PersonId;
+                trnRequestMetadata.Status = TrnRequestStatus.Completed;
                 trnRequestMetadata.TrnToken = Guid.NewGuid().ToString();
                 await dbContext.SaveChangesAsync();
             });
@@ -77,7 +78,8 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
 
             await WithDbContextAsync(async dbContext =>
             {
-                trnRequestMetadata.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
+                trnRequestMetadata.ResolvedPersonId = person.PersonId;
+                trnRequestMetadata.Status = TrnRequestStatus.Completed;
                 trnRequestMetadata.TrnToken = Guid.NewGuid().ToString();
                 await dbContext.SaveChangesAsync();
             });
@@ -119,7 +121,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
 
             await WithDbContextAsync(async dbContext =>
             {
-                trnRequestMetadata.SetRejected();
+                trnRequestMetadata.Status = TrnRequestStatus.Rejected;
                 await dbContext.SaveChangesAsync();
             });
 
@@ -164,7 +166,8 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
 
             await WithDbContextAsync(async dbContext =>
             {
-                trnRequestMetadata.SetResolvedPerson(person.PersonId, TrnRequestStatus.Completed);
+                trnRequestMetadata.ResolvedPersonId = person.PersonId;
+                trnRequestMetadata.Status = TrnRequestStatus.Completed;
                 trnRequestMetadata.TrnToken = Guid.NewGuid().ToString();
                 await dbContext.SaveChangesAsync();
             });

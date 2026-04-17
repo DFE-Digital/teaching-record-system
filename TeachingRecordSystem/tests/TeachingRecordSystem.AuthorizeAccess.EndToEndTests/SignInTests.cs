@@ -560,7 +560,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .FirstOrDefaultAsync();
 
             Assert.NotNull(trnRequest);
-            Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+            Assert.Equal(TrnRequestStatus.Dormant, trnRequest.Status);
 
             var supportTask = await dbContext.SupportTasks
                 .Where(st => st.OneLoginUserSubject == subject)
