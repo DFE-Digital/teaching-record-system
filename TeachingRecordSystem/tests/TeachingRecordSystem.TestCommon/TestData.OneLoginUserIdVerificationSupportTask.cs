@@ -99,6 +99,7 @@ public partial class TestData
         public Task<SupportTask> ExecuteAsync(TestData testData) =>
             testData.WithDbContextAsync(async dbContext =>
             {
+                var applicationUser = await testData.CreateApplicationUserAsync();
                 var statedFirstName = _statedFirstName.ValueOr(testData.GenerateFirstName);
                 var statedLastName = _statedLastName.ValueOr(testData.GenerateLastName);
                 var statedDateOfBirth = _statedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
@@ -107,7 +108,7 @@ public partial class TestData
                 var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid());
                 var evidenceFileName = _evidenceFileName.ValueOr("evidence.pdf");
                 var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
-                var clientApplicationUserId = _clientApplicationUserId.ValueOrDefault();
+                var clientApplicationUserId = _clientApplicationUserId.ValueOr(applicationUser.UserId);
                 var status = _status.ValueOr(SupportTaskStatus.Open);
                 var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
 

@@ -12,22 +12,26 @@ public partial class SupportTaskSearchServiceTests
     [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Email, SortDirection.Ascending)]
     [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending)]
     [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Source, SortDirection.Ascending)]
     [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.SupportTaskReference, SortDirection.Descending)]
     [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Email, SortDirection.Descending)]
     [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Descending)]
     [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
+    [InlineData(OneLoginUserIdVerificationSupportTasksSortByOption.Source, SortDirection.Descending)]
     public async Task SearchOneLoginIdVerificationSupportTasks_ReturnsOrderedResults(OneLoginUserIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection)
     {
         // Arrange
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var oneLoginUsers = new OneLoginUser[] { oneLoginUser1, oneLoginUser2 };
-
+        var applicationUser = await TestData.CreateApplicationUserAsync(shortName: "TEST");
         var supportTasks = new SupportTask[] {
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject, configure =>
-                configure.WithCreatedOn(new DateTime(2000,10,10,1,1,1, DateTimeKind.Utc))),
+                configure.WithCreatedOn(new DateTime(2000,10,10,1,1,1, DateTimeKind.Utc))
+                    .WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject, configure =>
-                configure.WithCreatedOn(new DateTime(2000,10,11,1,1,1, DateTimeKind.Utc)))
+                configure.WithCreatedOn(new DateTime(2000,10,11,1,1,1, DateTimeKind.Utc))
+                    .WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: null, sortBy, sortDirection);
@@ -42,7 +46,8 @@ public partial class SupportTaskSearchServiceTests
                     ((OneLoginUserIdVerificationData)task.Data)!.StatedFirstName,
                     ((OneLoginUserIdVerificationData)task.Data)!.StatedLastName,
                     task.CreatedOn,
-                    user.EmailAddress
+                    user.EmailAddress,
+                    applicationUser.ShortName
                 });
         var paginationOptions = new PaginationOptions(PageNumber: 1);
 
@@ -65,6 +70,9 @@ public partial class SupportTaskSearchServiceTests
             OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.CreatedOn)
                 : expectedResults.OrderByDescending(s => s.CreatedOn),
+            OneLoginUserIdVerificationSupportTasksSortByOption.Source => sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.ShortName)
+                : expectedResults.OrderByDescending(s => s.ShortName),
             _ => expectedResults
         }).ToArray();
 
@@ -74,6 +82,7 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(expectedResultsOrdered.Select(r => r.CreatedOn), results.SearchResults.Select(r => r.CreatedOn));
         Assert.Equal(expectedResultsOrdered.Select(r => r.StatedFirstName), results.SearchResults.Select(r => r.FirstName));
         Assert.Equal(expectedResultsOrdered.Select(r => r.StatedLastName), results.SearchResults.Select(r => r.LastName));
+        Assert.Equal(expectedResultsOrdered.Select(r => r.ShortName), results.SearchResults.Select(r => r.SourceApplicationName));
     }
 
     [Theory]
@@ -119,19 +128,20 @@ public partial class SupportTaskSearchServiceTests
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync("x");
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithStatedFirstName("Alphie").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,10,1,1,1,1))),
+                configure.WithStatedFirstName("Alphie").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,10,1,1,1,1)).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithStatedFirstName("Bert").WithCreatedOn(new DateTime(2000,9,1,1,2,1))),
+                configure.WithStatedFirstName("Bert").WithCreatedOn(new DateTime(2000,9,1,1,2,1)).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithStatedFirstName("Colin").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,8,1,1,3,1))),
+                configure.WithStatedFirstName("Colin").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,8,1,1,3,1)).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithStatedFirstName("David").WithCreatedOn(new DateTime(2000,11,1,1,4,1))),
+                configure.WithStatedFirstName("David").WithCreatedOn(new DateTime(2000,11,1,1,4,1)).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithStatedFirstName("Edward").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,10,1,1,5,1)))
+                configure.WithStatedFirstName("Edward").WithStatedLastName("Smith").WithCreatedOn(new DateTime(2000,10,1,1,5,1)).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: search, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
@@ -161,15 +171,16 @@ public partial class SupportTaskSearchServiceTests
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithStatedFirstName("Alphie").WithCreatedOn(new DateTime(2025,1,20))),
+                configure.WithStatedFirstName("Alphie").WithCreatedOn(new DateTime(2025,1,20)).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithStatedFirstName("Bert").WithCreatedOn(new DateTime(2025,1,20))),
+                configure.WithStatedFirstName("Bert").WithCreatedOn(new DateTime(2025,1,20)).WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, configure =>
-                configure.WithStatedFirstName("Colin").WithCreatedOn(new DateTime(2025,1,21)))
+                configure.WithStatedFirstName("Colin").WithCreatedOn(new DateTime(2025,1,21)).WithClientApplicationUserId(applicationUser.UserId))
         };
 
         var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: searchText, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);

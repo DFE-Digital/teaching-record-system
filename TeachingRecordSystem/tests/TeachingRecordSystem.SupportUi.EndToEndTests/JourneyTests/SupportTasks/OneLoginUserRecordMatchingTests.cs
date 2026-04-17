@@ -8,7 +8,6 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
     public async Task Match()
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
-
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
@@ -42,7 +41,6 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
     public async Task NoMatch()
     {
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject);
         var taskData = supportTask.GetData<OneLoginUserRecordMatchingData>();
         var firstName = taskData.VerifiedNames![0][0];
@@ -103,7 +101,6 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
     public async Task StartMatchAndComeBackLater()
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
-
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(

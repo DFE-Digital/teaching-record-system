@@ -343,14 +343,34 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         var taskCount = tasks.Count;
 
+        var clientUserIds = tasks
+            .Select(t => ((OneLoginUserIdVerificationData)t.Data!).ClientApplicationUserId)
+            .Distinct()
+            .ToList();
+
+        var users = await dbContext.ApplicationUsers
+            .Where(u => clientUserIds.Contains(u.UserId))
+            .Select(u => new
+            {
+                u.UserId,
+                ShortName = (u.ShortName ?? u.Name)!
+            })
+            .ToDictionaryAsync(u => u.UserId, u => u.ShortName);
+
         var results = tasks
-            .Select(r => new OneLoginUserIdVerificationSupportTasksSearchResultItem(
-                r.SupportTaskReference,
-                r.Status,
-                (r.Data as OneLoginUserIdVerificationData)!.StatedFirstName,
-                (r.Data as OneLoginUserIdVerificationData)!.StatedLastName,
-                r.OneLoginUser!.EmailAddress,
-                r.CreatedOn))
+            .Select(r =>
+            {
+                var data = (OneLoginUserIdVerificationData)r.Data!;
+                return new OneLoginUserIdVerificationSupportTasksSearchResultItem(
+                    r.SupportTaskReference,
+                    r.Status,
+                    data.StatedFirstName,
+                    data.StatedLastName,
+                    r.OneLoginUser!.EmailAddress,
+                    r.CreatedOn,
+                    users[data.ClientApplicationUserId]!
+                );
+            })
             .AsQueryable();
 
         if (SearchTextIsDate(search, out var minDate, out var maxDate))
@@ -383,6 +403,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 .ThenBy(r => r.LastName, sortDirection),
             OneLoginUserIdVerificationSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, sortDirection),
             OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection).ThenBy(r => r.SupportTaskReference, sortDirection),
+            OneLoginUserIdVerificationSupportTasksSortByOption.Source => results.OrderBy(r => r.SourceApplicationName, sortDirection),
             _ => results
         }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
 
@@ -404,17 +425,38 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching && t.Status != SupportTaskStatus.Closed)
             .ToListAsync();
 
+        var clientUserIds = tasks
+            .Select(t => ((OneLoginUserRecordMatchingData)t.Data!).ClientApplicationUserId)
+            .Distinct()
+            .ToList();
+
+        var users = await dbContext.ApplicationUsers.IgnoreQueryFilters()
+            .Where(u => clientUserIds.Contains(u.UserId))
+            .Select(u => new
+            {
+                u.UserId,
+                ShortName = (u.ShortName ?? u.Name)!
+            })
+            .ToDictionaryAsync(u => u.UserId, u => u.ShortName);
+
         var taskCount = tasks.Count;
 
         var results = tasks
-            .Select(r => new OneLoginUserRecordMatchingSupportTasksSearchResultItem(
-                r.SupportTaskReference,
-                r.Status,
-                (r.Data as OneLoginUserRecordMatchingData)!.VerifiedNames!.First().First(),
-                (r.Data as OneLoginUserRecordMatchingData)!.VerifiedNames!.First().Last(),
-                (r.Data as OneLoginUserRecordMatchingData)!.VerifiedNames!.Skip(1).SelectMany(n => n).ToArray(),
-                r.OneLoginUser!.EmailAddress,
-                r.CreatedOn))
+            .Select(r =>
+            {
+                var data = (r.Data as OneLoginUserRecordMatchingData)!;
+                var name = users[(r.Data as OneLoginUserRecordMatchingData)!.ClientApplicationUserId];
+                return new OneLoginUserRecordMatchingSupportTasksSearchResultItem(
+                    r.SupportTaskReference,
+                    r.Status,
+                    data.VerifiedNames!.First().First(),
+                    data.VerifiedNames!.First().Last(),
+                    data.VerifiedNames!.Skip(1).SelectMany(n => n).ToArray(),
+                    r.OneLoginUser!.EmailAddress,
+                    r.CreatedOn,
+                    name
+                );
+            })
             .AsQueryable();
 
         if (SearchTextIsDate(search, out var minDate, out var maxDate))
@@ -447,6 +489,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 .ThenBy(r => r.LastName, sortDirection),
             OneLoginUserRecordMatchingSupportTasksSortByOption.Email => results.OrderBy(r => r.EmailAddress, sortDirection),
             OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection).ThenBy(r => r.SupportTaskReference, sortDirection),
+            OneLoginUserRecordMatchingSupportTasksSortByOption.Source => results.OrderBy(r => r.SourceApplicationName, sortDirection),
             _ => results
         }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
 

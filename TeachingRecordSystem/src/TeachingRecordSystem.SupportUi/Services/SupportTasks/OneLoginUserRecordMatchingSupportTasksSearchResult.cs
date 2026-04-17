@@ -13,7 +13,8 @@ public record OneLoginUserRecordMatchingSupportTasksSearchResultItem(
     string LastName,
     string[] OtherVerifiedNames,
     string? EmailAddress,
-    DateTime CreatedOn) : ISupportTaskSearchResult
+    DateTime CreatedOn,
+    string SourceApplicationName) : ISupportTaskSearchResult
 {
     public string Name => $"{FirstName} {LastName}";
 }

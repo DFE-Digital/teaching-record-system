@@ -91,13 +91,14 @@ public partial class TestData
 
         public async Task<SupportTask> ExecuteAsync(TestData testData)
         {
+            var applicationUser = await testData.CreateApplicationUserAsync();
             var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail());
             var verifiedNames = _verifiedNames.ValueOr([[testData.GenerateFirstName(), testData.GenerateLastName()]]);
             var verifiedDateOfBirth = _verifiedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
             var statedTrn = _statedTrn.ValueOr(await testData.GenerateTrnAsync());
             var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
-            var clientApplicationUserId = _clientApplicationUserId.ValueOr(Guid.NewGuid());
+            var clientApplicationUserId = _clientApplicationUserId.ValueOr(applicationUser.UserId);
             var status = _status.ValueOr(SupportTaskStatus.Open);
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
             var trnRequestId = _trnRequestId.ValueOrDefault();

@@ -12,7 +12,8 @@ public record OneLoginUserIdVerificationSupportTasksSearchResultItem(
     string FirstName,
     string LastName,
     string? EmailAddress,
-    DateTime CreatedOn) : ISupportTaskSearchResult
+    DateTime CreatedOn,
+    string SourceApplicationName) : ISupportTaskSearchResult
 {
     public string Name => $"{FirstName} {LastName}";
 }

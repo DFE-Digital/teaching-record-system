@@ -4,7 +4,6 @@ using AngleSharp.Html.Dom;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserMatching;
@@ -18,15 +17,23 @@ public class RecordMatchingTests(HostFixture hostFixture) : TestBase(hostFixture
         // Arrange
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
+        var applicationUser = await TestData.CreateApplicationUserAsync(shortName: "x");
         var supportTasksList = new List<SupportTask>
         {
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser1.Subject, configure =>
-                configure.WithVerifiedNames(["Alphie", "Smith"]).WithCreatedOn(new DateTime(2025,1,22, 1, 1, 1))),
+                configure.WithVerifiedNames(["Alphie", "Smith"])
+                    .WithCreatedOn(new DateTime(2025,1,22, 1, 1, 1))
+                    .WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser1.Subject, configure =>
-                configure.WithVerifiedNames(["Bert", "Johnson"]).WithCreatedOn(new DateTime(2025,1,22, 1, 0, 0))),
+                configure.WithVerifiedNames(["Bert", "Johnson"])
+                    .WithCreatedOn(new DateTime(2025,1,22, 1, 0, 0))
+                    .WithClientApplicationUserId(applicationUser.UserId)),
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser2.Subject, configure =>
-                configure.WithVerifiedNames(["Colin", "Smith"]).WithCreatedOn(new DateTime(2025,1,20, 1, 1, 1)))
+                configure.WithVerifiedNames(["Colin", "Smith"])
+                    .WithCreatedOn(new DateTime(2025,1,20, 1, 1, 1))
+                    .WithClientApplicationUserId(applicationUser.UserId))
         };
+
         var expectedResults = supportTasksList
             .Join([oneLoginUser1, oneLoginUser2],
                 task => ((OneLoginUserRecordMatchingData)task.Data).OneLoginUserSubject,
@@ -37,7 +44,8 @@ public class RecordMatchingTests(HostFixture hostFixture) : TestBase(hostFixture
                     FirstName = ((OneLoginUserRecordMatchingData)task.Data).VerifiedNames!.First().First(),
                     LastName = ((OneLoginUserRecordMatchingData)task.Data).VerifiedNames!.First().Last(),
                     task.CreatedOn,
-                    user.EmailAddress
+                    user.EmailAddress,
+                    applicationUser.ShortName
                 })
             .ToArray();
 
@@ -58,12 +66,14 @@ public class RecordMatchingTests(HostFixture hostFixture) : TestBase(hostFixture
         AssertRowHasContent(topRow, "task-name-and-id", expectedFirstResult.SupportTaskReference);
         AssertRowHasContent(topRow, "email", expectedFirstResult.EmailAddress!);
         AssertRowHasContent(topRow, "requested-on", expectedFirstResult.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
+        AssertRowHasContent(topRow, "source", expectedFirstResult.ShortName!);
 
         var nextRow = resultRows[1];
         var expectedNextResult = expectedResults[1];
         AssertRowHasContent(nextRow, "task-name-and-id", expectedNextResult.SupportTaskReference);
         AssertRowHasContent(nextRow, "email", expectedNextResult.EmailAddress!);
         AssertRowHasContent(nextRow, "requested-on", expectedNextResult.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
+        AssertRowHasContent(nextRow, "source", expectedFirstResult.ShortName!);
     }
 
     [Theory]
@@ -98,23 +108,29 @@ public class RecordMatchingTests(HostFixture hostFixture) : TestBase(hostFixture
         AssertRowHasContent(resultRows[1], "task-name-and-id", expectedNextResult.SupportTaskReference);
     }
 
-    [Theory]
-    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending)]
-    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Descending)]
-    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
-    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
-    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Email, SortDirection.Ascending)]
-    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Email, SortDirection.Descending)]
-    public async Task Get_OrderListByOption_OrdersList(OneLoginUserRecordMatchingSupportTasksSortByOption sortBy, SortDirection sortDirection)
+    [Fact]
+    public async Task Get_RecordsWithNoApplicationShortname_ShowApplicationName()
     {
         // Arrange
+        var sortBy = OneLoginUserRecordMatchingSupportTasksSortByOption.Email;
+        var sortDirection = SortDirection.Ascending;
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Access your Teaching Qualifications");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "National Professional Qualification");
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Sam@example.com"), verifiedInfo: null);
         var supportTask1 = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser1.Subject, options => options
-            .WithVerifiedNames(["Aaron", "Aerosmith"]));
+            .WithVerifiedNames(["Aaron", "Aerosmith"])
+            .WithClientApplicationUserId(applicationUser1.UserId));
         Clock.Advance(TimeSpan.FromDays(1));
         var supportTask2 = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser2.Subject, options => options
-            .WithVerifiedNames(["Sam", "Smith"]));
+            .WithVerifiedNames(["Sam", "Smith"])
+            .WithClientApplicationUserId(applicationUser2.UserId));
+
+        var applicationUsers = new Dictionary<Guid, string>
+        {
+            { applicationUser1.UserId, applicationUser1.Name! },
+            { applicationUser2.UserId, applicationUser2.Name! }
+        };
 
         var expectedResults = (new[] { supportTask1, supportTask2 })
             .Join([oneLoginUser1, oneLoginUser2],
@@ -127,7 +143,71 @@ public class RecordMatchingTests(HostFixture hostFixture) : TestBase(hostFixture
                     LastName = ((OneLoginUserRecordMatchingData)task.Data).VerifiedNames!.First().Last(),
                     task.Status,
                     task.CreatedOn,
-                    user.EmailAddress
+                    user.EmailAddress,
+                    ShortName = applicationUsers[((OneLoginUserRecordMatchingData)task.Data).ClientApplicationUserId]
+                });
+
+        var expectedResultsOrdered = expectedResults.OrderBy(s => s.ShortName).ToArray();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/one-login-user-matching/record-matching?sortBy={sortBy}&sortDirection={sortDirection}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var resultRows = doc.GetElementByTestId("results")?
+            .QuerySelectorAll("tbody > tr");
+
+        Assert.NotNull(resultRows);
+        AssertRowHasContent(resultRows[0], "source", expectedResultsOrdered[0].ShortName!);
+        AssertRowHasContent(resultRows[1], "source", expectedResultsOrdered[1].ShortName!);
+    }
+
+    [Theory]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Descending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn, SortDirection.Ascending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn, SortDirection.Descending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Email, SortDirection.Ascending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Email, SortDirection.Descending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Source, SortDirection.Descending)]
+    [InlineData(OneLoginUserRecordMatchingSupportTasksSortByOption.Source, SortDirection.Ascending)]
+    public async Task Get_OrderListByOption_OrdersList(OneLoginUserRecordMatchingSupportTasksSortByOption sortBy, SortDirection sortDirection)
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Access your Teaching Qualifications", shortName: "AYTQ");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "National Professional Qualification", shortName: "NPQ");
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
+        var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Sam@example.com"), verifiedInfo: null);
+        var supportTask1 = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser1.Subject, options => options
+            .WithVerifiedNames(["Aaron", "Aerosmith"])
+            .WithClientApplicationUserId(applicationUser1.UserId));
+        Clock.Advance(TimeSpan.FromDays(1));
+        var supportTask2 = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser2.Subject, options => options
+            .WithVerifiedNames(["Sam", "Smith"])
+            .WithClientApplicationUserId(applicationUser2.UserId));
+
+        var applicationUsers = new Dictionary<Guid, string>
+        {
+            { applicationUser1.UserId, applicationUser1.ShortName! },
+            { applicationUser2.UserId, applicationUser2.ShortName! }
+        };
+
+        var expectedResults = (new[] { supportTask1, supportTask2 })
+            .Join([oneLoginUser1, oneLoginUser2],
+                task => ((OneLoginUserRecordMatchingData)task.Data).OneLoginUserSubject,
+                user => user.Subject,
+                (task, user) => new
+                {
+                    task.SupportTaskReference,
+                    FirstName = ((OneLoginUserRecordMatchingData)task.Data).VerifiedNames!.First().First(),
+                    LastName = ((OneLoginUserRecordMatchingData)task.Data).VerifiedNames!.First().Last(),
+                    task.Status,
+                    task.CreatedOn,
+                    user.EmailAddress,
+                    ShortName = applicationUsers[((OneLoginUserRecordMatchingData)task.Data).ClientApplicationUserId]
                 });
 
         var expectedResultsOrdered = (sortBy switch
@@ -144,6 +224,9 @@ public class RecordMatchingTests(HostFixture hostFixture) : TestBase(hostFixture
             OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn => sortDirection == SortDirection.Ascending
                 ? expectedResults.OrderBy(s => s.CreatedOn)
                 : expectedResults.OrderByDescending(s => s.CreatedOn),
+            OneLoginUserRecordMatchingSupportTasksSortByOption.Source => sortDirection == SortDirection.Ascending
+                ? expectedResults.OrderBy(s => s.ShortName)
+                : expectedResults.OrderByDescending(s => s.ShortName),
             _ => expectedResults
         }).ToArray();
 
@@ -165,6 +248,8 @@ public class RecordMatchingTests(HostFixture hostFixture) : TestBase(hostFixture
         AssertRowHasContent(resultRows[1], "status", expectedResultsOrdered[1].Status.GetDisplayName()!);
         AssertRowHasContent(resultRows[0], "requested-on", expectedResultsOrdered[0].CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
         AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
+        AssertRowHasContent(resultRows[0], "source", expectedResultsOrdered[0].ShortName!);
+        AssertRowHasContent(resultRows[1], "source", expectedResultsOrdered[1].ShortName!);
     }
 
     [Theory]
@@ -204,6 +289,7 @@ public class RecordMatchingTests(HostFixture hostFixture) : TestBase(hostFixture
         // Arrange
         var pageSize = 20;
         var page = 1;
+
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
 
         // Create multiple pages

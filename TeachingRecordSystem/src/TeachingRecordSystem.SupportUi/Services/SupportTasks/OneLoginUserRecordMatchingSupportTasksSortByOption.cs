@@ -5,5 +5,6 @@ public enum OneLoginUserRecordMatchingSupportTasksSortByOption
     SupportTaskReference,
     Name,
     Email,
-    RequestedOn
+    RequestedOn,
+    Source
 }

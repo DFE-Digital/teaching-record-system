@@ -73,6 +73,12 @@
                                 link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching(Model.Search, OneLoginUserRecordMatchingSupportTasksSortByOption.Email, direction))">
                                 Email address
                             </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == OneLoginUserRecordMatchingSupportTasksSortByOption.Source ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching(search: Model.Search, OneLoginUserRecordMatchingSupportTasksSortByOption.Source, direction))">
+                                Source
+                            </th>
+
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body" data-testid="results">
@@ -93,6 +99,9 @@
                                     <support-task-status-tag status="@result.Status"/>
                                 </td>
                                 <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                                <td class="govuk-table__cell" data-testid="source">
+                                    <tag color="TagColor.Auto">@result.SourceApplicationName</tag>
+                                </td>
                             </tr>
                         }
                     </tbody>
