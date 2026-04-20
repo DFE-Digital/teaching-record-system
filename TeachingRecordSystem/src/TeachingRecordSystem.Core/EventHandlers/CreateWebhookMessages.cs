@@ -10,11 +10,7 @@ public class CreateWebhookMessages(
     public async Task HandleEventAsync(IEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         var messages = await webhookMessageFactory.CreateMessagesAsync(@event);
-
-        if (messages.Any())
-        {
-            dbContext.WebhookMessages.AddRange(messages);
-            await dbContext.SaveChangesAsync();
-        }
+        dbContext.WebhookMessages.AddRange(messages);
+        await dbContext.SaveChangesAsync();
     }
 }
