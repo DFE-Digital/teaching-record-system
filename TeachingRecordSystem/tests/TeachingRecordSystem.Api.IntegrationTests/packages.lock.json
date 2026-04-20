@@ -830,13 +830,13 @@
       "teachingrecordsystem.api": {
         "type": "Project",
         "dependencies": {
-          "AutoMapper": "[13.0.1, )",
           "FluentValidation.AspNetCore": "[11.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "MediatR": "[12.2.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.6, )",
           "Moq": "[4.20.72, )",
           "RedisRateLimiting.AspNetCore": "[1.2.0, )",
+          "Riok.Mapperly": "[4.3.1, )",
           "Swashbuckle.AspNetCore": "[6.6.2, )",
           "Swashbuckle.AspNetCore.Annotations": "[6.6.2, )",
           "System.IdentityModel.Tokens.Jwt": "[8.14.0, )",
@@ -944,12 +944,6 @@
         "dependencies": {
           "StackExchange.Redis": "2.7.4"
         }
-      },
-      "AutoMapper": {
-        "type": "CentralTransitive",
-        "requested": "[13.0.1, )",
-        "resolved": "13.0.1",
-        "contentHash": "/Fx1SbJ16qS7dU4i604Sle+U9VLX+WSNVJggk6MupKVkYvvBm4XqYaeFuf67diHefHKHs50uQIS2YEDFhPCakQ=="
       },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
         "type": "CentralTransitive",
@@ -1357,6 +1351,12 @@
         "requested": "[7.0.0, )",
         "resolved": "7.0.0",
         "contentHash": "AyWlducZGOnmlEVz4PaL3Qv8wcY3ClPZS9CrlDnSVahGd/E9tTEgSFiC8yoV/F6o6P6IYm8xnHFa/vmWT8tfcw=="
+      },
+      "Riok.Mapperly": {
+        "type": "CentralTransitive",
+        "requested": "[4.3.1, )",
+        "resolved": "4.3.1",
+        "contentHash": "oSE+OVLHyiojrws0QVbQaAT2YKsYbyHqJXPdV7EhGseR/dYgeWS2x1T5qY5I4E+RJkJqMSG+FyZOq4SljWgJWQ=="
       },
       "Scrutor": {
         "type": "CentralTransitive",

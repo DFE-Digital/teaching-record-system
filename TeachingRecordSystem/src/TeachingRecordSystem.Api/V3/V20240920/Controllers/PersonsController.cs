@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240920.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240920.Controllers;
 
 [Route("persons")]
-public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher, ApiMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -40,7 +40,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
+        return result.ToActionResult(r => Ok(mapper.MapGetPersonResponse(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.RecordIsMerged, StatusCodes.Status404NotFound)
@@ -59,7 +59,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     {
         var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
         var result = await commandDispatcher.DispatchAsync(command);
-        return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
+        return result.ToActionResult(r => Ok(mapper.MapFindPersonsResponse(r)));
     }
 
     [HttpGet("")]
@@ -80,7 +80,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
             {
                 Total = r.Total,
                 Query = request,
-                Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
+                Results = r.Items.Select(mapper.MapFindPersonResponseResult).AsReadOnly()
             }));
     }
 

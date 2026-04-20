@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.Api.V3.V20250203.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.CreateTrn)]
-public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class TrnRequestsController(ICommandDispatcher commandDispatcher, ApiMapper mapper) : ControllerBase
 {
     [HttpPost("")]
     [SwaggerOperation(
@@ -39,12 +39,12 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber,
             IdentityVerified = request.IdentityVerified,
             OneLoginUserSubject = request.OneLoginUserSubject,
-            Gender = request.Person.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null
+            Gender = request.Person.Gender is Gender gender ? mapper.MapGender(gender) : null
         };
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+        return result.ToActionResult(r => Ok(mapper.MapTrnRequestInfo(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestAlreadyCreated, StatusCodes.Status409Conflict);
     }
 }

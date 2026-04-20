@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;
 namespace TeachingRecordSystem.Api.V3.V20260416.Controllers;
 
 [Route("trn-request")]
-public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
+public class TrnRequestController(ICommandDispatcher commandDispatcher, V20250425.ApiMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
 {
     [HttpPut("activate")]
     [SwaggerOperation(
@@ -31,7 +31,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper 
         return result.ToActionResult(
                 r => StatusCode(
                     r.WasActivated ? StatusCodes.Status200OK : StatusCodes.Status204NoContent,
-                    mapper.Map<TrnRequestInfo>(r.TrnRequestInfo)))
+                    mapper.MapTrnRequestInfo(r.TrnRequestInfo)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
     }
 }

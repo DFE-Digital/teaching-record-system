@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240101.Requests;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
@@ -11,7 +10,6 @@ public record FindTeachersResponse
     public required IReadOnlyCollection<FindTeachersResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonsResultItem))]
 public record FindTeachersResponseResult
 {
     public required string Trn { get; init; }

@@ -11,7 +11,7 @@ using TeachingRecordSystem.Api.V3.V20240606.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 
 [Route("person")]
-public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonController(ICommandDispatcher commandDispatcher, ApiMapper mapper) : ControllerBase
 {
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     [HttpGet]
@@ -36,7 +36,7 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
+        return result.ToActionResult(r => Ok(mapper.MapGetPersonResponse(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);
     }
 
@@ -64,7 +64,7 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<CreateNameChangeResponse>(r)));
+        return result.ToActionResult(r => Ok(mapper.MapCreateNameChangeResponse(r)));
     }
 
     [HttpPost("date-of-birth-changes")]
@@ -89,6 +89,6 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<CreateDateOfBirthChangeResponse>(r)));
+        return result.ToActionResult(r => Ok(mapper.MapCreateDateOfBirthChangeResponse(r)));
     }
 }
