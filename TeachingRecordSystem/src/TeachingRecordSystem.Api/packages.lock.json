@@ -24,6 +24,24 @@
         "resolved": "2025.2.4",
         "contentHash": "TwbgxAkXxY+vNEhNVx/QXjJ4vqxmepOjsgRvvImQPbHkHMMb4W+ahL3laMsxXKtNT7iMy+E1B3xkqao2hf1n3A=="
       },
+      "Mapster": {
+        "type": "Direct",
+        "requested": "[10.0.7, )",
+        "resolved": "10.0.7",
+        "contentHash": "bZgWXyTM21Bc6Xrvk2BzPCFTwnvyTNSO4fUli/DVm02Kya80r5sY9ackpsECVlUqbda7ck9hr/1oKrCyI8yXmw==",
+        "dependencies": {
+          "Mapster.Core": "10.0.7"
+        }
+      },
+      "Mapster.DependencyInjection": {
+        "type": "Direct",
+        "requested": "[10.0.7, )",
+        "resolved": "10.0.7",
+        "contentHash": "jTLPkEH3Iii0N/dwyvpPhBPf1CdV3M4W6j8vkoLtoPZoE+LC403wBgzO8wnOZzZv+ih0l6NyVc3oNzCNxfH5vQ==",
+        "dependencies": {
+          "Mapster": "10.0.7"
+        }
+      },
       "MediatR": {
         "type": "Direct",
         "requested": "[12.2.0, )",
@@ -243,6 +261,11 @@
           "Newtonsoft.Json": "9.0.1",
           "System.Reflection.TypeExtensions": "4.7.0"
         }
+      },
+      "Mapster.Core": {
+        "type": "Transitive",
+        "resolved": "10.0.7",
+        "contentHash": "73Bd0aZ+t6DoG3X4FYDfOyVgvLxgUXJKIjrps3W1n7MR03DIWI+sL62VqQSPwuJdn7WJb8HYhkH/BNZ6ZlJydw=="
       },
       "MedallionTopologicalSort": {
         "type": "Transitive",
