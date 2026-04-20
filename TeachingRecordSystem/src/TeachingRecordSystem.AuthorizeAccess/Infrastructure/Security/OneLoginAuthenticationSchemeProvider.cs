@@ -271,7 +271,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         options.CorrelationCookie.Name = "onelogin-correlation.";
         options.NonceCookie.Name = "onelogin-nonce.";
 
-        options.UseJwtSecuredAuthorizationRequest = false;
+        options.UseJwtSecuredAuthorizationRequest = true;
 
         static string EnsurePrefixedWithSlash(string value) => !value.StartsWith('/') ? "/" + value : value;
     }
