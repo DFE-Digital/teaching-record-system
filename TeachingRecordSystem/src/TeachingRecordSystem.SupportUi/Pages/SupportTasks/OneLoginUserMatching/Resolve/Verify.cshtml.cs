@@ -78,8 +78,8 @@ public class VerifyModel(ISafeFileService safeFileService, SupportUiLinkGenerato
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
         Name = data.StatedFirstName + " " + data.StatedLastName;
         DateOfBirth = data.StatedDateOfBirth;
-        NationalInsuranceNumber = data.StatedNationalInsuranceNumber;
-        Trn = data.StatedTrn;
+        NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(data.StatedNationalInsuranceNumber);
+        Trn = TrnHelper.NormalizeTrn(data.StatedTrn);
         EmailAddress = oneLoginUser.EmailAddress;
 
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();

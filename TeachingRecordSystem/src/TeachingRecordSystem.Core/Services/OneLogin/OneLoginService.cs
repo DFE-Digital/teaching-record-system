@@ -362,7 +362,7 @@ public class OneLoginService(
 
         var firstNames = options.Names.Select(parts => parts.First()).ToArray();
         var lastNames = options.Names.Select(parts => parts.Skip(1).LastOrDefault()).Where(n => !string.IsNullOrEmpty(n)).ToArray();
-        var trns = new[] { options.Trn, options.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().Select(NormalizeTrn).ToArray();
+        var trns = new[] { options.Trn, options.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().Select(TrnHelper.NormalizeTrn).ToArray();
         var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(options.NationalInsuranceNumber);
 
         var results = await dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
@@ -557,9 +557,6 @@ public class OneLoginService(
 
         return oneLoginUser;
     }
-
-    private static string? NormalizeTrn(string? value) =>
-        string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
 
     private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser, ProcessContext processContext)
     {

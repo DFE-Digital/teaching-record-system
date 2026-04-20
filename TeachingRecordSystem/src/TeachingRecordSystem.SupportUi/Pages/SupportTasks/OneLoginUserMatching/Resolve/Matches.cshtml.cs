@@ -147,8 +147,8 @@ public class Matches(
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         Name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
         DateOfBirth = data.VerifiedOrStatedDatesOfBirth!.First();
-        NationalInsuranceNumber = data.StatedNationalInsuranceNumber;
-        Trn = data.StatedTrn;
+        NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(data.StatedNationalInsuranceNumber);
+        Trn = TrnHelper.NormalizeTrn(data.StatedTrn);
         EmailAddress = oneLoginUser.EmailAddress;
 
         var matchedPersonIds = JourneyInstance.State.MatchedPersons.Select(m => m.PersonId).ToArray();

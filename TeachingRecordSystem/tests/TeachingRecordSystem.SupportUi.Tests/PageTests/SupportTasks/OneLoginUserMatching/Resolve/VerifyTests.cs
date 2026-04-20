@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
+using CoreNationalInsuranceNumber = TeachingRecordSystem.Core.NationalInsuranceNumber;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -34,8 +35,8 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.Equal($"{requestData.StatedFirstName} {requestData.StatedLastName}", doc.GetSummaryListValueByKey("Name"));
         Assert.Equal(requestData.StatedDateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
-        Assert.Equal(requestData.StatedTrn, doc.GetSummaryListValueByKey("TRN"));
-        Assert.Equal(requestData.StatedNationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(TrnHelper.NormalizeTrn(requestData.StatedTrn), doc.GetSummaryListValueByKey("TRN"));
+        Assert.Equal(CoreNationalInsuranceNumber.Normalize(requestData.StatedNationalInsuranceNumber), doc.GetSummaryListValueByKey("National Insurance number"));
         if (evidenceIsPdf)
         {
             Assert.NotNull(doc.GetElementByTestId($"pdf-{requestData.EvidenceFileId}"));
@@ -46,6 +47,38 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
             Assert.NotNull(doc.GetElementByTestId($"image-{requestData.EvidenceFileId}"));
             Assert.Null(doc.GetElementByTestId($"pdf-{requestData.EvidenceFileId}"));
         }
+    }
+
+    [Fact]
+    public async Task Get_ValidRequest_WithNonNormalizedTrnAndNino_RendersNormalizedValues()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var nonNormalizedTrn = "01/23456";
+        var normalizedTrn = "0123456";
+        var nonNormalizedNino = "ab 12 34 56 c";
+        var normalizedNino = "AB123456C";
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject,
+            b => b
+                .WithStatedTrn(nonNormalizedTrn)
+                .WithStatedNationalInsuranceNumber(nonNormalizedNino));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(normalizedTrn, doc.GetSummaryListValueByKey("TRN"));
+        Assert.Equal(normalizedNino, doc.GetSummaryListValueByKey("National Insurance number"));
     }
 
     [Theory]
