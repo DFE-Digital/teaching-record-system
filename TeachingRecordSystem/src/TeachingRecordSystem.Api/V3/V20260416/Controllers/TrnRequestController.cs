@@ -7,23 +7,22 @@ using TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20260416.Controllers;
 
-[Route("trn-requests")]
-public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
+[Route("trn-request")]
+public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
 {
-    [HttpPut("active/{requestId}")]
+    [HttpPut("activate")]
     [SwaggerOperation(
         OperationId = "ActivateTrnRequest",
         Summary = "Activate dormant TRN request",
-        Description = "Activates a dormant request created by Teacher Auth.")]
+        Description = "Activates the dormant request created by Teacher Auth.")]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> ActivateAsync([FromRoute(Name = "requestId")] string trnRequestId)
+    public async Task<IActionResult> ActivateAsync()
     {
-        if (!currentUserProvider.TryGetTrnRequestId(out var tokenTrnRequestId) || tokenTrnRequestId != trnRequestId)
+        if (!currentUserProvider.TryGetTrnRequestId(out var trnRequestId))
         {
-            return Forbid();
+            return BadRequest();
         }
 
         var command = new ActivateTrnRequestCommand(trnRequestId);
