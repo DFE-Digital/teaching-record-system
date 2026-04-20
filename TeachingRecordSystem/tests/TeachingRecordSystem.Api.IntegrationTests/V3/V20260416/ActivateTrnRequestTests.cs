@@ -19,26 +19,6 @@ public class ActivateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Get_TrnRequestId_DoesNotMatchAccessToken_ReturnsForbidden()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-        var anotherApplicationUser = await TestData.CreateApplicationUserAsync();
-
-        var trnRequest = await TestData.CreateDormantTrnRequestAsync(anotherApplicationUser.UserId);
-
-        var httpClient = GetHttpClientWithAuthorizeAccessTokenForTrnRequest(applicationUser.UserId, trnRequest.RequestId);
-
-        var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/trn-requests/active/{trnRequest.ApplicationUserId}");
-
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
-    }
-
-    [Fact]
     public async Task Get_TrnRequestIsNotDormant_ReturnsNoContent()
     {
         // Arrange
@@ -49,7 +29,7 @@ public class ActivateTrnRequestTests : TestBase
 
         var httpClient = GetHttpClientWithAuthorizeAccessTokenForTrnRequest(applicationUser.UserId, trnRequestId);
 
-        var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/trn-requests/active/{trnRequestId}");
+        var request = new HttpRequestMessage(HttpMethod.Put, "/v3/trn-request/activate");
 
         // Act
         var response = await httpClient.SendAsync(request);
@@ -69,7 +49,7 @@ public class ActivateTrnRequestTests : TestBase
 
         var httpClient = GetHttpClientWithAuthorizeAccessTokenForTrnRequest(applicationUser.UserId, trnRequest.RequestId);
 
-        var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/trn-requests/active/{trnRequest.RequestId}");
+        var request = new HttpRequestMessage(HttpMethod.Put, "/v3/trn-request/activate");
 
         // Act
         var response = await httpClient.SendAsync(request);
