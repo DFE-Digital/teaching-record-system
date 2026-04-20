@@ -70,6 +70,12 @@ public class ResolveOneLoginUserMatchingStateFactory(
                 EmailAddress: emailAddress,
                 Trn: requestData.StatedTrn,
                 TrnTokenTrnHint: requestData.TrnTokenTrn));
+
+            var matchResult = oneLoginService.MatchPerson(suggestedMatches);
+            if (matchResult is not null)
+            {
+                suggestedMatches = [matchResult];
+            }
         }
 
         AppContent? appContent = null;
@@ -93,7 +99,13 @@ public class ResolveOneLoginUserMatchingStateFactory(
         }
 
         return supportTask.ResolveJourneySavedState?.GetState<ResolveOneLoginUserMatchingState>() is { } existingState ?
-            existingState with { MatchedPersons = suggestedMatches, AppContent = appContent, RecordMatchingPolicy = recordMatchingPolicy, SavedJourneyState = supportTask.ResolveJourneySavedState } :
+            existingState with
+            {
+                MatchedPersons = suggestedMatches,
+                AppContent = appContent,
+                RecordMatchingPolicy = recordMatchingPolicy,
+                SavedJourneyState = supportTask.ResolveJourneySavedState
+            } :
             new ResolveOneLoginUserMatchingState
             {
                 MatchedPersons = suggestedMatches,

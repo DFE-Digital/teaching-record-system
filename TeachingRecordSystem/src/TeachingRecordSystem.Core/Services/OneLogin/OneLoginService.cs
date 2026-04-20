@@ -309,9 +309,6 @@ public class OneLoginService(
 
     public virtual async Task<MatchPersonResult?> MatchPersonAsync(MatchPersonOptions options)
     {
-        // A One Login is matched if there is exactly one Person with a matching
-        // first name, last name, DOB AND either NINO or TRN.
-
         var suggestedMatches = await GetSuggestedPersonMatchesAsync(
             new GetSuggestedPersonMatchesOptions(
                 options.Names,
@@ -320,6 +317,14 @@ public class OneLoginService(
                 options.NationalInsuranceNumber,
                 options.Trn,
                 options.TrnTokenTrnHint));
+
+        return MatchPerson(suggestedMatches);
+    }
+
+    public virtual MatchPersonResult? MatchPerson(IReadOnlyCollection<MatchPersonResult> suggestedMatches)
+    {
+        // A One Login is matched if there is exactly one Person with a matching
+        // first name, last name, DOB AND either NINO or TRN.
 
         var candidates = new List<MatchPersonResult>();
 
