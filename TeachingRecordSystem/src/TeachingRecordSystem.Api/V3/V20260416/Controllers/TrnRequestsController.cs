@@ -8,9 +8,9 @@ using TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;
 namespace TeachingRecordSystem.Api.V3.V20260416.Controllers;
 
 [Route("trn-requests")]
-public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
+public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
 {
-    [HttpPut("active/{trnRequestId}")]
+    [HttpPut("active/{requestId}")]
     [SwaggerOperation(
         OperationId = "ActivateTrnRequest",
         Summary = "Activate dormant TRN request",
@@ -19,7 +19,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper 
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> ActivateAsync([FromRoute] string trnRequestId)
+    public async Task<IActionResult> ActivateAsync([FromRoute(Name = "requestId")] string trnRequestId)
     {
         if (!currentUserProvider.TryGetTrnRequestId(out var tokenTrnRequestId) || tokenTrnRequestId != trnRequestId)
         {
