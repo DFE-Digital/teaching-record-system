@@ -2,6 +2,7 @@ using AngleSharp.Dom;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
+using CoreNationalInsuranceNumber = TeachingRecordSystem.Core.NationalInsuranceNumber;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -120,8 +121,62 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         Assert.Equal($"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.Last()}", requestDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(supportTaskData.VerifiedOrStatedDatesOfBirth!.First().ToString(WebConstants.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(oneLoginUser.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
-        Assert.Equal(supportTaskData.StatedNationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("National Insurance number"));
-        Assert.Equal(supportTaskData.StatedTrn, requestDetails.GetSummaryListValueByKey("TRN"));
+        Assert.Equal(CoreNationalInsuranceNumber.Normalize(supportTaskData.StatedNationalInsuranceNumber), requestDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(TrnHelper.NormalizeTrn(supportTaskData.StatedTrn), requestDetails.GetSummaryListValueByKey("TRN"));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_ValidRequest_WithNonNormalizedTrnAndNino_ShowsNormalizedValues(bool isRecordMatchingOnlySupportTask)
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
+        var nonNormalizedTrn = "01/23456";
+        var normalizedTrn = "0123456";
+        var nonNormalizedNino = "ab 12 34 56 c";
+        var normalizedNino = "AB123456C";
+        var supportTask = isRecordMatchingOnlySupportTask ?
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+                oneLoginUser.Subject, t => t
+                    .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedTrn(nonNormalizedTrn)
+                    .WithStatedNationalInsuranceNumber(nonNormalizedNino)) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+                oneLoginUser.Subject, t => t
+                    .WithStatedFirstName(matchedPerson.FirstName)
+                    .WithStatedLastName(matchedPerson.LastName)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedTrn(nonNormalizedTrn)
+                    .WithStatedNationalInsuranceNumber(nonNormalizedNino));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            state => state.Verified = true,
+            new MatchPersonResult(
+                matchedPerson.PersonId,
+                matchedPerson.Trn,
+                [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
+                ]));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var requestDetails = doc.GetElementByTestId("request");
+        Assert.NotNull(requestDetails);
+        Assert.Equal(normalizedNino, requestDetails.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(normalizedTrn, requestDetails.GetSummaryListValueByKey("TRN"));
     }
 
     [Theory]
