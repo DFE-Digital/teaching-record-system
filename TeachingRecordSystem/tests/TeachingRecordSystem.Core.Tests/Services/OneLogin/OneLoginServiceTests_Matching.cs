@@ -240,8 +240,8 @@ public partial class OneLoginServiceTests
         var person4 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
         var trnTokenHintTrn = person4.Trn;
 
-        // person who matches on previous last name and DOB
-        var person5 = await TestData.CreatePersonAsync(p => p.WithFirstName(TestData.GenerateChangedFirstName(firstName)).WithLastName(TestData.GenerateChangedLastName(lastName))
+        // person who matches on first name, previous last name and DOB
+        var person5 = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(TestData.GenerateChangedLastName(lastName))
             .WithDateOfBirth(dateOfBirth)
             .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), lastName, Clock.UtcNow)));
 

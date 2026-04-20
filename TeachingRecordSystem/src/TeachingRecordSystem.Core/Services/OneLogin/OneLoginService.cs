@@ -459,6 +459,15 @@ public class OneLoginService(
 
                 return new { Result = result, Score = score, MatchedAttributes = matchedAttributes };
             })
+            .Where(r =>
+            {
+                // Discard results that match on a single name and DOB only
+                var matchedAttributeTypes = r.MatchedAttributes.Select(a => a.Key).ToArray();
+                var matchedOnSingleName = matchedAttributeTypes.Intersect([PersonMatchedAttribute.FirstName, PersonMatchedAttribute.LastName]).Count() == 1;
+                var matchedOnDob = matchedAttributeTypes.Contains(PersonMatchedAttribute.DateOfBirth);
+                var matchOnSingleNameAndDobOnly = matchedAttributeTypes.Length is 2 && (matchedOnDob && matchedOnSingleName);
+                return !matchOnSingleNameAndDobOnly;
+            })
             .OrderByDescending(t => t.Score)
             .Select(t => t.Result)
             .AsReadOnly();
