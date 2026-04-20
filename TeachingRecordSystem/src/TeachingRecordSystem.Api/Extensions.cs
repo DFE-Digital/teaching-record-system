@@ -3,13 +3,12 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using OneOf;
-using Optional;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
-using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.OpenApi;
 using TeachingRecordSystem.Api.Infrastructure.RateLimiting;
@@ -47,14 +46,6 @@ public static class Extensions
 
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        services.Scan(scan =>
-        {
-            scan.FromAssemblies(typeof(Extensions).Assembly)
-                .AddClasses(filter => filter.AssignableTo(typeof(ITypeConverter<,>)))
-                .AsSelf()
-                .WithTransientLifetime();
-        });
-
         services
             .AddMvc(options =>
             {
@@ -132,7 +123,7 @@ public static class Extensions
             .AddWebhookOptions(configuration)
             .AddOpenApi(configuration)
             .AddFluentValidation()
-            .AddAutoMapper()
+            .AddMapster()
             .AddHttpContextAccessor()
             .AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>())
             .AddSingleton<ICurrentUserProvider, ClaimsPrincipalCurrentUserProvider>()
@@ -156,17 +147,10 @@ public static class Extensions
         return services;
     }
 
-    private static IServiceCollection AddAutoMapper(this IServiceCollection services)
+    private static IServiceCollection AddMapster(this IServiceCollection services)
     {
-        services.AddAutoMapper(cfg =>
-            {
-                cfg.AddMaps(typeof(Program).Assembly);
-                cfg.CreateMap(typeof(Option<>), typeof(Option<>)).ConvertUsing(typeof(OptionToOptionTypeConverter<,>));
-                cfg.CreateMap(typeof(OneOf<,>), typeof(OneOf<,>)).ConvertUsing(typeof(OneOfToOneOfTypeConverter<,,,>));
-            })
-            .AddTransient(typeof(WrapWithOptionValueConverter<>))
-            .AddTransient(typeof(WrapWithOptionValueConverter<,>));
-
+        TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
+        services.AddMapster();
         return services;
     }
 

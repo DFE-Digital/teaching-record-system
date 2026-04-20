@@ -15,7 +15,6 @@ public record FindPersonResponse
     public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonsResultItem))]
 public record FindPersonResponseResult
 {
     public required string Trn { get; init; }

@@ -12,7 +12,6 @@ using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.V
 
 namespace TeachingRecordSystem.Api.V3.V20250627.Responses;
 
-[AutoMap(typeof(GetPersonResult))]
 public record GetPersonResponse
 {
     public required string Trn { get; init; }
@@ -35,7 +34,6 @@ public record GetPersonResponse
     public required QtlsStatus QtlsStatus { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultMandatoryQualification))]
 public record GetPersonResponseMandatoryQualification
 {
     public required Guid MandatoryQualificationId { get; init; }
@@ -43,7 +41,6 @@ public record GetPersonResponseMandatoryQualification
     public required string Specialism { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultRouteToProfessionalStatus))]
 public record GetPersonResponseRouteToProfessionalStatus
 {
     public required Guid RouteToProfessionalStatusId { get; init; }
@@ -60,13 +57,11 @@ public record GetPersonResponseRouteToProfessionalStatus
     public required GetPersonResponseProfessionalStatusInductionExemption InductionExemption { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultRouteToProfessionalStatusForAppropriateBody))]
 public record GetPersonResponseRouteToProfessionalStatusForAppropriateBody
 {
     public required TrainingProvider TrainingProvider { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultRouteToProfessionalStatusInductionExemption))]
 public record GetPersonResponseProfessionalStatusInductionExemption
 {
     public required bool IsExempt { get; init; }

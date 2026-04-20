@@ -1,4 +1,3 @@
-using AutoMapper.Configuration.Annotations;
 using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -9,7 +8,6 @@ using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsSta
 
 namespace TeachingRecordSystem.Api.V3.V20250327.Responses;
 
-[AutoMap(typeof(GetPersonResult))]
 public record GetPersonResponse
 {
     public required string Trn { get; init; }
@@ -34,24 +32,19 @@ public record GetPersonResponse
     public required QtlsStatus QtlsStatus { get; set; }
 }
 
-[AutoMap(typeof(Implementation.Dtos.QtsInfo))]
 public record GetPersonResponseQts
 {
-    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string? StatusDescription { get; init; }
     public required int AwardedOrApprovedCount { get; init; }
 }
 
-[AutoMap(typeof(Implementation.Dtos.EytsInfo))]
 public record GetPersonResponseEyts
 {
-    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string? StatusDescription { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInitialTeacherTraining))]
 public record GetPersonResponseInitialTeacherTraining
 {
     public required GetPersonResponseInitialTeacherTrainingProvider? Provider { get; init; }
@@ -65,32 +58,27 @@ public record GetPersonResponseInitialTeacherTraining
     public required IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInitialTeacherTrainingForAppropriateBody))]
 public record GetPersonResponseInitialTeacherTrainingForAppropriateBody
 {
     public required GetPersonResponseInitialTeacherTrainingProvider Provider { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInitialTeacherTrainingQualification))]
 public record GetPersonResponseInitialTeacherTrainingQualification
 {
     public required string Name { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInitialTeacherTrainingAgeRange))]
 public record GetPersonResponseInitialTeacherTrainingAgeRange
 {
     public required string Description { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInitialTeacherTrainingProvider))]
 public record GetPersonResponseInitialTeacherTrainingProvider
 {
     public required string Name { get; init; }
     public required string Ukprn { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInitialTeacherTrainingSubject))]
 public record GetPersonResponseInitialTeacherTrainingSubject
 {
     public required string Code { get; init; }
@@ -109,10 +97,8 @@ public record GetPersonResponseNpqQualificationType
     public required string Name { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultMandatoryQualification))]
 public record GetPersonResponseMandatoryQualification
 {
-    [SourceMember("EndDate")]
     public required DateOnly Awarded { get; init; }
     public required string Specialism { get; init; }
 }

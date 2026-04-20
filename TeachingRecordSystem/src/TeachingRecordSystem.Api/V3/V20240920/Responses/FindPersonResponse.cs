@@ -1,4 +1,3 @@
-using AutoMapper.Configuration.Annotations;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240920.Requests;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
@@ -14,7 +13,6 @@ public record FindPersonResponse
     public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonsResultItem))]
 public record FindPersonResponseResult
 {
     public required string Trn { get; init; }
@@ -23,7 +21,6 @@ public record FindPersonResponseResult
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
-    [SourceMember(nameof(FindPersonsResultItem.DqtInductionStatus))]
     public required DqtInductionStatusInfo InductionStatus { get; init; }
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
