@@ -42,8 +42,7 @@
     "dev": "light-green",
     "review": "pink",
     "pre-production": "bright-purple",
-    "tps-sandbox": "turquoise",
-    "pentest": "purple"
+    "tps-sandbox": "turquoise"
   );
 
   @each $env, $color in $env-colors {

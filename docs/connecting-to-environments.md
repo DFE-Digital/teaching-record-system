@@ -152,25 +152,7 @@ trs-tps-sandbox-worker-599fb4c7cc-pbltb                           1/1       Runn
 > kubectl exec -it trs-tps-sandbox-ui-64b78b5c-w6grn -n tra-production --insecure-skip-tls-verify -- /bin/ash
 ```
 
-## Connecting to pentest environment (for disaster recovery)
 
-Pentest pods are in `s189-teacher-services-cloud-test`, resource group `s189t01-tsc-pt-rg`, `s189t01-tsc-platform-test-aks` cluster.
-
-Namespace: `development`
-
-```shell
-> az account set --subscription s189-teacher-services-cloud-test
-> az aks get-credentials --overwrite-existing -g s189t01-tsc-pt-rg --name s189t01-tsc-platform-test-aks
-> kubectl get pods -n development --insecure-skip-tls-verify
-NAME                                              READY     STATUS      RESTARTS       AGE
-[...]                                             
-trs-pentest-api-85b757cc86-cvwqg               1/1       Running     0          3d1h
-trs-pentest-authz-579bf4d698-q7z8r             1/1       Running     0          3d1h
-trs-pentest-migrations-fwsrd                   0/1       Completed   0          3d1h
-trs-pentest-ui-7dcb6d5fbd-7ph2b                1/1       Running     0          3d1h
-trs-pentest-worker-566cffc6dd-jkxt7            1/1       Running     0          3d1h
-> kubectl exec -it trs-pentest-ui-7dcb6d5fbd-7ph2b -n development --insecure-skip-tls-verify -- /bin/ash
-```
 
 ## Connecting to other environments
 

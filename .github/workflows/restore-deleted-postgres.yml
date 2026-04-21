@@ -10,7 +10,6 @@ on:
         type: choice
         options:
         - dev
-        - pentest
         - pre-production
         - production
       confirm-production:
