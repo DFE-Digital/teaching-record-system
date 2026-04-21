@@ -9,7 +9,8 @@ namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 public enum GetTrnRequestCommandOptions
 {
     None = 0,
-    SupportsDormantRequests = 1 << 0
+    SupportsDormantRequests = 1 << 0,
+    SupportsRejectedRequests = 1 << 1
 }
 
 public record GetTrnRequestCommand(string RequestId, GetTrnRequestCommandOptions Options = GetTrnRequestCommandOptions.None) : ICommand<TrnRequestInfo>;
@@ -32,7 +33,7 @@ public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentU
         var status = trnRequest.Status;
         var trn = status == TrnRequestStatus.Completed ? trnRequestInfo.ResolvedPersonTrn : null;
 
-        if (status is TrnRequestStatus.Rejected)
+        if (!command.Options.HasFlag(GetTrnRequestCommandOptions.SupportsRejectedRequests) && status is TrnRequestStatus.Rejected)
         {
             return ApiError.UnsupportedTrnRequestStatus(command.RequestId);
         }

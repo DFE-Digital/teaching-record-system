@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 [Route("teacher")]
 public class TeacherController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
-    [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+    [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [HttpGet]
     [SwaggerOperation(
         OperationId = "GetCurrentTeacher",

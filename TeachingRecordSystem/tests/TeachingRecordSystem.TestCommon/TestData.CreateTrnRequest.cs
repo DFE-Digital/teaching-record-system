@@ -6,6 +6,16 @@ public partial class TestData
 {
     public async Task<TrnRequestMetadata> CreateDormantTrnRequestAsync(Guid applicationUserId)
     {
+        return await CreateTrnRequestWithStatusAsync(applicationUserId, TrnRequestStatus.Dormant);
+    }
+
+    public async Task<TrnRequestMetadata> CreateRejectedTrnRequestAsync(Guid applicationUserId)
+    {
+        return await CreateTrnRequestWithStatusAsync(applicationUserId, TrnRequestStatus.Rejected);
+    }
+
+    private async Task<TrnRequestMetadata> CreateTrnRequestWithStatusAsync(Guid applicationUserId, TrnRequestStatus status)
+    {
         var requestId = Guid.NewGuid().ToString();
 
         return await WithDbContextAsync(async dbContext =>
@@ -50,7 +60,7 @@ public partial class TestData
                 NpqEvidenceFileId = null,
                 NpqEvidenceFileName = null,
                 WorkEmailAddress = null,
-                Status = TrnRequestStatus.Dormant
+                Status = status
             };
 
             dbContext.TrnRequestMetadata.Add(trnRequestMetadata);

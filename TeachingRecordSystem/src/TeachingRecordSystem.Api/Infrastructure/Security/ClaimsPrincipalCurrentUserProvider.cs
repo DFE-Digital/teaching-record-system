@@ -1,9 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Infrastructure.Security;
 
-public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContextAccessor) : ICurrentUserProvider
+public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContextAccessor, IDbContextFactory<TrsDbContext> dbContextFactory) : ICurrentUserProvider
 {
     public static bool TryGetCurrentApplicationUserFromHttpContext(HttpContext httpContext, out Guid userId)
     {
@@ -63,5 +64,33 @@ public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContext
 
         trnRequestId = null;
         return false;
+    }
+
+    public async Task<string?> GetTrnAsync()
+    {
+        var httpContext = httpContextAccessor.HttpContext ?? throw new Exception("No HttpContext.");
+
+        if (httpContext.User.FindFirst(AuthorizeAccessClaimTypes.Trn) is { Value: var claimTrn })
+        {
+            return claimTrn;
+        }
+
+        if (httpContext.User.FindFirst(AuthorizeAccessClaimTypes.TrnRequestId) is { Value: var requestId })
+        {
+            var applicationUserId = GetCurrentApplicationUserId();
+
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+            var trn = await (
+                    from m in dbContext.TrnRequestMetadata
+                    join person in dbContext.Persons on m.ResolvedPersonId equals person.PersonId
+                    where m.ApplicationUserId == applicationUserId && m.RequestId == requestId
+                    select person.Trn)
+                .SingleOrDefaultAsync();
+
+            return trn;
+        }
+
+        return null;
     }
 }

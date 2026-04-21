@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using CoreTrnRequestStatus = TeachingRecordSystem.Core.Models.TrnRequestStatus;
 
 namespace TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData;
 
@@ -18,6 +19,14 @@ public record TrnRequestInfo
     public required string? AccessYourTeachingQualificationsLink { get; init; }
 }
 
+public enum TrnRequestStatus
+{
+    Pending = 0,
+    Completed = 1,
+    Rejected = 2,
+    Dormant = 3
+}
+
 public class TrnRequestCompletedNotificationMapper(
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptions,
     PersonInfoCache personInfoCache) :
@@ -26,7 +35,7 @@ public class TrnRequestCompletedNotificationMapper(
     public async Task<TrnRequestCompletedNotification?> MapEventAsync(TrnRequestUpdatedEvent @event)
     {
         var statusChanged = (@event.Changes & TrnRequestUpdatedChanges.Status) != 0;
-        var newStatusIsCompleted = @event.TrnRequest.Status == TrnRequestStatus.Completed;
+        var newStatusIsCompleted = @event.TrnRequest.Status == CoreTrnRequestStatus.Completed;
 
         if (!statusChanged || !newStatusIsCompleted)
         {

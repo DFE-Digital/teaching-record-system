@@ -730,7 +730,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
     [Fact]
     public Task
-        OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserWithTrnAssociatedBySupportMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
+        OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndTeacherAuthAccessTokenAssociatedBySupportMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
         WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
                 processId,
@@ -786,7 +786,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
     [Fact]
     public Task
-        OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserWithTrnAssociatedByTrnTokenMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
+        OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndTeacherAuthAccessTokenAssociatedByTrnTokenMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
         WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
                 processId,
