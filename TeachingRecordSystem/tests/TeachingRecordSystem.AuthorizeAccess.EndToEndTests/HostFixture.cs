@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
@@ -23,13 +22,14 @@ namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
 public sealed class HostFixture : InitializeDbFixture
 {
+    private const int Port = 55649;
     public const string BaseUrl = "http://localhost:55649";
     public const string FakeOneLoginAuthenticationScheme = "FakeOneLogin";
     public const string DeferredFakeOneLoginAuthenticationScheme = "DeferredFakeOneLogin";
 
     private bool _initialized;
     private bool _disposed;
-    private Host<Program>? _host;
+    private readonly ApiWebApplicationFactory _webApplicationFactory = new();
     private IPlaywright? _playwright;
     private IBrowser? _browser;
 
@@ -49,7 +49,7 @@ public sealed class HostFixture : InitializeDbFixture
         get
         {
             ThrowIfNotInitialized();
-            return _host.Services;
+            return _webApplicationFactory.Services;
         }
     }
 
@@ -64,103 +64,10 @@ public sealed class HostFixture : InitializeDbFixture
         });
     }
 
-    private Host<Program> CreateHost() =>
-        Host<Program>.CreateHost(
-            BaseUrl,
-            builder =>
-            {
-                var configuration = TestConfiguration.GetConfiguration();
-                builder.UseConfiguration(configuration);
-
-                builder.ConfigureServices((context, services) =>
-                {
-                    services.Configure<AuthenticationOptions>(options =>
-                    {
-                        options.AddScheme(FakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
-                        options.AddScheme(DeferredFakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
-                    });
-
-                    services.Configure<OpenIdConnectOptions>(
-                        TestAppConfiguration.AuthenticationSchemeName,
-                        options =>
-                        {
-                            options.Authority = BaseUrl;
-                            options.RequireHttpsMetadata = false;
-                        });
-
-                    services.Configure<OpenIdConnectOptions>(
-                        DeferredTestAppConfiguration.AuthenticationSchemeName,
-                        options =>
-                        {
-                            options.Authority = BaseUrl;
-                            options.RequireHttpsMetadata = false;
-                        });
-
-                    services.Configure<OpenIddictServerAspNetCoreOptions>(options => options.DisableTransportSecurityRequirement = true);
-
-                    services.Configure<AuthorizeAccessOptions>(options =>
-                    {
-                        using var rsa = RSA.Create(keySizeInBits: 2048);
-                        var privateKeyPem = rsa.ExportRSAPrivateKeyPem();
-
-                        options.OneLoginSigningKeys =
-                        [
-                            new AuthorizeAccessOptionsOneLoginSigningKey
-                            {
-                                KeyId = "test-key-1",
-                                PrivateKeyPem = privateKeyPem
-                            }
-                        ];
-                    });
-
-                    services
-                        .AddSingleton(DbHelper.Instance)
-                        .AddSingleton<TestData>()
-                        .AddSingleton<OneLoginCurrentUserProvider>()
-                        .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
-                        .AddSingleton(GetMockFileService())
-                        .AddSingleton(GetMockSafeFileService())
-                        .AddSingleton(Mock.Of<IGetAnIdentityApiClient>())
-                        .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
-
-                    IFileService GetMockFileService()
-                    {
-                        var fileService = new Mock<IFileService>();
-                        fileService
-                            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
-                            .ReturnsAsync(Guid.NewGuid());
-                        fileService
-                            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
-                            .ReturnsAsync("https://fake.blob.core.windows.net/fake");
-                        fileService
-                            .Setup(s => s.OpenReadStreamAsync(It.IsAny<Guid>()))
-                            .ReturnsAsync(() => new MemoryStream(TestData.JpegImage));
-                        return fileService.Object;
-                    }
-
-                    ISafeFileService GetMockSafeFileService()
-                    {
-                        var safeFileService = new Mock<ISafeFileService>();
-                        safeFileService
-                            .Setup(s => s.TrySafeUploadAsync(
-                                It.IsAny<Stream>(),
-                                It.IsAny<string?>(),
-                                out It.Ref<Guid>.IsAny,
-                                null))
-                            .Callback((Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride) =>
-                            {
-                                fileId = fileIdOverride ?? Guid.NewGuid();
-                            })
-                            .ReturnsAsync(true);
-                        return safeFileService.Object;
-                    }
-                });
-            });
-
-    [MemberNotNull(nameof(_playwright), nameof(_browser), nameof(_host))]
+    [MemberNotNull(nameof(_playwright), nameof(_browser), nameof(_webApplicationFactory))]
     private void ThrowIfNotInitialized()
     {
-        if (!_initialized || _playwright is null || _browser is null || _host is null)
+        if (!_initialized || _playwright is null || _browser is null || _webApplicationFactory is null)
         {
             throw new InvalidOperationException("Fixture has not been initialized");
         }
@@ -203,9 +110,7 @@ public sealed class HostFixture : InitializeDbFixture
 
     public override async ValueTask InitializeAsync()
     {
-        await base.InitializeAsync();
-
-        _host = CreateHost();
+        _webApplicationFactory.StartServer();
 
         _playwright = await Playwright.CreateAsync();
 
@@ -241,114 +146,115 @@ public sealed class HostFixture : InitializeDbFixture
 
         _disposed = true;
 
-        if (Browser != null)
+        if (_browser is not null)
         {
-            await Browser.DisposeAsync();
+            await _browser.DisposeAsync();
         }
 
         _playwright?.Dispose();
 
-        if (_host != null)
-        {
-            await _host.DisposeAsync();
-        }
+        await _webApplicationFactory.DisposeAsync();
 
         await base.DisposeAsync();
     }
 
-    public sealed class Host<T> : IAsyncDisposable
-        where T : class
+    private class ApiWebApplicationFactory : WebApplicationFactory<Program>
     {
-        private readonly KestrelWebApplicationFactory<T> _applicationFactory;
-
-        private Host(KestrelWebApplicationFactory<T> applicationFactory)
+        public ApiWebApplicationFactory()
         {
-            _applicationFactory = applicationFactory;
+            UseKestrel(Port);
         }
 
-        public IServiceProvider Services => _applicationFactory.Services;
-
-#pragma warning disable CA1000
-        public static Host<T> CreateHost(
-#pragma warning restore CA1000
-            string url,
-            Action<IWebHostBuilder> configureWebHostBuilder)
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            var applicationFactory = new KestrelWebApplicationFactory<T>(url, configureWebHostBuilder);
-            _ = applicationFactory.Services;  // Starts the server
-            return new Host<T>(applicationFactory);
-        }
+            builder.UseEnvironment("EndToEndTests");
 
-        public ValueTask DisposeAsync() => _applicationFactory.DisposeAsync();
+            var configuration = TestConfiguration.GetConfiguration();
+            builder.UseConfiguration(configuration);
 
-        // See https://github.com/dotnet/aspnetcore/issues/4892
-        private class KestrelWebApplicationFactory<TFactory> : WebApplicationFactory<TFactory>
-            where TFactory : class
-        {
-            private readonly Action<IWebHostBuilder> _configureWebHostBuilder;
-            private IHost? _host;
-
-            public KestrelWebApplicationFactory(string url, Action<IWebHostBuilder> configureWebHostBuilder)
+            builder.ConfigureServices((context, services) =>
             {
-                Url = url;
-                _configureWebHostBuilder = configureWebHostBuilder;
-            }
-
-            public override IServiceProvider Services
-            {
-                get
+                services.Configure<AuthenticationOptions>(options =>
                 {
-                    EnsureServer();
-                    return _host!.Services;
-                }
-            }
+                    options.AddScheme(FakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
+                    options.AddScheme(DeferredFakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
+                });
 
-            public string Url { get; }
+                services.Configure<OpenIdConnectOptions>(
+                    TestAppConfiguration.AuthenticationSchemeName,
+                    options =>
+                    {
+                        options.Authority = BaseUrl;
+                        options.RequireHttpsMetadata = false;
+                    });
 
-            protected override void ConfigureWebHost(IWebHostBuilder builder)
-            {
-                builder
-                    .UseUrls(Url)
-                    .UseEnvironment("EndToEndTests");
+                services.Configure<OpenIdConnectOptions>(
+                    DeferredTestAppConfiguration.AuthenticationSchemeName,
+                    options =>
+                    {
+                        options.Authority = BaseUrl;
+                        options.RequireHttpsMetadata = false;
+                    });
 
-                _configureWebHostBuilder(builder);
-            }
+                services.Configure<OpenIddictServerAspNetCoreOptions>(options => options.DisableTransportSecurityRequirement = true);
 
-            protected override IHost CreateHost(IHostBuilder builder)
-            {
-                // We need to return a host configured with TestServer, even though we're not going to use it.
-                // Configure an empty dummy web app with TestServer.
-                var dummyBuilder = new HostBuilder();
-                dummyBuilder.ConfigureWebHost(webBuilder => webBuilder.Configure(app => { }).UseTestServer());
-                var testHost = dummyBuilder.Build();
-                testHost.Start();
-
-                builder.ConfigureWebHost(webHostBuilder => webHostBuilder.UseKestrel());
-
-                _host = builder.Build();
-                _host.Start();
-
-                return testHost;
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                base.Dispose(disposing);
-
-                if (disposing)
+                services.Configure<AuthorizeAccessOptions>(options =>
                 {
-                    _host?.Dispose();
-                }
-            }
+                    using var rsa = RSA.Create(keySizeInBits: 2048);
+                    var privateKeyPem = rsa.ExportRSAPrivateKeyPem();
 
-            private void EnsureServer()
-            {
-                if (_host is null)
+                    options.OneLoginSigningKeys =
+                    [
+                        new AuthorizeAccessOptionsOneLoginSigningKey
+                        {
+                            KeyId = "test-key-1",
+                            PrivateKeyPem = privateKeyPem
+                        }
+                    ];
+                });
+
+                services
+                    .AddSingleton(DbHelper.Instance)
+                    .AddSingleton<TestData>()
+                    .AddSingleton<OneLoginCurrentUserProvider>()
+                    .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
+                    .AddSingleton(GetMockFileService())
+                    .AddSingleton(GetMockSafeFileService())
+                    .AddSingleton(Mock.Of<IGetAnIdentityApiClient>())
+                    .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
+
+                IFileService GetMockFileService()
                 {
-                    // This forces WebApplicationFactory to bootstrap the server
-                    using var _ = CreateDefaultClient();
+                    var fileService = new Mock<IFileService>();
+                    fileService
+                        .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
+                        .ReturnsAsync(Guid.NewGuid());
+                    fileService
+                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                        .ReturnsAsync("https://fake.blob.core.windows.net/fake");
+                    fileService
+                        .Setup(s => s.OpenReadStreamAsync(It.IsAny<Guid>()))
+                        .ReturnsAsync(() => new MemoryStream(TestData.JpegImage));
+                    return fileService.Object;
                 }
-            }
+
+                ISafeFileService GetMockSafeFileService()
+                {
+                    var safeFileService = new Mock<ISafeFileService>();
+                    safeFileService
+                        .Setup(s => s.TrySafeUploadAsync(
+                            It.IsAny<Stream>(),
+                            It.IsAny<string?>(),
+                            out It.Ref<Guid>.IsAny,
+                            null))
+                        .Callback((Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride) =>
+                        {
+                            fileId = fileIdOverride ?? Guid.NewGuid();
+                        })
+                        .ReturnsAsync(true);
+                    return safeFileService.Object;
+                }
+            });
         }
     }
 }
