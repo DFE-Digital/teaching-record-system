@@ -32,19 +32,21 @@
 }
 
 @section Header {
-    @if (IsSectionDefined("Header"))
-    {
-        await RenderSectionAsync("Header");
-    }
-    else
-    {
-        var serviceName = ViewBag.ServiceName ?? throw new InvalidOperationException("ViewBag.ServiceName is not set.");
-        var serviceUrl = ViewBag.ServiceUrl ?? throw new InvalidOperationException("ViewBag.ServiceUrl is not set.");
+    <header class="govuk-template__header">
+        @if (IsSectionDefined("Header"))
+        {
+            await RenderSectionAsync("Header");
+        }
+        else
+        {
+            var serviceName = ViewBag.ServiceName ?? throw new InvalidOperationException("ViewBag.ServiceName is not set.");
+            var serviceUrl = ViewBag.ServiceUrl ?? throw new InvalidOperationException("ViewBag.ServiceUrl is not set.");
 
-        await Html.RenderPartialAsync("./_OneLoginServiceHeader");
+            await Html.RenderPartialAsync("./_OneLoginServiceHeader");
 
-        <govuk-service-navigation service-name="@serviceName" service-url="@serviceUrl" />
-    }
+            <govuk-service-navigation service-name="@serviceName" service-url="@serviceUrl" />
+        }
+    </header>
 }
 
 @section BeforeContent {
@@ -61,16 +63,17 @@
 
 @RenderBody()
 
-@section Footer {
+@section GovUkFooter {
     <govuk-footer>
         <govuk-footer-meta>
             <govuk-footer-meta-items>
                 <govuk-footer-meta-item href="https://accessibility-statements.education.gov.uk/s/40">Accessibility statement</govuk-footer-meta-item>
             </govuk-footer-meta-items>
         </govuk-footer-meta>
+        <govuk-footer-content-licence />
+        <govuk-footer-copyright />
     </govuk-footer>
 }
-
 
 @section BodyEnd {
     @Html.GovUkFrontendScriptImports(cspNonce: NonceService.GetNonce())

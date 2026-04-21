@@ -26,13 +26,16 @@
 }
 
 @section BeforeContent {
-    @RenderSection("BeforeContent", required: false)
+    @await RenderSectionAsync("BeforeContent", required: false)
 }
 
 @RenderBody()
 
-@section Footer {
-    <govuk-footer />
+@section GovUkFooter {
+    <govuk-footer>
+        <govuk-footer-content-licence />
+        <govuk-footer-copyright />
+    </govuk-footer>
 }
 
 @section BodyEnd {

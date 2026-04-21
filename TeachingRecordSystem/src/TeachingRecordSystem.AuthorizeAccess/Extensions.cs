@@ -37,7 +37,6 @@ public static class Extensions
     {
         services.AddGovUkFrontend(options =>
         {
-            options.Rebrand = true;
             options.DefaultButtonPreventDoubleClick = true;
             options.DefaultFileUploadJavaScriptEnhancements = true;
         });
