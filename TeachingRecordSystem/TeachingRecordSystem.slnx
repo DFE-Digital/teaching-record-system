@@ -7,7 +7,6 @@
   <Folder Name="/Solution Items/">
     <File Path=".config/dotnet-tools.json" />
     <File Path="appsettings.aks_dev_shared.json" />
-    <File Path="appsettings.aks_pentest_shared.json" />
     <File Path="appsettings.aks_pre-production_shared.json" />
     <File Path="appsettings.aks_production_shared.json" />
     <File Path="appsettings.aks_tps-sandbox_shared.json" />
