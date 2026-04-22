@@ -1,3 +1,4 @@
+@using Htmx.TagHelpers
 @using Microsoft.AspNetCore.Authorization;
 @using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 @inject IAuthorizationService AuthorizationService
@@ -13,9 +14,12 @@
 
 @section Head {
     <meta name="robots" content="noindex">
+    <meta name="htmx-config" includeAspNetAntiforgeryToken="true" includeIndicatorStyles="false" />
     <link rel="stylesheet" asp-href-include="~/Styles/*.css" asp-append-version="true">
     @await RenderSectionAsync("Styles", required: false)
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/htmx/htmx.min.js" asp-append-version="true"></script>
+    <script src="@HtmxAntiforgeryScriptEndpoints.Path" defer asp-add-nonce="true"></script>
 }
 
 @section GovUkHeader {

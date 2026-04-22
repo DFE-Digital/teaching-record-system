@@ -1018,6 +1018,8 @@
         "dependencies": {
           "DartSassBuilder": "[1.1.0, )",
           "GovUk.Frontend.AspNetCore": "[4.1.0, )",
+          "Htmx": "[1.12.0, )",
+          "Htmx.TagHelpers": "[1.12.0, )",
           "Humanizer.Core": "[3.0.10, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
@@ -1295,6 +1297,18 @@
           "Hangfire.Core": "1.8.0",
           "Npgsql": "6.0.11"
         }
+      },
+      "Htmx": {
+        "type": "CentralTransitive",
+        "requested": "[1.12.0, )",
+        "resolved": "1.12.0",
+        "contentHash": "HbFkLTDTjAhLUqaPNOFKOsm2qkYZKQQegD6cP8WbrtyaC8BXRLuz7LkxVbarOMkZiJDXhu0L9N2ry83Ai7BLrA=="
+      },
+      "Htmx.TagHelpers": {
+        "type": "CentralTransitive",
+        "requested": "[1.12.0, )",
+        "resolved": "1.12.0",
+        "contentHash": "37I/ltAUVqXPAYNi3grIbxAVG+8GHM1XE1nh3m9OyeneUN9fFt0C7lDsGHorPmgheCr1h7M2dJlHeXAOmOZgBw=="
       },
       "Humanizer.Core": {
         "type": "CentralTransitive",

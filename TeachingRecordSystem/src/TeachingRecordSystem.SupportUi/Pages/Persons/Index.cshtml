@@ -8,7 +8,7 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
         <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
-        
+
         <div class="govuk-!-margin-top-6">
             <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
                 <div class="govuk-!-margin-bottom-4">
@@ -29,44 +29,64 @@
     </div>
 </div>
 
-<div class="govuk-grid-row govuk-!-margin-top-6">
+<div class="govuk-grid-row govuk-!-margin-top-6" id="results">
     <div class="govuk-grid-column-full">
 
         <div class="trs-filter__container govuk-!-margin-bottom-6">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">Filter by</h3>
 
             <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false">
-                <input type="hidden" asp-for="Search" />            
-                
-                <div class="govuk-grid-row">
-                    <div class="govuk-grid-column-two-thirds">
-                        <div class="trs_checkboxes__wrapper--horizontal">
-                            <govuk-checkboxes for="IncludeActive" class="govuk-checkboxes govuk-checkboxes--small">
-                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
-                                    @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.IncludeActive)].GetValueOrDefault(true, 0))
-                                </govuk-checkboxes-item>
-                            </govuk-checkboxes>
+                <input type="hidden" asp-for="Search" />
 
-                            <govuk-checkboxes for="IncludeDeactivated" class="govuk-checkboxes govuk-checkboxes--small">
-                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
-                                    @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.IncludeDeactivated)].GetValueOrDefault(true, 0))
-                                </govuk-checkboxes-item>
-                            </govuk-checkboxes>
+                <div class="trs-display-flex">
+                    <govuk-checkboxes id-prefix="Filters" class="trs-flex-auto govuk-!-margin-bottom-0" checkboxes-class="trs-checkboxes--inline govuk-checkboxes--small">
+                        @{
+                            string GetLink(bool? includeActive = null, bool? includeDeactivated = null, bool? includeOneLogin = null) =>
+                                LinkGenerator.Persons.Index(
+                                    Model.Search,
+                                    includeActive ?? Model.IncludeActive ?? false,
+                                    includeDeactivated ?? Model.IncludeDeactivated ?? false,
+                                    includeOneLogin ?? Model.IncludeOneLoginUser ?? false,
+                                    Model.SortBy,
+                                    Model.SortDirection);
 
-                            <govuk-checkboxes for="IncludeOneLoginUser" class="govuk-checkboxes govuk-checkboxes--small">
-                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
-                                    GOV.UK One Login (@Model.Facets![nameof(Model.IncludeOneLoginUser)].GetValueOrDefault(true, 0))
+                            (string Label, string Name, bool? Applied, string ToggleLink)[] filters = [
+                                (PersonStatus.Active.GetDisplayName()!, Html.NameFor(m => m.IncludeActive), Applied: Model.IncludeActive, GetLink(includeActive: Model.IncludeActive is not true)),
+                                (PersonStatus.Deactivated.GetDisplayName()!, Html.NameFor(m => m.IncludeDeactivated), Applied: Model.IncludeDeactivated, GetLink(includeDeactivated: Model.IncludeDeactivated is not true)),
+                                ("GOV.UK One Login", Html.NameFor(m => m.IncludeOneLoginUser), Applied: Model.IncludeOneLoginUser, GetLink(includeOneLogin: !Model.IncludeOneLoginUser is not true))
+                            ];
+
+                            foreach (var (label, name, applied, toggleLink) in filters)
+                            {
+                                <govuk-checkboxes-item name="@name"
+                                                       checked="@applied"
+                                                       value="@true"
+                                                       input-hx-get="@toggleLink"
+                                                       input-hx-select="#results"
+                                                       input-hx-target="#results"
+                                                       input-hx-swap="outerHTML"
+                                                       input-hx-push-url="true"
+                                                       class="trs-nowrap">
+                                    @label (@Model.Facets![name].GetValueOrDefault(true, 0))
                                 </govuk-checkboxes-item>
-                            </govuk-checkboxes>
-                        </div>
+                            }
+                        }
+                    </govuk-checkboxes>
+
+                    <div class="govuk-button-group govuk-!-margin-bottom-0">
+                        <a href="@LinkGenerator.Persons.Index(Model.Search)"
+                           hx-get="@LinkGenerator.Persons.Index(Model.Search)"
+                           hx-select="#results"
+                           hx-target="#results"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
+                           class="govuk-link">
+                            Clear all
+                        </a>
+
+                        <govuk-button type="submit" class="govuk-!-margin-bottom-0">Apply filters</govuk-button>
                     </div>
-                    <div class="govuk-grid-column-one-third">
-                        <div class="govuk-button-group govuk-!-margin-bottom-0">
-                            <a href="@LinkGenerator.Persons.Index(Model.Search)" class="govuk-link">Clear all</a>
-                            <govuk-button type="submit" class="govuk-!-margin-bottom-0">Apply filters</govuk-button>
-                        </div>
-                    </div>
-                </div>                    
+                </div>
             </form>
         </div>
 

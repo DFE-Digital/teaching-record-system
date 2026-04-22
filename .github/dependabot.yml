@@ -33,6 +33,9 @@ updates:
       dfeanalytics:
         patterns:
           - 'DfeAnalytics.*'
+      htmx:
+        patterns:
+          - 'Htmx*'
 
   - package-ecosystem: github-actions
     directory: /

@@ -5,5 +5,10 @@
     {
       "library": "@ministryofjustice/frontend@2.1.3",
       "destination": "wwwroot/lib/ministryofjustice/frontend/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "htmx@2.0.7",
+      "destination": "wwwroot/lib/htmx/"
     }]
 }
