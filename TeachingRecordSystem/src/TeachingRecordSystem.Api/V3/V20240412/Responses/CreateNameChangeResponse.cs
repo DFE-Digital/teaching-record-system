@@ -2,8 +2,9 @@ using TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 namespace TeachingRecordSystem.Api.V3.V20240412.Responses;
 
-[AutoMap(typeof(CreateNameChangeRequestResult))]
 public record CreateNameChangeResponse
 {
     public required string CaseNumber { get; init; }
+
+    public static CreateNameChangeResponse FromModel(CreateNameChangeRequestResult r) => new() { CaseNumber = r.CaseNumber };
 }
