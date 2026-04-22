@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer.Core" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+  <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
   </ItemGroup>
 
