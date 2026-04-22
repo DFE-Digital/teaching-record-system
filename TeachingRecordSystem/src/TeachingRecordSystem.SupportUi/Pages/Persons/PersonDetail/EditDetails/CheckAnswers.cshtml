@@ -16,80 +16,80 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-card>
-                <govuk-summary-card-title>Personal details</govuk-summary-card-title>
+                <title>Personal details</title>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Full name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangePersonalDetailsLink visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress?.ToDisplayString()</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="email address">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber?.ToDisplayString()</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="National Insurance number">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="gender">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Full name</key>
+                        <value>@Model.Name</value>
+                        <row-actions>
+                            <action data-testid="change-details-link" href=@Model.ChangePersonalDetailsLink visually-hidden-text="name">Change</action>
+                        </row-actions>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        <row-actions>
+                            <action href=@Model.ChangePersonalDetailsLink visually-hidden-text="date of birth">Change</action>
+                        </row-actions>
+                    </row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@Model.EmailAddress?.ToDisplayString()</value>
+                        <row-actions>
+                            <action href=@Model.ChangePersonalDetailsLink visually-hidden-text="email address">Change</action>
+                        </row-actions>
+                    </row>
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@Model.NationalInsuranceNumber?.ToDisplayString()</value>
+                        <row-actions>
+                            <action href=@Model.ChangePersonalDetailsLink visually-hidden-text="National Insurance number">Change</action>
+                        </row-actions>
+                    </row>
+                    <row>
+                        <key>Gender</key>
+                        <value use-empty-fallback>@Model.Gender?.GetDisplayName()</value>
+                        <row-actions>
+                            <action href=@Model.ChangePersonalDetailsLink visually-hidden-text="gender">Change</action>
+                        </row-actions>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
 
             <govuk-summary-card>
-                <govuk-summary-card-title>@(Model.NameChangeReason is not null && Model.OtherDetailsChangeReason is not null ? "Reasons for change" : "Reason for change")</govuk-summary-card-title>
+                <title>@(Model.NameChangeReason is not null && Model.OtherDetailsChangeReason is not null ? "Reasons for change" : "Reason for change")</title>
                 <govuk-summary-list>
                     @if (Model.NameChangeReason is not null)
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason for name change</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@Model.NameChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action data-testid="name-change-reason-link" href=@Model.ChangeNameChangeReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>@(Model.OtherDetailsChangeReason is not null ? "Evidence" : "Evidence uploaded")</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
+                        <row>
+                            <key>Reason for name change</key>
+                            <value>@Model.NameChangeReason?.GetDisplayName()</value>
+                            <row-actions>
+                                <action data-testid="name-change-reason-link" href=@Model.ChangeNameChangeReasonLink visually-hidden-text="reason">Change</action>
+                            </row-actions>
+                        </row>
+                        <row>
+                            <key>@(Model.OtherDetailsChangeReason is not null ? "Evidence" : "Evidence uploaded")</key>
+                            <value>
                                 <vc:evidence-file-link evidence-file="@Model.NameChangeEvidenceFile" />
-                            </govuk-summary-list-row-value>
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href=@Model.ChangeNameChangeReasonLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
-                        </govuk-summary-list-row>
+                            </value>
+                            <row-actions>
+                                <action href=@Model.ChangeNameChangeReasonLink visually-hidden-text="evidence">Change</action>
+                            </row-actions>
+                        </row>
                     }
                     @if (Model.OtherDetailsChangeReason is not null)
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>@(Model.NameChangeReason is not null ? "Other personal details change" : "Reason for personal details change")</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@Model.OtherDetailsChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action data-testid="other-details-change-reason-link" href=@Model.ChangeDetailsChangeReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
+                        <row>
+                            <key>@(Model.NameChangeReason is not null ? "Other personal details change" : "Reason for personal details change")</key>
+                            <value>@Model.OtherDetailsChangeReason?.GetDisplayName()</value>
+                            <row-actions>
+                                <action data-testid="other-details-change-reason-link" href=@Model.ChangeDetailsChangeReasonLink visually-hidden-text="reason">Change</action>
+                            </row-actions>
+                        </row>
+                        <row>
+                            <key>Reason details</key>
+                            <value>
                                 @if (Model.OtherDetailsChangeReasonDetail is not null)
                                 {
                                     @Html.ConvertNewlinesToLineBreaks(Model.OtherDetailsChangeReasonDetail)
@@ -98,20 +98,20 @@
                                 {
                                     <span use-empty-fallback></span>
                                 }
-                            </govuk-summary-list-row-value>
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href=@Model.ChangeDetailsChangeReasonLink visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>@(Model.NameChangeReason is not null ? "Evidence" : "Evidence uploaded")</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
+                            </value>
+                            <row-actions>
+                                <action href=@Model.ChangeDetailsChangeReasonLink visually-hidden-text="reason details">Change</action>
+                            </row-actions>
+                        </row>
+                        <row>
+                            <key>@(Model.NameChangeReason is not null ? "Evidence" : "Evidence uploaded")</key>
+                            <value>
                                 <vc:evidence-file-link evidence-file="@Model.OtherDetailsChangeEvidenceFile" />
-                            </govuk-summary-list-row-value>
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href=@Model.ChangeDetailsChangeReasonLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
-                        </govuk-summary-list-row>
+                            </value>
+                            <row-actions>
+                                <action href=@Model.ChangeDetailsChangeReasonLink visually-hidden-text="evidence">Change</action>
+                            </row-actions>
+                        </row>
                     }
                 </govuk-summary-list>
             </govuk-summary-card>

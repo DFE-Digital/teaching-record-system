@@ -45,38 +45,38 @@
         <div data-testid="details">
             <govuk-summary-list>
                 @if (updatedEvent.Changes.HasAnyFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNameChange)) {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Name</key>
+                        <value use-empty-fallback>@name</value>
+                    </row>
                 }
                 @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@attributes.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@attributes.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
                 }
                 @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@attributes.EmailAddress</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@attributes.EmailAddress</value>
+                    </row>
                 }
                 @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@attributes.NationalInsuranceNumber</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@attributes.NationalInsuranceNumber</value>
+                    </row>
                 }
                 @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@attributes.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Gender</key>
+                        <value use-empty-fallback>@attributes.Gender?.GetDisplayName()</value>
+                    </row>
                 }
             </govuk-summary-list>
         </div>
@@ -85,20 +85,20 @@
             <govuk-details-summary>@changesHeading</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@updatedEvent.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Reason</key>
+                        <value>@updatedEvent.ChangeReason.GetDisplayName()</value>
+                    </row>
                     @if (updatedEvent.ChangeReason == NpqTrnRequestResolvedReason.RecordMerged)
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.Comments</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Comments</key>
+                            <value use-empty-fallback>@updatedEvent.Comments</value>
+                        </row>
                     }
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                    <row>
+                        <key>Evidence</key>
+                        <value>
                             @if (evidenceFileUrl is not null)
                             {
                                 <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{requestData.NpqEvidenceFileName} (opens in new tab)")</a>
@@ -107,8 +107,8 @@
                             {
                                 <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
                             }
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
 
                 </govuk-summary-list>
             </govuk-details-text>
@@ -118,9 +118,9 @@
             <govuk-details-summary>TRN request data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Source</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                    <row>
+                        <key>Source</key>
+                        <value>
                             @if (applicationUser is not null)
                             {
                                 <tag color="TagColor.Auto">@applicationUser.Name</tag>
@@ -129,19 +129,19 @@
                             {
                                 <span use-empty-fallback></span>
                             }
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Request ID</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@requestData.RequestId</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Created on</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@requestData.CreatedOn.ToString(WebConstants.DateTimeDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                        </value>
+                    </row>
+                    <row>
+                        <key>Request ID</key>
+                        <value use-empty-fallback>@requestData.RequestId</value>
+                    </row>
+                    <row>
+                        <key>Created on</key>
+                        <value use-empty-fallback>@requestData.CreatedOn.ToString(WebConstants.DateTimeDisplayFormat)</value>
+                    </row>
+                    <row>
+                        <key>Name</key>
+                        <value>
                             @if (!string.IsNullOrWhiteSpace(requestDataName))
                             {
                                 @Html.ConvertNewlinesToLineBreaks(requestDataName)
@@ -150,24 +150,24 @@
                             {
                                 <span use-empty-fallback></span>
                             }
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@requestData.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@requestData.EmailAddress</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@requestData.NationalInsuranceNumber</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@requestData.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@requestData.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@requestData.EmailAddress</value>
+                    </row>
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@requestData.NationalInsuranceNumber</value>
+                    </row>
+                    <row>
+                        <key>Gender</key>
+                        <value use-empty-fallback>@requestData.Gender?.GetDisplayName()</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>
@@ -179,38 +179,38 @@
                 <govuk-details-text>
                     <govuk-summary-list>
                         @if (updatedEvent.Changes.HasAnyFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNameChange)) {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback>@oldName</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>Name</key>
+                                <value use-empty-fallback>@oldName</value>
+                            </row>
                         }
                         @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>Date of birth</key>
+                                <value use-empty-fallback>@oldAttributes.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            </row>
                         }
                         @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.EmailAddress</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>Email address</key>
+                                <value use-empty-fallback>@oldAttributes.EmailAddress</value>
+                            </row>
                         }
                         @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.NationalInsuranceNumber</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>National Insurance number</key>
+                                <value use-empty-fallback>@oldAttributes.NationalInsuranceNumber</value>
+                            </row>
                         }
                         @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>Gender</key>
+                                <value use-empty-fallback>@oldAttributes.Gender?.GetDisplayName()</value>
+                            </row>
                         }
                     </govuk-summary-list>
                 </govuk-details-text>

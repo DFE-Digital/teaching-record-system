@@ -15,23 +15,23 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.AlertTypeName</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.Type(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="alert type">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Html.ConvertNewlinesToLineBreaks(Model.Details)</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.Details(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="details">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>Alert type</key>
+                    <value>@Model.AlertTypeName</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.AddAlert.Type(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="alert type">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Details</key>
+                    <value use-empty-fallback>@Html.ConvertNewlinesToLineBreaks(Model.Details)</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.AddAlert.Details(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="details">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Link</key>
+                    <value>
                         @if (Model.Link is not null)
                         {
                             <a href="@Model.LinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.Link} (opens in new tab)")</a>
@@ -40,33 +40,33 @@
                         {
                             <span use-empty-fallback></span>
                         }
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.Link(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="link">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.StartDate.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.AddAlert.Link(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="link">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Start date</key>
+                    <value>@Model.StartDate.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.AddAlert.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</action>
+                    </row-actions>
+                </row>
             </govuk-summary-list>
 
             <h2 class="govuk-heading-l">Why are you adding this alert?</h2>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.AddReason.GetDisplayName()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for adding">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>Reason</key>
+                    <value>@Model.AddReason.GetDisplayName()</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for adding">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value>
                         @if (Model.AddReasonDetail is not null)
                         {
                             @Html.ConvertNewlinesToLineBreaks(Model.AddReasonDetail)
@@ -75,21 +75,21 @@
                         {
                             <span use-empty-fallback></span>
                         }
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</action>
+                    </row-actions>
+                </row>
 
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>Evidence</key>
+                    <value>
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</action>
+                    </row-actions>
+                </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

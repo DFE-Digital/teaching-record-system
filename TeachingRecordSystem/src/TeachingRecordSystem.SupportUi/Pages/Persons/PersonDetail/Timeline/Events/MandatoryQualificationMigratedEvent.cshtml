@@ -23,17 +23,17 @@
                     <govuk-summary-list>
                         @if (migratedEvent.Changes.HasFlag(MandatoryQualificationMigratedEventChanges.Provider))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="provider">@(mandatoryQualification.Provider!.Name)</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>Training provider</key>
+                                <value data-testid="provider">@(mandatoryQualification.Provider!.Name)</value>
+                            </row>
                         }
                         @if (migratedEvent.Changes.HasFlag(MandatoryQualificationMigratedEventChanges.Specialism))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="specialism">@(mandatoryQualification.Specialism!.Value.GetTitle())</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>Specialism</key>
+                                <value data-testid="specialism">@(mandatoryQualification.Specialism!.Value.GetTitle())</value>
+                            </row>
                         }
                     </govuk-summary-list>
                 </govuk-details-text>

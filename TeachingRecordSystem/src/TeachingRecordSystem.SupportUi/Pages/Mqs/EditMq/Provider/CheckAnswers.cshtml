@@ -15,31 +15,31 @@
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>New training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="new-provider">@Model.ProviderName</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Previous training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="current-provider">@(Model.CurrentProviderName ?? "None")</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>New training provider</key>
+                    <value data-testid="new-provider">@Model.ProviderName</value>
+                </row>
+                <row>
+                    <key>Previous training provider</key>
+                    <value data-testid="current-provider">@(Model.CurrentProviderName ?? "None")</value>
+                </row>
             </govuk-summary-list>
             <h2 class="govuk-heading-m">Why are you editing this mandatory qualification?</h2>
             <govuk-summary-list data-testid="change-reason-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="change-reason">@Model.ChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="change-reason-detail">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="evidence">
+                <row>
+                    <key>Reason</key>
+                    <value data-testid="change-reason">@Model.ChangeReason!.GetDisplayName()</value>
+                </row>
+                <row>
+                    <key>More details</key>
+                    <value data-testid="change-reason-detail">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")</value>
+                </row>
+                <row>
+                    <key>Evidence</key>
+                    <value data-testid="evidence">
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                    </value>
+                </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

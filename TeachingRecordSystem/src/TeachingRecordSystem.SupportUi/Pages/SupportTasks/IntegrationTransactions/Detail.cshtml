@@ -32,40 +32,40 @@
 
     <div class="govuk-grid-column-full">
         <govuk-summary-card data-testid="integration-record">
-            <govuk-summary-card-title>Record information</govuk-summary-card-title>
+            <title>Record information</title>
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Date and time</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.IntegrationTransaction!.CreatedOn.ToString(WebConstants.DateTimeDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>File name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.FileName</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Interface ID</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.IntegrationTransactionId</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Total count</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.TotalCount</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Successes</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.SuccessesCount</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Warnings</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.WarningsCount</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Failures</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.FailuresCount</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Duplicates</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.DuplicatesCount</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Date and time</key>
+                    <value>@Model.IntegrationTransaction!.CreatedOn.ToString(WebConstants.DateTimeDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>File name</key>
+                    <value use-empty-fallback>@Model.IntegrationTransaction!.FileName</value>
+                </row>
+                <row>
+                    <key>Interface ID</key>
+                    <value use-empty-fallback>@Model.IntegrationTransaction!.IntegrationTransactionId</value>
+                </row>
+                <row>
+                    <key>Total count</key>
+                    <value use-empty-fallback>@Model.IntegrationTransaction!.TotalCount</value>
+                </row>
+                <row>
+                    <key>Successes</key>
+                    <value use-empty-fallback>@Model.IntegrationTransaction!.SuccessesCount</value>
+                </row>
+                <row>
+                    <key>Warnings</key>
+                    <value use-empty-fallback>@Model.IntegrationTransaction!.WarningsCount</value>
+                </row>
+                <row>
+                    <key>Failures</key>
+                    <value use-empty-fallback>@Model.IntegrationTransaction!.FailuresCount</value>
+                </row>
+                <row>
+                    <key>Duplicates</key>
+                    <value use-empty-fallback>@Model.IntegrationTransaction!.DuplicatesCount</value>
+                </row>
             </govuk-summary-list>
         </govuk-summary-card>
 

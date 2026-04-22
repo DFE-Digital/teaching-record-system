@@ -15,51 +15,51 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.InductionStatus.GetTitle()</govuk-summary-list-row-value>
+                <row>
+                    <key>Induction status</key>
+                    <value>@Model.InductionStatus.GetTitle()</value>
                     @if (Model.ShowStatusChangeLink)
                     {
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action
+                        <row-actions>
+                            <action
                                 href="@LinkGenerator.Persons.PersonDetail.EditInduction.Status(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
-                                visually-hidden-text="induction status">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                                visually-hidden-text="induction status">Change</action>
+                        </row-actions>
                     }
-                    </govuk-summary-list-row>
+                    </row>
                 @if (Model.InductionStatus.RequiresStartDate())
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Induction started on</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <row>
+                        <key>Induction started on</key>
+                        <value use-empty-fallback>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                         @if (Model.ShowStartDateChangeLink)
                         {
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action
-                                href="@LinkGenerator.Persons.PersonDetail.EditInduction.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"                              visually-hidden-text="start date">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
+                            <row-actions>
+                                <action
+                                href="@LinkGenerator.Persons.PersonDetail.EditInduction.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"                              visually-hidden-text="start date">Change</action>
+                            </row-actions>
                         }
-                    </govuk-summary-list-row>
+                    </row>
                 }
                 @if (Model.InductionStatus.RequiresCompletedDate())
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Induction completed on</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <row>
+                        <key>Induction completed on</key>
+                        <value use-empty-fallback>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                         @if (Model.ShowCompletedDateChangeLink)
                         {
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action
-                                href="@LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"                              visually-hidden-text="completed date">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
+                            <row-actions>
+                                <action
+                                href="@LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"                              visually-hidden-text="completed date">Change</action>
+                            </row-actions>
                         }
-                    </govuk-summary-list-row>
+                    </row>
                 }
                 @if(Model.InductionStatus.RequiresExemptionReasons())
                 {
-                    <govuk-summary-list-row class="govuk-list--spaced">
-                        <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                    <row class="govuk-list--spaced">
+                        <key>Exemption reason</key>
+                        <value>
                             @if (Model.SelectedExemptionReasonsValues is not null)
                             {
                                 <ul class="govuk-list">
@@ -69,28 +69,28 @@
                                     }
                                 </ul>
                             }
-                        </govuk-summary-list-row-value>
+                        </value>
                         @if (Model.ShowExemptionReasonsChangeLink)
                         {
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action
-                                href="@LinkGenerator.Persons.PersonDetail.EditInduction.ExemptionReasons(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"                              visually-hidden-text="exemption reason">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
+                            <row-actions>
+                                <action
+                                href="@LinkGenerator.Persons.PersonDetail.EditInduction.ExemptionReasons(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"                              visually-hidden-text="exemption reason">Change</action>
+                            </row-actions>
                         }
-                    </govuk-summary-list-row>
+                    </row>
                 }
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for changing induction details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action
+                <row>
+                    <key>Reason for changing induction details</key>
+                    <value>@Model.ChangeReason.GetDisplayName()</value>
+                    <row-actions>
+                        <action
                         href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
-                        visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                        visually-hidden-text="reason for change">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Reason details</key>
+                    <value>
                         @if (Model.ChangeReasonDetail is not null)
                         {
                             @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
@@ -99,24 +99,24 @@
                         {
                             <span use-empty-fallback></span>
                         }
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action
+                    </value>
+                    <row-actions>
+                        <action
                             href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
-                            visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Do you have evidence to upload</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                            visually-hidden-text="reason details">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Do you have evidence to upload</key>
+                    <value>
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action
+                    </value>
+                    <row-actions>
+                        <action
                             href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
-                            visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                            visually-hidden-text="evidence">Change</action>
+                    </row-actions>
+                </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

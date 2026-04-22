@@ -15,56 +15,56 @@
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="provider">@Model.ProviderName</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Mqs.AddMq.Provider(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="training provider">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="specialism">@Model.Specialism.GetTitle()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Mqs.AddMq.Specialism(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="specialism">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Mqs.AddMq.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="status">@Model.Status.GetTitle()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Mqs.AddMq.Status(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="status">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Mqs.AddMq.Status(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Training provider</key>
+                    <value data-testid="provider">@Model.ProviderName</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Mqs.AddMq.Provider(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="training provider">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Specialism</key>
+                    <value data-testid="specialism">@Model.Specialism.GetTitle()</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Mqs.AddMq.Specialism(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="specialism">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Start date</key>
+                    <value data-testid="start-date">@Model.StartDate.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Mqs.AddMq.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Status</key>
+                    <value data-testid="status">@Model.Status.GetTitle()</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Mqs.AddMq.Status(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="status">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>End date</key>
+                    <value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Mqs.AddMq.Status(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="end date">Change</action>
+                    </row-actions>
+                </row>
             </govuk-summary-list>
 
             <h2 class="govuk-heading-m">Why are you adding this mandatory qualification?</h2>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.AddReason.GetDisplayName()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Mqs.AddMq.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for adding">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>Reason</key>
+                    <value>@Model.AddReason.GetDisplayName()</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Mqs.AddMq.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for adding">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value>
                         @if (Model.AddReasonDetail is not null)
                         {
                             @Html.ConvertNewlinesToLineBreaks(Model.AddReasonDetail)
@@ -73,21 +73,21 @@
                         {
                             <span use-empty-fallback></span>
                         }
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Mqs.AddMq.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Mqs.AddMq.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</action>
+                    </row-actions>
+                </row>
 
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>Evidence</key>
+                    <value>
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Mqs.AddMq.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Mqs.AddMq.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</action>
+                    </row-actions>
+                </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

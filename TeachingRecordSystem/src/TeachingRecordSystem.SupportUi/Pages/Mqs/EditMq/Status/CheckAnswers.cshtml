@@ -17,50 +17,50 @@
             <govuk-summary-list data-testid="change-summary">
                 @if (Model.IsStatusChange)
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>New status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="new-status">@(Model.NewStatus.HasValue ? Model.NewStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Previous status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="current-status">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>New status</key>
+                        <value data-testid="new-status">@(Model.NewStatus.HasValue ? Model.NewStatus.Value.GetTitle() : "None")</value>
+                    </row>
+                    <row>
+                        <key>Previous status</key>
+                        <value data-testid="current-status">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value.GetTitle() : "None")</value>
+                    </row>
                 }
                 @if (Model.IsEndDateChange)
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>New end date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Previous end date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>New end date</key>
+                        <value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</value>
+                    </row>
+                    <row>
+                        <key>Previous end date</key>
+                        <value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</value>
+                    </row>
                 }
             </govuk-summary-list>
             <h2 class="govuk-heading-m">Why are you editing this mandatory qualification?</h2>
             <govuk-summary-list data-testid="change-reason-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                <row>
+                    <key>Reason</key>
                     @if (Model.IsEndDateChange && !Model.IsStatusChange)
                     {
-                        <govuk-summary-list-row-value data-testid="change-reason">@Model.EndDateChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
+                        <value data-testid="change-reason">@Model.EndDateChangeReason!.GetDisplayName()</value>
                     }
                     else
                     {
-                        <govuk-summary-list-row-value data-testid="change-reason">@Model.StatusChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
+                        <value data-testid="change-reason">@Model.StatusChangeReason!.GetDisplayName()</value>
                     }
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="change-reason-detail">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="evidence">
+                </row>
+                <row>
+                    <key>More details</key>
+                    <value data-testid="change-reason-detail">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")</value>
+                </row>
+                <row>
+                    <key>Evidence</key>
+                    <value data-testid="evidence">
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                    </value>
+                </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

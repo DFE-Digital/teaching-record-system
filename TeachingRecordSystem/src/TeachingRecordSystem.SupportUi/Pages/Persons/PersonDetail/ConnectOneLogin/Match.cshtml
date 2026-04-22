@@ -19,37 +19,37 @@
             </govuk-inset-text>
 
             <govuk-summary-card data-testid="record">
-                <govuk-summary-card-title>Record details</govuk-summary-card-title>
+                <title>Record details</title>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@($"{Model.PersonFirstName} {Model.PersonLastName}")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.PersonEmailAddress</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback="">@Model.PersonDateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.PersonTrn</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.PersonNationalInsuranceNumber</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Name</key>
+                        <value>@($"{Model.PersonFirstName} {Model.PersonLastName}")</value>
+                    </row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@Model.PersonEmailAddress</value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback="">@Model.PersonDateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
+                    <row>
+                        <key>TRN</key>
+                        <value use-empty-fallback>@Model.PersonTrn</value>
+                    </row>
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@Model.PersonNationalInsuranceNumber</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
 
             <govuk-summary-card data-testid="one-login">
-                <govuk-summary-card-title>GOV.UK One Login details</govuk-summary-card-title>
+                <title>GOV.UK One Login details</title>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                    <row>
+                        <key>Name</key>
+                        <value>
                             @if (Model.OneLoginUserVerifiedNames is not null && Model.OneLoginUserVerifiedNames.Length > 0)
                             {
                                 <ul class="govuk-list">
@@ -69,17 +69,17 @@
                             {
                                 <span highlight="true" use-empty-fallback></span>
                             }
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.EmailAddress) == true))">
+                        </value>
+                    </row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.EmailAddress) == true))">
                             @Model.OneLoginUserEmailAddress
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                        </value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value>
                             @if (Model.OneLoginUserVerifiedDatesOfBirth is not null && Model.OneLoginUserVerifiedDatesOfBirth.Length > 0)
                             {
                                 <ul class="govuk-list">
@@ -97,8 +97,8 @@
                             {
                                 <span highlight="@(!(Model.MatchedAttributeTypes?.Contains(PersonMatchedAttribute.DateOfBirth) == true))" use-empty-fallback></span>
                             }
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
 

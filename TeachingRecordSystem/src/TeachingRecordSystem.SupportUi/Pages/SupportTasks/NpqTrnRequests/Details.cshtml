@@ -14,48 +14,48 @@
             <span class="govuk-caption-l">TRN requests</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <govuk-summary-card>
-                <govuk-summary-card-title>
+                <title>
                     Requested on @Model.SupportTask!.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat)
-                </govuk-summary-card-title>
+                </title>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Source</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback><tag color="TagColor.Auto">@Model.SourceApplicationUserName</tag></govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.PersonName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.EmailAddress</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Working in school or educational setting</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@(Model.NpqWorkingInEducationalSetting.HasValue ? Model.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>NPQ application ID</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqApplicationId</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>NPQ name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>NPQ training provider</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqTrainingProvider</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="evidence">
+                    <row>
+                        <key>Source</key>
+                        <value use-empty-fallback><tag color="TagColor.Auto">@Model.SourceApplicationUserName</tag></value>
+                    </row>
+                    <row>
+                        <key>Name</key>
+                        <value use-empty-fallback>@Model.PersonName</value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.EmailAddress</value>
+                    </row>
+                    <row>
+                        <key>Working in school or educational setting</key>
+                        <value use-empty-fallback>@(Model.NpqWorkingInEducationalSetting.HasValue ? Model.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : null)</value>
+                    </row>
+                    <row>
+                        <key>NPQ application ID</key>
+                        <value use-empty-fallback>@Model.NpqApplicationId</value>
+                    </row>
+                    <row>
+                        <key>NPQ name</key>
+                        <value use-empty-fallback>@Model.NpqName</value>
+                    </row>
+                    <row>
+                        <key>NPQ training provider</key>
+                        <value use-empty-fallback>@Model.NpqTrainingProvider</value>
+                    </row>
+                    <row>
+                        <key>Evidence</key>
+                        <value data-testid="evidence">
                             <vc:evidence-file-link evidence-file="@Model.NpqEvidenceFile" />
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
             <govuk-radios for="CreateRecord">

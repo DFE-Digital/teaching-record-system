@@ -42,22 +42,22 @@
                 @if (Model.Person is not null)
                 {
                     <govuk-summary-list class="govuk-!-margin-bottom-3">
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@Model.Person.Trn</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@Model.Person.FirstName @Model.Person.LastName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@Model.Person.DateOfBirth?.ToString("dd/MM/yyyy")</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@Model.Person.NationalInsuranceNumber</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>TRN</key>
+                            <value>@Model.Person.Trn</value>
+                        </row>
+                        <row>
+                            <key>Name</key>
+                            <value>@Model.Person.FirstName @Model.Person.LastName</value>
+                        </row>
+                        <row>
+                            <key>Date of birth</key>
+                            <value>@Model.Person.DateOfBirth?.ToString("dd/MM/yyyy")</value>
+                        </row>
+                        <row>
+                            <key>National Insurance number</key>
+                            <value>@Model.Person.NationalInsuranceNumber</value>
+                        </row>
                     </govuk-summary-list>
 
                     <govuk-checkboxes for="DetachPerson" class="govuk-checkboxes--small">

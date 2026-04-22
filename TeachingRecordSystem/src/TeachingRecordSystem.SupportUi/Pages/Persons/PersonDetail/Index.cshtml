@@ -21,25 +21,25 @@
 @if (Model.ConnectedOneLoginUsers?.Length > 0)
 {
     <govuk-summary-card data-testid="associated-one-login-users">
-        <govuk-summary-card-title>Connected GOV.UK One Login details
-        </govuk-summary-card-title>
+        <title>Connected GOV.UK One Login details
+        </title>
         <govuk-summary-list>
             @foreach (var user in Model.ConnectedOneLoginUsers)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@user.EmailAddress</govuk-summary-list-row-value>
+                <row>
+                    <key>Email address</key>
+                    <value>@user.EmailAddress</value>
                     @if (Model.CanConnectOneLogin)
                     {
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action
+                        <row-actions>
+                            <action
                                 href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(Model.PersonId, user.Subject, journeyInstanceId: null)"
                                 visually-hidden-text="@user.EmailAddress">
                                 Disconnect
-                            </govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                            </action>
+                        </row-actions>
                     }
-                </govuk-summary-list-row>
+                </row>
             }
         </govuk-summary-list>
     </govuk-summary-card>
@@ -66,55 +66,55 @@
 @if (Model.PersonProfessionalStatus is not null)
 {
     <govuk-summary-card>
-        <govuk-summary-card-title data-testid="professional-status-details">Professional status details</govuk-summary-card-title>
+        <title data-testid="professional-status-details">Professional status details</title>
         <govuk-summary-list>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Qualified teacher status (QTS)</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.QtsDate != null ? "Holds" : "No")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Qualified teacher status (QTS)</key>
+                <value>@(Model.PersonProfessionalStatus.QtsDate != null ? "Holds" : "No")</value>
+            </row>
             @if (Model.PersonProfessionalStatus.QtsDate is not null)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>QTS held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.PersonProfessionalStatus.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>QTS held since</key>
+                    <value>@Model.PersonProfessionalStatus.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Qualified teacher learning and skills status (QTLS)</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.QtlsStatus == QtlsStatus.None ? "No" : Model.PersonProfessionalStatus.QtlsStatus.ToString())</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Qualified teacher learning and skills status (QTLS)</key>
+                <value>@(Model.PersonProfessionalStatus.QtlsStatus == QtlsStatus.None ? "No" : Model.PersonProfessionalStatus.QtlsStatus.ToString())</value>
+            </row>
             @if (Model.PersonProfessionalStatus.InductionStatus != InductionStatus.None)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.PersonProfessionalStatus.InductionStatus.GetTitle()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Induction status</key>
+                    <value>@Model.PersonProfessionalStatus.InductionStatus.GetTitle()</value>
+                </row>
             }
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Early years teacher status (EYTS)</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.EytsDate is not null ? "Holds" : "No")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Early years teacher status (EYTS)</key>
+                <value>@(Model.PersonProfessionalStatus.EytsDate is not null ? "Holds" : "No")</value>
+            </row>
             @if (Model.PersonProfessionalStatus.EytsDate is not null)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>EYTS held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.PersonProfessionalStatus.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>EYTS held since</key>
+                    <value>@Model.PersonProfessionalStatus.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Early years professional status (EYPS)</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.HasEyps ? "Holds" : "No")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Partial qualified teacher status (PQTS)</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.PqtsDate != null ? "Holds" : "No")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Early years professional status (EYPS)</key>
+                <value>@(Model.PersonProfessionalStatus.HasEyps ? "Holds" : "No")</value>
+            </row>
+            <row>
+                <key>Partial qualified teacher status (PQTS)</key>
+                <value>@(Model.PersonProfessionalStatus.PqtsDate != null ? "Holds" : "No")</value>
+            </row>
             @if (Model.PersonProfessionalStatus.PqtsDate is not null)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>PQTS held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.PersonProfessionalStatus.PqtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>PQTS held since</key>
+                    <value>@Model.PersonProfessionalStatus.PqtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
         </govuk-summary-list>
     </govuk-summary-card>

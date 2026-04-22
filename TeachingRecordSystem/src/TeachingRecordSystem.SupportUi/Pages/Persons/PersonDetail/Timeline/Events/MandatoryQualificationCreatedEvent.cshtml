@@ -16,48 +16,48 @@
 
     <div class="moj-timeline__description">
         <govuk-summary-list>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="provider">@(mandatoryQualification.Provider?.Name ?? mandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="specialism">@(mandatoryQualification.Specialism?.GetTitle() ?? "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="start-date">@(mandatoryQualification.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat) ?? "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="status">@(mandatoryQualification.Status?.GetTitle() ?? "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="end-date">@(mandatoryQualification.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat) ?? "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Training provider</key>
+                <value data-testid="provider">@(mandatoryQualification.Provider?.Name ?? mandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")</value>
+            </row>
+            <row>
+                <key>Specialism</key>
+                <value data-testid="specialism">@(mandatoryQualification.Specialism?.GetTitle() ?? "None")</value>
+            </row>
+            <row>
+                <key>Start date</key>
+                <value data-testid="start-date">@(mandatoryQualification.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat) ?? "None")</value>
+            </row>
+            <row>
+                <key>Status</key>
+                <value data-testid="status">@(mandatoryQualification.Status?.GetTitle() ?? "None")</value>
+            </row>
+            <row>
+                <key>End date</key>
+                <value data-testid="end-date">@(mandatoryQualification.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat) ?? "None")</value>
+            </row>
         </govuk-summary-list>
 
         <govuk-details class="govuk-!-margin-bottom-2">
             <govuk-details-summary>Reason for adding mandatory qualification</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@createdEvent.AddReason</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="reason-detail" use-empty-fallback>
+                    <row>
+                        <key>Reason</key>
+                        <value data-testid="reason" use-empty-fallback>@createdEvent.AddReason</value>
+                    </row>
+                    <row>
+                        <key>Additional information</key>
+                        <value data-testid="reason-detail" use-empty-fallback>
                             @Html.ConvertNewlinesToLineBreaks(createdEvent.AddReasonDetail)
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="evidence">
+                        </value>
+                    </row>
+                    <row>
+                        <key>Evidence</key>
+                        <value data-testid="evidence">
                             <vc:event-evidence-file-link evidence-file="@createdEvent.EvidenceFile" />
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>

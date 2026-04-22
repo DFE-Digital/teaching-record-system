@@ -24,13 +24,13 @@
             <govuk-details-summary>Reason for @actionNoun</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@statusUpdatedEvent.Reason</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                    <row>
+                        <key>Reason</key>
+                        <value use-empty-fallback>@statusUpdatedEvent.Reason</value>
+                    </row>
+                    <row>
+                        <key>Reason details</key>
+                        <value>
                             @if (statusUpdatedEvent.ReasonDetail is not null)
                             {
                                 @Html.ConvertNewlinesToLineBreaks(statusUpdatedEvent.ReasonDetail)
@@ -39,14 +39,14 @@
                             {
                                 <span use-empty-fallback></span>
                             }
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                        </value>
+                    </row>
+                    <row>
+                        <key>Evidence</key>
+                        <value>
                             <vc:event-evidence-file-link evidence-file="@statusUpdatedEvent.EvidenceFile" />
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>

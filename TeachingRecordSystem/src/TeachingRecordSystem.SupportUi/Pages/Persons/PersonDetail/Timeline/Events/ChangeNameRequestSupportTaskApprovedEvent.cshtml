@@ -22,18 +22,18 @@
     <div class="moj-timeline__description">
         <div data-testid="details">
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Request type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>Name change</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Date of request</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@supportTaskEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Name</key>
+                    <value use-empty-fallback>@name</value>
+                </row>
+                <row>
+                    <key>Request type</key>
+                    <value>Name change</value>
+                </row>
+                <row>
+                    <key>Date of request</key>
+                    <value use-empty-fallback>@supportTaskEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
 
             </govuk-summary-list>
         </div>
@@ -42,10 +42,10 @@
             <govuk-details-summary>Previous data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@oldName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Name</key>
+                        <value use-empty-fallback>@oldName</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>

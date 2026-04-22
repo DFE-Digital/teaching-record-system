@@ -15,31 +15,31 @@
 
         <form action="@LinkGenerator.Mqs.EditMq.StartDate.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-summary-list data-testid="change-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>New start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="new-start-date">@Model.NewStartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Previous start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="current-start-date">@(Model.CurrentStartDate.HasValue ? Model.CurrentStartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>New start date</key>
+                    <value data-testid="new-start-date">@Model.NewStartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>Previous start date</key>
+                    <value data-testid="current-start-date">@(Model.CurrentStartDate.HasValue ? Model.CurrentStartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</value>
+                </row>
             </govuk-summary-list>
             <h2 class="govuk-heading-m">Why are you editing this mandatory qualification?</h2>
             <govuk-summary-list data-testid="change-reason-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="change-reason">@Model.ChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="change-reason-detail">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="evidence">
+                <row>
+                    <key>Reason</key>
+                    <value data-testid="change-reason">@Model.ChangeReason!.GetDisplayName()</value>
+                </row>
+                <row>
+                    <key>More details</key>
+                    <value data-testid="change-reason-detail">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")</value>
+                </row>
+                <row>
+                    <key>Evidence</key>
+                    <value data-testid="evidence">
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                    </value>
+                </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

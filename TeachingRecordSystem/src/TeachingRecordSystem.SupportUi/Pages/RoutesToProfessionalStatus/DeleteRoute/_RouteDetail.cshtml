@@ -1,69 +1,69 @@
 @model RouteDetailViewModel
 <govuk-summary-list>
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value>@Model.RouteToProfessionalStatusType.Name</govuk-summary-list-row-value>
-    </govuk-summary-list-row>
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value>@Model.Status.GetTitle()</govuk-summary-list-row-value>
-    </govuk-summary-list-row>
+    <row>
+        <key>Route</key>
+        <value>@Model.RouteToProfessionalStatusType.Name</value>
+    </row>
+    <row>
+        <key>Status</key>
+        <value>@Model.Status.GetTitle()</value>
+    </row>
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-    </govuk-summary-list-row>
+    <row>
+        <key>Start date</key>
+        <value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+    </row>
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-    </govuk-summary-list-row>
+    <row>
+        <key>End date</key>
+        <value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+    </row>
 
     @if (Model.HoldsFromRequired != FieldRequirement.NotApplicable)
     {
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
+        <row>
+            <key>Held since</key>
+            <value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+        </row>
     }
     @if (Model.HasInductionExemptionRequired != FieldRequirement.NotApplicable)
     {
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@(Model.IsExemptFromInduction.HasValue ? Model.IsExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
+        <row>
+            <key>Induction exemption</key>
+            <value use-empty-fallback>@(Model.IsExemptFromInduction.HasValue ? Model.IsExemptFromInduction.Value ? "Yes" : "No" : null)</value>
+        </row>
     }
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingProvider</govuk-summary-list-row-value>
-    </govuk-summary-list-row>
+    <row>
+        <key>Training provider</key>
+        <value use-empty-fallback>@Model.TrainingProvider</value>
+    </row>
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.DegreeType</govuk-summary-list-row-value>
-    </govuk-summary-list-row>
+    <row>
+        <key>Degree type</key>
+        <value use-empty-fallback>@Model.DegreeType</value>
+    </row>
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingCountry</govuk-summary-list-row-value>
-   </govuk-summary-list-row>
+    <row>
+        <key>Country of training</key>
+        <value use-empty-fallback>@Model.TrainingCountry</value>
+   </row>
 
-    <govuk-summary-list-row>
-    <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
+    <row>
+    <key>Age range</key>
     @if (Model.TrainingAgeSpecialismRangeFrom is not null && Model.TrainingAgeSpecialismRangeTo is not null)
     {
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismRange</govuk-summary-list-row-value>
+        <value use-empty-fallback>@Model.TrainingAgeSpecialismRange</value>
     }
     else
     {
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
+        <value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</value>
         }
-    </govuk-summary-list-row>
+    </row>
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value>
+    <row>
+        <key>Subjects</key>
+        <value>
             @if (Model.TrainingSubjects is not null && Model.TrainingSubjects.Any())
             {
                 <ul class="govuk-list">
@@ -77,6 +77,6 @@
             {
                 <span use-empty-fallback></span>
             }
-        </govuk-summary-list-row-value>
-    </govuk-summary-list-row>
+        </value>
+    </row>
 </govuk-summary-list>

@@ -15,49 +15,49 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>New details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Html.ConvertNewlinesToLineBreaks(Model.NewDetails)</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Details.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Previous details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>
+                <row>
+                    <key>New details</key>
+                    <value>@Html.ConvertNewlinesToLineBreaks(Model.NewDetails)</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Details.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Previous details</key>
+                    <value use-empty-fallback>
                         @Html.ConvertNewlinesToLineBreaks(Model.PreviousDetails)
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                    </value>
+                </row>
             </govuk-summary-list>
 
             <h2 class="govuk-heading-m">Why are you editing this alert?</h2>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>
+                <row>
+                    <key>Reason</key>
+                    <value>@Model.ChangeReason.GetDisplayName()</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value use-empty-fallback>
                         @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Evidence</key>
+                    <value>
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</action>
+                    </row-actions>
+                </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

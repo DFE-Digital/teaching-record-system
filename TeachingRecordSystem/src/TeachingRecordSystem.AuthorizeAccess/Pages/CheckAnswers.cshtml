@@ -14,20 +14,20 @@
             <h2 class="govuk-heading-m">GOV.UK One Login details</h2>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.Email</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Email address</key>
+                    <value>@Model.Email</value>
+                </row>
                 @if (Model.IdentityVerified)
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.DateOfBirth.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Name</key>
+                        <value>@Model.Name</value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value>@Model.DateOfBirth.ToString("d MMMM yyyy")</value>
+                    </row>
                 }
             </govuk-summary-list>
 
@@ -36,65 +36,65 @@
             <govuk-summary-list>
                 @if (!Model.IdentityVerified)
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@Links.Name(returnUrl: Request.GetEncodedPathAndQuery())"
+                    <row>
+                        <key>Name</key>
+                        <value>@Model.Name</value>
+                        <row-actions>
+                            <action href="@Links.Name(returnUrl: Request.GetEncodedPathAndQuery())"
                                                            visually-hidden-text="name">
                                 Change
-                            </govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.DateOfBirth.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@Links.DateOfBirth(returnUrl: Request.GetEncodedPathAndQuery())"
+                            </action>
+                        </row-actions>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value>@Model.DateOfBirth.ToString("d MMMM yyyy")</value>
+                        <row-actions>
+                            <action href="@Links.DateOfBirth(returnUrl: Request.GetEncodedPathAndQuery())"
                                                            visually-hidden-text="date of birth">
                                 Change
-                            </govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
+                            </action>
+                        </row-actions>
+                    </row>
                 }
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>
+                <row>
+                    <key>
                         National Insurance number
-                    </govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@Links.NationalInsuranceNumber(returnUrl: Request.GetEncodedPathAndQuery())"
+                    </key>
+                    <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
+                    <row-actions>
+                        <action href="@Links.NationalInsuranceNumber(returnUrl: Request.GetEncodedPathAndQuery())"
                                                        visually-hidden-text="National Insurance number">
                             Change
-                        </govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>
+                        </action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>
                         TRN
-                    </govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@Links.Trn(returnUrl: Request.GetEncodedPathAndQuery())"
+                    </key>
+                    <value use-empty-fallback>@Model.Trn</value>
+                    <row-actions>
+                        <action href="@Links.Trn(returnUrl: Request.GetEncodedPathAndQuery())"
                                                        visually-hidden-text="teacher reference number">
                             Change
-                        </govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                        </action>
+                    </row-actions>
+                </row>
                 @if (!Model.IdentityVerified)
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>
+                    <row>
+                        <key>
                             Proof of identity
-                        </govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.ProofOfIdentityFileName</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@Links.ProofOfIdentity(returnUrl: Request.GetEncodedPathAndQuery())"
+                        </key>
+                        <value use-empty-fallback>@Model.ProofOfIdentityFileName</value>
+                        <row-actions>
+                            <action href="@Links.ProofOfIdentity(returnUrl: Request.GetEncodedPathAndQuery())"
                                                            visually-hidden-text="proof of identity">
                                 Change
-                            </govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
+                            </action>
+                        </row-actions>
+                    </row>
                 }
             </govuk-summary-list>
 
