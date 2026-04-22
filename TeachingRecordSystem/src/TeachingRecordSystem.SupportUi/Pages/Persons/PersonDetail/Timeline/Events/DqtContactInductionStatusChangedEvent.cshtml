@@ -15,19 +15,19 @@
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="induction-status" use-empty-fallback>@changedEvent.InductionStatus</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Induction status</key>
+                <value data-testid="induction-status" use-empty-fallback>@changedEvent.InductionStatus</value>
+            </row>
         </govuk-summary-list>
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
             <govuk-details-summary>Previous data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="old-induction-status" use-empty-fallback="">@changedEvent.OldInductionStatus</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Induction status</key>
+                        <value data-testid="old-induction-status" use-empty-fallback="">@changedEvent.OldInductionStatus</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>

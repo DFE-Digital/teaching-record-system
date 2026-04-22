@@ -17,28 +17,28 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-card data-testid="request">
-                <govuk-summary-card-title>Request details</govuk-summary-card-title>
+                <title>Request details</title>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.Name</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Name</key>
+                        <value use-empty-fallback>@Model.Name</value>
+                    </row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@Model.EmailAddress</value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@Model.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
+                    <row>
+                        <key>TRN</key>
+                        <value use-empty-fallback>@Model.Trn</value>
+                    </row>
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
 
@@ -49,39 +49,39 @@
             @foreach (var match in Model.SuggestedMatches!)
             {
                 <govuk-summary-card data-testid="match">
-                    <govuk-summary-card-title>Record @match.Identifier</govuk-summary-card-title>
+                    <title>Record @match.Identifier</title>
                     <govuk-summary-list>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@match.HasNameMismatch">
+                        <row>
+                            <key>Name</key>
+                            <value use-empty-fallback highlight="@match.HasNameMismatch">
                                 @match.FirstName @match.MiddleName @match.LastName
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                            </value>
+                        </row>
                         @if (match.PreviousNames!.Count > 0)
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value>
+                            <row>
+                                <key>Previous names</key>
+                                <value>
                                     <list-text-items text-items="@match.PreviousNames"></list-text-items>
-                                </govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                                </value>
+                            </row>
                         }
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.EmailAddress))">@match.EmailAddress</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.DateOfBirth))">@match.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.Trn))">@match.Trn</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!(match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.NationalInsuranceNumber) || (string.IsNullOrEmpty(Model.NationalInsuranceNumber) && string.IsNullOrEmpty(match.NationalInsuranceNumber))))">@match.NationalInsuranceNumber</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Email address</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.EmailAddress))">@match.EmailAddress</value>
+                        </row>
+                        <row>
+                            <key>Date of birth</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.DateOfBirth))">@match.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        </row>
+                        <row>
+                            <key>TRN</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.Trn))">@match.Trn</value>
+                        </row>
+                        <row>
+                            <key>National Insurance number</key>
+                            <value use-empty-fallback highlight="@(!(match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.NationalInsuranceNumber) || (string.IsNullOrEmpty(Model.NationalInsuranceNumber) && string.IsNullOrEmpty(match.NationalInsuranceNumber))))">@match.NationalInsuranceNumber</value>
+                        </row>
                     </govuk-summary-list>
                 </govuk-summary-card>
             }

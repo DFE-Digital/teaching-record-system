@@ -16,38 +16,38 @@
         <govuk-summary-list class="govuk-!-margin-bottom-0">
             @if (!string.IsNullOrEmpty(name))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Name</key>
+                    <value>@name</value>
+                </row>
             }
             @if (createdEvent.Details.DateOfBirth is DateOnly dateOfBirth)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Date of birth</key>
+                    <value>@dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
             @if (createdEvent.Details.EmailAddress is string emailAddress)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@emailAddress</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Email address</key>
+                    <value>@emailAddress</value>
+                </row>
             }
             @if (createdEvent.Details.NationalInsuranceNumber is string nationalInsuranceNumber)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@nationalInsuranceNumber</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>National Insurance number</key>
+                    <value>@nationalInsuranceNumber</value>
+                </row>
             }
             @if (createdEvent.Details.Gender is Gender gender)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@gender.GetDisplayName()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Gender</key>
+                    <value>@gender.GetDisplayName()</value>
+                </row>
             }
         </govuk-summary-list>
     </div>

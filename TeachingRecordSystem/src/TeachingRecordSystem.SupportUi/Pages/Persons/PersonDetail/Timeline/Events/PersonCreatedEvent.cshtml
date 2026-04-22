@@ -27,34 +27,34 @@
     <div class="moj-timeline__description">
         <div data-testid="details">
             <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Name</key>
+                        <value use-empty-fallback>@name</value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
                     @if (email is not null)
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@email</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Email address</key>
+                            <value use-empty-fallback>@email</value>
+                        </row>
                     }
                     @if (nino is not null)
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@nino</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>National Insurance number</key>
+                            <value use-empty-fallback>@nino</value>
+                        </row>
                     }
                     @if (details.Gender is not null)
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@details.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Gender</key>
+                            <value use-empty-fallback>@details.Gender?.GetDisplayName()</value>
+                        </row>
                     }
             </govuk-summary-list>
         </div>
@@ -63,13 +63,13 @@
             <govuk-details-summary>Reason for creating record</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@createdEvent.CreateReason</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
+                        <row>
+                            <key>Reason</key>
+                            <value use-empty-fallback>@createdEvent.CreateReason</value>
+                        </row>
+                        <row>
+                            <key>Reason details</key>
+                            <value>
                                 @if (createdEvent.CreateReasonDetail is not null)
                                 {
                                     @Html.ConvertNewlinesToLineBreaks(createdEvent.CreateReasonDetail)
@@ -78,14 +78,14 @@
                                 {
                                     <span use-empty-fallback></span>
                                 }
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
+                            </value>
+                        </row>
+                        <row>
+                            <key>Evidence</key>
+                            <value>
                             <vc:event-evidence-file-link evidence-file="@createdEvent.EvidenceFile" />
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                            </value>
+                        </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>

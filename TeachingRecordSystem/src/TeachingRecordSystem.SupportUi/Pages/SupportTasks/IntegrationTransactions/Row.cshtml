@@ -17,34 +17,34 @@
 
     <div class="govuk-grid-column-two-thirds govuk-!-padding-bottom-4 govuk-body-m">
         <govuk-summary-card>
-            <govuk-summary-card-title>Row details information</govuk-summary-card-title>
+            <title>Row details information</title>
             @if (Model.Person != null)
             {
-                <govuk-summary-card-actions>
-                    <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(Model.Person!.PersonId)" target="_blank">View record (opens in new tab)</govuk-summary-card-action>
-                </govuk-summary-card-actions>
+                <card-actions>
+                    <action href="@LinkGenerator.Persons.PersonDetail.Index(Model.Person!.PersonId)" target="_blank">View record (opens in new tab)</action>
+                </card-actions>
             }
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Row ID</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.Row.IntegrationTransactionRecordId</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>@Model.Row!.Status.GetDisplayName()</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+                <row>
+                    <key>Row ID</key>
+                    <value>@Model.Row.IntegrationTransactionRecordId</value>
+            </row>
+            <row>
+                <key>Status</key>
+                <value>@Model.Row!.Status.GetDisplayName()</value>
+            </row>
             @if (Model.Person != null)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Person</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.PersonName</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Linked record</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>Person</key>
+                    <value>@Model.PersonName</value>
+                </row>
+                <row>
+                    <key>Linked record</key>
+                    <value>
                         <a href="@LinkGenerator.Persons.PersonDetail.Index(Model.Person!.PersonId)" target="_blank" rel="noopener noreferrer">@Model.Person.Trn</a>
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                    </value>
+                </row>
             }
             </govuk-summary-list>
         </govuk-summary-card>

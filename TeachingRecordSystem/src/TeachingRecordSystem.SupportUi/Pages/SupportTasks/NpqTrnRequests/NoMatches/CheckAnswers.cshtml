@@ -22,34 +22,34 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <govuk-summary-card data-testid="request">
-                <govuk-summary-card-title>
+                <title>
                     Details of the record
-                </govuk-summary-card-title>
+                </title>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.FirstName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.MiddleName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.LastName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>First name</key>
+                        <value use-empty-fallback>@Model.FirstName</value>
+                    </row>
+                    <row>
+                        <key>Middle name</key>
+                        <value use-empty-fallback>@Model.MiddleName</value>
+                    </row>
+                    <row>
+                        <key>Last name</key>
+                        <value use-empty-fallback>@Model.LastName</value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
+                    <row>
+                        <key>Email</key>
+                        <value use-empty-fallback>@Model.EmailAddress</value>
+                    </row>
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
             <div class="govuk-button-group">

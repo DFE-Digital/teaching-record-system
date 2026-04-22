@@ -16,29 +16,29 @@
 
             <h2 class="govuk-heading-m">Request details</h2>
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="name">@Model.Name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="date-of-birth">@Model.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="email">@Model.EmailAddress</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Proof of identity</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>Name</key>
+                    <value data-testid="name">@Model.Name</value>
+                </row>
+                <row>
+                    <key>Date of birth</key>
+                    <value data-testid="date-of-birth">@Model.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>Email address</key>
+                    <value data-testid="email">@Model.EmailAddress</value>
+                </row>
+                <row>
+                    <key>TRN</key>
+                    <value>@Model.Trn</value>
+                </row>
+                <row>
+                    <key>National Insurance number</key>
+                    <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
+                </row>
+                <row>
+                    <key>Proof of identity</key>
+                    <value>
                         <a href="@Model.Evidence!.FileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="view-larger-@Model.Evidence!.FileId">View larger (opens in new tab)</a>
                         <div class="govuk-!-margin-top-2">
                             @if (Model.Evidence!.MimeType == "application/pdf")
@@ -51,8 +51,8 @@
                                 <img src="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Evidence(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" alt="@Model.Evidence.FileName" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="image-@Model.Evidence!.FileId" />
                             }
                         </div>
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                    </value>
+                </row>
             </govuk-summary-list>
 
             <govuk-radios for="Verified" data-testid="reason-options">

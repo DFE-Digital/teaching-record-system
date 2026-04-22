@@ -5,63 +5,63 @@
 @model PersonDetailViewModel
 
 <govuk-summary-card>
-    <govuk-summary-card-title>Personal details</govuk-summary-card-title>
+    <title>Personal details</title>
     @if (Model.CanChangeDetails)
     {
-        <govuk-summary-card-actions>
-            <govuk-summary-card-action data-testid="change-details-link" href=@LinkGenerator.Persons.PersonDetail.EditDetails.Index(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
-        </govuk-summary-card-actions>
+        <card-actions>
+            <action data-testid="change-details-link" href=@LinkGenerator.Persons.PersonDetail.EditDetails.Index(Model.PersonId) visually-hidden-text="personal details">Change</action>
+        </card-actions>
     }
     <govuk-summary-list>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
+        <row>
+            <key>Name</key>
+            <value>@Model.Name</value>
+        </row>
         @if (Model.PreviousNames.Length > 0)
         {
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Previous name(s)</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>
+            <row>
+                <key>Previous name(s)</key>
+                <value>
                     <ul class="govuk-list">
                         @foreach (var previousName in Model.PreviousNames)
                         {
                             <li class="govuk-!-margin-bottom-0">@previousName</li>
                         }
                     </ul>
-                </govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+                </value>
+            </row>
         }
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
+        <row>
+            <key>Date of birth</key>
+            <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+        </row>
         @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowGender))
         {
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value use-empty-fallback>@Model.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Gender</key>
+                <value use-empty-fallback>@Model.Gender?.GetDisplayName()</value>
+            </row>
         }
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
+        <row>
+            <key>TRN</key>
+            <value>@Model.Trn</value>
+        </row>
+        <row>
+            <key>National Insurance number</key>
+            <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
+        </row>
         @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowEmail))
         {
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value use-empty-fallback>@Model.Email</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Email address</key>
+                <value use-empty-fallback>@Model.Email</value>
+            </row>
         }
         @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowStatus))
         {
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value use-empty-fallback>
+            <row>
+                <key>Status</key>
+                <value use-empty-fallback>
                     @if (Model.IsActive == false)
                     {
                         <tag color="TagColor.Grey">Deactivated</tag>
@@ -70,8 +70,8 @@
                     {
                         <tag color="TagColor.Green">Active</tag>
                     }
-                </govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+                </value>
+            </row>
         }
     </govuk-summary-list>
 </govuk-summary-card>

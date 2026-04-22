@@ -33,30 +33,30 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-half">
             <govuk-summary-card>
-                <govuk-summary-card-title>TRN request</govuk-summary-card-title>
-                <govuk-summary-card-actions>
-                    <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId)" target="_blank">View record (opens in a new tab)</govuk-summary-card-action>
-                </govuk-summary-card-actions>
+                <title>TRN request</title>
+                <card-actions>
+                    <action href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId)" target="_blank">View record (opens in a new tab)</action>
+                </card-actions>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.Name</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Flag@(Model.FlagCount != 1 ? "s" : "")</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                    <row>
+                        <key>Name</key>
+                        <value use-empty-fallback>@Model.Name</value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@Model.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@Model.EmailAddress</value>
+                    </row>
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
+                    </row>
+                    <row>
+                        <key>Flag@(Model.FlagCount != 1 ? "s" : "")</key>
+                        <value>
                             <ul class="govuk-list">
                                 @if (Model.HasOpenAlerts)
                                 {
@@ -83,8 +83,8 @@
                                     </li>
                                 }
                             </ul>
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
         </div>

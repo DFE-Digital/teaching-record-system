@@ -18,47 +18,47 @@
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="induction-status">@migratedEvent.InductionStatus.GetTitle()</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            <row>
+                <key>Induction status</key>
+                <value data-testid="induction-status">@migratedEvent.InductionStatus.GetTitle()</value>
+            </row>
             @if (migratedEvent.InductionExemptionReasonId is Guid exemptionReasonId)
             {
                 var exemptionReason = await ReferenceDataCache.GetInductionExemptionReasonByIdAsync(exemptionReasonId);
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Induction exemption reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="exemption-reason">@exemptionReason.Name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Induction exemption reason</key>
+                    <value data-testid="exemption-reason">@exemptionReason.Name</value>
+                </row>
             }
             @if (migratedEvent.InductionStartDate.HasValue)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@migratedEvent.InductionStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Started on</key>
+                    <value data-testid="start-date">@migratedEvent.InductionStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
             @if (migratedEvent.InductionCompletedDate.HasValue)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="completed-date">@migratedEvent.InductionCompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Completed on</key>
+                    <value data-testid="completed-date">@migratedEvent.InductionCompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
         </govuk-summary-list>
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
             <govuk-details-summary>Previous data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>DQT induction status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="dqt-induction-status">@migratedEvent.DqtInductionStatus</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>DQT induction status</key>
+                        <value data-testid="dqt-induction-status">@migratedEvent.DqtInductionStatus</value>
+                    </row>
                     @if (dqtInduction?.InductionExemptionReason.HasValue == true)
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>DQT induction exemption reason</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="dqt-exemption-reason">@dqtInduction.InductionExemptionReason.ValueOrDefault()</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>DQT induction exemption reason</key>
+                            <value data-testid="dqt-exemption-reason">@dqtInduction.InductionExemptionReason.ValueOrDefault()</value>
+                        </row>
                     }
                 </govuk-summary-list>
             </govuk-details-text>

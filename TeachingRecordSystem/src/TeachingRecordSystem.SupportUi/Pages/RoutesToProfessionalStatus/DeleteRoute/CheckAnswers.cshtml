@@ -17,33 +17,33 @@
 
             <h2 class="govuk-heading-m">Why are you deleting this route?</h2>
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="reason">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback="true">@Model.ChangeReasonDetail.ChangeReasonDetail</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="additional information">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="evidence">
+                <row>
+                    <key>Reason</key>
+                    <value>@Model.ChangeReason?.GetDisplayName()</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                       visually-hidden-text="reason">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value use-empty-fallback="true">@Model.ChangeReasonDetail.ChangeReasonDetail</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                       visually-hidden-text="additional information">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Evidence</key>
+                    <value data-testid="evidence">
                         <vc:evidence-file-link evidence-file="@Model.ChangeReasonDetail.Evidence.UploadedEvidenceFile" />
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                       visually-hidden-text="evidence">Change</action>
+                    </row-actions>
 
-                </govuk-summary-list-row>
+                </row>
             </govuk-summary-list>
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit" data-testid="confirm-button">Confirm and delete route</govuk-button>

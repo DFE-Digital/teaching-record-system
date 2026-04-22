@@ -19,34 +19,34 @@
         <govuk-summary-list>
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Teacher status name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="teacher-status-name" use-empty-fallback>@qts?.TeacherStatusName</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Teacher status name</key>
+                    <value data-testid="teacher-status-name" use-empty-fallback>@qts?.TeacherStatusName</value>
+                </row>
             }
 
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Early years status name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="early-years-status-name" use-empty-fallback>@qts?.EarlyYearsStatusName</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Early years status name</key>
+                    <value data-testid="early-years-status-name" use-empty-fallback>@qts?.EarlyYearsStatusName</value>
+                </row>
             }
 
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.QtsDate))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@qts?.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>QTS date</key>
+                    <value data-testid="qts-date" use-empty-fallback>@qts?.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
 
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EytsDate))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@qts?.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>EYTS date</key>
+                    <value data-testid="eyts-date" use-empty-fallback>@qts?.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
         </govuk-summary-list>
         <govuk-details class="govuk-!-margin-bottom-2">
@@ -55,34 +55,34 @@
                 <govuk-summary-list>
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Teacher status name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-teacher-status-name" use-empty-fallback>@oldQts?.TeacherStatusName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Teacher status name</key>
+                            <value data-testid="old-teacher-status-name" use-empty-fallback>@oldQts?.TeacherStatusName</value>
+                        </row>
                     }
 
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Early years status name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-early-years-status-name" use-empty-fallback>@oldQts?.EarlyYearsStatusName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Early years status name</key>
+                            <value data-testid="old-early-years-status-name" use-empty-fallback>@oldQts?.EarlyYearsStatusName</value>
+                        </row>
                     }
 
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.QtsDate))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@oldQts?.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>QTS date</key>
+                            <value data-testid="old-qts-date" use-empty-fallback>@oldQts?.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        </row>
                     }
 
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EytsDate))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@oldQts?.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>EYTS date</key>
+                            <value data-testid="old-eyts-date" use-empty-fallback>@oldQts?.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        </row>
                     }
                 </govuk-summary-list>
             </govuk-details-text>

@@ -20,34 +20,34 @@
         <govuk-summary-list>
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.Status))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="induction-status" use-empty-fallback>@induction.InductionStatus.ValueOrDefault()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Induction status</key>
+                    <value data-testid="induction-status" use-empty-fallback>@induction.InductionStatus.ValueOrDefault()</value>
+                </row>
             }
 
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="exemption-reason" use-empty-fallback>@induction.InductionExemptionReason.ValueOrDefault()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Exemption reason</key>
+                    <value data-testid="exemption-reason" use-empty-fallback>@induction.InductionExemptionReason.ValueOrDefault()</value>
+                </row>
             }
 
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.StartDate))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@induction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Started on</key>
+                    <value data-testid="start-date" use-empty-fallback>@induction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
 
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.CompletionDate))
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="completion-date" use-empty-fallback>@induction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Completed on</key>
+                    <value data-testid="completion-date" use-empty-fallback>@induction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
             }
         </govuk-summary-list>
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
@@ -56,34 +56,34 @@
                 <govuk-summary-list>
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.Status))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-induction-status" use-empty-fallback>@oldInduction.InductionStatus.ValueOrDefault()</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Induction status</key>
+                            <value data-testid="old-induction-status" use-empty-fallback>@oldInduction.InductionStatus.ValueOrDefault()</value>
+                        </row>
                     }
 
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-exemption-reason" use-empty-fallback>@oldInduction.InductionExemptionReason.ValueOrDefault()</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Exemption reason</key>
+                            <value data-testid="old-exemption-reason" use-empty-fallback>@oldInduction.InductionExemptionReason.ValueOrDefault()</value>
+                        </row>
                     }
 
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.StartDate))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Started on</key>
+                            <value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        </row>
                     }
 
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.CompletionDate))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-completion-date" use-empty-fallback>@oldInduction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Completed on</key>
+                            <value data-testid="old-completion-date" use-empty-fallback>@oldInduction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        </row>
                     }
                 </govuk-summary-list>
             </govuk-details-text>

@@ -19,24 +19,24 @@
 @if (Model.HasQts)
 {
     <govuk-summary-card data-testid="induction-card">
-        <govuk-summary-card-title data-testid="induction-title">Induction details</govuk-summary-card-title>
+        <title data-testid="induction-title">Induction details</title>
         <govuk-summary-list>
-            <govuk-summary-list-row data-testid="induction-status">
-                <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>@Model.Status.GetTitle()</govuk-summary-list-row-value>
+            <row data-testid="induction-status">
+                <key>Induction status</key>
+                <value>@Model.Status.GetTitle()</value>
                 @if (Model.CanWrite)
                 {
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action data-testid="change-induction-status" href="@LinkGenerator.Persons.PersonDetail.EditInduction.Status(person.PersonId, journeyInstanceId: null)" visually-hidden-text="status">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
+                    <row-actions>
+                        <action data-testid="change-induction-status" href="@LinkGenerator.Persons.PersonDetail.EditInduction.Status(person.PersonId, journeyInstanceId: null)" visually-hidden-text="status">Change</action>
+                    </row-actions>
                 }
-            </govuk-summary-list-row>
+            </row>
 
             @if (Model.ExemptionReasonIdsHeldOnPerson!.Length > 0)
             {
-                <govuk-summary-list-row class="govuk-list--spaced" data-testid="induction-exemption-reasons">
-                    <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row class="govuk-list--spaced" data-testid="induction-exemption-reasons">
+                    <key>Exemption reason</key>
+                    <value>
                         @if (Model.ExemptionReasonNames is not null)
                         {
                             <ul class="govuk-list">
@@ -46,58 +46,58 @@
                                 }
                             </ul>
                         }
-                    </govuk-summary-list-row-value>
+                    </value>
                     @if (Model.CanWrite)
                     {
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-exemption-reason" href="@LinkGenerator.Persons.PersonDetail.EditInduction.ExemptionReasons(person.PersonId, journeyInstanceId: null)" visually-hidden-text="exemption reason">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                        <row-actions>
+                            <action data-testid="change-induction-exemption-reason" href="@LinkGenerator.Persons.PersonDetail.EditInduction.ExemptionReasons(person.PersonId, journeyInstanceId: null)" visually-hidden-text="exemption reason">Change</action>
+                        </row-actions>
                     }
-                </govuk-summary-list-row>
+                </row>
             }
 
             @if (Model.ShowStartDate)
             {
-                <govuk-summary-list-row data-testid="induction-start-date">
-                    <govuk-summary-list-row-key>Induction started on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <row data-testid="induction-start-date">
+                    <key>Induction started on</key>
+                    <value>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                     @if (Model.CanWrite)
                     {
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.StartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                        <row-actions>
+                            <action data-testid="change-induction-start-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.StartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="start date">Change</action>
+                        </row-actions>
                     }
-                </govuk-summary-list-row>
+                </row>
             }
 
             @if (Model.ShowCompletedDate)
             {
-                <govuk-summary-list-row data-testid="induction-completed-date">
-                    <govuk-summary-list-row-key>Induction completed on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <row data-testid="induction-completed-date">
+                    <key>Induction completed on</key>
+                    <value>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                     @if (Model.CanWrite)
                     {
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="completed date">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                        <row-actions>
+                            <action data-testid="change-induction-completed-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="completed date">Change</action>
+                        </row-actions>
                     }
-                </govuk-summary-list-row>
+                </row>
             }
 
             @if (Model.InductionExemptedRoutes is not null)
             {
                 foreach (var exemptedRoute in Model.InductionExemptedRoutes)
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Route induction exemption reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@($"{exemptedRoute.RouteToProfessionalStatusType?.InductionExemptionReason?.Name} - {exemptedRoute.RouteToProfessionalStatusType?.Name}")</govuk-summary-list-row-value>
+                    <row>
+                        <key>Route induction exemption reason</key>
+                        <value>@($"{exemptedRoute.RouteToProfessionalStatusType?.InductionExemptionReason?.Name} - {exemptedRoute.RouteToProfessionalStatusType?.Name}")</value>
                         @if (Model.CanWrite)
                         {
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action data-testid="change-induction-exempted-route" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Index(exemptedRoute.QualificationId, fromInductions: true)" visually-hidden-text="induction exemption reason">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
+                            <row-actions>
+                                <action data-testid="change-induction-exempted-route" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Index(exemptedRoute.QualificationId, fromInductions: true)" visually-hidden-text="induction exemption reason">Change</action>
+                            </row-actions>
                         }
-                    </govuk-summary-list-row>
+                    </row>
                 }
             }
         </govuk-summary-list>

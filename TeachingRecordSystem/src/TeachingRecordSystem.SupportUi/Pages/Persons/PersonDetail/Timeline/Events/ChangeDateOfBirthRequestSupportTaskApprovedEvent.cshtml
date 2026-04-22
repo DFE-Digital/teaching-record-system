@@ -22,18 +22,18 @@
     <div class="moj-timeline__description">
         <div data-testid="details">
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@dob</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Request type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>Date of birth change</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Date of request</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@supportTaskEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Date of birth</key>
+                    <value use-empty-fallback>@dob</value>
+                </row>
+                <row>
+                    <key>Request type</key>
+                    <value>Date of birth change</value>
+                </row>
+                <row>
+                    <key>Date of request</key>
+                    <value use-empty-fallback>@supportTaskEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
 
             </govuk-summary-list>
         </div>
@@ -42,10 +42,10 @@
             <govuk-details-summary>Previous data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@oldDob</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@oldDob</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>

@@ -18,14 +18,14 @@
     <div class="moj-timeline__description">
         <div data-testid="details">
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Request type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>Date of birth change</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Date of request</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@supportTaskEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Request type</key>
+                    <value>Date of birth change</value>
+                </row>
+                <row>
+                    <key>Date of request</key>
+                    <value use-empty-fallback>@supportTaskEvent.CreatedUtc.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
 
             </govuk-summary-list>
         </div>
@@ -34,10 +34,10 @@
             <govuk-details-summary>Reason for rejection</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@supportTaskEvent.RejectionReason</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Reason</key>
+                        <value use-empty-fallback>@supportTaskEvent.RejectionReason</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>

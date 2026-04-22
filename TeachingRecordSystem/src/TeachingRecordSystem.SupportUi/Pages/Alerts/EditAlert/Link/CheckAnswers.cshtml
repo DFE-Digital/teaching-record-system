@@ -15,9 +15,9 @@
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>New link</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>New link</key>
+                    <value>
                         @if (Model.NewLink is not null)
                         {
                             <a href="@Model.NewLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.NewLink} (opens in new tab)")</a>
@@ -26,14 +26,14 @@
                         {
                             <span use-empty-fallback></span>
                         }
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Link.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new link">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Previous link</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Link.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new link">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Previous link</key>
+                    <value>
                         @if (Model.PreviousLink is not null)
                         {
                             <a href="@Model.PreviousLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.PreviousLink} (opens in new tab)")</a>
@@ -42,23 +42,23 @@
                         {
                             <span use-empty-fallback></span>
                         }
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                    </value>
+                </row>
             </govuk-summary-list>
 
             <h2 class="govuk-heading-m">Why are you editing this alert?</h2>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Link.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>Reason</key>
+                    <value>@Model.ChangeReason.GetDisplayName()</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Link.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value>
                         @if (Model.ChangeReasonDetail is not null)
                         {
                             @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
@@ -67,20 +67,20 @@
                         {
                             <span use-empty-fallback></span>
                         }
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Link.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="evidence">
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Link.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Evidence</key>
+                    <value data-testid="evidence">
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Link.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Link.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</action>
+                    </row-actions>
+                </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

@@ -28,67 +28,67 @@
             @foreach (var (match, i) in Model.PotentialDuplicates!.Select((match, i) => (match, i)))
             {
                 <govuk-summary-card data-testid="person-@match.Identifier.ToString().ToLower()" class="trs-potential-duplicates__item">
-                    <govuk-summary-card-title>
+                    <title>
                         TRN @match.Trn
-                    </govuk-summary-card-title>
-                    <govuk-summary-card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
+                    </title>
+                    <card-actions>
+                        <action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
                             View record (opens in a new tab)
-                        </govuk-summary-card-action>
-                    </govuk-summary-card-actions>
+                        </action>
+                    </card-actions>
                     <govuk-summary-list>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName))">
+                        <row>
+                            <key>First name</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName))">
                                 @match.FirstName
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName))">
+                            </value>
+                        </row>
+                        <row>
+                            <key>Middle name</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName))">
                                 @match.MiddleName
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName))">
+                            </value>
+                        </row>
+                        <row>
+                            <key>Last name</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName))">
                                 @match.LastName
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth))">
+                            </value>
+                        </row>
+                        <row>
+                            <key>Date of birth</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth))">
                                 @match.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress))">
+                            </value>
+                        </row>
+                        <row>
+                            <key>Email</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress))">
                                 @match.EmailAddress
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber))">
+                            </value>
+                        </row>
+                        <row>
+                            <key>National Insurance number</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber))">
                                 @match.NationalInsuranceNumber
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.Gender))">
+                            </value>
+                        </row>
+                        <row>
+                            <key>Gender</key>
+                            <value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.Gender))">
                                 @match.Gender?.GetDisplayName()
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>@match.Trn</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                            </value>
+                        </row>
+                        <row>
+                            <key>TRN</key>
+                            <value>@match.Trn</value>
+                        </row>
                         @if (match.ActiveAlertCount > 0)
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Alerts</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value><a href="@LinkGenerator.Persons.PersonDetail.Alerts(match.PersonId)" target="_blank" class="govuk-link">(@match.ActiveAlertCount) open alert@(match.ActiveAlertCount == 1 ? "" : "s") (opens in a new tab)</a></govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>Alerts</key>
+                                <value><a href="@LinkGenerator.Persons.PersonDetail.Alerts(match.PersonId)" target="_blank" class="govuk-link">(@match.ActiveAlertCount) open alert@(match.ActiveAlertCount == 1 ? "" : "s") (opens in a new tab)</a></value>
+                            </row>
                         }
                     </govuk-summary-list>
                 </govuk-summary-card>

@@ -36,17 +36,17 @@
         @foreach (var (alert, externalLinkUri, canWrite) in Model.OpenAlerts)
         {
             <govuk-summary-card data-testid="open-alert">
-                <govuk-summary-card-title heading-level="3">@alert.AlertType!.Name</govuk-summary-card-title>
+                <title heading-level="3">@alert.AlertType!.Name</title>
                 @if (canWrite)
                 {
-                    <govuk-summary-card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="alert">Delete</govuk-summary-card-action>
-                    </govuk-summary-card-actions>
+                    <card-actions>
+                        <action href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="alert">Delete</action>
+                    </card-actions>
                 }
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                    <row>
+                        <key>Details</key>
+                        <value>
                             @if (alert.Details is not null)
                             {
                                 @Html.ConvertNewlinesToLineBreaks(alert.Details)
@@ -55,17 +55,17 @@
                             {
                                 <span use-empty-fallback></span>
                             }
-                        </govuk-summary-list-row-value>
+                        </value>
                         @if (canWrite)
                         {
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Details.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="details">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
+                            <row-actions>
+                                <action href="@LinkGenerator.Alerts.EditAlert.Details.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="details">Change</action>
+                            </row-actions>
                         }
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                    </row>
+                    <row>
+                        <key>Link</key>
+                        <value>
                             @if (alert.ExternalLink is not null)
                             {
                                 <a href="@externalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{alert.ExternalLink} (opens in new tab)")</a>
@@ -74,34 +74,34 @@
                             {
                                 <span use-empty-fallback></span>
                             }
-                        </govuk-summary-list-row-value>
+                        </value>
                         @if (canWrite)
                         {
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Link.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="link">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
+                            <row-actions>
+                                <action href="@LinkGenerator.Alerts.EditAlert.Link.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="link">Change</action>
+                            </row-actions>
                         }
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </row>
+                    <row>
+                        <key>Start date</key>
+                        <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                         @if (canWrite)
                         {
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.StartDate.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
+                            <row-actions>
+                                <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="start date">Change</action>
+                            </row-actions>
                         }
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback></govuk-summary-list-row-value>
+                    </row>
+                    <row>
+                        <key>End date</key>
+                        <value use-empty-fallback></value>
                         @if (canWrite)
                         {
-                            <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.CloseAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Add</govuk-summary-list-row-action>
-                            </govuk-summary-list-row-actions>
+                            <row-actions>
+                                <action href="@LinkGenerator.Alerts.CloseAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Add</action>
+                            </row-actions>
                         }
-                    </govuk-summary-list-row>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
         }

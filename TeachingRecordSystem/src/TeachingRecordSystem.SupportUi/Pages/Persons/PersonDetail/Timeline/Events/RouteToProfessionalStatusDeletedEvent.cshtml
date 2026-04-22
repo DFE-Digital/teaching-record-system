@@ -32,22 +32,22 @@
             <govuk-details-summary>Reason for deletion</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@deletedEvent.DeletionReason</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback data-testid="reason-detail">
+                    <row>
+                        <key>Reason</key>
+                        <value data-testid="reason" use-empty-fallback>@deletedEvent.DeletionReason</value>
+                    </row>
+                    <row>
+                        <key>Reason details</key>
+                        <value use-empty-fallback data-testid="reason-detail">
                             @Html.ConvertNewlinesToLineBreaks(deletedEvent.DeletionReasonDetail)
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
+                        </value>
+                    </row>
+                    <row>
+                        <key>Evidence</key>
+                        <value>
                             <vc:event-evidence-file-link evidence-file="@deletedEvent.EvidenceFile" />
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>
@@ -59,38 +59,38 @@
                     <govuk-summary-list>
                         @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Person has EYPS</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="has-eyps" use-empty-fallback>@(deletedEvent.PersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>Person has EYPS</key>
+                                <value data-testid="has-eyps" use-empty-fallback>@(deletedEvent.PersonAttributes.HasEyps ? "Yes" : "No")</value>
+                            </row>
                         }
                         @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@deletedEvent.PersonAttributes.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>EYTS date</key>
+                                <value data-testid="eyts-date" use-empty-fallback>@deletedEvent.PersonAttributes.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            </row>
                         }
                         @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>PQTS date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="pqts-date" use-empty-fallback>@deletedEvent.PersonAttributes.PqtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>PQTS date</key>
+                                <value data-testid="pqts-date" use-empty-fallback>@deletedEvent.PersonAttributes.PqtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            </row>
                         }
                         @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@deletedEvent.PersonAttributes.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>QTS date</key>
+                                <value data-testid="qts-date" use-empty-fallback>@deletedEvent.PersonAttributes.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            </row>
                         }
                         @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus))
                         {
-                            <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="qtls-status" use-empty-fallback>@deletedEvent.PersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
-                            </govuk-summary-list-row>
+                            <row>
+                                <key>QTLS status</key>
+                                <value data-testid="qtls-status" use-empty-fallback>@deletedEvent.PersonAttributes.QtlsStatus.ToString()</value>
+                            </row>
                         }
                     </govuk-summary-list>
                 </govuk-details-text>
@@ -102,98 +102,98 @@
                 <govuk-summary-list>
                 @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="old-has-eyps">@(deletedEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Person has Eyps</key>
+                        <value data-testid="old-has-eyps">@(deletedEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</value>
+                    </row>
                 }
                 @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>EYTS date</key>
+                        <value data-testid="old-eyts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
                 }
                 @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>PQTS date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="old-pqts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.PqtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>PQTS date</key>
+                        <value data-testid="old-pqts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.PqtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
                 }
                 @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>QTS date</key>
+                        <value data-testid="old-qts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
                 }
                 @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus))
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="old-qtls-status">@deletedEvent.OldPersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>QTLS status</key>
+                        <value data-testid="old-qtls-status">@deletedEvent.OldPersonAttributes.QtlsStatus.ToString()</value>
+                    </row>
                 }
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="route" use-empty-fallback>@routeType.Name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="status" use-empty-fallback>@professionalStatus.Status.GetDisplayName()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="exemption" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="training-provider" use-empty-fallback>@trainingProvider?.Name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="degree-type" use-empty-fallback>@degreeType?.Name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Country</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="country" use-empty-fallback>@country?.Name</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
+                <row>
+                    <key>Route</key>
+                    <value data-testid="route" use-empty-fallback>@routeType.Name</value>
+                </row>
+                <row>
+                    <key>Status</key>
+                    <value data-testid="status" use-empty-fallback>@professionalStatus.Status.GetDisplayName()</value>
+                </row>
+                <row>
+                    <key>Start date</key>
+                    <value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>End date</key>
+                    <value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
+                <row>
+                        <key>Held since</key>
+                    <value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>Induction exemption</key>
+                    <value data-testid="exemption" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)</value>
+                </row>
+                <row>
+                    <key>Training provider</key>
+                    <value data-testid="training-provider" use-empty-fallback>@trainingProvider?.Name</value>
+                </row>
+                <row>
+                    <key>Degree type</key>
+                    <value data-testid="degree-type" use-empty-fallback>@degreeType?.Name</value>
+                </row>
+                <row>
+                    <key>Country</key>
+                    <value data-testid="country" use-empty-fallback>@country?.Name</value>
+                </row>
+                <row>
+                    <key>Age range</key>
                     @if (ageRangeFromTo is not null)
                     {
-                        <govuk-summary-list-row-value data-testid="age-range" use-empty-fallback>@ageRangeFromTo</govuk-summary-list-row-value>
+                        <value data-testid="age-range" use-empty-fallback>@ageRangeFromTo</value>
                     }
                     else
                     {
-                        <govuk-summary-list-row-value data-testid="age-range-type" use-empty-fallback>@ageRangeType?.GetDisplayName()</govuk-summary-list-row-value>
+                        <value data-testid="age-range-type" use-empty-fallback>@ageRangeType?.GetDisplayName()</value>
                     }
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback data-testid="subjects"><list-text-items text-items="@subjects" /></govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                </row>
+                <row>
+                    <key>Subjects</key>
+                    <value use-empty-fallback data-testid="subjects"><list-text-items text-items="@subjects" /></value>
+                </row>
                 @if (professionalStatus.SourceApplicationReference is not null)
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback data-testId="source-application-reference">
+                    <row>
+                        <key>Source application reference</key>
+                        <value use-empty-fallback data-testId="source-application-reference">
                             @professionalStatus.SourceApplicationReference
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </value>
+                    </row>
                 }
             </govuk-summary-list>
             </govuk-details-text>

@@ -44,31 +44,31 @@
                 <govuk-summary-list>
                     @if (mergedEvent.Changes.HasAnyFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNameChange))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Name</key>
+                            <value use-empty-fallback>@name</value>
+                        </row>
                     }
                     @if (mergedEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonDateOfBirth))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Date of birth</key>
+                            <value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        </row>
                     }
                     @if (mergedEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@nino</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>National Insurance number</key>
+                            <value use-empty-fallback>@nino</value>
+                        </row>
                     }
                     @if (mergedEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonGender))
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@details.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        <row>
+                            <key>Gender</key>
+                            <value use-empty-fallback>@details.Gender?.GetDisplayName()</value>
+                        </row>
                     }
                 </govuk-summary-list>
             </div>
@@ -80,13 +80,13 @@
                 <govuk-details-summary>Reason for change</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-summary-list>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@mergedEvent.Comments</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
+                        <row>
+                            <key>Comments</key>
+                            <value use-empty-fallback>@mergedEvent.Comments</value>
+                        </row>
+                        <row>
+                            <key>Evidence</key>
+                            <value>
                                 @if (evidenceFileUrl is not null)
                                 {
                                     <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{mergedEvent.EvidenceFileName!} (opens in new tab)")</a>
@@ -95,8 +95,8 @@
                                 {
                                     <span use-empty-fallback></span>
                                 }
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                            </value>
+                        </row>
                     </govuk-summary-list>
                 </govuk-details-text>
             </govuk-details>

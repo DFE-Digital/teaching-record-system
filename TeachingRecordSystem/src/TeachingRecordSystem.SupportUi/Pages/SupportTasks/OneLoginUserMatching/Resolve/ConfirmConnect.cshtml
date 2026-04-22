@@ -21,49 +21,49 @@
             <h2 class="govuk-heading-s">GOV.UK One Login details</h2>
 
             <govuk-summary-list data-testid="one-login-user-details">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.OneLoginUserEmailAddress</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Email address</key>
+                    <value>@Model.OneLoginUserEmailAddress</value>
+                </row>
             </govuk-summary-list>
 
             <govuk-summary-card data-testid="matched-person-details">
-                <govuk-summary-card-title>Record details</govuk-summary-card-title>
-                <govuk-summary-card-actions>
-                    <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(Model.MatchedPersonId)" target="_blank">
+                <title>Record details</title>
+                <card-actions>
+                    <action href="@LinkGenerator.Persons.PersonDetail.Index(Model.MatchedPersonId)" target="_blank">
                         View record (opens in a new tab)
-                    </govuk-summary-card-action>
-                </govuk-summary-card-actions>
+                    </action>
+                </card-actions>
                 <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.MatchedPersonName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Name</key>
+                        <value>@Model.MatchedPersonName</value>
+                    </row>
                     @if (Model.MatchedPersonPreviousNames!.Count > 0)
                     {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
+                        <row>
+                            <key>Previous names</key>
+                            <value>
                                 <list-text-items text-items="@Model.MatchedPersonPreviousNames"></list-text-items>
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                            </value>
+                        </row>
                     }
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.MatchedPersonEmailAddress</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.MatchedPersonDateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.MatchedPersonTrn</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.MatchedPersonNationalInsuranceNumber</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@Model.MatchedPersonEmailAddress</value>
+                    </row>
+                    <row>
+                        <key>Date of birth</key>
+                        <value>@Model.MatchedPersonDateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    </row>
+                    <row>
+                        <key>TRN</key>
+                        <value>@Model.MatchedPersonTrn</value>
+                    </row>
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@Model.MatchedPersonNationalInsuranceNumber</value>
+                    </row>
                 </govuk-summary-list>
             </govuk-summary-card>
 

@@ -15,22 +15,22 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>GOV.UK One Login email address</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.OneLoginEmailAddress</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                <row>
+                    <key>GOV.UK One Login email address</key>
+                    <value>@Model.OneLoginEmailAddress</value>
+                </row>
+                <row>
+                    <key>Reason</key>
+                    <value>
                         @Model.ConnectReason!.Value.GetDisplayName()@if (Model.ConnectReason == ConnectOneLoginReason.AnotherReason)
                         {
                             <text>: </text>@Html.ConvertNewlinesToLineBreaks(Model.ReasonDetail!)
                         }
-                    </govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" data-testid="change-reason-link" visually-hidden-text="reason">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Persons.PersonDetail.ConnectOneLogin.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" data-testid="change-reason-link" visually-hidden-text="reason">Change</action>
+                    </row-actions>
+                </row>
             </govuk-summary-list>
 
             @if (!Model.IsOneLoginUserVerified)

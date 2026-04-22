@@ -18,26 +18,26 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.EmailAddress</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.Reason.GetDisplayName()</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@resolveLinkGenerator.NotConnecting(Model.SupportTaskReference, Model.JourneyInstance.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                <row>
+                    <key>Email address</key>
+                    <value>@Model.EmailAddress</value>
+                </row>
+                <row>
+                    <key>Reason</key>
+                    <value>@Model.Reason.GetDisplayName()</value>
+                    <row-actions>
+                        <action href="@resolveLinkGenerator.NotConnecting(Model.SupportTaskReference, Model.JourneyInstance.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason">Change</action>
+                    </row-actions>
+                </row>
                 @if (Model.Reason is OneLoginUserNotConnectingReason.AnotherReason)
                 {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Additional details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.AdditionalDetails</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@resolveLinkGenerator.NotConnecting(Model.SupportTaskReference, Model.JourneyInstance.InstanceId, fromCheckAnswers: true)" visually-hidden-text="additional details">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    </govuk-summary-list-row>
+                    <row>
+                        <key>Additional details</key>
+                        <value>@Model.AdditionalDetails</value>
+                        <row-actions>
+                            <action href="@resolveLinkGenerator.NotConnecting(Model.SupportTaskReference, Model.JourneyInstance.InstanceId, fromCheckAnswers: true)" visually-hidden-text="additional details">Change</action>
+                        </row-actions>
+                    </row>
                 }
             </govuk-summary-list>
 
