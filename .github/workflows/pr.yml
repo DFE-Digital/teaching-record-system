@@ -25,7 +25,7 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # Pinned at v4.0.0
 
       - uses: actions/setup-dotnet@v5
         with:
@@ -62,7 +62,7 @@ jobs:
         working-directory: terraform/aks
 
       - name: Lint
-        uses: reviewdog/action-tflint@v1.25.0
+        uses: reviewdog/action-tflint@54a5e5aed57dcfbb4662ec548de876df33d6288d # Pinned at v1.25.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tflint_rulesets: azurerm
@@ -81,7 +81,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # Pinned at v4.0.0
 
       - uses: actions/setup-dotnet@v5
         with:
@@ -113,7 +113,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # Pinned at v4.0.0
 
       - uses: actions/setup-dotnet@v5
         with:

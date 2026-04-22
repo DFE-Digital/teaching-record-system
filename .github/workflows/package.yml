@@ -21,7 +21,7 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: extractions/setup-just@v4
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # Pinned at v4.0.0
 
       - uses: actions/setup-dotnet@v5
         with:
@@ -62,7 +62,7 @@ jobs:
 
       - name: Run Snyk to check Docker image for vulnerabilities
         if: steps.build.outputs.skipped != 'true'
-        uses: snyk/actions/docker@master
+        uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04 # Pinned at v1.0.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
