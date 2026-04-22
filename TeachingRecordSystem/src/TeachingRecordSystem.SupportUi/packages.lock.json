@@ -17,6 +17,18 @@
           "Microsoft.Extensions.FileProviders.Embedded": "8.0.26"
         }
       },
+      "Htmx": {
+        "type": "Direct",
+        "requested": "[1.12.0, )",
+        "resolved": "1.12.0",
+        "contentHash": "HbFkLTDTjAhLUqaPNOFKOsm2qkYZKQQegD6cP8WbrtyaC8BXRLuz7LkxVbarOMkZiJDXhu0L9N2ry83Ai7BLrA=="
+      },
+      "Htmx.TagHelpers": {
+        "type": "Direct",
+        "requested": "[1.12.0, )",
+        "resolved": "1.12.0",
+        "contentHash": "37I/ltAUVqXPAYNi3grIbxAVG+8GHM1XE1nh3m9OyeneUN9fFt0C7lDsGHorPmgheCr1h7M2dJlHeXAOmOZgBw=="
+      },
       "Humanizer.Core": {
         "type": "Direct",
         "requested": "[3.0.10, )",
@@ -190,7 +202,8 @@
         "resolved": "11.11.0",
         "contentHash": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
         "dependencies": {
-          "FluentValidation": "11.11.0"
+          "FluentValidation": "11.11.0",
+          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
         }
       },
       "Google.Api.Gax": {
@@ -380,6 +393,11 @@
         "type": "Transitive",
         "resolved": "10.0.6",
         "contentHash": "PIcmALdKzeSJNWmxsLDsS8XKFqiH5+9GzIM+qd3w1efYIwmO0w5304i37/SkfynctHZwkiiQjb2mkoIXU1CGZg=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "2.1.0",
+        "contentHash": "8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ=="
       },
       "Microsoft.Extensions.DependencyModel": {
         "type": "Transitive",

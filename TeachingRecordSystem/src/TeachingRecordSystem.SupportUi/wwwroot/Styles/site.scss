@@ -114,12 +114,6 @@
   max-width: none;
 }
 
-.trs_checkboxes__wrapper--horizontal {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
 .trs-checkboxes_hint {
   padding-top: 1rem;
 }
@@ -308,6 +302,18 @@
   }
 }
 
+.trs-checkboxes--inline {
+  @media #{govuk-from-breakpoint(tablet)} {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    .govuk-checkboxes__item {
+      margin-right: govuk-spacing(4);
+    }
+  }
+}
+
 .trs-radios--inline-two-column {
   @extend .govuk-radios--inline;
 
@@ -401,6 +407,10 @@
 
 .trs-display-flex {
   display: flex
+}
+
+.trs-flex-auto {
+  flex: auto;
 }
 
 .trs-float-right {

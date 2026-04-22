@@ -1,4 +1,5 @@
 using Hangfire;
+using Htmx.TagHelpers;
 using Joonasw.AspNetCore.SecurityHeaders;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Endpoints;
@@ -73,6 +74,7 @@ app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/_hangfire"), a => a.Us
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHtmxAntiforgeryScript();
 app.MapRazorPages();
 app.MapControllers();
 

@@ -146,7 +146,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             statusesToInclude.Add(PersonStatus.Deactivated);
         }
 
-        if (statusesToInclude.Count > 0)
+        //if (statusesToInclude.Count > 0)
         {
             query = query.Where(p => statusesToInclude.Contains(p.Status));
         }
