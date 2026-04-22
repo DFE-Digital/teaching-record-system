@@ -40,7 +40,7 @@
                 @if (canWrite)
                 {
                     <card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="alert">Delete</govuk-summary-card-action>
+                        <action href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="alert">Delete</action>
                     </card-actions>
                 }
                 <govuk-summary-list>

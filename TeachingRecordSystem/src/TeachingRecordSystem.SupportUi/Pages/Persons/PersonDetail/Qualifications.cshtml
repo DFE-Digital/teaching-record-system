@@ -30,8 +30,8 @@ else
                 <card-actions>
                     @if (Model.CanEdit)
                     {
-                        <govuk-summary-card-action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Index(professionalStatus.QualificationId)" visually-hidden-text="edit route" data-testid="edit-route-link-@professionalStatus.QualificationId">Edit route</govuk-summary-card-action>
-                        <govuk-summary-card-action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Index(professionalStatus.QualificationId)" visually-hidden-text="delete route" data-testid="delete-route-link-@professionalStatus.QualificationId">Delete route</govuk-summary-card-action>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Index(professionalStatus.QualificationId)" visually-hidden-text="edit route" data-testid="edit-route-link-@professionalStatus.QualificationId">Edit route</action>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Index(professionalStatus.QualificationId)" visually-hidden-text="delete route" data-testid="delete-route-link-@professionalStatus.QualificationId">Delete route</action>
                     }
                 </card-actions>
                 <govuk-summary-list>
@@ -175,7 +175,7 @@ else
             <card-actions>
                 @if (Model.CanEdit)
                 {
-                    <govuk-summary-card-action href="@LinkGenerator.Mqs.DeleteMq.Index(mq.QualificationId, null)" data-testid="delete-link-@mq.QualificationId">Delete qualification</govuk-summary-card-action>
+                    <action href="@LinkGenerator.Mqs.DeleteMq.Index(mq.QualificationId, null)" data-testid="delete-link-@mq.QualificationId">Delete qualification</action>
                 }
             </card-actions>
             <govuk-summary-list>

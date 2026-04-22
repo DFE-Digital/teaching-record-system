@@ -21,7 +21,7 @@
             @if (Model.Person != null)
             {
                 <card-actions>
-                    <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(Model.Person!.PersonId)" target="_blank">View record (opens in new tab)</govuk-summary-card-action>
+                    <action href="@LinkGenerator.Persons.PersonDetail.Index(Model.Person!.PersonId)" target="_blank">View record (opens in new tab)</action>
                 </card-actions>
             }
             <govuk-summary-list>
