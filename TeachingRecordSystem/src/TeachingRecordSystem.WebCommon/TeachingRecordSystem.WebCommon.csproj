@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer.Core" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" />
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
   </ItemGroup>
 
