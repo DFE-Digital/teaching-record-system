@@ -50,7 +50,7 @@ public partial class TestData
 
             return testData.WithDbContextAsync(async dbContext =>
             {
-                var now = testData.Clock.UtcNow;
+                var now = testData.TimeProvider.UtcNow;
 
                 var note = new Note
                 {

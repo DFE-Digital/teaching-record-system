@@ -31,7 +31,7 @@ public partial class TestData
             {
                 ApplicationUserId = applicationUserId,
                 RequestId = requestId,
-                CreatedOn = Clock.UtcNow,
+                CreatedOn = TimeProvider.UtcNow,
                 IdentityVerified = null,
                 EmailAddress = emailAddress,
                 OneLoginUserSubject = null,

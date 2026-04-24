@@ -23,7 +23,7 @@ public partial class TestData
             ContentHtml = contentHtml,
             CreatedByDqtUserName = createdByUserName ?? GenerateName(),
             CreatedByDqtUserId = createdByUserId,
-            CreatedOn = createdDate ?? Clock.UtcNow,
+            CreatedOn = createdDate ?? TimeProvider.UtcNow,
             UpdatedByDqtUserId = null,
             UpdatedOn = null,
             UpdatedByDqtUserName = null,

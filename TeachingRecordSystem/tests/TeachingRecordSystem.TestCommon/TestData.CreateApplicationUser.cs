@@ -70,7 +70,7 @@ public partial class TestData
             {
                 EventId = Guid.NewGuid(),
                 RaisedBy = SystemUser.SystemUserId,
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 ApplicationUser = EventModels.ApplicationUser.FromModel(user)
             };
             dbContext.AddEventWithoutBroadcast(@event);

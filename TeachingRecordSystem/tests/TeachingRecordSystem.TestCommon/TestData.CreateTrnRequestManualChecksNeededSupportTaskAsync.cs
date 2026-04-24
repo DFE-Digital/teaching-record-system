@@ -51,7 +51,7 @@ public partial class TestData
                 trnRequestApplicationUserId,
                 trnRequestId,
                 SystemUser.SystemUserId,
-                (createdOn ?? Clock.UtcNow).ToUniversalTime(),
+                (createdOn ?? TimeProvider.UtcNow).ToUniversalTime(),
                 out var createdEvent);
             task.Status = status;
 

@@ -37,7 +37,7 @@ public partial class TestData
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn((createdOn ?? Clock.UtcNow).ToUniversalTime());
+                s.WithCreatedOn((createdOn ?? TimeProvider.UtcNow).ToUniversalTime());
             });
 
         return supportTask;
@@ -146,7 +146,7 @@ public partial class TestData
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
             var gender = _gender.ValueOr(testData.GenerateGender());
-            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+            var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
             var matchedPersons = _matchedPersonIds.ValueOrDefault();
             var integrationTransactionId = _integrationTransactionId;
             var fileName = _fileName ?? string.Empty;
@@ -155,7 +155,7 @@ public partial class TestData
             {
                 ApplicationUserId = userId,
                 RequestId = trnRequestId,
-                CreatedOn = testData.Clock.UtcNow,
+                CreatedOn = testData.TimeProvider.UtcNow,
                 IdentityVerified = null,
                 OneLoginUserSubject = null,
                 Name = (new List<string?> { firstName, middleName, lastName }).OfType<string>().ToArray(),

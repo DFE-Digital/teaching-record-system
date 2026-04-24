@@ -17,20 +17,20 @@ public partial class TestData
     public TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         ReferenceDataCache referenceDataCache,
-        TimeProvider clock) :
-        this(dbContextFactory, referenceDataCache, clock, () => new TestTrnGenerator(dbContextFactory).GenerateTrnAsync())
+        TimeProvider timeProvider) :
+        this(dbContextFactory, referenceDataCache, timeProvider, () => new TestTrnGenerator(dbContextFactory).GenerateTrnAsync())
     {
     }
 
     private TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         ReferenceDataCache referenceDataCache,
-        TimeProvider clock,
+        TimeProvider timeProvider,
         Func<Task<string>> generateTrn)
     {
         DbContextFactory = dbContextFactory;
         ReferenceDataCache = referenceDataCache;
-        Clock = clock;
+        TimeProvider = timeProvider;
         _generateTrn = generateTrn;
     }
 
@@ -46,7 +46,7 @@ public partial class TestData
         0x00, 0x00, 0x00, 0x00, 0xFF, 0xDA, 0x00, 0x08, 0x01, 0x01, 0x00, 0x01, 0x3F, 0x10
     ];
 
-    public TimeProvider Clock { get; }
+    public TimeProvider TimeProvider { get; }
 
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; }
 
@@ -94,7 +94,7 @@ public partial class TestData
         {
             dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
         }
-        while (dateOfBirth >= DateOnly.FromDateTime(Clock.UtcNow) || dateOfBirth < new DateOnly(1940, 1, 1));
+        while (dateOfBirth >= DateOnly.FromDateTime(TimeProvider.UtcNow) || dateOfBirth < new DateOnly(1940, 1, 1));
 
         return dateOfBirth;
     }

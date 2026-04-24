@@ -92,7 +92,7 @@ public partial class TestData
             var evidenceFileName = _evidenceFileName.ValueOr("evidence-file.jpg");
             var emailAddress = _hasEmailAddress ? _emailAddress.ValueOr(testData.GenerateUniqueEmail) : null;
             var status = _status.ValueOr(SupportTaskStatus.Open);
-            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow).ToUniversalTime();
+            var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow).ToUniversalTime();
 
             var data = new ChangeDateOfBirthRequestData()
             {

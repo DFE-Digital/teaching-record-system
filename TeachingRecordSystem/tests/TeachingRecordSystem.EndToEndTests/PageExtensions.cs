@@ -1,21 +1,19 @@
 using Microsoft.Playwright;
 
-namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
+namespace TeachingRecordSystem.EndToEndTests;
 
 public static class PageExtensions
 {
     public static Task WaitForUrlPathAsync(this IPage page, string path) =>
-        page.WaitForURLAsync(url =>
-        {
-            var asUri = new Uri(url);
-            return asUri.LocalPath == path;
-        }, new PageWaitForURLOptions { WaitUntil = WaitUntilState.Commit });
+        page.WaitForURLAsync(
+            url => new Uri(url).LocalPath == path,
+            new PageWaitForURLOptions { WaitUntil = WaitUntilState.Commit });
 
-    public static async Task GoToTestStartPageAsync(this IPage page, string? trnToken = null, bool deferred = false)
+    public static async Task GoToAuthorizeAccessTestStartPageAsync(this IPage page, string? trnToken = null, bool deferred = false)
     {
         var scheme = deferred ? HostFixture.DeferredFakeOneLoginAuthenticationScheme : HostFixture.FakeOneLoginAuthenticationScheme;
 
-        var url = $"/test" +
+        var url = $"{HostFixture.AuthorizeAccessBaseUrl}/test" +
             $"?scheme={Uri.EscapeDataString(scheme)}" +
             $"&trn_token={Uri.EscapeDataString(trnToken ?? "")}";
 
@@ -42,11 +40,17 @@ public static class PageExtensions
     }
 
     public static Task ClickButtonAsync(this IPage page, string text) =>
-        page.ClickAsync($"button{TestBase.TextIsSelector(text)}");
+        page.ClickAsync($"button{TextIsSelector(text)}");
 
     public static Task ClickGovUkButtonAsync(this IPage page, string text) =>
-        page.ClickAsync($".govuk-button{TestBase.TextIsSelector(text)}");
+        page.ClickAsync($".govuk-button{TextIsSelector(text)}");
 
     public static Task ClickBackLinkAsync(this IPage page) =>
-        page.ClickAsync($".govuk-back-link");
+        page.ClickAsync(".govuk-back-link");
+
+    public static string TextSelector(string? text) => $":text(\"{text?.Replace("\"", "\\\"")}\")";
+
+    public static string TextIsSelector(string? text) => $":text-is(\"{text?.Replace("\"", "\\\"")}\")";
+
+    public static string HasTextSelector(string? text) => $":has-text(\"{text?.Replace("\"", "\\\"")}\")";
 }

@@ -100,7 +100,7 @@ public partial class TestData
             var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
             var clientApplicationUserId = _clientApplicationUserId.ValueOr(applicationUser.UserId);
             var status = _status.ValueOr(SupportTaskStatus.Open);
-            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+            var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
             var trnRequestId = _trnRequestId.ValueOrDefault();
 
             return await testData.WithDbContextAsync(async dbContext =>

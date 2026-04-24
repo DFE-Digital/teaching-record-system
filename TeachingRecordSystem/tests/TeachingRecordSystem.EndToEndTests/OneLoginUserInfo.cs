@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
+namespace TeachingRecordSystem.EndToEndTests;
 
 #pragma warning disable IDE1006 // Naming Styles
 public record OneLoginUserInfo(string sub, string email, string vot, string sid, string? CoreIdentityVc)

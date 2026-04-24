@@ -20,7 +20,7 @@ public partial class TestData
 
         var builder = new CreatePersonBuilder(referenceData);
         configure?.Invoke(builder);
-        return await builder.ExecuteAsync(this, Clock);
+        return await builder.ExecuteAsync(this, TimeProvider);
     }
 
     public class CreatePersonBuilder
@@ -543,7 +543,7 @@ public partial class TestData
                     {
                         ApplicationUserId = trnRequest.ApplicationUserId,
                         RequestId = trnRequest.RequestId,
-                        CreatedOn = testData.Clock.UtcNow,
+                        CreatedOn = testData.TimeProvider.UtcNow,
                         IdentityVerified = trnRequest.IdentityVerified,
                         OneLoginUserSubject = trnRequest.OneLoginUserSubject,
                         EmailAddress = _email,
@@ -690,8 +690,8 @@ public partial class TestData
                 ExternalLink = externalLink,
                 StartDate = startDate,
                 EndDate = endDate,
-                CreatedOn = _createdUtc.ValueOr(testData.Clock.UtcNow)!.Value,
-                UpdatedOn = _createdUtc.ValueOr(testData.Clock.UtcNow)!.Value
+                CreatedOn = _createdUtc.ValueOr(testData.TimeProvider.UtcNow)!.Value,
+                UpdatedOn = _createdUtc.ValueOr(testData.TimeProvider.UtcNow)!.Value
             };
 
             dbContext.Alerts.Add(alert);
@@ -830,7 +830,7 @@ public partial class TestData
             var reason = _reason.ValueOrDefault();
             var reasonDetail = _reasonDetail.ValueOrDefault();
             var evidenceFile = _evidenceFile.ValueOrDefault();
-            var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
+            var createdUtc = _createdUtc.ValueOr(testData.TimeProvider.UtcNow);
 
             var provider = providerId.HasValue ?
                 await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
@@ -839,8 +839,8 @@ public partial class TestData
             var mq = new MandatoryQualification()
             {
                 QualificationId = QualificationId,
-                CreatedOn = testData.Clock.UtcNow,
-                UpdatedOn = testData.Clock.UtcNow,
+                CreatedOn = testData.TimeProvider.UtcNow,
+                UpdatedOn = testData.TimeProvider.UtcNow,
                 PersonId = personId,
                 ProviderId = providerId,
                 Status = status,
@@ -1000,7 +1000,7 @@ public partial class TestData
                 changeReasonDetail: null,
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
-                testData.Clock.UtcNow,
+                testData.TimeProvider.UtcNow,
                 out var @event);
 
             if (@event is not null)
