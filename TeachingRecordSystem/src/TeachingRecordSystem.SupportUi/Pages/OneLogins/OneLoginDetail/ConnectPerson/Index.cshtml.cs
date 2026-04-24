@@ -33,8 +33,6 @@ public class IndexModel(
     [BindProperty]
     public string? Trn { get; set; }
 
-    public string? OneLoginEmailAddress { get; set; }
-
     public void OnGet()
     {
         Trn = JourneyInstance?.State.PersonTrn;
@@ -46,7 +44,7 @@ public class IndexModel(
 
         var person = await dbContext.Persons
             .Where(p => p.Trn == Trn)
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
 
         if (person is null)
         {
