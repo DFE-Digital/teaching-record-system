@@ -25,6 +25,23 @@ public static class HttpContextExtensions
                 person.DateOfBirth,
                 person.NationalInsuranceNumber));
 
+    public static CurrentOneLoginUserFeature GetCurrentOneLoginUserFeature(this HttpContext context) =>
+        context.Features.GetRequiredFeature<CurrentOneLoginUserFeature>();
+
+    public static void SetCurrentOneLoginUserFeature(this HttpContext context, CurrentOneLoginUserFeature currentOneLoginUserFeature) =>
+        context.Features.Set(currentOneLoginUserFeature);
+
+    public static void SetCurrentOneLoginUserFeature(this HttpContext context, OneLoginUser oneLoginUser) =>
+        SetCurrentOneLoginUserFeature(
+            context,
+            new CurrentOneLoginUserFeature(
+                oneLoginUser.Subject,
+                oneLoginUser.EmailAddress,
+                oneLoginUser.PersonId,
+                oneLoginUser.VerifiedOn,
+                oneLoginUser.VerifiedNames,
+                oneLoginUser.VerifiedDatesOfBirth));
+
     public static CurrentMandatoryQualificationFeature GetCurrentMandatoryQualificationFeature(this HttpContext context) =>
         context.Features.GetRequiredFeature<CurrentMandatoryQualificationFeature>();
 
@@ -63,6 +80,14 @@ public record CurrentPersonFeature(
 {
     public string Name => (FirstName + " " + MiddleName).Trim() + " " + LastName;
 }
+
+public record CurrentOneLoginUserFeature(
+    string Subject,
+    string? EmailAddress,
+    Guid? PersonId,
+    DateTime? VerifiedOn,
+    string[][]? VerifiedNames,
+    DateOnly[]? VerifiedDatesOfBirth);
 
 public record CurrentMandatoryQualificationFeature(MandatoryQualification MandatoryQualification);
 

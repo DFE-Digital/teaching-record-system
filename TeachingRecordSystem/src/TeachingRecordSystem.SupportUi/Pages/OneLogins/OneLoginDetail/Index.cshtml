@@ -1,0 +1,19 @@
+@page "/one-logins/{OneLoginUserSubject}"
+@model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.IndexModel
+@{
+    ViewBag.Title = "GOV.UK One Login details";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">        
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        <p class="govuk-body">This page is under construction.</p>       
+
+        <govuk-button-group>
+            <govuk-button href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Index(Model.OneLoginUserSubject, journeyInstanceId: null)">
+                Connect to a record
+            </govuk-button>
+        </govuk-button-group>
+    </div>
+</div>

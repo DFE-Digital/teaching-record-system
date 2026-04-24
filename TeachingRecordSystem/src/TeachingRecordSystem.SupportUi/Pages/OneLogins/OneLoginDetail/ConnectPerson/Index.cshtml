@@ -1,0 +1,31 @@
+@page "/one-logins/{OneLoginUserSubject}/connect-person"
+@model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerson.IndexModel
+@{
+    ViewBag.Title = "Enter the teacher reference number (TRN) of the record";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.OneLogins.OneLoginDetail.Index(Model.OneLoginUserSubject)">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <span class="govuk-caption-l">Record management</span>
+
+            <govuk-input for="Trn" label-class="govuk-label--l">
+                <govuk-input-label>@ViewBag.Title</govuk-input-label>
+                <govuk-input-hint>
+                    <govuk-inset-text>
+                        You’re connecting a GOV.UK One Login to a record. You’ll be able to review the details before confirming.
+                    </govuk-inset-text>
+                </govuk-input-hint>
+            </govuk-input>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.IndexCancel(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
