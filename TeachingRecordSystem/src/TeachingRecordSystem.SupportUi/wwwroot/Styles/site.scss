@@ -70,6 +70,10 @@
   white-space: nowrap;
 }
 
+.trs-whitespace-wrap {
+  white-space: wrap;
+}
+
 .trs-support-tasks {
   display: flex;
   align-items: flex-start;
@@ -90,24 +94,44 @@
   margin-top: 11px; /* trs-support-tasks__filters's padding + border width */
 }
 
+.trs-table-layout-fixed {
+  table-layout: fixed;
+}
+
 .trs-\!-inline {
   display: inline;
 }
 
 .trs-\!-width-70 {
-  width: 70px;
+  width: 70px !important;
+}
+
+.trs-\!-width-80 {
+  width: 80px !important;
+}
+
+.trs-\!-width-110 {
+  width: 110px !important;
+}
+
+.trs-\!-width-120 {
+  width: 120px !important;
+}
+
+.trs-\!-width-130 {
+  width: 130px !important;
 }
 
 .trs-\!-width-150 {
-  width: 150px;
+  width: 150px !important;
 }
 
 .trs-\!-width-200 {
-  width: 200px;
+  width: 200px !important;
 }
 
 .trs-\!-width-300 {
-  width: 300px;
+  width: 300px !important;
 }
 
 .trs-\!-max-width-none {

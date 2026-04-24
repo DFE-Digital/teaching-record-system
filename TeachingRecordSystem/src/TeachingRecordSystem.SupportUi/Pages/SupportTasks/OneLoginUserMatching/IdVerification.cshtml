@@ -53,20 +53,20 @@
             }
             else
             {
-                <table class="govuk-table">
+                <table class="govuk-table trs-table-layout-fixed">
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                            <th scope="col" class="govuk-table__header trs-!-width-200"
                                 sort-direction="@(Model.SortBy == OneLoginUserIdVerificationSupportTasksSortByOption.Name ? Model.SortDirection : null)"
                                 link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginUserIdVerificationSupportTasksSortByOption.Name, direction))">
                                 Name and task ID
                             </th>
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                            <th scope="col" class="govuk-table__header trs-!-width-130"
                                 sort-direction="@(Model.SortBy == OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
                                 link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn, direction))">
                                 Requested on
                             </th>
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
+                            <th scope="col" class="govuk-table__header trs-!-width-120">
                                 Status
                             </th>
                             <th scope="col" class="govuk-table__header"
@@ -74,7 +74,7 @@
                                 link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(Model.Search, OneLoginUserIdVerificationSupportTasksSortByOption.Email, direction))">
                                 Email address
                             </th>
-                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                            <th scope="col" class="govuk-table__header trs-!-width-80"
                                 sort-direction="@(Model.SortBy == OneLoginUserIdVerificationSupportTasksSortByOption.Source ? Model.SortDirection : null)"
                                 link-template="@(direction => LinkGenerator.SupportTasks.OneLoginUserMatching.IdVerification(search: Model.Search, OneLoginUserIdVerificationSupportTasksSortByOption.Source, direction))">
                                 Source
@@ -98,7 +98,7 @@
                                 <td class="govuk-table__cell" data-testid="status">
                                     <support-task-status-tag status="@result.Status"/>
                                 </td>
-                                <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                                <td class="govuk-table__cell trs-whitespace-wrap" data-testid="email">@result.EmailAddress</td>
                                 <td class="govuk-table__cell" data-testid="source">
                                     <tag color="TagColor.Auto">@result.SourceApplicationName</tag>
                                 </td>
