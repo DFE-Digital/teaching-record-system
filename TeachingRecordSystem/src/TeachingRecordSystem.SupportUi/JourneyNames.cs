@@ -31,4 +31,5 @@ public static class JourneyNames
     public const string ResolveOneLoginUserMatching = nameof(ResolveOneLoginUserMatching);
     public const string DisconnectOneLogin = nameof(DisconnectOneLogin);
     public const string ConnectOneLogin = nameof(ConnectOneLogin);
+    public const string ConnectPerson = nameof(ConnectPerson);
 }

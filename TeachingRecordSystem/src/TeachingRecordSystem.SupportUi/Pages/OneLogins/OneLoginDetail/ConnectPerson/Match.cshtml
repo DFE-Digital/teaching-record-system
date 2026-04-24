@@ -1,0 +1,29 @@
+@page "/one-logins/{OneLoginUserSubject}/connect-person/match"
+@model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerson.MatchModel
+@{
+    ViewBag.Title = "Connect GOV.UK One Login to record";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Index(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">Record management</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        <p class="govuk-body">This page is under construction.</p>
+
+        <govuk-summary-list>
+            <row>
+                <key>GOV.UK One Login email</key>
+                <value>@Model.OneLoginUserEmailAddress</value>
+            </row>
+            <row>
+                <key>TRN</key>
+                <value>@Model.PersonTrn</value>
+            </row>
+        </govuk-summary-list>
+    </div>
+</div>

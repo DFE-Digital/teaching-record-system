@@ -3,6 +3,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Pages.ApiKeys;
 using TeachingRecordSystem.SupportUi.Pages.ApplicationUsers;
 using TeachingRecordSystem.SupportUi.Pages.Mqs;
+using TeachingRecordSystem.SupportUi.Pages.OneLogins;
 using TeachingRecordSystem.SupportUi.Pages.Persons;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks;
@@ -41,6 +42,7 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
     public ApiKeysLinkGenerator ApiKeys => new(linkGenerator);
     public ApplicationUsersLinkGenerator ApplicationUsers => new(linkGenerator);
     public MqsLinkGenerator Mqs => new(linkGenerator);
+    public OneLoginsLinkGenerator OneLogins => new(linkGenerator);
     public PersonsLinkGenerator Persons => new(linkGenerator);
     public RoutesToProfessionalStatusLinkGenerator RoutesToProfessionalStatus => new(linkGenerator);
     public SupportTasksLinkGenerator SupportTasks => new(linkGenerator);
