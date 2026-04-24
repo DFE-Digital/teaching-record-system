@@ -13,7 +13,7 @@ public class SupportTaskStatusTagTagHelper : TagTagHelper
     {
         var tagClass = Status switch
         {
-            SupportTaskStatus.Open => "govuk-tag--yellow",
+            SupportTaskStatus.Open => "govuk-tag--grey",
             SupportTaskStatus.InProgress => "govuk-tag--blue",
             SupportTaskStatus.Closed => "govuk-tag--green",
             _ => throw new NotSupportedException()
