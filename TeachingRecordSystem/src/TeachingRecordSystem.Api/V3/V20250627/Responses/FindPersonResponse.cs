@@ -1,8 +1,8 @@
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20250627.Requests;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos;
+using NameInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.NameInfo;
 using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsStatus;
 using QtsInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.QtsInfo;
 
@@ -15,7 +15,6 @@ public record FindPersonResponse
     public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonsResultItem))]
 public record FindPersonResponseResult
 {
     public required string Trn { get; init; }
@@ -29,4 +28,19 @@ public record FindPersonResponseResult
     public required IReadOnlyCollection<Alert> Alerts { get; init; }
     public required InductionInfo? Induction { get; init; }
     public required QtlsStatus QtlsStatus { get; set; }
+
+    public static FindPersonResponseResult FromModel(FindPersonsResultItem r) => new()
+    {
+        Trn = r.Trn,
+        DateOfBirth = r.DateOfBirth,
+        FirstName = r.FirstName,
+        MiddleName = r.MiddleName,
+        LastName = r.LastName,
+        PreviousNames = r.PreviousNames.Select(n => new NameInfo { FirstName = n.FirstName, MiddleName = n.MiddleName, LastName = n.LastName }).ToArray(),
+        Qts = r.Qts.FromModel(),
+        Eyts = r.Eyts.FromModel(),
+        Alerts = r.Alerts.Select(a => a.FromModel()).ToArray(),
+        Induction = r.Induction.FromModel(),
+        QtlsStatus = (QtlsStatus)(int)r.QtlsStatus
+    };
 }

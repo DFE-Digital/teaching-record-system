@@ -4,11 +4,10 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260416.Dtos;
-
 namespace TeachingRecordSystem.Api.V3.V20260416.Controllers;
 
 [Route("trn-request")]
-public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
+public class TrnRequestController(ICommandDispatcher commandDispatcher, ICurrentUserProvider currentUserProvider) : ControllerBase
 {
     [HttpGet]
     [SwaggerOperation(
@@ -30,7 +29,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper 
             GetTrnRequestCommandOptions.SupportsDormantRequests | GetTrnRequestCommandOptions.SupportsRejectedRequests);
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+        return result.ToActionResult(r => Ok(r.FromModel()))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
     }
 
@@ -55,7 +54,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper 
         return result.ToActionResult(
                 r => StatusCode(
                     r.WasActivated ? StatusCodes.Status200OK : StatusCodes.Status204NoContent,
-                    mapper.Map<TrnRequestInfo>(r.TrnRequestInfo)))
+                    r.TrnRequestInfo.FromModel()))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
     }
 }

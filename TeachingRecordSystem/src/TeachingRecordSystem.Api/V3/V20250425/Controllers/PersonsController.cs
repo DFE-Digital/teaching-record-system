@@ -11,7 +11,7 @@ using Gender = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.Gender;
 namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 
 [Route("persons")]
-public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPut("{trn}/professional-statuses/{reference}")]
     [SwaggerOperation(
@@ -73,7 +73,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
             DateOfBirth = request.DateOfBirth,
             EmailAddress = request.EmailAddress,
             NationalInsuranceNumber = request.NationalInsuranceNumber,
-            Gender = request.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null
+            Gender = request.Gender is Gender gender ? (Core.Models.Gender)(int)gender : null
         };
 
         var result = await commandDispatcher.DispatchAsync(command);

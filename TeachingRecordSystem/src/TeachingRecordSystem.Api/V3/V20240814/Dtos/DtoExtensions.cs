@@ -1,3 +1,4 @@
+using CoreDqtInductionStatus = TeachingRecordSystem.Api.V3.Implementation.Dtos.DqtInductionStatus;
 using CoreDqtInductionStatusInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.DqtInductionStatusInfo;
 using CoreEytsInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.EytsInfo;
 using CoreQtsInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.QtsInfo;
@@ -24,15 +25,15 @@ public static class DqtInductionStatusInfoExtensions
         {
             Status = model.Status switch
             {
-                Implementation.Dtos.DqtInductionStatus.Exempt => DqtInductionStatus.Exempt,
-                Implementation.Dtos.DqtInductionStatus.Fail => DqtInductionStatus.Fail,
-                Implementation.Dtos.DqtInductionStatus.FailedInWales => DqtInductionStatus.FailedinWales,
-                Implementation.Dtos.DqtInductionStatus.InductionExtended => DqtInductionStatus.InductionExtended,
-                Implementation.Dtos.DqtInductionStatus.InProgress => DqtInductionStatus.InProgress,
-                Implementation.Dtos.DqtInductionStatus.NotYetCompleted => DqtInductionStatus.NotYetCompleted,
-                Implementation.Dtos.DqtInductionStatus.Pass => DqtInductionStatus.Pass,
-                Implementation.Dtos.DqtInductionStatus.PassedInWales => DqtInductionStatus.PassedinWales,
-                Implementation.Dtos.DqtInductionStatus.RequiredToComplete => DqtInductionStatus.RequiredtoComplete,
+                CoreDqtInductionStatus.Exempt => DqtInductionStatus.Exempt,
+                CoreDqtInductionStatus.Fail => DqtInductionStatus.Fail,
+                CoreDqtInductionStatus.FailedInWales => DqtInductionStatus.FailedinWales,
+                CoreDqtInductionStatus.InductionExtended => DqtInductionStatus.InductionExtended,
+                CoreDqtInductionStatus.InProgress => DqtInductionStatus.InProgress,
+                CoreDqtInductionStatus.NotYetCompleted => DqtInductionStatus.NotYetCompleted,
+                CoreDqtInductionStatus.Pass => DqtInductionStatus.Pass,
+                CoreDqtInductionStatus.PassedInWales => DqtInductionStatus.PassedinWales,
+                CoreDqtInductionStatus.RequiredToComplete => DqtInductionStatus.RequiredtoComplete,
                 _ => throw new ArgumentOutOfRangeException(nameof(model.Status))
             },
             StatusDescription = model.StatusDescription

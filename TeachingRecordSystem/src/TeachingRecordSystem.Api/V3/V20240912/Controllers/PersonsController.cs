@@ -9,7 +9,7 @@ using TeachingRecordSystem.Core.ApiSchema.V3.V20240912.Dtos;
 namespace TeachingRecordSystem.Api.V3.V20240912.Controllers;
 
 [Route("persons")]
-public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPut("{trn}/qtls")]
     [SwaggerOperation(
@@ -26,7 +26,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
         var command = new SetQtlsCommand(trn, request.QtsDate);
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<QtlsResponse>(r)))
+        return result.ToActionResult(r => Ok(r.FromModel()))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
@@ -42,7 +42,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     {
         var command = new GetQtlsCommand(trn);
         var result = await commandDispatcher.DispatchAsync(command);
-        return result.ToActionResult(r => Ok(mapper.Map<QtlsResponse>(r)))
+        return result.ToActionResult(r => Ok(r.FromModel()))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 }

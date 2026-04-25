@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20250327.Responses;
 namespace TeachingRecordSystem.Api.V3.V20250327.Controllers;
 
 [Route("persons")]
-public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -29,7 +29,6 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     {
         include ??= GetPersonRequestIncludes.None;
 
-        // For now we don't support both a DOB and NINO being passed
         if (dateOfBirth is not null && nationalInsuranceNumber is not null)
         {
             return BadRequest();
@@ -48,7 +47,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
         var result = await commandDispatcher.DispatchAsync(command);
 
         return result
-            .ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
+            .ToActionResult(r => Ok(GetPersonResponse.FromModel(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.RecordIsMerged, StatusCodes.Status404NotFound)
@@ -67,7 +66,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     {
         var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
         var result = await commandDispatcher.DispatchAsync(command);
-        return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
+        return result.ToActionResult(r => Ok(FindPersonsResponse.FromModel(r)));
     }
 
     [HttpGet("")]
@@ -88,7 +87,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
             {
                 Total = r.Total,
                 Query = request,
-                Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
+                Results = r.Items.Select(FindPersonResponseResult.FromModel).AsReadOnly()
             }));
     }
 }

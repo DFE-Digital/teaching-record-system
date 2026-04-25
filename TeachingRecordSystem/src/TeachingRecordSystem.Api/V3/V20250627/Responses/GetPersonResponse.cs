@@ -1,6 +1,7 @@
 using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos;
 using Alert = TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos.Alert;
 using EytsInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.EytsInfo;
@@ -12,7 +13,6 @@ using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.V
 
 namespace TeachingRecordSystem.Api.V3.V20250627.Responses;
 
-[AutoMap(typeof(GetPersonResult))]
 public record GetPersonResponse
 {
     public required string Trn { get; init; }
@@ -33,9 +33,36 @@ public record GetPersonResponse
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
     public required QtlsStatus QtlsStatus { get; init; }
+
+    public static GetPersonResponse FromModel(GetPersonResult r) => new()
+    {
+        Trn = r.Trn,
+        FirstName = r.FirstName,
+        MiddleName = r.MiddleName,
+        LastName = r.LastName,
+        DateOfBirth = r.DateOfBirth,
+        NationalInsuranceNumber = r.NationalInsuranceNumber,
+        PendingNameChange = r.PendingNameChange,
+        PendingDateOfBirthChange = r.PendingDateOfBirthChange,
+        EmailAddress = r.EmailAddress,
+        Qts = r.Qts.FromModel(),
+        Eyts = r.Eyts.FromModel(),
+        Induction = r.Induction.Map(i => i.FromModel()!),
+        RoutesToProfessionalStatuses = r.RoutesToProfessionalStatuses.Map(routes => routes.IsT0
+            ? OneOf<IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatus>, IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatusForAppropriateBody>>
+                .FromT0(routes.AsT0.Select(GetPersonResponseRouteToProfessionalStatus.FromModel).ToArray())
+            : OneOf<IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatus>, IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatusForAppropriateBody>>
+                .FromT1(routes.AsT1.Select(r2 => new GetPersonResponseRouteToProfessionalStatusForAppropriateBody
+                { TrainingProvider = r2.TrainingProvider.FromModel()! }).ToArray())),
+        MandatoryQualifications = r.MandatoryQualifications.MapItems(mq => new GetPersonResponseMandatoryQualification
+        { MandatoryQualificationId = mq.MandatoryQualificationId, EndDate = mq.EndDate, Specialism = mq.Specialism }),
+        Alerts = r.Alerts.MapItems(a => a.FromModel()),
+        PreviousNames = r.PreviousNames.MapItems(n => new NameInfo { FirstName = n.FirstName, MiddleName = n.MiddleName, LastName = n.LastName }),
+        AllowIdSignInWithProhibitions = r.AllowIdSignInWithProhibitions,
+        QtlsStatus = (QtlsStatus)(int)r.QtlsStatus
+    };
 }
 
-[AutoMap(typeof(GetPersonResultMandatoryQualification))]
 public record GetPersonResponseMandatoryQualification
 {
     public required Guid MandatoryQualificationId { get; init; }
@@ -43,7 +70,6 @@ public record GetPersonResponseMandatoryQualification
     public required string Specialism { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultRouteToProfessionalStatus))]
 public record GetPersonResponseRouteToProfessionalStatus
 {
     public required Guid RouteToProfessionalStatusId { get; init; }
@@ -58,15 +84,33 @@ public record GetPersonResponseRouteToProfessionalStatus
     public required TrainingProvider? TrainingProvider { get; init; }
     public required DegreeType? DegreeType { get; init; }
     public required GetPersonResponseProfessionalStatusInductionExemption InductionExemption { get; init; }
+
+    public static GetPersonResponseRouteToProfessionalStatus FromModel(GetPersonResultRouteToProfessionalStatus m) => new()
+    {
+        RouteToProfessionalStatusId = m.RouteToProfessionalStatusId,
+        RouteToProfessionalStatusType = m.RouteToProfessionalStatusType.FromModel(),
+        Status = (RouteToProfessionalStatusStatus)(int)m.Status,
+        HoldsFrom = m.HoldsFrom,
+        TrainingStartDate = m.TrainingStartDate,
+        TrainingEndDate = m.TrainingEndDate,
+        TrainingSubjects = m.TrainingSubjects.Select(s => s.FromModel()).ToArray(),
+        TrainingAgeSpecialism = m.TrainingAgeSpecialism.FromModel(),
+        TrainingCountry = m.TrainingCountry.FromModel(),
+        TrainingProvider = m.TrainingProvider.FromModel(),
+        DegreeType = m.DegreeType.FromModel(),
+        InductionExemption = new GetPersonResponseProfessionalStatusInductionExemption
+        {
+            IsExempt = m.InductionExemption.IsExempt,
+            ExemptionReasons = m.InductionExemption.ExemptionReasons.Select(r => r.FromModel()).ToArray()
+        }
+    };
 }
 
-[AutoMap(typeof(GetPersonResultRouteToProfessionalStatusForAppropriateBody))]
 public record GetPersonResponseRouteToProfessionalStatusForAppropriateBody
 {
     public required TrainingProvider TrainingProvider { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultRouteToProfessionalStatusInductionExemption))]
 public record GetPersonResponseProfessionalStatusInductionExemption
 {
     public required bool IsExempt { get; init; }

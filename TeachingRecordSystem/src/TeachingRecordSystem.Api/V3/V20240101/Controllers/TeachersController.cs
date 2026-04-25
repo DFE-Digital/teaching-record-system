@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240101.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
 [Route("teachers")]
-public class TeachersController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class TeachersController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -37,7 +37,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<GetTeacherResponse>(r)))
+        return result.ToActionResult(r => Ok(GetTeacherResponse.FromModel(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.RecordIsMerged, StatusCodes.Status404NotFound);
@@ -113,7 +113,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
             {
                 Total = r.Total,
                 Query = request,
-                Results = r.Items.Select(mapper.Map<FindTeachersResponseResult>).AsReadOnly()
+                Results = r.Items.Select(FindTeachersResponseResult.FromModel).AsReadOnly()
             }));
     }
 }

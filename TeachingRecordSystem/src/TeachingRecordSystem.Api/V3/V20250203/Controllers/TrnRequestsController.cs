@@ -4,6 +4,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20250203.Requests;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos;
 using Gender = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.Gender;
 using TrnRequestInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos.TrnRequestInfo;
 
@@ -11,7 +12,7 @@ namespace TeachingRecordSystem.Api.V3.V20250203.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.CreateTrn)]
-public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class TrnRequestsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPost("")]
     [SwaggerOperation(
@@ -39,12 +40,12 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber,
             IdentityVerified = request.IdentityVerified,
             OneLoginUserSubject = request.OneLoginUserSubject,
-            Gender = request.Person.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null
+            Gender = request.Person.Gender is Gender gender ? (Core.Models.Gender)(int)gender : null
         };
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+        return result.ToActionResult(r => Ok(r.FromModel()))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestAlreadyCreated, StatusCodes.Status409Conflict);
     }
 }
