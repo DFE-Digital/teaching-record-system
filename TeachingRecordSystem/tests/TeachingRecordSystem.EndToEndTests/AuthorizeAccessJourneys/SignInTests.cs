@@ -577,7 +577,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
             return trnRequest.RequestId;
         });
 
-        await page.ClickGovUkButtonAsync("You can return to the Test App (Deferred Matching) service.");
+        await page.GetByTestId("continue-link").ClickAsync();
 
         await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
     }
