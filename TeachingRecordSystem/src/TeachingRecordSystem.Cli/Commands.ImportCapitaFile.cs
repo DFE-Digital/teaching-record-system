@@ -1,4 +1,3 @@
-using Azure.Identity;
 using Azure.Storage.Files.DataLake;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -62,8 +61,7 @@ public static partial class Commands
                 .BuildServiceProvider();
 
             var notNeededDatalakeClient = new DataLakeServiceClient(
-                new Uri("https://notused.invalid"),
-                new DefaultAzureCredential());
+                new Uri("https://notused.invalid"));
 
             var job = ActivatorUtilities.CreateInstance<CapitaImportJob>(services,
                 notNeededDatalakeClient,
