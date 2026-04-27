@@ -18,6 +18,7 @@ public enum OneLoginUserNotConnectingReason
 {
     [Display(Name = "There is no matching record")]
     NoMatchingRecord,
+    [Obsolete("This option is no longer presented to users but may exist in historical data")]
     [Display(Name = "The details only partly match a record")]
     DetailsOnlyPartlyMatch,
     [Display(Name = "Another reason")]

@@ -24,11 +24,11 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
 
                 // Assert
                 var doc = await AssertEx.HtmlResponseAsync(response);
-                Assert.Null(doc.QuerySelector("form button[type='submit']"));
+                Assert.Null(doc.QuerySelector("a[data-testid='continue-link']"));
             });
 
     [Fact]
-    public async Task Get_WithDeferredRecordMatchingAndAuthenticationTicket_ShowsReturnToServiceButton()
+    public async Task Get_WithDeferredRecordMatchingAndAuthenticationTicket_ShowsReturnToServiceLink()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true, recordMatchingPolicy: RecordMatchingPolicy.Deferred);
@@ -49,35 +49,9 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 // Assert
                 var doc = await AssertEx.HtmlResponseAsync(response);
 
-                var returnButton = doc.QuerySelector("form button[type='submit']");
-                Assert.NotNull(returnButton);
-                Assert.Contains("Test Service", returnButton.TextContent);
-            });
-    }
-
-    [Fact]
-    public async Task Post_WithAuthenticationTicket_RedirectsToCallbackUri()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true, recordMatchingPolicy: RecordMatchingPolicy.Deferred);
-
-        await WithJourneyCoordinatorAsync(
-            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", applicationUser.UserId, null, null, RecordMatchingPolicy.Deferred),
-            async coordinator =>
-            {
-                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-
-                await SetupInstanceStateWithAuthenticationTicketAsync(coordinator, oneLoginUser, applicationUser);
-
-                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.RequestSubmitted(coordinator.InstanceId));
-
-                // Act
-                var response = await HttpClient.SendAsync(request);
-
-                // Assert
-                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-                Assert.NotNull(response.Headers.Location);
-                Assert.Equal(coordinator.State.RedirectUri, response.Headers.Location.OriginalString);
+                var returnLink = doc.QuerySelector("a[data-testid='continue-link']");
+                Assert.NotNull(returnLink);
+                Assert.Contains("Test Service", returnLink.TextContent);
             });
     }
 

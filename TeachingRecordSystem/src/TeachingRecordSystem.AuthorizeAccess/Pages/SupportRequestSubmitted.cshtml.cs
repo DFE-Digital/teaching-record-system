@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
@@ -12,8 +11,5 @@ public class SupportRequestSubmittedModel(SignInJourneyCoordinator coordinator) 
 
     public string ServiceName => coordinator.State.ServiceName;
 
-    public IActionResult OnPost()
-    {
-        return coordinator.GetNextPage().ToActionResult();
-    }
+    public string ContinueToApplicationUrl => coordinator.Links.ContinueToApplication();
 }
