@@ -7,11 +7,14 @@ public class AddAnalyticsDataMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context, IJourneyInstanceProvider journeyInstanceProvider)
     {
-        var coordinator = journeyInstanceProvider.GetSignInJourneyCoordinator(context);
-
-        if (coordinator is not null && context.GetWebRequestEvent() is Event webRequestEvent)
+        if (context.Session.IsAvailable)
         {
-            webRequestEvent.Data[DfeAnalyticsEventDataKeys.ApplicationUserId] = [coordinator.State.ClientApplicationUserId.ToString()];
+            var coordinator = journeyInstanceProvider.GetSignInJourneyCoordinator(context);
+
+            if (coordinator is not null && context.GetWebRequestEvent() is Event webRequestEvent)
+            {
+                webRequestEvent.Data[DfeAnalyticsEventDataKeys.ApplicationUserId] = [coordinator.State.ClientApplicationUserId.ToString()];
+            }
         }
 
         await next(context);
