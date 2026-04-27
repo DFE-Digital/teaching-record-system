@@ -40,8 +40,8 @@ public partial class TestData
                 PersonEmailAddress = personEmailAddress,
                 EmployerPostcode = employerPostcode,
                 EmployerEmailAddress = employerEmailAddress,
-                CreatedOn = Clock.UtcNow,
-                UpdatedOn = Clock.UtcNow,
+                CreatedOn = TimeProvider.UtcNow,
+                UpdatedOn = TimeProvider.UtcNow,
                 Key = key
             };
 

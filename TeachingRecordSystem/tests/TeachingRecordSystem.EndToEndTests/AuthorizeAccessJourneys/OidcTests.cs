@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
+namespace TeachingRecordSystem.EndToEndTests.AuthorizeAccessJourneys;
 
 public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
@@ -20,7 +20,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = await context.NewPageAsync();
 
         // Act
-        await page.GotoAsync("/oidc-test");
+        await page.GotoAsync($"{AuthorizeAccessBaseUrl}/oidc-test");
         await page.ClickButtonAsync("Start");
         await page.WaitForUrlPathAsync("/oidc-test/signed-in");
 
@@ -57,7 +57,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GotoAsync("/oidc-test");
+        await page.GotoAsync($"{AuthorizeAccessBaseUrl}/oidc-test");
         await page.ClickGovUkButtonAsync("Start");
         await page.WaitForUrlPathAsync("/oidc-test/signed-in");
 

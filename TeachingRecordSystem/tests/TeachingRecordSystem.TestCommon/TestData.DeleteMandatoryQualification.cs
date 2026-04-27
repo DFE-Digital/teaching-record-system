@@ -14,7 +14,7 @@ public partial class TestData
     {
         return WithDbContextAsync(async dbContext =>
         {
-            var now = Clock.UtcNow;
+            var now = TimeProvider.UtcNow;
 
             var qualification = await dbContext.MandatoryQualifications
                 .Include(q => q.Provider)

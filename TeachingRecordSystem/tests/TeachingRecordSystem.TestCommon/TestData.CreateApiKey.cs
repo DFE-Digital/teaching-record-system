@@ -8,14 +8,14 @@ public partial class TestData
 {
     public Task<ApiKey> CreateApiKeyAsync(Guid applicationUserId, bool expired = false) => WithDbContextAsync(async dbContext =>
     {
-        var expires = expired ? Clock.UtcNow.AddMinutes(-1) : (DateTime?)null;
+        var expires = expired ? TimeProvider.UtcNow.AddMinutes(-1) : (DateTime?)null;
 
         var apiKey = new ApiKey()
         {
             ApiKeyId = Guid.NewGuid(),
             ApplicationUserId = applicationUserId,
-            CreatedOn = Clock.UtcNow,
-            UpdatedOn = Clock.UtcNow,
+            CreatedOn = TimeProvider.UtcNow,
+            UpdatedOn = TimeProvider.UtcNow,
             Key = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)),
             Expires = expires
         };
@@ -25,7 +25,7 @@ public partial class TestData
         var @event = new ApiKeyCreatedEvent()
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = SystemUser.SystemUserId,
             ApiKey = EventModels.ApiKey.FromModel(apiKey)
         };

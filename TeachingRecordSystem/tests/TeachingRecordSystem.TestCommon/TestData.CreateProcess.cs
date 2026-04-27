@@ -22,8 +22,8 @@ public partial class TestData
             {
                 ProcessId = Guid.NewGuid(),
                 ProcessType = processType,
-                CreatedOn = Clock.UtcNow,
-                UpdatedOn = Clock.UtcNow,
+                CreatedOn = TimeProvider.UtcNow,
+                UpdatedOn = TimeProvider.UtcNow,
                 UserId = userId ?? SystemUser.SystemUserId,
                 DqtUserId = null,
                 DqtUserName = null,
@@ -43,7 +43,7 @@ public partial class TestData
                     Payload = @event,
                     PersonIds = @event.PersonIds,
                     OneLoginUserSubjects = @event.OneLoginUserSubjects,
-                    CreatedOn = Clock.UtcNow
+                    CreatedOn = TimeProvider.UtcNow
                 });
             }
 

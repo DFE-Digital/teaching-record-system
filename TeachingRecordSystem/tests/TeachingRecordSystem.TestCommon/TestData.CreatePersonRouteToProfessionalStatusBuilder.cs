@@ -175,7 +175,7 @@ public partial class TestData
                 degreeTypeId: _degreeTypeId,
                 isExemptFromInduction: _exemptFromInduction,
                 createdBy: _createdByUser,
-                now: testData.Clock.UtcNow,
+                now: testData.TimeProvider.UtcNow,
                 changeReason: _changeReason,
                 changeReasonDetail: _changeReasonDetail,
                 evidenceFile: _evidenceFile,

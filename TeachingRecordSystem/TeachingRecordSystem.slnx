@@ -28,10 +28,10 @@
   <Folder Name="/tests/">
     <Project Path="tests/TeachingRecordSystem.Api.IntegrationTests/TeachingRecordSystem.Api.IntegrationTests.csproj" />
     <Project Path="tests/TeachingRecordSystem.Api.UnitTests/TeachingRecordSystem.Api.UnitTests.csproj" />
-    <Project Path="tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests.csproj" />
     <Project Path="tests/TeachingRecordSystem.AuthorizeAccess.Tests/TeachingRecordSystem.AuthorizeAccess.Tests.csproj" />
     <Project Path="tests/TeachingRecordSystem.Cli.Tests/TeachingRecordSystem.Cli.Tests.csproj" />
     <Project Path="tests/TeachingRecordSystem.Core.Tests/TeachingRecordSystem.Core.Tests.csproj" />
+    <Project Path="tests/TeachingRecordSystem.EndToEndTests/TeachingRecordSystem.EndToEndTests.csproj" />
     <Project Path="tests/TeachingRecordSystem.SupportUi.EndToEndTests/TeachingRecordSystem.SupportUi.EndToEndTests.csproj" />
     <Project Path="tests/TeachingRecordSystem.SupportUi.Tests/TeachingRecordSystem.SupportUi.Tests.csproj" />
     <Project Path="tests/TeachingRecordSystem.TestCommon/TeachingRecordSystem.TestCommon.csproj" />

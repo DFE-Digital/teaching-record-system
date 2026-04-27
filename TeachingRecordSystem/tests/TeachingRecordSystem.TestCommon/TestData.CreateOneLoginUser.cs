@@ -49,7 +49,7 @@ public partial class TestData
             if (verifiedInfo is not null)
             {
                 user.SetVerified(
-                    Clock.UtcNow,
+                    TimeProvider.UtcNow,
                     OneLoginUserVerificationRoute.OneLogin,
                     verifiedByApplicationUserId: null,
                     [verifiedInfo.Value.Name],
@@ -59,7 +59,7 @@ public partial class TestData
 
             if (personId is not null)
             {
-                user.SetMatched(Clock.UtcNow, personId.Value, OneLoginUserMatchRoute.Automatic, matchedAttributes: null);
+                user.SetMatched(TimeProvider.UtcNow, personId.Value, OneLoginUserMatchRoute.Automatic, matchedAttributes: null);
             }
 
             dbContext.OneLoginUsers.Add(user);

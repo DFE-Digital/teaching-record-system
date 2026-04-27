@@ -3,11 +3,13 @@ using System.Security.Claims;
 using GovUk.OneLogin.AspNetCore;
 using GovUk.Questions.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using TeachingRecordSystem.AuthorizeAccess;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
 
-namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
+namespace TeachingRecordSystem.EndToEndTests.Infrastructure.Security;
 
 public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider, IJourneyInstanceProvider journeyInstanceProvider) :
     IAuthenticationHandler, IAuthenticationSignOutHandler

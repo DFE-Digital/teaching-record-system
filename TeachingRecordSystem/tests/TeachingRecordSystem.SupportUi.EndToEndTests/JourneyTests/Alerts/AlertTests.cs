@@ -193,12 +193,12 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task EditAlertEndDate()
     {
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var endDate = TestData.Clock.Today.AddDays(-10);
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
+        var endDate = TestData.TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
-        var newEndDate = TestData.Clock.Today.AddDays(-5);
+        var newEndDate = TestData.TimeProvider.Today.AddDays(-5);
         var reason = AlertChangeEndDateReasonOption.AnotherReason;
         var reasonDetail = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
@@ -247,7 +247,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public async Task EditAlertLink(bool hasCurrentLink)
     {
-        var startDate = TestData.Clock.Today.AddDays(-50);
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
         var link = hasCurrentLink ? TestData.GenerateUrl() : null;
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithExternalLink(link)));
         var personId = person.PersonId;
@@ -308,11 +308,11 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task CloseAlert()
     {
-        var startDate = TestData.Clock.Today.AddDays(-50);
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
-        var newEndDate = TestData.Clock.Today.AddDays(-5);
+        var newEndDate = TestData.TimeProvider.Today.AddDays(-5);
         var changeReason = CloseAlertReasonOption.AlertPeriodHasEnded;
         var changeReasonDetail = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
@@ -359,8 +359,8 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task ReopenAlert()
     {
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var endDate = TestData.Clock.Today.AddDays(-10);
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
+        var endDate = TestData.TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
@@ -404,8 +404,8 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task DeleteAlert()
     {
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var endDate = TestData.Clock.Today.AddDays(-10);
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
+        var endDate = TestData.TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;

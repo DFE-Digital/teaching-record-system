@@ -1,9 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright;
 using Optional;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 
-namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
+namespace TeachingRecordSystem.EndToEndTests.AuthorizeAccessJourneys;
 
 public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
@@ -17,7 +18,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/not-verified");
     }
@@ -35,7 +36,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
         await page.ClickGovUkButtonAsync("Find your teaching record");
@@ -64,7 +65,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
         await page.ClickGovUkButtonAsync("Find your teaching record");
@@ -98,7 +99,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
         await page.ClickGovUkButtonAsync("Find your teaching record");
@@ -131,7 +132,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
         await page.ClickGovUkButtonAsync("Find your teaching record");
@@ -168,7 +169,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
         await page.ClickGovUkButtonAsync("Find your teaching record");
@@ -196,14 +197,14 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var trnToken = Guid.NewGuid().ToString();
 
-        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        using (var idDbContext = HostFixture.AuthorizeAccessHostServices.GetRequiredService<IdDbContext>())
         {
             idDbContext.TrnTokens.Add(new IdTrnToken()
             {
                 TrnToken = trnToken,
                 Trn = person.Trn,
-                CreatedUtc = Clock.UtcNow,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                CreatedUtc = TimeProvider.UtcNow,
+                ExpiresUtc = TimeProvider.UtcNow.AddDays(1),
                 Email = email,
                 UserId = null
             });
@@ -214,7 +215,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync(trnToken: trnToken);
+        await page.GoToAuthorizeAccessTestStartPageAsync(trnToken: trnToken);
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -229,7 +230,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
 
-        using (var scope = HostFixture.Services.CreateScope())
+        using (var scope = HostFixture.AuthorizeAccessHostServices.CreateScope())
         {
             using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
 
@@ -239,8 +240,8 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EmailAddress = email,
                 FirstName = person.FirstName,
                 LastName = person.LastName,
-                Created = Clock.UtcNow,
-                Updated = Clock.UtcNow,
+                Created = TimeProvider.UtcNow,
+                Updated = TimeProvider.UtcNow,
                 UserType = IdModelTypes.UserType.Teacher,
                 TrnVerificationLevel = TrnVerificationLevel.Medium,
                 Trn = person.Trn
@@ -252,7 +253,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -267,7 +268,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
 
-        using (var scope = HostFixture.Services.CreateScope())
+        using (var scope = HostFixture.AuthorizeAccessHostServices.CreateScope())
         {
             using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
 
@@ -277,8 +278,8 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EmailAddress = email,
                 FirstName = person.FirstName,
                 LastName = person.LastName,
-                Created = Clock.UtcNow,
-                Updated = Clock.UtcNow,
+                Created = TimeProvider.UtcNow,
+                Updated = TimeProvider.UtcNow,
                 UserType = IdModelTypes.UserType.Teacher,
                 TrnVerificationLevel = TrnVerificationLevel.Low,
                 TrnAssociationSource = TrnAssociationSource.TrnToken,
@@ -291,7 +292,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -306,7 +307,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
 
-        using (var scope = HostFixture.Services.CreateScope())
+        using (var scope = HostFixture.AuthorizeAccessHostServices.CreateScope())
         {
             using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
 
@@ -316,8 +317,8 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EmailAddress = email,
                 FirstName = person.FirstName,
                 LastName = person.LastName,
-                Created = Clock.UtcNow,
-                Updated = Clock.UtcNow,
+                Created = TimeProvider.UtcNow,
+                Updated = TimeProvider.UtcNow,
                 UserType = IdModelTypes.UserType.Teacher,
                 TrnVerificationLevel = TrnVerificationLevel.Low,
                 TrnAssociationSource = TrnAssociationSource.SupportUi,
@@ -330,7 +331,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -346,7 +347,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -369,7 +370,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.AssertSignedInAsync(person.Trn);
     }
@@ -393,7 +394,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.PauseAsync();
         await page.AssertSignedInAsync(person.Trn);
@@ -410,7 +411,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/pending-support-request");
     }
@@ -425,7 +426,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync();
+        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/not-verified");
         await page.ClickButtonAsync("Verify using my personal details");
@@ -483,7 +484,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync(deferred: true);
+        await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
 
         await page.WaitForUrlPathAsync("/connect");
         await page.ClickGovUkButtonAsync("Find your teaching record");
@@ -529,7 +530,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPageAsync(deferred: true);
+        await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
 
         await page.WaitForUrlPathAsync("/connect");
         await page.ClickGovUkButtonAsync("Find your teaching record");

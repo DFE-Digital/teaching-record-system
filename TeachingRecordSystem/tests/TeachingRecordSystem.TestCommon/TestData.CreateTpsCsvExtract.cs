@@ -74,7 +74,7 @@ public partial class TestData
 
             _tpsCsvExtractId ??= Guid.NewGuid();
             _filename ??= "test.csv";
-            var createdOn = testData.Clock.UtcNow;
+            var createdOn = testData.TimeProvider.UtcNow;
 
             var tpsCsvExtract = new TpsCsvExtract
             {

@@ -189,7 +189,7 @@ public partial class TestData
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
             var gender = _gender.ValueOr(testData.GenerateGender());
-            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+            var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
 
             var matchedPersons = _matchedPersonIds.ValueOrDefault();
 

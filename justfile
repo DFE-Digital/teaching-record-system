@@ -21,9 +21,9 @@ restore:
   @dotnet restore --locked-mode
 
 # Install Playwright
-[working-directory: 'TeachingRecordSystem/tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests']
-install-playwright:
-  @pwsh -nop -c bin/Debug/net10.0/playwright.ps1 install chromium
+[working-directory: 'TeachingRecordSystem/tests/TeachingRecordSystem.EndToEndTests']
+install-playwright *ARGS:
+  @pwsh -nop -c bin/Debug/net10.0/playwright.ps1 install
 
 # Run the trscli
 cli *ARGS:

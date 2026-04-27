@@ -35,13 +35,13 @@ public static class Utils
         if (changedFiles.Any(f => f.Contains("TeachingRecordSystem.SupportUi")))
         {
             projectList.Add("TeachingRecordSystem.SupportUi.Tests");
-            projectList.Add("TeachingRecordSystem.SupportUi.EndToEndTests");
+            projectList.Add("TeachingRecordSystem.EndToEndTests");
         }
 
         if (changedFiles.Any(f => f.Contains("TeachingRecordSystem.AuthorizeAccess")))
         {
             projectList.Add("TeachingRecordSystem.AuthorizeAccess.Tests");
-            projectList.Add("TeachingRecordSystem.AuthorizeAccess.EndToEndTests");
+            projectList.Add("TeachingRecordSystem.EndToEndTests");
         }
 
         return projectList;

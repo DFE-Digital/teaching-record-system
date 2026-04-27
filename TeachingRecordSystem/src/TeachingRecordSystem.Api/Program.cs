@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.Api;
 using TeachingRecordSystem.Api.Endpoints;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Middleware;
@@ -8,54 +7,62 @@ using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 
 [assembly: ApiController]
 
-var builder = WebApplication.CreateBuilder(args);
+namespace TeachingRecordSystem.Api;
 
-builder.WebHost.UseDefaultServiceProvider(options =>
+public class Program
 {
-    options.ValidateOnBuild = true;
-    options.ValidateScopes = true;
-});
+#pragma warning disable VSTHRD200
+    public static async Task Main(string[] args)
+#pragma warning restore VSTHRD200
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
+        builder.WebHost.UseDefaultServiceProvider(options =>
+        {
+            options.ValidateOnBuild = true;
+            options.ValidateScopes = true;
+        });
 
-builder.ConfigureLogging((config, services) =>
-{
-    config.Enrich.With(ActivatorUtilities.CreateInstance<AddUserIdLogEventEnricher>(services));
-});
+        builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
-builder
-    .AddServiceDefaults(dataProtectionBlobName: "Api", cacheTableName: "api")
-    .AddCoreServices()
-    .AddApiServices();
+        builder.ConfigureLogging((config, services) =>
+        {
+            config.Enrich.With(ActivatorUtilities.CreateInstance<AddUserIdLogEventEnricher>(services));
+        });
 
-var app = builder.Build();
+        builder
+            .AddServiceDefaults(dataProtectionBlobName: "Api", cacheTableName: "api")
+            .AddCoreServices()
+            .AddApiServices();
 
-app.MapDefaultEndpoints();
+        var app = builder.Build();
 
-app.UseMiddleware<AssignRequestedVersionMiddleware>();
+        app.MapDefaultEndpoints();
 
-app.UseRouting();
-app.UseTransactions();
+        app.UseMiddleware<AssignRequestedVersionMiddleware>();
 
-app.UseAuthentication();
-app.UseAuthorization();
+        app.UseRouting();
+        app.UseTransactions();
 
-if (builder.Environment.IsProduction())
-{
-    // Apply rate limiting to authenticated endpoints
-    // (i.e. everywhere except health check, status endpoints etc.)
-    app.UseWhen(ctx => ctx.User.Identity?.IsAuthenticated == true, x => x.UseRateLimiter());
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        if (builder.Environment.IsProduction())
+        {
+            // Apply rate limiting to authenticated endpoints
+            // (i.e. everywhere except health check, status endpoints etc.)
+            app.UseWhen(ctx => ctx.User.Identity?.IsAuthenticated == true, x => x.UseRateLimiter());
+        }
+
+        app.MapWebhookJwks();
+
+        app.MapControllers();
+
+        if (builder.Environment.IsDevelopment())
+        {
+            app.UseMigrationsEndPoint();
+        }
+
+        await app.RunAsync();
+    }
 }
-
-app.MapWebhookJwks();
-
-app.MapControllers();
-
-if (builder.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-
-app.Run();
-
-public partial class Program;

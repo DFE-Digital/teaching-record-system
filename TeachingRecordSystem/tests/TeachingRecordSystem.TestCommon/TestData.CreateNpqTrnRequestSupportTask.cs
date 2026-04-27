@@ -189,7 +189,7 @@ public partial class TestData
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOrDefault();
             var gender = _gender.ValueOrDefault();
-            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+            var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
             var npqApplicationId = _npqApplicationId.ValueOr(testData.GenerateNpqApplicationId());
             var npqIsInEducationalSetting = _npqIsInEducationalSetting.ValueOr(Faker.Boolean.Random);
             var npqName = _npqName.ValueOr(Faker.Name.Last);
