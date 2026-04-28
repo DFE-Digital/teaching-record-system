@@ -14,5 +14,5 @@ public record FindPersonRequest
 
 public enum FindPersonFindBy
 {
-    LastNameAndDateOfBirth = 1
+    LastNameAndDateOfBirth = 0
 }
