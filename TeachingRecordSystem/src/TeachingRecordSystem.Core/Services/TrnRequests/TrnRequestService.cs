@@ -154,9 +154,9 @@ public class TrnRequestService(
         bool publishTrnRequestUpdatedEvent,
         ProcessContext processContext)
     {
-        if (trnRequest.Status is not TrnRequestStatus.Pending)
+        if (trnRequest.Status is not (TrnRequestStatus.Pending or TrnRequestStatus.Dormant))
         {
-            throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be completed.");
+            throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} or {TrnRequestStatus.Dormant} requests can be completed.");
         }
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
