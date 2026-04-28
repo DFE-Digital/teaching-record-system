@@ -47,15 +47,6 @@ public class CheckAnswersModel(
 
         if (IdentityVerified)
         {
-            if (state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
-            {
-                await coordinator.UpdateStateAsync(async state =>
-                {
-                    trnRequestId = await coordinator.CompleteWithDeferredMatchingAsync(state);
-                    return state;
-                });
-            }
-
             supportTask = await oneLoginUserMatchingSupportTaskService.CreateRecordMatchingSupportTaskAsync(
                 new CreateOneLoginUserRecordMatchingSupportTaskOptions
                 {
