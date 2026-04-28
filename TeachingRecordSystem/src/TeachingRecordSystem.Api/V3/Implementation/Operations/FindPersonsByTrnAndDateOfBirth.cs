@@ -18,7 +18,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
             .ToArray();
 
         var persons = await DbContext.Persons
-            .Where(p => trns.Contains(p.Trn))
+            .Where(p => trns.Contains(p.Trn) && p.DateOfBirth != null)
             .Select(p => new { p.PersonId, p.DateOfBirth, p.Trn })
             .ToArrayAsync();
 
