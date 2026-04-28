@@ -5,6 +5,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -36,6 +38,10 @@ public abstract class TestBase
     protected CaptureEventObserver EventObserver => TestScopedServices.GetCurrent().EventObserver;
 
     protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
+
+    protected OneLoginUserMatchingSupportTaskService OneLoginSupportTaskService => HostFixture.Services.GetRequiredService<OneLoginUserMatchingSupportTaskService>();
+
+    protected OneLoginService OneLoginService => HostFixture.Services.GetRequiredService<OneLoginService>();
 
     protected Mock<IAadUserService> AzureActiveDirectoryUserServiceMock =>
         TestScopedServices.GetCurrent().AzureActiveDirectoryUserServiceMock;

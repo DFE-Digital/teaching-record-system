@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 
@@ -40,7 +41,15 @@ public class CheckAnswers(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, timeProvider.UtcNow, User.GetUserId());
+        var changeReason = new ChangeReasonWithDetailsAndEvidence()
+        {
+            Reason = Reason?.GetDisplayName(),
+            Details = JourneyInstance!.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason
+                ? JourneyInstance.State.Detail
+                : null,
+            EvidenceFile = null
+        };
+        var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, timeProvider.UtcNow, User.GetUserId(), changeReason: changeReason);
         var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
         if (JourneyInstance!.State.StayVerified == DisconnectOneLoginStayVerified.Yes)
         {
