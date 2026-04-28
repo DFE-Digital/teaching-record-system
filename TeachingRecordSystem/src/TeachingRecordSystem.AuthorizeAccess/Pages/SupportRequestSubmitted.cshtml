@@ -30,9 +30,9 @@
 
         @if (Model.CanReturnToService)
         {
-            <form method="post">
-                <govuk-button type="submit">You can return to the @Model.ServiceName service.</govuk-button>
-            </form>
+            <p class="govuk-body">
+                You can return to the <a href="@Model.ContinueToApplicationUrl" class="govuk-link" data-testid="continue-link">@Model.ServiceName</a> service.
+            </p>
         }
     </div>
 </div>
