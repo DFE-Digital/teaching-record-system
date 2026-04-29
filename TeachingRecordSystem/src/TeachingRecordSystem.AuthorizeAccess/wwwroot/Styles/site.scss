@@ -18,4 +18,8 @@
   cursor: pointer;
   padding: 0;
   @include govuk-font($size: 19);
+
+  &:hover {
+    color: govuk-colour("light-grey");
+  }
 }
