@@ -81,7 +81,8 @@ public class ChangeHistoryModel(
             nameof(LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent),
             nameof(LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent),
             nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent),
-            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent)
+            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent),
+            nameof(OneLoginUserUpdatedEvent)
         };
 
         var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert", StringComparison.Ordinal)).ToArray();
@@ -152,7 +153,11 @@ public class ChangeHistoryModel(
             ProcessType.PersonMergingInDqt,
             ProcessType.AlertCreating,
             ProcessType.AlertUpdating,
-            ProcessType.AlertDeleting
+            ProcessType.AlertDeleting,
+            ProcessType.PersonOneLoginUserDisconnecting,
+            ProcessType.PersonOneLoginUserConnecting,
+            ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting,
+            ProcessType.OneLoginUserIdVerificationSupportTaskCompleting,
         };
 
         var processes = await dbContext.Processes

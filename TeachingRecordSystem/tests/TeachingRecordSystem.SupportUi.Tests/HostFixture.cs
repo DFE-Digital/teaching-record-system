@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Tests;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -92,7 +94,9 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                     .AddSingleton<INotificationSender, NoopNotificationSender>()
                     .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()
-                    .AddStartupTask<AddTestRouteTypesStartupTask>();
+                    .AddStartupTask<AddTestRouteTypesStartupTask>()
+                    .AddOneLoginService()
+                    .AddSupportTaskServices();
 
                 TestScopedServices.ConfigureServices(services);
             });
