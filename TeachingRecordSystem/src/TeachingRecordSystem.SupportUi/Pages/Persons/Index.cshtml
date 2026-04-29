@@ -70,7 +70,7 @@
             </form>
         </div>
 
-        <table class="govuk-table govuk-!-margin-top-4">
+        <table class="govuk-table govuk-!-margin-top-4 trs-table-layout-fixed">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
@@ -78,10 +78,10 @@
                         link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.Name, direction))">
                         Name
                     </th>
-                    <th scope="col" class="govuk-table__header"
+                    <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == PersonSearchSortByOption.OneLoginEmailAddress ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.OneLoginEmailAddress, direction))">
-                        One Login email address(es)
+                        One Login email address
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == PersonSearchSortByOption.DateOfBirth ? Model.SortDirection : null)"
@@ -118,7 +118,7 @@
                     {
                         <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
                             <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.Persons.PersonDetail.Index(personInfo.PersonId)" class="govuk-link">@personInfo.Name</a></td>
-                            <td class="govuk-table__cell" data-testid="one-login-emails" use-empty-fallback>
+                            <td class="govuk-table__cell trs-break-word" data-testid="one-login-emails" use-empty-fallback>
                                 @if (personInfo.OneLoginUserEmailAddresses.Length > 0)
                                 {
                                     <ul class="govuk-list">
