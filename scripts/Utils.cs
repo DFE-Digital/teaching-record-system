@@ -35,6 +35,7 @@ public static class Utils
         if (changedFiles.Any(f => f.Contains("TeachingRecordSystem.SupportUi")))
         {
             projectList.Add("TeachingRecordSystem.SupportUi.Tests");
+            projectList.Add("TeachingRecordSystem.SupportUi.EndToEndTests");
             projectList.Add("TeachingRecordSystem.EndToEndTests");
         }
 
