@@ -98,11 +98,11 @@
       },
       "EntityFrameworkCore.Projectables": {
         "type": "Direct",
-        "requested": "[6.0.2, )",
-        "resolved": "6.0.2",
-        "contentHash": "J618uJR/TxwdROZ9on4kOC7IFnR6y56m3sym4JWABg1ZOkNQdC9c0BC51lff9VoYGv1Z5OCPCLG5CmHMU/WYuQ==",
+        "requested": "[6.0.3, )",
+        "resolved": "6.0.3",
+        "contentHash": "gisCNuoLYfSd4A2Mp6ZkwRDe1woSNaWWVRKzc01SHzjuHrsil7kqjT35vLRUPWRMpY2yTxrfHyzPUxjzf7VfpA==",
         "dependencies": {
-          "EntityFrameworkCore.Projectables.Abstractions": "6.0.2",
+          "EntityFrameworkCore.Projectables.Abstractions": "6.0.3",
           "Microsoft.EntityFrameworkCore": "10.0.0"
         }
       },
@@ -571,8 +571,8 @@
       },
       "EntityFrameworkCore.Projectables.Abstractions": {
         "type": "Transitive",
-        "resolved": "6.0.2",
-        "contentHash": "lf4S1VQKmypmV68xNb5pDc2STT4eOu5k5CJlstGPjgi8I+V6ChtQ8F71AgVIqWujaoIxuDkseXk5p7pDEYINgA=="
+        "resolved": "6.0.3",
+        "contentHash": "IzghQ95dPm4CeI4sDvNmgk4PJAOTahpJ/wZD7HVeTS9DxE/8c0pQ/CpzPdcsEFNVXu8YJICceqCcJouHx2d95g=="
       },
       "Google.Api.Gax": {
         "type": "Transitive",
