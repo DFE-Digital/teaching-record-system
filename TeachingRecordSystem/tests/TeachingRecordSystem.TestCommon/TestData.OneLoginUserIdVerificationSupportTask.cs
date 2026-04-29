@@ -104,7 +104,7 @@ public partial class TestData
                 var statedLastName = _statedLastName.ValueOr(testData.GenerateLastName);
                 var statedDateOfBirth = _statedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
                 var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
-                var statedTrn = _statedTrn.HasValue ? _statedTrn.ValueOrDefault() : await testData.GenerateTrnAsync();
+                var statedTrn = _statedTrn.HasValue ? _statedTrn.ValueOrDefault() : "0000000";
                 var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid());
                 var evidenceFileName = _evidenceFileName.ValueOr("evidence.pdf");
                 var trnTokenTrn = _trnTokenTrn.ValueOrDefault();

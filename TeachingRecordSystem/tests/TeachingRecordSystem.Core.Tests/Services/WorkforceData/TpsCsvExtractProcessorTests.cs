@@ -13,7 +13,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Arrange
         var establishment1 = await TestData.CreateEstablishmentAsync(localAuthorityCode: "123", establishmentNumber: "1234");
 
-        var trn = await TestData.GenerateTrnAsync();
+        var trn = "0000000";
         var tpsCsvExtractId = Guid.NewGuid();
         var startDate = new DateOnly(2023, 02, 03);
         var endDate = new DateOnly(2024, 03, 30);

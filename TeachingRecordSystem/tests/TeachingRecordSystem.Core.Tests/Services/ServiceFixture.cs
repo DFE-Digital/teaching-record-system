@@ -36,7 +36,6 @@ public class ServiceFixture : ServiceProviderFixture
             .AddSingleton<IOptions<AccessYourTeachingQualificationsOptions>>(Options.Create(new AccessYourTeachingQualificationsOptions { BaseAddress = "http://localhost" }))
             .AddSingleton<IOptions<TrnRequestOptions>>(Options.Create(new TrnRequestOptions()))
             .AddSingleton<INotificationSender, NoopNotificationSender>()
-            .AddTestTrnGeneration()
             .AddSingleton<WebhookReceiver>();
 
         TestScopedServices.ConfigureServices(services);

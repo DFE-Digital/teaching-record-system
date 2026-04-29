@@ -47,7 +47,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_PersonDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var trn = await TestData.GenerateTrnAsync();
+        var trn = "0000000";
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/persons/{trn}/cpd-induction")
         {

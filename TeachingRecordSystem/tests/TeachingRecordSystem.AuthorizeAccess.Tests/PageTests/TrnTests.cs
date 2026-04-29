@@ -19,7 +19,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
-                var existingTrn = haveExistingValueInState ? await TestData.GenerateTrnAsync() : null;
+                var existingTrn = haveExistingValueInState ? "0000000" : null;
 
                 coordinator.UpdateState(state =>
                 {
@@ -219,7 +219,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 
-                var trn = await TestData.GenerateTrnAsync();
+                var trn = "9999999";
 
                 var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
                 {

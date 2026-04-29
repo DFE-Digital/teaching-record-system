@@ -39,7 +39,7 @@ public class SetWelshInductionStatusTests : TestBase
     public async Task Put_PersonDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var trn = await TestData.GenerateTrnAsync();
+        var trn = "0000000";
 
         var startDate = new DateOnly(2022, 1, 1);
         var completedDate = startDate.AddMonths(12);

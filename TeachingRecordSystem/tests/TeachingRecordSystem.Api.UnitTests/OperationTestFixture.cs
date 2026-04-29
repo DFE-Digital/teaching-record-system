@@ -23,7 +23,6 @@ public class OperationTestFixture : ServiceProviderFixture
             .AddCoreServices(configuration, environment)
             .AddApiServices(configuration, environment)
             .AddSingleton<TestData>()
-            .AddTestTrnGeneration()
             .AddSingleton(_currentUserProviderMock.Object)
             .AddSingleton<INotificationSender, NoopNotificationSender>();
 

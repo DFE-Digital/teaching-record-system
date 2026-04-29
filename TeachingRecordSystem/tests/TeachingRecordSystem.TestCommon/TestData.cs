@@ -1,38 +1,17 @@
 using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public partial class TestData
+public partial class TestData(
+    IDbContextFactory<TrsDbContext> dbContextFactory,
+    ReferenceDataCache referenceDataCache,
+    TimeProvider timeProvider)
 {
     private static readonly Lock _gate = new();
     private static readonly HashSet<string> _emails = [];
     private static readonly HashSet<string> _mobileNumbers = [];
     private static int _applicationUserNumber = 1;
-
-    private readonly Func<Task<string>> _generateTrn;
-
-    [ActivatorUtilitiesConstructor]
-    public TestData(
-        IDbContextFactory<TrsDbContext> dbContextFactory,
-        ReferenceDataCache referenceDataCache,
-        TimeProvider timeProvider) :
-        this(dbContextFactory, referenceDataCache, timeProvider, () => new TestTrnGenerator(dbContextFactory).GenerateTrnAsync())
-    {
-    }
-
-    private TestData(
-        IDbContextFactory<TrsDbContext> dbContextFactory,
-        ReferenceDataCache referenceDataCache,
-        TimeProvider timeProvider,
-        Func<Task<string>> generateTrn)
-    {
-        DbContextFactory = dbContextFactory;
-        ReferenceDataCache = referenceDataCache;
-        TimeProvider = timeProvider;
-        _generateTrn = generateTrn;
-    }
 
     // https://stackoverflow.com/a/30290754
     public static byte[] JpegImage { get; } =
@@ -46,20 +25,11 @@ public partial class TestData
         0x00, 0x00, 0x00, 0x00, 0xFF, 0xDA, 0x00, 0x08, 0x01, 0x01, 0x00, 0x01, 0x3F, 0x10
     ];
 
-    public TimeProvider TimeProvider { get; }
+    public TimeProvider TimeProvider { get; } = timeProvider;
 
-    public IDbContextFactory<TrsDbContext> DbContextFactory { get; }
+    public IDbContextFactory<TrsDbContext> DbContextFactory { get; } = dbContextFactory;
 
-    public ReferenceDataCache ReferenceDataCache { get; }
-
-    public static TestData CreateWithCustomTrnGeneration(
-        IDbContextFactory<TrsDbContext> dbContextFactory,
-        ReferenceDataCache referenceDataCache,
-        TimeProvider clock,
-        Func<Task<string>> generateTrn)
-    {
-        return new TestData(dbContextFactory, referenceDataCache, clock, generateTrn);
-    }
+    public ReferenceDataCache ReferenceDataCache { get; } = referenceDataCache;
 
     public static async Task<string> GetBase64EncodedFileContentAsync(Stream file)
     {
@@ -293,8 +263,6 @@ public partial class TestData
 
         return mobileNumber;
     }
-
-    public Task<string> GenerateTrnAsync() => _generateTrn();
 
     public Gender GenerateGender() => Faker.Enum.Random<Gender>();
 

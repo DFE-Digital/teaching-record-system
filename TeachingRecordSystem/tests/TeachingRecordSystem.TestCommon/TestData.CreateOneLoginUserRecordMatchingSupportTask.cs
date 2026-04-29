@@ -96,7 +96,7 @@ public partial class TestData
             var verifiedNames = _verifiedNames.ValueOr([[testData.GenerateFirstName(), testData.GenerateLastName()]]);
             var verifiedDateOfBirth = _verifiedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
-            var statedTrn = _statedTrn.ValueOr(await testData.GenerateTrnAsync());
+            var statedTrn = _statedTrn.ValueOr("0000000");
             var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
             var clientApplicationUserId = _clientApplicationUserId.ValueOr(applicationUser.UserId);
             var status = _status.ValueOr(SupportTaskStatus.Open);

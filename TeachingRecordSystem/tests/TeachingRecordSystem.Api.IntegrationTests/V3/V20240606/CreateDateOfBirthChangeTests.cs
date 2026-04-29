@@ -47,7 +47,7 @@ public class CreateDateOfBirthChangeTests : TestBase
     public async Task Post_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
-        var trn = await TestData.GenerateTrnAsync();
+        var trn = "0000000";
         var newDateOfBirth = TestData.GenerateDateOfBirth();
 
         var evidenceFileName = "evidence.txt";
