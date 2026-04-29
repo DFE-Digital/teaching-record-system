@@ -12,13 +12,10 @@
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
-                        <govuk-radios-item-hint>
-                            <strong>National Insurance number</strong><br />
-                            It’s on your National Insurance card, benefit letter, payslip or P60 - for example, 'QQ 12 34 56 C'
-                        </govuk-radios-item-hint>
                         <govuk-radios-item-conditional>
                             <govuk-input for="NationalInsuranceNumber" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
                                 <govuk-input-label>National Insurance number</govuk-input-label>
+                                <govuk-input-hint>It’s on your National Insurance card, benefit letter, payslip or P60 - for example, 'QQ 12 34 56 C'</govuk-input-hint>
                             </govuk-input>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
