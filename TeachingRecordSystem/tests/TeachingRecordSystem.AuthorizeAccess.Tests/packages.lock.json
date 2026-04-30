@@ -54,8 +54,8 @@
       },
       "Azure.Core": {
         "type": "Transitive",
-        "resolved": "1.53.0",
-        "contentHash": "x9c/toFMOtRrlTdFuE7rlGCVAduQzWVfKmLz5juj41zJAXEhYD5hluiUyyAEzJ6OxpBnKtiaBztzwpZITAVjtg==",
+        "resolved": "1.54.0",
+        "contentHash": "m6hHbx1q9+GCBZ5A9ykzFylPdTwscX2APH7PlnqV+yu+DH3RRtuIDJMRqdU17cMyinv0hCPofpegoyQ6qWPW7g==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "10.0.3",
           "Microsoft.Identity.Client": "4.83.1",
@@ -1115,7 +1115,7 @@
         "dependencies": {
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
-          "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.1, )",
+          "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.2, )",
           "FluentValidation.AspNetCore": "[11.3.1, )",
           "Hangfire.AspNetCore": "[1.8.23, )",
           "Humanizer.Core": "[3.0.10, )",
@@ -1155,13 +1155,12 @@
       },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
         "type": "CentralTransitive",
-        "requested": "[1.5.1, )",
-        "resolved": "1.5.1",
-        "contentHash": "8Yy2LMuqdEziikD/Xp64/Tx8o71pG22YK3tKdQ7Y297fg2uaLyWAseOyribQLsSuMH2Ma/YGPB6muJ2I/P6PVA==",
+        "requested": "[1.5.2, )",
+        "resolved": "1.5.2",
+        "contentHash": "uV/M1O+48Ug43lppo7CWKKxHEyMJZJk0twoL/OSp2aDV2Bpkmqyh1+CPr5K1umPI4NgRyPh2kpWDt37m9vkJ3g==",
         "dependencies": {
-          "Azure.Core": "1.46.2",
-          "Azure.Storage.Blobs": "12.24.1",
-          "Microsoft.Bcl.AsyncInterfaces": "8.0.0"
+          "Azure.Core": "1.54.0",
+          "Azure.Storage.Blobs": "12.26.0"
         }
       },
       "Azure.Storage.Blobs": {
