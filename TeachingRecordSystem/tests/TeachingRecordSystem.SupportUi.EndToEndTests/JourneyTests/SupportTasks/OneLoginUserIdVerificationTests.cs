@@ -65,7 +65,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches");
-        await page.ClickButtonAsync("Send email");
+        await page.ClickButtonAsync("Confirm");
 
         await page.WaitForUrlPathAsync("/support-tasks/one-login-user-matching/id-verification");
     }
