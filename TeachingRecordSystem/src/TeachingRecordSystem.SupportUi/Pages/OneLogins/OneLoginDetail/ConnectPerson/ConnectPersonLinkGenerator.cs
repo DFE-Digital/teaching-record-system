@@ -13,4 +13,16 @@ public class ConnectPersonLinkGenerator(LinkGenerator linkGenerator)
 
     public string MatchCancel(string oneLoginUserSubject, JourneyInstanceId? journeyInstanceId = null) =>
         linkGenerator.GetRequiredPathByPage("/OneLogins/OneLoginDetail/ConnectPerson/Match", handler: "Cancel", routeValues: new { oneLoginUserSubject }, journeyInstanceId: journeyInstanceId);
+
+    public string Reason(string oneLoginUserSubject, JourneyInstanceId? journeyInstanceId = null, bool fromCheckAnswers = false) =>
+        linkGenerator.GetRequiredPathByPage("/OneLogins/OneLoginDetail/ConnectPerson/Reason", routeValues: new { oneLoginUserSubject, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string ReasonCancel(string oneLoginUserSubject, JourneyInstanceId? journeyInstanceId = null) =>
+        linkGenerator.GetRequiredPathByPage("/OneLogins/OneLoginDetail/ConnectPerson/Reason", handler: "Cancel", routeValues: new { oneLoginUserSubject }, journeyInstanceId: journeyInstanceId);
+
+    public string CheckAnswers(string oneLoginUserSubject, JourneyInstanceId? journeyInstanceId = null) =>
+        linkGenerator.GetRequiredPathByPage("/OneLogins/OneLoginDetail/ConnectPerson/CheckAnswers", routeValues: new { oneLoginUserSubject }, journeyInstanceId: journeyInstanceId);
+
+    public string CheckAnswersCancel(string oneLoginUserSubject, JourneyInstanceId? journeyInstanceId = null) =>
+        linkGenerator.GetRequiredPathByPage("/OneLogins/OneLoginDetail/ConnectPerson/CheckAnswers", handler: "Cancel", routeValues: new { oneLoginUserSubject }, journeyInstanceId: journeyInstanceId);
 }
