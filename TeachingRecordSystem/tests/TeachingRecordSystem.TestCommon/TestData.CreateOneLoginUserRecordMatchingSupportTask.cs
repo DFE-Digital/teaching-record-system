@@ -83,28 +83,88 @@ public partial class TestData
             return this;
         }
 
-        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithTrnRequest(string trnRequestId)
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithTrnRequestId(string trnRequestId)
         {
             _trnRequestId = Option.Some(trnRequestId);
             return this;
         }
 
-        public async Task<SupportTask> ExecuteAsync(TestData testData)
-        {
-            var applicationUser = await testData.CreateApplicationUserAsync();
-            var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail());
-            var verifiedNames = _verifiedNames.ValueOr([[testData.GenerateFirstName(), testData.GenerateLastName()]]);
-            var verifiedDateOfBirth = _verifiedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
-            var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
-            var statedTrn = _statedTrn.ValueOr("0000000");
-            var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
-            var clientApplicationUserId = _clientApplicationUserId.ValueOr(applicationUser.UserId);
-            var status = _status.ValueOr(SupportTaskStatus.Open);
-            var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
-            var trnRequestId = _trnRequestId.ValueOrDefault();
-
-            return await testData.WithDbContextAsync(async dbContext =>
+        public Task<SupportTask> ExecuteAsync(TestData testData) =>
+            testData.WithDbContextAsync(async dbContext =>
             {
+                var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail());
+                var verifiedNames = _verifiedNames.ValueOr([[testData.GenerateFirstName(), testData.GenerateLastName()]]);
+                var verifiedDateOfBirth = _verifiedDateOfBirth.ValueOr(testData.GenerateDateOfBirth);
+                var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
+                var statedTrn = _statedTrn.ValueOr("9999999");
+                var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
+                var status = _status.ValueOr(SupportTaskStatus.Open);
+                var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
+
+                Guid clientApplicationUserId;
+                string? trnRequestId = _trnRequestId.ValueOrDefault();
+
+                if (_clientApplicationUserId.HasValue)
+                {
+                    clientApplicationUserId = _clientApplicationUserId.ValueOrFailure();
+                }
+                else
+                {
+                    clientApplicationUserId = Guid.NewGuid();
+
+                    var applicationUser = new ApplicationUser
+                    {
+                        UserId = clientApplicationUserId,
+                        Name = testData.GenerateApplicationUserName(),
+                        ApiRoles = [],
+                        IsOidcClient = false,
+                        RecordMatchingPolicy = RecordMatchingPolicy.Deferred
+                    };
+
+                    dbContext.ApplicationUsers.Add(applicationUser);
+                }
+
+                if (trnRequestId is not null)
+                {
+                    var trnRequestExists = await dbContext.TrnRequestMetadata.AnyAsync(m => m.RequestId == trnRequestId);
+
+                    if (!trnRequestExists)
+                    {
+                        var firstName = verifiedNames.First().First();
+                        var lastName = verifiedNames.First().LastOrDefault() ?? testData.GenerateLastName();
+
+                        var trnRequestMetadata = new TrnRequestMetadata
+                        {
+                            ApplicationUserId = clientApplicationUserId,
+                            RequestId = trnRequestId,
+                            CreatedOn = createdOn,
+                            IdentityVerified = true,
+                            EmailAddress = emailAddress,
+                            OneLoginUserSubject = oneLoginUserSubject,
+                            FirstName = firstName,
+                            MiddleName = null,
+                            LastName = lastName,
+                            PreviousFirstName = null,
+                            PreviousLastName = null,
+                            Name = [firstName, lastName],
+                            DateOfBirth = verifiedDateOfBirth,
+                            PotentialDuplicate = false,
+                            NationalInsuranceNumber = statedNationalInsuranceNumber,
+                            Gender = null,
+                            AddressLine1 = null,
+                            AddressLine2 = null,
+                            AddressLine3 = null,
+                            City = null,
+                            Postcode = null,
+                            Country = null,
+                            TrnToken = null,
+                            Status = TrnRequestStatus.Dormant
+                        };
+
+                        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+                    }
+                }
+
                 var data = new OneLoginUserRecordMatchingData()
                 {
                     OneLoginUserSubject = oneLoginUserSubject,
@@ -116,57 +176,6 @@ public partial class TestData
                     ClientApplicationUserId = clientApplicationUserId,
                     TrnTokenTrn = trnTokenTrn
                 };
-
-                if (trnRequestId is not null)
-                {
-                    var applicationUser = await dbContext.ApplicationUsers.SingleOrDefaultAsync(u => u.UserId == clientApplicationUserId);
-
-                    if (applicationUser is null)
-                    {
-                        applicationUser = new ApplicationUser()
-                        {
-                            Name = testData.GenerateApplicationUserName(),
-                            UserId = clientApplicationUserId,
-                            ApiRoles = [],
-                            IsOidcClient = false,
-                            RecordMatchingPolicy = RecordMatchingPolicy.Deferred
-                        };
-
-                        dbContext.ApplicationUsers.Add(applicationUser);
-                    }
-
-                    var firstName = verifiedNames.First().First();
-                    var lastName = verifiedNames.First().LastOrDefault() ?? testData.GenerateLastName();
-
-                    var trnRequestMetadata = new TrnRequestMetadata
-                    {
-                        ApplicationUserId = clientApplicationUserId,
-                        RequestId = trnRequestId,
-                        CreatedOn = createdOn,
-                        IdentityVerified = true,
-                        EmailAddress = emailAddress,
-                        OneLoginUserSubject = oneLoginUserSubject,
-                        FirstName = firstName,
-                        MiddleName = null,
-                        LastName = lastName,
-                        PreviousFirstName = null,
-                        PreviousLastName = null,
-                        Name = [firstName, lastName],
-                        DateOfBirth = verifiedDateOfBirth,
-                        PotentialDuplicate = false,
-                        NationalInsuranceNumber = statedNationalInsuranceNumber,
-                        Gender = null,
-                        AddressLine1 = null,
-                        AddressLine2 = null,
-                        AddressLine3 = null,
-                        City = null,
-                        Postcode = null,
-                        Country = null,
-                        TrnToken = null
-                    };
-
-                    dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
-                }
 
                 var supportTask = SupportTask.Create(
                     supportTaskType: SupportTaskType.OneLoginUserRecordMatching,
@@ -190,6 +199,5 @@ public partial class TestData
                     .ThenInclude(m => m!.ApplicationUser)
                     .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             });
-        }
     }
 }

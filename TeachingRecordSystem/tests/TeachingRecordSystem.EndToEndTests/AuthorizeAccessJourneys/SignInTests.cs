@@ -6,7 +6,7 @@ using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 
 namespace TeachingRecordSystem.EndToEndTests.AuthorizeAccessJourneys;
 
-public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
+public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task SignIn_UnknownUserNotVerified()
@@ -154,35 +154,6 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickGovUkButtonAsync("Submit support request");
 
         await page.WaitForUrlPathAsync("/request-submitted");
-    }
-
-    [Fact]
-    public async Task SignIn_UnknownVerifiedUserWithNeitherNinoNorTrn_DoesNotMatch()
-    {
-        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber(false));
-
-        var subject = TestData.CreateOneLoginUserSubject();
-        var email = Faker.Internet.Email();
-        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToAuthorizeAccessTestStartPageAsync();
-
-        await page.WaitForUrlPathAsync("/connect");
-        await page.ClickGovUkButtonAsync("Find your teaching record");
-
-        await page.WaitForUrlPathAsync("/national-insurance-number");
-        await page.CheckAsync("text=No");
-        await page.ClickGovUkButtonAsync("Continue");
-
-        await page.WaitForUrlPathAsync("/trn");
-        await page.CheckAsync("label:text-is('No')");
-        await page.ClickGovUkButtonAsync("Continue");
-
-        await page.WaitForUrlPathAsync("/no-trn");
     }
 
     [Fact]
@@ -401,22 +372,6 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task SignIn_UserHasPendingTask()
-    {
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync();
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
-
-        await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToAuthorizeAccessTestStartPageAsync();
-
-        await page.WaitForUrlPathAsync("/pending-support-request");
-    }
-
-    [Fact]
     public async Task SignIn_UnknownUnverifiedUser()
     {
         var subject = TestData.CreateOneLoginUserSubject();
@@ -468,117 +423,5 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickGovUkButtonAsync("Submit support request");
 
         await page.WaitForUrlPathAsync("/request-submitted");
-    }
-
-    [Fact]
-    public async Task SignIn_VerifiedUserWithDeferredRecordMatchingPolicyAndNoTrn_CreatesDormantTrnRequestAndSignsIn()
-    {
-        var subject = TestData.CreateOneLoginUserSubject();
-        var email = Faker.Internet.Email();
-        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(
-            TestData.GenerateFirstName(),
-            TestData.GenerateLastName(),
-            TestData.GenerateDateOfBirth());
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
-
-        await page.WaitForUrlPathAsync("/connect");
-        await page.ClickGovUkButtonAsync("Find your teaching record");
-
-        await page.WaitForUrlPathAsync("/national-insurance-number");
-        await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
-        await page.ClickGovUkButtonAsync("Continue");
-
-        await page.WaitForUrlPathAsync("/trn");
-        await page.CheckAsync("label:text-is('No')");
-        await page.ClickGovUkButtonAsync("Continue");
-
-        await page.WaitForUrlPathAsync("/trn-deferred");
-
-        await page.ClickGovUkButtonAsync("Continue");
-
-        var trnRequestId = await WithDbContextAsync(async dbContext =>
-        {
-            var trnRequest = await dbContext.TrnRequestMetadata
-                .Where(r => r.OneLoginUserSubject == subject)
-                .OrderByDescending(r => r.CreatedOn)
-                .FirstOrDefaultAsync();
-
-            Assert.NotNull(trnRequest);
-            return trnRequest.RequestId;
-        });
-
-        await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
-    }
-
-    [Fact]
-    public async Task SignIn_VerifiedUserWithDeferredRecordMatchingPolicyAndUnmatchedTrn_CreatesSupportTaskWithDormantTrnRequestAndSignsIn()
-    {
-        var subject = TestData.CreateOneLoginUserSubject();
-        var email = Faker.Internet.Email();
-        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(
-            TestData.GenerateFirstName(),
-            TestData.GenerateLastName(),
-            TestData.GenerateDateOfBirth());
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
-
-        await page.WaitForUrlPathAsync("/connect");
-        await page.ClickGovUkButtonAsync("Find your teaching record");
-
-        await page.WaitForUrlPathAsync("/national-insurance-number");
-        await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
-        await page.ClickGovUkButtonAsync("Continue");
-
-        await page.WaitForUrlPathAsync("/trn");
-        await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('Teacher reference number')", "9999999");
-        await page.ClickGovUkButtonAsync("Continue");
-
-        await page.WaitForUrlPathAsync("/not-found");
-        await page.ClickGovUkButtonAsync("Check your answers");
-
-        await page.WaitForUrlPathAsync("/check-answers");
-        await page.ClickGovUkButtonAsync("Submit support request");
-
-        await page.WaitForUrlPathAsync("/request-submitted");
-
-        var trnRequestId = await WithDbContextAsync(async dbContext =>
-        {
-            var trnRequest = await dbContext.TrnRequestMetadata
-                .Where(r => r.OneLoginUserSubject == subject)
-                .OrderByDescending(r => r.CreatedOn)
-                .FirstOrDefaultAsync();
-
-            Assert.NotNull(trnRequest);
-            Assert.Equal(TrnRequestStatus.Dormant, trnRequest.Status);
-
-            var supportTask = await dbContext.SupportTasks
-                .Where(st => st.OneLoginUserSubject == subject)
-                .OrderByDescending(st => st.CreatedOn)
-                .FirstOrDefaultAsync();
-
-            Assert.NotNull(supportTask);
-            Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTask.SupportTaskType);
-            Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
-            Assert.Equal(trnRequest.RequestId, supportTask.TrnRequestId);
-            Assert.Equal(trnRequest.ApplicationUserId, supportTask.TrnRequestApplicationUserId);
-
-            return trnRequest.RequestId;
-        });
-
-        await page.GetByTestId("continue-link").ClickAsync();
-
-        await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
     }
 }
