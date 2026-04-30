@@ -71,8 +71,8 @@ public class MatchModel(
         // Get existing connected OneLogin user emails if any
         var connectedOneLoginUsers = await dbContext.OneLoginUsers
             .AsNoTracking()
-            .Where(u => u.PersonId == person.PersonId)
-            .Select(u => u.EmailAddress)
+            .Where(u => u.PersonId == person.PersonId && u.EmailAddress != null)
+            .Select(u => u.EmailAddress!)
             .ToArrayAsync();
 
         PersonConnectedOneLoginEmailAddresses = connectedOneLoginUsers.Length > 0 ? connectedOneLoginUsers : null;

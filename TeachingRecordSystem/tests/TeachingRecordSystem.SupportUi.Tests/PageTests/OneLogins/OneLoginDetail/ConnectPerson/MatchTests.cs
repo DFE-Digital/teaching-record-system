@@ -589,8 +589,8 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var existingOneLoginUser1 = await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>("existing1@example.com"));
-        var existingOneLoginUser2 = await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>("existing2@example.com"));
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>("existing1@example.com"));
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>("existing2@example.com"));
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: null,
