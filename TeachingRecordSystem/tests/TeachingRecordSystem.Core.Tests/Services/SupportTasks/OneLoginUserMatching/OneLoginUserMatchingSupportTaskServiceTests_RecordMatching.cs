@@ -213,7 +213,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
                 .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
                 .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
                 .WithStatedTrn(matchedPerson.Trn!)
-                .WithTrnRequest(trnRequestId));
+                .WithTrnRequestId(trnRequestId));
 
         var options = new ConnectedOutcomeOptions
         {
