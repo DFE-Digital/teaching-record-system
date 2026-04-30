@@ -19,7 +19,7 @@
 //     {
 //         // Arrange
 //         SetCurrentApiClient(roles);
-//         var trn = await TestData.GenerateTrnAsync();
+//         var trn = "0000000";
 //         var newDateOfBirth = TestData.GenerateDateOfBirth();
 //         var evidenceFileName = "evidence.txt";
 //         var evidenceFileUrl = Faker.Internet.SecureUrl();
@@ -99,7 +99,7 @@
 //     public async Task Post_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
 //     {
 //         // Arrange
-//         var trn = await TestData.GenerateTrnAsync();
+//         var trn = "0000000";
 //         var newDateOfBirth = TestData.GenerateDateOfBirth();
 //
 //         var evidenceFileName = "evidence.txt";

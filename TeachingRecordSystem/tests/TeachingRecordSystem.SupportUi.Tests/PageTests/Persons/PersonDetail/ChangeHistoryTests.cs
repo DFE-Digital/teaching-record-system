@@ -165,7 +165,7 @@ public partial class ChangeHistoryTests(HostFixture hostFixture) : TestBase(host
                 EmailAddress = TestData.GenerateUniqueEmail(),
                 NationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!),
                 Gender = TestData.GenerateChangedGender(person.Gender),
-                Trn = await TestData.GenerateTrnAsync(),
+                Trn = "0000000",
                 DateOfDeath = null,
                 QtsDate = null,
                 EytsDate = null,

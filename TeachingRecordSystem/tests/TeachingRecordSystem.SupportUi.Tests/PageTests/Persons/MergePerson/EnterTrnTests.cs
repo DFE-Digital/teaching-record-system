@@ -169,7 +169,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var newTrn = await TestData.GenerateTrnAsync();
+        var newTrn = "0000000";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,

@@ -65,7 +65,7 @@ public partial class OneLoginServiceTests
         var trn = trnOption switch
         {
             OneLogin.TrnArgumentOption.SpecifiedAndMatches => person.Trn,
-            OneLogin.TrnArgumentOption.SpecifiedButDifferent => await TestData.GenerateTrnAsync(),
+            OneLogin.TrnArgumentOption.SpecifiedButDifferent => "0000000",
             _ => null
         };
 

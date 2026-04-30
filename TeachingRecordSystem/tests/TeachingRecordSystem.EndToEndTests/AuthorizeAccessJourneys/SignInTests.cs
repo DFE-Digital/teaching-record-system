@@ -144,7 +144,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrnAsync());
+        await page.FillAsync("label:text-is('Teacher reference number')", "9999999");
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");
@@ -449,7 +449,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrnAsync());
+        await page.FillAsync("label:text-is('Teacher reference number')", "9999999");
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/proof-of-identity");
@@ -542,7 +542,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrnAsync());
+        await page.FillAsync("label:text-is('Teacher reference number')", "9999999");
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");

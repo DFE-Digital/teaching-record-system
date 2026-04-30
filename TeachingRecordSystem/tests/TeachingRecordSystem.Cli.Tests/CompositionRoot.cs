@@ -34,8 +34,7 @@ public class CompositionRoot : IAsyncLifetime
             .AddDatabase(configuration)
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
-            .AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero)))
-            .AddTestTrnGeneration();
+            .AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero)));
 
         return services.BuildServiceProvider();
     }

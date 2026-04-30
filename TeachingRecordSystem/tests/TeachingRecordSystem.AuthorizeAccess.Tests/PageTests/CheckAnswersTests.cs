@@ -17,7 +17,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-                var trn = await TestData.GenerateTrnAsync();
+                var trn = "0000000";
 
                 await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
 
@@ -45,7 +45,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var lastName = TestData.GenerateLastName();
                 var dateOfBirth = TestData.GenerateDateOfBirth();
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-                var trn = await TestData.GenerateTrnAsync();
+                var trn = "0000000";
                 var proofOfIdentityFileId = Guid.NewGuid();
                 var proofOfIdentityFileName = "identity.png";
 
@@ -89,7 +89,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-                var trn = await TestData.GenerateTrnAsync();
+                var trn = "0000000";
 
                 await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
 
@@ -172,7 +172,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var lastName = TestData.GenerateLastName();
                 var dateOfBirth = TestData.GenerateDateOfBirth();
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-                var trn = await TestData.GenerateTrnAsync();
+                var trn = "0000000";
                 var proofOfIdentityFileId = Guid.NewGuid();
                 var proofOfIdentityFileName = "identity.png";
 
@@ -267,7 +267,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-                var trn = await TestData.GenerateTrnAsync();
+                var trn = "0000000";
 
                 await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
 
@@ -321,7 +321,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-                var trn = await TestData.GenerateTrnAsync();
+                var trn = "0000000";
 
                 await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
 

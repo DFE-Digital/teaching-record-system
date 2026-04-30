@@ -60,7 +60,7 @@
 //                     .ToAsyncEnumerable()
 //                     .SelectAwait(async i => new
 //                     {
-//                         trn = await TestData.GenerateTrnAsync(),
+//                         trn = "0000000",
 //                         dateOfBirth = new DateOnly(1990, 1, 1).AddDays(i)
 //                     })
 //                     .ToArrayAsync()

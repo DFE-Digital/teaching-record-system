@@ -15,9 +15,9 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var statedLastName = Faker.Name.Last();
         var statedDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
         var statedNationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-        var statedTrn = await TestData.GenerateTrnAsync();
+        var statedTrn = "0000000";
         var clientApplicationUserId = Guid.NewGuid();
-        var trnTokenTrn = await TestData.GenerateTrnAsync();
+        var trnTokenTrn = "0000000";
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "evidence.jpg";
 

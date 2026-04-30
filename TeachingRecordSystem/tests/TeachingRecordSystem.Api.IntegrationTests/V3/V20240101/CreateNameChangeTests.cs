@@ -19,7 +19,7 @@
 //     {
 //         // Arrange
 //         SetCurrentApiClient(roles);
-//         var trn = await TestData.GenerateTrnAsync();
+//         var trn = "0000000";
 //         var newFirstName = TestData.GenerateFirstName();
 //         var newMiddleName = TestData.GenerateMiddleName();
 //         var newLastName = TestData.GenerateLastName();
@@ -106,7 +106,7 @@
 //     public async Task Post_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
 //     {
 //         // Arrange
-//         var trn = await TestData.GenerateTrnAsync();
+//         var trn = "0000000";
 //         var newFirstName = TestData.GenerateFirstName();
 //         var newMiddleName = TestData.GenerateMiddleName();
 //         var newLastName = TestData.GenerateLastName();

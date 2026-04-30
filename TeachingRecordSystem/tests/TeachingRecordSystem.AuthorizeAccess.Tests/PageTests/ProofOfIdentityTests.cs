@@ -202,7 +202,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
         AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
         coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, nationalInsuranceNumber ?? TestData.GenerateNationalInsuranceNumber()));
         AddUrlToPath(coordinator, StepUrls.Trn);
-        await coordinator.UpdateStateAsync(async s => s.SetTrn(true, trn ?? await TestData.GenerateTrnAsync()));
+        await coordinator.UpdateStateAsync(async s => s.SetTrn(true, trn ?? "0000000"));
         AddUrlToPath(coordinator, StepUrls.ProofOfIdentity);
     }
 }

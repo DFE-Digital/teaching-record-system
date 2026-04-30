@@ -9,7 +9,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
     public async Task HandleAsync_PersonDoesNotExist_ReturnsError()
     {
         // Arrange
-        var command = await CreateCommand();
+        var command = CreateCommand();
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -23,7 +23,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var command = await CreateCommand() with
+        var command = CreateCommand() with
         {
             Trn = person.Trn,
             EvidenceFileUrl = "https://nonexistenturl.com"
@@ -46,7 +46,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
             person.PersonId,
             b => b.WithStatus(SupportTaskStatus.Open));
 
-        var command = await CreateCommand() with
+        var command = CreateCommand() with
         {
             Trn = person.Trn
         };
@@ -68,7 +68,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
             person.PersonId,
             b => b.WithStatus(SupportTaskStatus.InProgress));
 
-        var command = await CreateCommand() with
+        var command = CreateCommand() with
         {
             Trn = person.Trn
         };
@@ -90,7 +90,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
             person.PersonId,
             b => b.WithStatus(SupportTaskStatus.Closed));
 
-        var command = await CreateCommand() with
+        var command = CreateCommand() with
         {
             Trn = person.Trn
         };
@@ -108,7 +108,7 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var command = await CreateCommand() with
+        var command = CreateCommand() with
         {
             Trn = person.Trn
         };
@@ -150,10 +150,10 @@ public class CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixt
         });
     }
 
-    private async Task<CreateDateOfBirthChangeRequestCommand> CreateCommand() =>
-        new CreateDateOfBirthChangeRequestCommand()
+    private CreateDateOfBirthChangeRequestCommand CreateCommand() =>
+        new()
         {
-            Trn = await TestData.GenerateTrnAsync(),
+            Trn = "0000000",
             DateOfBirth = TestData.GenerateDateOfBirth(),
             EmailAddress = TestData.GenerateUniqueEmail(),
             EvidenceFileName = "evidence.txt",

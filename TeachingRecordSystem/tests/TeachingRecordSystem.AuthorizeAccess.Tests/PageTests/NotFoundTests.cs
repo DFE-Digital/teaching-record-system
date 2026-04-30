@@ -19,7 +19,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
                 await coordinator.UpdateStateAsync(async state =>
                 {
                     state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber());
-                    state.SetTrn(true, await TestData.GenerateTrnAsync());
+                    state.SetTrn(true, "0000000");
                 });
 
                 var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.NotFound(coordinator.InstanceId));
@@ -63,7 +63,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
         coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, nationalInsuranceNumber ?? TestData.GenerateNationalInsuranceNumber()));
         AddUrlToPath(coordinator, StepUrls.Trn);
-        await coordinator.UpdateStateAsync(async s => s.SetTrn(true, trn ?? await TestData.GenerateTrnAsync()));
+        await coordinator.UpdateStateAsync(async s => s.SetTrn(true, trn ?? "0000000"));
         AddUrlToPath(coordinator, StepUrls.NotFound);
     }
 }
