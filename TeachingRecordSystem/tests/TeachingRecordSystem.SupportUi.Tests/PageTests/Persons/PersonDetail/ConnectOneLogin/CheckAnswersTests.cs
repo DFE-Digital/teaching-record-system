@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
@@ -230,7 +231,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(person.DateOfBirth, updatedOneLoginUser.VerifiedDatesOfBirth[0]);
         });
 
-        Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.PersonOneLoginUserConnecting, p.ProcessContext.ProcessType));
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonOneLoginUserConnecting, p.ProcessContext.ProcessType);
+            Assert.NotNull(p.ProcessContext.Process.ChangeReason);
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal("The system could not find a match automatically", changeReason.Reason);
+            Assert.Null(changeReason.Details);
+        });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
@@ -285,7 +293,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
         });
 
-        Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.PersonOneLoginUserConnecting, p.ProcessContext.ProcessType));
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonOneLoginUserConnecting, p.ProcessContext.ProcessType);
+            Assert.NotNull(p.ProcessContext.Process.ChangeReason);
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal("The system could not find a match automatically", changeReason.Reason);
+            Assert.Null(changeReason.Details);
+        });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
@@ -332,5 +347,53 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
+    }
+
+    [Fact]
+    public async Task Post_WithAnotherReasonAndDetail_SavesReasonInProcessContext()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(
+            personId: null,
+            email: Option.Some<string?>("test@example.com"),
+            verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
+
+        var journeyInstance = await CreateJourneyInstance(
+            JourneyNames.ConnectOneLogin,
+            new ConnectOneLoginState
+            {
+                Subject = oneLoginUser.Subject,
+                OneLoginEmailAddress = oneLoginUser.EmailAddress,
+                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                ConnectReason = ConnectOneLoginReason.AnotherReason,
+                ReasonDetail = "Custom connection reason details"
+            },
+            new KeyValuePair<string, object>("personId", person.PersonId));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonOneLoginUserConnecting, p.ProcessContext.ProcessType);
+            Assert.NotNull(p.ProcessContext.Process.ChangeReason);
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal("Another reason", changeReason.Reason);
+            Assert.Equal("Custom connection reason details", changeReason.Details);
+        });
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.NotNull(journeyInstance);
+        Assert.True(journeyInstance.Completed);
     }
 }

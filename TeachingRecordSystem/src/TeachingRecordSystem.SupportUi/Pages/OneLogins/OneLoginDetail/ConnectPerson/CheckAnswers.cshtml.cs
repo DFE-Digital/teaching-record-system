@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -70,7 +71,16 @@ public class CheckAnswersModel(
             .Where(p => p.PersonId == JourneyInstance!.State.PersonId)
             .SingleAsync();
 
-        var processContext = new ProcessContext(ProcessType.OneLoginUserPersonConnecting, timeProvider.UtcNow, User.GetUserId());
+        var changeReason = new ChangeReasonWithDetailsAndEvidence()
+        {
+            Reason = JourneyInstance!.State.ConnectReason?.GetDisplayName(),
+            Details = JourneyInstance.State.ConnectReason == ConnectPersonReason.AnotherReason
+                ? JourneyInstance.State.ReasonDetail
+                : null,
+            EvidenceFile = null
+        };
+
+        var processContext = new ProcessContext(ProcessType.OneLoginUserPersonConnecting, timeProvider.UtcNow, User.GetUserId(), changeReason: changeReason);
 
         if (oneLoginUserFeature.VerifiedOn is null)
         {
