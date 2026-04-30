@@ -1,0 +1,55 @@
+@page "/one-logins/{OneLoginUserSubject}/connect-person/check-answers"
+@model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerson.CheckAnswersModel
+@{
+    ViewBag.Title = "Check details before connecting this GOV.UK One Login to a record";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Reason(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+}
+
+<form action="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.CheckAnswers(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Record management</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-summary-list data-testid="summary">
+                <row>
+                    <key>GOV.UK One Login email address</key>
+                    <value>@Model.OneLoginEmailAddress</value>
+                </row>
+                <row>
+                    <key>TRN</key>
+                    <value>@Model.PersonTrn</value>
+                </row>
+                <row>
+                    <key>Reason</key>
+                    <value>
+                        @Model.ConnectReason!.Value.GetDisplayName()@if (Model.ConnectReason == ConnectPersonReason.AnotherReason)
+                        {
+                            <text>: </text>@Html.ConvertNewlinesToLineBreaks(Model.ReasonDetail!)
+                        }
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Reason(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" data-testid="change-reason-link" visually-hidden-text="reason">Change</action>
+                    </row-actions>
+                </row>
+            </govuk-summary-list>
+
+            @if (!Model.IsOneLoginUserVerified)
+            {
+                <govuk-checkboxes for="IdentityConfirmed">
+                    <govuk-checkboxes-item value="@true" class="trs-nowrap">
+                        I confirm I’ve completed the required identity checks outside this service
+                    </govuk-checkboxes-item>
+                </govuk-checkboxes>
+            }
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="confirm-button">Confirm and connect account</govuk-button>
+                <govuk-button formaction="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.CheckAnswersCancel(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+            </div>
+        </div>
+    </div>
+</form>

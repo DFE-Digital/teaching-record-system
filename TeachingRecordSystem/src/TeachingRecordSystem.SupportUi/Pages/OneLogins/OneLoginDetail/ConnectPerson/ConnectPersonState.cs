@@ -10,6 +10,8 @@ public class ConnectPersonState : IRegisterJourney
 
     public Guid? PersonId { get; set; }
     public string? PersonTrn { get; set; }
+    public ConnectPersonReason? ConnectReason { get; set; }
+    public string? ReasonDetail { get; set; }
 
-    public bool IsComplete => PersonId.HasValue;
+    public bool IsComplete => PersonId.HasValue && ConnectReason.HasValue;
 }

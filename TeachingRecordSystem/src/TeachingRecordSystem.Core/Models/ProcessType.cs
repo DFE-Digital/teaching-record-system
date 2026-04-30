@@ -42,5 +42,6 @@ public enum ProcessType
     AlertUpdating = 40,
     AlertDeleting = 41,
     PersonDeceased = 42,
-    TrnRequestActivating = 43
+    TrnRequestActivating = 43,
+    OneLoginUserPersonConnecting = 44
 }

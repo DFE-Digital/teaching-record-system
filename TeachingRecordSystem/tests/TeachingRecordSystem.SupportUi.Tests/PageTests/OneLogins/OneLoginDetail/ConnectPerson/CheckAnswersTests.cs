@@ -2,10 +2,9 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
-using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
+using TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerson;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.ConnectOneLogin;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.OneLogins.OneLoginDetail.ConnectPerson;
 
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
@@ -13,8 +12,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithoutJourneyInstance_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/check-answers");
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -34,23 +33,22 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
         var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState
+            JourneyNames.ConnectPerson,
+            new ConnectPersonState
             {
-                Subject = oneLoginUser.Subject,
-                OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                PersonId = person.PersonId,
+                PersonTrn = person.Trn
             },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/persons/{person.PersonId}/connect-one-login/reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/one-logins/{oneLoginUser.Subject}/connect-person/reason", response.Headers.Location?.OriginalString);
     }
 
     [Theory]
@@ -66,21 +64,21 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 email: Option.Some<string?>("test@example.com"),
                 verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)))
             : await TestData.CreateOneLoginUserAsync(
+                personId: null,
                 email: Option.Some<string?>("test@example.com"),
-                verified: false);
+                verifiedInfo: null);
 
         var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState
+            JourneyNames.ConnectPerson,
+            new ConnectPersonState
             {
-                Subject = oneLoginUser.Subject,
-                OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
-                ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
+                PersonId = person.PersonId,
+                PersonTrn = person.Trn,
+                ConnectReason = ConnectPersonReason.DataLossOrIncompleteInformation
             },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -91,9 +89,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var summaryList = doc.GetElementByTestId("summary");
         Assert.NotNull(summaryList);
         Assert.Equal("test@example.com", summaryList.GetSummaryListValueByKey("GOV.UK One Login email address"));
-        Assert.Equal("The system could not find a match automatically", summaryList.GetSummaryListValueByKey("Reason"));
+        Assert.Equal(person.Trn, summaryList.GetSummaryListValueByKey("TRN"));
+        Assert.Equal("Data loss or incomplete information", summaryList.GetSummaryListValueByKey("Reason"));
 
-        var expectedChangeLink = $"/persons/{person.PersonId}/connect-one-login/reason?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/one-logins/{oneLoginUser.Subject}/connect-person/reason?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-reason-link")?.GetAttribute("href"));
 
         var checkbox = doc.QuerySelector<IHtmlInputElement>("input[name='IdentityConfirmed'][type='checkbox']");
@@ -118,18 +117,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
         var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState
+            JourneyNames.ConnectPerson,
+            new ConnectPersonState
             {
-                Subject = oneLoginUser.Subject,
-                OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
-                ConnectReason = ConnectOneLoginReason.AnotherReason,
+                PersonId = person.PersonId,
+                PersonTrn = person.Trn,
+                ConnectReason = ConnectPersonReason.AnotherReason,
                 ReasonDetail = "Custom connection reason"
             },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -148,26 +146,26 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
+            personId: null,
             email: Option.Some<string?>("test@example.com"),
-            verified: false);
+            verifiedInfo: null);
 
         var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState
+            JourneyNames.ConnectPerson,
+            new ConnectPersonState
             {
-                Subject = oneLoginUser.Subject,
-                OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
-                ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
+                PersonId = person.PersonId,
+                PersonTrn = person.Trn,
+                ConnectReason = ConnectPersonReason.DataLossOrIncompleteInformation
             },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder
             {
-                ["IdentityConfirmed"] = "false"
-            })
+                { "IdentityConfirmed", "false" }
+            }
         };
 
         // Act
@@ -178,31 +176,31 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WithConfirmation_CompletesJourneyAndRedirects()
+    public async Task Post_WithConfirmation_CompletesJourneyAndRedirectsToPersonDetail()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
+            personId: null,
             email: Option.Some<string?>("test@example.com"),
-            verified: false);
+            verifiedInfo: null);
 
         var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState
+            JourneyNames.ConnectPerson,
+            new ConnectPersonState
             {
-                Subject = oneLoginUser.Subject,
-                OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
-                ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
+                PersonId = person.PersonId,
+                PersonTrn = person.Trn,
+                ConnectReason = ConnectPersonReason.DataLossOrIncompleteInformation
             },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder
             {
-                ["IdentityConfirmed"] = "true"
-            })
+                { "IdentityConfirmed", "true" }
+            }
         };
 
         // Act
@@ -233,10 +231,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.PersonOneLoginUserConnecting, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.OneLoginUserPersonConnecting, p.ProcessContext.ProcessType);
             Assert.NotNull(p.ProcessContext.Process.ChangeReason);
             var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
-            Assert.Equal("The system could not find a match automatically", changeReason.Reason);
+            Assert.Equal("Data loss or incomplete information", changeReason.Reason);
             Assert.Null(changeReason.Details);
         });
 
@@ -261,19 +259,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
         var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState
+            JourneyNames.ConnectPerson,
+            new ConnectPersonState
             {
-                Subject = oneLoginUser.Subject,
-                OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
-                ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
+                PersonId = person.PersonId,
+                PersonTrn = person.Trn,
+                ConnectReason = ConnectPersonReason.DataLossOrIncompleteInformation
             },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+            Content = new FormUrlEncodedContentBuilder()
         };
 
         // Act
@@ -295,10 +292,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.PersonOneLoginUserConnecting, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.OneLoginUserPersonConnecting, p.ProcessContext.ProcessType);
             Assert.NotNull(p.ProcessContext.Process.ChangeReason);
             var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
-            Assert.Equal("The system could not find a match automatically", changeReason.Reason);
+            Assert.Equal("Data loss or incomplete information", changeReason.Reason);
             Assert.Null(changeReason.Details);
         });
 
@@ -313,43 +310,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetail()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(
-            personId: null,
-            email: Option.Some<string?>("test@example.com"),
-            verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
-
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState
-            {
-                Subject = oneLoginUser.Subject,
-                OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
-                ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/check-answers?handler=Cancel&{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
-
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
-    }
-
-    [Fact]
     public async Task Post_WithAnotherReasonAndDetail_SavesReasonInProcessContext()
     {
         // Arrange
@@ -360,20 +320,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
         var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState
+            JourneyNames.ConnectPerson,
+            new ConnectPersonState
             {
-                Subject = oneLoginUser.Subject,
-                OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
-                ConnectReason = ConnectOneLoginReason.AnotherReason,
+                PersonId = person.PersonId,
+                PersonTrn = person.Trn,
+                ConnectReason = ConnectPersonReason.AnotherReason,
                 ReasonDetail = "Custom connection reason details"
             },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+            Content = new FormUrlEncodedContentBuilder()
         };
 
         // Act
@@ -385,7 +344,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.PersonOneLoginUserConnecting, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.OneLoginUserPersonConnecting, p.ProcessContext.ProcessType);
             Assert.NotNull(p.ProcessContext.Process.ChangeReason);
             var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal("Another reason", changeReason.Reason);
