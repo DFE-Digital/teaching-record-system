@@ -49,7 +49,12 @@
             @foreach (var match in Model.SuggestedMatches!)
             {
                 <govuk-summary-card data-testid="match">
-                    <title>Record @match.Identifier</title>
+	                <title>Record @match.Identifier</title>
+	                <govuk-summary-card-actions>
+		                <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
+			                View record (opens in a new tab)
+		                </govuk-summary-card-action>
+	                </govuk-summary-card-actions>
                     <govuk-summary-list>
                         <row>
                             <key>Name</key>
