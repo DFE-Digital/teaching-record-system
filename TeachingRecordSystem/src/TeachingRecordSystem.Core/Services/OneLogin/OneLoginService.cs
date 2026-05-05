@@ -478,25 +478,24 @@ public class OneLoginService(
             .AsReadOnly();
     }
 
-    public async Task<string?> GetPendingSupportTaskReferenceByUserAsync(string oneLoginUserSubject)
-    {
-        var task = await dbContext.SupportTasks
+    public Task<string?> GetPendingSupportTaskReferenceByUserAsync(string oneLoginUserSubject) =>
+        dbContext.SupportTasks
             .Where(t => t.OneLoginUserSubject == oneLoginUserSubject && t.Status != SupportTaskStatus.Closed)
             .OrderBy(t => t.CreatedOn)
+            .Select(t => t.SupportTaskReference)
             .FirstOrDefaultAsync();
-
-        return task?.SupportTaskReference;
-    }
 
     public async Task<bool> HasClosedIdVerificationSupportTaskAsync(string oneLoginUserSubject)
     {
-        var closedIdVerificationTasks = await dbContext.SupportTasks
-            .Where(t => t.OneLoginUserSubject == oneLoginUserSubject &&
-                       t.Status == SupportTaskStatus.Closed &&
-                       t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-            .ToListAsync();
+        var closedIdVerificationTaskData = await dbContext.SupportTasks
+            .Where(t =>
+                t.OneLoginUserSubject == oneLoginUserSubject &&
+                t.Status == SupportTaskStatus.Closed &&
+                t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
+            .Select(t => t.Data)
+            .ToArrayAsync();
 
-        return closedIdVerificationTasks.Any(t => ((OneLoginUserIdVerificationData)t.Data).Outcome != OneLoginUserIdVerificationOutcome.NotVerified);
+        return closedIdVerificationTaskData.Any(t => ((OneLoginUserIdVerificationData)t).Outcome != OneLoginUserIdVerificationOutcome.NotVerified);
     }
 
     public async Task<OneLoginUser> OnSignInAsync(string sub, string email, ProcessContext processContext)
