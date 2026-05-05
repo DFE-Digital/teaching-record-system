@@ -113,22 +113,24 @@ public class SignInJourneyCoordinator(
                 state.SetVerified(oneLoginUser.VerifiedNames!, oneLoginUser.VerifiedDatesOfBirth!);
             }
 
-            if (trn is not null && !ShowDebugPages)
+            if (!ShowDebugPages)
             {
-                Complete(state, trn);
-            }
-            else if (existingTrnRequestId is not null && !ShowDebugPages)
-            {
-                CompleteWithExistingTrnRequest(state, existingTrnRequestId);
-            }
-            else if (trn is null &&
-                existingTrnRequestId is null &&
-                pendingSupportTaskReference is null &&
-                hasClosedIdVerificationSupportTask &&
-                state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred &&
-                !ShowDebugPages)
-            {
-                await CompleteWithDeferredMatchingAsync(state, processContext);
+                if (trn is not null)
+                {
+                    Complete(state, trn);
+                }
+                else if (existingTrnRequestId is not null)
+                {
+                    CompleteWithExistingTrnRequest(state, existingTrnRequestId);
+                }
+                else if (trn is null &&
+                    existingTrnRequestId is null &&
+                    pendingSupportTaskReference is null &&
+                    hasClosedIdVerificationSupportTask &&
+                    state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
+                {
+                    await CompleteWithDeferredMatchingAsync(state, processContext);
+                }
             }
         });
     }

@@ -90,7 +90,7 @@ public class DebugIdentityModel(
         else if (IdentityVerified)
         {
             verifiedNames = (VerifiedNames ?? string.Empty).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray())
+                .Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 .ToArray();
 
             if (verifiedNames.Length == 0)
@@ -128,15 +128,17 @@ public class DebugIdentityModel(
             return this.PageWithErrors();
         }
 
-        if (_oneLoginUser!.PersonId is not null && !DetachPerson)
+        if (_oneLoginUser!.PersonId is not null)
         {
-            coordinator.UpdateState(state => coordinator.Complete(state, _oneLoginUser.Person!.Trn));
-            return GetNextPage();
-        }
-
-        if (_oneLoginUser!.PersonId is not null && DetachPerson)
-        {
-            _oneLoginUser.ClearMatchedPerson();
+            if (DetachPerson)
+            {
+                _oneLoginUser.ClearMatchedPerson();
+            }
+            else
+            {
+                coordinator.UpdateState(state => coordinator.Complete(state, _oneLoginUser.Person!.Trn));
+                return GetNextPage();
+            }
         }
 
         // Don't re-verify if already verified in database (checkbox is disabled so can't change)
@@ -153,6 +155,12 @@ public class DebugIdentityModel(
             {
                 return coordinator.OnVerificationFailed().ToActionResult();
             }
+        }
+
+        if (IdentityVerified && coordinator.State.RecordMatchingPolicy is RecordMatchingPolicy.Deferred)
+        {
+            await coordinator.UpdateStateAsync(state => coordinator.CompleteWithDeferredMatchingAsync(state));
+            return GetNextPage();
         }
 
         await dbContext.SaveChangesAsync();
