@@ -19,9 +19,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[4.1.0, )",
-        "resolved": "4.1.0",
-        "contentHash": "Isz4Y7Lr4/IjN8yaUQ83mb1uecWrxXdKl/NT+d8k5JpvdQlhd0MT6Q9mgEXv/lGNZ6izrAGS7IWocgb+ihT/Xw==",
+        "requested": "[4.1.1, )",
+        "resolved": "4.1.1",
+        "contentHash": "HAMWsNj1Z1jJg35Dq0fuE0MkSrrdYmND6f+44m6brvqLE1w5TGGzXN7hTFSU7OJ7hUw5hfVbH5VhKXf5AQhX5g==",
         "dependencies": {
           "Microsoft.Extensions.FileProviders.Embedded": "8.0.26"
         }
@@ -194,8 +194,7 @@
         "resolved": "11.11.0",
         "contentHash": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
         "dependencies": {
-          "FluentValidation": "11.11.0",
-          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
+          "FluentValidation": "11.11.0"
         }
       },
       "Google.Api.Gax": {
@@ -395,11 +394,6 @@
         "type": "Transitive",
         "resolved": "10.3.0",
         "contentHash": "b3gmxtyX0n8bQFuZ679f8QiOWqjeZKFc6XXPUsYNFzMcWi0Q44Ej3pB41N/QQ0maX380kmOMF36bLSBHNThXAg=="
-      },
-      "Microsoft.Extensions.DependencyInjection.Abstractions": {
-        "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ=="
       },
       "Microsoft.Extensions.DependencyInjection.AutoActivation": {
         "type": "Transitive",
