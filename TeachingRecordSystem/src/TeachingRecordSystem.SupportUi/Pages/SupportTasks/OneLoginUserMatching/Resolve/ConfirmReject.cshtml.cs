@@ -45,7 +45,8 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
             {
                 SupportTask = _supportTask!,
                 RejectReason = JourneyInstance.State.RejectReason!.Value,
-                RejectionAdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails
+                RejectionAdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails,
+                EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginNotVerifiedEmailTemplateId
             },
             processContext);
 

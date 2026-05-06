@@ -76,7 +76,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         {
             SupportTask = supportTask,
             RejectReason = rejectReason,
-            RejectionAdditionalDetails = rejectionAdditionalDetails
+            RejectionAdditionalDetails = rejectionAdditionalDetails,
+            EmailTemplateId = null
         };
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
@@ -135,7 +136,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         {
             SupportTask = supportTask,
             RejectReason = reason,
-            RejectionAdditionalDetails = rejectionAdditionalDetails
+            RejectionAdditionalDetails = rejectionAdditionalDetails,
+            EmailTemplateId = null
         };
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
@@ -163,7 +165,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         {
             SupportTask = supportTask,
             RejectReason = OneLoginIdVerificationRejectReason.AnotherReason,
-            RejectionAdditionalDetails = rejectionAdditionalDetails
+            RejectionAdditionalDetails = rejectionAdditionalDetails,
+            EmailTemplateId = null
         };
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
@@ -176,6 +179,35 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
         Assert.Collection(emails,
             e => Assert.Equal(e.Personalization["reason"], rejectionAdditionalDetails));
+    }
+
+    [Fact]
+    public async Task ResolveVerificationSupportTaskAsync_WithNotVerifiedOutcome_WithCustomEmailTemplateId_UsesCustomTemplate()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var customTemplateId = "custom-template-id";
+
+        var options = new NotVerifiedOutcomeOptions
+        {
+            SupportTask = supportTask,
+            RejectReason = OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest,
+            RejectionAdditionalDetails = null,
+            EmailTemplateId = customTemplateId
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails,
+            e => Assert.Equal(customTemplateId, e.TemplateId));
     }
 
     [Fact]
@@ -194,7 +226,9 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         {
             SupportTask = supportTask,
             NotConnectingReason = notConnectingReason,
-            NotConnectingAdditionalDetails = notConnectingAdditionalDetails
+            NotConnectingAdditionalDetails = notConnectingAdditionalDetails,
+            RecordMatchingPolicy = RecordMatchingPolicy.Required,
+            EmailTemplateId = null
         };
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
@@ -229,6 +263,103 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Events.AssertEventsPublished(
             e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
             e => Assert.IsType<SupportTaskUpdatedEvent>(e));
+    }
+
+    [Fact]
+    public async Task ResolveVerificationSupportTaskAsync_WithVerifiedOnlyWithMatchesOutcome_WithDeferredPolicyAndCustomEmailTemplateId_SendsEmailWithReason()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var customTemplateId = "custom-template-id";
+        var notConnectingReason = OneLoginUserNotConnectingReason.NoMatchingRecord;
+
+        var options = new VerifiedOnlyWithMatchesOutcomeOptions
+        {
+            SupportTask = supportTask,
+            NotConnectingReason = notConnectingReason,
+            NotConnectingAdditionalDetails = null,
+            RecordMatchingPolicy = RecordMatchingPolicy.Deferred,
+            EmailTemplateId = customTemplateId
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails,
+            e =>
+            {
+                Assert.Equal(customTemplateId, e.TemplateId);
+                Assert.Equal(notConnectingReason.GetDisplayName(), e.Personalization["reason"]);
+            });
+    }
+
+    [Fact]
+    public async Task ResolveVerificationSupportTaskAsync_WithVerifiedOnlyWithMatchesOutcome_WithDeferredPolicyAndAnotherReason_SendsEmailWithAdditionalDetails()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var customTemplateId = "custom-template-id";
+        var notConnectingAdditionalDetails = Faker.Lorem.Paragraph();
+
+        var options = new VerifiedOnlyWithMatchesOutcomeOptions
+        {
+            SupportTask = supportTask,
+            NotConnectingReason = OneLoginUserNotConnectingReason.AnotherReason,
+            NotConnectingAdditionalDetails = notConnectingAdditionalDetails,
+            RecordMatchingPolicy = RecordMatchingPolicy.Deferred,
+            EmailTemplateId = customTemplateId
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails,
+            e =>
+            {
+                Assert.Equal(customTemplateId, e.TemplateId);
+                Assert.Equal(notConnectingAdditionalDetails, e.Personalization["reason"]);
+            });
+    }
+
+    [Fact]
+    public async Task ResolveVerificationSupportTaskAsync_WithVerifiedOnlyWithMatchesOutcome_WithRequiredPolicy_DoesNotSendEmail()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var options = new VerifiedOnlyWithMatchesOutcomeOptions
+        {
+            SupportTask = supportTask,
+            NotConnectingReason = OneLoginUserNotConnectingReason.AnotherReason,
+            NotConnectingAdditionalDetails = Faker.Lorem.Paragraph(),
+            RecordMatchingPolicy = RecordMatchingPolicy.Required,
+            EmailTemplateId = "custom-template-id"
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Empty(emails);
     }
 
     [Fact]
@@ -311,7 +442,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
                 KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
-            ]
+            ],
+            EmailTemplateId = null
         };
 
         var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
@@ -349,6 +481,47 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             e => Assert.IsType<EmailSentEvent>(e),
             e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
             e => Assert.IsType<SupportTaskUpdatedEvent>(e));
+    }
+
+    [Fact]
+    public async Task ResolveVerificationSupportTaskAsync_WithVerifiedAndConnectedOutcome_WithCustomEmailTemplateId_UsesCustomTemplate()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var matchedPerson = await TestData.CreatePersonAsync();
+
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithStatedFirstName(matchedPerson.FirstName)
+                .WithStatedLastName(matchedPerson.LastName)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedTrn(matchedPerson.Trn!));
+
+        var customTemplateId = "custom-template-id";
+
+        var options = new VerifiedAndConnectedOutcomeOptions
+        {
+            SupportTask = supportTask,
+            MatchedPersonId = matchedPerson.PersonId,
+            MatchedAttributes =
+            [
+                KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
+            ],
+            EmailTemplateId = customTemplateId
+        };
+
+        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails, e => Assert.Equal(customTemplateId, e.TemplateId));
     }
 
     private Task WithServiceAsync(Func<OneLoginUserMatchingSupportTaskService, Task> action, params object[] arguments) =>

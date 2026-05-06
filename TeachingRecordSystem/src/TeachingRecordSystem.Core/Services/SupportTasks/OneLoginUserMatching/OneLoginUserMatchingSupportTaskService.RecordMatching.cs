@@ -43,6 +43,18 @@ public partial class OneLoginUserMatchingSupportTaskService
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
+        var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
+
+        if (options.RecordMatchingPolicy == RecordMatchingPolicy.Deferred && options.EmailTemplateId is not null)
+        {
+            var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
+            var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
+            var reason = options.NotConnectingReason is OneLoginUserNotConnectingReason.AnotherReason
+                ? options.NotConnectingAdditionalDetails!
+                : options.NotConnectingReason.GetDisplayName()!;
+            await oneLoginService.EnqueueNotConnectedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, reason, processContext, options.EmailTemplateId);
+        }
+
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
             {
@@ -128,7 +140,7 @@ public partial class OneLoginUserMatchingSupportTaskService
         {
             var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
             var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
-            await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
+            await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId);
         }
     }
 }

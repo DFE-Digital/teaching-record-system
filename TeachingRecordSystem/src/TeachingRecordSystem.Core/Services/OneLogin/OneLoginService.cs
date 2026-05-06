@@ -22,12 +22,12 @@ public class OneLoginService(
     // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
     private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
 
-    public async Task EnqueueNotVerifiedEmailAsync(string emailAddress, string personName, string reason, ProcessContext processContext)
+    public async Task EnqueueNotVerifiedEmailAsync(string emailAddress, string personName, string reason, ProcessContext processContext, string? templateId = null)
     {
         var email = new Email
         {
             EmailId = Guid.NewGuid(),
-            TemplateId = EmailTemplateIds.OneLoginNotVerified,
+            TemplateId = templateId ?? EmailTemplateIds.OneLoginNotVerified,
             EmailAddress = emailAddress,
             Personalization = GetOneLoginNotVerifiedEmailPersonalization(personName, reason).ToDictionary()
         };
@@ -54,7 +54,7 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task EnqueueRecordMatchedEmailAsync(string emailAddress, string personName, ProcessContext processContext)
+    public async Task EnqueueRecordMatchedEmailAsync(string emailAddress, string personName, ProcessContext processContext, string? templateId = null)
     {
         var personalization = new Dictionary<string, string>
         {
@@ -64,9 +64,25 @@ public class OneLoginService(
         var email = new Email
         {
             EmailId = Guid.NewGuid(),
-            TemplateId = EmailTemplateIds.OneLoginRecordMatched,
+            TemplateId = templateId ?? EmailTemplateIds.OneLoginRecordMatched,
             EmailAddress = emailAddress,
             Personalization = personalization
+        };
+
+        dbContext.Emails.Add(email);
+        await dbContext.SaveChangesAsync();
+
+        await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
+    }
+
+    public async Task EnqueueNotConnectedEmailAsync(string emailAddress, string personName, string reason, ProcessContext processContext, string? templateId = null)
+    {
+        var email = new Email
+        {
+            EmailId = Guid.NewGuid(),
+            TemplateId = templateId ?? EmailTemplateIds.OneLoginNotConnected,
+            EmailAddress = emailAddress,
+            Personalization = GetOneLoginNotConnectedEmailPersonalization(personName, reason).ToDictionary()
         };
 
         dbContext.Emails.Add(email);
@@ -301,6 +317,13 @@ public class OneLoginService(
         new Dictionary<string, string> { ["name"] = personName };
 
     private static IReadOnlyDictionary<string, string> GetOneLoginNotVerifiedEmailPersonalization(string personName, string reason) =>
+        new Dictionary<string, string>
+        {
+            ["name"] = personName,
+            ["reason"] = reason
+        };
+
+    private static IReadOnlyDictionary<string, string> GetOneLoginNotConnectedEmailPersonalization(string personName, string reason) =>
         new Dictionary<string, string>
         {
             ["name"] = personName,
