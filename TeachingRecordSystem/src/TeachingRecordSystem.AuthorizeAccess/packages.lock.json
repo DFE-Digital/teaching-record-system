@@ -28,11 +28,11 @@
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "Direct",
-        "requested": "[0.4.2, )",
-        "resolved": "0.4.2",
-        "contentHash": "q4jHwl6gJZnxoj0XBwj6WpJIDqdH7wwqYVwWysIMKM2qKV0+Y6S7qR9alOOkSzTYkMlaKwtS/gIYb1ehBqfUWw==",
+        "requested": "[0.4.3, )",
+        "resolved": "0.4.3",
+        "contentHash": "ImkDGUH6bkg7fSroHJqOzsQjS86q0drmOba3rXyZI13SRmA7xfuwVSRCmZde7QPsRgnCUGTaa4ksQlGR5mMXEA==",
         "dependencies": {
-          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.25"
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.26"
         }
       },
       "GovUk.Questions.AspNetCore": {
@@ -194,7 +194,8 @@
         "resolved": "11.11.0",
         "contentHash": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
         "dependencies": {
-          "FluentValidation": "11.11.0"
+          "FluentValidation": "11.11.0",
+          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
         }
       },
       "Google.Api.Gax": {
@@ -394,6 +395,11 @@
         "type": "Transitive",
         "resolved": "10.3.0",
         "contentHash": "b3gmxtyX0n8bQFuZ679f8QiOWqjeZKFc6XXPUsYNFzMcWi0Q44Ej3pB41N/QQ0maX380kmOMF36bLSBHNThXAg=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "2.1.0",
+        "contentHash": "8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ=="
       },
       "Microsoft.Extensions.DependencyInjection.AutoActivation": {
         "type": "Transitive",
