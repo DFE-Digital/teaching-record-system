@@ -34,7 +34,7 @@ public class ConfirmNotConnecting(
     {
         if (cancel)
         {
-            await JourneyInstance.DeleteAsync();         
+            await JourneyInstance.DeleteAsync();
 
             if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
             {
@@ -48,7 +48,7 @@ public class ConfirmNotConnecting(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveVerificationSupportTaskAsync(      
+            await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedOnlyWithMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!,
