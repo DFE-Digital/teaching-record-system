@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -241,8 +242,24 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
     public async Task Post_IdVerificationSupportTaskMarksUserVerifiedClosesSupportTaskAndRedirectsToListPageWithFlashMessage()
     {
         // Arrange
+        var clientApplicationUserId = Guid.NewGuid();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var applicationUser = new ApplicationUser
+            {
+                UserId = clientApplicationUserId,
+                Name = TestData.GenerateApplicationUserName(),
+                ApiRoles = [],
+                IsOidcClient = false,
+                RecordMatchingPolicy = RecordMatchingPolicy.Required
+            };
+            dbContext.ApplicationUsers.Add(applicationUser);
+            await dbContext.SaveChangesAsync();
+        });
+
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, t => t.WithClientApplicationUserId(clientApplicationUserId));
         var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
         var notConnectingReason = OneLoginUserNotConnectingReason.AnotherReason;
@@ -297,11 +314,28 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
     public async Task Post_RecordMatchingSupportTaskSetsOutcomeClosesSupportTaskAndRedirectsToListPageWithFlashMessage()
     {
         // Arrange
+        var clientApplicationUserId = Guid.NewGuid();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var applicationUser = new ApplicationUser
+            {
+                UserId = clientApplicationUserId,
+                Name = TestData.GenerateApplicationUserName(),
+                ApiRoles = [],
+                IsOidcClient = false,
+                RecordMatchingPolicy = RecordMatchingPolicy.Required
+            };
+            dbContext.ApplicationUsers.Add(applicationUser);
+            await dbContext.SaveChangesAsync();
+        });
+
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         var firstName = TestData.GenerateFirstName();
         var lastName = TestData.GenerateLastName();
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
             oneLoginUser.Subject, t => t
+                .WithClientApplicationUserId(clientApplicationUserId)
                 .WithVerifiedNames([firstName, lastName]));
         var supportTaskData = supportTask.GetData<OneLoginUserRecordMatchingData>();
 
@@ -397,5 +431,188 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Post_DeferredRecordMatchingPolicyWithCustomFlashMessage_UsesCustomFlashMessage(bool isRecordMatchingOnlySupportTask)
+    {
+        // Arrange
+        var customFlashMessage = "Request closed for {0}. We’ve sent them an email with a link to continue their national professional qualification (NPQ) registration.";
+        var clientApplicationUserId = Guid.NewGuid();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var applicationUser = new ApplicationUser
+            {
+                UserId = clientApplicationUserId,
+                Name = TestData.GenerateApplicationUserName(),
+                ApiRoles = [],
+                IsOidcClient = false,
+                RecordMatchingPolicy = RecordMatchingPolicy.Deferred,
+                AppContent = new AppContent
+                {
+                    OneLoginNotConnectedEmailTemplateId = Guid.NewGuid().ToString(),
+                    OneLoginNotConnectedEmailSentFlashMessage = customFlashMessage
+                }
+            };
+            dbContext.ApplicationUsers.Add(applicationUser);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
+        var supportTask = isRecordMatchingOnlySupportTask ?
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, t => t.WithClientApplicationUserId(clientApplicationUserId)) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, t => t.WithClientApplicationUserId(clientApplicationUserId));
+        var supportTaskData = supportTask.GetData<IOneLoginUserMatchingData>();
+        var firstName = supportTaskData.VerifiedOrStatedNames!.First().First();
+        var lastName = supportTaskData.VerifiedOrStatedNames!.First().LastOrDefault();
+
+        var notConnectingReason = OneLoginUserNotConnectingReason.AnotherReason;
+        var additionalDetails = Faker.Lorem.Paragraph();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask,
+            s =>
+            {
+                s.Verified = true;
+                s.MatchedPersonId = ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel;
+                s.NotConnectingReason = notConnectingReason;
+                s.NotConnectingAdditionalDetails = additionalDetails;
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+            nextPageDoc,
+            "Email sent",
+            string.Format(customFlashMessage, $"{firstName} {lastName}"));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Post_DeferredRecordMatchingPolicyWithoutCustomFlashMessage_UsesDefaultFlashMessage(bool isRecordMatchingOnlySupportTask)
+    {
+        // Arrange
+        var clientApplicationUserId = Guid.NewGuid();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var applicationUser = new ApplicationUser
+            {
+                UserId = clientApplicationUserId,
+                Name = TestData.GenerateApplicationUserName(),
+                ApiRoles = [],
+                IsOidcClient = false,
+                RecordMatchingPolicy = RecordMatchingPolicy.Deferred
+            };
+            dbContext.ApplicationUsers.Add(applicationUser);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
+        var supportTask = isRecordMatchingOnlySupportTask ?
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, t => t.WithClientApplicationUserId(clientApplicationUserId)) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, t => t.WithClientApplicationUserId(clientApplicationUserId));
+        var supportTaskData = supportTask.GetData<IOneLoginUserMatchingData>();
+        var firstName = supportTaskData.VerifiedOrStatedNames!.First().First();
+        var lastName = supportTaskData.VerifiedOrStatedNames!.First().LastOrDefault();
+
+        var notConnectingReason = OneLoginUserNotConnectingReason.AnotherReason;
+        var additionalDetails = Faker.Lorem.Paragraph();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask,
+            s =>
+            {
+                s.Verified = true;
+                s.MatchedPersonId = ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel;
+                s.NotConnectingReason = notConnectingReason;
+                s.NotConnectingAdditionalDetails = additionalDetails;
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+            nextPageDoc,
+            "Email sent",
+            $"Request closed for {firstName} {lastName}. We’ve sent them an email confirming their GOV.UK One Login is not connected to a teaching record.");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Post_RequiredRecordMatchingPolicy_DoesNotSendEmailAndUsesDefaultFlashMessage(bool isRecordMatchingOnlySupportTask)
+    {
+        // Arrange
+        var clientApplicationUserId = Guid.NewGuid();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var applicationUser = new ApplicationUser
+            {
+                UserId = clientApplicationUserId,
+                Name = TestData.GenerateApplicationUserName(),
+                ApiRoles = [],
+                IsOidcClient = false,
+                RecordMatchingPolicy = RecordMatchingPolicy.Required
+            };
+            dbContext.ApplicationUsers.Add(applicationUser);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
+        var supportTask = isRecordMatchingOnlySupportTask ?
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject, t => t.WithClientApplicationUserId(clientApplicationUserId)) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject, t => t.WithClientApplicationUserId(clientApplicationUserId));
+        var supportTaskData = supportTask.GetData<IOneLoginUserMatchingData>();
+        var firstName = supportTaskData.VerifiedOrStatedNames!.First().First();
+        var lastName = supportTaskData.VerifiedOrStatedNames!.First().LastOrDefault();
+
+        var notConnectingReason = OneLoginUserNotConnectingReason.AnotherReason;
+        var additionalDetails = Faker.Lorem.Paragraph();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask,
+            s =>
+            {
+                s.Verified = true;
+                s.MatchedPersonId = ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel;
+                s.NotConnectingReason = notConnectingReason;
+                s.NotConnectingAdditionalDetails = additionalDetails;
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+            nextPageDoc,
+            "GOV.UK One Login not connected to a record",
+            $"Request closed for {firstName} {lastName}.");
     }
 }

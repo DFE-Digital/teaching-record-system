@@ -91,9 +91,17 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public string? OneLoginCannotFindRecordEmailTemplateId { get; set; }
 
+    public string? OneLoginNotVerifiedEmailTemplateId { get; set; }
+
+    public string? OneLoginRecordMatchedEmailTemplateId { get; set; }
+
+    public string? OneLoginNotConnectedEmailTemplateId { get; set; }
+
     public string? OneLoginNoMatchesPageContentHtml { get; set; }
 
     public string? OneLoginNoMatchesEmailSentFlashMessage { get; set; }
+
+    public string? OneLoginNotConnectedEmailSentFlashMessage { get; set; }
 
     public string? OneLoginFoundPageLinkText { get; set; }
 
@@ -116,8 +124,12 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         OneLoginPostLogoutRedirectUriPath = _user.OneLoginPostLogoutRedirectUriPath;
         RecordMatchingPolicy = _user.RecordMatchingPolicy;
         OneLoginCannotFindRecordEmailTemplateId = _user.AppContent?.OneLoginCannotFindRecordEmailTemplateId;
+        OneLoginNotVerifiedEmailTemplateId = _user.AppContent?.OneLoginNotVerifiedEmailTemplateId;
+        OneLoginRecordMatchedEmailTemplateId = _user.AppContent?.OneLoginRecordMatchedEmailTemplateId;
+        OneLoginNotConnectedEmailTemplateId = _user.AppContent?.OneLoginNotConnectedEmailTemplateId;
         OneLoginNoMatchesPageContentHtml = _user.AppContent?.OneLoginNoMatchesPageContentHtml;
         OneLoginNoMatchesEmailSentFlashMessage = _user.AppContent?.OneLoginNoMatchesEmailSentFlashMessage;
+        OneLoginNotConnectedEmailSentFlashMessage = _user.AppContent?.OneLoginNotConnectedEmailSentFlashMessage;
         OneLoginFoundPageLinkText = _user.AppContent?.OneLoginFoundPageLinkText;
         ShortName = _user.ShortName;
     }
@@ -205,13 +217,21 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             newAppContent = new TeachingRecordSystem.Core.Models.AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = OneLoginCannotFindRecordEmailTemplateId,
+                OneLoginNotVerifiedEmailTemplateId = OneLoginNotVerifiedEmailTemplateId,
+                OneLoginRecordMatchedEmailTemplateId = OneLoginRecordMatchedEmailTemplateId,
+                OneLoginNotConnectedEmailTemplateId = OneLoginNotConnectedEmailTemplateId,
                 OneLoginNoMatchesPageContentHtml = OneLoginNoMatchesPageContentHtml,
                 OneLoginNoMatchesEmailSentFlashMessage = OneLoginNoMatchesEmailSentFlashMessage,
+                OneLoginNotConnectedEmailSentFlashMessage = OneLoginNotConnectedEmailSentFlashMessage,
                 OneLoginFoundPageLinkText = OneLoginFoundPageLinkText
             };
             var appContentChanged = oldAppContent?.OneLoginCannotFindRecordEmailTemplateId != newAppContent.OneLoginCannotFindRecordEmailTemplateId ||
+                                   oldAppContent?.OneLoginNotVerifiedEmailTemplateId != newAppContent.OneLoginNotVerifiedEmailTemplateId ||
+                                   oldAppContent?.OneLoginRecordMatchedEmailTemplateId != newAppContent.OneLoginRecordMatchedEmailTemplateId ||
+                                   oldAppContent?.OneLoginNotConnectedEmailTemplateId != newAppContent.OneLoginNotConnectedEmailTemplateId ||
                                    oldAppContent?.OneLoginNoMatchesPageContentHtml != newAppContent.OneLoginNoMatchesPageContentHtml ||
                                    oldAppContent?.OneLoginNoMatchesEmailSentFlashMessage != newAppContent.OneLoginNoMatchesEmailSentFlashMessage ||
+                                   oldAppContent?.OneLoginNotConnectedEmailSentFlashMessage != newAppContent.OneLoginNotConnectedEmailSentFlashMessage ||
                                    oldAppContent?.OneLoginFoundPageLinkText != newAppContent.OneLoginFoundPageLinkText;
 
             changes |=

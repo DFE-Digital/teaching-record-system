@@ -62,7 +62,7 @@ public partial class OneLoginUserMatchingSupportTaskService
         var reason = options.RejectReason is OneLoginIdVerificationRejectReason.AnotherReason
             ? options.RejectionAdditionalDetails!
             : options.RejectReason.GetDisplayName()!;
-        await oneLoginService.EnqueueNotVerifiedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, reason, processContext);
+        await oneLoginService.EnqueueNotVerifiedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, reason, processContext, options.EmailTemplateId);
     }
 
     public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithMatchesOutcomeOptions options, ProcessContext processContext)
@@ -82,6 +82,15 @@ public partial class OneLoginUserMatchingSupportTaskService
                 CoreIdentityClaimVc = null
             },
             processContext);
+
+        if (options.RecordMatchingPolicy == RecordMatchingPolicy.Deferred && options.EmailTemplateId is not null)
+        {
+            var name = $"{data.StatedFirstName} {data.StatedLastName}";
+            var reason = options.NotConnectingReason is OneLoginUserNotConnectingReason.AnotherReason
+                ? options.NotConnectingAdditionalDetails!
+                : options.NotConnectingReason.GetDisplayName()!;
+            await oneLoginService.EnqueueNotConnectedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, reason, processContext, options.EmailTemplateId);
+        }
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
@@ -156,7 +165,7 @@ public partial class OneLoginUserMatchingSupportTaskService
             processContext);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
-        await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext);
+        await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>

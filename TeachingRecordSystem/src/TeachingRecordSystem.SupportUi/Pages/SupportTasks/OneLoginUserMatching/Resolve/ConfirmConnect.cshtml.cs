@@ -68,7 +68,8 @@ public class ConfirmConnect(
                 {
                     SupportTask = _supportTask!,
                     MatchedPersonId = MatchedPersonId,
-                    MatchedAttributes = matchedPerson.MatchedAttributes
+                    MatchedAttributes = matchedPerson.MatchedAttributes,
+                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginRecordMatchedEmailTemplateId
                 },
                 processContext);
         }
@@ -82,7 +83,8 @@ public class ConfirmConnect(
                     SupportTask = _supportTask!,
                     MatchedPersonId = MatchedPersonId,
                     Trn = matchedPerson.Trn,
-                    MatchedAttributes = matchedPerson.MatchedAttributes
+                    MatchedAttributes = matchedPerson.MatchedAttributes,
+                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginRecordMatchedEmailTemplateId
                 },
                 processContext);
         }

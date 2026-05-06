@@ -8,4 +8,5 @@ public record ConnectedOutcomeOptions
     public required Guid MatchedPersonId { get; init; }
     public required string Trn { get; init; }
     public required IEnumerable<KeyValuePair<PersonMatchedAttribute, string>> MatchedAttributes { get; init; }
+    public required string? EmailTemplateId { get; init; }
 }
