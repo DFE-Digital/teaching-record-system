@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -10,7 +9,6 @@ namespace TeachingRecordSystem.Api.Infrastructure.Security;
 
 public class ApiKeyAuthenticationHandler(
     TrsDbContext dbContext,
-    IMemoryCache memoryCache,
     IOptionsMonitor<ApiKeyAuthenticationOptions> options,
     ILoggerFactory logger,
     UrlEncoder encoder) : AuthenticationHandler<ApiKeyAuthenticationOptions>(options, logger, encoder)
@@ -19,7 +17,7 @@ public class ApiKeyAuthenticationHandler(
 
     private const string AuthenticationHeaderScheme = "Bearer";
 
-    protected async override Task<AuthenticateResult> HandleAuthenticateAsync()
+    protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         string? authorizationHeader = Request.Headers.Authorization;
 
@@ -35,28 +33,11 @@ public class ApiKeyAuthenticationHandler(
 
         var key = authorizationHeader[(AuthenticationHeaderScheme.Length + 1)..];
 
-        var apiKey = await memoryCache.GetOrCreateAsync(
-            key: $"ApiKeys:{key}",
-            async cacheEntry =>
-            {
-                var apiKey = await dbContext.ApiKeys
-                    .AsNoTracking()
-                    .Where(k => k.Key == key)
-                    .Include(k => k.ApplicationUser)
-                    .SingleOrDefaultAsync();
-
-                if (apiKey is null)
-                {
-                    // Don't cache bad keys
-                    cacheEntry.SetAbsoluteExpiration(DateTimeOffset.UtcNow);
-                }
-                else
-                {
-                    cacheEntry.SetSlidingExpiration(TimeSpan.FromMinutes(2));
-                }
-
-                return apiKey;
-            });
+        var apiKey = await dbContext.ApiKeys
+            .AsNoTracking()
+            .Where(k => k.Key == key)
+            .Include(k => k.ApplicationUser)
+            .SingleOrDefaultAsync();
 
         if (apiKey is null)
         {
