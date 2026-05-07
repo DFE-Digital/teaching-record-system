@@ -157,6 +157,31 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_WithSearchThatLooksLikeAnEmailAddressWithDifferentCase_DisplaysMatchOnOneLoginUserEmail()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var emailAddress = "Test.User@Example.Com";
+        await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(emailAddress));
+        var search = "test.user@example.com";
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var personResults = doc.GetAllElementsByTestId($"person-{person.PersonId}");
+        Assert.Single(personResults);
+
+        var emailResults = doc.GetAllElementsByTestId("one-login-emails");
+        Assert.Single(emailResults);
+        Assert.Contains(emailAddress, emailResults.Single().TextContent);
+    }
+
+    [Fact]
     public async Task Get_WithIncludeActiveFilter_DisplaysOnlyActivePersons()
     {
         // Arrange

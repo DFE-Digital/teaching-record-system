@@ -14,7 +14,8 @@ public class OneLoginUserMapping : IEntityTypeConfiguration<OneLoginUser>
         builder.IncludeInAnalyticsSync(includeAllColumns: false);
         builder.HasKey(o => o.Subject);
         builder.Property(o => o.Subject).HasMaxLength(255).ConfigureAnalyticsSync(hidden: true);
-        builder.Property(o => o.EmailAddress).HasMaxLength(200).ConfigureAnalyticsSync(hidden: true);
+        builder.Property(o => o.EmailAddress).HasMaxLength(200).UseCollation(Collations.CaseInsensitive).ConfigureAnalyticsSync(hidden: true);
+        builder.HasIndex(o => o.EmailAddress).IsCreatedConcurrently();
         builder.Property(o => o.PersonId).ConfigureAnalyticsSync(included: true, hidden: false);
         builder.HasOne(o => o.Person).WithMany(p => p.OneLoginUsers).HasForeignKey(o => o.PersonId);
         builder.Property(o => o.VerifiedNames)
