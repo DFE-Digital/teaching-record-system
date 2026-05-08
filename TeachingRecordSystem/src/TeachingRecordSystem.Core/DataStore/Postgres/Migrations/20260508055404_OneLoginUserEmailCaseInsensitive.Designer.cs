@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260508055404_OneLoginUserEmailCaseInsensitive")]
+    partial class OneLoginUserEmailCaseInsensitive
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1406,10 +1409,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.HasKey("Subject")
                         .HasName("pk_one_login_users");
-
-                    b.HasIndex("EmailAddress")
-                        .HasDatabaseName("ix_one_login_users_email_address")
-                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
 
                     b.ToTable("one_login_users", (string)null);
                 });
