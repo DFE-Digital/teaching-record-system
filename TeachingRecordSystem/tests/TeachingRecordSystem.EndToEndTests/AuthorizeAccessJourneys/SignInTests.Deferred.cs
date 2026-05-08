@@ -1,3 +1,7 @@
+using System.Net.Http.Json;
+using System.Text.Json;
+using Microsoft.Playwright;
+using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.EndToEndTests.AuthorizeAccessJourneys;
@@ -39,6 +43,10 @@ public partial class SignInTests
         await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
 
         await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
+
+        await page.CloseAsync();
+
+        await ActivateAndResolveDormantTrnRequestAndSignInAsync(context, trnRequestId);
     }
 
     [Fact]
@@ -71,6 +79,10 @@ public partial class SignInTests
         await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
 
         await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
+
+        await page.CloseAsync();
+
+        await ActivateAndResolveDormantTrnRequestAndSignInAsync(context, trnRequestId);
     }
 
     [Fact]
@@ -117,6 +129,10 @@ public partial class SignInTests
         });
 
         await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
+
+        await page.CloseAsync();
+
+        await ActivateAndResolveDormantTrnRequestAndSignInAsync(context, trnRequestId);
     }
 
     [Fact]
@@ -183,6 +199,45 @@ public partial class SignInTests
         await page.GetByTestId("continue-link").ClickAsync();
 
         await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
+
+        await page.CloseAsync();
+
+        await ActivateAndResolveDormantTrnRequestAndSignInAsync(context, trnRequestId);
+    }
+
+    private async Task ActivateAndResolveDormantTrnRequestAndSignInAsync(IBrowserContext context, string trnRequestId)
+    {
+        var resolvedTrn = await ResolveDormantTrnRequestAsync();
+
+        var page = await context.NewPageAsync();
+
+        await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
+
+        await page.AssertSignedInAsync(resolvedTrn);
+
+        async Task<string> ResolveDormantTrnRequestAsync()
+        {
+            var applicationUserId = await GetDeferredRecordMatchingPolicyApplicationUserId();
+
+            using var httpClient = HostFixture.GetHttpClientWithAuthorizeAccessTokenForTrnRequest(
+                applicationUserId,
+                trnRequestId,
+                version: VersionRegistry.V3MinorVersions.V20260416);
+
+            var activateResponse = await httpClient.PutAsync("/v3/trn-request/activate", content: null);
+            activateResponse.EnsureSuccessStatusCode();
+
+            var activateResponseBodyJson = (await activateResponse.Content.ReadFromJsonAsync<JsonDocument>())!;
+
+            var status = activateResponseBodyJson.RootElement.GetProperty("status").GetString();
+            if (status is not "Completed")
+            {
+                throw new InvalidOperationException($"Unexpected status '{status}' when activating dormant TRN request.");
+            }
+
+            var trn = activateResponseBodyJson.RootElement.GetProperty("trn").GetString()!;
+            return trn;
+        }
     }
 
     private Task<Guid> GetDeferredRecordMatchingPolicyApplicationUserId() =>
