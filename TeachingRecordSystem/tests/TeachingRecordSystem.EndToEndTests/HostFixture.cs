@@ -1,17 +1,26 @@
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Playwright;
 using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess;
+using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.EndToEndTests;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -29,21 +38,34 @@ public sealed class HostFixture : InitializeDbFixture
     private const int AuthorizeAccessPort = 55649;
     private const int SupportUiPort = 5901;
 
-    private readonly ApiWebApplicationFactory _apiWebApplicationFactory = new();
-    private readonly AuthorizeAccessWebApplicationFactory _authorizeAccessWebApplicationFactory = new();
-    private readonly SupportUiWebApplicationFactory _supportUiWebApplicationFactory = new();
+    private readonly ApiWebApplicationFactory _apiWebApplicationFactory;
+    private readonly AuthorizeAccessWebApplicationFactory _authorizeAccessWebApplicationFactory;
+    private readonly SupportUiWebApplicationFactory _supportUiWebApplicationFactory;
 
     private IPlaywright _playwright = null!;
     private IBrowser _browser = null!;
 
     public HostFixture()
     {
+        _apiWebApplicationFactory = new(this);
+        _authorizeAccessWebApplicationFactory = new(this);
+        _supportUiWebApplicationFactory = new();
+
         TimeProvider = TimeProvider.System;
 
         TestData = new(
             DbHelper.Instance.DbContextFactory,
             new ReferenceDataCache(DbHelper.Instance.DbContextFactory),
             this.TimeProvider);
+
+        using (var rsa = RSA.Create())
+        {
+            JwtSigningCredentials = new SigningCredentials(
+                new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)),
+                SecurityAlgorithms.RsaSha256);
+        }
+
+        ConfigureMocks();
     }
 
     public static string ApiBaseUrl => $"http://localhost:{ApiPort}";
@@ -54,13 +76,17 @@ public sealed class HostFixture : InitializeDbFixture
     public IServiceProvider AuthorizeAccessHostServices => _authorizeAccessWebApplicationFactory.Services;
     public IServiceProvider SupportUiHostServices => _supportUiWebApplicationFactory.Services;
 
+    public SigningCredentials JwtSigningCredentials { get; }
+
     public IDbContextFactory<TrsDbContext> DbContextFactory => DbHelper.DbContextFactory;
     public TimeProvider TimeProvider { get; }
     public TestData TestData { get; }
 
+    public IGetAnIdentityApiClient GetAnIdentityApiClientMock { get; } = Mock.Of<IGetAnIdentityApiClient>();
+
     public override async ValueTask InitializeAsync()
     {
-        //_apiWebApplicationFactory.StartServer();
+        _apiWebApplicationFactory.StartServer();
         _authorizeAccessWebApplicationFactory.StartServer();
         //_supportUiWebApplicationFactory.StartServer();
 
@@ -102,6 +128,44 @@ public sealed class HostFixture : InitializeDbFixture
             ViewportSize = ViewportSize.NoViewport
         });
 
+    public HttpClient GetHttpClientWithAuthorizeAccessTokenForTrnRequest(
+        Guid applicationUserId,
+        string trnRequestId,
+        string? version)
+    {
+        Claim[] claims = [
+            new("scope", "teaching_record"),
+            new("trn_request_id", trnRequestId),
+            new("trs_user_id", applicationUserId.ToString())
+        ];
+
+        var subject = new ClaimsIdentity(claims);
+
+        var jwtHandler = new JwtSecurityTokenHandler { MapInboundClaims = false };
+
+        var signingCredentials = JwtSigningCredentials;
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = subject,
+            Expires = DateTime.UtcNow.AddHours(1),
+            SigningCredentials = signingCredentials
+        };
+
+        var accessToken = jwtHandler.CreateEncodedJwt(tokenDescriptor);
+
+        var httpClient = new HttpClient();
+        httpClient.BaseAddress = new Uri(ApiBaseUrl);
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+
+        if (version is not null)
+        {
+            httpClient.DefaultRequestHeaders.Add(VersionRegistry.MinorVersionHeaderName, version);
+        }
+
+        return httpClient;
+    }
+
     private async Task AddTestAppToApplicationUsers()
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
@@ -137,22 +201,106 @@ public sealed class HostFixture : InitializeDbFixture
         await dbContext.SaveChangesAsync();
     }
 
+    private void ConfigureServices(IServiceCollection services)
+    {
+        services
+            .AddSingleton<IGetAnIdentityApiClient>(GetAnIdentityApiClientMock)
+            .AddSingleton<INotificationSender, NoopNotificationSender>()
+            .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
+    }
+
+    private void ConfigureMocks()
+    {
+        Mock.Get(GetAnIdentityApiClientMock)
+            .Setup(c => c.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest request) => new CreateTrnTokenResponse
+            {
+                Trn = request.Trn,
+                Email = request.Email,
+                TrnToken = Guid.NewGuid().ToString(),
+                ExpiresUtc = TimeProvider.UtcNow.AddDays(30)
+            });
+    }
+
     private class ApiWebApplicationFactory : WebApplicationFactory<Api.Program>
     {
-        public ApiWebApplicationFactory()
+        private readonly HostFixture _hostFixture;
+
+        public ApiWebApplicationFactory(HostFixture hostFixture)
         {
+            _hostFixture = hostFixture;
+
             UseKestrel(ApiPort);
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment("EndToEndTests");
+
+            var configuration = TestConfiguration.GetConfiguration();
+            builder.UseConfiguration(configuration);
+
+            builder.ConfigureServices((context, services) =>
+            {
+                // Replace authentication handlers with mechanisms we can control from tests
+                services.Configure<AuthenticationOptions>(options =>
+                {
+                    //options.SchemeMap[ApiKeyAuthenticationHandler.AuthenticationScheme].HandlerType = typeof(TestApiKeyAuthenticationHandler);
+                    options.SchemeMap["IdAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
+                    options.SchemeMap["AuthorizeAccessAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
+                });
+
+                services.Configure<SimpleJwtBearerAuthenticationOptions>("IdAccessToken", o => o.IssuerSigningKey = _hostFixture.JwtSigningCredentials.Key);
+                services.Configure<SimpleJwtBearerAuthenticationOptions>("AuthorizeAccessAccessToken", o => o.IssuerSigningKey = _hostFixture.JwtSigningCredentials.Key);
+
+                _hostFixture.ConfigureServices(services);
+
+                services
+                    .AddSingleton(DbHelper.Instance)
+                    .AddSingleton<TestData>();
+
+                services.AddDbContext<IdDbContext>(
+                    options => options.UseInMemoryDatabase("TeacherAuthId"),
+                    contextLifetime: ServiceLifetime.Transient);
+
+                services.Configure<GetAnIdentityOptions>(options =>
+                {
+                    options.TokenEndpoint = "dummy";
+                    options.ClientId = "dummy";
+                    options.ClientSecret = "dummy";
+                    options.BaseAddress = "dummy";
+                });
+
+                services.Configure<WebhookOptions>(options =>
+                {
+                    using var key = ECDsa.Create(ECCurve.NamedCurves.nistP384);
+                    var certRequest = new CertificateRequest("CN=Teaching Record System Tests", key, HashAlgorithmName.SHA384);
+                    using var cert = certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddDays(1));
+                    var certPem = cert.ExportCertificatePem();
+                    var keyPem = key.ExportECPrivateKeyPem();
+
+                    options.CanonicalDomain = "http://localhost";
+                    options.SigningKeyId = "testkey";
+                    options.Keys = [
+                        new WebhookOptionsKey
+                        {
+                            KeyId = "testkey",
+                            CertificatePem = certPem,
+                            PrivateKeyPem = keyPem,
+                        }];
+                });
+            });
         }
     }
 
     private class AuthorizeAccessWebApplicationFactory : WebApplicationFactory<AuthorizeAccess.Program>
     {
-        public AuthorizeAccessWebApplicationFactory()
+        private readonly HostFixture _hostFixture;
+
+        public AuthorizeAccessWebApplicationFactory(HostFixture hostFixture)
         {
+            _hostFixture = hostFixture;
+
             UseKestrel(AuthorizeAccessPort);
         }
 
@@ -204,14 +352,14 @@ public sealed class HostFixture : InitializeDbFixture
                     ];
                 });
 
+                _hostFixture.ConfigureServices(services);
+
                 services
                     .AddSingleton(DbHelper.Instance)
                     .AddSingleton<TestData>()
                     .AddSingleton<OneLoginCurrentUserProvider>()
                     .AddSingleton(GetMockFileService())
-                    .AddSingleton(GetMockSafeFileService())
-                    .AddSingleton(Mock.Of<IGetAnIdentityApiClient>())
-                    .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
+                    .AddSingleton(GetMockSafeFileService());
 
                 IFileService GetMockFileService()
                 {
