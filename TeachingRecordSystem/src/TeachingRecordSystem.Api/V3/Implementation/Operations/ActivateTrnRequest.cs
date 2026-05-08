@@ -29,7 +29,7 @@ public class ActivateTrnRequestHandler(TrnRequestService trnRequestService, Time
         {
             var processContext = new ProcessContext(ProcessType.TrnRequestActivating, timeProvider.UtcNow, currentApplicationUserId);
 
-            await trnRequestService.ActivateTrnRequestAsync(trnRequest, processContext);
+            trnRequestInfo = await trnRequestService.ActivateTrnRequestAsync(trnRequest, processContext);
         }
 
         return new ActivateTrnRequestResult(
