@@ -39,6 +39,16 @@
           "System.ComponentModel.Annotations": "5.0.0"
         }
       },
+      "NSign.AspNetCore": {
+        "type": "Direct",
+        "requested": "[1.2.3, )",
+        "resolved": "1.2.3",
+        "contentHash": "54DxuUVOtuP0uGHugDDNl+aLI154eqUHmmW4+LvBw/9AS4eEJV4BomMSDLIWlPL0fxwkrmNvBrihkjxDaH/MOQ==",
+        "dependencies": {
+          "NSign.Abstractions": "1.2.3",
+          "StructuredFieldValues": "0.7.6"
+        }
+      },
       "xunit.runner.visualstudio": {
         "type": "Direct",
         "requested": "[3.1.5, )",

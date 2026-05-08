@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Hosting;
@@ -14,6 +13,7 @@ using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess;
 using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.EventHandlers;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
@@ -23,6 +23,7 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.EndToEndTests;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Security;
+using TeachingRecordSystem.EndToEndTests.Infrastructure.Webhooks;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
@@ -38,6 +39,8 @@ public sealed class HostFixture : InitializeDbFixture
     private const int AuthorizeAccessPort = 55649;
     private const int SupportUiPort = 5901;
 
+    public static Guid DeferredRecordMatchingPolicyApplicationUserId { get; } = new("D498A7AE-27AC-4D8B-9B5B-0FCD15028165");
+
     private readonly ApiWebApplicationFactory _apiWebApplicationFactory;
     private readonly AuthorizeAccessWebApplicationFactory _authorizeAccessWebApplicationFactory;
     private readonly SupportUiWebApplicationFactory _supportUiWebApplicationFactory;
@@ -45,11 +48,15 @@ public sealed class HostFixture : InitializeDbFixture
     private IPlaywright _playwright = null!;
     private IBrowser _browser = null!;
 
+    private readonly WebhookReceiver _webhookReceiver;
+
     public HostFixture()
     {
         _apiWebApplicationFactory = new(this);
         _authorizeAccessWebApplicationFactory = new(this);
         _supportUiWebApplicationFactory = new();
+
+        _webhookReceiver = new();
 
         TimeProvider = TimeProvider.System;
 
@@ -64,6 +71,8 @@ public sealed class HostFixture : InitializeDbFixture
                 new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)),
                 SecurityAlgorithms.RsaSha256);
         }
+
+        WebhookMessageRecorder = _webhookReceiver.WebhookMessageRecorder;
 
         ConfigureMocks();
     }
@@ -81,6 +90,7 @@ public sealed class HostFixture : InitializeDbFixture
     public IDbContextFactory<TrsDbContext> DbContextFactory => DbHelper.DbContextFactory;
     public TimeProvider TimeProvider { get; }
     public TestData TestData { get; }
+    public WebhookMessageRecorder WebhookMessageRecorder { get; }
 
     public IGetAnIdentityApiClient GetAnIdentityApiClientMock { get; } = Mock.Of<IGetAnIdentityApiClient>();
 
@@ -111,6 +121,7 @@ public sealed class HostFixture : InitializeDbFixture
         await dbHelper.InitializeAsync();
         await dbHelper.ClearDataAsync();
         await AddTestAppToApplicationUsers();
+        await AddWebhookReceiverEndpoint();
     }
 
     public override async ValueTask DisposeAsync()
@@ -118,6 +129,8 @@ public sealed class HostFixture : InitializeDbFixture
         await _apiWebApplicationFactory.DisposeAsync();
         await _authorizeAccessWebApplicationFactory.DisposeAsync();
         await _supportUiWebApplicationFactory.DisposeAsync();
+
+        _webhookReceiver.Dispose();
 
         await base.DisposeAsync();
     }
@@ -187,7 +200,7 @@ public sealed class HostFixture : InitializeDbFixture
         // Add the deferred test app with Deferred record matching policy
         dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
         {
-            UserId = Guid.NewGuid(),
+            UserId = DeferredRecordMatchingPolicyApplicationUserId,
             Name = "Test App (Deferred Matching)",
             IsOidcClient = true,
             ClientId = DeferredTestAppConfiguration.ClientId,
@@ -201,12 +214,65 @@ public sealed class HostFixture : InitializeDbFixture
         await dbContext.SaveChangesAsync();
     }
 
+    private async Task AddWebhookReceiverEndpoint()
+    {
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        dbContext.WebhookEndpoints.Add(new Core.DataStore.Postgres.Models.WebhookEndpoint
+        {
+            WebhookEndpointId = Guid.NewGuid(),
+            ApplicationUserId = DeferredRecordMatchingPolicyApplicationUserId,
+            Address = _webhookReceiver.FullyQualifiedEndpoint,
+            ApiVersion = VersionRegistry.V3MinorVersions.V20260416,
+            CloudEventTypes = ["trn_request.completed"],
+            Enabled = true,
+            CreatedOn = TimeProvider.UtcNow,
+            UpdatedOn = TimeProvider.UtcNow
+        });
+
+        await dbContext.SaveChangesAsync();
+    }
+
     private void ConfigureServices(IServiceCollection services)
     {
         services
             .AddSingleton<IGetAnIdentityApiClient>(GetAnIdentityApiClientMock)
             .AddSingleton<INotificationSender, NoopNotificationSender>()
             .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
+
+        services.Configure<WebhookOptions>(options =>
+        {
+            options.CanonicalDomain = "https://dummy";
+            options.SigningKeyId = "key";
+            options.Keys =
+            [
+                new WebhookOptionsKey()
+                {
+                    KeyId = _webhookReceiver.KeyId,
+                    CertificatePem = _webhookReceiver.Certificate.ExportCertificatePem(),
+                    PrivateKeyPem = _webhookReceiver.SigningKey.ExportECPrivateKeyPem()
+                }
+            ];
+        });
+
+        WebhookSender.Register(services);
+
+        services.AddDbContext<IdDbContext>(
+            options => options.UseInMemoryDatabase("TeacherAuthId"),
+            contextLifetime: ServiceLifetime.Transient);
+
+        services.Configure<GetAnIdentityOptions>(options =>
+        {
+            options.TokenEndpoint = "dummy";
+            options.ClientId = "dummy";
+            options.ClientSecret = "dummy";
+            options.BaseAddress = "dummy";
+        });
+
+        // Replace CreateWebhookMessages with SendWebhookMessagesEventHandler;
+        // we want to dispatch webhook messages immediately instead of queueing them
+        services.Remove(services.Single(sd => sd.ImplementationType == typeof(CreateWebhookMessages)));
+        services.AddTransient<IEventHandler, SendWebhookMessagesEventHandler>();
     }
 
     private void ConfigureMocks()
@@ -258,37 +324,6 @@ public sealed class HostFixture : InitializeDbFixture
                 services
                     .AddSingleton(DbHelper.Instance)
                     .AddSingleton<TestData>();
-
-                services.AddDbContext<IdDbContext>(
-                    options => options.UseInMemoryDatabase("TeacherAuthId"),
-                    contextLifetime: ServiceLifetime.Transient);
-
-                services.Configure<GetAnIdentityOptions>(options =>
-                {
-                    options.TokenEndpoint = "dummy";
-                    options.ClientId = "dummy";
-                    options.ClientSecret = "dummy";
-                    options.BaseAddress = "dummy";
-                });
-
-                services.Configure<WebhookOptions>(options =>
-                {
-                    using var key = ECDsa.Create(ECCurve.NamedCurves.nistP384);
-                    var certRequest = new CertificateRequest("CN=Teaching Record System Tests", key, HashAlgorithmName.SHA384);
-                    using var cert = certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddDays(1));
-                    var certPem = cert.ExportCertificatePem();
-                    var keyPem = key.ExportECPrivateKeyPem();
-
-                    options.CanonicalDomain = "http://localhost";
-                    options.SigningKeyId = "testkey";
-                    options.Keys = [
-                        new WebhookOptionsKey
-                        {
-                            KeyId = "testkey",
-                            CertificatePem = certPem,
-                            PrivateKeyPem = keyPem,
-                        }];
-                });
             });
         }
     }

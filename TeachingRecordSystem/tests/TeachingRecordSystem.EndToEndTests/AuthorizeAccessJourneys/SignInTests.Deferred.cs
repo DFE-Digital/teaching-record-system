@@ -30,7 +30,7 @@ public partial class SignInTests
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
 
-        var applicationUserId = await GetDeferredRecordMatchingPolicyApplicationUserId();
+        var applicationUserId = HostFixture.DeferredRecordMatchingPolicyApplicationUserId;
         var trnRequestId = Guid.NewGuid().ToString();
 
         await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
@@ -55,7 +55,7 @@ public partial class SignInTests
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
 
-        var applicationUserId = await GetDeferredRecordMatchingPolicyApplicationUserId();
+        var applicationUserId = HostFixture.DeferredRecordMatchingPolicyApplicationUserId;
         var trnRequestId = Guid.NewGuid().ToString();
 
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
@@ -217,7 +217,7 @@ public partial class SignInTests
 
         async Task<string> ResolveDormantTrnRequestAsync()
         {
-            var applicationUserId = await GetDeferredRecordMatchingPolicyApplicationUserId();
+            var applicationUserId = HostFixture.DeferredRecordMatchingPolicyApplicationUserId;
 
             using var httpClient = HostFixture.GetHttpClientWithAuthorizeAccessTokenForTrnRequest(
                 applicationUserId,
@@ -239,10 +239,4 @@ public partial class SignInTests
             return trn;
         }
     }
-
-    private Task<Guid> GetDeferredRecordMatchingPolicyApplicationUserId() =>
-        WithDbContextAsync(dbContext => dbContext.ApplicationUsers
-            .Where(u => u.OneLoginAuthenticationSchemeName == HostFixture.DeferredFakeOneLoginAuthenticationScheme)
-            .Select(u => u.UserId)
-            .SingleAsync());
 }
