@@ -1,4 +1,5 @@
 name: Deploy environment
+run-name: Deploy ${{ github.ref_name }} to ${{ inputs.environment }} by @${{ github.actor }}
 
 on:
   workflow_dispatch:
