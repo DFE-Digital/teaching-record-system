@@ -35,6 +35,8 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseMiddleware<LogSessionUrlsMiddleware>();
+
         app.MapDefaultEndpoints();
 
         app.UseWhen(

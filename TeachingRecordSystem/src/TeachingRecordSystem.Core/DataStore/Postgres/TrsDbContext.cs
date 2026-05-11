@@ -168,6 +168,17 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TrsDbContext).Assembly);
 
+        var sessionUrlsModel = modelBuilder.Entity("SessionUrls");
+        sessionUrlsModel.HasNoKey();
+        sessionUrlsModel.Property<string>("SessionId").HasColumnType("varchar(255)");
+        sessionUrlsModel.Property<DateTime>("Timestamp");
+        sessionUrlsModel.Property<string>("Method").HasColumnType("varchar(10)");
+        sessionUrlsModel.Property<string>("Url").HasColumnType("text");
+        sessionUrlsModel.Property<string>("State").HasColumnType("jsonb");
+        sessionUrlsModel.Property<string>("RequestHeaders").HasColumnType("text");
+        sessionUrlsModel.Property<string>("ResponseHeaders").HasColumnType("text");
+        sessionUrlsModel.HasIndex("SessionId");
+
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             var clrType = entityType.ClrType;
