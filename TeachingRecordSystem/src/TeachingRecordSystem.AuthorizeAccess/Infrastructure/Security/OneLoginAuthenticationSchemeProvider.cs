@@ -201,17 +201,29 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         {
             // This handles the scenario where we've requested ID verification but One Login couldn't do it.
 
+            var journeyInstanceProvider = context.HttpContext.RequestServices.GetRequiredService<IJourneyInstanceProvider>();
+
             if (context.Properties!.TryGetVectorsOfTrust(out var vtr) &&
-                vtr.SequenceEqual([SignInJourneyCoordinator.Vtrs.AuthenticationAndIdentityVerification]))
+                journeyInstanceProvider.GetSignInJourneyCoordinator(context.HttpContext) is { } coordinator)
             {
-                context.HandleResponse();
+                var requestedIdVerification = vtr.SequenceEqual([SignInJourneyCoordinator.Vtrs.AuthenticationAndIdentityVerification]);
 
-                var journeyInstanceProvider = context.HttpContext.RequestServices.GetRequiredService<IJourneyInstanceProvider>();
-                var coordinator = journeyInstanceProvider.GetSignInJourneyCoordinator(context.HttpContext) ??
-                    throw new InvalidOperationException("No journey.");
+                IResult? result = null;
 
-                var result = coordinator.OnVerificationFailed();
-                await result.ExecuteAsync(context.HttpContext);
+                if (context.Request.Query["error_description"] == "Access denied for security reasons, a new authentication request may be successful")
+                {
+                    result = requestedIdVerification ? coordinator.VerifyIdentityWithOneLogin() : coordinator.SignInWithOneLogin();
+                }
+                else if (requestedIdVerification)
+                {
+                    result = coordinator.OnVerificationFailed();
+                }
+
+                if (result is not null)
+                {
+                    context.HandleResponse();
+                    await result.ExecuteAsync(context.HttpContext);
+                }
             }
         };
 
