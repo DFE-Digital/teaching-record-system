@@ -47,8 +47,8 @@ public class WebhookMessageFactory(
 
         var endpointCloudEventTypeVersions = endpoints!
             .SelectMany(e =>
-                e.CloudEventTypes.Select(t => (Version: e.ApiVersion, CloudEventType: t, e.WebhookEndpointId)))
-            .GroupBy(t => (t.Version, t.CloudEventType), t => t.WebhookEndpointId)
+                e.CloudEventTypes.Select(t => (Version: e.ApiVersion, CloudEventType: t, WebhookEndpoint: e)))
+            .GroupBy(t => (t.Version, t.CloudEventType), t => t.WebhookEndpoint)
             .ToDictionary(g => g.Key, g => g.AsEnumerable());
 
         var messages = new List<WebhookMessage>();
@@ -81,14 +81,15 @@ public class WebhookMessageFactory(
 
             var serializedPayload = JsonSerializer.SerializeToElement(payload, _serializerOptions);
 
-            messages.AddRange(endpointCloudEventTypeVersions[(version, cloudEventType)].Select(epId =>
+            messages.AddRange(endpointCloudEventTypeVersions[(version, cloudEventType)].Select(ep =>
             {
                 var id = Guid.NewGuid();
 
                 return new WebhookMessage
                 {
                     WebhookMessageId = id,
-                    WebhookEndpointId = epId,
+                    WebhookEndpointId = ep.WebhookEndpointId,
+                    WebhookEndpoint = ep,
                     CloudEventId = id.ToString(),
                     CloudEventType = cloudEventType,
                     Timestamp = timeProvider.UtcNow,
