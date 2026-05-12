@@ -37,7 +37,7 @@ public partial class OneLoginServiceTests
 
         string[][] names = nameOption switch
         {
-            OneLogin.NameArgumentOption.NoFullName => [[person.FirstName]],
+            OneLogin.NameArgumentOption.MatchesFirstNameOnly => [[person.FirstName]],
             OneLogin.NameArgumentOption.MatchesPersonName => [[person.FirstName, person.LastName]],
             OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName => [[person.FirstName, person.LastName], [TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName, person.LastName]), person.LastName]],
             OneLogin.NameArgumentOption.MatchesAlias => [[alias!, person.LastName]],
@@ -532,22 +532,22 @@ public partial class OneLoginServiceTests
             _matchNameDobAndNinoAttributes
         },
 
+        // Matches on first name, DOB, TRN and NINO but not first name
+        {
+            OneLogin.NameArgumentOption.MatchesFirstNameOnly,
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
+            OneLogin.TrnArgumentOption.SpecifiedAndMatches,
+            /*expectMatch: */ true,
+            [PersonMatchedAttribute.FirstName, PersonMatchedAttribute.DateOfBirth, PersonMatchedAttribute.NationalInsuranceNumber, PersonMatchedAttribute.Trn]
+        },
+        
 
         // *** No match cases ***
 
         // Missing names
         {
             OneLogin.NameArgumentOption.NotSpecified,
-            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
-            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
-            OneLogin.TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ false,
-            null
-        },
-
-        // Missing full name
-        {
-            OneLogin.NameArgumentOption.NoFullName,
             OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
             OneLogin.TrnArgumentOption.SpecifiedAndMatches,
@@ -641,7 +641,7 @@ public partial class OneLoginServiceTests
         public enum NameArgumentOption
         {
             NotSpecified,
-            NoFullName,
+            MatchesFirstNameOnly,
             MatchesPersonName,
             MultipleSpecifiedAndOneMatchesPersonName,
             MatchesAlias,

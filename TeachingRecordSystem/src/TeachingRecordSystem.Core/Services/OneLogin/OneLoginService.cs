@@ -347,7 +347,8 @@ public class OneLoginService(
     public virtual MatchPersonResult? MatchPerson(IReadOnlyCollection<MatchPersonResult> suggestedMatches)
     {
         // A One Login is matched if there is exactly one Person with a matching
-        // first name, last name, DOB AND either NINO or TRN.
+        // first name, last name, DOB AND either NINO or TRN *OR*
+        // first name, DOB, NINO and TRN.
 
         var candidates = new List<MatchPersonResult>();
 
@@ -356,16 +357,14 @@ public class OneLoginService(
             var matchedAttributes = match.MatchedAttributes;
             var matchedAttributeTypes = matchedAttributes.Select(kvp => kvp.Key).ToArray();
 
-            var requiredAttributeTypes = new[]
-            {
-                PersonMatchedAttribute.FirstName,
-                PersonMatchedAttribute.LastName,
-                PersonMatchedAttribute.DateOfBirth
-            };
+            var firstNameMatched = matchedAttributeTypes.Contains(PersonMatchedAttribute.FirstName);
+            var lastNameMatched = matchedAttributeTypes.Contains(PersonMatchedAttribute.LastName);
+            var dateOfBirthMatched = matchedAttributeTypes.Contains(PersonMatchedAttribute.DateOfBirth);
+            var nationalInsuranceNumberMatched = matchedAttributeTypes.Contains(PersonMatchedAttribute.NationalInsuranceNumber);
+            var trnMatched = matchedAttributeTypes.Contains(PersonMatchedAttribute.Trn);
 
-            if (!requiredAttributeTypes.Except(matchedAttributeTypes).Any() &&
-                (matchedAttributeTypes.Contains(PersonMatchedAttribute.NationalInsuranceNumber) ||
-                 matchedAttributeTypes.Contains(PersonMatchedAttribute.Trn)))
+            if ((firstNameMatched && lastNameMatched && dateOfBirthMatched && (nationalInsuranceNumberMatched || trnMatched)) ||
+                (firstNameMatched && dateOfBirthMatched && nationalInsuranceNumberMatched && trnMatched))
             {
                 candidates.Add(new MatchPersonResult(
                     match.PersonId,
