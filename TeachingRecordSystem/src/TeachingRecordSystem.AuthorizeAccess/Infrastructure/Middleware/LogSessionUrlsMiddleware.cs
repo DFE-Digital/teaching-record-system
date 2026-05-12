@@ -13,7 +13,7 @@ public class LogSessionUrlsMiddleware(RequestDelegate next)
 
     public Task InvokeAsync(
         HttpContext context,
-        TrsDbContext dbContext,
+        IDbContextFactory<TrsDbContext> dbContextFactory,
         IJourneyInstanceProvider journeyInstanceProvider,
         TimeProvider timeProvider)
     {
@@ -51,6 +51,8 @@ public class LogSessionUrlsMiddleware(RequestDelegate next)
                     context.Response.Headers
                         .Where(h => _responseHeadersToLog.Contains(h.Key))
                         .Select(x => x.Key + ": " + x.Value));
+
+                await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
                 await dbContext.Database.ExecuteSqlAsync(
                     $"""
