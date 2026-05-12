@@ -166,6 +166,12 @@ public sealed class OneLoginAuthenticationSchemeProvider(
                         metadata: new EndpointMetadataCollection(
                             new EndpointJourneyMetadata { JourneyName = SignInJourneyCoordinator.JourneyName }),
                         displayName: null));
+
+                // Capture error_description, since Sentry will redact it from the captured query string
+                if (context.Request.Query["error_description"] is { Count: > 0 } errorDescription)
+                {
+                    SentrySdk.SetTag("oidc.error_description", errorDescription.ToString());
+                }
             }
 
             return Task.CompletedTask;
