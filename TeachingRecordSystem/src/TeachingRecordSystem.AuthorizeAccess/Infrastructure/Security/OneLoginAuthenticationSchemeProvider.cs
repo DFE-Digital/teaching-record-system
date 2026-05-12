@@ -218,6 +218,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
                 if (context.Request.Query["error_description"] == "Access denied for security reasons, a new authentication request may be successful")
                 {
+                    SentrySdk.Logger.LogError("Received access_denied; re-challenging");
                     result = requestedIdVerification ? coordinator.VerifyIdentityWithOneLogin() : coordinator.SignInWithOneLogin();
                 }
                 else if (requestedIdVerification)
