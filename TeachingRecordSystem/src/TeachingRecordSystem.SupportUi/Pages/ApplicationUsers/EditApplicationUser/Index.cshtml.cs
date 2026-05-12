@@ -107,6 +107,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public string? ShortName { get; set; }
 
+    public string? SignInUrl { get; set; }
+
     public void OnGet()
     {
         Name = _user!.Name;
@@ -132,6 +134,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         OneLoginNotConnectedEmailSentFlashMessage = _user.AppContent?.OneLoginNotConnectedEmailSentFlashMessage;
         OneLoginFoundPageLinkText = _user.AppContent?.OneLoginFoundPageLinkText;
         ShortName = _user.ShortName;
+        SignInUrl = _user.AppContent?.SignInUrl;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -209,12 +212,12 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             (!new HashSet<string>(_user.ApiRoles ?? []).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
             (IsOidcClient != _user.IsOidcClient ? ApplicationUserUpdatedEventChanges.IsOidcClient : 0);
 
-        TeachingRecordSystem.Core.Models.AppContent? newAppContent = null;
+        AppContent? newAppContent = null;
 
         if (IsOidcClient)
         {
             var oldAppContent = _user.AppContent;
-            newAppContent = new TeachingRecordSystem.Core.Models.AppContent
+            newAppContent = new AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = OneLoginCannotFindRecordEmailTemplateId,
                 OneLoginNotVerifiedEmailTemplateId = OneLoginNotVerifiedEmailTemplateId,
@@ -223,7 +226,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 OneLoginNoMatchesPageContentHtml = OneLoginNoMatchesPageContentHtml,
                 OneLoginNoMatchesEmailSentFlashMessage = OneLoginNoMatchesEmailSentFlashMessage,
                 OneLoginNotConnectedEmailSentFlashMessage = OneLoginNotConnectedEmailSentFlashMessage,
-                OneLoginFoundPageLinkText = OneLoginFoundPageLinkText
+                OneLoginFoundPageLinkText = OneLoginFoundPageLinkText,
+                SignInUrl = SignInUrl
             };
             var appContentChanged = oldAppContent?.OneLoginCannotFindRecordEmailTemplateId != newAppContent.OneLoginCannotFindRecordEmailTemplateId ||
                                    oldAppContent?.OneLoginNotVerifiedEmailTemplateId != newAppContent.OneLoginNotVerifiedEmailTemplateId ||
@@ -232,7 +236,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                                    oldAppContent?.OneLoginNoMatchesPageContentHtml != newAppContent.OneLoginNoMatchesPageContentHtml ||
                                    oldAppContent?.OneLoginNoMatchesEmailSentFlashMessage != newAppContent.OneLoginNoMatchesEmailSentFlashMessage ||
                                    oldAppContent?.OneLoginNotConnectedEmailSentFlashMessage != newAppContent.OneLoginNotConnectedEmailSentFlashMessage ||
-                                   oldAppContent?.OneLoginFoundPageLinkText != newAppContent.OneLoginFoundPageLinkText;
+                                   oldAppContent?.OneLoginFoundPageLinkText != newAppContent.OneLoginFoundPageLinkText ||
+                                   oldAppContent?.SignInUrl != newAppContent.SignInUrl;
 
             changes |=
                 (ClientId != _user.ClientId ? ApplicationUserUpdatedEventChanges.ClientId : 0) |

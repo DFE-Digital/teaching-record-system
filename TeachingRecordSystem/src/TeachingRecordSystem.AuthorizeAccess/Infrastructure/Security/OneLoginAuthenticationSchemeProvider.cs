@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using TeachingRecordSystem.AuthorizeAccess.Controllers;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -199,6 +200,23 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
         options.Events.OnAccessDenied = async context =>
         {
+            if (context.Request.Query["error_description"] == "Access denied for security reasons, a new authentication request may be successful")
+            {
+                // Don't log this error in Sentry, but do capture as a message for visibility
+                SentrySdk.ConfigureScope(s => s.AddEventProcessor(DropEventProcessor.Instance));
+                SentrySdk.CaptureMessage(
+                    $"Received 'access_denied' error with 'error_description': '{context.Request.Query["error_description"]}'.");
+
+                // Allow the exception to bubble-up, which will render our Error page, where the user can return to the calling service and retry.
+                // Add the calling service to the context so the Error page knows which service the request is for.
+                context.HttpContext.Items[ErrorController.ClientApplicationDisplayNameKey] = user.Name;
+                context.HttpContext.Items[ErrorController.ClientApplicationSignInUrlKey] =
+                    user.AppContent?.SignInUrl ??
+                    new Uri(user.RedirectUris!.First()).GetLeftPart(UriPartial.Authority);
+
+                return;
+            }
+
             // This handles the scenario where we've requested ID verification but One Login couldn't do it.
 
             if (context.Properties!.TryGetVectorsOfTrust(out var vtr) &&

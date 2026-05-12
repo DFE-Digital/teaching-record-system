@@ -6,6 +6,9 @@ namespace TeachingRecordSystem.AuthorizeAccess.Controllers;
 [Route("error")]
 public class ErrorController : Controller
 {
+    public const string ClientApplicationDisplayNameKey = "ClientApplicationDisplayName";
+    public const string ClientApplicationSignInUrlKey = "ClientApplicationSignInUrl";
+
     public IActionResult Error(int? code)
     {
         // If there is no error, return a 404
