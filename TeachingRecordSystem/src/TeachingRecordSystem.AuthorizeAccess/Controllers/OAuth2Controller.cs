@@ -228,7 +228,7 @@ public class OAuth2Controller(
                 yield return Destinations.IdentityToken;
                 yield break;
 
-            case AuthorizeAccessClaimTypes.TrsUserId:
+            case AuthorizeAccessClaimTypes.TrsApplicationUserId:
                 yield return Destinations.AccessToken;
                 yield break;
 

@@ -420,7 +420,7 @@ public class SignInJourneyCoordinator(
             new Claim(AuthorizeAccessClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
             new Claim(AuthorizeAccessClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
             new Claim(AuthorizeAccessClaimTypes.OneLoginIdToken, oneLoginIdToken),
-            new Claim(AuthorizeAccessClaimTypes.TrsUserId, state.ClientApplicationUserId.ToString())
+            new Claim(AuthorizeAccessClaimTypes.TrsApplicationUserId, state.ClientApplicationUserId.ToString())
         };
 
         claims.AddRange(specificClaims);

@@ -148,8 +148,8 @@ public sealed class HostFixture : InitializeDbFixture
     {
         Claim[] claims = [
             new("scope", "teaching_record"),
-            new("trn_request_id", trnRequestId),
-            new("trs_user_id", applicationUserId.ToString())
+            new(AuthorizeAccessClaimTypes.TrnRequestId, trnRequestId),
+            new(AuthorizeAccessClaimTypes.TrsApplicationUserId, applicationUserId.ToString())
         ];
 
         var subject = new ClaimsIdentity(claims);

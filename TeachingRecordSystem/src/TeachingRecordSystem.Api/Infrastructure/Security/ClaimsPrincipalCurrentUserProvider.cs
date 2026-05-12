@@ -11,7 +11,7 @@ public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContext
         var principal = httpContext.User;
 
         // If there's a TRN claim then it's either an access token from ID or from Teacher Auth (i.e. AuthorizeAccess).
-        if (principal.HasClaim(c => c.Type is "trn" or "trn_request_id"))
+        if (principal.HasClaim(c => c.Type is "trn" or AuthorizeAccessClaimTypes.TrnRequestId))
         {
             if (principal.HasClaim(c => c.Type == "scope" && c.Value.Contains("dqt:read")))
             {
@@ -21,10 +21,10 @@ public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContext
                 return true;
             }
 
-            if (principal.FindFirstValue("trs_user_id") is string trsUserId)
+            if (principal.FindFirstValue(AuthorizeAccessClaimTypes.TrsApplicationUserId) is string trsApplicationUserId)
             {
                 // Teacher Auth access token
-                userId = Guid.Parse(trsUserId);
+                userId = Guid.Parse(trsApplicationUserId);
                 return true;
             }
         }
