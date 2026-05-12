@@ -1,5 +1,4 @@
 @page "/test"
-@using GovUk.OneLogin.AspNetCore
 @using System.Security.Claims
 @model TeachingRecordSystem.AuthorizeAccess.Pages.TestModel
 @{
@@ -8,6 +7,6 @@
 
 <h1>Hello @User.FindFirstValue("person_id")</h1>
 
-<div data-testid="trn">@User.FindFirstValue("trn")</div>
+<div data-testid="trn">@User.FindFirstValue(AuthorizeAccessClaimTypes.Trn)</div>
 
-<div data-testid="trn-request-id">@User.FindFirstValue("trn_request_id")</div>
+<div data-testid="trn-request-id">@User.FindFirstValue(AuthorizeAccessClaimTypes.TrnRequestId)</div>

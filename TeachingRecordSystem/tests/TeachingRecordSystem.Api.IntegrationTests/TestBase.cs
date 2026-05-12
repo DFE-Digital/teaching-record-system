@@ -91,7 +91,7 @@ public abstract class TestBase
     {
         Claim[] claims = [
             new("scope", "teaching_record"),
-            new("trn", trn)
+            new(AuthorizeAccessClaimTypes.Trn, trn)
         ];
 
         return GetHttpClientWithJwtAccessToken(claims, version);
@@ -101,8 +101,8 @@ public abstract class TestBase
     {
         Claim[] claims = [
             new("scope", "teaching_record"),
-            new("trn_request_id", trnRequestId),
-            new("trs_user_id", applicationUserId.ToString())
+            new(AuthorizeAccessClaimTypes.TrnRequestId, trnRequestId),
+            new(AuthorizeAccessClaimTypes.TrsApplicationUserId, applicationUserId.ToString())
         ];
 
         return GetHttpClientWithJwtAccessToken(claims, version);
