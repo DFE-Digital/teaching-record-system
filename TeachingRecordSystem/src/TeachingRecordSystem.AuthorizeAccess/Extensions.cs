@@ -4,6 +4,7 @@ using Dfe.Analytics.AspNetCore;
 using GovUk.Frontend.AspNetCore;
 using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -43,7 +44,11 @@ public static class Extensions
 
         // One Login has a one hour timeout on IDV journeys; we need to make sure our session cookies last that long too
         // otherwise callbacks will fail due to the missing journey.
-        services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(2));
+        services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromHours(2);
+            options.Cookie.Name = "sess";
+        });
 
         services.AddGovUkQuestions();
 
@@ -72,6 +77,8 @@ public static class Extensions
                 options.Filters.Add(new FluentValidationExceptionFilter());
                 options.Filters.Add(new NoCachePageFilter());
             });
+
+        services.Configure<AntiforgeryOptions>(options => options.Cookie.Name = "af");
 
         services.AddAuthentication(options =>
         {
