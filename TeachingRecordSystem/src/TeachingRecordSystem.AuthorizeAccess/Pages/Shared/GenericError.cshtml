@@ -1,3 +1,4 @@
+@using static TeachingRecordSystem.AuthorizeAccess.Controllers.ErrorController
 @{
     Layout = "./_ErrorLayout";
     ViewBag.Title = "Sorry, there is a problem with the service";
@@ -5,7 +6,20 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">Sorry, there is a problem with the service</h1>
-        <p class="govuk-body">Try again later.</p>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        @if (Context.Items.TryGetValue(ClientApplicationDisplayNameKey, out var displayNameObj) && displayNameObj is string clientApplicationDisplayName &&
+            Context.Items.TryGetValue(ClientApplicationSignInUrlKey, out var signInUrlObj) && signInUrlObj is string clientApplicationSignInUrl)
+        {
+            <p class="govuk-body">
+                <a href="@clientApplicationSignInUrl" class="govuk-link">
+                    Return to @clientApplicationDisplayName and try again.
+                </a>
+            </p>
+        }
+        else
+        {
+            <p class="govuk-body">Try again later.</p>
+        }
     </div>
 </div>

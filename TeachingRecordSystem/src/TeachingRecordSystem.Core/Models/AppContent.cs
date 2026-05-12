@@ -10,4 +10,5 @@ public record AppContent
     public string? OneLoginNoMatchesEmailSentFlashMessage { get; init; }
     public string? OneLoginNotConnectedEmailSentFlashMessage { get; init; }
     public string? OneLoginFoundPageLinkText { get; init; }
+    public string? SignInUrl { get; init; }
 }
