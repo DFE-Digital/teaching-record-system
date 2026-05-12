@@ -265,12 +265,6 @@ public class SignInJourneyCoordinator(
             return Path.Steps.Last();
         }
 
-        // Allow continue to application to be accessed from Found page
-        if (HttpContext.Request.GetEncodedPathAndQuery() == Links.ContinueToApplication())
-        {
-            return Path.Steps.Last();
-        }
-
         return base.GetCurrentStep();
     }
 
@@ -320,16 +314,16 @@ public class SignInJourneyCoordinator(
 
             UpdateState(state => Complete(state, matchedTrn));
 
-            var nextUrl = SquashPathAndAdvanceTo(Links.Found()).Url;
+            var nextUrl = SquashPathAndAdvanceTo(Links.Found(), additionalStepUrls: Links.ContinueToApplication()).Url;
             return new RedirectResult(nextUrl);
         }
 
         return null;
     }
 
-    private RedirectHttpResult SquashPathAndAdvanceTo(string url, bool includeRedirectUri = true)
+    private RedirectHttpResult SquashPathAndAdvanceTo(string url, bool includeRedirectUri = true, params IEnumerable<string> additionalStepUrls)
     {
-        var urls = new List<string>(2) { url };
+        var urls = new List<string> { url };
 
         // Ensure the RedirectUri is included in the path
         if (includeRedirectUri)
@@ -337,11 +331,13 @@ public class SignInJourneyCoordinator(
             urls.Insert(0, GetRedirectUri());
         }
 
+        urls.AddRange(additionalStepUrls);
+
         var steps = urls.Select(CreateStepFromUrl);
         var path = new JourneyPath(steps);
         UnsafeSetPath(path);
 
-        return (RedirectHttpResult)Results.Redirect(urls.Last());
+        return (RedirectHttpResult)Results.Redirect(url);
     }
 
     public void Complete(SignInJourneyState state, string trn)
