@@ -1,3 +1,5 @@
+#!/usr/bin/env -S dotnet --
+
 var testProjects = await Utils.GetAffectedTestProjectsAsync();
 
 await using var stdOut = Console.OpenStandardOutput();

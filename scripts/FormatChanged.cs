@@ -1,3 +1,5 @@
+#!/usr/bin/env -S dotnet --
+
 await using var stdOut = Console.OpenStandardOutput();
 await using var stdErr = Console.OpenStandardError();
 
