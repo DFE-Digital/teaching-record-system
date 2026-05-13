@@ -1,3 +1,5 @@
+#!/usr/bin/env -S dotnet --
+
 if (args.Length > 1)
 {
     Console.WriteLine("Usage: dotnet run GetTestProjectsToRun.cs <branch name?>");
