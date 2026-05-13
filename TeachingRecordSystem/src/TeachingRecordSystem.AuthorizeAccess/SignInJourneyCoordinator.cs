@@ -45,6 +45,13 @@ public class SignInJourneyCoordinator(
     public IResult VerifyIdentityWithOneLogin() =>
         OneLoginChallenge(Vtrs.AuthenticationAndIdentityVerification);
 
+    public IResult OnOneLoginCallbackDebug(AuthenticationTicket ticket)
+    {
+        UpdateState(s => s.OneLoginAuthenticationTicket = ticket);
+
+        return SquashPathAndAdvanceTo(Links.DebugIdentity());
+    }
+
     public async Task<IResult> OnOneLoginCallbackAsync(AuthenticationTicket ticket)
     {
         if (!ticket.Properties.TryGetVectorsOfTrust(out var vtr))
@@ -61,11 +68,6 @@ public class SignInJourneyCoordinator(
             Debug.Assert(vtr.SequenceEqual([Vtrs.AuthenticationAndIdentityVerification]));
             Debug.Assert(State.OneLoginAuthenticationTicket is not null);
             await OnUserVerifiedAsync(ticket);
-        }
-
-        if (ShowDebugPages)
-        {
-            return SquashPathAndAdvanceTo(Links.DebugIdentity());
         }
 
         return GetNextPage();
@@ -113,24 +115,21 @@ public class SignInJourneyCoordinator(
                 state.SetVerified(oneLoginUser.VerifiedNames!, oneLoginUser.VerifiedDatesOfBirth!);
             }
 
-            if (!ShowDebugPages)
+            if (trn is not null)
             {
-                if (trn is not null)
-                {
-                    Complete(state, trn);
-                }
-                else if (existingTrnRequestId is not null)
-                {
-                    CompleteWithExistingTrnRequest(state, existingTrnRequestId);
-                }
-                else if (trn is null &&
-                    existingTrnRequestId is null &&
-                    pendingSupportTaskReference is null &&
-                    hasClosedIdVerificationSupportTask &&
-                    state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
-                {
-                    await CompleteWithDeferredMatchingAsync(state, processContext);
-                }
+                Complete(state, trn);
+            }
+            else if (existingTrnRequestId is not null)
+            {
+                CompleteWithExistingTrnRequest(state, existingTrnRequestId);
+            }
+            else if (trn is null &&
+                existingTrnRequestId is null &&
+                pendingSupportTaskReference is null &&
+                hasClosedIdVerificationSupportTask &&
+                state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
+            {
+                await CompleteWithDeferredMatchingAsync(state, processContext);
             }
         });
     }
