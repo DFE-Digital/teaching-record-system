@@ -1,7 +1,7 @@
 @page "/persons/{PersonId}/edit-induction/check-answers"
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction.CheckAnswersModel
 @{
-    ViewBag.Title = "Check your answers";
+    ViewBag.Title = "Check your details before updating induction details’";
 }
 
 @section BeforeContent {
@@ -9,14 +9,14 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-column-two-thirds">
         <form action="@LinkGenerator.Persons.PersonDetail.EditInduction.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Induction - @Model.PersonName</span>
+            <span class="govuk-caption-l">Edit induction details - @Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
                 <row>
-                    <key>Induction status</key>
+                    <key>Status</key>
                     <value>@Model.InductionStatus.GetTitle()</value>
                     @if (Model.ShowStatusChangeLink)
                     {
@@ -30,7 +30,7 @@
                 @if (Model.InductionStatus.RequiresStartDate())
                 {
                     <row>
-                        <key>Induction started on</key>
+                        <key>Start date</key>
                         <value use-empty-fallback>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                         @if (Model.ShowStartDateChangeLink)
                         {
@@ -44,7 +44,7 @@
                 @if (Model.InductionStatus.RequiresCompletedDate())
                 {
                     <row>
-                        <key>Induction completed on</key>
+                        <key>Completion date</key>
                         <value use-empty-fallback>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                         @if (Model.ShowCompletedDateChangeLink)
                         {
@@ -106,17 +106,48 @@
                             visually-hidden-text="reason details">Change</action>
                     </row-actions>
                 </row>
+            </govuk-summary-list>
+
+            <h2 class="govuk-heading-m">Why are you editing these induction details?</h2>
+            <govuk-summary-list>
                 <row>
-                    <key>Do you have evidence to upload</key>
-                    <value>
-                        <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
-                    </value>
-                    <row-actions>
-                        <action
-                            href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
-                            visually-hidden-text="evidence">Change</action>
-                    </row-actions>
-                </row>
+					<key>Reason</key>
+					<value>@Model.ChangeReason.GetDisplayName()</value>
+					<row-actions>
+						<action
+						href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
+						visually-hidden-text="reason for change">Change</action>
+					</row-actions>
+				</row>
+				<row>
+					<key>Additional information</key>
+					<value>
+						@if (Model.ChangeReasonDetail is not null)
+						{
+							@Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
+						}
+						else
+						{
+							<span use-empty-fallback></span>
+						}
+					</value>
+					<row-actions>
+						<action
+							href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
+							visually-hidden-text="reason details">Change</action>
+					</row-actions>
+				</row>
+				<row>
+					<key>Evidence</key>
+					<value>
+						<vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
+					</value>
+					<row-actions>
+						<action
+							href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
+							visually-hidden-text="evidence">Change</action>
+					</row-actions>
+				</row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">

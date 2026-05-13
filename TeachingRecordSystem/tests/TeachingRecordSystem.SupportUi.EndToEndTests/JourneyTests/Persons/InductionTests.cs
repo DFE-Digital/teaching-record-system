@@ -268,7 +268,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
-        await page.SelectReasonMoreDetailsAsync(true, TestData.GenerateLoremIpsum());
+        await page.SelectReasonMoreDetailsAsync(true, TestData.GenerateLoremIpsum(), "Enter details");
         await page.SelectUploadEvidenceAsync(true, "document.jpeg");
         await page.ClickContinueButtonAsync();
 
@@ -352,12 +352,12 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction started on");
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Start date");
         await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction completed on");
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Completion date");
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
         await page.ClickContinueButtonAsync();
 
@@ -369,6 +369,21 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Evidence");
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
+        await page.ClickContinueButtonAsync();
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Additional information");
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(true, "some details", "Enter details");
+        await page.ClickContinueButtonAsync();
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
     }
 
@@ -412,7 +427,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction status");
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Status");
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
         await page.ClickContinueButtonAsync();
@@ -469,17 +484,17 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction status");
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Status");
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
         await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction started on");
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Start date");
         await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
         await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction completed on");
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Completion date");
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
         await page.ClickBackLinkAsync();
 

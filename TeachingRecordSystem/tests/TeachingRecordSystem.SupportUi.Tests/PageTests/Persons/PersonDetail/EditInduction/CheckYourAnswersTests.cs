@@ -69,7 +69,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsInductionStatus_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool showChangeLink)
     {
         // Arrange
-        var labelContent = "Induction status";
+        var labelContent = "Status";
 
         DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
         DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
@@ -138,7 +138,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsStartDate_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool showStartDateRow, bool showChangeLink)
     {
         // Arrange
-        var labelContent = "Induction started on";
+        var labelContent = "Start date";
 
         DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
         DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
@@ -213,7 +213,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsCompletedDate_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool ShowsCompletedDate)
     {
         // Arrange
-        var labelContent = "Induction completed on";
+        var labelContent = "Completion date";
 
         DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
         DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
@@ -419,7 +419,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var valueDetails = labelDetails.NextElementSibling;
         Assert.Equal(ChangeReasonDetails, valueDetails!.TrimmedText());
 
-        var labelFileUpload = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Do you have evidence to upload");
+        var labelFileUpload = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Evidence");
         Assert.NotNull(labelFileUpload);
         var valueFileUpload = labelFileUpload.NextElementSibling;
         Assert.Equal("Not provided", valueFileUpload!.TrimmedText());
@@ -580,6 +580,136 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.True(journeyInstance.Completed);
     }
 
+    [Theory]
+    [InlineData(PersonInductionChangeReason.AnotherReason)]
+    [InlineData(PersonInductionChangeReason.IncompleteDetails)]
+    [InlineData(PersonInductionChangeReason.NewInformation)]
+    public async Task Get_ShowReasonDetails_AsExpected(PersonInductionChangeReason reason)
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.InProgress;
+        var startDate = Clock.Today.AddYears(-2);
+        var completedDate = Clock.Today;
+        var exemptionReasonIds = Array.Empty<Guid>();
+
+        var editInductionState = new EditInductionStateBuilder()
+            .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+            .WithExemptionReasonIds(exemptionReasonIds)
+            .WithStartDate(startDate)
+            .WithCompletedDate(completedDate)
+            .WithReasonChoice(reason)
+            .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
+            .WithFileUploadChoice(uploadFile: false)
+            .Build();
+
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            editInductionState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Reason");
+        Assert.NotNull(label);
+
+        var valueDetails = label.NextElementSibling;
+        Assert.Equal(reason.GetDisplayName(), valueDetails!.TrimmedText());
+    }
+
+    [Theory]
+    [InlineData(true, "this is some details", "this is some details")]
+    [InlineData(false, null, "Not provided")]
+    public async Task Get_ShowAdditionalInformation_AsExpected(bool addDetail, string? details, string? expectedDetails)
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.InProgress;
+        var startDate = Clock.Today.AddYears(-2);
+        var completedDate = Clock.Today;
+        var exemptionReasonIds = Array.Empty<Guid>();
+
+        var editInductionState = new EditInductionStateBuilder()
+            .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+            .WithExemptionReasonIds(exemptionReasonIds)
+            .WithStartDate(startDate)
+            .WithCompletedDate(completedDate)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
+            .WithReasonDetailsChoice(addDetails: addDetail, details)
+            .WithFileUploadChoice(uploadFile: false)
+            .Build();
+
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            editInductionState
+        );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Additional information");
+        Assert.NotNull(label);
+
+        var valueDetails = label.NextElementSibling;
+        Assert.Equal(expectedDetails, valueDetails!.TrimmedText());
+    }
+
+    [Theory]
+    [InlineData(true, "evidence.jpeg (opens in new tab)")]
+    [InlineData(false, "Not provided")]
+    public async Task Get_ShowAttachment_AsExpected(bool uploadFile, string? expectedString)
+    {
+        // Arrange
+        var evidenceFileId = uploadFile == true ? Guid.NewGuid() : default(Guid?);
+        var inductionStatus = InductionStatus.InProgress;
+        var startDate = Clock.Today.AddYears(-2);
+        var completedDate = Clock.Today;
+        var exemptionReasonIds = Array.Empty<Guid>();
+
+        var editInductionState = new EditInductionStateBuilder()
+            .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+            .WithExemptionReasonIds(exemptionReasonIds)
+            .WithStartDate(startDate)
+            .WithCompletedDate(completedDate)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
+            .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
+            .WithFileUploadChoice(uploadFile: uploadFile, evidenceFileId)
+            .Build();
+
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            editInductionState
+        );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Evidence");
+        Assert.NotNull(label);
+
+        var valueDetails = label.NextElementSibling;
+        Assert.Equal(expectedString, valueDetails!.TrimmedText());
+    }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(

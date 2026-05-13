@@ -17,7 +17,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
             .WithFirstName("Alfred")
             .WithMiddleName("The")
             .WithLastName("Great"));
-        var expectedCaption = "Induction - Alfred The Great";
+        var expectedCaption = "Edit induction details - Alfred The Great";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -90,7 +90,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await AssertEx.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("What is their induction status?", statusChoicesLegend!.TrimmedText());
+        Assert.Equal("Select an induction status", statusChoicesLegend!.TrimmedText());
         Assert.Equal(expectedChoices, statusChoices);
     }
 
@@ -135,7 +135,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await AssertEx.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("What is their induction status?", statusChoicesLegend!.TrimmedText());
+        Assert.Equal("Select an induction status", statusChoicesLegend!.TrimmedText());
         Assert.Equal(expectedChoices, statusChoices);
     }
 

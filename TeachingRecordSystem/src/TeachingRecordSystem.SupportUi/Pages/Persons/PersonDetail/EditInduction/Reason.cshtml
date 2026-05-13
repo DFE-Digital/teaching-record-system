@@ -12,7 +12,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form action="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Induction - @Model.PersonName</span>
+            <span class="govuk-caption-l">Enter induction details - @Model.PersonName</span>
             <govuk-radios for="ChangeReason" data-testid="reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true">Why are you changing the induction details?</govuk-radios-fieldset-legend>
@@ -34,13 +34,13 @@
             <govuk-radios for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="has-additional-reason_detail-options-legend">
-                        <h2 class ="govuk-fieldset__legend--m">Do you want to add more information about why you’re changing the induction details?</h2>
+                        <h2 class ="govuk-fieldset__legend--m">Do you want to provide more information?</h2>
                     </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional data-testid="additional-detail">
                             <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>Add additional detail</govuk-character-count-label>
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
                             </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>

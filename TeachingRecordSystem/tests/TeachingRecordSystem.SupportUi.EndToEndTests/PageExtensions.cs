@@ -189,8 +189,8 @@ public static class PageExtensions
         Assert.Contains($"/persons/{personId}", href);
     }
 
-    public static Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null) =>
-        page.SelectReasonMoreDetailsAsync("Add additional detail", addAdditionalDetail, details);
+    public static Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null, string labelText = "Add additional detail") =>
+        page.SelectReasonMoreDetailsAsync(labelText, addAdditionalDetail, details);
 
     public static async Task SelectReasonMoreDetailsAsync(this IPage page, string additionalDetailLabel, bool addAdditionalDetail, string? details = null)
     {
