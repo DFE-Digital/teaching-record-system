@@ -18,25 +18,20 @@
             <govuk-input for="Email" type="email" disabled="true" />
 
             <govuk-checkboxes for="AttemptedIdentityVerification">
-                <govuk-checkboxes-item value="@true" disabled="@Model.IsAlreadyVerified">Attempted identity verification</govuk-checkboxes-item>
+                <govuk-checkboxes-item value="@true" disabled="@Model.IdentityVerified">Attempted identity verification</govuk-checkboxes-item>
             </govuk-checkboxes>
 
-            @if (Model.IsAlreadyVerified)
-            {
-                <input type="hidden" asp-for="IdentityVerified" value="true" />
-            }
-
             <govuk-checkboxes for="IdentityVerified">
-                <govuk-checkboxes-item value="@true" disabled="@Model.IsAlreadyVerified">
+                <govuk-checkboxes-item value="@true" disabled="@Model.IdentityVerified">
                     Identity verified
-                    @if (Model.IsAlreadyVerified)
+                    @if (Model.IdentityVerified)
                     {
                         <text> (already verified in database)</text>
                     }
 
                     <govuk-checkboxes-item-conditional>
-                        <govuk-textarea for="VerifiedNames" disabled="@Model.IsAlreadyVerified" />
-                        <govuk-textarea for="VerifiedDatesOfBirth" disabled="@Model.IsAlreadyVerified" />
+                        <govuk-textarea for="VerifiedNames" disabled="@Model.IdentityVerified" />
+                        <govuk-textarea for="VerifiedDatesOfBirth" disabled="@Model.IdentityVerified" />
                     </govuk-checkboxes-item-conditional>
                 </govuk-checkboxes-item>
             </govuk-checkboxes>
@@ -64,10 +59,6 @@
                             <value>@Model.Person.NationalInsuranceNumber</value>
                         </row>
                     </govuk-summary-list>
-
-                    <govuk-checkboxes for="DetachPerson" class="govuk-checkboxes--small">
-                        <govuk-checkboxes-item value="@true">Detach teaching record</govuk-checkboxes-item>
-                    </govuk-checkboxes>
                 }
                 else
                 {

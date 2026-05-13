@@ -79,21 +79,4 @@ public class OneLoginUser
         MatchRoute = route;
         MatchedAttributes = matchedAttributes?.ToArray();
     }
-
-    public void ClearVerifiedInfo()
-    {
-        // Used for testing only
-        VerifiedOn = null;
-        VerificationRoute = null;
-        VerifiedNames = null;
-        VerifiedDatesOfBirth = null;
-    }
-
-    public void ClearMatchedPerson()
-    {
-        // Used for testing only
-        PersonId = null;
-        MatchRoute = null;
-        MatchedAttributes = null;
-    }
 }

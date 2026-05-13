@@ -16,6 +16,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 public class DebugIdentityModel(
     TrsDbContext dbContext,
     SignInJourneyCoordinator coordinator,
+    TimeProvider timeProvider,
     IOptions<AuthorizeAccessOptions> optionsAccessor) : PageModel
 {
     private OneLoginUser? _oneLoginUser;
@@ -45,34 +46,16 @@ public class DebugIdentityModel(
     [Display(Name = "Verified dates of birth")]
     public string? VerifiedDatesOfBirth { get; set; }
 
-    public string? CoreIdentityJwt { get; set; }
-
     public PersonInfo? Person { get; set; }
-
-    [BindProperty]
-    public bool DetachPerson { get; set; }
-
-    public bool IsAlreadyVerified { get; set; }
 
     public void OnGet()
     {
-        AttemptedIdentityVerification = coordinator.State.AttemptedIdentityVerification;
-        IdentityVerified = coordinator.State.IdentityVerified || IsAlreadyVerified;
+        IdentityVerified = _oneLoginUser!.VerificationRoute is not null;
 
         if (IdentityVerified)
         {
-            if (IsAlreadyVerified)
-            {
-                // Use stored verified info from database
-                VerifiedNames = string.Join("\n", _oneLoginUser!.VerifiedNames!.Select(name => string.Join(" ", name)));
-                VerifiedDatesOfBirth = string.Join("\n", _oneLoginUser!.VerifiedDatesOfBirth!.Select(dob => dob.ToString("dd/MM/yyyy")));
-            }
-            else
-            {
-                // Use verified info from journey state
-                VerifiedNames = string.Join("\n", coordinator.State.VerifiedNames!.Select(name => string.Join(" ", name)));
-                VerifiedDatesOfBirth = string.Join("\n", coordinator.State.VerifiedDatesOfBirth!.Select(dob => dob.ToString("dd/MM/yyyy")));
-            }
+            VerifiedNames = string.Join("\n", _oneLoginUser.VerifiedNames!.Select(name => string.Join(" ", name)));
+            VerifiedDatesOfBirth = string.Join("\n", _oneLoginUser.VerifiedDatesOfBirth!.Select(dob => dob.ToString("dd/MM/yyyy")));
         }
     }
 
@@ -81,13 +64,7 @@ public class DebugIdentityModel(
         string[][]? verifiedNames;
         DateOnly[]? verifiedDatesOfBirth;
 
-        // Skip validation if already verified (fields are disabled)
-        if (IsAlreadyVerified)
-        {
-            verifiedNames = _oneLoginUser!.VerifiedNames;
-            verifiedDatesOfBirth = _oneLoginUser!.VerifiedDatesOfBirth;
-        }
-        else if (IdentityVerified)
+        if (IdentityVerified)
         {
             verifiedNames = (VerifiedNames ?? string.Empty).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries))
@@ -128,46 +105,28 @@ public class DebugIdentityModel(
             return this.PageWithErrors();
         }
 
-        if (_oneLoginUser!.PersonId is not null)
+        var alreadyVerified = _oneLoginUser!.VerificationRoute is not null;
+
+        if (!alreadyVerified && IdentityVerified)
         {
-            if (DetachPerson)
-            {
-                _oneLoginUser.ClearMatchedPerson();
-            }
-            else
-            {
-                coordinator.UpdateState(state => coordinator.Complete(state, _oneLoginUser.Person!.Trn));
-                return GetNextPage();
-            }
+            _oneLoginUser.SetVerified(
+                timeProvider.UtcNow,
+                OneLoginUserVerificationRoute.Support,
+                verifiedByApplicationUserId: null,
+                verifiedNames,
+                verifiedDatesOfBirth,
+                coreIdentityClaimVc: null);
+
+            await dbContext.SaveChangesAsync();
+        }
+        else if (AttemptedIdentityVerification)
+        {
+            coordinator.UpdateState(s => s.AttemptedIdentityVerification = true);
         }
 
-        // Don't re-verify if already verified in database (checkbox is disabled so can't change)
-        if (IdentityVerified && !IsAlreadyVerified)
-        {
-            await coordinator.OnUserVerifiedCoreAsync(verifiedNames!, verifiedDatesOfBirth!, coreIdentityClaimVc: null);
-        }
-        else if (!IdentityVerified)
-        {
-            _oneLoginUser.ClearVerifiedInfo();
-            coordinator.UpdateState(state => state.ClearVerified());
+        await coordinator.OnOneLoginCallbackAsync(coordinator.State.OneLoginAuthenticationTicket!);
 
-            if (AttemptedIdentityVerification)
-            {
-                return coordinator.OnVerificationFailed().ToActionResult();
-            }
-        }
-
-        if (IdentityVerified && coordinator.State.RecordMatchingPolicy is RecordMatchingPolicy.Deferred)
-        {
-            await coordinator.UpdateStateAsync(state => coordinator.CompleteWithDeferredMatchingAsync(state));
-            return GetNextPage();
-        }
-
-        await dbContext.SaveChangesAsync();
-
-        return GetNextPage();
-
-        IActionResult GetNextPage() => coordinator.GetNextPage().ToActionResult();
+        return coordinator.GetNextPage().ToActionResult();
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -196,9 +155,6 @@ public class DebugIdentityModel(
         {
             Person = new(person.PersonId, person.Trn, person.FirstName, person.LastName, person.DateOfBirth, person.NationalInsuranceNumber);
         }
-
-        // Check if user already has verified identity in database
-        IsAlreadyVerified = _oneLoginUser?.VerifiedOn is not null;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

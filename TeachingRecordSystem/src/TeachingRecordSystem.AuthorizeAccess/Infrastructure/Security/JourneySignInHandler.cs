@@ -69,7 +69,9 @@ public class JourneySignInHandler(IJourneyInstanceProvider journeyInstanceProvid
 
         var ticket = new AuthenticationTicket(user, properties, _scheme.Name);
 
-        var result = await coordinator.OnOneLoginCallbackAsync(ticket);
+        var result = coordinator.ShowDebugPages ?
+            coordinator.OnOneLoginCallbackDebug(ticket) :
+            await coordinator.OnOneLoginCallbackAsync(ticket);
 
         await result.ExecuteAsync(_context);
     }
