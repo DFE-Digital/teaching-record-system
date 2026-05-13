@@ -149,7 +149,14 @@ public class DebugIdentityModel(
 
         _oneLoginUser = await dbContext.OneLoginUsers
             .Include(o => o.Person)
-            .FirstOrDefaultAsync(o => o.Subject == Subject);
+            .SingleOrDefaultAsync(o => o.Subject == Subject);
+
+        if (_oneLoginUser is null)
+        {
+            _oneLoginUser = new OneLoginUser { Subject = Subject!, EmailAddress = Email };
+            dbContext.OneLoginUsers.Add(_oneLoginUser);
+            await dbContext.SaveChangesAsync();
+        }
 
         if (_oneLoginUser?.Person is Person person)
         {
