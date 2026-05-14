@@ -21,23 +21,32 @@ public class CookiesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var doc = await AssertEx.HtmlResponseAsync(response);
                 Assert.Equal("Cookies - Test Service", doc.Title);
 
-                // Check the page contains the expected cookie names and descriptions
-                var content = doc.Body!.TextContent;
+                // Check each cookie row contains the expected information
+                var sessCookieRow = doc.GetElementByTestId("cookie-sess");
+                Assert.NotNull(sessCookieRow);
+                Assert.Contains("sess", sessCookieRow.TextContent);
+                Assert.Contains("Stores your session information", sessCookieRow.TextContent);
+                Assert.Contains("close your browser", sessCookieRow.TextContent);
 
-                Assert.Contains("sess", content);
-                Assert.Contains("Stores your session information", content);
-                Assert.Contains("2 hours", content);
+                var afCookieRow = doc.GetElementByTestId("cookie-af");
+                Assert.NotNull(afCookieRow);
+                Assert.Contains("af", afCookieRow.TextContent);
+                Assert.Contains("Cross-Site Request Forgery", afCookieRow.TextContent);
+                Assert.Contains("close your browser", afCookieRow.TextContent);
 
-                Assert.Contains("af", content);
-                Assert.Contains("Cross-Site Request Forgery", content);
-                Assert.Contains("close your browser", content);
+                var correlationCookieRow = doc.GetElementByTestId("cookie-onelogin-correlation");
+                Assert.NotNull(correlationCookieRow);
+                Assert.Contains("onelogin-correlation", correlationCookieRow.TextContent);
+                Assert.Contains("Security token", correlationCookieRow.TextContent);
+                Assert.Contains("prevent unauthorized access", correlationCookieRow.TextContent);
+                Assert.Contains("close your browser", correlationCookieRow.TextContent);
 
-                Assert.Contains("onelogin-correlation", content);
-                Assert.Contains("Security token", content);
-                Assert.Contains("15 minutes", content);
-
-                Assert.Contains("onelogin-nonce", content);
-                Assert.Contains("validate the authentication response", content);
+                var nonceCookieRow = doc.GetElementByTestId("cookie-onelogin-nonce");
+                Assert.NotNull(nonceCookieRow);
+                Assert.Contains("onelogin-nonce", nonceCookieRow.TextContent);
+                Assert.Contains("Security token", nonceCookieRow.TextContent);
+                Assert.Contains("validate the authentication response", nonceCookieRow.TextContent);
+                Assert.Contains("close your browser", nonceCookieRow.TextContent);
             });
     }
 }
