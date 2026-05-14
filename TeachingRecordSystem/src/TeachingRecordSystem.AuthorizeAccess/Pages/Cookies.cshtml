@@ -1,0 +1,69 @@
+@page
+@inject IJourneyInstanceProvider JourneyInstanceProvider
+@model TeachingRecordSystem.AuthorizeAccess.Pages.CookiesModel
+@{
+    ViewBag.Title = "Cookies";
+}
+
+@section BeforeContent {}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Cookies</h1>
+
+        <p class="govuk-body">
+            Cookies are small files saved on your phone, tablet or computer when you visit a website.
+        </p>
+
+        <p class="govuk-body">
+            We use cookies to make this service work and collect information about how you use our service.
+        </p>
+
+        <h2 class="govuk-heading-l">Essential cookies</h2>
+
+        <p class="govuk-body">
+            Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.
+        </p>
+
+        <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-table__caption--s">Essential cookies we use</caption>
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Name</th>
+                    <th scope="col" class="govuk-table__header">Purpose</th>
+                    <th scope="col" class="govuk-table__header">Expires</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">sess</td>
+                    <td class="govuk-table__cell">
+                        Stores your session information while you sign in
+                    </td>
+                    <td class="govuk-table__cell">2 hours</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">af</td>
+                    <td class="govuk-table__cell">
+                        Protects against Cross-Site Request Forgery (CSRF) attacks
+                    </td>
+                    <td class="govuk-table__cell">When you close your browser</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">onelogin-correlation.*</td>
+                    <td class="govuk-table__cell">
+                        Security token used during sign in with GOV.UK One Login to prevent unauthorized access
+                    </td>
+                    <td class="govuk-table__cell">15 minutes or when you complete sign in</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">onelogin-nonce.*</td>
+                    <td class="govuk-table__cell">
+                        Security token used during sign in with GOV.UK One Login to validate the authentication response
+                    </td>
+                    <td class="govuk-table__cell">15 minutes or when you complete sign in</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
