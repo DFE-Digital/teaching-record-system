@@ -258,8 +258,10 @@ public class SignInJourneyCoordinator(
 
     public override JourneyPathStep? GetCurrentStep()
     {
-        // Ensure the sign out URL can always be hit, even though it'll never be in the journey's Path
-        if (HttpContext.Request.GetEncodedPathAndQuery() == Links.SignOut())
+        var currentUrl = HttpContext.Request.GetEncodedPathAndQuery();
+
+        // Ensure these URLs can always be hit, even though they'll never be in the journey's Path
+        if (currentUrl == Links.SignOut() || currentUrl == Links.Cookies())
         {
             return Path.Steps.Last();
         }
@@ -479,5 +481,7 @@ public class SignInJourneyCoordinator(
         public string ProofOfIdentity(string? returnUrl = null) => linkGenerator.ProofOfIdentity(instanceId, returnUrl);
 
         public string SignOut() => linkGenerator.SignOut(instanceId);
+
+        public string Cookies() => linkGenerator.Cookies(instanceId);
     }
 }
