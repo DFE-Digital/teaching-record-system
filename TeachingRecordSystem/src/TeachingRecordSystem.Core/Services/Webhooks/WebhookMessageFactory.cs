@@ -89,7 +89,6 @@ public class WebhookMessageFactory(
                 {
                     WebhookMessageId = id,
                     WebhookEndpointId = ep.WebhookEndpointId,
-                    WebhookEndpoint = ep,
                     CloudEventId = id.ToString(),
                     CloudEventType = cloudEventType,
                     Timestamp = timeProvider.UtcNow,
@@ -101,6 +100,15 @@ public class WebhookMessageFactory(
                     DeliveryErrors = []
                 };
             }));
+        }
+
+        dbContext.WebhookMessages.AddRange(messages);
+        await dbContext.SaveChangesAsync();
+
+        foreach (var message in messages)
+        {
+            dbContext.Entry(message).State = EntityState.Detached;
+            message.WebhookEndpoint = endpoints!.Single(e => e.WebhookEndpointId == message.WebhookEndpointId);
         }
 
         return messages;
