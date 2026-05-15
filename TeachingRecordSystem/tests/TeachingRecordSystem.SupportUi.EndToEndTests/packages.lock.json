@@ -999,9 +999,9 @@
           "JetBrains.Annotations": "[2025.2.4, )",
           "Markdig": "[0.45.0, )",
           "Microsoft.Data.SqlClient": "[6.1.3, )",
-          "Microsoft.EntityFrameworkCore.Design": "[10.0.7, )",
-          "Microsoft.EntityFrameworkCore.InMemory": "[10.0.7, )",
-          "Microsoft.EntityFrameworkCore.Relational": "[10.0.7, )",
+          "Microsoft.EntityFrameworkCore.Design": "[10.0.8, )",
+          "Microsoft.EntityFrameworkCore.InMemory": "[10.0.8, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.8, )",
           "Microsoft.Extensions.Azure": "[1.14.0, )",
           "NSign.Client": "[1.2.3, )",
           "NSign.SignatureProviders": "[1.2.3, )",
@@ -1044,7 +1044,7 @@
         "dependencies": {
           "Faker.Net": "[2.0.163, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Microsoft.Extensions.TimeProvider.Testing": "[10.5.0, )",
+          "Microsoft.Extensions.TimeProvider.Testing": "[10.6.0, )",
           "Moq": "[4.20.72, )",
           "Respawn": "[7.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
@@ -1366,33 +1366,33 @@
       },
       "Microsoft.EntityFrameworkCore.Design": {
         "type": "CentralTransitive",
-        "requested": "[10.0.7, )",
-        "resolved": "10.0.7",
-        "contentHash": "8UMWkJdfwN/tyEZS6zd0s55zE5zaG4owldh+E91vXitHmux3FTP6Hjhgk6RL9Sv+TdO4FMERQIT6VzBtRrb1AQ==",
+        "requested": "[10.0.8, )",
+        "resolved": "10.0.8",
+        "contentHash": "LlUUXdfqKFk7RlGExojVP8GI6hN9O21WjpxFnp5mLeGjd9iYdwywIgK9WOLvPM2hrknrRyHR/i43FQdw/oCrOw==",
         "dependencies": {
           "Humanizer.Core": "2.14.1",
           "Microsoft.Build.Framework": "18.0.2",
           "Microsoft.CodeAnalysis.CSharp": "5.0.0",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "5.0.0",
           "Microsoft.CodeAnalysis.Workspaces.MSBuild": "5.0.0",
-          "Microsoft.EntityFrameworkCore.Relational": "10.0.7",
-          "Microsoft.Extensions.DependencyModel": "10.0.7",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.8",
+          "Microsoft.Extensions.DependencyModel": "10.0.8",
           "Mono.TextTemplating": "3.0.0",
           "Newtonsoft.Json": "13.0.3"
         }
       },
       "Microsoft.EntityFrameworkCore.InMemory": {
         "type": "CentralTransitive",
-        "requested": "[10.0.7, )",
-        "resolved": "10.0.7",
-        "contentHash": "RAns8RTPymM9GsIdY5Y8wWdpdMEXputTl24+95WhYzqF4HhT0i+jFmNgDxBTy386vU9ruoUC5gcPAiuJr8SZxg==",
+        "requested": "[10.0.8, )",
+        "resolved": "10.0.8",
+        "contentHash": "C3T9khx1oiLPrS6ehoSnZptiEuTOIaX60it9SGvCkWTeF5i6+IceK6p7mtx+mkFwWB5qx+v3IhgG51iUEtLq9w==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "10.0.7"
+          "Microsoft.EntityFrameworkCore": "10.0.8"
         }
       },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "CentralTransitive",
-        "requested": "[10.0.7, )",
+        "requested": "[10.0.8, )",
         "resolved": "10.0.8",
         "contentHash": "UU3diAD2wwZveye2rnrwaF/wvJ9tm5iL2fuY9TTap6/iGQK1OO29M1BzXZRlRPVH/dByt5w/pISBSFtyR7hTqw==",
         "dependencies": {
@@ -1420,9 +1420,9 @@
       },
       "Microsoft.Extensions.TimeProvider.Testing": {
         "type": "CentralTransitive",
-        "requested": "[10.5.0, )",
-        "resolved": "10.5.0",
-        "contentHash": "BW6DXn0oZWfoEN9cb+3PcM2IBHqcTnsO+UqEhW+uzdEuZSY3C9i9ITKoLiYbS8JwWm6daTpa4kRikUwr3KD+qQ=="
+        "requested": "[10.6.0, )",
+        "resolved": "10.6.0",
+        "contentHash": "qQDiaYWpvIymGbu+kXaMDS8YdqfeQkv6DOxPF2GSwC+eSzIKqOOnSP34TYt7gKqvB7p8/aSptexnW6nF0CUdnw=="
       },
       "Microsoft.Identity.Web": {
         "type": "CentralTransitive",
