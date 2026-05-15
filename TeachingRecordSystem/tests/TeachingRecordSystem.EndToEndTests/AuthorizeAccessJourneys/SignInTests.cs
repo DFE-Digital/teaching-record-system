@@ -367,7 +367,6 @@ public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture
 
         await page.GoToAuthorizeAccessTestStartPageAsync();
 
-        await page.PauseAsync();
         await page.AssertSignedInAsync(person.Trn);
     }
 

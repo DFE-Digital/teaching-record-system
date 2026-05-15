@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
@@ -7,9 +8,21 @@ public class SupportRequestSubmittedModel(SignInJourneyCoordinator coordinator) 
 {
     public string SupportTaskReference => coordinator.State.CreatedSupportTaskReference!;
 
-    public bool CanReturnToService => coordinator.State.AuthenticationTicket is not null;
+    public bool CanContinueToService => coordinator.State.AuthenticationTicket is not null;
 
     public string ServiceName => coordinator.State.ServiceName;
 
-    public string ContinueToApplicationUrl => coordinator.Links.ContinueToApplication();
+    public void OnGet()
+    {
+    }
+
+    public IActionResult OnPost()
+    {
+        if (!CanContinueToService)
+        {
+            return BadRequest();
+        }
+
+        return coordinator.GetNextPage().ToActionResult();
+    }
 }

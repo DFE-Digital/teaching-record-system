@@ -45,8 +45,6 @@ public class CheckAnswersModel(
         SupportTask supportTask;
         string? trnRequestId = null;
 
-        var pathStepUrls = new List<string> { coordinator.Links.SupportRequestSubmitted() };
-
         if (IdentityVerified)
         {
             if (state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
@@ -56,8 +54,6 @@ public class CheckAnswersModel(
                     trnRequestId = await coordinator.CompleteWithDeferredMatchingAsync(state);
                     return state;
                 });
-
-                pathStepUrls.Add(coordinator.Links.ContinueToApplication());
             }
 
             supportTask = await oneLoginUserMatchingSupportTaskService.CreateRecordMatchingSupportTaskAsync(
@@ -96,10 +92,9 @@ public class CheckAnswersModel(
 
         coordinator.UpdateState(s => s.CreatedSupportTaskReference = supportTask.SupportTaskReference);
 
-        var newPath = new JourneyPath(pathStepUrls.Select(coordinator.CreateStepFromUrl));
-        coordinator.UnsafeSetPath(newPath);
-
-        return Redirect(pathStepUrls.First());  // SupportRequestSubmitted
+        return coordinator.AdvanceTo(
+            links => links.SupportRequestSubmitted(),
+            new PushStepOptions { SetAsFirstStep = true });  // Prevents the user from going back to any page before 'SupportRequestSubmitted'
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

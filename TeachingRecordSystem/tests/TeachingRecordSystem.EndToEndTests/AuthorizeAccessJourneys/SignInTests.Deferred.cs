@@ -196,7 +196,7 @@ public partial class SignInTests
             return trnRequest.RequestId;
         });
 
-        await page.GetByTestId("continue-link").ClickAsync();
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
 
