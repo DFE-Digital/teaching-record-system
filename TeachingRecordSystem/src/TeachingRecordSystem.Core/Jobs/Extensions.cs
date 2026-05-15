@@ -203,6 +203,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<BackfillAuthzRegistrationTokenJob>(
+                nameof(BackfillAuthzRegistrationTokenJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                GetRecurringJobSchedule(BackfillAuthzRegistrationTokenJob.JobSchedule));
+
             recurringJobManager.RemoveIfExists("BackfillAlertProcessesJob (dry-run)");
             recurringJobManager.RemoveIfExists("BackfillAlertProcessesJob");
             recurringJobManager.RemoveIfExists("CreateDqtAnnotationAuditEventsJob");
