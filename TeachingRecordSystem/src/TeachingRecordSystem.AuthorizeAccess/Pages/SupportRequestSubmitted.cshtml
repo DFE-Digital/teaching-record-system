@@ -28,11 +28,17 @@
             You’ll need your reference number if you need to contact support about your request.
         </p>
 
-        @if (Model.CanReturnToService)
+        @if (Model.CanContinueToService)
         {
-            <p class="govuk-body">
-                You can return to the <a href="@Model.ContinueToApplicationUrl" class="govuk-link" data-testid="continue-link">@Model.ServiceName</a> service.
-            </p>
+            <form method="post">
+                <p class="govuk-body">
+                    You can return to the @Model.ServiceName service.
+                </p>
+
+                <div class="govuk-button-group">
+                    <govuk-button type="submit" data-testid="continue-btn">Continue</govuk-button>
+                </div>
+            </form>
         }
     </div>
 </div>

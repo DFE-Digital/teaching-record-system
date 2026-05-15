@@ -49,9 +49,9 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 // Assert
                 var doc = await AssertEx.HtmlResponseAsync(response);
 
-                var returnLink = doc.QuerySelector("a[data-testid='continue-link']");
+                var returnLink = doc.QuerySelector(".govuk-button[data-testid='continue-btn']");
                 Assert.NotNull(returnLink);
-                Assert.Contains("Test Service", returnLink.TextContent);
+                Assert.Contains("You can return to the Test Service service.", doc.GetElementsByTagName("main")[0].TextContent);
             });
     }
 

@@ -36,7 +36,6 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.ClickRadioByLabelAsync("Connect it to Record A");
         await page.ClickContinueButtonAsync();
 
-        await page.PauseAsync();
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-connect");
         await page.ClickButtonAsync("Confirm and connect account");
 

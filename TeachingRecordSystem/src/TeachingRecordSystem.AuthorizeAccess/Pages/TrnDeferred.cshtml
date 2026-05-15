@@ -4,16 +4,16 @@
     ViewBag.Title = "Continue your registration";
 }
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-        <form method="post">
-            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<form method="post">
+    <div class="govuk-panel govuk-panel--interruption">
+        <h1 class="govuk-panel__title">@ViewBag.Title</h1>
 
+        <div class="govuk-panel__body">
             <p class="govuk-body">
-                You'll be given a teacher reference number (TRN) once you've enrolled on a course.
+                You’ll be given a teacher reference number (TRN) once you’ve been accepted on a course.
             </p>
 
-            <govuk-button type="submit">Continue</govuk-button>
-        </form>
+            <govuk-button class="govuk-!-margin-bottom-0">Continue</govuk-button>
+        </div>
     </div>
-</div>
+</form>
