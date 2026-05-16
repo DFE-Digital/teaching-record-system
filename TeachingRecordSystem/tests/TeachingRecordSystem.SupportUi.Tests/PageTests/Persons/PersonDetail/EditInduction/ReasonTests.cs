@@ -83,7 +83,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expectedChoices, reasonChoices);
 
         var additionalDetailLegend = doc.GetElementByTestId("has-additional-reason_detail-options-legend");
-        Assert.Equal("Do you want to add more information about why you’re changing the induction details?", additionalDetailLegend!.TrimmedText());
+        Assert.Equal("Do you want to provide more information?", additionalDetailLegend!.TrimmedText());
         var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)

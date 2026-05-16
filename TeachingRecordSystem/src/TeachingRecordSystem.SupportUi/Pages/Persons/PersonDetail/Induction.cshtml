@@ -22,7 +22,7 @@
         <title data-testid="induction-title">Induction details</title>
         <govuk-summary-list>
             <row data-testid="induction-status">
-                <key>Induction status</key>
+                <key>Status</key>
                 <value>@Model.Status.GetTitle()</value>
                 @if (Model.CanWrite)
                 {
@@ -59,7 +59,7 @@
             @if (Model.ShowStartDate)
             {
                 <row data-testid="induction-start-date">
-                    <key>Induction started on</key>
+                    <key>Start date</key>
                     <value>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                     @if (Model.CanWrite)
                     {
@@ -73,7 +73,7 @@
             @if (Model.ShowCompletedDate)
             {
                 <row data-testid="induction-completed-date">
-                    <key>Induction completed on</key>
+                    <key>Completion date</key>
                     <value>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
                     @if (Model.CanWrite)
                     {
