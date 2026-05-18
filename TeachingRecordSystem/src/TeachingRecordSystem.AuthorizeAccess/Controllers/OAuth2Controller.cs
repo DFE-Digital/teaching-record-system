@@ -232,6 +232,10 @@ public class OAuth2Controller(
                 yield return Destinations.AccessToken;
                 yield break;
 
+            case AuthorizeAccessClaimTypes.TrnRequestId:
+                yield return Destinations.AccessToken;
+                yield break;
+
             default:
                 yield break;
         }
