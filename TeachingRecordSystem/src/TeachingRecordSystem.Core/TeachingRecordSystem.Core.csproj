@@ -297,7 +297,6 @@
     <PackageReference Include="Hangfire.NetCore" />
     <PackageReference Include="Hangfire.PostgreSql" />
     <PackageReference Include="IdentityModel" />
-    <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
