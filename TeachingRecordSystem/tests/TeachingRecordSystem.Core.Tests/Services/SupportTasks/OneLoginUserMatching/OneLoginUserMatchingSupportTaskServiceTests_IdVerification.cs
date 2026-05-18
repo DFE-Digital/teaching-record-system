@@ -431,7 +431,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailReplyToId = customReplyToId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -585,7 +585,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailReplyToId = customReplyToId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
