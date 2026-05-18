@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260515150322_AddAuthzRegistrationToken")]
+    partial class AddAuthzRegistrationToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -462,20 +465,20 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.AuthzRegistrationToken", b =>
                 {
-                    b.Property<string>("Token")
+                    b.Property<string>("AuthzRegistrationTokenValue")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
-                        .HasColumnName("token");
+                        .HasColumnName("authz_registration_token");
 
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_utc");
 
-                    b.Property<string>("EmailAddress")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("emailaddress")
+                        .HasColumnName("email")
                         .UseCollation("case_insensitive");
 
                     b.Property<DateTime>("ExpiresUtc")
@@ -493,11 +496,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character(7)")
                         .HasColumnName("trn");
 
-                    b.HasKey("Token")
+                    b.HasKey("AuthzRegistrationTokenValue")
                         .HasName("pk_authz_registration_tokens");
 
-                    b.HasIndex("EmailAddress")
-                        .HasDatabaseName("ix_authz_registration_tokens_emailaddress");
+                    b.HasIndex("Email")
+                        .HasDatabaseName("ix_authz_registration_tokens_email");
 
                     b.HasIndex("IsActive")
                         .HasDatabaseName("ix_authz_registration_tokens_is_active");

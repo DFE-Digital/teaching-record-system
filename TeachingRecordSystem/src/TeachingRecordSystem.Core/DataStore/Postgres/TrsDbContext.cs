@@ -126,6 +126,8 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
 
     public DbSet<ProcessEvent> ProcessEvents => Set<ProcessEvent>();
 
+    public DbSet<AuthzRegistrationToken> AuthzRegistrationTokens => Set<AuthzRegistrationToken>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
