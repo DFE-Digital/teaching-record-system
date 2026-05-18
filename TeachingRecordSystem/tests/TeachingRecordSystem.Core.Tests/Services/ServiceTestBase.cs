@@ -18,8 +18,6 @@ public abstract class ServiceTestBase
 
     protected DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler => TestScopedServices.GetCurrent().BackgroundJobScheduler;
 
-    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
-
     protected IDbContextFactory<TrsDbContext> DbContextFactory => _fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     protected EventCapture Events => _fixture.Services.GetRequiredService<EventCapture>();
@@ -27,6 +25,8 @@ public abstract class ServiceTestBase
     protected IServiceProvider Services => _fixture.Services;
 
     protected TestData TestData => Services.GetRequiredService<TestData>();
+
+    protected FakeTimeProvider TimeProvider => TestScopedServices.GetCurrent().TimeProvider;
 
     protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
         DbContextFactory.WithDbContextAsync(action);

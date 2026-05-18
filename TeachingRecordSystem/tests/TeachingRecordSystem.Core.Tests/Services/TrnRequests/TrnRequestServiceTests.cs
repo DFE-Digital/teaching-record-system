@@ -20,7 +20,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
                 TrnToken = Guid.NewGuid().ToString(),
                 Trn = req.Trn,
                 Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1)
+                ExpiresUtc = TimeProvider.UtcNow.AddDays(1)
             });
 
         AytqOptionsAccessor = Options.Create(new AccessYourTeachingQualificationsOptions()
@@ -44,7 +44,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var options = GetCreateTrnRequestOptions(applicationUser.UserId);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var result = await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -101,7 +101,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var definiteMatch =
             await TestData.CreatePersonAsync(p => p.WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber(nationalInsuranceNumber));
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var result = await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -135,7 +135,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth));
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var result = await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -151,7 +151,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var options = GetCreateTrnRequestOptions(applicationUser.UserId);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var result = await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -179,7 +179,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             .WithDateOfBirth(dateOfBirth)
             .WithNationalInsuranceNumber(nationalInsuranceNumber));
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -214,7 +214,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
             .WithAlert());
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -260,7 +260,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             .WithDateOfBirth(dateOfBirth)
             .WithAlert());
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -294,7 +294,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             .WithDateOfBirth(dateOfBirth)
             .WithNationalInsuranceNumber(nationalInsuranceNumber));
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -315,7 +315,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
 
         var options = GetCreateTrnRequestOptions(applicationUser.UserId, tryResolve: false);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
@@ -341,7 +341,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
         trnRequest.Status = TrnRequestStatus.Pending;
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() =>
@@ -362,7 +362,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             .WithDateOfBirth(trnRequest.DateOfBirth)
             .WithNationalInsuranceNumber(trnRequest.NationalInsuranceNumber!));
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
@@ -379,7 +379,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
@@ -410,7 +410,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             .WithLastName(trnRequest.LastName!)
             .WithDateOfBirth(trnRequest.DateOfBirth));
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
@@ -438,7 +438,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
 
         var (trnRequest, matchedPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
@@ -461,7 +461,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
 
         var (trnRequest, matchedPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId, matchedPersonHasFurtherChecksRequiredFlag: true);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
@@ -491,7 +491,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
 
         var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext));
@@ -528,7 +528,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
         trnRequest.Status = TrnRequestStatus.Rejected;
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(async () =>
@@ -550,7 +550,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         trnRequest.ResolvedPersonId = matchingPerson.PersonId;
         trnRequest.Status = TrnRequestStatus.Completed;
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(async () =>
@@ -570,7 +570,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
 
         var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest, processContext));
@@ -595,7 +595,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
         trnRequest.Status = TrnRequestStatus.Rejected;
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(async () =>
@@ -617,7 +617,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         trnRequest.ResolvedPersonId = matchingPerson.PersonId;
         trnRequest.Status = TrnRequestStatus.Completed;
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(async () =>
@@ -639,7 +639,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         trnRequest.ResolvedPersonId = matchingPerson.PersonId;
         trnRequest.Status = TrnRequestStatus.Pending;
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest, processContext));
@@ -902,7 +902,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         {
             ApplicationUserId = options.ApplicationUserId,
             RequestId = options.RequestId,
-            CreatedOn = Clock.UtcNow,
+            CreatedOn = TimeProvider.UtcNow,
             IdentityVerified = options.OneLoginUserInfo?.IdentityVerified,
             EmailAddress = options.EmailAddress,
             OneLoginUserSubject = options.OneLoginUserInfo?.OneLoginUserSubject,

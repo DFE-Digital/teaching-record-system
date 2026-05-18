@@ -13,7 +13,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserVerifiedOptions
         {
@@ -37,7 +37,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserVerifiedOptions
         {
@@ -74,7 +74,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserVerifiedOptions
         {
@@ -108,7 +108,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserMatchedOptions
         {
@@ -132,7 +132,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         var matchedPerson = await TestData.CreatePersonAsync();
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserMatchedOptions
         {
@@ -169,7 +169,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         var matchedPerson = await TestData.CreatePersonAsync();
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserMatchedOptions
         {
@@ -206,7 +206,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         var matchedPerson = await TestData.CreatePersonAsync();
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserVerifiedAndMatchedOptions
         {
@@ -234,7 +234,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var matchedPerson = await TestData.CreatePersonAsync();
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserVerifiedAndMatchedOptions
         {
@@ -285,7 +285,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var matchedPerson = await TestData.CreatePersonAsync();
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var options = new SetUserVerifiedAndMatchedOptions
         {
@@ -331,7 +331,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         // Arrange
         var subject = Guid.NewGuid().ToString();
         var email = Faker.Internet.Email();
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var result = await WithServiceAsync(s => s.OnSignInAsync(subject, email, processContext));
@@ -360,7 +360,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var result = await WithServiceAsync(s => s.OnSignInAsync(oneLoginUser.Subject, oneLoginUser.EmailAddress!, processContext));
@@ -383,7 +383,7 @@ public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestB
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var newEmail = Faker.Internet.Email();
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var result = await WithServiceAsync(s => s.OnSignInAsync(oneLoginUser.Subject, newEmail, processContext));

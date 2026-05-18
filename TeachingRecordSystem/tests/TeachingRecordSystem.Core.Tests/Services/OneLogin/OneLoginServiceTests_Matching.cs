@@ -243,7 +243,7 @@ public partial class OneLoginServiceTests
         // person who matches on first name, previous last name and DOB
         var person5 = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(TestData.GenerateChangedLastName(lastName))
             .WithDateOfBirth(dateOfBirth)
-            .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), lastName, Clock.UtcNow)));
+            .WithPreviousNames((TestData.GenerateFirstName(), TestData.GenerateMiddleName(), lastName, TimeProvider.UtcNow)));
 
         string[][] names = [[firstName, lastName]];
         DateOnly[] datesOfBirth = [dateOfBirth];
@@ -541,7 +541,7 @@ public partial class OneLoginServiceTests
             /*expectMatch: */ true,
             [PersonMatchedAttribute.FirstName, PersonMatchedAttribute.DateOfBirth, PersonMatchedAttribute.NationalInsuranceNumber, PersonMatchedAttribute.Trn]
         },
-        
+
 
         // *** No match cases ***
 

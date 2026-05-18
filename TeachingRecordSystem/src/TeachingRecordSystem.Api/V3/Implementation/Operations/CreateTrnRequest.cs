@@ -82,6 +82,7 @@ public class CreateTrnRequestHandler(
         return new TrnRequestInfo()
         {
             RequestId = command.RequestId,
+            OneLoginUserSubject = trnRequest.OneLoginUserSubject,
 #pragma warning disable TRS0001
             Person = new TrnRequestInfoPerson()
             {

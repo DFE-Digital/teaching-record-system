@@ -4,9 +4,14 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public async Task<TrnRequestMetadata> CreateDormantTrnRequestAsync(Guid applicationUserId)
+    public async Task<TrnRequestMetadata> CreateDormantTrnRequestAsync(Guid applicationUserId, string? oneLoginUserSubject = null)
     {
-        return await CreateTrnRequestWithStatusAsync(applicationUserId, TrnRequestStatus.Dormant);
+        oneLoginUserSubject ??= CreateOneLoginUserSubject();
+
+        return await CreateTrnRequestWithStatusAsync(
+            applicationUserId,
+            TrnRequestStatus.Dormant,
+            oneLoginUserSubject);
     }
 
     public async Task<TrnRequestMetadata> CreateRejectedTrnRequestAsync(Guid applicationUserId)
@@ -14,7 +19,10 @@ public partial class TestData
         return await CreateTrnRequestWithStatusAsync(applicationUserId, TrnRequestStatus.Rejected);
     }
 
-    private async Task<TrnRequestMetadata> CreateTrnRequestWithStatusAsync(Guid applicationUserId, TrnRequestStatus status)
+    private async Task<TrnRequestMetadata> CreateTrnRequestWithStatusAsync(
+        Guid applicationUserId,
+        TrnRequestStatus status,
+        string? oneLoginUserSubject = null)
     {
         var requestId = Guid.NewGuid().ToString();
 
@@ -34,7 +42,7 @@ public partial class TestData
                 CreatedOn = TimeProvider.UtcNow,
                 IdentityVerified = null,
                 EmailAddress = emailAddress,
-                OneLoginUserSubject = null,
+                OneLoginUserSubject = oneLoginUserSubject,
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,

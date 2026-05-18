@@ -747,7 +747,7 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
         var dbContextFactory = DbContextFactory;
-        // Clock is inherited from ServiceTestBase
+        // TimeProvider is inherited from ServiceTestBase
         var tpsCsvExtractId = Guid.NewGuid();
         var filename = "pending/test.csv";
         var csvContent = new StringBuilder();
@@ -763,7 +763,7 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
         var importer = new TpsCsvExtractFileImporter(
             tpsExtractStorageService,
             dbContextFactory,
-            Clock);
+            TimeProvider);
         await importer.ImportFileAsync(tpsCsvExtractId, filename, CancellationToken.None);
 
         // Assert
@@ -784,13 +784,13 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
         var dbContextFactory = DbContextFactory;
-        // Clock is inherited from ServiceTestBase
+        // TimeProvider is inherited from ServiceTestBase
         var tpsCsvExtractId = Guid.NewGuid();
         var tpsCsvExtract = new TpsCsvExtract
         {
             TpsCsvExtractId = tpsCsvExtractId,
             Filename = "pending/test.csv",
-            CreatedOn = Clock.UtcNow
+            CreatedOn = TimeProvider.UtcNow
         };
 
         var validLoadItem = new TpsCsvExtractLoadItem
@@ -814,7 +814,7 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             WithdrawalIndicator = null,
             ExtractDate = "07/03/2024",
             Gender = "Male",
-            Created = Clock.UtcNow,
+            Created = TimeProvider.UtcNow,
             Errors = TpsCsvExtractItemLoadErrors.None
         };
         var invalidLoadItem = new TpsCsvExtractLoadItem
@@ -838,7 +838,7 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
             WithdrawalIndicator = null,
             ExtractDate = "07/03/2024",
             Gender = "Not a gender",
-            Created = Clock.UtcNow,
+            Created = TimeProvider.UtcNow,
             Errors = TpsCsvExtractItemLoadErrors.GenderIncorrectFormat
         };
 
@@ -851,7 +851,7 @@ public class TpsCsvExtractFileImporterTests(ServiceFixture fixture) : ServiceTes
         var importer = new TpsCsvExtractFileImporter(
             tpsExtractStorageService,
             dbContextFactory,
-            Clock);
+            TimeProvider);
         await importer.CopyValidFormatDataToStagingAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert

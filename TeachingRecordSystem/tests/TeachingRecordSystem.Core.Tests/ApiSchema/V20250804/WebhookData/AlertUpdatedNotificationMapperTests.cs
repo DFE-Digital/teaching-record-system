@@ -28,7 +28,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 var oldDetails = alert.Details;
                 var newDetails = Faker.Lorem.Paragraph();
                 alert.Details = newDetails;
-                alert.UpdatedOn = Clock.UtcNow;
+                alert.UpdatedOn = TimeProvider.UtcNow;
 
                 var updatedEvent = new AlertUpdatedEvent
                 {
@@ -88,7 +88,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 var oldDetails = alert.Details;
                 var newDetails = Faker.Lorem.Paragraph();
                 alert.Details = newDetails;
-                alert.UpdatedOn = Clock.UtcNow;
+                alert.UpdatedOn = TimeProvider.UtcNow;
 
                 var updatedEvent = new AlertUpdatedEvent
                 {
@@ -139,7 +139,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
                 var oldExternalLink = alert.ExternalLink;
                 var newExternalLink = Faker.Internet.Url();
                 alert.ExternalLink = newExternalLink;
-                alert.UpdatedOn = Clock.UtcNow;
+                alert.UpdatedOn = TimeProvider.UtcNow;
 
                 var updatedEvent = new AlertUpdatedEvent
                 {
