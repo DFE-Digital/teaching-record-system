@@ -23,7 +23,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessNonMatchingTrnsAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -48,7 +48,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessNonMatchingEstablishmentsAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -72,7 +72,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -101,7 +101,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -130,7 +130,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -159,7 +159,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -195,7 +195,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -229,7 +229,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -261,7 +261,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -292,7 +292,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -321,7 +321,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -351,7 +351,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -379,7 +379,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -407,7 +407,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
@@ -430,7 +430,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.UpdateLatestEstablishmentVersionsAsync(CancellationToken.None);
 
         // Assert
@@ -457,7 +457,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.ProcessEndedEmploymentsAsync(CancellationToken.None);
 
         // Assert
@@ -484,7 +484,7 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         // Act
         var processor = new TpsCsvExtractProcessor(
             DbContextFactory,
-            Clock);
+            TimeProvider);
         await processor.BackfillEmployerEmailAddressInEmploymentHistoryAsync(CancellationToken.None);
 
         // Assert

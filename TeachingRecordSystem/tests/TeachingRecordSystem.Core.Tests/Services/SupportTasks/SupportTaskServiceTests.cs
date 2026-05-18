@@ -31,7 +31,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             TrnRequest = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService, SupportTask>(
@@ -65,7 +65,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             TrnRequest = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var result = await WithServiceAsync<SupportTaskService, SupportTask>(
@@ -98,7 +98,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var reasonDetail = Faker.Lorem.Paragraph();
         var options = new DeleteSupportTaskOptions(supportTaskReference, reasonDetail);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(service => service.DeleteSupportTaskAsync(options, processContext)));
@@ -118,14 +118,14 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(supportTask);
-            supportTask.DeletedOn = Clock.UtcNow.AddDays(-1);
+            supportTask.DeletedOn = TimeProvider.UtcNow.AddDays(-1);
             await dbContext.SaveChangesAsync();
         });
 
         var reasonDetail = Faker.Lorem.Paragraph();
         var options = new DeleteSupportTaskOptions(supportTask.SupportTaskReference, reasonDetail);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(service => service.DeleteSupportTaskAsync(options, processContext)));
@@ -145,7 +145,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         var reasonDetail = Faker.Lorem.Paragraph();
         var options = new DeleteSupportTaskOptions(supportTask.SupportTaskReference, reasonDetail);
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync<SupportTaskService>(service => service.DeleteSupportTaskAsync(options, processContext));
@@ -179,7 +179,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Comments = Faker.Lorem.Paragraph()
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(
@@ -208,7 +208,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Comments = Faker.Lorem.Paragraph()
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
@@ -225,7 +225,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         {
             var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
             Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
-            Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, supportTask.UpdatedOn);
             Assert.Equal(options.Comments, supportTaskUpdatedEvent.Comments);
             Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data, supportTaskUpdatedEvent.Changes);
         });
@@ -247,7 +247,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Comments = Faker.Lorem.Paragraph()
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
@@ -263,7 +263,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         {
             var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
             Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
-            Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, supportTask.UpdatedOn);
             Assert.Equal(options.Comments, supportTaskUpdatedEvent.Comments);
             Assert.Equal(SupportTaskUpdatedEventChanges.Status, supportTaskUpdatedEvent.Changes);
         });
@@ -275,7 +275,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
@@ -285,7 +285,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Comments = Faker.Lorem.Paragraph()
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
@@ -324,7 +324,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Comments = Faker.Lorem.Paragraph()
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
@@ -341,7 +341,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         {
             var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
             Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
-            Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, supportTask.UpdatedOn);
             Assert.Equal(options.Comments, supportTaskUpdatedEvent.Comments);
             Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.ResolveJourneySavedState, supportTaskUpdatedEvent.Changes);
         });

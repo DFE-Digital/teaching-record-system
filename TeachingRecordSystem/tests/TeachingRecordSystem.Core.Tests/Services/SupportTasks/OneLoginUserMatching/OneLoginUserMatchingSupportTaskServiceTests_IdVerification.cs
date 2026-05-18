@@ -35,7 +35,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EvidenceFileName = evidenceFileName
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var supportTask = await WithServiceAsync(s => s.CreateVerificationSupportTaskAsync(options, processContext));
@@ -80,7 +80,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -140,7 +140,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -169,7 +169,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -198,7 +198,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = customTemplateId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -231,7 +231,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -284,7 +284,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = customTemplateId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -319,7 +319,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = customTemplateId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -351,7 +351,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = "custom-template-id"
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -377,7 +377,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -446,7 +446,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));
@@ -469,7 +469,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Assert.NotNull(updatedOneLoginUser.VerifiedDatesOfBirth);
         Assert.Collection(updatedOneLoginUser.VerifiedDatesOfBirth, dob => Assert.Equal(data.StatedDateOfBirth, dob));
         Assert.Equal(matchedPerson.PersonId, updatedOneLoginUser.PersonId);
-        Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
+        Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.MatchedOn);
         Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
         Assert.NotNull(updatedOneLoginUser.MatchedAttributes);
 
@@ -513,7 +513,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             EmailTemplateId = customTemplateId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveVerificationSupportTaskAsync(options, processContext));

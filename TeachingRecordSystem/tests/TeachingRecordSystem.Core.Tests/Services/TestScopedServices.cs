@@ -12,12 +12,12 @@ public class TestScopedServices
 
     public TestScopedServices(IServiceProvider serviceProvider)
     {
-        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
-        Events = new(Clock);
+        TimeProvider = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
+        Events = new(TimeProvider);
         BackgroundJobScheduler = new(serviceProvider);
     }
 
-    public FakeTimeProvider Clock { get; }
+    public FakeTimeProvider TimeProvider { get; }
 
     public EventCapture Events { get; }
 
@@ -57,7 +57,7 @@ public class TestScopedServices
 
     private class ForwardToTestScopedTimeProvider : TimeProvider
     {
-        public override DateTimeOffset GetUtcNow() => GetCurrent().Clock.GetUtcNow();
+        public override DateTimeOffset GetUtcNow() => GetCurrent().TimeProvider.GetUtcNow();
     }
 }
 

@@ -141,7 +141,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             var @event = new OneLoginUserUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                OneLoginUser = EventModels.OneLoginUser.FromModel(oneLoginUser) with { VerifiedOn = Clock.UtcNow },
+                OneLoginUser = EventModels.OneLoginUser.FromModel(oneLoginUser) with { VerifiedOn = TimeProvider.UtcNow },
                 OldOneLoginUser = EventModels.OneLoginUser.FromModel(oneLoginUser),
                 Changes = OneLoginUserUpdatedEventChanges.VerifiedOn
             };

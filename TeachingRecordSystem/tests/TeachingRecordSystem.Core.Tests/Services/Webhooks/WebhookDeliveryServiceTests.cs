@@ -24,7 +24,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
             senderMock.Object,
             DbContextFactory,
             CreateDummyOptions(),
-            Clock,
+            TimeProvider,
             new NullLogger<WebhookDeliveryService>());
 
         // Act
@@ -38,8 +38,8 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         await WithDbContextAsync(async dbContext =>
         {
             await dbContext.Entry(message).ReloadAsync();
-            Assert.Equal(Clock.UtcNow, message.Delivered);
-            Assert.Collection(message.DeliveryAttempts, t => Assert.Equal(Clock.UtcNow, t));
+            Assert.Equal(TimeProvider.UtcNow, message.Delivered);
+            Assert.Collection(message.DeliveryAttempts, t => Assert.Equal(TimeProvider.UtcNow, t));
         });
     }
 
@@ -48,7 +48,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
     {
         // Arrange
         var endpoint = await CreateApplicationUserAndEndpoint();
-        var message = await CreateMessage(endpoint, configureMessage: message => message.NextDeliveryAttempt = Clock.UtcNow.AddDays(1));
+        var message = await CreateMessage(endpoint, configureMessage: message => message.NextDeliveryAttempt = TimeProvider.UtcNow.AddDays(1));
 
         var senderMock = new Mock<IWebhookSender>();
 
@@ -56,7 +56,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
             senderMock.Object,
             DbContextFactory,
             CreateDummyOptions(),
-            Clock,
+            TimeProvider,
             new NullLogger<WebhookDeliveryService>());
 
         // Act
@@ -82,7 +82,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
             senderMock.Object,
             DbContextFactory,
             CreateDummyOptions(),
-            Clock,
+            TimeProvider,
             new NullLogger<WebhookDeliveryService>());
 
         // Act
@@ -105,7 +105,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
             senderMock.Object,
             DbContextFactory,
             CreateDummyOptions(),
-            Clock,
+            TimeProvider,
             new NullLogger<WebhookDeliveryService>());
 
         // Act
@@ -136,7 +136,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
             senderMock.Object,
             DbContextFactory,
             CreateDummyOptions(),
-            Clock,
+            TimeProvider,
             new NullLogger<WebhookDeliveryService>());
 
         // Act
@@ -149,8 +149,8 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         {
             await dbContext.Entry(message).ReloadAsync();
             Assert.Null(message.Delivered);
-            Assert.Collection(message.DeliveryAttempts, t => Assert.Equal(Clock.UtcNow, t));
-            Assert.True(message.NextDeliveryAttempt > Clock.UtcNow);
+            Assert.Collection(message.DeliveryAttempts, t => Assert.Equal(TimeProvider.UtcNow, t));
+            Assert.True(message.NextDeliveryAttempt > TimeProvider.UtcNow);
             Assert.Collection(message.DeliveryErrors, e => Assert.Equal(sendMessageExceptionMessage, e));
         });
     }
@@ -161,7 +161,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         // Arrange
         var endpoint = await CreateApplicationUserAndEndpoint();
 
-        var message = await CreateMessage(endpoint, timestamp: Clock.UtcNow.Subtract(TimeSpan.FromDays(365)), message =>
+        var message = await CreateMessage(endpoint, timestamp: TimeProvider.UtcNow.Subtract(TimeSpan.FromDays(365)), message =>
         {
             // Set up a message that's been attempted multiple times before and has failed every time but has a single retry left
 
@@ -191,7 +191,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
             senderMock.Object,
             DbContextFactory,
             CreateDummyOptions(),
-            Clock,
+            TimeProvider,
             new NullLogger<WebhookDeliveryService>());
 
         // Act
@@ -204,7 +204,7 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
         {
             await dbContext.Entry(message).ReloadAsync();
             Assert.Null(message.Delivered);
-            Assert.Equal(Clock.UtcNow, message.DeliveryAttempts.Last());
+            Assert.Equal(TimeProvider.UtcNow, message.DeliveryAttempts.Last());
             Assert.Null(message.NextDeliveryAttempt);
             Assert.Equal(sendMessageExceptionMessage, message.DeliveryErrors.Last());
         });
@@ -252,8 +252,8 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
                     {
                         Foo = i
                     }),
-                    Timestamp = Clock.UtcNow,
-                    NextDeliveryAttempt = Clock.UtcNow,
+                    Timestamp = TimeProvider.UtcNow,
+                    NextDeliveryAttempt = TimeProvider.UtcNow,
                     WebhookEndpointId = endpoint.WebhookEndpointId,
                     WebhookMessageId = Guid.NewGuid()
                 };
@@ -275,8 +275,8 @@ public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBa
                 {
                     Foo = 42
                 }),
-                Timestamp = timestamp ?? Clock.UtcNow,
-                NextDeliveryAttempt = Clock.UtcNow,
+                Timestamp = timestamp ?? TimeProvider.UtcNow,
+                NextDeliveryAttempt = TimeProvider.UtcNow,
                 WebhookEndpointId = endpoint.WebhookEndpointId,
                 WebhookMessageId = Guid.NewGuid()
             };

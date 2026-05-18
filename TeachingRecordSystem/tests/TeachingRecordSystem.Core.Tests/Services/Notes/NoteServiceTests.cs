@@ -25,7 +25,7 @@ public class NoteServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
             OriginalFileName = fileName
         };
 
-        var processContext = new ProcessContext(ProcessType.NoteCreating, Clock.UtcNow, user.UserId);
+        var processContext = new ProcessContext(ProcessType.NoteCreating, TimeProvider.UtcNow, user.UserId);
 
         // Act
         var note = await WithServiceAsync<NoteService, Note>(service => service.CreateNoteAsync(options, processContext));

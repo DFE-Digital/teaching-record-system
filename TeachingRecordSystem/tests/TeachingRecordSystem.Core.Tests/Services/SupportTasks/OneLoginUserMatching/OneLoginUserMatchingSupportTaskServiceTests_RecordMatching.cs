@@ -30,7 +30,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             TrnTokenTrn = trnTokenTrn
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var supportTask = await WithServiceAsync(s => s.CreateRecordMatchingSupportTaskAsync(options, processContext));
@@ -76,7 +76,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
@@ -113,7 +113,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = customTemplateId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
@@ -148,7 +148,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = customTemplateId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
@@ -180,7 +180,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = "custom-template-id"
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
@@ -208,7 +208,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = emailTemplateId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
@@ -268,7 +268,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
@@ -284,7 +284,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var updatedOneLoginUser =
             await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
         Assert.Equal(matchedPerson.PersonId, updatedOneLoginUser.PersonId);
-        Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
+        Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.MatchedOn);
         Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
         Assert.NotNull(updatedOneLoginUser.MatchedAttributes);
 
@@ -329,7 +329,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = customTemplateId
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
@@ -371,7 +371,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
@@ -387,7 +387,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var updatedOneLoginUser =
             await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
         Assert.Equal(matchedPerson.PersonId, updatedOneLoginUser.PersonId);
-        Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
+        Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.MatchedOn);
         Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
         Assert.NotNull(updatedOneLoginUser.MatchedAttributes);
 
@@ -433,7 +433,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             EmailTemplateId = null
         };
 
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));

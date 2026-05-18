@@ -25,8 +25,8 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
             {
                 dbContext.Alerts.Attach(alert);
 
-                alert.DeletedOn = Clock.UtcNow;
-                alert.UpdatedOn = Clock.UtcNow;
+                alert.DeletedOn = TimeProvider.UtcNow;
+                alert.UpdatedOn = TimeProvider.UtcNow;
 
                 var deletedEvent = new AlertDeletedEvent
                 {
@@ -73,8 +73,8 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
             {
                 dbContext.Alerts.Attach(alert);
 
-                alert.DeletedOn = Clock.UtcNow;
-                alert.UpdatedOn = Clock.UtcNow;
+                alert.DeletedOn = TimeProvider.UtcNow;
+                alert.UpdatedOn = TimeProvider.UtcNow;
 
                 var deletedEvent = new AlertDeletedEvent
                 {

@@ -3,6 +3,7 @@ namespace TeachingRecordSystem.Api.V3.Implementation.Dtos;
 public record TrnRequestInfo
 {
     public required string RequestId { get; init; }
+    public required string? OneLoginUserSubject { get; init; }
 #pragma warning disable TRS0001
     public required TrnRequestInfoPerson Person { get; init; }
 #pragma warning restore TRS0001

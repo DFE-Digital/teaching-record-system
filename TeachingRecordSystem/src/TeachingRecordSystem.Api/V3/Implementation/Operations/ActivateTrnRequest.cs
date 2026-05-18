@@ -37,6 +37,7 @@ public class ActivateTrnRequestHandler(TrnRequestService trnRequestService, Time
             new Dtos.TrnRequestInfo()
             {
                 RequestId = command.RequestId,
+                OneLoginUserSubject = trnRequest.OneLoginUserSubject,
 #pragma warning disable TRS0001
                 Person = new TrnRequestInfoPerson()
 #pragma warning restore TRS0001

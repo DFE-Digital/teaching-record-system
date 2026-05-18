@@ -29,7 +29,7 @@ public partial class TrnRequestServiceTests
         {
             ApplicationUserId = applicationUser.UserId,
             RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = Clock.UtcNow,
+            CreatedOn = TimeProvider.UtcNow,
             IdentityVerified = null,
             EmailAddress = null,
             OneLoginUserSubject = null,
@@ -80,7 +80,7 @@ public partial class TrnRequestServiceTests
         {
             ApplicationUserId = applicationUser.UserId,
             RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = Clock.UtcNow,
+            CreatedOn = TimeProvider.UtcNow,
             IdentityVerified = null,
             EmailAddress = null,
             OneLoginUserSubject = null,
@@ -136,7 +136,7 @@ public partial class TrnRequestServiceTests
         {
             ApplicationUserId = applicationUser.UserId,
             RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = Clock.UtcNow,
+            CreatedOn = TimeProvider.UtcNow,
             IdentityVerified = null,
             EmailAddress = emailAddress,
             OneLoginUserSubject = oneLoginUser.Subject,
@@ -187,7 +187,7 @@ public partial class TrnRequestServiceTests
         {
             ApplicationUserId = applicationUser.UserId,
             RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = Clock.UtcNow,
+            CreatedOn = TimeProvider.UtcNow,
             IdentityVerified = null,
             EmailAddress = emailAddress,
             OneLoginUserSubject = noneTrsOneLoginUserSubject,
@@ -300,7 +300,7 @@ public partial class TrnRequestServiceTests
         {
             ApplicationUserId = applicationUser.UserId,
             RequestId = Guid.NewGuid().ToString(),
-            CreatedOn = Clock.UtcNow,
+            CreatedOn = TimeProvider.UtcNow,
             IdentityVerified = null,
             EmailAddress = emailAddress,
             OneLoginUserSubject = null,
