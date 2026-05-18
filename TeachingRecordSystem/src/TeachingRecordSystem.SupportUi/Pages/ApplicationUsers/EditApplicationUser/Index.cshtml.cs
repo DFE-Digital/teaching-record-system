@@ -48,7 +48,13 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             .NotEmpty().WithMessage("Enter the One Login post logout redirect URI").When(m => m.IsOidcClient)
             .MaximumLength(ApplicationUser.RedirectUriPathMaxLength).WithMessage("One Login post logout redirect URI must be 150 characters or less").When(m => m.IsOidcClient),
         v => v.RuleFor(m => m.ShortName)
-            .MaximumLength(ApplicationUser.ShortNameMaxLength).WithMessage("Short name must be 25 characters or less")
+            .MaximumLength(ApplicationUser.ShortNameMaxLength).WithMessage("Short name must be 25 characters or less"),
+        v => v.RuleFor(m => m.SupportEmailAddressNotifyId)
+            .Must(id => string.IsNullOrEmpty(id) || Guid.TryParse(id, out _)).WithMessage("Support email address Notify ID must be a valid GUID")
+            .When(m => m.IsOidcClient),
+        v => v.RuleFor(m => m.SupportEmailAddress)
+            .EmailAddress().WithMessage("Enter a valid email address")
+            .When(m => m.IsOidcClient && !string.IsNullOrEmpty(m.SupportEmailAddress))
     };
 
     private ApplicationUser? _user;
@@ -109,6 +115,10 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public string? SignInUrl { get; set; }
 
+    public string? SupportEmailAddressNotifyId { get; set; }
+
+    public string? SupportEmailAddress { get; set; }
+
     public void OnGet()
     {
         Name = _user!.Name;
@@ -135,6 +145,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         OneLoginFoundPageLinkText = _user.AppContent?.OneLoginFoundPageLinkText;
         ShortName = _user.ShortName;
         SignInUrl = _user.AppContent?.SignInUrl;
+        SupportEmailAddressNotifyId = _user.AppContent?.SupportEmailAddressNotifyId;
+        SupportEmailAddress = _user.AppContent?.SupportEmailAddress;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -227,7 +239,9 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 OneLoginNoMatchesEmailSentFlashMessage = OneLoginNoMatchesEmailSentFlashMessage,
                 OneLoginNotConnectedEmailSentFlashMessage = OneLoginNotConnectedEmailSentFlashMessage,
                 OneLoginFoundPageLinkText = OneLoginFoundPageLinkText,
-                SignInUrl = SignInUrl
+                SignInUrl = SignInUrl,
+                SupportEmailAddressNotifyId = SupportEmailAddressNotifyId,
+                SupportEmailAddress = SupportEmailAddress
             };
             var appContentChanged = oldAppContent?.OneLoginCannotFindRecordEmailTemplateId != newAppContent.OneLoginCannotFindRecordEmailTemplateId ||
                                    oldAppContent?.OneLoginNotVerifiedEmailTemplateId != newAppContent.OneLoginNotVerifiedEmailTemplateId ||
@@ -237,7 +251,9 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                                    oldAppContent?.OneLoginNoMatchesEmailSentFlashMessage != newAppContent.OneLoginNoMatchesEmailSentFlashMessage ||
                                    oldAppContent?.OneLoginNotConnectedEmailSentFlashMessage != newAppContent.OneLoginNotConnectedEmailSentFlashMessage ||
                                    oldAppContent?.OneLoginFoundPageLinkText != newAppContent.OneLoginFoundPageLinkText ||
-                                   oldAppContent?.SignInUrl != newAppContent.SignInUrl;
+                                   oldAppContent?.SignInUrl != newAppContent.SignInUrl ||
+                                   oldAppContent?.SupportEmailAddressNotifyId != newAppContent.SupportEmailAddressNotifyId ||
+                                   oldAppContent?.SupportEmailAddress != newAppContent.SupportEmailAddress;
 
             changes |=
                 (ClientId != _user.ClientId ? ApplicationUserUpdatedEventChanges.ClientId : 0) |

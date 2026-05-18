@@ -16,5 +16,5 @@ public class NoopNotificationSender : INotificationSender
         return Task.FromResult(sb.ToString());
     }
 
-    public Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization) => Task.CompletedTask;
+    public Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization, string? emailReplyToId = null) => Task.CompletedTask;
 }

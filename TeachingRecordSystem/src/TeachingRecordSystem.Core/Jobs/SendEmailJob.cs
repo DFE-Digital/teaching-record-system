@@ -57,7 +57,8 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
         await notificationSender.SendEmailAsync(
             email.TemplateId,
             email.EmailAddress,
-            new Dictionary<string, string>(email.Personalization));
+            new Dictionary<string, string>(email.Personalization),
+            email.EmailReplyToId);
 
         email.SentOn = timeProvider.UtcNow;
 

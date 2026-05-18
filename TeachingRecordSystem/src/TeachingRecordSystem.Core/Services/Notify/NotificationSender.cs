@@ -23,7 +23,7 @@ public class NotificationSender : INotificationSender
         }
     }
 
-    public async Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization)
+    public async Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization, string? emailReplyToId = null)
     {
         NotificationClient client = _notificationClient;
 
@@ -53,7 +53,8 @@ public class NotificationSender : INotificationSender
             await client.SendEmailAsync(
                 to,
                 templateId,
-                personalisation: personalization.ToDictionary(kvp => kvp.Key, kvp => (dynamic)kvp.Value));
+                personalisation: personalization.ToDictionary(kvp => kvp.Key, kvp => (dynamic)kvp.Value),
+                emailReplyToId: emailReplyToId);
 
             _logger.LogInformation("Successfully sent email to {Email}.", to);
         }

@@ -93,7 +93,13 @@ public partial class OneLoginUserMatchingSupportTaskService
         {
             var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
             var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
-            await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId);
+
+            await oneLoginService.EnqueueRecordNotFoundEmailAsync(
+                supportTask.OneLoginUser!.EmailAddress!,
+                name,
+                processContext,
+                options.EmailTemplateId,
+                options.EmailReplyToId);
         }
     }
 
@@ -140,7 +146,13 @@ public partial class OneLoginUserMatchingSupportTaskService
         {
             var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
             var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
-            await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId);
+
+            await oneLoginService.EnqueueRecordMatchedEmailAsync(
+                supportTask.OneLoginUser!.EmailAddress!,
+                name,
+                processContext,
+                options.EmailTemplateId,
+                options.EmailReplyToId);
         }
     }
 }

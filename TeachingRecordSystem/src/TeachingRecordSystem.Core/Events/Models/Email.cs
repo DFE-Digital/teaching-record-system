@@ -8,6 +8,7 @@ public record Email
     public required IReadOnlyDictionary<string, string> Personalization { get; init; }
     public required IReadOnlyDictionary<string, object> Metadata { get; init; }
     public required DateTime? SentOn { get; init; }
+    public required string? EmailReplyToId { get; init; }
 
     public static Email FromModel(DataStore.Postgres.Models.Email email) => new()
     {
@@ -16,6 +17,7 @@ public record Email
         EmailAddress = email.EmailAddress,
         Personalization = email.Personalization.ToDictionary(),
         Metadata = email.Metadata.ToDictionary(),
-        SentOn = email.SentOn
+        SentOn = email.SentOn,
+        EmailReplyToId = email.EmailReplyToId
     };
 }
