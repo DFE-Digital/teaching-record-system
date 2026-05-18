@@ -205,7 +205,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var options = new NoMatchesOutcomeOptions
         {
             SupportTask = supportTask,
-            EmailTemplateId = emailTemplateId
+            EmailTemplateId = emailTemplateId,
+            EmailReplyToId = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -240,6 +241,33 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
     }
 
     [Fact]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNoMatchesOutcome_WithCustomEmailReplyToId_UsesCustomReplyTo()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject);
+
+        var customReplyToId = "custom-reply-to-id";
+
+        var options = new NoMatchesOutcomeOptions
+        {
+            SupportTask = supportTask,
+            EmailTemplateId = EmailTemplateIds.OneLoginCannotFindRecord,
+            EmailReplyToId = customReplyToId
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails, e => Assert.Equal(customReplyToId, e.EmailReplyToId));
+    }
+
+    [Fact]
     public async Task ResolveRecordMatchingSupportTaskAsync_WithConnectedOutcome_ClosesSupportTaskSetsUserToMatchedAndEmailsUser()
     {
         // Arrange
@@ -265,7 +293,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
                 KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
             ],
-            EmailTemplateId = null
+            EmailTemplateId = null,
+            EmailReplyToId = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -326,7 +355,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
                 KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
             ],
-            EmailTemplateId = customTemplateId
+            EmailTemplateId = customTemplateId,
+            EmailReplyToId = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -338,6 +368,49 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
         var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
         Assert.Collection(emails, e => Assert.Equal(customTemplateId, e.TemplateId));
+    }
+
+    [Fact]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithConnectedOutcome_WithCustomEmailReplyToId_UsesCustomReplyTo()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync();
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
+                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedTrn(matchedPerson.Trn!));
+
+        var customReplyToId = "custom-reply-to-id";
+
+        var options = new ConnectedOutcomeOptions
+        {
+            SupportTask = supportTask,
+            MatchedPersonId = matchedPerson.PersonId,
+            Trn = matchedPerson.Trn!,
+            MatchedAttributes =
+            [
+                KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
+            ],
+            EmailTemplateId = null,
+            EmailReplyToId = customReplyToId
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
+
+        // Assert
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+        var emails = await WithDbContextAsync(dbContext => dbContext.Emails.Where(e => e.EmailAddress == oneLoginUser.EmailAddress).ToArrayAsync());
+        Assert.Collection(emails, e => Assert.Equal(customReplyToId, e.EmailReplyToId));
     }
 
     [Fact]
@@ -368,7 +441,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
                 KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
             ],
-            EmailTemplateId = null
+            EmailTemplateId = null,
+            EmailReplyToId = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -430,7 +504,8 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
                 KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName)
             ],
-            EmailTemplateId = null
+            EmailTemplateId = null,
+            EmailReplyToId = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);

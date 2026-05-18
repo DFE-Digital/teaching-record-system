@@ -11,4 +11,6 @@ public record AppContent
     public string? OneLoginNotConnectedEmailSentFlashMessage { get; init; }
     public string? OneLoginFoundPageLinkText { get; init; }
     public string? SignInUrl { get; init; }
+    public string? SupportEmailAddressNotifyId { get; init; }
+    public string? SupportEmailAddress { get; init; }
 }

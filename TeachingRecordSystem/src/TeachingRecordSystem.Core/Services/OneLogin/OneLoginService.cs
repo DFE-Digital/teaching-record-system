@@ -38,14 +38,15 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task EnqueueRecordNotFoundEmailAsync(string emailAddress, string personName, ProcessContext processContext, string? templateId = null)
+    public async Task EnqueueRecordNotFoundEmailAsync(string emailAddress, string personName, ProcessContext processContext, string? templateId = null, string? emailReplyToId = null)
     {
         var email = new Email
         {
             EmailId = Guid.NewGuid(),
             TemplateId = templateId ?? EmailTemplateIds.OneLoginCannotFindRecord,
             EmailAddress = emailAddress,
-            Personalization = GetOneLoginCannotFindRecordEmailPersonalization(personName).ToDictionary()
+            Personalization = GetOneLoginCannotFindRecordEmailPersonalization(personName).ToDictionary(),
+            EmailReplyToId = emailReplyToId
         };
 
         dbContext.Emails.Add(email);
@@ -54,7 +55,7 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task EnqueueRecordMatchedEmailAsync(string emailAddress, string personName, ProcessContext processContext, string? templateId = null)
+    public async Task EnqueueRecordMatchedEmailAsync(string emailAddress, string personName, ProcessContext processContext, string? templateId = null, string? emailReplyToId = null)
     {
         var personalization = new Dictionary<string, string>
         {
@@ -66,7 +67,8 @@ public class OneLoginService(
             EmailId = Guid.NewGuid(),
             TemplateId = templateId ?? EmailTemplateIds.OneLoginRecordMatched,
             EmailAddress = emailAddress,
-            Personalization = personalization
+            Personalization = personalization,
+            EmailReplyToId = emailReplyToId
         };
 
         dbContext.Emails.Add(email);

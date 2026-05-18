@@ -113,7 +113,8 @@ public partial class ChangeHistoryTests
                 ],
                 SupportTask = supportTask,
                 Trn = matchedPerson.Trn,
-                EmailTemplateId = null
+                EmailTemplateId = null,
+                EmailReplyToId = null
             },
             process);
 
@@ -163,7 +164,8 @@ public partial class ChangeHistoryTests
                 KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
             ],
-            EmailTemplateId = null
+            EmailTemplateId = null,
+            EmailReplyToId = null
         };
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, Clock.UtcNow, SystemUser.SystemUserId);

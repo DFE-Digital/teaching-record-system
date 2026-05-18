@@ -205,6 +205,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         string oneLoginAuthenticationSchemeName,
         string oneLoginRedirectUriPath,
         string oneLoginPostLogoutRedirectUriPath,
+        string supportEmailAddressNotifyId,
+        string supportEmailAddress,
         string expectedErrorField,
         string expectedErrorMessage)
     {
@@ -227,7 +229,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "OneLoginClientKeyPem", oneLoginClientKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
                 { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
-                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath }
+                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath },
+                { "SupportEmailAddressNotifyId", supportEmailAddressNotifyId },
+                { "SupportEmailAddress", supportEmailAddress }
             }
         };
 
@@ -364,6 +368,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var pageContent = "<p>Custom content for this app</p>";
         var flashMessage = "Request closed for {0}. We've sent them an email with a link to continue their NPQ registration.";
         var foundPageLinkText = "<p class=\"govuk-body\">You can return to the <a href=\"{0}\" class=\"govuk-link\">Register for a national professional qualification</a> service.</p>";
+        var supportEmailAddressNotifyId = Guid.NewGuid().ToString();
+        var supportEmailAddress = "support@example.com";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
@@ -386,7 +392,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "OneLoginCannotFindRecordEmailTemplateId", emailTemplateId },
                 { "OneLoginNoMatchesPageContentHtml", pageContent },
                 { "OneLoginNoMatchesEmailSentFlashMessage", flashMessage },
-                { "OneLoginFoundPageLinkText", foundPageLinkText }
+                { "OneLoginFoundPageLinkText", foundPageLinkText },
+                { "SupportEmailAddressNotifyId", supportEmailAddressNotifyId },
+                { "SupportEmailAddress", supportEmailAddress }
             }
         };
 
@@ -406,6 +414,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(pageContent, applicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
             Assert.Equal(flashMessage, applicationUser.AppContent.OneLoginNoMatchesEmailSentFlashMessage);
             Assert.Equal(foundPageLinkText, applicationUser.AppContent.OneLoginFoundPageLinkText);
+            Assert.Equal(supportEmailAddressNotifyId, applicationUser.AppContent.SupportEmailAddressNotifyId);
+            Assert.Equal(supportEmailAddress, applicationUser.AppContent.SupportEmailAddress);
         });
 
         EventObserver.AssertEventsSaved(
@@ -417,6 +427,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
                 Assert.Equal(flashMessage, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesEmailSentFlashMessage);
                 Assert.Equal(foundPageLinkText, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginFoundPageLinkText);
+                Assert.Equal(supportEmailAddressNotifyId, applicationUserUpdatedEvent.ApplicationUser.AppContent.SupportEmailAddressNotifyId);
+                Assert.Equal(supportEmailAddress, applicationUserUpdatedEvent.ApplicationUser.AppContent.SupportEmailAddress);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.AppContent);
                 Assert.True(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent));
             });
@@ -551,6 +563,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         string OneLoginAuthenticationSchemeName,
         string OneLoginRedirectUriPath,
         string OneLoginPostLogoutRedirectUriPath,
+        string SupportEmailAddressNotifyId,
+        string SupportEmailAddress,
         string ExpectedErrorField,
         string ExpectedErrorMessage)[] GetInvalidOidcDetailsData() =>
     [
@@ -564,6 +578,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             "",  // OneLoginAuthenticationSchemeName
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "OneLoginAuthenticationSchemeName",
             "Enter an authentication scheme name"
         ),
@@ -577,6 +593,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             new string('x', 51),  // OneLoginAuthenticationSchemeName
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "OneLoginAuthenticationSchemeName",
             "Authentication scheme name must be 50 characters or less"
         ),
@@ -590,6 +608,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "OneLoginPrivateKeyPem",
             "Enter the One Login private key"
         ),
@@ -603,6 +623,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "OneLoginClientId",
             "Enter the One Login client ID"
         ),
@@ -616,6 +638,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             "",  // OneLoginRedirectUriPath
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "OneLoginRedirectUriPath",
             "Enter the One Login redirect URI"
         ),
@@ -629,6 +653,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             "",  // OneLoginPostLogoutRedirectUriPath
+            "",
+            "",
             "OneLoginPostLogoutRedirectUriPath",
             "Enter the One Login post logout redirect URI"
         ),
@@ -642,6 +668,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             new string('x', 151),  // OneLoginRedirectUriPath
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "OneLoginRedirectUriPath",
             "One Login redirect URI must be 150 characters or less"
         ),
@@ -655,6 +683,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             new string('x', 151),  // OneLoginPostLogoutRedirectUriPath
+            "",
+            "",
             "OneLoginPostLogoutRedirectUriPath",
             "One Login post logout redirect URI must be 150 characters or less"
         ),
@@ -668,6 +698,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "ClientId",
             "Enter a client ID"
         ),
@@ -681,6 +713,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "ClientId",
             "Client ID must be 50 characters or less"
         ),
@@ -694,6 +728,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "ClientSecret",
             "Enter a client secret"
         ),
@@ -707,6 +743,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "ClientSecret",
             "Client secret must be 200 characters or less"
         ),
@@ -720,6 +758,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "ClientSecret",
             "Client secret must be at least 16 characters"
         ),
@@ -733,6 +773,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "RedirectUris",
             "One or more redirect URIs are not valid"
         ),
@@ -746,8 +788,40 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Guid.NewGuid().ToString(),
             $"/_onelogin/{Guid.NewGuid:N}/callback",
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "",
             "PostLogoutRedirectUris",
             "One or more post logout redirect URIs are not valid"
+        ),
+        (
+            Guid.NewGuid().ToString(),
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "not-a-valid-guid",  // SupportEmailAddressNotifyId
+            "",
+            "SupportEmailAddressNotifyId",
+            "Support email address Notify ID must be a valid GUID"
+        ),
+        (
+            Guid.NewGuid().ToString(),
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "",
+            "not-a-valid-email",  // SupportEmailAddress
+            "SupportEmailAddress",
+            "Enter a valid email address"
         )
     ];
 

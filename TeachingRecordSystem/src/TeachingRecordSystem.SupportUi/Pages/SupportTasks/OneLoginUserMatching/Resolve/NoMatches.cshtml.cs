@@ -49,7 +49,8 @@ public class NoMatches(
                 new VerifiedOnlyWithoutMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!,
-                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId ?? EmailTemplateIds.OneLoginCannotFindRecord
+                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId ?? EmailTemplateIds.OneLoginCannotFindRecord,
+                    EmailReplyToId = JourneyInstance.State.AppContent?.SupportEmailAddressNotifyId ?? null
                 },
                 processContext);
         }
@@ -65,7 +66,8 @@ public class NoMatches(
                 new NoMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!,
-                    EmailTemplateId = emailTemplateId
+                    EmailTemplateId = emailTemplateId,
+                    EmailReplyToId = JourneyInstance.State.AppContent?.SupportEmailAddressNotifyId ?? null
                 },
                 processContext);
         }

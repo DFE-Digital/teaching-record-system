@@ -140,7 +140,7 @@ public partial class OneLoginUserMatchingSupportTaskService
             processContext);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
-        await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId);
+        await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId, options.EmailReplyToId);
     }
 
     public async Task ResolveVerificationSupportTaskAsync(VerifiedAndConnectedOutcomeOptions options, ProcessContext processContext)
@@ -165,7 +165,7 @@ public partial class OneLoginUserMatchingSupportTaskService
             processContext);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
-        await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId);
+        await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId, options.EmailReplyToId);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
