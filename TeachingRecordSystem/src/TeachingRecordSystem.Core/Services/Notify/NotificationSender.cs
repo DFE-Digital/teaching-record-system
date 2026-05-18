@@ -10,30 +10,17 @@ public class NotificationSender : INotificationSender
     private readonly NotificationClient _notificationClient;
     private readonly NotificationClient? _noSendNotificationClient;
     private readonly ILogger<NotificationSender> _logger;
-    private readonly TemplateRenderer _templateRenderer;
 
     public NotificationSender(IOptions<NotifyOptions> notifyOptionsAccessor, ILogger<NotificationSender> logger)
     {
         _options = notifyOptionsAccessor.Value;
         _notificationClient = new NotificationClient(_options.ApiKey);
         _logger = logger;
-        _templateRenderer = new TemplateRenderer();
 
         if (_options.ApplyDomainFiltering && !string.IsNullOrEmpty(_options.NoSendApiKey))
         {
             _noSendNotificationClient = new NotificationClient(_options.NoSendApiKey);
         }
-    }
-
-    public async Task<string> RenderEmailTemplateHtmlAsync(
-        string templateId,
-        IReadOnlyDictionary<string, string> personalization,
-        bool stripLinks)
-    {
-        var template = (await _notificationClient.GetTemplateByIdAsync(templateId)) ??
-            throw new ArgumentException($"Template with ID '{templateId}' not found.", nameof(templateId));
-
-        return _templateRenderer.Render(template.body, personalization, stripLinks);
     }
 
     public async Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization)
