@@ -14,5 +14,5 @@ public record FindTeachersRequest
 
 public enum FindTeachersFindBy
 {
-    LastNameAndDateOfBirth = 1
+    LastNameAndDateOfBirth = 0
 }

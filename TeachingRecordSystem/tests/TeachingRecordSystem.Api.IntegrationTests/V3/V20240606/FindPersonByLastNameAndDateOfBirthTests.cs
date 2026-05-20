@@ -36,7 +36,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
     }
 
     [Theory]
-    [InlineData("", "Invalid matching policy.")]
+    [InlineData("", "The value '' is invalid.")]
     [InlineData("BadFindBy", "The value 'BadFindBy' is not valid for FindBy.")]
     public async Task Get_InvalidFindBy_ReturnsError(string findBy, string expectedErrorMessage)
     {
