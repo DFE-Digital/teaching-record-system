@@ -1,5 +1,5 @@
-@import '../lib/govuk-frontend/index';
-@import '../lib/govuk-one-login-service-header/dist/styles/service-header-no-imports';
+@import 'govuk-frontend';
+@import '../wwwroot/lib/govuk-one-login-service-header/dist/styles/service-header-no-imports';
 @import './Components/interruption-card.scss';
 
 .trs-panel--left {

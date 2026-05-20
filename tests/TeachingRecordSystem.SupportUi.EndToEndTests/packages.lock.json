@@ -1023,7 +1023,8 @@
       "teachingrecordsystem.supportui": {
         "type": "Project",
         "dependencies": {
-          "DartSassBuilder": "[1.1.0, )",
+          "AspNetCore.SassCompiler": "[1.99.0, )",
+          "DartSassBuilder": "(, )",
           "GovUk.Frontend.AspNetCore": "[4.1.0, )",
           "Humanizer.Core": "[3.0.10, )",
           "JetBrains.Annotations": "[2025.2.4, )",
@@ -1095,6 +1096,12 @@
           "StackExchange.Redis": "2.7.4"
         }
       },
+      "AspNetCore.SassCompiler": {
+        "type": "CentralTransitive",
+        "requested": "[1.99.0, )",
+        "resolved": "1.99.0",
+        "contentHash": "a1cIh5KPiZoZ9lVqKLVX/koskE6LAiIB61sbh6mWW3R2mJanzziatiSHk+fd+leu2XGNdaTfy9VG5k8F6VhyKA=="
+      },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
         "type": "CentralTransitive",
         "requested": "[1.5.3, )",
@@ -1152,12 +1159,6 @@
         "requested": "[33.1.0, )",
         "resolved": "33.1.0",
         "contentHash": "kqfTOZGrn7NarNeXgjh86JcpTHUoeQDMB8t9NVa/ZtlSYiV1rxfRnQ49WaJsob4AiGrbK0XDzpyKkBwai4F8eg=="
-      },
-      "DartSassBuilder": {
-        "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "3UKGIRom67Ka/49osw4gBoCGSL3kdEjJ6yFL1rBPkQICMe9LqNoF64xpVnVYo4nA4zfpB20fHF0oJYWPKUJbAQ=="
       },
       "dbup-sqlserver": {
         "type": "CentralTransitive",

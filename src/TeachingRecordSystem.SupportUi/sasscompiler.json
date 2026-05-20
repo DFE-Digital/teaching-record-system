@@ -1,0 +1,8 @@
+{
+  "Source": "Styles/app.scss",
+  "Target": "wwwroot/app.css",
+  "Arguments": "--style=compressed --quiet-deps",
+  "IncludePaths": [
+    "lib"
+  ]
+}
