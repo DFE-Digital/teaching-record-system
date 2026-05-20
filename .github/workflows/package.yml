@@ -25,7 +25,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v5
         with:
-          global-json-file: TeachingRecordSystem/global.json
+          global-json-file: global.json
 
       - name: Get Docker image tag
         id: image_tags
@@ -67,4 +67,4 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ${{ steps.image_tags.outputs.tag }}
-          args: --severity-threshold=high --file=./TeachingRecordSystem/Dockerfile
+          args: --severity-threshold=high --file=./Dockerfile

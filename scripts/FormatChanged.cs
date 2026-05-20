@@ -16,8 +16,7 @@ foreach (var tf in changedTfFiles)
 }
 
 var changedCsFiles = changedFiles
-    .Where(path => path.StartsWith("TeachingRecordSystem/") && path.EndsWith(".cs"))
-    .Select(f => f.Replace("TeachingRecordSystem/", ""))
+    .Where(path => path.EndsWith(".cs"))
     .ToList();
 
 if (changedCsFiles.Count > 0)
@@ -27,7 +26,6 @@ if (changedCsFiles.Count > 0)
 
     await (Cli.Wrap("dotnet")
             .WithArguments(dotnetArgs)
-            .WithWorkingDirectory("TeachingRecordSystem")
         | (stdOut, stdErr))
         .ExecuteAsync();
 }

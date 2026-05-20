@@ -17,11 +17,8 @@ public static class Utils
                 "--file",
                 projectListFile,
                 "--branch",
-                targetBranch,
-                "--dir",
-                "../"
+                targetBranch
             })
-            .WithWorkingDirectory("TeachingRecordSystem")
             .ExecuteBufferedAsync();
 
         var currentDirectory = Directory.GetCurrentDirectory();

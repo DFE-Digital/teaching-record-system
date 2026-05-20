@@ -11,7 +11,7 @@ foreach (var testProject in testProjects)
 
     await (Cli.Wrap("dotnet")
             .WithArguments(dotnetArgs)
-            .WithWorkingDirectory(Path.Combine("TeachingRecordSystem", "tests", testProject))
+            .WithWorkingDirectory(Path.Combine("tests", testProject))
         | (stdOut, stdErr))
         .ExecuteAsync();
 }
