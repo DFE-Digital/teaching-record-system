@@ -35,7 +35,7 @@ jobs:
           sudo apt install postgresql-client-17 -y
 
       - name: Update DB schema
-        run: dotnet run --project TeachingRecordSystem/src/TeachingRecordSystem.Cli -- migrate-db --connection-string "Host=localhost;Username=postgres;Password=trs;Database=trs"
+        run: dotnet run --project src/TeachingRecordSystem.Cli -- migrate-db --connection-string "Host=localhost;Username=postgres;Password=trs;Database=trs"
 
       - name: Dump database
         run: |

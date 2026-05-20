@@ -2,7 +2,7 @@ version: 2
 updates:
 
   - package-ecosystem: nuget
-    directory: /TeachingRecordSystem/
+    directory: /
     schedule:
       interval: 'daily'
     groups:

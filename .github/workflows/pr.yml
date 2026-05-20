@@ -29,13 +29,13 @@ jobs:
 
       - uses: actions/setup-dotnet@v5
         with:
-          global-json-file: TeachingRecordSystem/global.json
+          global-json-file: global.json
 
       - name: Install tools
         run: just install-tools
 
       - name: Lint
-        run: cd TeachingRecordSystem && dotnet format --verify-no-changes --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
+        run: dotnet format --verify-no-changes --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
 
   validate_terraform:
     name: Validate Terraform
@@ -85,7 +85,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v5
         with:
-          global-json-file: TeachingRecordSystem/global.json
+          global-json-file: global.json
 
       - name: Install tools
         run: just install-tools
@@ -98,7 +98,7 @@ jobs:
           TARGET_BRANCH=main
           git fetch origin $TARGET_BRANCH --quiet
 
-          echo "project_short_names=$(dotnet run scripts/GetTestProjectsToRun.cs -- origin/$TARGET_BRANCH | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
+          echo "project_short_names=$(dotnet run scripts/GetTestProjectsToRun.cs -- origin/$TARGET_BRANCH | sed 's/^TeachingRecordSystem.//' | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
 
   tests:
     name: Tests
@@ -117,7 +117,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v5
         with:
-          global-json-file: TeachingRecordSystem/global.json
+          global-json-file: global.json
 
       - name: Install tools
         run: just install-tools
@@ -146,21 +146,21 @@ jobs:
 
       - name: Build project
         run: dotnet build -c Release --no-restore
-        working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.${{ matrix.project_short_name }}
+        working-directory: tests/TeachingRecordSystem.${{ matrix.project_short_name }}
 
       - name: Install Playwright if required
         run: |
           if [[ "$PROJECT_NAME" =~ .*EndToEndTests ]]; then
             pwsh ./bin/Release/net10.0/playwright.ps1 install chromium
           fi
-        working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.${{ matrix.project_short_name }}
+        working-directory: tests/TeachingRecordSystem.${{ matrix.project_short_name }}
         env:
           PROJECT_NAME: ${{ matrix.project_short_name }}
 
       - name: Run tests
         uses: ./.github/workflows/actions/test
         with:
-          test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.${{ matrix.project_short_name }}
+          test_project_path: tests/TeachingRecordSystem.${{ matrix.project_short_name }}
           report_name: "${{ matrix.project_short_name }} test results"
           dotnet_test_args: >-
             --no-build

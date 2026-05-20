@@ -11,31 +11,27 @@ default:
   @just --list
 
 # Install local tools
-[working-directory: 'TeachingRecordSystem']
 install-tools:
   @dotnet tool restore
 
 # Restore dependencies
-[working-directory: 'TeachingRecordSystem']
 restore:
   @dotnet restore --locked-mode
 
 # Install Playwright
-[working-directory: 'TeachingRecordSystem/tests/TeachingRecordSystem.EndToEndTests']
+[working-directory: 'tests/TeachingRecordSystem.EndToEndTests']
 install-playwright *ARGS:
   @pwsh -nop -c bin/Debug/net10.0/playwright.ps1 install
 
 # Run the trscli
 cli *ARGS:
-  @dotnet {{"TeachingRecordSystem" / "src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net10.0" / "trscli.dll"}} {{ARGS}}
+  @dotnet {{"src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net10.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
-[working-directory: 'TeachingRecordSystem']
 build:
   @dotnet build
 
 # Test the .NET solution
-[working-directory: 'TeachingRecordSystem']
 test:
   @dotnet test
 
@@ -44,7 +40,6 @@ test-changed *ARGS:
   @dotnet run scripts/TestChanged.cs -- {{ARGS}}
 
 # Format the .NET solution and Terraform code
-[working-directory: 'TeachingRecordSystem']
 format:
   @dotnet format --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
   @terraform fmt ../terraform/aks
@@ -54,61 +49,57 @@ format-changed:
   @dotnet run scripts/FormatChanged.cs
 
 # Run the EF Core Command-line Tools for the Core project
-[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Core']
+[working-directory: 'src/TeachingRecordSystem.Core']
 ef *ARGS:
   @dotnet dotnet-ef {{ARGS}}
 
 # Run the API project in Development mode
-[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Api']
+[working-directory: 'src/TeachingRecordSystem.Api']
 run-api:
   @dotnet run
 
 # Run the API project in Development mode and watch for file changes
-[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Api']
+[working-directory: 'src/TeachingRecordSystem.Api']
 watch-api:
   @dotnet watch
 
 # Run the AuthorizeAccess project in Development mode and watch for file changes
-[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.AuthorizeAccess']
+[working-directory: 'src/TeachingRecordSystem.AuthorizeAccess']
 watch-authz:
   @dotnet watch
 
 # Run the UI project in Development mode and watch for file changes
-[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.SupportUi']
+[working-directory: 'src/TeachingRecordSystem.SupportUi']
 watch-ui:
   @dotnet watch
 
 # Watch for file changes and compile any SASS files that have changed
-[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.SupportUi']
+[working-directory: 'src/TeachingRecordSystem.SupportUi']
 watch-ui-sass:
   @sass wwwroot/Styles/site.scss wwwroot/Styles/site.css --watch
 
 # Run the Worker project in Development mode and watch for file changes
-[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Worker']
+[working-directory: 'src/TeachingRecordSystem.Worker']
 watch-worker:
   @dotnet watch
 
 # Build the Docker image
-[working-directory: 'TeachingRecordSystem']
 docker-build *ARGS: restore
   @dotnet publish -c Release --no-restore
   @docker build . {{ARGS}}
 
 # Set a configuration entry in user secrets for running the apps
-[working-directory: 'TeachingRecordSystem']
 set-secret key value:
   @dotnet user-secrets set "{{key}}" "{{value}}" --id {{user-secrets-id}}
 
 # Set a configuration entry in user secrets for tests
-[working-directory: 'TeachingRecordSystem']
 set-tests-secret key value:
   @dotnet user-secrets set "{{key}}" "{{value}}" --id {{test-user-secrets-id}}
 
-[working-directory: 'TeachingRecordSystem/src/TeachingRecordSystem.Cli']
+[working-directory: 'src/TeachingRecordSystem.Cli']
 create-admin email name:
   @dotnet {{"bin" / "Debug" / "net10.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
 
-[working-directory: '..']
 make *ARGS:
   @make {{ARGS}}
 

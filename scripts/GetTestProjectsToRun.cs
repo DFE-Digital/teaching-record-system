@@ -9,7 +9,6 @@ if (args.Length > 1)
 var branchName = args.Length == 1 ? args[0] : "main";
 
 var projectList = (await Utils.GetAffectedTestProjectsAsync(branchName))
-    .Select(project => project[("TeachingRecordSystem.").Length..])
     .ToArray();
 
 if (projectList.Length != 0)
