@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using static TeachingRecordSystem.AuthorizeAccess.SignInJourneyCoordinator.Vtrs;
 using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 using RecordMatchingPolicy = TeachingRecordSystem.Core.Models.RecordMatchingPolicy;
+using User = TeachingRecordSystem.Core.Services.OneLogin.User;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -994,7 +996,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
         Clock.Advance(TimeSpan.FromDays(1));
 
-        var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!);
+        var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, isActive: true);
 
         var firstName = person.FirstName;
         var lastName = person.LastName;
@@ -1152,7 +1154,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
         Clock.Advance(TimeSpan.FromDays(1));
 
-        var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, userId: Guid.NewGuid());
+        var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, userId: Guid.NewGuid(), isActive: false);
 
         await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
@@ -1489,25 +1491,24 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         }
     }
 
-    private async Task<string> CreateTrnToken(string trn, string email, TimeSpan? expires = null, Guid? userId = null)
+    private async Task<string> CreateTrnToken(string trn, string email, TimeSpan? expires = null, Guid? userId = null, bool isActive = true)
     {
         var trnToken = Guid.NewGuid().ToString();
         var expiresUtc = Clock.UtcNow.Add(expires ?? TimeSpan.FromHours(1));
 
-        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        await WithDbContextAsync(async dbContext =>
         {
-            idDbContext.TrnTokens.Add(new IdTrnToken()
+            dbContext.AuthzRegistrationTokens.Add(new AuthzRegistrationToken()
             {
-                TrnToken = trnToken,
+                Token = trnToken,
                 Trn = trn,
                 CreatedUtc = Clock.UtcNow,
                 ExpiresUtc = expiresUtc,
-                Email = email,
-                UserId = userId
+                EmailAddress = email,
+                IsActive = isActive
             });
-
-            await idDbContext.SaveChangesAsync();
-        }
+            await dbContext.SaveChangesAsync();
+        });
 
         return trnToken;
     }
