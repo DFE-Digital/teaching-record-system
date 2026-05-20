@@ -1665,7 +1665,7 @@
       "teachingrecordsystem.api": {
         "type": "Project",
         "dependencies": {
-          "AutoMapper": "[13.0.1, )",
+          "AutoMapper": "[16.1.1, )",
           "FluentValidation.AspNetCore": "[11.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
           "MediatR": "[12.2.0, )",
@@ -1755,7 +1755,6 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.99.0, )",
-          "DartSassBuilder": "(, )",
           "GovUk.Frontend.AspNetCore": "[4.1.0, )",
           "Humanizer.Core": "[3.0.10, )",
           "JetBrains.Annotations": "[2025.2.4, )",
@@ -1843,11 +1842,13 @@
       },
       "AutoMapper": {
         "type": "CentralTransitive",
-        "requested": "[13.0.1, )",
-        "resolved": "13.0.1",
-        "contentHash": "/Fx1SbJ16qS7dU4i604Sle+U9VLX+WSNVJggk6MupKVkYvvBm4XqYaeFuf67diHefHKHs50uQIS2YEDFhPCakQ==",
+        "requested": "[16.1.1, )",
+        "resolved": "16.1.1",
+        "contentHash": "VNEky8JA15ci+oIDRGHITOGOpV4dILsf8pnn24QhDl2urtqgJ2IXiS/V2EtGU17P/+f6OeFQPJETaZXV9QOIZg==",
         "dependencies": {
-          "Microsoft.Extensions.Options": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Options": "10.0.0",
+          "Microsoft.IdentityModel.JsonWebTokens": "8.14.0"
         }
       },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
