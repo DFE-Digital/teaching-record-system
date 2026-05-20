@@ -2,11 +2,11 @@
   "version": 2,
   "dependencies": {
     "net10.0": {
-      "DartSassBuilder": {
+      "AspNetCore.SassCompiler": {
         "type": "Direct",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "3UKGIRom67Ka/49osw4gBoCGSL3kdEjJ6yFL1rBPkQICMe9LqNoF64xpVnVYo4nA4zfpB20fHF0oJYWPKUJbAQ=="
+        "requested": "[1.99.0, )",
+        "resolved": "1.99.0",
+        "contentHash": "a1cIh5KPiZoZ9lVqKLVX/koskE6LAiIB61sbh6mWW3R2mJanzziatiSHk+fd+leu2XGNdaTfy9VG5k8F6VhyKA=="
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",

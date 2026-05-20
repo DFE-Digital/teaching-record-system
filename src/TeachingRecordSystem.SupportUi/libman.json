@@ -4,6 +4,6 @@
   "libraries": [
     {
       "library": "@ministryofjustice/frontend@2.1.3",
-      "destination": "wwwroot/lib/ministryofjustice/frontend/"
+      "destination": "lib/ministryofjustice/frontend/"
     }]
 }

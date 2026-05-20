@@ -39,6 +39,11 @@ public static class Extensions
 
     public static IServiceCollection AddSupportUiServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
+        if (environment.IsDevelopment())
+        {
+            services.AddSassCompiler();
+        }
+
         services.AddGovUkFrontend(options =>
         {
             options.DefaultButtonPreventDoubleClick = true;

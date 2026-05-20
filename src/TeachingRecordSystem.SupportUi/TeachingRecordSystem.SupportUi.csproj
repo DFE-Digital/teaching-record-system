@@ -2,22 +2,22 @@
 
   <PropertyGroup>
     <RestoreGovUkFrontendNpmPackage>true</RestoreGovUkFrontendNpmPackage>
-    <GovUkFrontendNpmPackageLocation>wwwroot/lib/govuk-frontend</GovUkFrontendNpmPackageLocation>
-    <EnableDefaultSassItems>false</EnableDefaultSassItems>
+    <GovUkFrontendNpmPackageLocation>lib/govuk-frontend</GovUkFrontendNpmPackageLocation>
     <RequiresSharedAppsettings>true</RequiresSharedAppsettings>
   </PropertyGroup>
 
   <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
-    <Copy SourceFiles="wwwroot/lib/govuk-frontend/govuk-frontend.min.js" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="lib/govuk-frontend/govuk-frontend.min.js" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="DartSassBuilder" />
+    <PackageReference Include="AspNetCore.SassCompiler" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
-    <PackageReference Include="Microsoft.Identity.Web" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+    <PackageReference Include="Microsoft.Identity.Web" />
     <PackageReference Include="Microsoft.Identity.Web.GraphServiceClientBeta" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" />
@@ -33,15 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SassFile Include="wwwroot/Styles/site.scss" Exclude="wwwroot/lib/**/*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot\lib\**\*" CopyToPublishDirectory="Never" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <_ContentIncludedByDefault Remove="wwwroot\Styles\Components\accessible-autocomplete.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\Styles\site.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\Styles\site.css.map" />
   </ItemGroup>
 
 </Project>
