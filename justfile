@@ -85,7 +85,6 @@ watch-worker:
 
 # Build the Docker image
 docker-build *ARGS: restore
-  @dotnet publish -c Release --no-restore
   @docker build . {{ARGS}}
 
 # Set a configuration entry in user secrets for running the apps
