@@ -39,14 +39,22 @@ public static class TestAppConfigurationExtensions
 
             authBuilder.AddOpenIdConnect(TestAppConfiguration.AuthenticationSchemeName, options =>
             {
-                ConfigureOpenIdConnectOptions(options, TestAppConfiguration.ClientId, TestAppConfiguration.ClientSecret,
-                    TestAppConfiguration.RedirectUriPath, TestAppConfiguration.PostLogoutRedirectUriPath);
+                ConfigureOpenIdConnectOptions(
+                    options,
+                    TestAppConfiguration.ClientId,
+                    TestAppConfiguration.ClientSecret,
+                    TestAppConfiguration.RedirectUriPath,
+                    TestAppConfiguration.PostLogoutRedirectUriPath);
             });
 
             authBuilder.AddOpenIdConnect(DeferredTestAppConfiguration.AuthenticationSchemeName, options =>
             {
-                ConfigureOpenIdConnectOptions(options, DeferredTestAppConfiguration.ClientId, DeferredTestAppConfiguration.ClientSecret,
-                    DeferredTestAppConfiguration.RedirectUriPath, DeferredTestAppConfiguration.PostLogoutRedirectUriPath);
+                ConfigureOpenIdConnectOptions(
+                    options,
+                    DeferredTestAppConfiguration.ClientId,
+                    DeferredTestAppConfiguration.ClientSecret,
+                    DeferredTestAppConfiguration.RedirectUriPath,
+                    DeferredTestAppConfiguration.PostLogoutRedirectUriPath);
             });
         }
         else
@@ -59,7 +67,12 @@ public static class TestAppConfigurationExtensions
         return builder;
     }
 
-    private static void ConfigureOpenIdConnectOptions(OpenIdConnectOptions options, string clientId, string clientSecret, string callbackPath, string signedOutCallbackPath)
+    private static void ConfigureOpenIdConnectOptions(
+        OpenIdConnectOptions options,
+        string clientId,
+        string clientSecret,
+        string callbackPath,
+        string signedOutCallbackPath)
     {
         options.Authority = "https://localhost:7236";
         options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -82,6 +95,9 @@ public static class TestAppConfigurationExtensions
 
         options.ClaimActions.Add(new MapJsonClaimAction(AuthorizeAccessClaimTypes.VerifiedName));
         options.ClaimActions.Add(new MapJsonClaimAction(AuthorizeAccessClaimTypes.VerifiedDateOfBirth));
+
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.None;
+        options.NonceCookie.SecurePolicy = CookieSecurePolicy.None;
 
         options.Events.OnRedirectToIdentityProvider = ctx =>
         {
