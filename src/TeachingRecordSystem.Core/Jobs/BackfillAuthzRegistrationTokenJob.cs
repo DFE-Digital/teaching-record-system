@@ -15,7 +15,6 @@ public class BackfillAuthzRegistrationTokenJob(TrsDbContext trsDbContext, IConfi
 
     private const int BatchSize = 500;
 
-
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var sourceConnectionString =
@@ -133,7 +132,7 @@ public class BackfillAuthzRegistrationTokenJob(TrsDbContext trsDbContext, IConfi
                         cancellationToken);
 
                     await importer.WriteAsync(
-                        true,
+                        row.UserId is null,
                         NpgsqlDbType.Boolean,
                         cancellationToken);
                 }
@@ -188,8 +187,7 @@ public class BackfillAuthzRegistrationTokenJob(TrsDbContext trsDbContext, IConfi
 
         public required DateTime ExpiresUtc { get; init; }
 
-        // Legacy field intentionally ignored.
-        public required Guid UserId { get; init; }
+        public required Guid? UserId { get; init; }
     }
 }
 
