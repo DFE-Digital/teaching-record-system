@@ -17,9 +17,6 @@ COPY --from=build /source/src/TeachingRecordSystem.Cli/bin/Release/net10.0/publi
 COPY --from=build /source/src/TeachingRecordSystem.SupportUi/bin/Release/net10.0/publish/ ./SupportUi/
 COPY --from=build /source/src/TeachingRecordSystem.Worker/bin/Release/net10.0/publish/ ./Worker/
 COPY --from=build /source/src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net10.0/publish/ ./AuthorizeAccess/
-COPY --from=build /source/db.sh .
-
-RUN chmod +x ./db.sh
 
 # Ensure culture data is available
 RUN apk add --no-cache tzdata icu-data-full icu-libs
