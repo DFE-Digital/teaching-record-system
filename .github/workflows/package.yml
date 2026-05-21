@@ -23,10 +23,6 @@ jobs:
 
       - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # Pinned at v4.0.0
 
-      - uses: actions/setup-dotnet@v5
-        with:
-          global-json-file: global.json
-
       - name: Get Docker image tag
         id: image_tags
         run: |
@@ -38,14 +34,6 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get cached packages
-        uses: actions/cache/restore@v5
-        with:
-          path: |
-            ~/.nuget/packages
-            ~/.local/share/.librarymanager/cache
-          key: ${{ hashFiles('**/packages.lock.json', '**/libman.json') }}
 
       - name: Docker build & push
         id: build
