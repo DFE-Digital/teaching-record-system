@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Dfe.Analytics.AspNetCore;
 using Dfe.Analytics.Events;
 using Microsoft.AspNetCore.Http.Features;
@@ -15,6 +16,7 @@ public class AddAnalyticsDataMiddleware(RequestDelegate next)
             if (coordinator is not null && context.GetWebRequestEvent() is Event webRequestEvent)
             {
                 webRequestEvent.Data[DfeAnalyticsEventDataKeys.ApplicationUserId] = [coordinator.State.ClientApplicationUserId.ToString()];
+                webRequestEvent.UserId = coordinator.State.OneLoginAuthenticationTicket?.Principal.FindFirstValue("sub");
             }
         }
 
