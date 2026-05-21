@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright;
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
+using User = TeachingRecordSystem.Core.Services.OneLogin.User;
 
 namespace TeachingRecordSystem.EndToEndTests.AuthorizeAccessJourneys;
 
@@ -168,20 +170,19 @@ public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture
 
         var trnToken = Guid.NewGuid().ToString();
 
-        using (var idDbContext = HostFixture.AuthorizeAccessHostServices.GetRequiredService<IdDbContext>())
+        await WithDbContextAsync(async dbContext =>
         {
-            idDbContext.TrnTokens.Add(new IdTrnToken()
+            dbContext.AuthzRegistrationTokens.Add(new AuthzRegistrationToken()
             {
-                TrnToken = trnToken,
+                Token = trnToken,
                 Trn = person.Trn,
                 CreatedUtc = TimeProvider.UtcNow,
                 ExpiresUtc = TimeProvider.UtcNow.AddDays(1),
-                Email = email,
-                UserId = null
+                EmailAddress = email,
+                IsActive = true
             });
-
-            await idDbContext.SaveChangesAsync();
-        }
+            await dbContext.SaveChangesAsync();
+        });
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

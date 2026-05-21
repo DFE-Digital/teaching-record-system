@@ -249,14 +249,15 @@ public class OneLoginService(
     {
         Person? getAnIdentityPerson = null;
         OneLoginUserMatchRoute? matchRoute = null;
-        IdTrnToken? trnTokenModel = null;
+        AuthzRegistrationToken? trnTokenModel = null;
 
         // First try and match on TRN Token
         if (trnToken is not null)
         {
             var utcNow = timeProvider.UtcNow;
-            trnTokenModel = await WithIdDbContextAsync(c => c.TrnTokens.SingleOrDefaultAsync(
-                t => t.TrnToken == trnToken && t.ExpiresUtc > utcNow && t.UserId == null));
+
+            trnTokenModel = await dbContext.AuthzRegistrationTokens.SingleOrDefaultAsync(
+                t => t.Token == trnToken && t.ExpiresUtc > utcNow && t.IsActive == true);
             if (trnTokenModel is not null)
             {
                 getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == trnTokenModel.Trn);
@@ -302,8 +303,8 @@ public class OneLoginService(
         if (trnTokenModel is not null)
         {
             // Invalidate the token
-            trnTokenModel.UserId = _teacherAuthIdUserIdSentinel;
-            await WithIdDbContextAsync(c => c.SaveChangesAsync());
+            trnTokenModel.IsActive = false;
+            await dbContext.SaveChangesAsync();
         }
 
         return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: matchRoute, matchedAttributes);
