@@ -1,8 +1,5 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine3.23@sha256:732cd42c6f659814c9804ad7b05c7f761e83ef8379c5b2fdc3af673353caff73 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-amd64@sha256:69ff714a42f7931475acfcd2792d69cd4a656e4f3653d520e25c0fbe3c6d0cba AS build
 WORKDIR /source
-
-# Install pre-reqs for SASS compilation
-RUN apk add --no-cache gcompat
 
 COPY . ./
 RUN dotnet tool restore
@@ -18,12 +15,9 @@ COPY --from=build /source/src/TeachingRecordSystem.SupportUi/bin/Release/net10.0
 COPY --from=build /source/src/TeachingRecordSystem.Worker/bin/Release/net10.0/publish/ ./Worker/
 COPY --from=build /source/src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net10.0/publish/ ./AuthorizeAccess/
 
-# Fix for invoking trscli
-#RUN apk --no-cache add libc6-compat
-
 ENV SENTRY_RELEASE=${GIT_SHA}
 ENV GIT_SHA=${GIT_SHA}
 ENV ASPNETCORE_HTTP_PORTS=3000
 ENV PATH="${PATH}:/Apps/TrsCli"
 
-USER app
+USER $APP_UID
