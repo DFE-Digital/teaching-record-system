@@ -41,7 +41,6 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper 
         Description = "Activates the dormant request created by Teacher Auth.")]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status204NoContent)]
     public async Task<IActionResult> ActivateAsync()
     {
         if (!currentUserProvider.TryGetTrnRequestId(out var trnRequestId))
@@ -54,7 +53,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper 
 
         return result.ToActionResult(
                 r => StatusCode(
-                    r.WasActivated ? StatusCodes.Status200OK : StatusCodes.Status204NoContent,
+                    StatusCodes.Status200OK,
                     mapper.Map<TrnRequestInfo>(r.TrnRequestInfo)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
     }
