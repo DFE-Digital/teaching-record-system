@@ -1042,7 +1042,7 @@
           "Respawn": "[7.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "Testcontainers.PostgreSql": "[4.11.0, )",
-          "xunit.v3.assert": "[3.2.0, )",
+          "xunit.v3.assert": "[3.2.2, )",
           "xunit.v3.extensibility.core": "[3.2.2, )"
         }
       },
@@ -1684,7 +1684,7 @@
       },
       "xunit.v3.assert": {
         "type": "CentralTransitive",
-        "requested": "[3.2.0, )",
+        "requested": "[3.2.2, )",
         "resolved": "3.2.2",
         "contentHash": "BPciBghgEEaJN/JG00QfCYDfEfnLgQhfnYEy+j1izoeHVNYd5+3Wm8GJ6JgYysOhpBPYGE+sbf75JtrRc7jrdA=="
       },
