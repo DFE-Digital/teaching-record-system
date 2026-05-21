@@ -19,7 +19,7 @@ public class ActivateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Get_TrnRequestIsNotDormant_ReturnsNoContent()
+    public async Task Put_TrnRequestIsNotDormant_ReturnsOk()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -35,13 +35,13 @@ public class ActivateTrnRequestTests : TestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status204NoContent);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
         Assert.Equal("Completed", jsonResponse.RootElement.GetProperty("status").GetString());
         Assert.NotNull(jsonResponse.RootElement.GetProperty("trn").GetString());
     }
 
     [Fact]
-    public async Task Get_ValidRequestForDormantRequest_ReturnsOk()
+    public async Task Put_ValidRequestForDormantRequest_ReturnsOk()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
