@@ -25,7 +25,7 @@
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.0" />
     <PackageVersion Include="EntityFrameworkCore.Projectables" Version="6.0.4" />
     <PackageVersion Include="Faker.Net" Version="2.0.163" />
-    <PackageVersion Include="FluentValidation" Version="12.1.0" />
+    <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.4.3" />
     <PackageVersion Include="GovUk.Questions.AspNetCore" Version="0.1.0-alpha.0.94" />
