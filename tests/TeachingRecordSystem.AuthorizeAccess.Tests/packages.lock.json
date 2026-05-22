@@ -1072,7 +1072,7 @@
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.99.0, )",
           "DfeAnalytics.AspNetCore": "[0.4.3-alpha.0.3, )",
-          "GovUk.Frontend.AspNetCore": "[4.1.0, )",
+          "GovUk.Frontend.AspNetCore": "[4.1.1, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.3, )",
           "GovUk.Questions.AspNetCore": "[0.1.0-alpha.0.94, )",
           "Humanizer.Core": "[3.0.10, )",
@@ -1349,9 +1349,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[4.1.0, )",
-        "resolved": "4.1.0",
-        "contentHash": "Isz4Y7Lr4/IjN8yaUQ83mb1uecWrxXdKl/NT+d8k5JpvdQlhd0MT6Q9mgEXv/lGNZ6izrAGS7IWocgb+ihT/Xw==",
+        "requested": "[4.1.1, )",
+        "resolved": "4.1.1",
+        "contentHash": "HAMWsNj1Z1jJg35Dq0fuE0MkSrrdYmND6f+44m6brvqLE1w5TGGzXN7hTFSU7OJ7hUw5hfVbH5VhKXf5AQhX5g==",
         "dependencies": {
           "Microsoft.Extensions.FileProviders.Embedded": "8.0.26"
         }
