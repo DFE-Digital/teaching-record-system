@@ -39,15 +39,15 @@
 
   $env-colors: (
     "local": "orange",
-    "dev": "light-green",
-    "review": "pink",
-    "pre-production": "bright-purple",
-    "tps-sandbox": "turquoise"
+    "dev": govuk-colour("green", $variant: "tint-25"),
+    "review": govuk-colour("magenta", $variant: "primary"),
+    "pre-production": govuk-colour("magenta", $variant: "shade-25"),
+    "tps-sandbox": govuk-colour("teal", $variant: "primary")
   );
 
   @each $env, $color in $env-colors {
     &--#{$env} {
-      outline: 5px solid govuk-colour($color);
+      outline: 5px solid $color;
     }
   }
 }
@@ -59,7 +59,7 @@
 }
 
 .trs-subtle-emphasis {
-  color: govuk-colour("mid-grey");
+  color: govuk-colour("black", $variant: "tint-80");
 }
 
 .trs-monospace {
@@ -282,7 +282,7 @@
 }
 
 .trs-filter__container {
-  background-color: govuk-colour("light-grey");
+  background-color: govuk-colour("black", $variant: "tint-95");
   padding: 20px;
 }
 
@@ -363,7 +363,7 @@
 
 .trs-tile {
   @include govuk-link-common;
-  background-color: govuk-colour("light-grey");
+  background-color: govuk-colour("black", $variant: "tint-95");
   color: govuk-colour("black");
   display: block;
   text-decoration: none;

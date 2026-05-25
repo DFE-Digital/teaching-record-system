@@ -7,7 +7,7 @@
 }
 
 .trs-empty-fallback {
-  color: govuk-colour("dark-grey");
+  color: govuk-colour("black", $variant: "tint-25");
 }
 
 .trs-panel--interruption__link-button {
@@ -20,6 +20,6 @@
   @include govuk-font($size: 19);
 
   &:hover {
-    color: govuk-colour("light-grey");
+    color: govuk-colour("black", $variant: "tint-95");
   }
 }
