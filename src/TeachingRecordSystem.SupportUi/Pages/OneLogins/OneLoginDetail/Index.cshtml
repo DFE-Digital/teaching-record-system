@@ -5,15 +5,13 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">        
+    <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <p class="govuk-body">This page is under construction.</p>       
+        <p class="govuk-body">This page is under construction.</p>
 
-        <govuk-button-group>
-            <govuk-button-link href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Index(Model.OneLoginUserSubject)">
-                Connect to a record
-            </govuk-button-link>
-        </govuk-button-group>
+        <govuk-button-link href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Index(Model.OneLoginUserSubject)">
+            Connect to a record
+        </govuk-button-link>
     </div>
 </div>
