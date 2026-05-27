@@ -26,7 +26,7 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
         var requestId = Guid.NewGuid().ToString();
         var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
 
-        await TestData.CreateApiTrnRequestSupportTaskAsync(
+        await TestData.CreateTrnRequestSupportTaskAsync(
             applicationUserId,
             c => c.WithRequestId(requestId).WithStatus(SupportTaskStatus.Open));
 
@@ -71,7 +71,7 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
         // Arrange
         var applicationUserId = CurrentUserProvider.GetCurrentApplicationUserId();
 
-        var task = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId);
+        var task = await TestData.CreateTrnRequestSupportTaskAsync(applicationUserId);
 
         await WithDbContextAsync(async dbContext =>
         {

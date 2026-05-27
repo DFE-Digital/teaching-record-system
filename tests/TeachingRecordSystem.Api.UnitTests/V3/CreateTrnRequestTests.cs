@@ -151,7 +151,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
         });
@@ -195,7 +195,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent>();
         });
@@ -240,7 +240,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
         });
@@ -281,7 +281,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
         });
@@ -330,7 +330,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
         });
@@ -384,7 +384,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent>();
         });
@@ -441,7 +441,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent>();
         });
@@ -498,7 +498,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
         });
@@ -532,7 +532,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent, PersonCreatedEvent>();
         });
@@ -587,7 +587,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent>();
         });
@@ -700,7 +700,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
         Events.AssertProcessesCreated(p =>
         {
-            Assert.Equal(ProcessType.ApiTrnRequestCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(ProcessType.TrnRequestCreating, p.ProcessContext.ProcessType);
 
             p.AssertProcessHasEvents<TrnRequestCreatedEvent, SupportTaskCreatedEvent>();
         });
@@ -788,7 +788,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         WithDbContextAsync(async dbContext =>
         {
             var supportTask = await dbContext.SupportTasks
-                .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
+                .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.TrnRequest &&
                     t.TrnRequestMetadata!.ApplicationUserId == applicationUserId &&
                     t.TrnRequestMetadata!.RequestId == requestId);
 
@@ -800,7 +800,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         WithDbContextAsync(async dbContext =>
         {
             var supportTask = await dbContext.SupportTasks
-                .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
+                .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.TrnRequest &&
                     t.TrnRequestMetadata!.ApplicationUserId == applicationUserId &&
                     t.TrnRequestMetadata!.RequestId == requestId);
 

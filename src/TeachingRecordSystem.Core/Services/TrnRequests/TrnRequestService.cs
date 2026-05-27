@@ -561,8 +561,8 @@ public class TrnRequestService(
             await supportTaskService.CreateSupportTaskAsync(
                 new CreateSupportTaskOptions
                 {
-                    SupportTaskType = SupportTaskType.ApiTrnRequest,
-                    Data = new ApiTrnRequestData(),
+                    SupportTaskType = SupportTaskType.TrnRequest,
+                    Data = new TrnRequestData(),
                     PersonId = null,
                     OneLoginUserSubject = null,
                     TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)

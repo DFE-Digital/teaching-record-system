@@ -6,18 +6,18 @@ namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 public class SupportTaskSearchService(TrsDbContext dbContext)
 {
-    private static readonly SupportTaskType[] AllChangeRequestTypes = [SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest];
+    private static readonly SupportTaskType[] _allChangeRequestTypes = [SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest];
 
-    public async Task<ApiTrnRequestsSearchResult> SearchApiTrnRequestsAsync(ApiTrnRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<TrnRequestsSearchResult> SearchTrnRequestsAsync(TrnRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
-        var sortBy = searchOptions.SortBy ?? ApiTrnRequestsSortByOption.RequestedOn;
+        var sortBy = searchOptions.SortBy ?? TrnRequestsSortByOption.RequestedOn;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
 
         var tasks = dbContext.SupportTasks
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status != SupportTaskStatus.Closed);
+            .Where(t => t.SupportTaskType == SupportTaskType.TrnRequest && t.Status != SupportTaskStatus.Closed);
 
         var totalTaskCount = await tasks.CountAsync();
 
@@ -41,20 +41,20 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         tasks = sortBy switch
         {
-            ApiTrnRequestsSortByOption.Name => tasks
+            TrnRequestsSortByOption.Name => tasks
                 .OrderBy(t => t.TrnRequestMetadata!.FirstName, sortDirection)
                 .ThenBy(t => t.TrnRequestMetadata!.MiddleName, sortDirection)
                 .ThenBy(t => t.TrnRequestMetadata!.LastName, sortDirection),
-            ApiTrnRequestsSortByOption.Email => tasks
+            TrnRequestsSortByOption.Email => tasks
                 .OrderBy(t => t.TrnRequestMetadata!.EmailAddress, sortDirection),
-            ApiTrnRequestsSortByOption.Source => tasks
+            TrnRequestsSortByOption.Source => tasks
                 .OrderBy(t => t.TrnRequestMetadata!.ApplicationUser!.Name, sortDirection),
             _ => tasks
                 .OrderBy(t => t.CreatedOn, sortDirection)
         };
 
         var searchResuts = await tasks
-            .Select(t => new ApiTrnRequestsSearchResultItem(
+            .Select(t => new TrnRequestsSearchResultItem(
                 t.SupportTaskReference,
                 t.TrnRequestMetadata!.FirstName!,
                 t.TrnRequestMetadata!.MiddleName ?? "",
@@ -71,81 +71,17 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<NpqTrnRequestsSearchResult> SearchNpqTrnRequestsAsync(NpqTrnRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
-    {
-        var search = searchOptions.Search?.Trim() ?? string.Empty;
-        var sortBy = searchOptions.SortBy ?? NpqTrnRequestsSortByOption.RequestedOn;
-        var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
-
-        var tasks = dbContext.SupportTasks
-            .Include(t => t.TrnRequestMetadata)
-            .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest && t.Status != SupportTaskStatus.Closed);
-
-        var totalTaskCount = await tasks.CountAsync();
-
-        if (SearchTextIsDate(search, out var minDate, out var maxDate))
-        {
-            tasks = tasks.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
-        }
-        else if (SearchTextHelper.IsEmailAddress(search, out var email))
-        {
-            tasks = tasks.Where(t =>
-                t.TrnRequestMetadata!.EmailAddress != null &&
-                EF.Functions.Collate(t.TrnRequestMetadata.EmailAddress, Collations.CaseInsensitive) == email);
-        }
-        else if (SearchTextIsName(search, out var nameParts))
-        {
-            tasks = tasks.Where(t =>
-                nameParts.All(n => t.TrnRequestMetadata!.Name.Select(m => EF.Functions.Collate(m, Collations.CaseInsensitive)).Contains(n)));
-        }
-
-        var totalFilteredTaskCount = await tasks.CountAsync();
-
-        tasks = sortBy switch
-        {
-            NpqTrnRequestsSortByOption.Name => tasks
-                .OrderBy(t => t.TrnRequestMetadata!.FirstName, sortDirection)
-                .ThenBy(t => t.TrnRequestMetadata!.MiddleName, sortDirection)
-                .ThenBy(t => t.TrnRequestMetadata!.LastName, sortDirection),
-            NpqTrnRequestsSortByOption.Email => tasks
-                .OrderBy(t => t.TrnRequestMetadata!.EmailAddress, sortDirection),
-            NpqTrnRequestsSortByOption.PotentialDuplicate => tasks
-                .OrderBy(t => t.TrnRequestMetadata!.PotentialDuplicate, sortDirection),
-            _ => tasks
-                .OrderBy(t => t.CreatedOn, sortDirection)
-        };
-
-        var searchResults = await tasks
-            .Select(t => new NpqTrnRequestsSearchResultItem(
-                t.SupportTaskReference,
-                t.TrnRequestMetadata!.FirstName!,
-                t.TrnRequestMetadata!.MiddleName ?? "",
-                t.TrnRequestMetadata!.LastName!,
-                t.TrnRequestMetadata!.EmailAddress,
-                t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser!.Name,
-                t.TrnRequestMetadata.PotentialDuplicate))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
-
-        return new()
-        {
-            TotalTaskCount = totalTaskCount,
-            SearchResults = searchResults
-        };
-    }
-
     public async Task<ChangeRequestsSearchResult> SearchChangeRequestsAsync(ChangeRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
     {
 
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? ChangeRequestsSortByOption.RequestedOn;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
-        var changeRequestTypes = searchOptions.ChangeRequestTypes ?? AllChangeRequestTypes;
+        var changeRequestTypes = searchOptions.ChangeRequestTypes ?? _allChangeRequestTypes;
 
         foreach (var t in changeRequestTypes)
         {
-            if (!AllChangeRequestTypes.Contains(t))
+            if (!_allChangeRequestTypes.Contains(t))
             {
                 throw new ArgumentOutOfRangeException($"Support task type {t} is not a Change Request task type.");
             }

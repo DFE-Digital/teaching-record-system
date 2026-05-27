@@ -64,7 +64,7 @@ public class GetTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, t => t
             .WithRequestId(trnRequestId)
             .WithFirstName(firstName)
             .WithMiddleName(middleName)

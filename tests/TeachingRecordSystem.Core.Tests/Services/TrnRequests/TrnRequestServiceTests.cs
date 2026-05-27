@@ -402,7 +402,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
                 .SingleOrDefaultAsync(t =>
                     t.TrnRequestApplicationUserId == applicationUser.UserId &&
                     t.TrnRequestId == trnRequest.RequestId &&
-                    t.SupportTaskType == SupportTaskType.ApiTrnRequest);
+                    t.SupportTaskType == SupportTaskType.TrnRequest);
             Assert.NotNull(supportTask);
             Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
         });

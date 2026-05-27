@@ -170,7 +170,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var subject = TestData.CreateOneLoginUserSubject();
 
                 var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
-                await TestData.CreateApiTrnRequestSupportTaskAsync(
+                await TestData.CreateTrnRequestSupportTaskAsync(
                     trnRequestFromApplicationUser.UserId,
                     s => s.WithStatus(SupportTaskStatus.Open).WithIdentityVerified(true).WithOneLoginUserSubject(subject));
 

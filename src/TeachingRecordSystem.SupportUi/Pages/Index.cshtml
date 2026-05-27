@@ -42,8 +42,8 @@
                 <div class="trs-tile-section">
                     <h2 class="govuk-heading-m">TRN requests</h2>
                     <div class="trs-tile-row">
-                        <a href="@LinkGenerator.SupportTasks.ApiTrnRequests.Index()" class="trs-tile trs-tile--branded">
-                            <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ApiTrnRequest)</span>
+                        <a href="@LinkGenerator.SupportTasks.TrnRequests.Index()" class="trs-tile trs-tile--branded">
+                            <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.TrnRequest)</span>
                             <span class="trs-tile__title">Potential duplicates via API</span>
                         </a>
                         <a href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index()" class="trs-tile trs-tile--branded">
