@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -55,7 +54,6 @@ public static partial class Commands
                 .AddWebhookDeliveryService(configuration)
                 .AddWebhookMessageFactory()
                 .AddMemoryCache()
-                .AddIdentityApi(configuration)
                 .AddEventPublisher()
                 .AddBackgroundJobScheduler(environment)
                 .AddHangfire(environment);

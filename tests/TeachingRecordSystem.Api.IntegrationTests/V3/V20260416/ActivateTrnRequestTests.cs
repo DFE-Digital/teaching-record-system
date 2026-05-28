@@ -1,23 +1,9 @@
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20260416;
 
 [Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
-public class ActivateTrnRequestTests : TestBase
+public class ActivateTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ActivateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
-            {
-                Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
-                Trn = req.Trn,
-                TrnToken = Guid.NewGuid().ToString()
-            });
-    }
-
     [Fact]
     public async Task Put_TrnRequestIsNotDormant_ReturnsOk()
     {

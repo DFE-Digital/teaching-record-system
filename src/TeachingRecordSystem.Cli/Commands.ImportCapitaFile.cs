@@ -2,7 +2,6 @@ using Azure.Storage.Files.DataLake;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -56,7 +55,6 @@ public static partial class Commands
                 .AddEventPublisher()
                 .AddPersonService()
                 .AddSupportTaskService()
-                .AddIdentityApi(configuration)
                 .AddTrnRequestService(configuration)
                 .BuildServiceProvider();
 

@@ -1,24 +1,10 @@
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20260515;
 
 [Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
-public class GetTrnRequestTests : TestBase
+public class GetTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public GetTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
-            {
-                Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
-                Trn = req.Trn,
-                TrnToken = Guid.NewGuid().ToString()
-            });
-    }
-
     [Fact]
     public async Task Get_UnauthenticatedUser_ReturnsUnauthorized()
     {

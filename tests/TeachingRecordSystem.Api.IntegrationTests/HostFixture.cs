@@ -10,7 +10,6 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.IntegrationTests;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Webhooks;
@@ -131,14 +130,6 @@ public class HostFixture : InitializeDbFixture
                 services.AddDbContext<IdDbContext>(
                     options => options.UseInMemoryDatabase("TeacherAuthId"),
                     contextLifetime: ServiceLifetime.Transient);
-
-                services.Configure<GetAnIdentityOptions>(options =>
-                {
-                    options.TokenEndpoint = "dummy";
-                    options.ClientId = "dummy";
-                    options.ClientSecret = "dummy";
-                    options.BaseAddress = "dummy";
-                });
 
                 services.Configure<WebhookOptions>(options =>
                 {

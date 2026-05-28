@@ -18,7 +18,6 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Oidc;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.WebCommon.Filters;
@@ -190,9 +189,6 @@ public static class Extensions
 
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
-            services
-                .AddIdentityApi(configuration);
-
             services
                 .TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OneLoginOptions>, OneLoginPostConfigureOptions>());
 

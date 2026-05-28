@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -17,7 +16,6 @@ public class TestScopedServices
     public TestScopedServices(IServiceProvider serviceProvider)
     {
         Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
-        GetAnIdentityApiClient = new();
         Events = new(Clock);
         LegacyEventObserver = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
@@ -29,7 +27,6 @@ public class TestScopedServices
     public static void ConfigureServices(IServiceCollection services) =>
         services
             .AddSingleton<TimeProvider>(new ForwardToTestScopedTimeProvider())
-            .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
             .AddTestScoped(tss => tss.BlobStorageFileService.Object)
             .AddTestScoped(tss => tss.Events)
             .AddTransient<IEventHandler>(sp => sp.GetRequiredService<EventCapture>())
@@ -64,8 +61,6 @@ public class TestScopedServices
     }
 
     public FakeTimeProvider Clock { get; }
-
-    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 
     public EventCapture Events { get; }
 

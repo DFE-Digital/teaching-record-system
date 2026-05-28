@@ -2,7 +2,6 @@ using System.Net;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V3.V20240606.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
@@ -13,16 +12,6 @@ public class CreateTrnRequestTests : TestBase
         : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.CreateTrn]);
-
-        GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
-            {
-                Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
-                Trn = req.Trn,
-                TrnToken = Guid.NewGuid().ToString()
-            });
     }
 
     [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]

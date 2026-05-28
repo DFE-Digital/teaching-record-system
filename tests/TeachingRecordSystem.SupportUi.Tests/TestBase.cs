@@ -4,7 +4,6 @@ using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -55,8 +54,6 @@ public abstract class TestBase
     protected ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
 
     protected Mock<IFileService> FileServiceMock => TestScopedServices.GetCurrent().BlobStorageFileServiceMock;
-
-    protected Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => TestScopedServices.GetCurrent().GetAnIdentityApiClientMock;
 
     protected TrnRequestOptions TrnRequestOptions => TestScopedServices.GetCurrent().TrnRequestOptions;
 

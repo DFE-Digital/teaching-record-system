@@ -6,7 +6,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -34,14 +33,14 @@ public class JobFixture : ServiceProviderFixture
             .AddPersonService()
             .AddSupportTaskService()
             .AddTrnRequestService(configuration)
-            .AddSingleton<IGetAnIdentityApiClient>(_ => Mock.Of<IGetAnIdentityApiClient>())
             .AddSingleton<IBackgroundJobScheduler>(_ => Mock.Of<IBackgroundJobScheduler>())
             .AddSingleton(Options.Create(new AccessYourTeachingQualificationsOptions { BaseAddress = "https://aytq.example.com/" }))
             .AddSingleton(Options.Create(new TrnRequestOptions()))
             .AddSingleton(Options.Create(new CapitaTpsUserOption { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId }))
             .AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (_, _) => Mock.Of<DataLakeServiceClient>())
             .AddTransient<InductionImporter>()
-            .AddTransient<QtsImporter>();
+            .AddTransient<QtsImporter>()
+            .AddTrnRequestService(configuration);
 
         TestScopedServices.ConfigureServices(services);
     }

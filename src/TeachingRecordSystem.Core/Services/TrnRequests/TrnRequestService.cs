@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using NpgsqlTypes;
@@ -6,8 +7,6 @@ using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 
@@ -20,7 +19,6 @@ public class TrnRequestService(
     IEventPublisher eventPublisher,
     SupportTaskService supportTaskService,
     PersonService personService,
-    IGetAnIdentityApiClient idApiClient,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
 {
@@ -356,10 +354,31 @@ public class TrnRequestService(
         return true;
     }
 
-    private async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)
+    public async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)
     {
-        var response = await idApiClient.CreateTrnTokenAsync(new CreateTrnTokenRequest() { Email = emailAddress, Trn = trn });
-        return response.TrnToken;
+        var trnToken = await GenerateTrnTokenAsync();
+        dbContext.AuthzRegistrationTokens.Add(new AuthzRegistrationToken
+        {
+            Trn = trn,
+            EmailAddress = emailAddress,
+            Token = trnToken,
+            CreatedUtc = default,
+            ExpiresUtc = default,
+        });
+        return trnToken;
+
+        async Task<string> GenerateTrnTokenAsync()
+        {
+            string token;
+            do
+            {
+                var buffer = new byte[8];
+                RandomNumberGenerator.Fill(buffer);
+                token = Convert.ToHexString(buffer).ToLower();
+            } while (await dbContext.AuthzRegistrationTokens.AnyAsync(t => t.Token == token));
+
+            return token;
+        }
     }
 
     // internal for testing
