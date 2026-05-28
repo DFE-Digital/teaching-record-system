@@ -10,6 +10,10 @@
     <Copy SourceFiles="lib/govuk-frontend/govuk-frontend.min.js" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
   </Target>
 
+  <Target Name="CopyAutoCompleteToWwwroot" BeforeTargets="Build">
+    <Copy SourceFiles="Styles/Components/accessible-autocomplete.min.css" DestinationFolder="wwwroot/Styles/Components" SkipUnchangedFiles="true" />
+  </Target>
+  
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
