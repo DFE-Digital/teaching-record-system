@@ -11,10 +11,10 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form method="post">
+        <form method="post" autocomplete="off">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input for="Key" disabled="true" input-class="govuk-input--width-20 trs-monospace" label-class="govuk-label--m" />
+            <govuk-password-input for="Key" disabled="true" input-class="govuk-input--width-20 trs-monospace" label-class="govuk-label--m" />
 
             <govuk-button
                 type="submit"
@@ -27,27 +27,3 @@
         </form>
     </div>
 </div>
-
-<template id="showkey">
-    <govuk-checkboxes name="ShowKey" input-id="ShowKey" class="govuk-checkboxes--small">
-        <govuk-checkboxes-item value="true">Show key</govuk-checkboxes-item>
-    </govuk-checkboxes>
-</template>
-
-<script type="text/javascript" asp-add-nonce="true">
-    if ('content' in document.createElement('template')) {
-        const keyInput = document.querySelector("#@Html.IdFor(m => m.Key)");
-
-        const showKeyTemplate = document.querySelector('#showkey');
-        const showKey = showKeyTemplate.content.cloneNode(true);
-        const showKeyCheckbox = showKey.querySelector('input');
-        const setInputTypeFromShowKeyValue = () => keyInput.setAttribute('type', showKeyCheckbox.checked ? 'text' : 'password');
-
-        setInputTypeFromShowKeyValue();
-        showKeyCheckbox.addEventListener('change', setInputTypeFromShowKeyValue);
-
-        const keyFormGroup = keyInput.parentNode;
-        keyFormGroup.classList.add('govuk-!-margin-bottom-3');
-        keyFormGroup.after(showKey);
-    }
-</script>

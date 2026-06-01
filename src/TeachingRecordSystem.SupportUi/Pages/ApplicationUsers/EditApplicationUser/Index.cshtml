@@ -12,7 +12,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form method="post">
+        <form method="post" autocomplete="off">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Name">
@@ -90,9 +90,9 @@
                             <govuk-input-label class="govuk-label--s">Client ID</govuk-input-label>
                         </govuk-input>
 
-                        <govuk-input for="ClientSecret" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">Client secret</govuk-input-label>
-                        </govuk-input>
+                        <govuk-password-input for="ClientSecret" input-class="trs-monospace" spellcheck="false">
+                            <govuk-password-input-label class="govuk-label--s">Client secret</govuk-password-input-label>
+                        </govuk-password-input>
 
                         <govuk-textarea for="RedirectUris" textarea-class="trs-monospace trs-nowrap">
                             <govuk-textarea-label class="govuk-label--s">Redirect URIs</govuk-textarea-label>
@@ -219,29 +219,3 @@
         </form>
     </div>
 </div>
-
-<template id="showkey">
-    <govuk-checkboxes name="ShowKey" input-id="ShowKey" class="govuk-checkboxes--small">
-        <govuk-checkboxes-item value="true">Show key</govuk-checkboxes-item>
-    </govuk-checkboxes>
-</template>
-
-<script type="text/javascript" asp-add-nonce="true">
-    if ('content' in document.createElement('template')) {
-        const keyInput = document.querySelector("#@Html.IdFor(m => m.OneLoginPrivateKeyPem)");
-
-        if (keyInput.value) {
-            const showKeyTemplate = document.querySelector('#showkey');
-            const showKey = showKeyTemplate.content.cloneNode(true);
-            const showKeyCheckbox = showKey.querySelector('input');
-            const setInputTypeFromShowKeyValue = () => keyInput.style.display = showKeyCheckbox.checked ? '' : 'none';
-
-            setInputTypeFromShowKeyValue();
-            showKeyCheckbox.addEventListener('change', setInputTypeFromShowKeyValue);
-
-            const keyFormGroup = keyInput.parentNode;
-            keyInput.classList.add('govuk-!-margin-bottom-0');
-            keyFormGroup.querySelector('.govuk-hint').after(showKey);
-        }
-    }
-</script>
