@@ -72,7 +72,7 @@ terraform-init: vendor-modules
 	terraform -chdir=terraform/aks init -upgrade -backend-config config/${CONFIG}.backend.tfvars $(backend_key) -reconfigure
 
 terraform-plan: terraform-init # make [env] terraform-plan init
-	terraform -chdir=terraform/aks plan -var-file config/${CONFIG}.tfvars.json
+	terraform -chdir=terraform/aks plan ${DETAILED_EXITCODE} -var-file config/${CONFIG}.tfvars.json
 
 terraform-apply: terraform-init
 	terraform -chdir=terraform/aks apply -var-file config/${CONFIG}.tfvars.json ${AUTO_APPROVE}
@@ -96,7 +96,7 @@ domains-init: vendor-domain-modules domains set-azure-account ## terraform init 
 	terraform -chdir=terraform/domains/environment_domains init -reconfigure -upgrade -backend-config=config/${CONFIG}_backend.tfvars
 
 domains-plan: domains-init ## terraform plan for environment dns/afd resources
-	terraform -chdir=terraform/domains/environment_domains plan -var-file config/${CONFIG}.tfvars.json
+	terraform -chdir=terraform/domains/environment_domains plan ${DETAILED_EXITCODE} -var-file config/${CONFIG}.tfvars.json
 
 domains-apply: domains-init ## terraform apply for environment dns/afd resources, needs CONFIRM_DEPLOY=1 for production
 	terraform -chdir=terraform/domains/environment_domains apply -var-file config/${CONFIG}.tfvars.json ${AUTO_APPROVE}
@@ -108,7 +108,7 @@ domains-infra-init: domains ## make domains-infra-init - terraform init for dns/
 	terraform -chdir=terraform/domains/infrastructure init -reconfigure -upgrade
 
 domains-infra-plan: domains-infra-init ## terraform plan for dns core resources
-	terraform -chdir=terraform/domains/infrastructure plan -var-file config/trs.tfvars.json
+	terraform -chdir=terraform/domains/infrastructure plan ${DETAILED_EXITCODE} -var-file config/trs.tfvars.json
 
 domains-infra-apply: domains-infra-init ## terraform apply for dns core resources
 	terraform -chdir=terraform/domains/infrastructure apply -var-file config/trs.tfvars.json ${AUTO_APPROVE}
