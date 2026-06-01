@@ -19,6 +19,14 @@
     "import-claim-test-data": {
       "commandName": "Project",
       "commandLineArgs": "import-claim-test-data --file \"/Users/work/Downloads/1.csv\" --output \"/Users/work/Downloads/trns.csv\""
+    },
+    "app-content export": {
+      "commandName": "Project",
+      "commandLineArgs": "app-content export --user-id c39fed0f-c121-4624-8d3a-c488fed7d09f --file app-content.json"
+    },
+    "app-content import": {
+      "commandName": "Project",
+      "commandLineArgs": "app-content import --user-id 0f18f1ec-a102-4023-843f-1cadef3e6e14 --file app-content.json"
     }
   }
 }
