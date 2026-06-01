@@ -1,0 +1,26 @@
+@page "/extracts"
+@model TeachingRecordSystem.SupportUi.Pages.Extracts.Sanctions
+@{
+	ViewBag.Title = "Sanctions Export";
+}
+
+
+<div class="govuk-grid-row">
+	<div class="govuk-grid-column-full">
+		<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+		<ul class="govuk-list">
+			<li>
+				<a asp-page-handler="NewSanctions"
+				   class="govuk-link">
+					New Sanctions
+				</a>
+			</li>
+			<li>
+				<a asp-page-handler="SpentSanctions"
+				   class="govuk-link">
+					Spent Sanctions
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
