@@ -9,10 +9,6 @@
   <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
     <Copy SourceFiles="lib/govuk-frontend/govuk-frontend.min.js" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
   </Target>
-
-  <Target Name="CopyAutoCompleteToWwwroot" BeforeTargets="Build">
-    <Copy SourceFiles="Styles/Components/accessible-autocomplete.min.css" DestinationFolder="wwwroot/Styles/Components" SkipUnchangedFiles="true" />
-  </Target>
   
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" />
@@ -34,12 +30,6 @@
 
   <ItemGroup>
     <Using Include="TeachingRecordSystem.WebCommon" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\Styles\Components\accessible-autocomplete.min.css" />
-    <_ContentIncludedByDefault Remove="wwwroot\Styles\site.css" />
-    <_ContentIncludedByDefault Remove="wwwroot\Styles\site.css.map" />
   </ItemGroup>
 
 </Project>
