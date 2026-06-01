@@ -107,7 +107,7 @@ public class AppContentTests(IServiceProvider services) : CommandTestBase(servic
             Assert.NotNull(updatedUser.AppContent);
             Assert.Equal(appContent.OneLoginCannotFindRecordEmailTemplateId, updatedUser.AppContent!.OneLoginCannotFindRecordEmailTemplateId);
             Assert.Equal(appContent.SupportEmailAddress, updatedUser.AppContent.SupportEmailAddress);
-            
+
             var @event = await WithDbContextAsync(async dbContext =>
                 await dbContext.Events
                     .Where(e => e.EventName == "ApplicationUserUpdatedEvent")
@@ -165,7 +165,7 @@ public class AppContentTests(IServiceProvider services) : CommandTestBase(servic
             Assert.NotNull(updatedUser.AppContent);
             Assert.Equal(newAppContent.OneLoginCannotFindRecordEmailTemplateId, updatedUser.AppContent!.OneLoginCannotFindRecordEmailTemplateId);
             Assert.Equal(newAppContent.OneLoginNotVerifiedEmailTemplateId, updatedUser.AppContent.OneLoginNotVerifiedEmailTemplateId);
-            Assert.Equal(newAppContent.SupportEmailAddress, updatedUser.AppContent.SupportEmailAddress);            
+            Assert.Equal(newAppContent.SupportEmailAddress, updatedUser.AppContent.SupportEmailAddress);
             Assert.NotEqual(originalAppContent!.OneLoginCannotFindRecordEmailTemplateId, updatedUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
             Assert.NotEqual(originalAppContent.SupportEmailAddress, updatedUser.AppContent.SupportEmailAddress);
 
