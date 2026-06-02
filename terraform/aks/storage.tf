@@ -7,6 +7,7 @@ resource "azurerm_storage_account" "app_storage" {
   account_kind                      = "StorageV2"
   min_tls_version                   = "TLS1_2"
   infrastructure_encryption_enabled = true
+  allow_nested_items_to_be_public   = false
 
   blob_properties {
     last_access_time_enabled = true
