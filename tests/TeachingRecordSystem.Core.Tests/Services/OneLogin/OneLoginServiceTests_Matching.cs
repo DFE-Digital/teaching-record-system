@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.Core.Tests.Services.OneLogin;
 
@@ -261,6 +262,162 @@ public partial class OneLoginServiceTests
             r => Assert.Equal(person2b.PersonId, r.PersonId),
             r => Assert.Equal(person1.PersonId, r.PersonId),
             r => Assert.Equal(person5.PersonId, r.PersonId));
+    }
+
+    [Fact]
+    public async Task GetMatchedAttributesAsync_WithMatchingNamesAndDateOfBirth_ReturnsExpectedAttributes()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        string[][] names = [[person.FirstName, person.LastName]];
+        DateOnly[] datesOfBirth = [person.DateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetMatchedAttributesAsync(new GetMatchedAttributesOptions
+            {
+                PersonId = person.PersonId,
+                Names = names,
+                DatesOfBirth = datesOfBirth,
+                EmailAddress = null
+            }));
+
+        // Assert
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.FirstName && kvp.Value == person.FirstName);
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.LastName && kvp.Value == person.LastName);
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.DateOfBirth && kvp.Value == person.DateOfBirth.ToString("yyyy-MM-dd"));
+        Assert.DoesNotContain(result, kvp => kvp.Key == PersonMatchedAttribute.EmailAddress);
+    }
+
+    [Fact]
+    public async Task GetMatchedAttributesAsync_WithMatchingEmailAddress_ReturnsEmailAddressAttribute()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
+
+        string[][] names = [[person.FirstName, person.LastName]];
+        DateOnly[] datesOfBirth = [person.DateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetMatchedAttributesAsync(new GetMatchedAttributesOptions
+            {
+                PersonId = person.PersonId,
+                Names = names,
+                DatesOfBirth = datesOfBirth,
+                EmailAddress = person.EmailAddress
+            }));
+
+        // Assert
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.EmailAddress && kvp.Value == person.EmailAddress);
+    }
+
+    [Fact]
+    public async Task GetMatchedAttributesAsync_WithNonMatchingEmailAddress_DoesNotReturnEmailAddressAttribute()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
+        var differentEmail = TestData.GenerateUniqueEmail();
+
+        string[][] names = [[person.FirstName, person.LastName]];
+        DateOnly[] datesOfBirth = [person.DateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetMatchedAttributesAsync(new GetMatchedAttributesOptions
+            {
+                PersonId = person.PersonId,
+                Names = names,
+                DatesOfBirth = datesOfBirth,
+                EmailAddress = differentEmail
+            }));
+
+        // Assert
+        Assert.DoesNotContain(result, kvp => kvp.Key == PersonMatchedAttribute.EmailAddress);
+    }
+
+    [Fact]
+    public async Task GetMatchedAttributesAsync_WithNonMatchingNames_DoesNotReturnNameAttributes()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var differentFirstName = TestData.GenerateChangedFirstName(person.FirstName);
+        var differentLastName = TestData.GenerateChangedLastName(person.LastName);
+
+        string[][] names = [[differentFirstName, differentLastName]];
+        DateOnly[] datesOfBirth = [person.DateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetMatchedAttributesAsync(new GetMatchedAttributesOptions
+            {
+                PersonId = person.PersonId,
+                Names = names,
+                DatesOfBirth = datesOfBirth,
+                EmailAddress = null
+            }));
+
+        // Assert
+        Assert.DoesNotContain(result, kvp => kvp.Key == PersonMatchedAttribute.FirstName);
+        Assert.DoesNotContain(result, kvp => kvp.Key == PersonMatchedAttribute.LastName);
+    }
+
+    [Fact]
+    public async Task GetMatchedAttributesAsync_WithNonMatchingDateOfBirth_DoesNotReturnDateOfBirthAttribute()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var differentDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
+
+        string[][] names = [[person.FirstName, person.LastName]];
+        DateOnly[] datesOfBirth = [differentDateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetMatchedAttributesAsync(new GetMatchedAttributesOptions
+            {
+                PersonId = person.PersonId,
+                Names = names,
+                DatesOfBirth = datesOfBirth,
+                EmailAddress = null
+            }));
+
+        // Assert
+        Assert.DoesNotContain(result, kvp => kvp.Key == PersonMatchedAttribute.DateOfBirth);
+    }
+
+    [Fact]
+    public async Task GetMatchedAttributesAsync_WithAlias_ReturnsFirstNameAttribute()
+    {
+        // Arrange
+        var firstName = Guid.NewGuid().ToString("N");  // No hyphens: fn_split_names splits on hyphens, which would fragment a standard GUID and break synonym lookup
+        var alias = TestData.GenerateFirstName();
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.NameSynonyms.Add(new NameSynonyms { Name = firstName, Synonyms = [alias] });
+            dbContext.NameSynonyms.Add(new NameSynonyms { Name = alias, Synonyms = [firstName] });
+            await dbContext.SaveChangesAsync();
+        });
+
+        var person = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName));
+
+        string[][] names = [[alias, person.LastName]];
+        DateOnly[] datesOfBirth = [person.DateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetMatchedAttributesAsync(new GetMatchedAttributesOptions
+            {
+                PersonId = person.PersonId,
+                Names = names,
+                DatesOfBirth = datesOfBirth,
+                EmailAddress = null
+            }));
+
+        // Assert
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.FirstName);
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.LastName);
     }
 
     private static readonly PersonMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =

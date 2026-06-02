@@ -2,7 +2,6 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.ConnectOneLogin;
@@ -39,7 +38,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -75,7 +74,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                MatchedAttributes = [],
                 ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
@@ -123,7 +122,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                MatchedAttributes = [],
                 ConnectReason = ConnectOneLoginReason.AnotherReason,
                 ReasonDetail = "Custom connection reason"
             },
@@ -157,7 +156,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                MatchedAttributes = [],
                 ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
@@ -192,7 +191,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                MatchedAttributes = [],
                 ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
@@ -266,7 +265,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                MatchedAttributes = [],
                 ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
@@ -328,7 +327,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                MatchedAttributes = [],
                 ConnectReason = ConnectOneLoginReason.SystemCouldNotMatch
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
@@ -365,7 +364,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                MatchedAttributes = [],
                 ConnectReason = ConnectOneLoginReason.AnotherReason,
                 ReasonDetail = "Custom connection reason details"
             },

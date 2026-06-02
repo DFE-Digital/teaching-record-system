@@ -1,7 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Optional;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.ConnectOneLogin;
@@ -38,7 +37,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -71,7 +70,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
+                MatchedAttributes = [],
                 ConnectReason = ConnectOneLoginReason.AnotherReason,
                 ReasonDetail = "Test reason detail"
             },
@@ -111,7 +110,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -143,7 +142,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -178,7 +177,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -214,7 +213,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -254,7 +253,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -294,7 +293,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -335,7 +334,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Subject = oneLoginUser.Subject,
                 OneLoginEmailAddress = oneLoginUser.EmailAddress,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, [])
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 

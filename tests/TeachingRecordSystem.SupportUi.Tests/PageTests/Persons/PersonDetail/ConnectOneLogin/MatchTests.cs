@@ -1,6 +1,5 @@
 using AngleSharp.Dom;
 using Optional;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.ConnectOneLogin;
@@ -83,15 +82,11 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
-                        KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
-                        KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
-                    ]),
-
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                ]
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -147,14 +142,10 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
-                        KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName)
-                    ]),
-
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName)
+                ]
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -206,13 +197,9 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
-                    ]),
-
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                ]
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -249,8 +236,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(person.PersonId, person.Trn, []),
-
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -288,16 +274,12 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
-                        KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
-                        KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd")),
-                        KeyValuePair.Create(PersonMatchedAttribute.EmailAddress, person.EmailAddress!)
-                    ]),
-
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.EmailAddress, person.EmailAddress!)
+                ]
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -333,11 +315,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    []),
-
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -370,11 +348,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    []),
-
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -420,14 +394,10 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
-                        KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName)
-                    ]),  // Name matches (one of the multiple names)
-
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName)
+                ]  // Name matches (one of the multiple names)
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -473,11 +443,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    []),  // No matched attributes - none of the names match
-
+                MatchedAttributes = []  // No matched attributes - none of the names match
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -522,13 +488,9 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
-                    ]),  // DOB matches (one of the multiple DOBs)
-
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                ]  // DOB matches (one of the multiple DOBs)
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -573,11 +535,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    []),
-
+                MatchedAttributes = []
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -609,15 +567,11 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
-                        KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
-                        KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
-                    ]),
-
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                ]
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 
@@ -649,15 +603,11 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
-                MatchedPerson = new MatchPersonResult(
-                    person.PersonId,
-                    person.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
-                        KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
-                        KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
-                    ]),
-
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                ]
             },
             new KeyValuePair<string, object>("personId", person.PersonId));
 

@@ -43,7 +43,7 @@ public class MatchModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (JourneyInstance!.State.MatchedPerson is null)
+        if (JourneyInstance!.State.MatchedAttributes is null)
         {
             context.Result = NotFound();
             return;
@@ -68,7 +68,7 @@ public class MatchModel(
         OneLoginUserVerifiedNames = oneLoginUser.VerifiedNames;
         OneLoginUserVerifiedDatesOfBirth = oneLoginUser.VerifiedDatesOfBirth;
 
-        MatchedAttributeTypes = JourneyInstance.State.MatchedPerson.MatchedAttributes
+        MatchedAttributeTypes = JourneyInstance.State.MatchedAttributes
             .Select(a => a.Key)
             .ToArray();
 

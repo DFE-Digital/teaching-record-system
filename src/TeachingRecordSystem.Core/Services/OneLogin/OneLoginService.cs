@@ -387,8 +387,9 @@ public class OneLoginService(
     public async Task<IReadOnlyCollection<MatchPersonResult>> GetSuggestedPersonMatchesAsync(GetSuggestedPersonMatchesOptions options)
     {
         // Return any record that matches on last name and DOB OR NINO OR TRN.
-        // If PersonId is provided, only match against that specific person.
         // Results should be ordered such that matches on TRN are returned before matches on NINO with matches on last name + DOB last.
+
+        // N.B. Keep this aligned with GetMatchedAttributesAsync()
 
         var firstNames = options.Names.Select(parts => parts.First()).ToArray();
         var lastNames = options.Names.Select(parts => parts.Skip(1).LastOrDefault()).Where(n => !string.IsNullOrEmpty(n)).ToArray();
@@ -404,8 +405,7 @@ public class OneLoginService(
                     :dates_of_birth dates_of_birth,
                     (:email_address COLLATE "case_insensitive") email_address,
                     :trns trns,
-                    array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers,
-                    :person_id person_id
+                    array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers
                 )
                 SELECT
                     p.person_id,
@@ -424,12 +424,11 @@ public class OneLoginService(
                     (SELECT ARRAY(SELECT UNNEST(p.national_insurance_numbers) INTERSECT SELECT UNNEST(vars.national_insurance_numbers))) matched_national_insurance_number
                 FROM persons p, vars
                 WHERE
-                    (vars.person_id IS NOT NULL AND p.person_id = vars.person_id) OR
-                    (vars.person_id IS NULL AND p.status = 0 AND (
+                    p.status = 0 AND (
                         (array_length(vars.last_names, 1) > 0 AND p.date_of_birth = ANY(vars.dates_of_birth) AND p.names && vars.last_names) OR
                         p.trn = ANY(vars.trns) OR
                         (array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers)
-                    ))
+                    )
                 """,
                 // ReSharper disable FormatStringProblem
                 parameters:
@@ -445,8 +444,7 @@ public class OneLoginService(
                     {
                         Value = nationalInsuranceNumber ?? (object)DBNull.Value
                     },
-                    new NpgsqlParameter("trns", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = trns },
-                    new NpgsqlParameter("person_id", NpgsqlDbType.Uuid) { Value = options.PersonId ?? (object)DBNull.Value }
+                    new NpgsqlParameter("trns", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = trns }
                 ]
                 // ReSharper restore FormatStringProblem
             ).ToArrayAsync();
@@ -501,6 +499,73 @@ public class OneLoginService(
             .OrderByDescending(t => t.Score)
             .Select(t => t.Result)
             .AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>> GetMatchedAttributesAsync(GetMatchedAttributesOptions options)
+    {
+        // N.B. Keep this aligned with GetSuggestedPersonMatchesAsync()
+
+        var firstNames = options.Names.Select(parts => parts.First()).ToArray();
+        var lastNames = options.Names.Select(parts => parts.Skip(1).LastOrDefault()).Where(n => !string.IsNullOrEmpty(n)).ToArray();
+
+        var results = await dbContext.Database.SqlQueryRaw<MatchedAttributesQueryResult>(
+                """
+                WITH vars AS (
+                    SELECT
+                    case when array_length(:first_names, 1) > 0 then (fn_split_names(:first_names, include_synonyms => true) collate "case_insensitive") else ARRAY[]::varchar[] end first_names,
+                    case when array_length(:last_names, 1) > 0 then (fn_split_names(:last_names, include_synonyms => false) collate "case_insensitive") else ARRAY[]::varchar[] end last_names,
+                    :dates_of_birth dates_of_birth,
+                    (:email_address COLLATE "case_insensitive") email_address,
+                    :person_id person_id
+                )
+                SELECT
+                    array_length(vars.first_names, 1) > 0 AND p.names && vars.first_names first_name_matches,
+                    (SELECT ARRAY(SELECT UNNEST(p.names) INTERSECT SELECT UNNEST(vars.first_names))) matched_first_name,
+                    array_length(vars.last_names, 1) > 0 AND p.names && vars.last_names last_name_matches,
+                    (SELECT ARRAY(SELECT UNNEST(p.names) INTERSECT SELECT UNNEST(vars.last_names))) matched_last_name,
+                    p.date_of_birth = ANY(vars.dates_of_birth) date_of_birth_matches,
+                    (SELECT ARRAY(SELECT p.date_of_birth INTERSECT SELECT UNNEST(vars.dates_of_birth))) matched_date_of_birth,
+                    CASE WHEN vars.email_address IS NOT NULL AND p.email_address = vars.email_address THEN true ELSE false END email_address_matches,
+                    p.email_address matched_email_address
+                FROM persons p, vars
+                WHERE p.person_id = vars.person_id
+                """,
+                // ReSharper disable FormatStringProblem
+                parameters:
+                [
+                    new NpgsqlParameter("person_id", options.PersonId),
+                    new NpgsqlParameter("last_names", lastNames),
+                    new NpgsqlParameter("first_names", firstNames),
+                    new NpgsqlParameter("email_address", NpgsqlDbType.Varchar)
+                    {
+                        Value = options.EmailAddress ?? (object)DBNull.Value
+                    },
+                    new NpgsqlParameter("dates_of_birth", options.DatesOfBirth.ToArray())
+                ]
+                // ReSharper restore FormatStringProblem
+            ).ToArrayAsync();
+
+        return results
+            .Select(r =>
+            {
+                var matchedAttributes = new List<KeyValuePair<PersonMatchedAttribute, string>>();
+
+                void AddMatchedAttribute(bool isMatched, PersonMatchedAttribute attributeType, Func<string> getValue)
+                {
+                    if (isMatched)
+                    {
+                        matchedAttributes.Add(KeyValuePair.Create(attributeType, getValue()));
+                    }
+                }
+
+                AddMatchedAttribute(r.FirstNameMatches, PersonMatchedAttribute.FirstName, () => r.MatchedFirstName.First());
+                AddMatchedAttribute(r.LastNameMatches, PersonMatchedAttribute.LastName, () => r.MatchedLastName.First());
+                AddMatchedAttribute(r.DateOfBirthMatches, PersonMatchedAttribute.DateOfBirth, () => r.MatchedDateOfBirth.First().ToString("yyyy-MM-dd"));
+                AddMatchedAttribute(r.EmailAddressMatches, PersonMatchedAttribute.EmailAddress, () => r.MatchedEmailAddress!);
+
+                return matchedAttributes;
+            })
+            .Single();
     }
 
     public Task<string?> GetPendingSupportTaskReferenceByUserAsync(string oneLoginUserSubject) =>
@@ -662,7 +727,15 @@ public class OneLoginService(
         string[] MatchedNationalInsuranceNumber);
 
     [UsedImplicitly]
-    private record MatchedAttributesQueryResult(string AttributeType, string AttributeValue);
+    private record MatchedAttributesQueryResult(
+        bool FirstNameMatches,
+        string[] MatchedFirstName,
+        bool LastNameMatches,
+        string[] MatchedLastName,
+        bool DateOfBirthMatches,
+        string? MatchedEmailAddress,
+        bool EmailAddressMatches,
+        DateOnly[] MatchedDateOfBirth);
 
     private record TryMatchToTrnRequestResult(string Trn);
 }

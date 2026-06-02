@@ -60,20 +60,20 @@ public class IndexModel(
             return this.PageWithErrors();
         }
 
-        var suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new GetSuggestedPersonMatchesOptions(
-            Names: oneLoginUser.VerifiedNames ?? [],
-            DatesOfBirth: oneLoginUser.VerifiedDatesOfBirth ?? [],
-            EmailAddress: oneLoginUser.EmailAddress,
-            NationalInsuranceNumber: null,
-            Trn: null,
-            TrnTokenTrnHint: null,
-            PersonId: PersonId));
+        var matchedAttributes = await oneLoginService.GetMatchedAttributesAsync(
+            new GetMatchedAttributesOptions
+            {
+                PersonId = PersonId,
+                Names = oneLoginUser.VerifiedNames ?? [],
+                DatesOfBirth = oneLoginUser.VerifiedDatesOfBirth ?? [],
+                EmailAddress = oneLoginUser.EmailAddress
+            });
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.Subject = oneLoginUser.Subject;
             state.OneLoginEmailAddress = oneLoginUser.EmailAddress;
-            state.MatchedPerson = suggestedMatches.FirstOrDefault();
+            state.MatchedAttributes = matchedAttributes;
         });
 
         return Redirect(linkGenerator.Persons.PersonDetail.ConnectOneLogin.Match(PersonId, JourneyInstance.InstanceId));
