@@ -6,5 +6,4 @@ public record GetSuggestedPersonMatchesOptions(
     string? EmailAddress,
     string? NationalInsuranceNumber,
     string? Trn,
-    string? TrnTokenTrnHint,
-    Guid? PersonId = null);
+    string? TrnTokenTrnHint);

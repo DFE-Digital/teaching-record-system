@@ -82,7 +82,7 @@ public class CheckAnswersModel(
 
         var processContext = new ProcessContext(ProcessType.PersonOneLoginUserConnecting, timeProvider.UtcNow, User.GetUserId(), changeReason: changeReason);
 
-        var matchedPerson = JourneyInstance!.State.MatchedPerson!;
+        var matchedAttributes = JourneyInstance!.State.MatchedAttributes!;
 
         if (oneLoginUser.VerifiedOn is null)
         {
@@ -98,9 +98,9 @@ public class CheckAnswersModel(
                     VerifiedNames = [verifiedNames],
                     VerifiedDatesOfBirth = person.DateOfBirth.HasValue ? [person.DateOfBirth.Value] : [],
                     CoreIdentityClaimVc = null,
-                    MatchedPersonId = matchedPerson.PersonId,
+                    MatchedPersonId = PersonId,
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
-                    MatchedAttributes = matchedPerson.MatchedAttributes
+                    MatchedAttributes = matchedAttributes
                 },
                 processContext);
         }
@@ -110,9 +110,9 @@ public class CheckAnswersModel(
                 new SetUserMatchedOptions
                 {
                     OneLoginUserSubject = JourneyInstance.State.Subject!,
-                    MatchedPersonId = matchedPerson.PersonId,
+                    MatchedPersonId = PersonId,
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
-                    MatchedAttributes = matchedPerson.MatchedAttributes
+                    MatchedAttributes = matchedAttributes
                 },
                 processContext);
         }
