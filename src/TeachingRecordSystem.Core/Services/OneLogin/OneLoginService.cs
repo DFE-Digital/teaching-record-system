@@ -196,7 +196,7 @@ public class OneLoginService(
         user.SetVerified(
             processContext.Now,
             options.VerificationRoute,
-            verifiedByApplicationUserId: null,
+            verifiedByApplicationUserId: options.VerifiedByApplicationUserId,
             options.VerifiedNames,
             options.VerifiedDatesOfBirth,
             options.CoreIdentityClaimVc);
@@ -686,12 +686,14 @@ public class OneLoginService(
         }
         Debug.Assert(trnRequestMetadata.ResolvedPersonId.HasValue);
 
+        var verifiedInfo = trnRequestMetadata.GetVerifiedInfo()!.Value;
+
         oneLoginUser.SetVerified(
             verifiedOn: trnRequestMetadata.CreatedOn,
             route: OneLoginUserVerificationRoute.External,
             verifiedByApplicationUserId: trnRequestMetadata.ApplicationUserId,
-            verifiedNames: [trnRequestMetadata.Name],
-            verifiedDatesOfBirth: [trnRequestMetadata.DateOfBirth],
+            verifiedNames: verifiedInfo.Names,
+            verifiedDatesOfBirth: verifiedInfo.DatesOfBirth,
             coreIdentityClaimVc: null);
 
         oneLoginUser.SetMatched(

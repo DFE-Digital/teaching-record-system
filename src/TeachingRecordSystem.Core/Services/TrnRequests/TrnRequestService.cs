@@ -393,34 +393,61 @@ public class TrnRequestService(
     {
         Debug.Assert(trnRequest.ResolvedPersonId.HasValue);
 
-        if (trnRequest.OneLoginUserSubject is string oneLoginUserSubject &&
-            await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject) is { PersonId: null } oneLoginUser)
+        if (trnRequest.OneLoginUserSubject is null || trnRequest.IdentityVerified is not true)
         {
-            if (oneLoginUser.VerificationRoute is null)
-            {
-                throw new InvalidOperationException("User must be verified.");
-            }
+            return;
+        }
 
+        var oneLoginUserSubject = trnRequest.OneLoginUserSubject;
+
+        if (await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject) is { PersonId: null } oneLoginUser)
+        {
             var personId = trnRequest.ResolvedPersonId.Value;
+            var verifiedInfo = trnRequest.GetVerifiedInfo()!.Value;
+            var matchRoute = OneLoginUserMatchRoute.TrnRequest;
 
             var matchedAttributes = await oneLoginService.GetMatchedAttributesAsync(
                 new GetMatchedAttributesOptions
                 {
                     PersonId = personId,
-                    Names = [[trnRequest.FirstName!, trnRequest.MiddleName ?? string.Empty, trnRequest.LastName!]],
-                    DatesOfBirth = [trnRequest.DateOfBirth],
+                    Names = verifiedInfo.Names,
+                    DatesOfBirth = verifiedInfo.DatesOfBirth,
                     EmailAddress = trnRequest.EmailAddress
                 });
 
-            await oneLoginService.SetUserMatchedAsync(
-                new SetUserMatchedOptions
-                {
-                    OneLoginUserSubject = oneLoginUserSubject,
-                    MatchedPersonId = personId,
-                    MatchRoute = OneLoginUserMatchRoute.TrnRequest,
-                    MatchedAttributes = matchedAttributes
-                },
-                processContext);
+            if (oneLoginUser.VerificationRoute is null)
+            {
+                // It's possible we have a One Login user that's been created via TeacherAuth that is currently unverified and unmatched
+                // then we get a TRN Request with that same user from, say, AfQTS.
+                // In that case they won't yet be marked as verified, so we handle that here.
+
+                await oneLoginService.SetUserVerifiedAndMatchedAsync(
+                    new SetUserVerifiedAndMatchedOptions
+                    {
+                        OneLoginUserSubject = oneLoginUserSubject,
+                        VerificationRoute = OneLoginUserVerificationRoute.External,
+                        VerifiedByApplicationUserId = trnRequest.ApplicationUserId,
+                        VerifiedDatesOfBirth = verifiedInfo.DatesOfBirth,
+                        VerifiedNames = verifiedInfo.Names,
+                        CoreIdentityClaimVc = null,
+                        MatchedPersonId = personId,
+                        MatchRoute = matchRoute,
+                        MatchedAttributes = matchedAttributes
+                    },
+                    processContext);
+            }
+            else
+            {
+                await oneLoginService.SetUserMatchedAsync(
+                    new SetUserMatchedOptions
+                    {
+                        OneLoginUserSubject = oneLoginUserSubject,
+                        MatchedPersonId = personId,
+                        MatchRoute = matchRoute,
+                        MatchedAttributes = matchedAttributes
+                    },
+                    processContext);
+            }
         }
     }
 
