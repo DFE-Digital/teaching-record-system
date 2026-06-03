@@ -27,7 +27,7 @@ public partial class SignInTests
     [Fact]
     public async Task SignIn_DeferredRecordMatchingPolicy_UserHasPendingMatchingTask_ReturnsExistingTrnRequestIdAndSignsIn()
     {
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
 
         var applicationUserId = HostFixture.DeferredRecordMatchingPolicyApplicationUserId;
@@ -52,7 +52,7 @@ public partial class SignInTests
     [Fact]
     public async Task SignIn_DeferredRecordMatchingPolicy_UserWasVerifiedViaSupportTaskButNotMatched_ReturnsExistingTrnRequestIdAndSignsIn()
     {
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
 
         var applicationUserId = HostFixture.DeferredRecordMatchingPolicyApplicationUserId;

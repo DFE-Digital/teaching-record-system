@@ -7,6 +7,7 @@ using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 
@@ -17,6 +18,7 @@ public record TrnRequestInfo(TrnRequestMetadata TrnRequest, string? ResolvedPers
 public class TrnRequestService(
     TrsDbContext dbContext,
     IEventPublisher eventPublisher,
+    OneLoginService oneLoginService,
     SupportTaskService supportTaskService,
     PersonService personService,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
@@ -165,8 +167,12 @@ public class TrnRequestService(
 
         trnRequest.ResolvedPersonId = person.PersonId;
         trnRequest.Status = furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed;
+
         await TryEnsureTrnTokenAsync(trnRequest, person.Trn);
+
         await dbContext.SaveChangesAsync();
+
+        await EnsureOneLoginUserConnectedAsync(trnRequest, processContext);
 
         if (furtherChecksNeeded)
         {
@@ -233,6 +239,8 @@ public class TrnRequestService(
         await TryEnsureTrnTokenAsync(trnRequest, person.Trn);
 
         await dbContext.SaveChangesAsync();
+
+        await EnsureOneLoginUserConnectedAsync(trnRequest, processContext);
 
         if (publishTrnRequestUpdatedEvent)
         {
@@ -378,6 +386,41 @@ public class TrnRequestService(
             } while (await dbContext.AuthzRegistrationTokens.AnyAsync(t => t.Token == token));
 
             return token;
+        }
+    }
+
+    private async Task EnsureOneLoginUserConnectedAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    {
+        Debug.Assert(trnRequest.ResolvedPersonId.HasValue);
+
+        if (trnRequest.OneLoginUserSubject is string oneLoginUserSubject &&
+            await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject) is { PersonId: null } oneLoginUser)
+        {
+            if (oneLoginUser.VerificationRoute is null)
+            {
+                throw new InvalidOperationException("User must be verified.");
+            }
+
+            var personId = trnRequest.ResolvedPersonId.Value;
+
+            var matchedAttributes = await oneLoginService.GetMatchedAttributesAsync(
+                new GetMatchedAttributesOptions
+                {
+                    PersonId = personId,
+                    Names = [[trnRequest.FirstName!, trnRequest.MiddleName ?? string.Empty, trnRequest.LastName!]],
+                    DatesOfBirth = [trnRequest.DateOfBirth],
+                    EmailAddress = trnRequest.EmailAddress
+                });
+
+            await oneLoginService.SetUserMatchedAsync(
+                new SetUserMatchedOptions
+                {
+                    OneLoginUserSubject = oneLoginUserSubject,
+                    MatchedPersonId = personId,
+                    MatchRoute = OneLoginUserMatchRoute.TrnRequest,
+                    MatchedAttributes = matchedAttributes
+                },
+                processContext);
         }
     }
 
