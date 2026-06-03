@@ -8,6 +8,7 @@ COPY . ./
 RUN dotnet tool restore
 RUN dotnet restore
 RUN dotnet publish --no-restore --configuration Release
+RUN dotnet ef migrations bundle -p src/TeachingRecordSystem.Core/ --configuration Release --context TrsDbContext --output efbundle
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.23@sha256:1201dde897ab436b7c6b386f6dbd4f9a3ca0245f9c5a8aac8f8bcdccb4c7d484
 ARG GIT_SHA
@@ -17,6 +18,7 @@ COPY --from=build /source/src/TeachingRecordSystem.Cli/bin/Release/net10.0/publi
 COPY --from=build /source/src/TeachingRecordSystem.SupportUi/bin/Release/net10.0/publish/ ./SupportUi/
 COPY --from=build /source/src/TeachingRecordSystem.Worker/bin/Release/net10.0/publish/ ./Worker/
 COPY --from=build /source/src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net10.0/publish/ ./AuthorizeAccess/
+COPY --from=build /source/efbundle ./efbundle
 
 # Ensure culture data is available
 RUN apk add --no-cache tzdata icu-data-full icu-libs

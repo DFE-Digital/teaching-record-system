@@ -133,7 +133,7 @@ e.g.
 To set up the initial TRS database schema run:
 ```shell
 > just build
-> just cli migrate-db
+> just ef database update
 > just cli add-trn-range --from 1000000 --to 9999999
 ```
 
