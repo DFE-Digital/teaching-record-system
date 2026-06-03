@@ -1,9 +1,5 @@
 {
   "profiles": {
-    "migrate-db": {
-      "commandName": "Project",
-      "commandLineArgs": "migrate-db"
-    },
     "migrate-reporting-db": {
       "commandName": "Project",
       "commandLineArgs": "migrate-reporting-db"

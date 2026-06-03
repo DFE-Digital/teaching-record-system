@@ -23,8 +23,8 @@ module "migrations" {
   environment  = local.app_name_suffix
   service_name = var.service_name
   docker_image = var.docker_image
-  commands     = ["trscli"]
-  arguments    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
+  commands     = ["/Apps/efbundle"]
+  arguments    = ["--connection", "$(CONNECTION_STRING)"]
   job_name     = "migrations"
   enable_logit = var.enable_logit
 

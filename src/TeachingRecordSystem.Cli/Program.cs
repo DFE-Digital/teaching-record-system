@@ -7,7 +7,6 @@ var configuration = new ConfigurationBuilder()
 
 var rootCommand = new RootCommand("Development tools for the Teaching Record System.")
 {
-    Commands.CreateMigrateDbCommand(configuration),
     Commands.CreateCreateAdminCommand(configuration),
     Commands.CreateGenerateKeyCommand(configuration),
     Commands.CreateDropDqtReportingReplicationSlotCommand(configuration),
