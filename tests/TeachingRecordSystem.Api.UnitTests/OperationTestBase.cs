@@ -5,7 +5,6 @@ using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -40,8 +39,6 @@ public abstract class OperationTestBase : IDisposable
     protected IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     protected TestData TestData => Services.GetRequiredService<TestData>();
-
-    protected Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => Mock.Get(Services.GetRequiredService<IGetAnIdentityApiClient>());
 
     protected EventCapture Events => TestScopedServices.GetCurrent().Events;
 

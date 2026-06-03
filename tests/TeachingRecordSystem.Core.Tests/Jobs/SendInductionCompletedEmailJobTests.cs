@@ -1,8 +1,6 @@
 using System.Text.Json;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -14,7 +12,6 @@ public class SendInductionCompletedEmailJobTests(JobFixture fixture) : JobTestBa
     {
         // Arrange
         var notificationSender = new Mock<INotificationSender>();
-        var getAnIdentityApiClient = new Mock<IGetAnIdentityApiClient>();
         var inductionCompletedEmailsJobId = Guid.NewGuid();
         var personId = Guid.NewGuid();
         var trn = "1234567";
@@ -49,24 +46,10 @@ public class SendInductionCompletedEmailJobTests(JobFixture fixture) : JobTestBa
             await dbContext.SaveChangesAsync();
         });
 
-        var tokenResponse = new CreateTrnTokenResponse
-        {
-            Email = emailAddress,
-            Trn = trn,
-            TrnToken = "Thisismytrntoken",
-            ExpiresUtc = Clock.UtcNow.AddDays(60)
-        };
-
-        getAnIdentityApiClient
-            .Setup(i => i.CreateTrnTokenAsync(
-                It.Is<CreateTrnTokenRequest>(r => r.Trn == trn && r.Email == emailAddress)))
-            .ReturnsAsync(tokenResponse);
-
         // Act
         await WithServiceAsync<SendInductionCompletedEmailJob>(
             job => job.ExecuteAsync(inductionCompletedEmailsJobId, personId),
-            notificationSender.Object,
-            getAnIdentityApiClient.Object);
+            notificationSender.Object);
 
         // Assert
         notificationSender

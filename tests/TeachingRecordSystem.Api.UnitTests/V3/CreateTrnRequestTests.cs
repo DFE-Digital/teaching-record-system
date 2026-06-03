@@ -2,27 +2,13 @@ using System.Diagnostics;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 #pragma warning disable TRS0001
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public class CreateTrnRequestTests : OperationTestBase
+public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
 {
-    public CreateTrnRequestTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
-    {
-        GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
-            {
-                Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
-                Trn = req.Trn,
-                TrnToken = Guid.NewGuid().ToString()
-            });
-    }
-
     [Fact]
     public async Task HandleAsync_RequestForSameUserAndIdAlreadyExists_ReturnsError()
     {

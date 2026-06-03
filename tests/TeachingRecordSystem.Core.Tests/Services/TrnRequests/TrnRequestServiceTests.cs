@@ -1,41 +1,19 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Tests.Services.TrnRequests;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
-public partial class TrnRequestServiceTests : ServiceTestBase
+public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
-    public TrnRequestServiceTests(ServiceFixture fixture) : base(fixture)
+    private IOptions<AccessYourTeachingQualificationsOptions> AytqOptionsAccessor { get; } = Options.Create(new AccessYourTeachingQualificationsOptions()
     {
-        GetAnIdentityApiClientMock = new();
-        GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
-            {
-                TrnToken = Guid.NewGuid().ToString(),
-                Trn = req.Trn,
-                Email = req.Email,
-                ExpiresUtc = TimeProvider.UtcNow.AddDays(1)
-            });
+        BaseAddress = "https://aytq.test/"
+    });
 
-        AytqOptionsAccessor = Options.Create(new AccessYourTeachingQualificationsOptions()
-        {
-            BaseAddress = "https://aytq.test/"
-        });
-
-        TrnRequestOptionsAccessor = Options.Create(new TrnRequestOptions());
-    }
-
-    private Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
-
-    private IOptions<AccessYourTeachingQualificationsOptions> AytqOptionsAccessor { get; }
-
-    private IOptions<TrnRequestOptions> TrnRequestOptionsAccessor { get; }
+    private IOptions<TrnRequestOptions> TrnRequestOptionsAccessor { get; } = Options.Create(new TrnRequestOptions());
 
     [Fact]
     public async Task CreateTrnRequestAsync_AddsRequestToDbAndPublishesEvent()
@@ -816,7 +794,6 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn));
 
         // Assert
-        VerifyTrnTokenApiNotCalled();
         Assert.Null(trnRequest.TrnToken);
     }
 
@@ -836,7 +813,7 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn));
 
         // Assert
-        VerifyTrnTokenApiNotCalled();
+        Assert.Null(trnRequest.TrnToken);
     }
 
     [Fact]
@@ -857,7 +834,6 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn));
 
         // Assert
-        VerifyTrnTokenApiNotCalled();
         Assert.Equal(initialToken, trnRequest.TrnToken);
     }
 
@@ -880,7 +856,6 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         var result = await WithServiceAsync(s => s.TryEnsureTrnTokenAsync(trnRequest, person.Trn));
 
         // Assert
-        VerifyTrnTokenApiCalled(trnRequest.EmailAddress!, person.Trn);
         Assert.NotNull(trnRequest.TrnToken);
     }
 
@@ -974,12 +949,6 @@ public partial class TrnRequestServiceTests : ServiceTestBase
             WorkEmailAddress = TestData.GenerateUniqueEmail()
         };
 
-    private void VerifyTrnTokenApiCalled(string emailAddress, string trn) =>
-        GetAnIdentityApiClientMock.Verify(mock => mock.CreateTrnTokenAsync(It.Is<CreateTrnTokenRequest>(r => r.Email == emailAddress && r.Trn == trn)));
-
-    private void VerifyTrnTokenApiNotCalled() =>
-        GetAnIdentityApiClientMock.Verify(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()), Times.Never);
-
     private Task WithServiceAsync(Func<TrnRequestService, Task> action, params object[] arguments) =>
         WithServiceAsync<TrnRequestService>(action, GetServiceDependencies(arguments));
 
@@ -987,5 +956,5 @@ public partial class TrnRequestServiceTests : ServiceTestBase
         WithServiceAsync<TrnRequestService, TResult>(action, GetServiceDependencies(arguments));
 
     private object[] GetServiceDependencies(object[] arguments) =>
-        [GetAnIdentityApiClientMock.Object, AytqOptionsAccessor, TrnRequestOptionsAccessor, .. arguments];
+        [AytqOptionsAccessor, TrnRequestOptionsAccessor, .. arguments];
 }

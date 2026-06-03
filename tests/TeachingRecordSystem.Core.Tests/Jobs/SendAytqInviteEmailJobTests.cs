@@ -1,7 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -13,7 +11,6 @@ public class SendAytqInviteEmailJobTests(JobFixture fixture) : JobTestBase(fixtu
     {
         // Arrange
         var notificationSender = new Mock<INotificationSender>();
-        var getAnIdentityApiClient = new Mock<IGetAnIdentityApiClient>();
 
         var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress(TestData.GenerateUniqueEmail()));
 
@@ -40,21 +37,8 @@ public class SendAytqInviteEmailJobTests(JobFixture fixture) : JobTestBase(fixtu
             return email;
         });
 
-        var tokenResponse = new CreateTrnTokenResponse
-        {
-            Email = person.EmailAddress!,
-            Trn = person.Trn,
-            TrnToken = "ThisIsMyTrnToken",
-            ExpiresUtc = Clock.UtcNow.AddDays(60)
-        };
-
-        getAnIdentityApiClient
-            .Setup(i => i.CreateTrnTokenAsync(
-                It.Is<CreateTrnTokenRequest>(r => r.Trn == tokenResponse.Trn && r.Email == tokenResponse.Email)))
-            .ReturnsAsync(tokenResponse);
-
         // Act
-        await WithServiceAsync<SendAytqInviteEmailJob>(job => job.ExecuteAsync(email.EmailId), notificationSender.Object, getAnIdentityApiClient.Object);
+        await WithServiceAsync<SendAytqInviteEmailJob>(job => job.ExecuteAsync(email.EmailId), notificationSender.Object);
 
         // Assert
         notificationSender

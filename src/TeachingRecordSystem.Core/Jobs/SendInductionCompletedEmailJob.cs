@@ -1,18 +1,17 @@
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
 public class SendInductionCompletedEmailJob(
     INotificationSender notificationSender,
     TrsDbContext dbContext,
-    IGetAnIdentityApiClient identityApiClient,
     IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider,
+    TrnRequestService trnRequestService)
 {
     private const string LinkToAccessYourQualificationsServicePersonalisationKey = "link to access your teaching qualifications service";
 
@@ -24,14 +23,11 @@ public class SendInductionCompletedEmailJob(
 
         if (!item.Personalization.ContainsKey(LinkToAccessYourQualificationsServicePersonalisationKey))
         {
-            var request = new CreateTrnTokenRequest
-            {
-                Trn = item.Trn,
-                Email = item.EmailAddress
-            };
+            var trn = item.Trn;
+            var email = item.EmailAddress;
+            var trnToken = await trnRequestService.CreateTrnTokenAsync(trn, email);
 
-            var tokenResponse = await identityApiClient.CreateTrnTokenAsync(request);
-            item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
+            item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={trnToken}";
         }
 
         await notificationSender.SendEmailAsync(EmailTemplateIds.InductionCompletedEmailConfirmation, item.EmailAddress, item.Personalization);

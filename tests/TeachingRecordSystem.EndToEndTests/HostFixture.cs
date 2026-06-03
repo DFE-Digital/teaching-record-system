@@ -16,8 +16,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.EventHandlers;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Webhooks;
@@ -73,8 +71,6 @@ public sealed class HostFixture : InitializeDbFixture
         }
 
         WebhookMessageRecorder = _webhookReceiver.WebhookMessageRecorder;
-
-        ConfigureMocks();
     }
 
     public static string ApiBaseUrl => $"http://localhost:{ApiPort}";
@@ -91,8 +87,6 @@ public sealed class HostFixture : InitializeDbFixture
     public TimeProvider TimeProvider { get; }
     public TestData TestData { get; }
     public WebhookMessageRecorder WebhookMessageRecorder { get; }
-
-    public IGetAnIdentityApiClient GetAnIdentityApiClientMock { get; } = Mock.Of<IGetAnIdentityApiClient>();
 
     public override async ValueTask InitializeAsync()
     {
@@ -236,7 +230,6 @@ public sealed class HostFixture : InitializeDbFixture
     private void ConfigureServices(IServiceCollection services)
     {
         services
-            .AddSingleton<IGetAnIdentityApiClient>(GetAnIdentityApiClientMock)
             .AddSingleton<INotificationSender, NoopNotificationSender>()
             .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
 
@@ -261,31 +254,11 @@ public sealed class HostFixture : InitializeDbFixture
             options => options.UseInMemoryDatabase("TeacherAuthId"),
             contextLifetime: ServiceLifetime.Transient);
 
-        services.Configure<GetAnIdentityOptions>(options =>
-        {
-            options.TokenEndpoint = "dummy";
-            options.ClientId = "dummy";
-            options.ClientSecret = "dummy";
-            options.BaseAddress = "dummy";
-        });
 
         // Replace CreateWebhookMessages with SendWebhookMessagesEventHandler;
         // we want to dispatch webhook messages immediately instead of queueing them
         services.Remove(services.Single(sd => sd.ImplementationType == typeof(CreateWebhookMessages)));
         services.AddTransient<IEventHandler, SendWebhookMessagesEventHandler>();
-    }
-
-    private void ConfigureMocks()
-    {
-        Mock.Get(GetAnIdentityApiClientMock)
-            .Setup(c => c.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest request) => new CreateTrnTokenResponse
-            {
-                Trn = request.Trn,
-                Email = request.Email,
-                TrnToken = Guid.NewGuid().ToString(),
-                ExpiresUtc = TimeProvider.UtcNow.AddDays(30)
-            });
     }
 
     private class ApiWebApplicationFactory : WebApplicationFactory<Api.Program>

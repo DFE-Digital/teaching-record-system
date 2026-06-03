@@ -2,7 +2,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
@@ -34,7 +33,6 @@ public class TestScopedServices
         BlobStorageSafeFileServiceMock
             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
             .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
-        GetAnIdentityApiClientMock = new();
         TrnRequestOptions = new TrnRequestOptions();
         BackgroundJobScheduler = new(serviceProvider);
         CurrentUserProvider = new();
@@ -44,7 +42,6 @@ public class TestScopedServices
         services
             .AddSingleton<TimeProvider>(new ForwardToTestScopedTimeProvider())
             .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
-            .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AzureActiveDirectoryUserServiceMock.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
@@ -81,8 +78,6 @@ public class TestScopedServices
     public Mock<IFileService> BlobStorageFileServiceMock { get; }
 
     public Mock<ISafeFileService> BlobStorageSafeFileServiceMock { get; }
-
-    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
     public TrnRequestOptions TrnRequestOptions { get; }
 

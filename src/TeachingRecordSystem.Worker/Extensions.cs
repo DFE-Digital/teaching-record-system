@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
-using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PublishApi;
 using TeachingRecordSystem.Core.Services.Webhooks;
@@ -47,7 +46,6 @@ public static class Extensions
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
             services
-                .AddIdentityApi(configuration)
                 .AddPublishApi(configuration)
                 .AddBackgroundJobs(configuration, environment);
         }

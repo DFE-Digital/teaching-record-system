@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
@@ -17,7 +16,6 @@ public class TestScopedServices
     public TestScopedServices(IServiceProvider serviceProvider)
     {
         Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
-        GetAnIdentityApiClientMock = new();
         BlobStorageFileServiceMock = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         BackgroundJobScheduler = new(serviceProvider);
@@ -32,7 +30,6 @@ public class TestScopedServices
     public static void ConfigureServices(IServiceCollection services) =>
         services
             .AddSingleton<TimeProvider>(new ForwardToTestScopedTimeProvider())
-            .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AccessYourTeachingQualificationsOptions)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
@@ -64,8 +61,6 @@ public class TestScopedServices
     }
 
     public FakeTimeProvider Clock { get; }
-
-    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
     public IOptions<AccessYourTeachingQualificationsOptions> AccessYourTeachingQualificationsOptions { get; }
 

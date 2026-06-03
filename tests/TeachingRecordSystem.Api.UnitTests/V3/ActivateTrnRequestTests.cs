@@ -1,24 +1,11 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public class ActivateTrnRequestTests : OperationTestBase
+public class ActivateTrnRequestTests(OperationTestFixture operationTestFixture)
+    : OperationTestBase(operationTestFixture)
 {
-    public ActivateTrnRequestTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
-    {
-        GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
-            {
-                Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
-                Trn = req.Trn,
-                TrnToken = Guid.NewGuid().ToString()
-            });
-    }
-
     [Fact]
     public async Task TrnRequestDoesNotExist_ReturnsError()
     {

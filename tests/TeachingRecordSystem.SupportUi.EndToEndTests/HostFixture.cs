@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.SupportUi.EndToEndTests;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -79,7 +77,6 @@ public sealed class HostFixture : InitializeDbFixture
                         .AddSingleton(GetMockFileService())
                         .AddSingleton(GetMockSafeFileService())
                         .AddSingleton(GetMockAdUserService())
-                        .AddSingleton(GetMockGetAnIdentityApiClient())
                         .AddStartupTask<SeedLookupData>()
                         .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
 
@@ -121,23 +118,6 @@ public sealed class HostFixture : InitializeDbFixture
                             .Setup(s => s.GetUserByIdAsync(TestUsers.TestAzureActiveDirectoryUser.UserId))
                             .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                         return userService.Object;
-                    }
-
-                    IGetAnIdentityApiClient GetMockGetAnIdentityApiClient()
-                    {
-                        var getAnIdentityApiClient = new Mock<IGetAnIdentityApiClient>();
-
-                        getAnIdentityApiClient
-                            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-                            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
-                            {
-                                Email = req.Email,
-                                ExpiresUtc = DateTime.UtcNow.AddYears(1),
-                                Trn = req.Trn,
-                                TrnToken = Guid.NewGuid().ToString()
-                            });
-
-                        return getAnIdentityApiClient.Object;
                     }
                 });
             });

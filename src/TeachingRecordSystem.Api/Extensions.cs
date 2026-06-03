@@ -17,7 +17,6 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Infrastructure.Json;
-using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.WebCommon.Filters;
 
@@ -147,11 +146,6 @@ public static class Extensions
             services
                 .AddStartupTask<ReferenceDataCache>()
                 .AddRateLimiting(configuration);
-        }
-
-        if (!environment.IsTests() && !environment.IsEndToEndTests())
-        {
-            services.AddIdentityApi(configuration);
         }
 
         return services;
