@@ -859,7 +859,95 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         Assert.NotNull(trnRequest.TrnToken);
     }
 
-    //...
+    [Fact]
+    public async Task ResolveTrnRequestWithMatchedPersonAsync_WithKnownOneLoginUser_ConnectsUserToPerson()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+        var (trnRequest, matchedPerson) = await CreatePendingTrnRequestAndMatchingPerson(
+            applicationUser.UserId,
+            configureOptions: r => r with { OneLoginUserInfo = new CreateTrnRequestOptionsOneLoginUserInfo(oneLoginUser.Subject, true) });
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchedPerson.PersonId, matchedPerson.Trn), processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject);
+            Assert.Equal(matchedPerson.PersonId, updatedUser.PersonId);
+        });
+    }
+
+    [Fact]
+    public async Task ResolveTrnRequestWithMatchedPersonAsync_WithUnknownOneLoginUser_DoesNotThrow()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var unknownSubject = TestData.CreateOneLoginUserSubject();
+
+        var (trnRequest, matchedPerson) = await CreatePendingTrnRequestAndMatchingPerson(
+            applicationUser.UserId,
+            configureOptions: r => r with { OneLoginUserInfo = new CreateTrnRequestOptionsOneLoginUserInfo(unknownSubject, false) });
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() =>
+            WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchedPerson.PersonId, matchedPerson.Trn), processContext)));
+
+        // Assert
+        Assert.Null(ex);
+    }
+
+    [Fact]
+    public async Task ResolveTrnRequestWithNewRecordAsync_WithKnownOneLoginUser_ConnectsUserToPerson()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+        var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(
+            applicationUser.UserId,
+            configureOptions: r => r with { OneLoginUserInfo = new CreateTrnRequestOptionsOneLoginUserInfo(oneLoginUser.Subject, true) });
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject);
+            Assert.Equal(trnRequest.ResolvedPersonId, updatedUser.PersonId);
+        });
+    }
+
+    [Fact]
+    public async Task ResolveTrnRequestWithNewRecordAsync_WithUnknownOneLoginUser_DoesNotThrow()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var unknownSubject = TestData.CreateOneLoginUserSubject();
+
+        var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(
+            applicationUser.UserId,
+            configureOptions: r => r with { OneLoginUserInfo = new CreateTrnRequestOptionsOneLoginUserInfo(unknownSubject, false) });
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() =>
+            WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext)));
+
+        // Assert
+        Assert.Null(ex);
+    }
 
     private async Task<(TrnRequestMetadata TrnRequest, Person Person)> CreatePendingTrnRequestAndMatchingPerson(
         Guid applicationUserId,
