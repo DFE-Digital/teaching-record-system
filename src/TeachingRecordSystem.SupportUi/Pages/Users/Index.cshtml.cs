@@ -93,7 +93,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             EditUrl = linkGenerator.Users.EditUser.Index(user.UserId),
             EmailAddress = user.Email ?? "No email address",
             Role = user.Role == null ? "No role assigned" : UserRoles.GetDisplayNameForRole(user.Role),
-            Status = user.Active ? "Active" : "Inactive"
+            Status = user.Active ? "Active" : "Deactivated"
         };
     }
 }
