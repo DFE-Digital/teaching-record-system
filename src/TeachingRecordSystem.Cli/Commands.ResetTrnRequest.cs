@@ -100,8 +100,8 @@ public partial class Commands
                     (oldTrnRequest.ResolvedPersonId != request.ResolvedPersonId ? TrnRequestUpdatedChanges.ResolvedPersonId : 0);
 
                 var supportTask = SupportTask.Create(
-                    SupportTaskType.ApiTrnRequest,
-                    new ApiTrnRequestData(),
+                    SupportTaskType.TrnRequest,
+                    new TrnRequestData(),
                     personId: null,
                     request.OneLoginUserSubject,
                     request.ApplicationUserId,

@@ -31,7 +31,7 @@ public class GetPersonTests : TestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var trnRequestId = Guid.NewGuid().ToString();
 
-        await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, t => t
             .WithRequestId(trnRequestId));
 
         var httpClient = GetHttpClientWithAuthorizeAccessTokenForTrnRequest(applicationUser.UserId, trnRequestId, Version);
@@ -52,7 +52,7 @@ public class GetPersonTests : TestBase
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var trnRequestId = Guid.NewGuid().ToString();
 
-        await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, t => t
             .WithRequestId(trnRequestId)
             .WithResolvedPersonId(person.PersonId));
 

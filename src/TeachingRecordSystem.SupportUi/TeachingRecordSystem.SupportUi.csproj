@@ -9,7 +9,7 @@
   <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
     <Copy SourceFiles="lib/govuk-frontend/govuk-frontend.min.js" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
   </Target>
-  
+
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />

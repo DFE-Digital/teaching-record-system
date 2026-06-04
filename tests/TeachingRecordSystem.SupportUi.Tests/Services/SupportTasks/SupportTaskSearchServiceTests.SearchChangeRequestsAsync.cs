@@ -161,7 +161,7 @@ public partial class SupportTaskSearchServiceTests
     }
 
     [Theory]
-    [InlineData(SupportTaskType.ApiTrnRequest)]
+    [InlineData(SupportTaskType.TrnRequest)]
     [InlineData(SupportTaskType.OneLoginUserRecordMatching)]
     [InlineData(SupportTaskType.NpqTrnRequest)]
     [InlineData(SupportTaskType.OneLoginUserIdVerification)]

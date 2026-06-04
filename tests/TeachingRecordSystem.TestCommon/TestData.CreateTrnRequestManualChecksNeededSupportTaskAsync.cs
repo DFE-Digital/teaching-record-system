@@ -9,7 +9,7 @@ public partial class TestData
         Guid? applicationUserId = null,
         SupportTaskStatus status = SupportTaskStatus.Open,
         DateTime? createdOn = null,
-        Action<CreateApiTrnRequestSupportTaskBuilder>? configureApiTrnRequest = null)
+        Action<CreateTrnRequestSupportTaskBuilder>? configureTrnRequest = null)
     {
         var matchedPerson = await CreatePersonAsync(p => p.WithEmailAddress(GenerateUniqueEmail()).WithAlert().WithQts().WithEyts());
 
@@ -25,7 +25,7 @@ public partial class TestData
             t =>
             {
                 t.WithTrnRequestStatus(TrnRequestStatus.Pending);
-                configureApiTrnRequest?.Invoke(t);
+                configureTrnRequest?.Invoke(t);
             });
 
         return await CreateTrnRequestManualChecksNeededSupportTaskAsync(

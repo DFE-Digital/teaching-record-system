@@ -24,7 +24,7 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
 
     public async Task HandleEventAsync(SupportTaskUpdatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
-        if (processContext.ProcessType is ProcessType.ApiTrnRequestResolving)
+        if (processContext.ProcessType is ProcessType.TrnRequestResolving)
         {
             var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
             var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();

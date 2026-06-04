@@ -251,10 +251,10 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
         {
             PersonId = personId,
             SupportTaskReference = "TEST-ST-1",
-            SupportTaskType = SupportTaskType.ApiTrnRequest,
+            SupportTaskType = SupportTaskType.TrnRequest,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Closed,
-            Data = new ApiTrnRequestData(),
+            Data = new TrnRequestData(),
             ResolveJourneySavedState = null
         };
 
@@ -262,10 +262,10 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
         {
             PersonId = personId,
             SupportTaskReference = "TEST-ST-1",
-            SupportTaskType = SupportTaskType.ApiTrnRequest,
+            SupportTaskType = SupportTaskType.TrnRequest,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Open,
-            Data = new ApiTrnRequestData(),
+            Data = new TrnRequestData(),
             ResolveJourneySavedState = null
         };
 

@@ -28,9 +28,8 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
         supportTaskType switch
         {
             SupportTaskType.OneLoginUserRecordMatching => SupportTasks.OneLoginUserMatching.Resolve.Index(supportTaskReference),
-            SupportTaskType.ApiTrnRequest => SupportTasks.ApiTrnRequests.Resolve.Index(supportTaskReference),
+            SupportTaskType.TrnRequest => SupportTasks.TrnRequests.Resolve.Index(supportTaskReference),
             SupportTaskType.TrnRequestManualChecksNeeded => SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(supportTaskReference),
-            SupportTaskType.NpqTrnRequest => SupportTasks.NpqTrnRequests.Details(supportTaskReference),
             SupportTaskType.ChangeDateOfBirthRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference),
             SupportTaskType.ChangeNameRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference),
             SupportTaskType.TeacherPensionsPotentialDuplicate => SupportTasks.TeacherPensions.Resolve.Matches(supportTaskReference),

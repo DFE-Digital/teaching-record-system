@@ -315,7 +315,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         {
             PersonId = personId,
             SupportTaskReference = "TEST-ST-1",
-            SupportTaskType = SupportTaskType.ApiTrnRequest,
+            SupportTaskType = SupportTaskType.TrnRequest,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Closed,
             Data = new NpqTrnRequestData(),
@@ -326,7 +326,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         {
             PersonId = personId,
             SupportTaskReference = "TEST-ST-1",
-            SupportTaskType = SupportTaskType.ApiTrnRequest,
+            SupportTaskType = SupportTaskType.TrnRequest,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Open,
             Data = new NpqTrnRequestData(),

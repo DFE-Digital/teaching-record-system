@@ -118,7 +118,7 @@ public class GetTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        await TestData.CreateApiTrnRequestSupportTaskAsync(ApplicationUserId, t => t
+        await TestData.CreateTrnRequestSupportTaskAsync(ApplicationUserId, t => t
             .WithRequestId(requestId)
             .WithFirstName(firstName)
             .WithMiddleName(middleName)

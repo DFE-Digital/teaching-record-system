@@ -14,8 +14,8 @@ public enum SupportTaskType
     [SupportTaskTypeDescription("change date of birth request", SupportTaskCategory.ChangeRequests, typeof(ChangeDateOfBirthRequestData))]
     ChangeDateOfBirthRequest = 3,
 
-    [SupportTaskTypeDescription("TRN request from API", SupportTaskCategory.TrnRequests, typeof(ApiTrnRequestData))]
-    ApiTrnRequest = 4,
+    [SupportTaskTypeDescription("TRN request", SupportTaskCategory.TrnRequests, typeof(TrnRequestData))]
+    TrnRequest = 4,
 
     [SupportTaskTypeDescription("TRN request from NPQ", SupportTaskCategory.TrnRequests, typeof(NpqTrnRequestData))]
     NpqTrnRequest = 5,

@@ -22,7 +22,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
 
         if (supportTaskTypes
              .Intersect([
-                 SupportTaskType.ApiTrnRequest,
+                 SupportTaskType.TrnRequest,
                  SupportTaskType.TrnRequestManualChecksNeeded,
                  SupportTaskType.NpqTrnRequest,
                  SupportTaskType.TeacherPensionsPotentialDuplicate,

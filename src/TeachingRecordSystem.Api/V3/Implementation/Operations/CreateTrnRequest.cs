@@ -42,7 +42,7 @@ public class CreateTrnRequestHandler(
         var normalizedNino = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber);
         var emailAddress = command.EmailAddresses.FirstOrDefault();
 
-        var processContext = new ProcessContext(ProcessType.ApiTrnRequestCreating, timeProvider.UtcNow, currentApplicationUserId);
+        var processContext = new ProcessContext(ProcessType.TrnRequestCreating, timeProvider.UtcNow, currentApplicationUserId);
 
         var (trnRequest, resolvedPersonTrn) = await trnRequestService.CreateTrnRequestAsync(
             new CreateTrnRequestOptions
@@ -66,8 +66,8 @@ public class CreateTrnRequestHandler(
             await supportTaskService.CreateSupportTaskAsync(
                 new CreateSupportTaskOptions
                 {
-                    SupportTaskType = SupportTaskType.ApiTrnRequest,
-                    Data = new ApiTrnRequestData(),
+                    SupportTaskType = SupportTaskType.TrnRequest,
+                    Data = new TrnRequestData(),
                     PersonId = null,
                     OneLoginUserSubject = null,  // This must be null as we likely won't have an entry in the one_login_users table yet
                     TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)

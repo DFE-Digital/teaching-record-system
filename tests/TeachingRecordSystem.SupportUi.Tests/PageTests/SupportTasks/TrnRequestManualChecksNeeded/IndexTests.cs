@@ -89,10 +89,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: t => t.WithFirstName("Jim").WithLastName("Smith")),
+                configureTrnRequest: t => t.WithFirstName("Jim").WithLastName("Smith")),
 
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: t => t.WithFirstName("Bob").WithLastName("Jones")),
+                configureTrnRequest: t => t.WithFirstName("Bob").WithLastName("Jones")),
         };
 
         var request = new HttpRequestMessage(HttpMethod.Get,
@@ -125,13 +125,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId,
                 createdOn: new DateTime(2025, 1, 1),
-                configureApiTrnRequest: t => t
+                configureTrnRequest: t => t
                     .WithFirstName("Zavier")
                     .WithDateOfBirth(new(2025, 1, 1))),
 
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId,
                 createdOn: new DateTime(2023, 10, 10),
-                configureApiTrnRequest: t => t
+                configureTrnRequest: t => t
                     .WithFirstName("Aaron")
                     .WithDateOfBirth(new(2023, 10, 10)))
         };

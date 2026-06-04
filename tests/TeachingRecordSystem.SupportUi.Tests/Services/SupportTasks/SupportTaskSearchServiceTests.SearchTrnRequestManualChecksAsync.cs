@@ -42,14 +42,14 @@ public partial class SupportTaskSearchServiceTests
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser1.UserId,
                 createdOn: new DateTime(2025, 1, 20),
-                configureApiTrnRequest: r => r
+                configureTrnRequest: r => r
                     .WithDateOfBirth(new DateOnly(1990, 1, 10))
                     .WithFirstName("Alice")
                     .WithMiddleName("The")
                     .WithLastName("Apple")),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(applicationUser2.UserId,
                 createdOn: new DateTime(2025, 1, 21),
-                configureApiTrnRequest: r => r
+                configureTrnRequest: r => r
                     .WithDateOfBirth(new DateOnly(1990, 1, 11))
                     .WithFirstName("Bob")
                     .WithMiddleName("A")
@@ -115,17 +115,17 @@ public partial class SupportTaskSearchServiceTests
         var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 20),
-                configureApiTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
+                configureTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 21),
-                configureApiTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
+                configureTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
             ["ST3"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 22),
-                configureApiTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Apple")),
+                configureTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Apple")),
             ["ST4"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 23),
-                configureApiTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("A").WithLastName("Banana")),
+                configureTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("A").WithLastName("Banana")),
             ["ST5"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 24),
-                configureApiTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("The").WithLastName("Yellow")),
+                configureTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("The").WithLastName("Yellow")),
             ["ST6"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 25),
-                configureApiTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("The").WithLastName("Banana"))
+                configureTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("The").WithLastName("Banana"))
         };
 
         // Act
@@ -177,17 +177,17 @@ public partial class SupportTaskSearchServiceTests
         var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
+                configureTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
+                configureTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
             ["ST3"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Apple")),
+                configureTrnRequest: r => r.WithFirstName("Alice").WithMiddleName("A").WithLastName("Apple")),
             ["ST4"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("A").WithLastName("Banana")),
+                configureTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("A").WithLastName("Banana")),
             ["ST5"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("The").WithLastName("Yellow")),
+                configureTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("The").WithLastName("Yellow")),
             ["ST6"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("The").WithLastName("Banana"))
+                configureTrnRequest: r => r.WithFirstName("Bob").WithMiddleName("The").WithLastName("Banana"))
         };
 
         // Act
@@ -210,8 +210,8 @@ public partial class SupportTaskSearchServiceTests
         // Arrange
         var tasks = new SupportTaskLookup
         {
-            ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: r => r.WithDateOfBirth(new DateOnly(1990, 1, 10))),
-            ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureApiTrnRequest: r => r.WithDateOfBirth(new DateOnly(1990, 1, 11))),
+            ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureTrnRequest: r => r.WithDateOfBirth(new DateOnly(1990, 1, 10))),
+            ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(configureTrnRequest: r => r.WithDateOfBirth(new DateOnly(1990, 1, 11))),
         };
 
         // Act
@@ -309,17 +309,17 @@ public partial class SupportTaskSearchServiceTests
         var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: t => t.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
+                configureTrnRequest: t => t.WithFirstName("Alice").WithMiddleName("The").WithLastName("Apple")),
             ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: t => t.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
+                configureTrnRequest: t => t.WithFirstName("Alice").WithMiddleName("A").WithLastName("Zephyr")),
             ["ST3"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: t => t.WithFirstName("Alice").WithMiddleName("A").WithLastName("Apple")),
+                configureTrnRequest: t => t.WithFirstName("Alice").WithMiddleName("A").WithLastName("Apple")),
             ["ST4"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: t => t.WithFirstName("Bob").WithMiddleName("A").WithLastName("Banana")),
+                configureTrnRequest: t => t.WithFirstName("Bob").WithMiddleName("A").WithLastName("Banana")),
             ["ST5"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: t => t.WithFirstName("Bob").WithMiddleName("The").WithLastName("Yellow")),
+                configureTrnRequest: t => t.WithFirstName("Bob").WithMiddleName("The").WithLastName("Yellow")),
             ["ST6"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(
-                configureApiTrnRequest: t => t.WithFirstName("Bob").WithMiddleName("The").WithLastName("Banana")),
+                configureTrnRequest: t => t.WithFirstName("Bob").WithMiddleName("The").WithLastName("Banana")),
         };
 
         // Act
