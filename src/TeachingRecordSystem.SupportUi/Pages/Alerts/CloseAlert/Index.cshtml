@@ -9,7 +9,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.Alerts.CloseAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form method="post">
             <span class="govuk-caption-l">Close alert -@Model.PersonName</span>
 
             <govuk-date-input for="EndDate" error-message-prefix="Alert end date">

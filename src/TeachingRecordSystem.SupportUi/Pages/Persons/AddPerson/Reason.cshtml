@@ -12,7 +12,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.Persons.AddPerson.Reason(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
+        <form method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="create-reason-caption">Create a record</span>
             <govuk-radios for="Reason" data-testid="create-reason-options">
                 <govuk-radios-fieldset>

@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.Alerts.AddAlert.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form method="post">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
 
             <govuk-date-input for="StartDate" error-message-prefix="Start date">

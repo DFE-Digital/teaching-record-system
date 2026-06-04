@@ -32,7 +32,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.Persons.PersonDetail.EditDetails.Index(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
+        <form method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="edit-details-caption">@Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 

@@ -10,7 +10,7 @@
         <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
         
         <div class="govuk-!-margin-top-6">
-            <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
+            <form method="get" asp-antiforgery="false" data-testid="search-form">
                 <div class="govuk-!-margin-bottom-4">
                     <govuk-input for="Search" data-testid="search-input" type="search" autocomplete="off">
                         <govuk-input-label>
@@ -35,7 +35,7 @@
         <div class="trs-filter__container govuk-!-margin-bottom-6">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">Filter by</h3>
 
-            <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false">
+            <form method="get" asp-antiforgery="false">
                 <input type="hidden" asp-for="Search" />            
                 
                 <div class="govuk-grid-row">

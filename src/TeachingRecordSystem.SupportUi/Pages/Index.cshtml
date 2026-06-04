@@ -11,7 +11,7 @@
     <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-m">@ViewBag.Title</h2>
         <div class="govuk-!-margin-bottom-6">
-            <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
+            <form method="get" asp-antiforgery="false" data-testid="search-form">
                 <div class="govuk-!-margin-bottom-4">
                     <govuk-input name="Search" data-testid="search-input" type="search">
                         <govuk-input-label>
