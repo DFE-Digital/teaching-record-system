@@ -589,10 +589,10 @@
       },
       "NSign.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.2.3",
-        "contentHash": "kyWbdsFJkVD+o9GeEJUs1HzubHsIadElflyUTFBzTtYQ/pV0H9qarYsUpimOe+ep5XODubmjEltPfjlC+A1b6A==",
+        "resolved": "1.2.4",
+        "contentHash": "7u+Rvo1DeHoRo7+KUD4IrsjK30miSd9gYEcwXL30T5NPXxeN/NIFTzdrNljCMl9o87eZ5SkgnDuDbDfl0OKRYQ==",
         "dependencies": {
-          "StructuredFieldValues": "0.7.6"
+          "StructuredFieldValues": "0.7.7"
         }
       },
       "OpenIddict.Abstractions": {
@@ -686,8 +686,8 @@
       },
       "StructuredFieldValues": {
         "type": "Transitive",
-        "resolved": "0.7.6",
-        "contentHash": "4cz+5Oxeb8pN19k0XqaACJYXwMAn25wxRw0h1KL+hcAXOAxGl9ArH7Jx0y3FyPao2VxSAbj0UJUkE8/i8XReoA=="
+        "resolved": "0.7.7",
+        "contentHash": "eqrFBXmowuor0M6KLjbkm8tfjADW9Jqy2rQi+SUrNkwU/AuDVHgHLAWmRhHiYVhq57QYzZNmdyKnsYWJTW0d/g=="
       },
       "Swashbuckle.AspNetCore.Swagger": {
         "type": "Transitive",
@@ -910,8 +910,8 @@
           "Microsoft.EntityFrameworkCore.InMemory": "[10.0.8, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.8, )",
           "Microsoft.Extensions.Azure": "[1.14.0, )",
-          "NSign.Client": "[1.2.3, )",
-          "NSign.SignatureProviders": "[1.2.3, )",
+          "NSign.Client": "[1.2.4, )",
+          "NSign.SignatureProviders": "[1.2.4, )",
           "Npgsql.DependencyInjection": "[10.0.2, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.1, )",
           "OneOf": "[3.0.271, )",
@@ -954,6 +954,8 @@
           "JetBrains.Annotations": "[2025.2.4, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[10.0.8, )",
           "Microsoft.Extensions.Caching.Postgres": "[1.2.2, )",
+          "NSign.Client": "[1.2.4, )",
+          "NSign.SignatureProviders": "[1.2.4, )",
           "OpenIddict.EntityFrameworkCore": "[7.5.0, )",
           "Sentry.AspNetCore": "[6.6.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
@@ -1320,21 +1322,21 @@
       },
       "NSign.Client": {
         "type": "CentralTransitive",
-        "requested": "[1.2.3, )",
-        "resolved": "1.2.3",
-        "contentHash": "XjX7xhiE3Unw0C0ygJ6NSkekt/hAIOSQdWPJ8AODOwhu9rekNnW3NRP+SVMPcqB1kOtoMXpRyTFqmB1VLA8ikA==",
+        "requested": "[1.2.4, )",
+        "resolved": "1.2.4",
+        "contentHash": "KEtltC11s8EXRGfAomu1dzUwzMEZ5mC0ZkwVBH5BE3jNZig+z5UpTxGBmDblSDcOmkPwgZd2+ZKT1jbYH2l0QQ==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.3",
-          "StructuredFieldValues": "0.7.6"
+          "NSign.Abstractions": "1.2.4",
+          "StructuredFieldValues": "0.7.7"
         }
       },
       "NSign.SignatureProviders": {
         "type": "CentralTransitive",
-        "requested": "[1.2.3, )",
-        "resolved": "1.2.3",
-        "contentHash": "6C33NTJNxzi3E6IdZ4VdLSgaYMNypiJssHS6uqoEAGKg9SDLWp2QxuQJXtzHf3gtMoXapzULhpirHccPxtDs5g==",
+        "requested": "[1.2.4, )",
+        "resolved": "1.2.4",
+        "contentHash": "ElFmVZ6gpN1wo+l6rI7vd2gT2E25baWHZ9glILidYoa/xmDvYD7HvXc/wKSjG4DbL6zfJLidyzwo4TBWYfF3Mg==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.3"
+          "NSign.Abstractions": "1.2.4"
         }
       },
       "OneOf": {
