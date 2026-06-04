@@ -114,12 +114,12 @@
       },
       "GovukNotify": {
         "type": "Direct",
-        "requested": "[7.2.0, )",
-        "resolved": "7.2.0",
-        "contentHash": "FMGqbjf+WO9uhEgrat9MQ7N1hnAsD3ycn2g24FnPPR3/UNFbIT5PxKDobE/kRRU0rxdx27yWG83FrraszL/+LQ==",
+        "requested": "[8.0.0, )",
+        "resolved": "8.0.0",
+        "contentHash": "VFvDQgI4XXNjImj9V76AWmUtuiP21mcsDgk5VJJanEbQcqFDuzazBwFYegwshuvyfjj9Z7hjFB1EbhSiDT9LhA==",
         "dependencies": {
-          "JWT": "[7.1.0, 9.0.0)",
-          "Newtonsoft.Json": "[10.0.3, 14.0.0)"
+          "JWT": "[11.0.0, 12.0.0]",
+          "Newtonsoft.Json": "[13.0.4, 14.0.0]"
         }
       },
       "Hangfire.Core": {
@@ -633,11 +633,10 @@
       },
       "JWT": {
         "type": "Transitive",
-        "resolved": "7.1.0",
-        "contentHash": "z33XjdWSKszw/SRde6fvVsCL2gaKdktZDHJIfpp0RqzNU7RQIaWC4wHUVV2i3RzQSsvQ4bjI3/2kwEAT5S62nA==",
+        "resolved": "11.0.0",
+        "contentHash": "jOT1PA95jgf78CqWsKt8hz9Uzv4J39vukzf5nYtfky9N6wl1W4vIXT1CdkQI7zG20HnApEMtmpC/pMtCKr4rvw==",
         "dependencies": {
-          "Newtonsoft.Json": "9.0.1",
-          "System.Reflection.TypeExtensions": "4.7.0"
+          "Newtonsoft.Json": "13.0.3"
         }
       },
       "MedallionTopologicalSort": {
@@ -1084,8 +1083,8 @@
       },
       "Newtonsoft.Json": {
         "type": "Transitive",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
+        "resolved": "13.0.4",
+        "contentHash": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A=="
       },
       "Npgsql": {
         "type": "Transitive",
@@ -1232,11 +1231,6 @@
         "type": "Transitive",
         "resolved": "10.0.3",
         "contentHash": "MaGhRfGunmrj/nHjtsi9XkhlYJ/ERGWrbA+BiSKNtGnAjc9XlG5EhAvak6VRcX5LYzPF6pBO8nJ613dTgzabig=="
-      },
-      "System.Reflection.TypeExtensions": {
-        "type": "Transitive",
-        "resolved": "4.7.0",
-        "contentHash": "VybpaOQQhqE6siHppMktjfGBw1GCwvCqiufqmP8F1nj7fTUNtW35LOEt3UZTEsECfo+ELAl/9o9nJx3U91i7vA=="
       },
       "System.Security.Cryptography.Pkcs": {
         "type": "Transitive",
