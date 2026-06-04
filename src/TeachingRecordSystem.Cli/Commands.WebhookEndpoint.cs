@@ -291,7 +291,8 @@ public partial class Commands
                         changes |= WebhookEndpointUpdatedChanges.Address;
                     }
 
-                    if (parseResult.GetValue(cloudEventTypesOption) is { } cloudEventTypes)
+                    if (parseResult.GetResult(cloudEventTypesOption)?.Implicit is false &&
+                        parseResult.GetValue(cloudEventTypesOption) is { } cloudEventTypes)
                     {
                         endpoint.CloudEventTypes = cloudEventTypes.Order().ToList();
                         changes |= WebhookEndpointUpdatedChanges.CloudEventTypes;
