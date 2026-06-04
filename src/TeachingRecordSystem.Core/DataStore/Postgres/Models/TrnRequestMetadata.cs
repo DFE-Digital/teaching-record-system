@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class TrnRequestMetadata
@@ -36,4 +38,18 @@ public class TrnRequestMetadata
     public Guid? NpqEvidenceFileId { get; init; }
     public string? NpqEvidenceFileName { get; init; }
     public string? WorkEmailAddress { get; init; }
+
+    [MemberNotNullWhen(true, nameof(IdentityVerified))]
+    public (string[][] Names, DateOnly[] DatesOfBirth)? GetVerifiedInfo()
+    {
+        if (IdentityVerified is not true)
+        {
+            return null;
+        }
+
+        string[] name = new[] { FirstName!, MiddleName!, LastName! }.Where(n => !string.IsNullOrEmpty(n)).ToArray();
+        var dateOfBirth = DateOfBirth;
+
+        return ([name], [dateOfBirth]);
+    }
 }

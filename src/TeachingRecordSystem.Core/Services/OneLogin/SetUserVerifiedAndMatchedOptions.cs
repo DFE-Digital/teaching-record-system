@@ -4,6 +4,7 @@ public record SetUserVerifiedAndMatchedOptions
 {
     public required string OneLoginUserSubject { get; init; }
     public required OneLoginUserVerificationRoute VerificationRoute { get; init; }
+    public Guid? VerifiedByApplicationUserId { get; init; }
     public required DateOnly[] VerifiedDatesOfBirth { get; init; }
     public required string[][] VerifiedNames { get; init; }
     public required string? CoreIdentityClaimVc { get; init; }
