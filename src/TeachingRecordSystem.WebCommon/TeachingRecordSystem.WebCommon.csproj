@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer.Core" />
+    <PackageReference Include="NSign.Client" />
+    <PackageReference Include="NSign.SignatureProviders" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
   </ItemGroup>
