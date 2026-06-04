@@ -1,6 +1,5 @@
 @page "/users/add/confirm"
-@using TeachingRecordSystem.Core;
-@using TeachingRecordSystem.Core.Legacy
+@using TeachingRecordSystem.Core
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @model TeachingRecordSystem.SupportUi.Pages.Users.AddUser.ConfirmModel
 @{
@@ -88,7 +87,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Add user</govuk-button>
-                <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users.Index()>Cancel and return to users</govuk-button-link>
+                <govuk-button-link class="govuk-button--secondary" href="@LinkGenerator.Users.Index()">Cancel and return to users</govuk-button-link>
             </div>
         </form>
     </div>
