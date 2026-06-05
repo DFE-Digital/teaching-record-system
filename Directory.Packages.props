@@ -12,7 +12,7 @@
     <PackageVersion Include="AspNetCore.SassCompiler" Version="1.99.0" />
     <PackageVersion Include="AutoMapper" Version="13.0.1" />
     <PackageVersion Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" Version="1.5.3" />
-    <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.29.0" />
     <PackageVersion Include="Azure.Storage.Files.DataLake" Version="12.24.0" />
     <PackageVersion Include="Castle.Core" Version="5.1.1" />
     <PackageVersion Include="CloudNative.CloudEvents" Version="2.8.0" />
