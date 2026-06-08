@@ -124,7 +124,7 @@ public static class Extensions
 
                 options.DisableAccessTokenEncryption();
                 options.SetAccessTokenLifetime(TimeSpan.FromHours(1));
-                options.SetRefreshTokenLifetime(TimeSpan.FromDays(10));
+                options.SetRefreshTokenLifetime(TimeSpan.FromDays(7));
 
                 if (environment.IsProduction())
                 {
