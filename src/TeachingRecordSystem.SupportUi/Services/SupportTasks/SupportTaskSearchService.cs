@@ -61,7 +61,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser!.Name))
+                t.TrnRequestMetadata.ApplicationUser!.ShortName ?? t.TrnRequestMetadata.ApplicationUser.Name))
             .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
 
         return new()
@@ -198,7 +198,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.DateOfBirth,
                 t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser!.Name))
+                t.TrnRequestMetadata.ApplicationUser!.ShortName ?? t.TrnRequestMetadata.ApplicationUser!.Name))
             .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
 
         return new()
