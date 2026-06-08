@@ -442,6 +442,13 @@ public class SignInJourneyCoordinator(
         var delegatedProperties = new AuthenticationProperties();
         delegatedProperties.SetVectorsOfTrust([vtr]);
         delegatedProperties.Items.Add(JourneySignInHandler.PropertyKeys.JourneyInstanceId, InstanceId.ToString());
+
+        // Ensure RedirectUri is set.
+        // (By default RedirectUri will be set to the current URL, which is often quite large.
+        // That then gets bundled into the `state` parameter and can end up with a URL that's over OneLogin's limits.)
+        // The actual value is unimportant since we intercept the callback and handle the redirect ourselves.
+        delegatedProperties.RedirectUri = "/";
+
         return Results.Challenge(delegatedProperties, authenticationSchemes: [State.OneLoginAuthenticationScheme]);
     }
 
