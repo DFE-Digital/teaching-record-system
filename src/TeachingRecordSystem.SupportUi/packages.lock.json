@@ -916,6 +916,7 @@
           "JetBrains.Annotations": "[2025.2.4, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[10.0.8, )",
           "Microsoft.Extensions.Caching.Postgres": "[1.2.2, )",
+          "Mime-Detective": "[25.8.1, )",
           "NSign.Client": "[1.2.4, )",
           "NSign.SignatureProviders": "[1.2.4, )",
           "OpenIddict.EntityFrameworkCore": "[7.5.0, )",
@@ -1204,6 +1205,12 @@
           "Microsoft.Bcl.TimeProvider": "10.0.5",
           "Npgsql": "10.0.2"
         }
+      },
+      "Mime-Detective": {
+        "type": "CentralTransitive",
+        "requested": "[25.8.1, )",
+        "resolved": "25.8.1",
+        "contentHash": "PxCKFfrFxc6rdiVliZjmOlYQ246KY45RDNRwyvG7UVhbyYn/W4nX5sOBcyUWuX8F9vRJ2Vy7jmBnvYqvuMSrtw=="
       },
       "morelinq": {
         "type": "CentralTransitive",
