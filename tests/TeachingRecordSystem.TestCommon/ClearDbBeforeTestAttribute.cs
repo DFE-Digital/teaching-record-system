@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Transactions;
 using Xunit.v3;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -11,6 +12,8 @@ public class ClearDbBeforeTestAttribute : BeforeAfterTestAttribute
         {
             throw new InvalidOperationException("Tests must be inside a collection with DisableParallelization set to true.");
         }
+
+        using var sc = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
 
 #pragma warning disable VSTHRD002
         DbHelper.Instance.ClearDataAsync().GetAwaiter().GetResult();
