@@ -39,3 +39,5 @@ jobs:
           validation-plan: ${{ matrix.validation_plan }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL_INFRA }}
+          gcp-wip: ${{ vars.GCP_WIP }}
+          gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
