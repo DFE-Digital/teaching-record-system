@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form data-testid="submit-form" action="@LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form data-testid="submit-form" method="post">
             <span class="govuk-caption-l">Enter induction details - @Model.PersonName</span>
 
             <govuk-date-input for="CompletedDate">

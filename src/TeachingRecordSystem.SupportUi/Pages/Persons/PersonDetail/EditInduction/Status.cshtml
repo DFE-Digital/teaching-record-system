@@ -15,7 +15,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <span data-testid="induction-status-caption" class="govuk-caption-l">Edit induction details - @Model.PersonName</span>
-        <form data-testid="submit-form" action="@LinkGenerator.Persons.PersonDetail.EditInduction.Status(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form data-testid="submit-form" method="post">
             <govuk-radios for="InductionStatus">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="status-choices-legend" class="govuk-fieldset__legend--l" is-page-heading="true">Select an induction status</govuk-radios-fieldset-legend>

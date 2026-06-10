@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.Alerts.EditAlert.Details.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form method="post">
             <span class="govuk-caption-l">Edit alert - @Model.PersonName</span>
 
             <govuk-character-count for="Details" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows" data-testid="details">

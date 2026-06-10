@@ -58,7 +58,6 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await AssertEx.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
-        Assert.Contains($"/persons/{person.PersonId}/edit-induction/status", form.Action);
         var buttons = form.GetElementsByTagName("button").Select(button => button as IHtmlButtonElement);
         Assert.Equal(2, buttons.Count());
         Assert.Equal("Continue", buttons.ElementAt(0)!.TrimmedText());

@@ -12,7 +12,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.Persons.PersonDetail.EditDetails.NameChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
+        <form method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="edit-details-caption">Change name - @Model.PersonName</span>
 
             <govuk-radios for="Reason" data-testid="change-reason-options">

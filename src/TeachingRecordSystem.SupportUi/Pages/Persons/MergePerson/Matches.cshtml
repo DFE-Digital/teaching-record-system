@@ -95,7 +95,7 @@
             }
         </div>
 
-        <form action="@Model.GetPageLink(MergePersonJourneyPage.Matches)" method="post" data-testid="submit-form">
+        <form method="post" data-testid="submit-form">
             @if (Model.CannotMergeReason is null)
             {
                 <govuk-radios for="PrimaryPersonId" data-testid="primary-person-options">

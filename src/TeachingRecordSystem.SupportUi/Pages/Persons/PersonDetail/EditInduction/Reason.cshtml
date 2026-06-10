@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form method="post">
             <span class="govuk-caption-l">Enter induction details - @Model.PersonName</span>
             <govuk-radios for="ChangeReason" data-testid="reason-options">
                 <govuk-radios-fieldset>

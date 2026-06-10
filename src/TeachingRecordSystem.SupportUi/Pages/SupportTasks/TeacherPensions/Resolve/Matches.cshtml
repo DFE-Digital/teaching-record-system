@@ -10,7 +10,7 @@
     <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) : LinkGenerator.SupportTasks.TeacherPensions.Index())"/>
 }
 
-<form action="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+<form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">Third-party tasks</span>

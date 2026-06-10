@@ -13,7 +13,7 @@
         <span class="govuk-caption-l">Edit mandatory qualification - @Model.PersonName</span>
         <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
-        <form action="@LinkGenerator.Mqs.EditMq.StartDate.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form method="post">
             <govuk-summary-list data-testid="change-summary">
                 <row>
                     <key>New start date</key>
