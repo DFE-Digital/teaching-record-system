@@ -74,26 +74,6 @@
   white-space: wrap;
 }
 
-.trs-support-tasks {
-  display: flex;
-  align-items: flex-start;
-  gap: 18px;
-}
-
-.trs-support-tasks__filters {
-  flex: 0 0 240px;
-  border: 1px solid grey;
-  padding: 10px;
-}
-
-.trs-support-tasks__list {
-  flex: 1;
-}
-
-.trs-support-tasks__list__sort-by {
-  margin-top: 11px; /* trs-support-tasks__filters's padding + border width */
-}
-
 .trs-table-layout-fixed {
   table-layout: fixed;
 }
@@ -102,36 +82,10 @@
   display: inline;
 }
 
-.trs-\!-width-70 {
-  width: 70px !important;
-}
-
-.trs-\!-width-80 {
-  width: 80px !important;
-}
-
-.trs-\!-width-110 {
-  width: 110px !important;
-}
-
-.trs-\!-width-120 {
-  width: 120px !important;
-}
-
-.trs-\!-width-130 {
-  width: 130px !important;
-}
-
-.trs-\!-width-150 {
-  width: 150px !important;
-}
-
-.trs-\!-width-200 {
-  width: 200px !important;
-}
-
-.trs-\!-width-300 {
-  width: 300px !important;
+@each $size in 70, 80, 90, 100, 110, 120, 130, 150, 200 {
+  .trs-\!-width-#{$size} {
+    width: #{$size}px !important;
+  }
 }
 
 .trs-\!-max-width-none {
@@ -281,9 +235,26 @@
   }
 }
 
-.trs-filter__container {
+.trs-horizontal-filters {
   background-color: govuk-colour("black", $variant: "tint-95");
   padding: 20px;
+
+  &__heading {
+    @extend .govuk-\!-margin-bottom-3;
+  }
+
+  &__container {
+    display: flex;
+  }
+
+  &__options {
+    flex: 1;
+  }
+
+  &__actions {
+    flex: none;
+    @extend .govuk-\!-margin-left-5;
+  }
 }
 
 .govuk-radios.trs-user-roles {
@@ -498,4 +469,8 @@
 
 .trs-break-word {
   word-wrap: break-word;
+}
+
+.trs-empty-fallback {
+  color: govuk-colour("black", $variant: "tint-25");
 }

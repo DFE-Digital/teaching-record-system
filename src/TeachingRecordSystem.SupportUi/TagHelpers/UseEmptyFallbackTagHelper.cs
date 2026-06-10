@@ -1,3 +1,5 @@
+using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace TeachingRecordSystem.SupportUi.TagHelpers;
@@ -14,7 +16,8 @@ public class UseEmptyFallbackTagHelper : TagHelper
 
         if (content.IsEmptyOrWhiteSpace)
         {
-            output.Content.SetContent(WebCommon.WebConstants.EmptyFallbackContent);
+            output.AddClass("trs-empty-fallback", HtmlEncoder.Default);
+            output.Content.SetContent(WebConstants.EmptyFallbackContent);
         }
     }
 }
