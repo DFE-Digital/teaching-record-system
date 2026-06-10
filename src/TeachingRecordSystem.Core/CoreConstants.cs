@@ -5,6 +5,7 @@ namespace TeachingRecordSystem.Core;
 public static class CoreConstants
 {
     public const string DateDisplayFormat = "d MMMM yyyy";
+    public const string DateShortDisplayFormat = "d MMM yyyy";
 
     public static readonly CultureInfo EnGbCulture = CultureInfo.GetCultureInfo("en-GB");
 }

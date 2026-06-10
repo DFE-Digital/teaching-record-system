@@ -23,7 +23,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(), new());
+        var result = await SearchTrnRequestsAsync(new(Search: null, SourceApplicationUserIds: []), new());
 
         // Assert
         Assert.Equal(1, result.TotalTaskCount);
@@ -55,7 +55,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(), new());
+        var result = await SearchTrnRequestsAsync(new(Search: null, SourceApplicationUserIds: []), new());
 
         // Assert
         Assert.Equal(2, result.TotalTaskCount);
@@ -92,7 +92,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(Search: ""), new());
+        var result = await SearchTrnRequestsAsync(new(Search: "", SourceApplicationUserIds: []), new());
 
         // Assert
         Assert.Equal(2, result.TotalTaskCount);
@@ -118,7 +118,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(Search: searchText), new());
+        var result = await SearchTrnRequestsAsync(new(Search: searchText, SourceApplicationUserIds: []), new());
 
         // Assert
         Assert.Equal(3, result.TotalTaskCount);
@@ -136,7 +136,7 @@ public partial class SupportTaskSearchServiceTests
         await TestData.CreateTrnRequestSupportTaskAsync(configure: r => r.WithCreatedOn(new DateTime(2025, 1, 20)));
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(Search: searchText), new());
+        var result = await SearchTrnRequestsAsync(new(Search: searchText, SourceApplicationUserIds: []), new());
 
         // Assert
         Assert.Equal(1, result.TotalTaskCount);
@@ -155,7 +155,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(Search: "bob@example.com"), new());
+        var result = await SearchTrnRequestsAsync(new(Search: "bob@example.com", SourceApplicationUserIds: []), new());
 
         // Assert
         Assert.Equal(2, result.TotalTaskCount);
@@ -171,7 +171,7 @@ public partial class SupportTaskSearchServiceTests
         await TestData.CreateTrnRequestSupportTaskAsync(configure: r => r.WithEmailAddress("bob@example.com"));
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(Search: "bob@example"), new());
+        var result = await SearchTrnRequestsAsync(new(Search: "bob@example", SourceApplicationUserIds: []), new());
 
         // Assert
         Assert.Equal(2, result.TotalTaskCount);
@@ -200,7 +200,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(Search: searchText), new());
+        var result = await SearchTrnRequestsAsync(new(Search: searchText, SourceApplicationUserIds: []), new());
 
         // Assert
         Assert.Equal(6, result.TotalTaskCount);
@@ -225,7 +225,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(SortBy: TrnRequestsSortByOption.Name, SortDirection: sortDirection), new());
+        var result = await SearchTrnRequestsAsync(new(Search: null, SourceApplicationUserIds: [], SortBy: TrnRequestsSortByOption.Name, SortDirection: sortDirection), new());
 
         // Assert
         Assert.Equal(6, result.TotalTaskCount);
@@ -249,7 +249,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(SortBy: TrnRequestsSortByOption.Email, SortDirection: sortDirection), new());
+        var result = await SearchTrnRequestsAsync(new(Search: null, SourceApplicationUserIds: [], SortBy: TrnRequestsSortByOption.Email, SortDirection: sortDirection), new());
 
         // Assert
         Assert.Equal(2, result.TotalTaskCount);
@@ -273,7 +273,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(SortBy: TrnRequestsSortByOption.RequestedOn, SortDirection: sortDirection), new());
+        var result = await SearchTrnRequestsAsync(new(Search: null, SourceApplicationUserIds: [], SortBy: TrnRequestsSortByOption.RequestedOn, SortDirection: sortDirection), new());
 
         // Assert
         Assert.Equal(4, result.TotalTaskCount);
@@ -298,7 +298,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(SortBy: TrnRequestsSortByOption.Source, SortDirection: sortDirection), new());
+        var result = await SearchTrnRequestsAsync(new(Search: null, SourceApplicationUserIds: [], SortBy: TrnRequestsSortByOption.Source, SortDirection: sortDirection), new());
 
         // Assert
         Assert.Equal(2, result.TotalTaskCount);
@@ -328,7 +328,7 @@ public partial class SupportTaskSearchServiceTests
         });
 
         // Act
-        var result = await SearchTrnRequestsAsync(new(), new(PageNumber: pageNumber, ItemsPerPage: 2));
+        var result = await SearchTrnRequestsAsync(new(Search: null, SourceApplicationUserIds: []), new(PageNumber: pageNumber, ItemsPerPage: 2));
 
         // Assert
         Assert.Equal(5, result.TotalTaskCount);
@@ -352,13 +352,128 @@ public partial class SupportTaskSearchServiceTests
 
         // Act
         var result = await SearchTrnRequestsAsync(
-            new(Search: "A", SortBy: TrnRequestsSortByOption.Name, SortDirection: SortDirection.Descending),
+            new(Search: "A", SourceApplicationUserIds: [], SortBy: TrnRequestsSortByOption.Name, SortDirection: SortDirection.Descending),
             new(PageNumber: 2, ItemsPerPage: 2));
 
         // Assert
         Assert.Equal(6, result.TotalTaskCount);
         Assert.Equal(3, result.SearchResults.TotalItemCount);
         Assert.Equal(["ST3"], tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Fact]
+    public async Task SearchTrnRequestsAsync_FilterBySourceApplication_ReturnsTasksForMatchingApplicationUsersOnly()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser3 = await TestData.CreateApplicationUserAsync(name: "C application");
+
+        var tasks = SupportTaskLookup.Create(new()
+        {
+            ["ST1"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId),
+            ["ST2"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser2.UserId),
+            ["ST3"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser3.UserId),
+        });
+
+        // Act
+        var result = await SearchTrnRequestsAsync(
+            new(Search: null, SourceApplicationUserIds: [applicationUser1.UserId, applicationUser3.UserId]),
+            new());
+
+        // Assert
+        Assert.Equal(3, result.TotalTaskCount);
+        Assert.Equal(2, result.SearchResults.TotalItemCount);
+        Assert.Equal(["ST1", "ST3"], tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Fact]
+    public async Task SearchTrnRequestsAsync_FilterBySourceApplicationCombinedWithSearch_AppliesBothFilters()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+
+        var tasks = SupportTaskLookup.Create(new()
+        {
+            ["ST1"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId, r => r.WithFirstName("Alice")),
+            ["ST2"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser2.UserId, r => r.WithFirstName("Alice")),
+            ["ST3"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId, r => r.WithFirstName("Bob")),
+        });
+
+        // Act
+        var result = await SearchTrnRequestsAsync(
+            new(Search: "Alice", SourceApplicationUserIds: [applicationUser1.UserId]),
+            new());
+
+        // Assert
+        Assert.Equal(["ST1"], tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Fact]
+    public async Task SearchTrnRequestsAsync_BySourceApplication_ReturnsCountOfOpenTasksPerApplicationUserBeforeSourceFilterApplied()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+
+        var tasks = SupportTaskLookup.Create(new()
+        {
+            ["ST1"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId),
+            ["ST2"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId),
+            ["ST3"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser2.UserId),
+        });
+
+        // Close one of application user 1's tasks - it should not be counted
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbTask = await dbContext.SupportTasks.FindAsync(tasks["ST2"].SupportTaskReference);
+            dbTask!.Status = SupportTaskStatus.Closed;
+            await dbContext.SaveChangesAsync();
+        });
+
+        // Act - filter to application user 2 only; the per-application counts should still cover both
+        var result = await SearchTrnRequestsAsync(
+            new(Search: null, SourceApplicationUserIds: [applicationUser2.UserId]),
+            new());
+
+        // Assert
+        Assert.Collection(
+            result.BySourceApplication.OrderBy(r => r.ApplicationUserId == applicationUser1.UserId ? 0 : 1),
+            r =>
+            {
+                Assert.Equal(applicationUser1.UserId, r.ApplicationUserId);
+                Assert.Equal(1, r.Count);
+            },
+            r =>
+            {
+                Assert.Equal(applicationUser2.UserId, r.ApplicationUserId);
+                Assert.Equal(1, r.Count);
+            });
+    }
+
+    [Fact]
+    public async Task SearchTrnRequestsAsync_BySourceApplication_RespectsSearchTextFilter()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+
+        SupportTaskLookup.Create(new()
+        {
+            ["ST1"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId, r => r.WithFirstName("Alice")),
+            ["ST2"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser2.UserId, r => r.WithFirstName("Bob")),
+        });
+
+        // Act
+        var result = await SearchTrnRequestsAsync(
+            new(Search: "Alice", SourceApplicationUserIds: []),
+            new());
+
+        // Assert - only application user 1 has a task matching the search
+        var bySource = Assert.Single(result.BySourceApplication);
+        Assert.Equal(applicationUser1.UserId, bySource.ApplicationUserId);
+        Assert.Equal(1, bySource.Count);
     }
 
     private Task<TrnRequestsSearchResult> SearchTrnRequestsAsync(TrnRequestsSearchOptions searchOptions, PaginationOptions paginationOptions) =>

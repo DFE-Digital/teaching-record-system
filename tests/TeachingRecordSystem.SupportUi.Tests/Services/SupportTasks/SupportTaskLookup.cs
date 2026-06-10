@@ -26,5 +26,4 @@ public class SupportTaskLookup : Dictionary<string, SupportTask>
 
     public static SupportTaskLookup Create(Dictionary<string, ISupportTaskCreateResult> results)
          => new(results.ToDictionary(r => r.Key, r => r.Value.SupportTask));
-
 }

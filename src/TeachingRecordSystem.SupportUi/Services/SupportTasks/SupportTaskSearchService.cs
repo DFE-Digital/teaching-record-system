@@ -8,11 +8,11 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 {
     private static readonly SupportTaskType[] _allChangeRequestTypes = [SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest];
 
-    public async Task<TrnRequestsSearchResult> SearchTrnRequestsAsync(TrnRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<TrnRequestsSearchResult> SearchTrnRequestsAsync(TrnRequestsSearchOptions options, PaginationOptions paginationOptions)
     {
-        var search = searchOptions.Search?.Trim() ?? string.Empty;
-        var sortBy = searchOptions.SortBy ?? TrnRequestsSortByOption.RequestedOn;
-        var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
+        var search = options.Search?.Trim() ?? string.Empty;
+        var sortBy = options.SortBy ?? TrnRequestsSortByOption.RequestedOn;
+        var sortDirection = options.SortDirection ?? SortDirection.Ascending;
 
         var tasks = dbContext.SupportTasks
             .Include(t => t.TrnRequestMetadata)
@@ -37,6 +37,16 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 nameParts.All(n => t.TrnRequestMetadata!.Name.Select(m => EF.Functions.Collate(m, Collations.CaseInsensitive)).Contains(n)));
         }
 
+        var resultsBySourceApplication = await tasks
+            .GroupBy(t => t.TrnRequestMetadata!.ApplicationUserId)
+            .Select(t => new TrnRequestsSearchResultBySourceApplication(t.Key, t.Count()))
+            .ToArrayAsync();
+
+        if (options.SourceApplicationUserIds.Count is not 0)
+        {
+            tasks = tasks.Where(t => options.SourceApplicationUserIds.Contains(t.TrnRequestMetadata!.ApplicationUserId));
+        }
+
         var totalFilteredTaskCount = await tasks.CountAsync();
 
         tasks = sortBy switch
@@ -53,7 +63,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 .OrderBy(t => t.CreatedOn, sortDirection)
         };
 
-        var searchResuts = await tasks
+        var searchResults = await tasks
             .Select(t => new TrnRequestsSearchResultItem(
                 t.SupportTaskReference,
                 t.TrnRequestMetadata!.FirstName!,
@@ -67,13 +77,13 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         return new()
         {
             TotalTaskCount = totalTaskCount,
-            SearchResults = searchResuts
+            SearchResults = searchResults,
+            BySourceApplication = resultsBySourceApplication
         };
     }
 
     public async Task<ChangeRequestsSearchResult> SearchChangeRequestsAsync(ChangeRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
     {
-
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? ChangeRequestsSortByOption.RequestedOn;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;

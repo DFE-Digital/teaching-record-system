@@ -1,7 +1,8 @@
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 public record TrnRequestsSearchOptions(
-    string? Search = null,
+    string? Search,
+    IReadOnlyCollection<Guid> SourceApplicationUserIds,
     TrnRequestsSortByOption? SortBy = null,
     SortDirection? SortDirection = null);
 

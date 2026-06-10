@@ -4,6 +4,7 @@ public record TrnRequestsSearchResult
 {
     public required int TotalTaskCount { get; init; }
     public required ResultPage<TrnRequestsSearchResultItem> SearchResults { get; init; }
+    public required IReadOnlyCollection<TrnRequestsSearchResultBySourceApplication> BySourceApplication { get; init; }
 }
 
 public record TrnRequestsSearchResultItem(
@@ -14,3 +15,5 @@ public record TrnRequestsSearchResultItem(
     string? EmailAddress,
     DateTime CreatedOn,
     string SourceApplicationName) : ISupportTaskSearchResult;
+
+public record TrnRequestsSearchResultBySourceApplication(Guid ApplicationUserId, int Count);
