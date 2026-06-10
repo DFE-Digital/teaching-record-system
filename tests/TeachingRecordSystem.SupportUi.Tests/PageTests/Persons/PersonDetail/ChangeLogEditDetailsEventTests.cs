@@ -157,8 +157,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
         {
-            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
-            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(oldDateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(oldDateOfBirth?.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
         }
         else
         {

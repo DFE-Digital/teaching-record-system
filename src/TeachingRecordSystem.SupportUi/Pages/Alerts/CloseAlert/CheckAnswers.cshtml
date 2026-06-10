@@ -38,11 +38,11 @@
                 </row>
                 <row>
                     <key>Start date</key>
-                    <value data-testid="start-date">@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="start-date">@Model.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
                 <row>
                     <key>End date</key>
-                    <value data-testid="end-date">@Model.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="end-date">@Model.EndDate!.Value.ToString(WebConstants.DateDisplayFormat)</value>
                     <row-actions>
                         <action href="@LinkGenerator.Alerts.CloseAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="end date">Change</action>
                     </row-actions>

@@ -93,8 +93,8 @@
                     Model.DateOfBirth!.Different,
                     Model.DateOfBirth!.Highlight,
                     Html.NameFor(m => m.DateOfBirthSource),
-                    Model.DateOfBirth!.TrnRequestValue?.ToString(WebConstants.DateOnlyDisplayFormat),
-                    Model.DateOfBirth!.ExistingRecordValue?.ToString(WebConstants.DateOnlyDisplayFormat),
+                    Model.DateOfBirth!.TrnRequestValue?.ToString(WebConstants.DateDisplayFormat),
+                    Model.DateOfBirth!.ExistingRecordValue?.ToString(WebConstants.DateDisplayFormat),
                     Model.DateOfBirthSource);
 
                 await RenderChoosePersonAttribute(

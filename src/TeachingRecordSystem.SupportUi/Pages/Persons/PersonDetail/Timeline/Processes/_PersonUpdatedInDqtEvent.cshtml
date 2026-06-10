@@ -20,7 +20,7 @@
     {
         <row>
             <key>Date of birth</key>
-            <value use-empty-fallback>@Model.Details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.Details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
         </row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EmailAddress))
@@ -48,28 +48,28 @@
     {
         <row>
             <key>Date of death</key>
-            <value use-empty-fallback>@Model.Details.DateOfDeath?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.Details.DateOfDeath?.ToString(WebConstants.DateDisplayFormat)</value>
         </row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtsDate))
     {
         <row>
             <key>QTS held since</key>
-            <value use-empty-fallback>@Model.Details.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.Details.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
         </row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EytsDate))
     {
         <row>
             <key>EYTS held since</key>
-            <value use-empty-fallback>@Model.Details.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.Details.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
         </row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsDate))
     {
         <row>
             <key>QTLS held since</key>
-            <value use-empty-fallback>@Model.Details.QtlsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.Details.QtlsDate?.ToString(WebConstants.DateDisplayFormat)</value>
         </row>
     }
     @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsStatus))
@@ -118,7 +118,7 @@
             {
                 <row>
                     <key>Date of birth</key>
-                    <value use-empty-fallback>@Model.OldDetails.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value use-empty-fallback>@Model.OldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EmailAddress))
@@ -146,28 +146,28 @@
             {
                 <row>
                     <key>Date of death</key>
-                    <value use-empty-fallback>@Model.OldDetails.DateOfDeath?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value use-empty-fallback>@Model.OldDetails.DateOfDeath?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtsDate))
             {
                 <row>
                     <key>QTS held since</key>
-                    <value use-empty-fallback>@Model.OldDetails.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value use-empty-fallback>@Model.OldDetails.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EytsDate))
             {
                 <row>
                     <key>EYTS held since</key>
-                    <value use-empty-fallback>@Model.OldDetails.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value use-empty-fallback>@Model.OldDetails.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsDate))
             {
                 <row>
                     <key>QTLS held since</key>
-                    <value use-empty-fallback>@Model.OldDetails.QtlsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value use-empty-fallback>@Model.OldDetails.QtlsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsStatus))

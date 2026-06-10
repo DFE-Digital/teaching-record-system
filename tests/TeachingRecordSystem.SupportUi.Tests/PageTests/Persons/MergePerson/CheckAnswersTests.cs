@@ -89,7 +89,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         static object? FormatValue(object? value) => value switch
         {
             null => WebConstants.EmptyFallbackContent,
-            DateOnly dateOnly => dateOnly.ToString(WebConstants.DateOnlyDisplayFormat),
+            DateOnly dateOnly => dateOnly.ToString(WebConstants.DateDisplayFormat),
             Gender gender => gender.GetDisplayName(),
             _ => value
         };
@@ -173,7 +173,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             value switch
             {
                 null => WebConstants.EmptyFallbackContent,
-                DateOnly dateOnly => dateOnly.ToString(WebConstants.DateOnlyDisplayFormat),
+                DateOnly dateOnly => dateOnly.ToString(WebConstants.DateDisplayFormat),
                 Gender gender => gender.GetDisplayName(),
                 _ => value
             };
@@ -302,7 +302,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             p => p.DateOfBirth,
             p => p.DateOfBirth,
             p => p.DateOfBirth,
-            value => ((DateOnly?)value)?.ToString(WebConstants.DateOnlyDisplayFormat)
+            value => ((DateOnly?)value)?.ToString(WebConstants.DateDisplayFormat)
         ),
         new(
             PersonMatchedAttribute.EmailAddress,

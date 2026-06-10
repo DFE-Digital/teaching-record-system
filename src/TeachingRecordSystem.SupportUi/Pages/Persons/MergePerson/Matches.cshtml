@@ -58,7 +58,7 @@
                         <row>
                             <key>Date of birth</key>
                             <value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth))">
-                                @match.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)
+                                @match.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)
                             </value>
                         </row>
                         <row>

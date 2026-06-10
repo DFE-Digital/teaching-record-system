@@ -17,14 +17,14 @@
             <govuk-summary-list data-testid="change-summary">
                 <row>
                     <key>New start date</key>
-                    <value>@Model.NewStartDate.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value>@Model.NewStartDate.ToString(WebConstants.DateDisplayFormat)</value>
                     <row-actions>
                         <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Previous start date</key>
-                    <value use-empty-fallback>@Model.PreviousStartDate.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value use-empty-fallback>@Model.PreviousStartDate.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             </govuk-summary-list>
 

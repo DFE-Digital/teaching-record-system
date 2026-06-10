@@ -35,7 +35,7 @@
             {
                 <row>
                     <key>QTS date</key>
-                    <value data-testid="qts-date" use-empty-fallback>@qts?.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="qts-date" use-empty-fallback>@qts?.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
 
@@ -43,7 +43,7 @@
             {
                 <row>
                     <key>EYTS date</key>
-                    <value data-testid="eyts-date" use-empty-fallback>@qts?.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="eyts-date" use-empty-fallback>@qts?.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
         </govuk-summary-list>

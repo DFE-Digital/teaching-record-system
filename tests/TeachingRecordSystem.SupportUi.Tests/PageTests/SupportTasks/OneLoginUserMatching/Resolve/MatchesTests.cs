@@ -119,7 +119,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
         Assert.Equal($"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.Last()}", requestDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(supportTaskData.VerifiedOrStatedDatesOfBirth!.First().ToString(WebConstants.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(supportTaskData.VerifiedOrStatedDatesOfBirth!.First().ToString(WebConstants.DateDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(oneLoginUser.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(CoreNationalInsuranceNumber.Normalize(supportTaskData.StatedNationalInsuranceNumber), requestDetails.GetSummaryListValueByKey("National Insurance number"));
         Assert.Equal(TrnHelper.NormalizeTrn(supportTaskData.StatedTrn), requestDetails.GetSummaryListValueByKey("TRN"));
@@ -251,7 +251,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         Assert.NotNull(matchDetails);
         Assert.Equal($"{matchedPerson1.FirstName} {matchedPerson1.MiddleName} {matchedPerson1.LastName}", matchDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(matchedPerson1.NationalInsuranceNumber, matchDetails.GetSummaryListValueByKey("National Insurance number"));
-        Assert.Equal(matchedPerson1.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), matchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(matchedPerson1.DateOfBirth.ToString(WebConstants.DateDisplayFormat), matchDetails.GetSummaryListValueByKey("Date of birth"));
         AssertMatchRowIsHighlighted(matchDetails, "Name");
         AssertMatchRowIsHighlighted(matchDetails, "Date of birth");
 

@@ -53,7 +53,7 @@
                                 <ul class="govuk-list">
                                     @foreach (var dob in Model.OneLoginUserVerifiedDatesOfBirth)
                                     {
-                                        <li>@dob.ToString(WebConstants.DateOnlyDisplayFormat)</li>
+                                        <li>@dob.ToString(WebConstants.DateDisplayFormat)</li>
                                     }
                                 </ul>
                             }
@@ -130,7 +130,7 @@
                                                 Model.OneLoginUserVerifiedDatesOfBirth?.Contains(Model.PersonDateOfBirth.Value) == true;
                             }
                             <span use-empty-fallback highlight="@(!dobMatches && Model.PersonDateOfBirth.HasValue)">
-                                @Model.PersonDateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)
+                                @Model.PersonDateOfBirth?.ToString(WebConstants.DateDisplayFormat)
                             </span>
                         </value>
                     </row>

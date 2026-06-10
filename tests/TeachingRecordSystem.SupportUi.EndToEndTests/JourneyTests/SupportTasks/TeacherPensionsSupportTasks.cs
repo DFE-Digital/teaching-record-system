@@ -145,7 +145,7 @@ public class TeacherPensionsSupportTasks(HostFixture hostFixture) : TestBase(hos
         await page.ClickContinueButtonAsync();
         await page.AssertOnTeachersPensionsSupportTaskMergePageAsync(supportTask.SupportTaskReference);
 
-        await page.ClickRadioByLabelAsync($"{duplicatePerson1.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat, CultureInfo.InvariantCulture)}");
+        await page.ClickRadioByLabelAsync($"{duplicatePerson1.DateOfBirth.ToString(WebConstants.DateDisplayFormat, CultureInfo.InvariantCulture)}");
         await page.CheckAsync("label:text-is('No')"); //no evidence
         await page.ClickContinueButtonAsync();
         await page.AssertOnTeachersPensionsSupportTaskResolveCheckAnswersPageAsync(supportTask.SupportTaskReference);
@@ -195,7 +195,7 @@ public class TeacherPensionsSupportTasks(HostFixture hostFixture) : TestBase(hos
         await page.ClickContinueButtonAsync();
         await page.AssertOnTeachersPensionsSupportTaskMergePageAsync(supportTask.SupportTaskReference);
 
-        await page.ClickRadioByLabelAsync($"{duplicatePerson1.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat, CultureInfo.InvariantCulture)}");
+        await page.ClickRadioByLabelAsync($"{duplicatePerson1.DateOfBirth.ToString(WebConstants.DateDisplayFormat, CultureInfo.InvariantCulture)}");
         await page.CheckAsync("label:text-is('No')"); //no evidence
         await page.ClickContinueButtonAsync();
         await page.AssertOnTeachersPensionsSupportTaskResolveCheckAnswersPageAsync(supportTask.SupportTaskReference);

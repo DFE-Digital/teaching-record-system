@@ -92,8 +92,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(journeyInstance.State.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("New start date"));
-        Assert.Equal(alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Previous start date"));
+        Assert.Equal(journeyInstance.State.StartDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("New start date"));
+        Assert.Equal(alert.StartDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Previous start date"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
         Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Evidence"));

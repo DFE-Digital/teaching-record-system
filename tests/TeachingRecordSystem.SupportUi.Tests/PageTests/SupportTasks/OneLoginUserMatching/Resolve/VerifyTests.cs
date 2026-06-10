@@ -33,7 +33,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
 
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal($"{requestData.StatedFirstName} {requestData.StatedLastName}", doc.GetSummaryListValueByKey("Name"));
-        Assert.Equal(requestData.StatedDateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(requestData.StatedDateOfBirth.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal(TrnHelper.NormalizeTrn(requestData.StatedTrn), doc.GetSummaryListValueByKey("TRN"));
         Assert.Equal(CoreNationalInsuranceNumber.Normalize(requestData.StatedNationalInsuranceNumber), doc.GetSummaryListValueByKey("National Insurance number"));

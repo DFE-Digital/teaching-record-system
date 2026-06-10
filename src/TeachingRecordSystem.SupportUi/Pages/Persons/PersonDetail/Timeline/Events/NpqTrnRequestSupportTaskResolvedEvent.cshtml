@@ -54,7 +54,7 @@
                 {
                     <row>
                         <key>Date of birth</key>
-                        <value use-empty-fallback>@attributes.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        <value use-empty-fallback>@attributes.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
                     </row>
                 }
                 @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress))
@@ -154,7 +154,7 @@
                     </row>
                     <row>
                         <key>Date of birth</key>
-                        <value use-empty-fallback>@requestData.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        <value use-empty-fallback>@requestData.DateOfBirth.ToString(WebConstants.DateDisplayFormat)</value>
                     </row>
                     <row>
                         <key>Email address</key>
@@ -188,7 +188,7 @@
                         {
                             <row>
                                 <key>Date of birth</key>
-                                <value use-empty-fallback>@oldAttributes.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                                <value use-empty-fallback>@oldAttributes.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
                             </row>
                         }
                         @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress))

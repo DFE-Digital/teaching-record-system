@@ -93,7 +93,7 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserM
         Assert.NotNull(matchedPersonSummaryList);
         Assert.Equal($"{matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}", matchedPersonSummaryList.GetSummaryListValueByKey("Name"));
         Assert.Equal(matchedPerson.EmailAddress, matchedPersonSummaryList.GetSummaryListValueByKey("Email address"));
-        Assert.Equal(matchedPerson.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), matchedPersonSummaryList.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(matchedPerson.DateOfBirth?.ToString(WebConstants.DateDisplayFormat), matchedPersonSummaryList.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(matchedPerson.Trn, matchedPersonSummaryList.GetSummaryListValueByKey("TRN"));
         Assert.Equal(matchedPerson.NationalInsuranceNumber, matchedPersonSummaryList.GetSummaryListValueByKey("National Insurance number"));
     }

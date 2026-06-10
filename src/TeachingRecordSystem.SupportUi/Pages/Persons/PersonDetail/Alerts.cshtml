@@ -84,7 +84,7 @@
                     </row>
                     <row>
                         <key>Start date</key>
-                        <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                         @if (canWrite)
                         {
                             <row-actions>
@@ -138,8 +138,8 @@
                 {
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell"><a href="@LinkGenerator.Alerts.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType!.Name</a></td>
-                        <td class="govuk-table__cell">@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</td>
-                        <td class="govuk-table__cell">@alert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</td>
+                        <td class="govuk-table__cell">@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</td>
+                        <td class="govuk-table__cell">@alert.EndDate?.ToString(WebConstants.DateDisplayFormat)</td>
                         <td class="govuk-table__cell">
                             @if (canWrite)
                             {

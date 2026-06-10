@@ -11,19 +11,19 @@
 
     <row>
         <key>Start date</key>
-        <value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+        <value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
     </row>
 
     <row>
         <key>End date</key>
-        <value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+        <value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
     </row>
 
     @if (Model.HoldsFromRequired != FieldRequirement.NotApplicable)
     {
         <row>
             <key>Held since</key>
-            <value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
         </row>
     }
     @if (Model.HasInductionExemptionRequired != FieldRequirement.NotApplicable)

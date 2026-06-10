@@ -179,7 +179,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
             Assert.NotNull(label.NextElementSibling);
             var value = label.NextElementSibling;
-            Assert.Equal(startDate?.ToString(WebConstants.DateOnlyDisplayFormat), value!.TrimmedText());
+            Assert.Equal(startDate?.ToString(WebConstants.DateDisplayFormat), value!.TrimmedText());
             if (showChangeLink)
             {
                 Assert.NotNull(value.NextElementSibling!.GetElementsByTagName("a").First());
@@ -253,7 +253,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
             Assert.NotNull(label);
             var value = label.NextElementSibling;
-            Assert.Equal(completedDate?.ToString(WebConstants.DateOnlyDisplayFormat), value!.TrimmedText());
+            Assert.Equal(completedDate?.ToString(WebConstants.DateDisplayFormat), value!.TrimmedText());
         }
         else
         {

@@ -48,21 +48,21 @@
             {
                 <row>
                     <key>EYTS date</key>
-                    <value data-testid="eyts-date" use-empty-fallback>@updatedEvent.PersonAttributes.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="eyts-date" use-empty-fallback>@updatedEvent.PersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonPqtsDate))
             {
                 <row>
                     <key>PQTS date</key>
-                    <value data-testid="pqts-date" use-empty-fallback>@updatedEvent.PersonAttributes.PqtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="pqts-date" use-empty-fallback>@updatedEvent.PersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate))
             {
                 <row>
                     <key>QTS date</key>
-                    <value data-testid="qts-date" use-empty-fallback>@updatedEvent.PersonAttributes.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="qts-date" use-empty-fallback>@updatedEvent.PersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtlsStatus))
@@ -83,21 +83,21 @@
             {
                 <row>
                     <key>Start date</key>
-                    <value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.EndDate))
             {
                 <row>
                     <key>End date</key>
-                    <value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom))
             {
                 <row>
                     <key>Held since</key>
-                    <value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))
@@ -197,21 +197,21 @@
                     {
                         <row>
                             <key>EYTS date</key>
-                            <value data-testid="old-eyts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.EytsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            <value data-testid="old-eyts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonPqtsDate))
                     {
                         <row>
                             <key>PQTS date</key>
-                            <value data-testid="old-pqts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.PqtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            <value data-testid="old-pqts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate))
                     {
                         <row>
                             <key>QTS date</key>
-                            <value data-testid="old-qts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.QtsDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            <value data-testid="old-qts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtlsStatus))
@@ -232,21 +232,21 @@
                     {
                         <row>
                             <key>Start date</key>
-                            <value data-testid="old-start-date" use-empty-fallback>@oldDetails.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            <value data-testid="old-start-date" use-empty-fallback>@oldDetails.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.EndDate))
                     {
                         <row>
                             <key>End date</key>
-                            <value data-testid="old-end-date" use-empty-fallback>@oldDetails.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            <value data-testid="old-end-date" use-empty-fallback>@oldDetails.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom))
                     {
                         <row>
                             <key>Held since</key>
-                            <value data-testid="old-award-date" use-empty-fallback>@oldDetails.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            <value data-testid="old-award-date" use-empty-fallback>@oldDetails.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))

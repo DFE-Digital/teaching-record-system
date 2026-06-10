@@ -87,7 +87,7 @@
                 {
                     <row>
                         <key>Start date</key>
-                        <value data-testid="start-date" use-empty-fallback>@induction.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        <value data-testid="start-date" use-empty-fallback>@induction.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                     </row>
                 }
 
@@ -95,7 +95,7 @@
                 {
                     <row>
                         <key>Completed date</key>
-                        <value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        <value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
                     </row>
                 }
             </govuk-summary-list>
@@ -162,7 +162,7 @@
                         {
                             <row>
                                 <key>Start date</key>
-                                <value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                                <value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                             </row>
                         }
 
@@ -170,7 +170,7 @@
                         {
                             <row>
                                 <key>Completed date</key>
-                                <value data-testid="old-completed-date" use-empty-fallback>@oldInduction.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                                <value data-testid="old-completed-date" use-empty-fallback>@oldInduction.CompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
                             </row>
                         }
 

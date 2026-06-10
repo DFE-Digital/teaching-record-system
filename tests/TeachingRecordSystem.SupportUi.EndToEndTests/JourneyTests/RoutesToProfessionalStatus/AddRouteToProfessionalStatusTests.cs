@@ -561,8 +561,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
 
         await page.AssertOnRouteAddCheckYourAnswersPage();
 
-        await page.AssertContentEqualsAsync(editStartDate.ToString(WebConstants.DateOnlyDisplayFormat), "Start date");
-        await page.AssertContentEqualsAsync(editEndDate.ToString(WebConstants.DateOnlyDisplayFormat), "End date");
+        await page.AssertContentEqualsAsync(editStartDate.ToString(WebConstants.DateDisplayFormat), "Start date");
+        await page.AssertContentEqualsAsync(editEndDate.ToString(WebConstants.DateDisplayFormat), "End date");
         await page.AssertContentContainsAsync(editDegreeType.Name, "Degree type");
         await page.AssertContentEqualsAsync(editAgeRange.GetDisplayName()!, "Age range");
         await page.AssertContentContainsAsync(editCountry.Name, "Country of training");

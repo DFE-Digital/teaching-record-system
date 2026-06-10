@@ -73,7 +73,7 @@ public class StartDateModel(
         }
         if (StartDate < Person.EarliestInductionStartDate)
         {
-            ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString(WebConstants.DateOnlyDisplayFormat)}");
+            ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString(WebConstants.DateDisplayFormat)}");
         }
 
         _validator.ValidateAndThrow(this);

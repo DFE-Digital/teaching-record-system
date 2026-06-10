@@ -106,7 +106,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(merge);
         Assert.Contains(person.FirstName, firstName.TextContent);
         Assert.Contains(duplicatePerson1.LastName, lastName.TextContent);
-        Assert.Contains(duplicatePerson1.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), dob.TextContent);
+        Assert.Contains(duplicatePerson1.DateOfBirth.ToString(WebConstants.DateDisplayFormat), dob.TextContent);
         Assert.Contains(person.NationalInsuranceNumber!, niNumber.TextContent);
         Assert.Contains(duplicatePerson1!.Trn, trn.TextContent);
         Assert.Contains(evidenceFileName, evidenceFile.TextContent);

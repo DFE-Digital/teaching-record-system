@@ -26,7 +26,7 @@
             </row>
             <row>
                 <key>Start date</key>
-                <value data-testid="start-date">@(mandatoryQualification.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat) ?? "None")</value>
+                <value data-testid="start-date">@(mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
             </row>
             <row>
                 <key>Status</key>
@@ -34,7 +34,7 @@
             </row>
             <row>
                 <key>End date</key>
-                <value data-testid="end-date">@(mandatoryQualification.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat) ?? "None")</value>
+                <value data-testid="end-date">@(mandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
             </row>
         </govuk-summary-list>
 

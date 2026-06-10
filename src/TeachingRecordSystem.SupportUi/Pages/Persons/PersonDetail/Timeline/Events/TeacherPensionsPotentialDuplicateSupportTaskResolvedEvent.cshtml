@@ -53,7 +53,7 @@
                     {
                         <row>
                             <key>Date of birth</key>
-                            <value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                            <value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
                         </row>
                     }
                     @if (mergedEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber))

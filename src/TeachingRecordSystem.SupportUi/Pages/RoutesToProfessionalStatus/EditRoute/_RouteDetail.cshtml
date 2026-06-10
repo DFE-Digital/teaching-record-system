@@ -17,7 +17,7 @@
     {
         <row>
             <key>Start date</key>
-            <value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
             <row-actions>
                 <action data-testid="edit-start-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</action>
             </row-actions>
@@ -28,7 +28,7 @@
     {
         <row>
             <key>End date</key>
-            <value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
             <row-actions>
                 <action data-testid="edit-end-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</action>
             </row-actions>
@@ -39,7 +39,7 @@
     {
         <row>
             <key>Held since</key>
-            <value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+            <value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
             <row-actions>
                 <action data-testid="edit-holds-from-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="held since">Change</action>
             </row-actions>

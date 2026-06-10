@@ -31,7 +31,7 @@
                 {
                     <row>
                         <key>Start date</key>
-                        <value use-empty-fallback>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        <value use-empty-fallback>@Model.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                         @if (Model.ShowStartDateChangeLink)
                         {
                             <row-actions>
@@ -45,7 +45,7 @@
                 {
                     <row>
                         <key>Completion date</key>
-                        <value use-empty-fallback>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                        <value use-empty-fallback>@Model.CompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
                         @if (Model.ShowCompletedDateChangeLink)
                         {
                             <row-actions>

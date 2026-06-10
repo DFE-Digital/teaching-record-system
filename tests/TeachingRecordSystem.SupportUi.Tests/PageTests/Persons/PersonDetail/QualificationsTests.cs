@@ -95,9 +95,9 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
 
         Assert.Equal(provider?.Name ?? "None", mandatoryQualificationSummary.GetElementByTestId($"mq-provider-{qualificationId}")!.TrimmedText());
         Assert.Equal(specialism?.GetTitle() ?? "None", mandatoryQualificationSummary.GetElementByTestId($"mq-specialism-{qualificationId}")!.TrimmedText());
-        Assert.Equal(startDate is not null ? startDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-start-date-{qualificationId}")!.TrimmedText());
+        Assert.Equal(startDate is not null ? startDate.Value.ToString(WebConstants.DateDisplayFormat) : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-start-date-{qualificationId}")!.TrimmedText());
         Assert.Equal(status is not null ? status.Value.ToString() : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-status-{qualificationId}")!.TrimmedText());
-        Assert.Equal(endDate is not null ? endDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-end-date-{qualificationId}")!.TrimmedText());
+        Assert.Equal(endDate is not null ? endDate.Value.ToString(WebConstants.DateDisplayFormat) : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-end-date-{qualificationId}")!.TrimmedText());
     }
 
     [Theory]
@@ -176,9 +176,9 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Null(noProfessionalStatuses);
 
         doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
-        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(WebConstants.DateOnlyDisplayFormat));
-        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(WebConstants.DateOnlyDisplayFormat));
-        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFrom.ToString(WebConstants.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(WebConstants.DateDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(WebConstants.DateDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFrom.ToString(WebConstants.DateDisplayFormat));
         doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
         doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Training provider", trainingProvider.Name);
         doc.AssertSummaryListRowContentContains($"professionalstatus-{qualificationid}", "Degree type", degreeType.Name);
@@ -217,8 +217,8 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Null(noProfessionalStatuses);
 
         doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
-        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(WebConstants.DateOnlyDisplayFormat));
-        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(WebConstants.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(WebConstants.DateDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(WebConstants.DateDisplayFormat));
         doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Held since");
         doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
         doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Training provider", "Not provided");
@@ -296,7 +296,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
         doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Start date");
         doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "End date");
-        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFromDate.ToString(WebConstants.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFromDate.ToString(WebConstants.DateDisplayFormat));
         doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Induction exemption", "Yes");
         doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Training provider");
         doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Degree type");
