@@ -47,7 +47,8 @@ public class CheckAnswers(
             Details = JourneyInstance!.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason
                 ? JourneyInstance.State.Detail
                 : null,
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = null
         };
         var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, timeProvider.UtcNow, User.GetUserId(), changeReason: changeReason);
         var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);

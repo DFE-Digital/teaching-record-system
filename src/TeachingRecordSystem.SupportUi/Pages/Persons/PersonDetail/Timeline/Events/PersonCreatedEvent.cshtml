@@ -81,6 +81,19 @@
                             </value>
                         </row>
                         <row>
+                            <key>Additional information</key>
+                            <value>
+                                @if (createdEvent.CreateAdditionalInformation is not null)
+                                {
+                                    @Html.ConvertNewlinesToLineBreaks(createdEvent.CreateAdditionalInformation)
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </value>
+                        </row>
+                        <row>
                             <key>Evidence</key>
                             <value>
                             <vc:event-evidence-file-link evidence-file="@createdEvent.EvidenceFile" />

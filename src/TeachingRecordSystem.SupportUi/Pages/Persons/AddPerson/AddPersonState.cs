@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
@@ -23,6 +24,10 @@ public class AddPersonState : IRegisterJourney
     public PersonCreateReason? Reason { get; set; }
     public string? ReasonDetail { get; set; }
     public EvidenceUploadModel Evidence { get; set; } = new();
+
+    public ProvideMoreInformationOption? ProvideAdditionalInformation { get; set; }
+
+    public string? AdditionalInformation { get; set; }
 
     public bool Initialized { get; set; }
 

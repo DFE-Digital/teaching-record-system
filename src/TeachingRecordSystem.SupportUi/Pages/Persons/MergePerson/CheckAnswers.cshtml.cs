@@ -132,7 +132,8 @@ public class CheckAnswersModel(
             {
                 Reason = null,
                 Details = Comments,
-                EvidenceFile = EvidenceFile?.ToEventModel()
+                EvidenceFile = EvidenceFile?.ToEventModel(),
+                AdditionalInformation = null
             });
 
         await personService.MergePersonsAsync(

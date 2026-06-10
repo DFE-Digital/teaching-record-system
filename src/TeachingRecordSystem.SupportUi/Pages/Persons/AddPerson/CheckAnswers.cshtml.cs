@@ -23,6 +23,7 @@ public class CheckAnswersModel(
     public Gender? Gender { get; set; }
     public PersonCreateReason? Reason { get; set; }
     public string? ReasonDetail { get; set; }
+    public string? AdditionalInformation { get; set; }
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
@@ -53,6 +54,7 @@ public class CheckAnswersModel(
         Reason = JourneyInstance.State.Reason;
         ReasonDetail = JourneyInstance.State.ReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
     }
 
     public void OnGet()
@@ -69,7 +71,8 @@ public class CheckAnswersModel(
             {
                 Reason = Reason?.GetDisplayName(),
                 Details = ReasonDetail,
-                EvidenceFile = EvidenceFile?.ToEventModel()
+                EvidenceFile = EvidenceFile?.ToEventModel(),
+                AdditionalInformation = AdditionalInformation
             });
 
         var person = await personService.CreatePersonAsync(

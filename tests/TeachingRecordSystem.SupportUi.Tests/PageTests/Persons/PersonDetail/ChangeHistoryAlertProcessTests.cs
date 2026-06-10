@@ -37,7 +37,8 @@ public partial class ChangeHistoryTests
         {
             Reason = "Safeguarding concern",
             Details = "Details about the alert",
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = null
         };
         var process = await TestData.CreateProcessAsync(ProcessType.AlertCreating, user.UserId, changeReason, @event);
 
@@ -106,7 +107,8 @@ public partial class ChangeHistoryTests
         {
             Reason = "Safeguarding concern",
             Details = "Details about the alert",
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = null
         };
         var process = await TestData.CreateProcessAsync(ProcessType.AlertCreating, user.UserId, changeReason, @event);
 
@@ -171,7 +173,8 @@ public partial class ChangeHistoryTests
         {
             Reason = "Update required",
             Details = "Updating alert information",
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = null
         };
         var process = await TestData.CreateProcessAsync(ProcessType.AlertUpdating, user.UserId, changeReason, @event);
 
@@ -257,7 +260,8 @@ public partial class ChangeHistoryTests
         {
             Reason = "Update required",
             Details = "Updating alert information",
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = null
         };
         var process = await TestData.CreateProcessAsync(ProcessType.AlertUpdating, user.UserId, changeReason, @event);
 
@@ -312,7 +316,8 @@ public partial class ChangeHistoryTests
         {
             Reason = null,
             Details = "Alert no longer applicable",
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = null
         };
         var process = await TestData.CreateProcessAsync(ProcessType.AlertDeleting, user.UserId, changeReason, @event);
 
@@ -381,7 +386,8 @@ public partial class ChangeHistoryTests
         {
             Reason = null,
             Details = "Alert no longer applicable",
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = null
         };
         var process = await TestData.CreateProcessAsync(ProcessType.AlertDeleting, user.UserId, changeReason, @event);
 

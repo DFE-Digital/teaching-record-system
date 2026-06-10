@@ -121,7 +121,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("Additional information", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
         var expectedFileUrl = $"http://localhost/files/evidence.pdf?fileUrl={expectedBlobStorageFileUrl}";
@@ -156,7 +156,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("They were awarded a mandatory qualification", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("Additional information", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListRowValues("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 

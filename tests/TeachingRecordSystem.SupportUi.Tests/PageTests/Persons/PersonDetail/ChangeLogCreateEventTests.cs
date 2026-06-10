@@ -30,6 +30,7 @@ public class ChangeLogCreateEventTests : TestBase
         string? emailAddress = "old@email-address.com";
         string? nationalInsuranceNumber = "AB 12 34 56 D";
         Gender? gender = Gender.Female;
+        var additionalInformation = "some additional information";
 
         var createReason = PersonCreateReason.AnotherReason.GetDisplayName();
         var createReasonDetail = "Reason detail";
@@ -60,7 +61,8 @@ public class ChangeLogCreateEventTests : TestBase
             CreateReason = createReason,
             CreateReasonDetail = createReasonDetail,
             EvidenceFile = evidenceFile,
-            TrnRequestMetadata = null
+            TrnRequestMetadata = null,
+            CreateAdditionalInformation = additionalInformation
         };
 
         await WithDbContextAsync(async dbContext =>
@@ -90,6 +92,7 @@ public class ChangeLogCreateEventTests : TestBase
 
         doc.AssertSummaryListRowValue("create-reason", "Reason", v => Assert.Equal(createReason, v.TrimmedText()));
         doc.AssertSummaryListRowValue("create-reason", "Reason details", v => Assert.Equal(createReasonDetail, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("create-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         doc.AssertSummaryListRowValue("create-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
 
@@ -128,7 +131,8 @@ public class ChangeLogCreateEventTests : TestBase
             CreateReason = createReason,
             CreateReasonDetail = null,
             EvidenceFile = null,
-            TrnRequestMetadata = null
+            TrnRequestMetadata = null,
+            CreateAdditionalInformation = null
         };
 
         await WithDbContextAsync(async dbContext =>

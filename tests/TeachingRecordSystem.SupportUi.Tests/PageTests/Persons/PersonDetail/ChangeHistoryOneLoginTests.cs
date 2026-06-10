@@ -61,7 +61,8 @@ public partial class ChangeHistoryTests
         {
             Details = "these are details",
             EvidenceFile = null,
-            Reason = "this is the reason"
+            Reason = "this is the reason",
+            AdditionalInformation = null
         };
         var process = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, Clock.UtcNow, user.UserId, reason);
 

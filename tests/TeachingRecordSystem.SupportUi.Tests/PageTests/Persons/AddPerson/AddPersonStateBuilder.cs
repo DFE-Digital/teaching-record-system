@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
@@ -13,6 +14,9 @@ public class AddPersonStateBuilder
     public string? EmailAddress { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
+
+    public string? AdditionalInformation { get; set; }
+    public ProvideMoreInformationOption? ProvideAdditionalInformation { get; set; }
 
     public PersonCreateReason? Reason { get; set; }
     public string? ReasonDetail { get; set; }
@@ -39,6 +43,13 @@ public class AddPersonStateBuilder
     public AddPersonStateBuilder WithDateOfBirth(DateOnly? dateOfBirth)
     {
         DateOfBirth = dateOfBirth;
+        return this;
+    }
+
+    public AddPersonStateBuilder WithAdditionalInformation(ProvideMoreInformationOption? provideAdditionalInformation, string? additionalInformation)
+    {
+        ProvideAdditionalInformation = provideAdditionalInformation;
+        AdditionalInformation = additionalInformation;
         return this;
     }
 
@@ -100,7 +111,9 @@ public class AddPersonStateBuilder
                 UploadEvidence = UploadEvidence,
                 UploadedEvidenceFile = UploadedEvidenceFile,
             },
-            Initialized = Initialized
+            Initialized = Initialized,
+            ProvideAdditionalInformation = ProvideAdditionalInformation,
+            AdditionalInformation = AdditionalInformation,
         };
     }
 }

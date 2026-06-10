@@ -26,6 +26,7 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 PersonAttributes = @event.Details,
                 CreateReason = changeReason?.Reason,
                 CreateReasonDetail = changeReason?.Details,
+                CreateAdditionalInformation = changeReason?.AdditionalInformation,
                 EvidenceFile = changeReason?.EvidenceFile,
                 TrnRequestMetadata = @event.TrnRequestMetadata
             };
