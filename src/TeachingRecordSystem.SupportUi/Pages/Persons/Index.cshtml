@@ -8,7 +8,7 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
         <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
-        
+
         <div class="govuk-!-margin-top-6">
             <form method="get" asp-antiforgery="false" data-testid="search-form">
                 <div class="govuk-!-margin-bottom-4">
@@ -36,8 +36,8 @@
             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">Filter by</h3>
 
             <form method="get" asp-antiforgery="false">
-                <input type="hidden" asp-for="Search" />            
-                
+                <input type="hidden" asp-for="Search" />
+
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-two-thirds">
                         <div class="trs_checkboxes__wrapper--horizontal">
@@ -66,7 +66,7 @@
                             <govuk-button type="submit" class="govuk-!-margin-bottom-0">Apply filters</govuk-button>
                         </div>
                     </div>
-                </div>                    
+                </div>
             </form>
         </div>
 
