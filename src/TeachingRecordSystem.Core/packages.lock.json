@@ -114,9 +114,9 @@
       },
       "GovukNotify": {
         "type": "Direct",
-        "requested": "[8.0.0, )",
-        "resolved": "8.0.0",
-        "contentHash": "VFvDQgI4XXNjImj9V76AWmUtuiP21mcsDgk5VJJanEbQcqFDuzazBwFYegwshuvyfjj9Z7hjFB1EbhSiDT9LhA==",
+        "requested": "[8.1.0, )",
+        "resolved": "8.1.0",
+        "contentHash": "lQI8TYhwzVWdyi12ZebXRNq6l5yc1L4R48FsjEml297Zx+3pRLFdxnySzYfl3aDiGUoqG8UiVEsL65zI2TpJBg==",
         "dependencies": {
           "JWT": "[11.0.0, 12.0.0]",
           "Newtonsoft.Json": "[13.0.4, 14.0.0]"
