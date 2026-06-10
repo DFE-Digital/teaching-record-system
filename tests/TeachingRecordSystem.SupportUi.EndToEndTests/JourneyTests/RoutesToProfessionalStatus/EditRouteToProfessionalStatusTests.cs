@@ -129,8 +129,8 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEqualsAsync(setStartDate.ToString(WebConstants.DateOnlyDisplayFormat), "Start date");
-        await page.AssertContentEqualsAsync(setEndDate.ToString(WebConstants.DateOnlyDisplayFormat), "End date");
+        await page.AssertContentEqualsAsync(setStartDate.ToString(WebConstants.DateDisplayFormat), "Start date");
+        await page.AssertContentEqualsAsync(setEndDate.ToString(WebConstants.DateDisplayFormat), "End date");
         await page.AssertContentContainsAsync(setDegreeType.Name, "Degree type");
         await page.AssertContentEqualsAsync(setAgeRange.GetDisplayName()!, "Age range");
         await page.AssertContentContainsAsync(setCountry.Name, "Country of training");
@@ -224,8 +224,8 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
         await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEqualsAsync(editStartDate.ToString(WebConstants.DateOnlyDisplayFormat), "Start date");
-        await page.AssertContentEqualsAsync(editEndDate.ToString(WebConstants.DateOnlyDisplayFormat), "End date");
+        await page.AssertContentEqualsAsync(editStartDate.ToString(WebConstants.DateDisplayFormat), "Start date");
+        await page.AssertContentEqualsAsync(editEndDate.ToString(WebConstants.DateDisplayFormat), "End date");
         await page.AssertContentContainsAsync(editDegreeType.Name, "Degree type");
         await page.AssertContentEqualsAsync(editAgeRange.GetDisplayName()!, "Age range");
         await page.AssertContentContainsAsync(editCountry.Name, "Country of training");
@@ -1073,7 +1073,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEqualsAsync(holdsFrom.ToString(WebConstants.DateOnlyDisplayFormat), "Held since");
+        await page.AssertContentEqualsAsync(holdsFrom.ToString(WebConstants.DateDisplayFormat), "Held since");
         await page.AssertContentEqualsAsync("Yes", "Induction exemption");
 
         await page.ClickLinkForElementWithTestIdAsync("edit-status-link");

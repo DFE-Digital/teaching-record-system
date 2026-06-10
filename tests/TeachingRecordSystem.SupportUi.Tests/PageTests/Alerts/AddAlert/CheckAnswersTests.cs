@@ -80,7 +80,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
         Assert.Equal(journeyInstance.State.AlertTypeName, doc.GetSummaryListValueByKey("Alert type"));
         Assert.Equal(journeyInstance.State.Details, doc.GetSummaryListValueByKey("Details"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Link} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Link"));
-        Assert.Equal(journeyInstance.State.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
+        Assert.Equal(journeyInstance.State.StartDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
         Assert.Equal(journeyInstance.State.AddReason!.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
         Assert.Equal(populateOptional ? journeyInstance.State.AddReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Evidence"));

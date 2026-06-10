@@ -60,7 +60,7 @@
             {
                 <row data-testid="induction-start-date">
                     <key>Start date</key>
-                    <value>@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value>@Model.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                     @if (Model.CanWrite)
                     {
                         <row-actions>
@@ -74,7 +74,7 @@
             {
                 <row data-testid="induction-completed-date">
                     <key>Completion date</key>
-                    <value>@Model.CompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value>@Model.CompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
                     @if (Model.CanWrite)
                     {
                         <row-actions>

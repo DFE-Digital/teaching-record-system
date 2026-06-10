@@ -58,14 +58,14 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var expectedFirstResult = expectedResults[2];
         AssertRowHasContent(topRow, "task-name-and-id", expectedFirstResult.SupportTaskReference);
         AssertRowHasContent(topRow, "email", expectedFirstResult.EmailAddress!);
-        AssertRowHasContent(topRow, "requested-on", expectedFirstResult.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
+        AssertRowHasContent(topRow, "requested-on", expectedFirstResult.CreatedOn.ToString(WebConstants.DateDisplayFormat));
         AssertRowHasContent(topRow, "source", expectedFirstResult.ShortName!);
 
         var nextRow = resultRows[1];
         var expectedNextResult = expectedResults[1];
         AssertRowHasContent(nextRow, "task-name-and-id", expectedNextResult.SupportTaskReference);
         AssertRowHasContent(nextRow, "email", expectedNextResult.EmailAddress!);
-        AssertRowHasContent(nextRow, "requested-on", expectedNextResult.CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
+        AssertRowHasContent(nextRow, "requested-on", expectedNextResult.CreatedOn.ToString(WebConstants.DateDisplayFormat));
         AssertRowHasContent(nextRow, "source", expectedFirstResult.ShortName!);
     }
 
@@ -243,8 +243,8 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         AssertRowHasContent(resultRows[1], "task-name-and-id", $"{expectedResultsOrdered[1].StatedFirstName} {expectedResultsOrdered[1].StatedLastName} {expectedResultsOrdered[1].SupportTaskReference}");
         AssertRowHasContent(resultRows[0], "status", expectedResultsOrdered[0].Status.GetDisplayName()!);
         AssertRowHasContent(resultRows[1], "status", expectedResultsOrdered[1].Status.GetDisplayName()!);
-        AssertRowHasContent(resultRows[0], "requested-on", expectedResultsOrdered[0].CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
-        AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(WebConstants.DateOnlyDisplayFormat));
+        AssertRowHasContent(resultRows[0], "requested-on", expectedResultsOrdered[0].CreatedOn.ToString(WebConstants.DateDisplayFormat));
+        AssertRowHasContent(resultRows[1], "requested-on", expectedResultsOrdered[1].CreatedOn.ToString(WebConstants.DateDisplayFormat));
         AssertRowHasContent(resultRows[0], "source", expectedResultsOrdered[0].ShortName!);
         AssertRowHasContent(resultRows[1], "source", expectedResultsOrdered[1].ShortName!);
     }

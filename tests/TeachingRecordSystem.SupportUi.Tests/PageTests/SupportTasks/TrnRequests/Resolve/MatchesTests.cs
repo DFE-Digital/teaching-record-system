@@ -76,7 +76,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
         Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.MiddleName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueByKey("Gender"));
@@ -129,7 +129,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             Assert.Null(firstMatchDetails.GetSummaryListValueByKey("Previous names"));
         }
 
-        Assert.Equal(firstMatch.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(firstMatch.DateOfBirth?.ToString(WebConstants.DateDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(firstMatch.EmailAddress, firstMatchDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(firstMatch.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(firstMatch.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));

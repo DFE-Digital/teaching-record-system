@@ -39,11 +39,11 @@
     </row>
     <row>
         <key>Start date</key>
-        <value use-empty-fallback>@Model.Alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+        <value use-empty-fallback>@Model.Alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
     </row>
     <row>
         <key>End date</key>
-        <value use-empty-fallback>@Model.Alert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+        <value use-empty-fallback>@Model.Alert.EndDate?.ToString(WebConstants.DateDisplayFormat)</value>
         @if (Model.CanEdit)
         {
             <row-actions>

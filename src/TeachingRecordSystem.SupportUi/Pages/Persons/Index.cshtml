@@ -130,7 +130,7 @@
                                     </ul>
                                 }
                             </td>
-                            <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(WebConstants.DateOnlyDisplayFormat) : string.Empty)</td>
+                            <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(WebConstants.DateDisplayFormat) : string.Empty)</td>
                             <td class="govuk-table__cell" data-testid="trn">@personInfo.Trn</td>
                             <td class="govuk-table__cell" data-testid="nino" use-empty-fallback>@personInfo.NationalInsuranceNumber</td>
                             <td class="govuk-table__cell" data-testid="status">@personInfo.PersonStatus</td>

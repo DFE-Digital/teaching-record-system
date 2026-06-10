@@ -37,14 +37,14 @@
             {
                 <row>
                     <key>Started on</key>
-                    <value data-testid="start-date">@induction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="start-date">@induction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (induction.CompletionDate.HasValue)
             {
                 <row>
                     <key>Completed on</key>
-                    <value data-testid="completion-date">@induction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="completion-date">@induction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
         </govuk-summary-list>

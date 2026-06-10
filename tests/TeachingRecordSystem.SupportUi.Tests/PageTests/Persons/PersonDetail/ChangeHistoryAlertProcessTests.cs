@@ -56,7 +56,7 @@ public partial class ChangeHistoryTests
             process.CreatedOn,
             [
                 ("Alert type", alertType.Name),
-                ("Start date", startDate.ToString(WebConstants.DateOnlyDisplayFormat))
+                ("Start date", startDate.ToString(WebConstants.DateDisplayFormat))
             ]);
     }
 
@@ -190,12 +190,12 @@ public partial class ChangeHistoryTests
             process.CreatedOn,
             [
                 ("Alert type", alertType.Name),
-                ("Start date", newStartDate.ToString(WebConstants.DateOnlyDisplayFormat)),
+                ("Start date", newStartDate.ToString(WebConstants.DateDisplayFormat)),
                 ("Details", "Updated alert details"),
                 ("External link", $"https://example.com (opens in new tab)")
             ],
             [
-                ("Start date", startDate.ToString(WebConstants.DateOnlyDisplayFormat)),
+                ("Start date", startDate.ToString(WebConstants.DateDisplayFormat)),
                 ("Details", "Original alert details"),
                 ("External link", WebConstants.EmptyFallbackContent)
             ]);
@@ -331,7 +331,7 @@ public partial class ChangeHistoryTests
             process.CreatedOn,
             [
                 ("Alert type", alertType.Name),
-                ("Start date", startDate.ToString(WebConstants.DateOnlyDisplayFormat))
+                ("Start date", startDate.ToString(WebConstants.DateDisplayFormat))
             ]);
     }
 

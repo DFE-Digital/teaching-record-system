@@ -95,8 +95,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : CloseAlertTestBase(hos
         Assert.Equal(alert.AlertType!.Name, doc.GetSummaryListValueByKey("Alert type"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Details"));
         Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Link"));
-        Assert.Equal(alert.StartDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
-        Assert.Equal(journeyInstance.State.EndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("End date"));
+        Assert.Equal(alert.StartDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
+        Assert.Equal(journeyInstance.State.EndDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("End date"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
         Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Evidence"));

@@ -47,7 +47,7 @@
                 </row>
                 <row>
                     <key>Start date</key>
-                    <value>@Model.StartDate.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value>@Model.StartDate.ToString(WebConstants.DateDisplayFormat)</value>
                     <row-actions>
                         <action href="@LinkGenerator.Alerts.AddAlert.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</action>
                     </row-actions>

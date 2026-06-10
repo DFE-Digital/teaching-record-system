@@ -31,7 +31,7 @@
                 </row>
                 <row>
                     <key>Start date</key>
-                    <value data-testid="start-date">@Model.StartDate.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="start-date">@Model.StartDate.ToString(WebConstants.DateDisplayFormat)</value>
                     <row-actions>
                         <action href="@LinkGenerator.Mqs.AddMq.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</action>
                     </row-actions>
@@ -45,7 +45,7 @@
                 </row>
                 <row>
                     <key>End date</key>
-                    <value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</value>
+                    <value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(WebConstants.DateDisplayFormat) : "None")</value>
                     <row-actions>
                         <action href="@LinkGenerator.Mqs.AddMq.Status(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="end date">Change</action>
                     </row-actions>

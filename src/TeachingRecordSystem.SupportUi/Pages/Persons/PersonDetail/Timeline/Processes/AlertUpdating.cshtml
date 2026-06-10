@@ -74,7 +74,7 @@
             }
             <row>
                 <key>Start date</key>
-                <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
             </row>
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
             {
@@ -105,7 +105,7 @@
             {
                 <row>
                     <key>End date</key>
-                    <value use-empty-fallback>@alert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value use-empty-fallback>@alert.EndDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))
@@ -161,7 +161,7 @@
                         {
                             <row>
                                 <key>Start date</key>
-                                <value use-empty-fallback>@oldAlert.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                                <value use-empty-fallback>@oldAlert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                             </row>
                         }
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
@@ -193,7 +193,7 @@
                         {
                             <row>
                                 <key>End date</key>
-                                <value use-empty-fallback>@oldAlert.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                                <value use-empty-fallback>@oldAlert.EndDate?.ToString(WebConstants.DateDisplayFormat)</value>
                             </row>
                         }
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))

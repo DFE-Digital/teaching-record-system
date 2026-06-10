@@ -117,7 +117,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(requestDetails);
         Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.MiddleName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(person.Trn, requestDetails.GetSummaryListValueByKey("TRN"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueByKey("Gender"));
         Assert.Contains(oneLoginEmail, requestDetails.GetSummaryListValueByKey("Connected One Login details"));
@@ -176,7 +176,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StringHelper.JoinNonEmpty(' ', duplicatePerson1.FirstName, duplicatePerson1.MiddleName, duplicatePerson1.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(StringHelper.JoinNonEmpty(' ', duplicatePerson1.PreviousNames.First().FirstName, duplicatePerson1.PreviousNames.First().MiddleName, duplicatePerson1.PreviousNames.First().LastName), firstMatchDetails.GetSummaryListValueByKey("Previous names"));
         Assert.Equal(duplicatePerson1.Trn, firstMatchDetails.GetSummaryListValueByKey("TRN"));
-        Assert.Equal(duplicatePerson1.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(duplicatePerson1.DateOfBirth.ToString(WebConstants.DateDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(duplicatePerson1.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(duplicatePerson1.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));
     }

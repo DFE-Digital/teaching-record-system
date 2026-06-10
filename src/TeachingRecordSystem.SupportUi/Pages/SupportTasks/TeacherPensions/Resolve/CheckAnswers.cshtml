@@ -47,7 +47,7 @@
                 </row>
                 <row>
                     <key>Date of birth</key>
-                    <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
                     @if (Model.IsDateOfBirthChangeable)
                     {
                         <row-actions>

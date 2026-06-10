@@ -32,7 +32,7 @@
             {
                 <row>
                     <key>Date of birth</key>
-                    <value>@dateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value>@dateOfBirth.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (importedEvent.Details.EmailAddress is string emailAddress)
@@ -60,21 +60,21 @@
             {
                 <row>
                     <key>Date of death</key>
-                    <value>@dateOfDeath.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value>@dateOfDeath.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (importedEvent.Details.QtsDate is DateOnly qtsDate)
             {
                 <row>
                     <key>QTS held since</key>
-                    <value>@qtsDate.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value>@qtsDate.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (importedEvent.Details.EytsDate is DateOnly eytsDate)
             {
                 <row>
                     <key>EYTS held since</key>
-                    <value>@eytsDate.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value>@eytsDate.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (importedEvent.Details.InductionStatus is InductionStatus inductionStatus)

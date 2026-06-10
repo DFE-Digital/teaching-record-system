@@ -158,7 +158,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             static object? FormatValue(object? value) => value switch
             {
                 null => WebConstants.EmptyFallbackContent,
-                DateOnly dateOnly => dateOnly.ToString(WebConstants.DateOnlyDisplayFormat),
+                DateOnly dateOnly => dateOnly.ToString(WebConstants.DateDisplayFormat),
                 Gender gender => gender.GetDisplayName(),
                 _ => value
             };
@@ -918,7 +918,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             "Date of birth",
             d => d.DateOfBirth,
             p => p.DateOfBirth,
-            value => ((DateOnly?)value)?.ToString(WebConstants.DateOnlyDisplayFormat)
+            value => ((DateOnly?)value)?.ToString(WebConstants.DateDisplayFormat)
         ),
         new(
             PersonMatchedAttribute.EmailAddress,

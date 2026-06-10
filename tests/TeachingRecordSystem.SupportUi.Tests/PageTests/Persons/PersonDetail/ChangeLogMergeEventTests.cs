@@ -134,8 +134,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
 
         if (changes.HasFlag(LegacyEvents.PersonsMergedEventChanges.DateOfBirth))
         {
-            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
-            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(WebConstants.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
         }
         else
         {

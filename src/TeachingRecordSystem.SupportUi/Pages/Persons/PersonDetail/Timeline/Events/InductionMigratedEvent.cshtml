@@ -34,14 +34,14 @@
             {
                 <row>
                     <key>Started on</key>
-                    <value data-testid="start-date">@migratedEvent.InductionStartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="start-date">@migratedEvent.InductionStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
             @if (migratedEvent.InductionCompletedDate.HasValue)
             {
                 <row>
                     <key>Completed on</key>
-                    <value data-testid="completed-date">@migratedEvent.InductionCompletedDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="completed-date">@migratedEvent.InductionCompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             }
         </govuk-summary-list>

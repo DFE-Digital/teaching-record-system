@@ -51,7 +51,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var cardActions = doc.QuerySelectorAll<IHtmlAnchorElement>(".govuk-summary-card__actions>*");
         Assert.Single(cardActions);
         Assert.Equal(StringHelper.JoinNonEmpty(' ', trnRequestMetadata.FirstName, trnRequestMetadata.MiddleName, trnRequestMetadata.LastName), doc.GetSummaryListValueByKey("Name"));
-        Assert.Equal(trnRequestMetadata.DateOfBirth.ToString(WebConstants.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(trnRequestMetadata.DateOfBirth.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(trnRequestMetadata.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal(trnRequestMetadata.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National insurance number"));
         Assert.Collection(

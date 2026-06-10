@@ -38,11 +38,11 @@
                 </row>
                 <row>
                     <key>Start date</key>
-                    <value data-testid="start-date">@Model.StartDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="start-date">@Model.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
                 <row>
                     <key>End date</key>
-                    <value data-testid="end-date" use-empty-fallback>@Model.EndDate?.ToString(WebConstants.DateOnlyDisplayFormat)</value>
+                    <value data-testid="end-date" use-empty-fallback>@Model.EndDate?.ToString(WebConstants.DateDisplayFormat)</value>
                 </row>
             </govuk-summary-list>
 

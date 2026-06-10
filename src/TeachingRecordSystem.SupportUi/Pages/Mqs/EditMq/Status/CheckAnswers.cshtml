@@ -30,11 +30,11 @@
                 {
                     <row>
                         <key>New end date</key>
-                        <value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</value>
+                        <value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString(WebConstants.DateDisplayFormat) : "None")</value>
                     </row>
                     <row>
                         <key>Previous end date</key>
-                        <value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString(WebConstants.DateOnlyDisplayFormat) : "None")</value>
+                        <value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString(WebConstants.DateDisplayFormat) : "None")</value>
                     </row>
                 }
             </govuk-summary-list>
