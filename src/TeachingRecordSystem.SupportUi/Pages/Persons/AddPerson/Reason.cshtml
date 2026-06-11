@@ -1,5 +1,6 @@
 @page "/persons/add/reason"
 @using TeachingRecordSystem.Core.Services.Persons
+@using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus
 @model TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson.ReasonModel
 @{
     Layout = "_Layout";
@@ -32,14 +33,33 @@
                         @PersonCreateReason.AnotherReason.GetDisplayName()
 
                         <govuk-radios-item-conditional data-testid="create-reason-detail">
-                            <govuk-character-count for="ReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>Enter details</govuk-character-count-label>
-                            </govuk-character-count>
+                            <govuk-input data-testid="reason-detail" for="ReasonDetail" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
+                                <govuk-input-label>Enter a reason</govuk-input-label>
+                           </govuk-input>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
 
+            <govuk-radios for="ProvideAdditionalInformation" data-testid="provide-more-information-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="create-provide-additional-information-legend">
+                        <h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2>
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
+                        @ProvideMoreInformationOption.Yes.GetDisplayName()
+                        <govuk-radios-item-conditional>
+                            <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@ProvideMoreInformationOption.No">
+                        @ProvideMoreInformationOption.No.GetDisplayName()
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            
             @Html.EditorFor(m => m.Evidence)
 
             <div class="govuk-button-group">

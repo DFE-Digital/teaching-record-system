@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
@@ -20,6 +21,9 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddPersonReasonPageAsync();
         await page.SelectChangeReasonAsync("create-reason-options", PersonCreateReason.MandatoryQualification);
+
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "this is a test");
+
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
@@ -48,6 +52,8 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnAddPersonReasonPageAsync();
         await page.SelectChangeReasonAsync("create-reason-options", PersonCreateReason.MandatoryQualification);
         await page.SelectUploadEvidenceAsync(false);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
+
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddPersonCheckAnswersPageAsync();
@@ -78,6 +84,7 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnAddPersonReasonPageAsync();
         await page.SelectChangeReasonAsync("create-reason-options", PersonCreateReason.MandatoryQualification);
         await page.SelectUploadEvidenceAsync(false);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddPersonCheckAnswersPageAsync();
@@ -114,6 +121,7 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnAddPersonReasonPageAsync();
         await page.SelectChangeReasonAsync("create-reason-options", PersonCreateReason.MandatoryQualification);
         await page.SelectUploadEvidenceAsync(false);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddPersonCheckAnswersPageAsync();

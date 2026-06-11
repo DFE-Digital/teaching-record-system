@@ -3,7 +3,9 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using ReasonModel = TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson.ReasonModel;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -45,6 +47,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
         var expectedFileUrl = $"http://localhost/files/evidence.jpg?fileUrl={expectedBlobStorageFileUrl}";
+        var additionalInfo = "this is additional info";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
@@ -53,6 +56,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .WithAddPersonReasonChoice(reasonChoice, reasonDetail)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, additionalInfo)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
@@ -67,8 +71,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Single(i => i.IsChecked).Value;
         Assert.Equal(reasonChoice.ToString(), reasonChoiceSelection);
 
-        var additionalDetailTextArea = doc.GetElementByTestId("create-reason-detail")!.GetElementsByTagName("textarea").Single() as IHtmlTextAreaElement;
-        Assert.Equal(reasonDetail, additionalDetailTextArea!.Value);
+        var reasonDetailTextbox =
+            doc.GetElementById("ReasonDetail") as IHtmlInputElement;
+        Assert.Equal(reasonDetail, reasonDetailTextbox!.Value);
+
+        var additionalInformation =
+            doc.GetElementById("AdditionalInformation") as IHtmlTextAreaElement;
+        Assert.Equal(additionalInfo, additionalInformation!.Value);
 
         var uploadEvidenceChoices = doc.GetChildElementsOfTestId<IHtmlInputElement>("upload-evidence-options", "input[type='radio']")
             .Single(i => i.IsChecked).Value;
@@ -112,6 +121,14 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Select(i => i.Value);
         Assert.Equal(expectedChoices, reasonChoices);
 
+        var provideAdditionalInformationLegnd = doc.GetElementByTestId("create-provide-additional-information-legend");
+        Assert.Equal("Do you want to provide more information?", provideAdditionalInformationLegnd!.TrimmedText());
+        var provideAdditionalInformationChoices = doc.GetElementByTestId("provide-more-information-options")!
+            .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
+            .Where(i => i.IsChecked == false)
+            .Select(i => i.Value);
+        Assert.Equal(["Yes", "No"], provideAdditionalInformationChoices);
+
         var uploadEvidenceChoicesLegend = doc.GetElementByTestId("upload-evidence-options-legend");
         Assert.Equal("Do you want to upload evidence?", uploadEvidenceChoicesLegend!.TrimmedText());
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
@@ -132,6 +149,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             new AddPersonStateBuilder()
                 .WithInitializedState()
                 .WithName("Alfred", "The", "Great")
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -140,6 +158,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new AddPersonPostRequestContentBuilder()
                 .WithReason(changeReason, changeReasonDetails)
                 .WithUploadEvidence(false)
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .BuildFormUrlEncoded()
         };
 
@@ -199,6 +218,59 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReasonDetail), "Enter a reason");
+    }
+
+    [Fact]
+    public async Task Post_ProvideAdditionalInformationNotAnswered_ReturnsError()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonStateBuilder()
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
+        {
+            Content = new AddPersonPostRequestContentBuilder()
+                .WithReason(PersonCreateReason.AnotherReason, null)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ProvideAdditionalInformation), "Select yes if you want to add more information");
+    }
+
+
+    [Fact]
+    public async Task Post_ProvideAdditionalInformationYes_AdditionalInformationNotProvided_ReturnsError()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonStateBuilder()
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
+                .WithAdditionalInformation(ProvideMoreInformationOption.No, "")
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
+        {
+            Content = new AddPersonPostRequestContentBuilder()
+                .WithReason(PersonCreateReason.AnotherReason, null)
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, null)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.AdditionalInformation), "Enter details");
     }
 
     [Fact]
@@ -405,6 +477,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState()
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
@@ -412,6 +485,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new AddPersonPostRequestContentBuilder()
                 .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"))
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .BuildMultipartFormData()
         };
 
@@ -436,6 +510,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState()
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
@@ -443,6 +518,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new AddPersonPostRequestContentBuilder()
                 .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .BuildMultipartFormData()
         };
 
@@ -465,6 +541,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState()
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "this is additional info that should be discarded")
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
@@ -472,6 +549,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new AddPersonPostRequestContentBuilder()
                 .WithReason(PersonCreateReason.MandatoryQualification, "A description about why the change typed into the box")
                 .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .WithAdditionalInformation(ProvideMoreInformationOption.No)
                 .BuildMultipartFormData()
         };
 
@@ -488,6 +566,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance.State.ReasonDetail);
         Assert.False(journeyInstance.State.Evidence.UploadEvidence);
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
+        Assert.Null(journeyInstance.State.AdditionalInformation);
     }
 
     private string GetRequestPath(JourneyInstance<AddPersonState> journeyInstance) =>

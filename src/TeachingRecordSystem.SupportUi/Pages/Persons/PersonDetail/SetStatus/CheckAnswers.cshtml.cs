@@ -40,7 +40,8 @@ public class CheckAnswersModel(
                 {
                     Reason = DeactivateReason?.GetDisplayName(),
                     Details = DeactivateReasonDetail,
-                    EvidenceFile = EvidenceFile?.ToEventModel()
+                    EvidenceFile = EvidenceFile?.ToEventModel(),
+                    AdditionalInformation = null
                 });
 
             await PersonService.DeactivatePersonAsync(new DeactivatePersonOptions(PersonId, DateOfDeath: null), processContext);
@@ -55,7 +56,8 @@ public class CheckAnswersModel(
                 {
                     Reason = ReactivateReason?.GetDisplayName(),
                     Details = ReactivateReasonDetail,
-                    EvidenceFile = EvidenceFile?.ToEventModel()
+                    EvidenceFile = EvidenceFile?.ToEventModel(),
+                    AdditionalInformation = null
                 });
 
             await PersonService.ReactivatePersonAsync(PersonId, processContext);

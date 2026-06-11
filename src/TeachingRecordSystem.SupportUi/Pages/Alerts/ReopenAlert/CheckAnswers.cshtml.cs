@@ -77,7 +77,8 @@ public class CheckAnswersModel(
             {
                 Reason = ChangeReason.GetDisplayName()!,
                 Details = ChangeReasonDetail,
-                EvidenceFile = EvidenceFile?.ToEventModel()
+                EvidenceFile = EvidenceFile?.ToEventModel(),
+                AdditionalInformation = null
             });
 
         await alertService.UpdateAlertAsync(

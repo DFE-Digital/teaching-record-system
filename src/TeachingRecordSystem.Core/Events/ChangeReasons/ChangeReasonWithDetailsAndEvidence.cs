@@ -5,4 +5,5 @@ public record ChangeReasonWithDetailsAndEvidence : IChangeReasonInfo
     public required string? Reason { get; init; }
     public required string? Details { get; init; }
     public required EventModels.File? EvidenceFile { get; init; }
+    public required string? AdditionalInformation { get; init; }
 }

@@ -62,7 +62,8 @@ public class CheckAnswersModel(
                 NameChangeEvidenceFile = NameChangeEvidenceFile?.ToEventModel(),
                 Reason = OtherDetailsChangeReason?.GetDisplayName(),
                 Details = OtherDetailsChangeReasonDetail,
-                EvidenceFile = OtherDetailsChangeEvidenceFile?.ToEventModel()
+                EvidenceFile = OtherDetailsChangeEvidenceFile?.ToEventModel(),
+                AdditionalInformation = null
             });
 
         await PersonService.UpdatePersonDetailsAsync(

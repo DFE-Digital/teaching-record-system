@@ -77,7 +77,8 @@ public class CheckAnswersModel(
             Details = JourneyInstance.State.ConnectReason == ConnectPersonReason.AnotherReason
                 ? JourneyInstance.State.ReasonDetail
                 : null,
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = null
         };
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserPersonConnecting, timeProvider.UtcNow, User.GetUserId(), changeReason: changeReason);

@@ -1,6 +1,7 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -148,6 +149,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(false)
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .BuildFormUrlEncoded()
         };
 
@@ -308,6 +310,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(false)
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .BuildFormUrlEncoded()
         };
 

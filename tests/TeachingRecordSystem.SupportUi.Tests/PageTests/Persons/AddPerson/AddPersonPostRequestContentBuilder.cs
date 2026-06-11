@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -16,6 +17,9 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
     public string? ReasonDetail { get; set; }
     public TestEvidenceUploadModel Evidence { get; set; } = new();
 
+    public string? AdditionalInformation { get; set; }
+    public ProvideMoreInformationOption? ProvideAdditionalInformation { get; set; }
+
     public AddPersonPostRequestContentBuilder WithFirstName(string? firstName)
     {
         FirstName = firstName;
@@ -25,6 +29,13 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
     public AddPersonPostRequestContentBuilder WithMiddleName(string? middleName)
     {
         MiddleName = middleName;
+        return this;
+    }
+
+    public AddPersonPostRequestContentBuilder WithAdditionalInformation(ProvideMoreInformationOption? provideAdditionalInformation, string? additionalInformation = null)
+    {
+        ProvideAdditionalInformation = provideAdditionalInformation;
+        AdditionalInformation = additionalInformation;
         return this;
     }
 
@@ -86,7 +97,7 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
         {
             FileId = id,
             FileName = evidenceFileName ?? "filename.jpg",
-            FileSizeDescription = evidenceFileSizeDescription ?? "5 MB"
+            FileSizeDescription = evidenceFileSizeDescription ?? "5 MB",
         };
 
         return this;

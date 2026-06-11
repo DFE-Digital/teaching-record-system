@@ -66,11 +66,27 @@
                     </row-actions>
                 </row>
                 <row>
-                    <key>Additional information</key>
+                    <key>Reason details</key>
                     <value>
                         @if (Model.ReasonDetail is not null)
                         {
                             @Html.ConvertNewlinesToLineBreaks(Model.ReasonDetail)
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </value>
+                    <row-actions>
+                        <action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional Information</key>
+                    <value>
+                        @if (Model.AdditionalInformation is not null)
+                        {
+                            @Html.ConvertNewlinesToLineBreaks(Model.AdditionalInformation)
                         }
                         else
                         {

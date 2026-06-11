@@ -76,7 +76,8 @@ public class CheckAnswersModel(
             {
                 Reason = DeleteReason.GetDisplayName()!,
                 Details = DeleteReasonDetail,
-                EvidenceFile = EvidenceFile?.ToEventModel()
+                EvidenceFile = EvidenceFile?.ToEventModel(),
+                AdditionalInformation = null
             });
 
         await alertService.DeleteAlertAsync(
