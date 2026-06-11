@@ -180,7 +180,7 @@ public class CapitaImportJob(
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
-                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, timeProvider.UtcNow, out var @event);
+                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, "", null, SystemUser.Instance.UserId, timeProvider.UtcNow, out var @event);
                             if (@event is not null)
                             {
                                 dbContext.AddEventWithoutBroadcast(@event);
@@ -227,7 +227,7 @@ public class CapitaImportJob(
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
                             person.DateOfDeath = dateOfDeath;
-                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, timeProvider.UtcNow, out var @event);
+                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, "", null, SystemUser.Instance.UserId, timeProvider.UtcNow, out var @event);
                             if (@event is not null)
                             {
                                 dbContext.AddEventWithoutBroadcast(@event);

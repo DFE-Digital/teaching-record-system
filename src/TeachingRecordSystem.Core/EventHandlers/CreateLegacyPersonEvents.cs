@@ -82,7 +82,8 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 DateOfDeath = @event.DateOfDeath,
                 Reason = changeReason.Reason,
                 ReasonDetail = changeReason.Details,
-                EvidenceFile = changeReason.EvidenceFile
+                EvidenceFile = changeReason.EvidenceFile,
+                AdditionalInformation = changeReason.AdditionalInformation
             };
 
             dbContext.AddEventWithoutBroadcast(legacyEvent);
@@ -147,7 +148,8 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 DateOfDeath = null,
                 Reason = changeReason.Reason,
                 ReasonDetail = changeReason.Details,
-                EvidenceFile = changeReason.EvidenceFile
+                EvidenceFile = changeReason.EvidenceFile,
+                AdditionalInformation = changeReason.AdditionalInformation
             };
 
             dbContext.AddEventWithoutBroadcast(legacyEvent);
