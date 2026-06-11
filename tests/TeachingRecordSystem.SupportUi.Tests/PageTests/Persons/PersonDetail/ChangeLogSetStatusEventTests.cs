@@ -33,6 +33,7 @@ public class ChangeLogSetStatusEventTests : TestBase
 
         var reason = PersonDeactivateReason.AnotherReason.GetDisplayName();
         var reasonDetail = "Reason detail";
+        var additionalInformation = "this is additional information";
         var evidenceFile = new EventModels.File
         {
             FileId = Guid.NewGuid(),
@@ -50,7 +51,8 @@ public class ChangeLogSetStatusEventTests : TestBase
             Reason = reason,
             ReasonDetail = reasonDetail,
             EvidenceFile = evidenceFile,
-            DateOfDeath = null
+            DateOfDeath = null,
+            AdditionalInformation = additionalInformation
         };
 
         await WithDbContextAsync(async dbContext =>
@@ -78,6 +80,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Reason details", v => Assert.Equal(reasonDetail, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
@@ -91,6 +94,7 @@ public class ChangeLogSetStatusEventTests : TestBase
 
         var reason = PersonReactivateReason.AnotherReason.GetDisplayName();
         var reasonDetail = "Reason detail";
+        var additionalInformation = "this is additional information";
         var evidenceFile = new EventModels.File
         {
             FileId = Guid.NewGuid(),
@@ -108,7 +112,8 @@ public class ChangeLogSetStatusEventTests : TestBase
             Reason = reason,
             ReasonDetail = reasonDetail,
             EvidenceFile = evidenceFile,
-            DateOfDeath = null
+            DateOfDeath = null,
+            AdditionalInformation = additionalInformation
         };
 
         await WithDbContextAsync(async dbContext =>
@@ -136,6 +141,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Reason details", v => Assert.Equal(reasonDetail, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }

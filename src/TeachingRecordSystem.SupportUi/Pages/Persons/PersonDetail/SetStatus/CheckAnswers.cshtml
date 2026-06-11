@@ -73,9 +73,25 @@
                         <value>@Model.DeactivateReason?.GetDisplayName()</value>
                         <row-actions>
                             <action data-testid="change-deactivate-reason-link"
-                                                           href=@Model.ChangeReasonLink visually-hidden-text="reason">
+                                    href=@Model.ChangeReasonLink visually-hidden-text="reason">
                                 Change
                             </action>
+                        </row-actions>
+                    </row>
+                    <row>
+                        <key>Reason details</key>
+                        <value>
+                            @if (Model.DeactivateReasonDetail is not null)
+                            {
+                                @Html.ConvertNewlinesToLineBreaks(Model.DeactivateReasonDetail)
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </value>
+                        <row-actions>
+                            <action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</action>
                         </row-actions>
                     </row>
                     <row>
@@ -83,7 +99,7 @@
                         <value>
                             @if (Model.DeactivateReasonDetail is not null)
                             {
-                                @Html.ConvertNewlinesToLineBreaks(Model.DeactivateReasonDetail)
+                                @Html.ConvertNewlinesToLineBreaks(Model.DeactivateAdditionalInformation)
                             }
                             else
                             {
@@ -104,17 +120,33 @@
                         <value>@Model.ReactivateReason?.GetDisplayName()</value>
                         <row-actions>
                             <action data-testid="change-reactivate-reason-link"
-                                                           href=@Model.ChangeReasonLink visually-hidden-text="reason">
+                                    href=@Model.ChangeReasonLink visually-hidden-text="reason">
                                 Change
                             </action>
                         </row-actions>
                     </row>
                     <row>
-                        <key>Additional information</key>
+                        <key>Reason details</key>
                         <value>
                             @if (Model.ReactivateReasonDetail is not null)
                             {
                                 @Html.ConvertNewlinesToLineBreaks(Model.ReactivateReasonDetail)
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </value>
+                        <row-actions>
+                            <action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</action>
+                        </row-actions>
+                    </row>
+                    <row>
+                        <key>Additional information</key>
+                        <value>
+                            @if (Model.ReactivateAdditionalInformation is not null)
+                            {
+                                @Html.ConvertNewlinesToLineBreaks(Model.ReactivateAdditionalInformation)
                             }
                             else
                             {

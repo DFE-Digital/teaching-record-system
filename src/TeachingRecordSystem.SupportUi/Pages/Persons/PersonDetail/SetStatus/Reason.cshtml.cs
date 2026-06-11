@@ -28,8 +28,18 @@ public class ReasonModel(
         v => v.RuleFor(m => m.DeactivateReasonDetail)
             .NotEmpty()
             .WithMessage("Enter a reason")
+            .When(x => x.DeactivateReason ==  PersonDeactivateReason.AnotherReason && x.TargetStatus == PersonStatus.Deactivated),
+
+        v => v.RuleFor(m => m.DeactivateAdditionalInformation)
+            .NotEmpty()
+            .WithMessage("Enter details")
             .When(x => x.ProvideMoreInformation == ProvideMoreInformationOption.Yes && x.TargetStatus == PersonStatus.Deactivated),
 
+        v => v.RuleFor(m => m.DeactivateAdditionalInformation)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+            .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
+            .When(m => m.TargetStatus == PersonStatus.Deactivated),
+        
         //re-activate rules
         v => v.RuleFor(m => m.ReactivateReason)
             .NotEmpty()
@@ -41,21 +51,27 @@ public class ReasonModel(
             .WithMessage("Select yes if you want to provide more information")
             .When(x=>x.TargetStatus == PersonStatus.Active),
 
+        v => v.RuleFor(m => m.ReactivateAdditionalInformation)
+            .NotEmpty()
+            .WithMessage("Enter details")
+            .When(x => x.ProvideMoreInformation == ProvideMoreInformationOption.Yes && x.TargetStatus == PersonStatus.Active),
+
+        v => v.RuleFor(m => m.ReactivateAdditionalInformation)
+            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
+                .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
+            .When(m => m.TargetStatus == PersonStatus.Active && m.ProvideMoreInformation == ProvideMoreInformationOption.Yes),
+
+        v => v.RuleFor(m => m.ReactivateReasonDetail)
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.ReactivateReason == PersonReactivateReason.AnotherReason),
+        
+        // Make sure to take into account evidence models validation rules.
+        v => v.RuleFor(x => x.Evidence).Evidence(),
+
         v => v.RuleFor(m => m.ReactivateReasonDetail)
             .NotEmpty()
             .WithMessage("Enter a reason")
-            .When(x => x.ProvideMoreInformation == ProvideMoreInformationOption.Yes && x.TargetStatus == PersonStatus.Active),
-
-        v => v.RuleFor(m => m.DeactivateReasonDetail)
-            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
-                .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
-            .When(m => m.TargetStatus == PersonStatus.Deactivated),
-        v => v.RuleFor(m => m.ReactivateReasonDetail)
-            .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
-                .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
-            .When(m => m.TargetStatus == PersonStatus.Active),
-        // Make sure to take into account evidence models validation rules.
-        v => v.RuleFor(x => x.Evidence).Evidence()
+            .When(x => x.DeactivateReason ==  PersonDeactivateReason.AnotherReason && x.TargetStatus == PersonStatus.Active),
     };
 
     [BindProperty]
@@ -80,12 +96,20 @@ public class ReasonModel(
         ? LinkGenerator.Persons.PersonDetail.SetStatus.CheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId)
         : LinkGenerator.Persons.PersonDetail.Index(PersonId);
 
+    [BindProperty]
+    public string? ReactivateAdditionalInformation { get; set; }
+
+    [BindProperty]
+    public string? DeactivateAdditionalInformation { get; set; }
+
     public void OnGet()
     {
         DeactivateReason = JourneyInstance!.State.DeactivateReason;
         DeactivateReasonDetail = JourneyInstance!.State.DeactivateReasonDetail;
+        DeactivateAdditionalInformation = JourneyInstance!.State.DeactivateAdditionalInformation;
         ReactivateReason = JourneyInstance!.State.ReactivateReason;
         ReactivateReasonDetail = JourneyInstance!.State.ReactivateReasonDetail;
+        ReactivateAdditionalInformation = JourneyInstance!.State.ReactivateAdditionalInformation;
         Evidence = JourneyInstance.State.Evidence;
         ProvideMoreInformation = JourneyInstance!.State.ProvideMoreInformation;
     }
@@ -106,9 +130,11 @@ public class ReasonModel(
         {
             state.ProvideMoreInformation = ProvideMoreInformation;
             state.DeactivateReason = DeactivateReason;
-            state.DeactivateReasonDetail = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? DeactivateReasonDetail : null;
+            state.DeactivateReasonDetail = DeactivateReason is PersonDeactivateReason.AnotherReason ? DeactivateReasonDetail : null;
+            state.DeactivateAdditionalInformation = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? DeactivateAdditionalInformation : null;
             state.ReactivateReason = ReactivateReason;
-            state.ReactivateReasonDetail = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? ReactivateReasonDetail : null;
+            state.ReactivateReasonDetail = ReactivateReason is PersonReactivateReason.AnotherReason ? ReactivateReasonDetail : null;
+            state.ReactivateAdditionalInformation = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? ReactivateAdditionalInformation : null;
             state.Evidence = Evidence;
         });
 

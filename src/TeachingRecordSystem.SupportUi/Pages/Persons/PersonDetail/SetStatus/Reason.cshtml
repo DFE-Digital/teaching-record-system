@@ -35,6 +35,11 @@
                         </govuk-radios-item>
                         <govuk-radios-item value="@PersonDeactivateReason.AnotherReason">
                             @PersonDeactivateReason.AnotherReason.GetDisplayName()
+                            <govuk-radios-item-conditional data-testid="deactivate-reason-detail">
+                                <govuk-input data-testid="deactivate-reason-detail" for="DeactivateReasonDetail" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
+                                    <govuk-input-label>Enter a reason</govuk-input-label>
+                                </govuk-input>
+                            </govuk-radios-item-conditional>
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>
@@ -46,8 +51,8 @@
                         </govuk-radios-fieldset-legend>
                         <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
                             @ProvideMoreInformationOption.Yes.GetDisplayName()
-                            <govuk-radios-item-conditional data-testid="deactivate-reason-detail">
-                                <govuk-character-count for="DeactivateReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                            <govuk-radios-item-conditional>
+                                <govuk-character-count for="DeactivateAdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
                                     <govuk-character-count-label>Enter details</govuk-character-count-label>
                                 </govuk-character-count>
                             </govuk-radios-item-conditional>
@@ -70,6 +75,11 @@
                         </govuk-radios-item>
                         <govuk-radios-item value="@PersonReactivateReason.AnotherReason">
                             @PersonReactivateReason.AnotherReason.GetDisplayName()
+                            <govuk-radios-item-conditional>
+                                <govuk-input data-testid="reactivate-reason-detail" for="ReactivateReasonDetail" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
+                                    <govuk-input-label>Enter a reason</govuk-input-label>
+                                </govuk-input>
+                            </govuk-radios-item-conditional>
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>
@@ -81,8 +91,8 @@
                         </govuk-radios-fieldset-legend>
                         <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
                             @ProvideMoreInformationOption.Yes.GetDisplayName()
-                            <govuk-radios-item-conditional data-testid="reactivate-reason-detail">
-                                <govuk-character-count for="ReactivateReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                            <govuk-radios-item-conditional>
+                                <govuk-character-count for="ReactivateAdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
                                     <govuk-character-count-label>Enter details</govuk-character-count-label>
                                 </govuk-character-count>
                             </govuk-radios-item-conditional>
