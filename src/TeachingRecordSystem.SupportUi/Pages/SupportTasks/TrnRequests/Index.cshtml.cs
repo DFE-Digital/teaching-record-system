@@ -52,9 +52,17 @@ public class Index(SupportTaskSearchService supportTaskSearchService, TrsDbConte
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;
 
-        // Ensure we cover all application users that generate TRN requests, even if there are no active requests for them right now
-        var allTrnRequestingSourceApplications = await dbContext.TrnRequestMetadata
-            .Select(t => new { t.ApplicationUser!.UserId, t.ApplicationUser.Name, t.ApplicationUser.ShortName })
+        // Ensure we cover all application users that generate TRN request tasks, even if there are no active requests for them right now.
+        // We explicitly use Join() rather than using the navigation properties since EF will generate `left join`s for the navigation properties,
+        // and that's slower than `inner join`s.
+        var allTrnRequestingSourceApplications = await dbContext.ApplicationUsers
+            .Join(dbContext.TrnRequestMetadata, t => t.UserId, u => u.ApplicationUserId, (user, req) => user)
+            .Join(
+                dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.TrnRequest).Select(t => t.TrnRequestApplicationUserId).Distinct(),
+                user => user.UserId,
+                userId => userId,
+                (user, task) => user)
+            .Select(u => new { u.UserId, u.Name, u.ShortName })
             .Distinct()
             .ToArrayAsync();
 

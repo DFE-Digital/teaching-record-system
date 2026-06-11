@@ -15,36 +15,44 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var sortDirection = options.SortDirection ?? SortDirection.Ascending;
 
         var tasks = dbContext.SupportTasks
-            .Include(t => t.TrnRequestMetadata)
-            .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.TrnRequest && t.Status != SupportTaskStatus.Closed);
+            .Where(t => t.SupportTaskType == SupportTaskType.TrnRequest && t.Status != SupportTaskStatus.Closed)
+            .Join(
+                dbContext.TrnRequestMetadata,
+                t => new { ApplicationUserId = t.TrnRequestApplicationUserId!.Value, RequestId = t.TrnRequestId! },
+                r => new { r.ApplicationUserId, r.RequestId },
+                (t, r) => new { Task = t, TrnRequest = r })
+            .Join(
+                dbContext.ApplicationUsers,
+                t => t.TrnRequest.ApplicationUserId,
+                u => u.UserId,
+                (t, user) => new { t.Task, t.TrnRequest, ApplicationUser = user });
 
         var totalTaskCount = await tasks.CountAsync();
 
         if (SearchTextIsDate(search, out var minDate, out var maxDate))
         {
-            tasks = tasks.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
+            tasks = tasks.Where(t => t.Task.CreatedOn >= minDate && t.Task.CreatedOn < maxDate);
         }
         else if (SearchTextHelper.IsEmailAddress(search, out var email))
         {
             tasks = tasks.Where(t =>
-                t.TrnRequestMetadata!.EmailAddress != null &&
-                EF.Functions.Collate(t.TrnRequestMetadata.EmailAddress, Collations.CaseInsensitive) == email);
+                t.TrnRequest.EmailAddress != null &&
+                EF.Functions.Collate(t.TrnRequest.EmailAddress, Collations.CaseInsensitive) == email);
         }
         else if (SearchTextIsName(search, out var nameParts))
         {
             tasks = tasks.Where(t =>
-                nameParts.All(n => t.TrnRequestMetadata!.Name.Select(m => EF.Functions.Collate(m, Collations.CaseInsensitive)).Contains(n)));
+                nameParts.All(n => t.TrnRequest.Name.Select(m => EF.Functions.Collate(m, Collations.CaseInsensitive)).Contains(n)));
         }
 
         var resultsBySourceApplication = await tasks
-            .GroupBy(t => t.TrnRequestMetadata!.ApplicationUserId)
+            .GroupBy(t => t.TrnRequest.ApplicationUserId)
             .Select(t => new TrnRequestsSearchResultBySourceApplication(t.Key, t.Count()))
             .ToArrayAsync();
 
         if (options.SourceApplicationUserIds.Count is not 0)
         {
-            tasks = tasks.Where(t => options.SourceApplicationUserIds.Contains(t.TrnRequestMetadata!.ApplicationUserId));
+            tasks = tasks.Where(t => options.SourceApplicationUserIds.Contains(t.TrnRequest.ApplicationUserId));
         }
 
         var totalFilteredTaskCount = await tasks.CountAsync();
@@ -52,26 +60,26 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         tasks = sortBy switch
         {
             TrnRequestsSortByOption.Name => tasks
-                .OrderBy(t => t.TrnRequestMetadata!.FirstName, sortDirection)
-                .ThenBy(t => t.TrnRequestMetadata!.MiddleName, sortDirection)
-                .ThenBy(t => t.TrnRequestMetadata!.LastName, sortDirection),
+                .OrderBy(t => t.TrnRequest.FirstName, sortDirection)
+                .ThenBy(t => t.TrnRequest.MiddleName, sortDirection)
+                .ThenBy(t => t.TrnRequest.LastName, sortDirection),
             TrnRequestsSortByOption.Email => tasks
-                .OrderBy(t => t.TrnRequestMetadata!.EmailAddress, sortDirection),
+                .OrderBy(t => t.TrnRequest.EmailAddress, sortDirection),
             TrnRequestsSortByOption.Source => tasks
-                .OrderBy(t => t.TrnRequestMetadata!.ApplicationUser!.Name, sortDirection),
+                .OrderBy(t => t.TrnRequest.ApplicationUser!.Name, sortDirection),
             _ => tasks
-                .OrderBy(t => t.CreatedOn, sortDirection)
+                .OrderBy(t => t.Task.CreatedOn, sortDirection)
         };
 
         var searchResults = await tasks
             .Select(t => new TrnRequestsSearchResultItem(
-                t.SupportTaskReference,
-                t.TrnRequestMetadata!.FirstName!,
-                t.TrnRequestMetadata!.MiddleName ?? "",
-                t.TrnRequestMetadata!.LastName!,
-                t.TrnRequestMetadata!.EmailAddress,
-                t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser!.ShortName ?? t.TrnRequestMetadata.ApplicationUser.Name))
+                t.Task.SupportTaskReference,
+                t.TrnRequest.FirstName!,
+                t.TrnRequest.MiddleName ?? "",
+                t.TrnRequest.LastName!,
+                t.TrnRequest.EmailAddress,
+                t.Task.CreatedOn,
+                t.ApplicationUser.ShortName ?? t.ApplicationUser.Name))
             .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
 
         return new()
