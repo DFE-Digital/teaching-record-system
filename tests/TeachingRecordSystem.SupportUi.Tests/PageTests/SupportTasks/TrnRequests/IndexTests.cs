@@ -67,9 +67,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var resultRow = GetResultRows(doc).FirstOrDefault();
         Assert.NotNull(resultRow);
 
-        AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
+        var nameColumn = resultRow.GetElementByTestId("name");
+        Assert.NotNull(nameColumn);
+        Assert.Contains($"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}", nameColumn.TrimmedText());
+        Assert.Contains(supportTask.SupportTaskReference, nameColumn.TrimmedText());
+
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
-        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(WebConstants.DateDisplayFormat));
+        AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(WebConstants.DateShortDisplayFormat));
         AssertRowHasContent("source", applicationUser.Name);
 
         void AssertRowHasContent(string testId, string expectedText)
@@ -151,6 +155,128 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_WithOpenTasks_ShowsSourceFilterWithCountPerApplicationUser()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser2.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/trn-requests/");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(["A application (2)", "B application (1)"], GetSourceFilterLabels(doc));
+    }
+
+    [Fact]
+    public async Task Get_SourceFilter_IncludesApplicationUsersWithNoOpenTasks()
+    {
+        // Arrange
+        var applicationUserWithOpenTask = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUserWithClosedTaskOnly = await TestData.CreateApplicationUserAsync(name: "B application");
+
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUserWithOpenTask.UserId);
+        await TestData.CreateTrnRequestSupportTaskAsync(
+            applicationUserWithClosedTaskOnly.UserId,
+            t => t.WithStatus(SupportTaskStatus.Closed));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/trn-requests/");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(["A application (1)", "B application (0)"], GetSourceFilterLabels(doc));
+    }
+
+    [Fact]
+    public async Task Get_SourceFilter_UsesApplicationUserShortNameWhenSet()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(name: "A long application name", shortName: "Short");
+
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/trn-requests/");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(["Short (1)"], GetSourceFilterLabels(doc));
+    }
+
+    [Fact]
+    public async Task Get_FilterByApplicationUserIds_ShowsOnlyMatchingResults()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+
+        var tasks = SupportTaskLookup.Create(new()
+        {
+            ["ST1"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId),
+            ["ST2"] = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser2.UserId),
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/trn-requests/?ApplicationUserIds={applicationUser1.UserId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(["ST1"], GetResultTaskKeys(doc, tasks));
+    }
+
+    [Fact]
+    public async Task Get_FilterByApplicationUserIds_ChecksSelectedFilterCheckboxes()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId);
+        await TestData.CreateTrnRequestSupportTaskAsync(applicationUser2.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/trn-requests/?ApplicationUserIds={applicationUser1.UserId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal([applicationUser1.UserId.ToString()], GetCheckedSourceFilterValues(doc));
+    }
+
+    [Fact]
+    public async Task Get_NoOpenTasks_DoesNotShowSourceFilter()
+    {
+        // Arrange
+        await TestData.CreateTrnRequestSupportTaskAsync(configure: t => t.WithStatus(SupportTaskStatus.Closed));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/trn-requests/");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Empty(GetSourceFilterLabels(doc));
+    }
+
+    [Fact]
     public async Task Get_ShowsPageOfResults()
     {
         // Arrange
@@ -188,6 +314,20 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     private static string[] GetResultTaskKeys(IHtmlDocument document, SupportTaskLookup tasks) =>
         GetResultTaskReferences(document)
             .Select(tasks.GetKeyFor)
+            .ToArray();
+
+    private static string[] GetSourceFilterLabels(IHtmlDocument document) =>
+        document
+            .GetElementsByClassName("govuk-checkboxes__item")
+            .Select(item => item.GetElementsByClassName("govuk-checkboxes__label").Single().TrimmedText())
+            .ToArray();
+
+    private static string[] GetCheckedSourceFilterValues(IHtmlDocument document) =>
+        document
+            .QuerySelectorAll("input[name='ApplicationUserIds']")
+            .Cast<IHtmlInputElement>()
+            .Where(input => input.IsChecked)
+            .Select(input => input.Value)
             .ToArray();
 }
 

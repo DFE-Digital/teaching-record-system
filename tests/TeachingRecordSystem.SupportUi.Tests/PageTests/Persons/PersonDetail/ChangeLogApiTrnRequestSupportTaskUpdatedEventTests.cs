@@ -164,7 +164,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 
         item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(Clock.UtcNow.ToString(WebConstants.DateTimeDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(Clock.UtcNow.ToString(WebConstants.DateAndTimeDisplayFormat), v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Previous name", v => Assert.Equal("Jim Smith", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateDisplayFormat) ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));

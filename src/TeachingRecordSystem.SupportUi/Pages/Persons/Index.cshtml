@@ -40,25 +40,23 @@
 
                 <div class="trs-horizontal-filters__container">
                     <div class="trs-horizontal-filters__options">
-                        <div class="trs_checkboxes__wrapper--horizontal">
-                            <govuk-checkboxes for="IncludeActive" class="govuk-checkboxes govuk-checkboxes--small">
-                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
-                                    @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.IncludeActive)].GetValueOrDefault(true, 0))
-                                </govuk-checkboxes-item>
-                            </govuk-checkboxes>
+                        <govuk-checkboxes for="IncludeActive">
+                            <govuk-checkboxes-item value="@true">
+                                @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.IncludeActive)].GetValueOrDefault(true, 0))
+                            </govuk-checkboxes-item>
+                        </govuk-checkboxes>
 
-                            <govuk-checkboxes for="IncludeDeactivated" class="govuk-checkboxes govuk-checkboxes--small">
-                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
-                                    @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.IncludeDeactivated)].GetValueOrDefault(true, 0))
-                                </govuk-checkboxes-item>
-                            </govuk-checkboxes>
+                        <govuk-checkboxes for="IncludeDeactivated">
+                            <govuk-checkboxes-item value="@true">
+                                @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.IncludeDeactivated)].GetValueOrDefault(true, 0))
+                            </govuk-checkboxes-item>
+                        </govuk-checkboxes>
 
-                            <govuk-checkboxes for="IncludeOneLoginUser" class="govuk-checkboxes govuk-checkboxes--small">
-                                <govuk-checkboxes-item value="@true" class="trs-nowrap">
-                                    GOV.UK One Login (@Model.Facets![nameof(Model.IncludeOneLoginUser)].GetValueOrDefault(true, 0))
-                                </govuk-checkboxes-item>
-                            </govuk-checkboxes>
-                        </div>
+                        <govuk-checkboxes for="IncludeOneLoginUser">
+                            <govuk-checkboxes-item value="@true">
+                                GOV.UK One Login (@Model.Facets![nameof(Model.IncludeOneLoginUser)].GetValueOrDefault(true, 0))
+                            </govuk-checkboxes-item>
+                        </govuk-checkboxes>
                     </div>
                     <div class="trs-horizontal-filters__actions">
                         <div class="govuk-button-group govuk-!-margin-bottom-0">
@@ -71,7 +69,7 @@
             </form>
         </div>
 
-        <table class="govuk-table govuk-!-margin-top-4 trs-table-layout-fixed">
+        <table class="govuk-table trs-table-layout-fixed">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header trs-!-width-200"

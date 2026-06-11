@@ -126,7 +126,7 @@
                         <key>Date of birth</key>
                         <value>
                             @{
-                                var dobMatches = Model.PersonDateOfBirth.HasValue && 
+                                var dobMatches = Model.PersonDateOfBirth.HasValue &&
                                                 Model.OneLoginUserVerifiedDatesOfBirth?.Contains(Model.PersonDateOfBirth.Value) == true;
                             }
                             <span use-empty-fallback highlight="@(!dobMatches && Model.PersonDateOfBirth.HasValue)">

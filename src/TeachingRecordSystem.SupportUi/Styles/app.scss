@@ -92,12 +92,6 @@
   max-width: none;
 }
 
-.trs_checkboxes__wrapper--horizontal {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
 .trs-checkboxes_hint {
   padding-top: 1rem;
 }
@@ -249,6 +243,25 @@
 
   &__options {
     flex: 1;
+    flex-direction: row;
+    display: flex;
+    gap: 0 1rem;
+
+    .govuk-form-group {
+      margin-bottom: 0;
+    }
+
+    .govuk-checkboxes {
+      @extend .govuk-checkboxes--small;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0 1rem;
+    }
+
+    .govuk-checkboxes__item {
+      @extend .trs-nowrap;
+    }
   }
 
   &__actions {

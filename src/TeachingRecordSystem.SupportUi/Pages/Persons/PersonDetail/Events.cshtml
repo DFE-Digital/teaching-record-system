@@ -21,7 +21,7 @@
                 </div>
                 <p class="moj-timeline__date">
                     <time datetime="@legacyEvent.Timestamp.ToString("O")" data-testid="timeline-item-time">
-                        @legacyEvent.Timestamp.ToString(WebConstants.DateTimeDisplayFormat)
+                        @legacyEvent.Timestamp.ToString(WebConstants.DateAndTimeDisplayFormat)
                     </time>
                 </p>
                 <div class="moj-timeline__description">
@@ -37,7 +37,7 @@
                 </div>
                 <p class="moj-timeline__date">
                     <time datetime="@processEventPayload.Timestamp.ToString("O")" data-testid="timeline-item-time">
-                        @processEventPayload.Timestamp.ToString(WebConstants.DateTimeDisplayFormat)
+                        @processEventPayload.Timestamp.ToString(WebConstants.DateAndTimeDisplayFormat)
                     </time>
                 </p>
                 <div class="moj-timeline__description">
