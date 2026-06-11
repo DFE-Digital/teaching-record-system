@@ -20,5 +20,6 @@ public class TrnRequestMetadataMapping : IEntityTypeConfiguration<TrnRequestMeta
         builder.HasIndex(r => r.OneLoginUserSubject);
         builder.HasIndex(r => r.EmailAddress);
         builder.HasOne(r => r.ApplicationUser).WithMany().HasForeignKey(r => r.ApplicationUserId);
+        builder.HasIndex(r => r.ApplicationUserId).IsCreatedConcurrently();
     }
 }
