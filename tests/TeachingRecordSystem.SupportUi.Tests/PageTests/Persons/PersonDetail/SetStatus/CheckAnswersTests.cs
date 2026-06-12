@@ -21,17 +21,21 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         var person = await CreatePersonToBecomeStatus(targetStatus);
 
+        var additionalInformation = "this is some additional information";
         var stateBuilder = new SetStatusStateBuilder()
             .WithInitializedState()
             .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB");
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason,  ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason,  ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
+                
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -77,11 +81,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason,  ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason,  ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -117,11 +121,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.RecordHolderDied, ProvideMoreInformationOption.No);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.RecordHolderDied)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.DeactivatedByMistake, ProvideMoreInformationOption.No);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.DeactivatedByMistake)
+                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -166,11 +172,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason,  ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(

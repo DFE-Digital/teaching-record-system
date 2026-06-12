@@ -11,20 +11,33 @@ public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
     public string? ReactivateReasonDetail { get; set; }
     public TestEvidenceUploadModel Evidence { get; set; } = new();
     public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
-
-
-    public SetStatusPostRequestContentBuilder WithDeactivateReason(PersonDeactivateReason deactivateReason, ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
+    public string? DeactivateAdditionalInformation { get; set; }
+    public string? ReactivateAdditionalInformation { get; set; }
+    
+    public SetStatusPostRequestContentBuilder WithDeactivateReason(PersonDeactivateReason deactivateReason, string? detail = null)
     {
         DeactivateReason = deactivateReason;
         DeactivateReasonDetail = detail;
+        return this;
+    }
+
+    public SetStatusPostRequestContentBuilder WithReactivateReason(PersonReactivateReason reactivateReason, string? detail = null)
+    {
+        ReactivateReason = reactivateReason;
+        ReactivateReasonDetail = detail;
+        return this;
+    }
+    
+    public SetStatusPostRequestContentBuilder WithDeactivateProvideAdditionalInformation(ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
+    {
+        DeactivateAdditionalInformation = detail;
         ProvideMoreInformation = provideAdditionalInformation;
         return this;
     }
 
-    public SetStatusPostRequestContentBuilder WithReactivateReason(PersonReactivateReason reactivateReason, ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
+    public SetStatusPostRequestContentBuilder WithReactivateProvideAdditionalInformation(ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
     {
-        ReactivateReason = reactivateReason;
-        ReactivateReasonDetail = detail;
+        ReactivateAdditionalInformation = detail;
         ProvideMoreInformation = provideAdditionalInformation;
         return this;
     }

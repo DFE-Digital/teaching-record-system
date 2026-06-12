@@ -51,7 +51,7 @@
                         </govuk-radios-fieldset-legend>
                         <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
                             @ProvideMoreInformationOption.Yes.GetDisplayName()
-                            <govuk-radios-item-conditional data-testid="deactivate-reason-detail">
+                            <govuk-radios-item-conditional>
                                 <govuk-character-count for="DeactivateAdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
                                     <govuk-character-count-label>Enter details</govuk-character-count-label>
                                 </govuk-character-count>
@@ -75,7 +75,7 @@
                         </govuk-radios-item>
                         <govuk-radios-item value="@PersonReactivateReason.AnotherReason">
                             @PersonReactivateReason.AnotherReason.GetDisplayName()
-                            <govuk-radios-item-conditional data-testid="reactivate-reason-detail">
+                            <govuk-radios-item-conditional>
                                 <govuk-input data-testid="reactivate-reason-detail" for="ReactivateReasonDetail" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
                                     <govuk-input-label>Enter a reason</govuk-input-label>
                                 </govuk-input>
@@ -91,7 +91,7 @@
                         </govuk-radios-fieldset-legend>
                         <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
                             @ProvideMoreInformationOption.Yes.GetDisplayName()
-                            <govuk-radios-item-conditional data-testid="reactivate-reason-detail">
+                            <govuk-radios-item-conditional>
                                 <govuk-character-count for="ReactivateAdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
                                     <govuk-character-count-label>Enter details</govuk-character-count-label>
                                 </govuk-character-count>
