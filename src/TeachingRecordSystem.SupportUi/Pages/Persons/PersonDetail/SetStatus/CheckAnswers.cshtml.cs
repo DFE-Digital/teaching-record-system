@@ -19,6 +19,9 @@ public class CheckAnswersModel(
     public string? DeactivateReasonDetail { get; set; }
     public PersonReactivateReason? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
+    public string? ReactivateAdditionalInformation { get; set; }
+    public string? DeactivateAdditionalInformation { get; set; }
+
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public string BackLink => LinkGenerator.Persons.PersonDetail.SetStatus.Reason(PersonId, TargetStatus, JourneyInstance!.InstanceId);
@@ -41,7 +44,7 @@ public class CheckAnswersModel(
                     Reason = DeactivateReason?.GetDisplayName(),
                     Details = DeactivateReasonDetail,
                     EvidenceFile = EvidenceFile?.ToEventModel(),
-                    AdditionalInformation = null
+                    AdditionalInformation = DeactivateAdditionalInformation
                 });
 
             await PersonService.DeactivatePersonAsync(new DeactivatePersonOptions(PersonId, DateOfDeath: null), processContext);
@@ -57,7 +60,7 @@ public class CheckAnswersModel(
                     Reason = ReactivateReason?.GetDisplayName(),
                     Details = ReactivateReasonDetail,
                     EvidenceFile = EvidenceFile?.ToEventModel(),
-                    AdditionalInformation = null
+                    AdditionalInformation = ReactivateAdditionalInformation
                 });
 
             await PersonService.ReactivatePersonAsync(PersonId, processContext);
@@ -87,6 +90,8 @@ public class CheckAnswersModel(
         DeactivateReasonDetail = state.DeactivateReasonDetail;
         ReactivateReason = state.ReactivateReason;
         ReactivateReasonDetail = state.ReactivateReasonDetail;
+        ReactivateAdditionalInformation = state.ReactivateAdditionalInformation;
+        DeactivateAdditionalInformation = state.DeactivateAdditionalInformation;
         EvidenceFile = state.Evidence.UploadedEvidenceFile;
     }
 }

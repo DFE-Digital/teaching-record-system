@@ -21,17 +21,21 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         var person = await CreatePersonToBecomeStatus(targetStatus);
 
+        var additionalInformation = "this is some additional information";
         var stateBuilder = new SetStatusStateBuilder()
             .WithInitializedState()
             .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB");
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
+
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -47,7 +51,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("Additional information", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
         var expectedFileUrl = $"http://localhost/files/evidence.pdf?fileUrl={expectedBlobStorageFileUrl}";
@@ -77,11 +82,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -117,11 +124,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.RecordHolderDied, ProvideMoreInformationOption.No);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.RecordHolderDied)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.DeactivatedByMistake, ProvideMoreInformationOption.No);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.DeactivatedByMistake)
+                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -166,11 +175,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ProvideMoreInformationOption.Yes, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(

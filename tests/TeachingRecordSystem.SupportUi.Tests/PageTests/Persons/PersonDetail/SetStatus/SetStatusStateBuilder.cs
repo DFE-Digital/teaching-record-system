@@ -14,6 +14,8 @@ public class SetStatusStateBuilder
 
     private bool Initialized { get; set; }
     public ProvideMoreInformationOption ProvideMoreInformation { get; set; }
+    public string? DeactivateAdditionalInformation { get; set; }
+    public string? ReactivateAdditionalInformation { get; set; }
 
     public SetStatusStateBuilder WithInitializedState()
     {
@@ -22,19 +24,31 @@ public class SetStatusStateBuilder
         return this;
     }
 
-    public SetStatusStateBuilder WithDeactivateReasonChoice(PersonDeactivateReason option, ProvideMoreInformationOption provideAdditionalInformation, string? detailText = null)
+    public SetStatusStateBuilder WithDeactivateReasonChoice(PersonDeactivateReason option, string? detailText = null)
     {
-        ProvideMoreInformation = provideAdditionalInformation;
         DeactivateReason = option;
         DeactivateReasonDetail = detailText;
         return this;
     }
 
-    public SetStatusStateBuilder WithReactivateReasonChoice(PersonReactivateReason option, ProvideMoreInformationOption provideAdditionalInformation, string? detailText = null)
+    public SetStatusStateBuilder WithReactivateReasonChoice(PersonReactivateReason option, string? detailText = null)
     {
-        ProvideMoreInformation = provideAdditionalInformation;
         ReactivateReason = option;
         ReactivateReasonDetail = detailText;
+        return this;
+    }
+
+    public SetStatusStateBuilder WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption provideAdditionalInformation, string? detailText = null)
+    {
+        ProvideMoreInformation = provideAdditionalInformation;
+        DeactivateAdditionalInformation = detailText;
+        return this;
+    }
+
+    public SetStatusStateBuilder WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption provideAdditionalInformation, string? detailText = null)
+    {
+        ProvideMoreInformation = provideAdditionalInformation;
+        ReactivateAdditionalInformation = detailText;
         return this;
     }
 
@@ -63,7 +77,9 @@ public class SetStatusStateBuilder
             ReactivateReasonDetail = ReactivateReasonDetail,
             ProvideMoreInformation = ProvideMoreInformation,
             Evidence = Evidence,
-            Initialized = Initialized
+            Initialized = Initialized,
+            ReactivateAdditionalInformation = ReactivateAdditionalInformation,
+            DeactivateAdditionalInformation = DeactivateAdditionalInformation,
         };
     }
 }
