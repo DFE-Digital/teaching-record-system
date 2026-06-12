@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.WebhookData;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20260612.WebhookData;
 using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.VNext.WebhookData;
