@@ -59,7 +59,7 @@ public class ReasonModel(
         v => v.RuleFor(m => m.ReactivateAdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
-            .When(m => m.TargetStatus == PersonStatus.Active),
+            .When(m => m.TargetStatus == PersonStatus.Active && m.ProvideMoreInformation == ProvideMoreInformationOption.Yes),
 
         v => v.RuleFor(m => m.ReactivateReasonDetail)
             .NotEmpty().WithMessage("Enter a reason")
