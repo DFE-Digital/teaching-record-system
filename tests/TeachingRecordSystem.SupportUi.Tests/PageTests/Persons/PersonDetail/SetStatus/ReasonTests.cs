@@ -653,12 +653,12 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         if (targetStatus == PersonStatus.Deactivated)
         {
             contentBuilder.WithDeactivateReason(PersonDeactivateReason.RecordHolderDied, "Unneccessary detail")
-                .WithDeactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, null);  
+                .WithDeactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, null);
         }
         else
         {
             contentBuilder.WithReactivateReason(PersonReactivateReason.DeactivatedByMistake, "Unneccessary detail")
-                .WithReactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, null);  
+                .WithReactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, null);
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
