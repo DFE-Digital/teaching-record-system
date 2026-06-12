@@ -34,7 +34,7 @@ public class ReasonModel(
             .NotEmpty()
             .WithMessage("Enter details")
             .When(x => x.ProvideMoreInformation == ProvideMoreInformationOption.Yes && x.TargetStatus == PersonStatus.Deactivated),
-        
+
         v => v.RuleFor(m => m.DeactivateAdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
             .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
@@ -60,7 +60,7 @@ public class ReasonModel(
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Reason details {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}")
             .When(m => m.TargetStatus == PersonStatus.Active),
-        
+
         v => v.RuleFor(m => m.ReactivateReasonDetail)
             .NotEmpty().WithMessage("Enter a reason")
             .When(m => m.ReactivateReason == PersonReactivateReason.AnotherReason),

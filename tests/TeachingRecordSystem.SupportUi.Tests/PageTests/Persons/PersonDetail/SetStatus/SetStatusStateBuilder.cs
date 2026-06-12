@@ -37,11 +37,11 @@ public class SetStatusStateBuilder
         ReactivateReasonDetail = detailText;
         return this;
     }
-    
+
     public SetStatusStateBuilder WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption provideAdditionalInformation, string? detailText = null)
     {
         ProvideMoreInformation = provideAdditionalInformation;
-        DeactivateAdditionalInformation= detailText;
+        DeactivateAdditionalInformation = detailText;
         return this;
     }
 

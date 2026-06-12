@@ -13,7 +13,7 @@ public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
     public ProvideMoreInformationOption? ProvideMoreInformation { get; set; }
     public string? DeactivateAdditionalInformation { get; set; }
     public string? ReactivateAdditionalInformation { get; set; }
-    
+
     public SetStatusPostRequestContentBuilder WithDeactivateReason(PersonDeactivateReason deactivateReason, string? detail = null)
     {
         DeactivateReason = deactivateReason;
@@ -27,7 +27,7 @@ public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
         ReactivateReasonDetail = detail;
         return this;
     }
-    
+
     public SetStatusPostRequestContentBuilder WithDeactivateProvideAdditionalInformation(ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
     {
         DeactivateAdditionalInformation = detail;

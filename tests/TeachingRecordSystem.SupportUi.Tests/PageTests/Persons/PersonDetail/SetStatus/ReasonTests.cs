@@ -57,7 +57,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
             var reasonDetailTextArea = doc.GetElementById("DeactivateReasonDetail") as IHtmlInputElement;
             Assert.Equal(reasonDetail, reasonDetailTextArea!.Value);
-            
+
             var additionalDetailTextArea = doc.GetElementById("DeactivateAdditionalInformation") as IHtmlTextAreaElement;
             Assert.Equal(expectedAdditionalInformation, additionalDetailTextArea!.Value);
         }
@@ -69,7 +69,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
             var reasonDetailTextArea = doc.GetElementById("ReactivateReasonDetail") as IHtmlInputElement;
             Assert.Equal(reasonDetail, reasonDetailTextArea!.Value);
-            
+
             var additionalDetailTextArea = doc.GetElementById("ReactivateAdditionalInformation") as IHtmlTextAreaElement;
             Assert.Equal(expectedAdditionalInformation, additionalDetailTextArea!.Value);
         }
@@ -372,13 +372,13 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            contentBuilder.WithDeactivateReason(PersonDeactivateReason.AnotherReason,  detail: null)
+            contentBuilder.WithDeactivateReason(PersonDeactivateReason.AnotherReason, detail: null)
                 .WithDeactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, detail: null);
         }
         else
         {
-            contentBuilder.WithReactivateReason(PersonReactivateReason.AnotherReason,  detail: null)
-                .WithReactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, detail: null);;
+            contentBuilder.WithReactivateReason(PersonReactivateReason.AnotherReason, detail: null)
+                .WithReactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, detail: null); ;
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -433,7 +433,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         else
         {
             contentBuilder.WithReactivateReason(PersonReactivateReason.AnotherReason, detail: null)
-                .WithReactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, detail: null);;
+                .WithReactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, detail: null); ;
         }
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
@@ -487,7 +487,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         }
         else
         {
-            contentBuilder.WithReactivateReason(PersonReactivateReason.AnotherReason,  detail: null)
+            contentBuilder.WithReactivateReason(PersonReactivateReason.AnotherReason, detail: null)
                 .WithReactivateProvideAdditionalInformation(ProvideMoreInformationOption.No, detail: null);
         }
 
@@ -567,7 +567,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         if (targetStatus == PersonStatus.Deactivated)
         {
             contentBuilder.WithDeactivateReason(PersonDeactivateReason.RecordHolderDied)
-                .WithDeactivateProvideAdditionalInformation(ProvideMoreInformationOption.No);;
+                .WithDeactivateProvideAdditionalInformation(ProvideMoreInformationOption.No); ;
         }
         else
         {

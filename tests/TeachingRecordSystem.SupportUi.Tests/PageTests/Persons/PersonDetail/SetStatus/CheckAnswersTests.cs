@@ -28,14 +28,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason,  ChangeReasonDetails)
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
                 .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason,  ChangeReasonDetails)
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
                 .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
-                
+
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -81,11 +81,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason,  ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason,  ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -177,7 +177,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason,  ChangeReasonDetails)
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
                 .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
 
