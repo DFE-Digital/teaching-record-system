@@ -5,9 +5,21 @@
 The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
 
+## 20260612
+
+- A webhook message has been added that fires when a person has been deactivated - `person.completed`.
+
+## 20260515
+
+- The `trn-request.completed` webhook message now has a `oneLoginUserSubject` property.
+
 ## 20260416
 
-An endpoint has been added to activate a dormant TRN request: `PUT /v3/trn-requests/active/<request_id>`.
+- An endpoint has been added to activate a dormant TRN request: `PUT /v3/trn-requests/active/<request_id>`.
+
+## 20260224
+
+- A webhook message has been added that fires when a TRN request has been completed - `trn-request.completed`.
 
 ## 20260120
 
