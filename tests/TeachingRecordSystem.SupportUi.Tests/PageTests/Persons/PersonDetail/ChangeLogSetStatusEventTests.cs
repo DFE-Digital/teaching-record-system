@@ -80,7 +80,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
-        doc.AssertSummaryListRowValue("change-reason", "Additional details", v => Assert.Equal(additionalInformation, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Reason details", v => Assert.Equal(reasonDetail, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
@@ -141,7 +141,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
-        doc.AssertSummaryListRowValue("change-reason", "Additional details", v => Assert.Equal(additionalInformation, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Reason details", v => Assert.Equal(reasonDetail, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
