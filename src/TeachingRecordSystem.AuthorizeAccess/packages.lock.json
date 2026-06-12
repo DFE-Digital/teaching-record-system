@@ -962,7 +962,7 @@
           "OneOf": "[3.0.271, )",
           "OpenIddict.EntityFrameworkCore": "[7.5.0, )",
           "Optional": "[4.0.0, )",
-          "Polly.Core": "[8.6.6, )",
+          "Polly.Core": "[8.7.0, )",
           "Scrutor": "[7.0.0, )",
           "Serilog.Formatting.Compact": "[3.0.0, )",
           "Serilog.Settings.Configuration": "[10.0.0, )",
@@ -1340,9 +1340,9 @@
       },
       "Polly.Core": {
         "type": "CentralTransitive",
-        "requested": "[8.6.6, )",
-        "resolved": "8.6.6",
-        "contentHash": "lCBL9mmhF9TZxHG3beVRkyjlLohkIC464xIAq7J7Y59C+z42hmsdUaeCKl2SIAYertOUU5TeBXyQDLDQGIKePQ=="
+        "requested": "[8.7.0, )",
+        "resolved": "8.7.0",
+        "contentHash": "BS2t+nsBer16PIebCEPNBK5fgMisADQyRCd7K+BgkMWpFmSaiYE+rVVNpFhGRqUkJmNSLmw0uCNzHHWfgml28Q=="
       },
       "prometheus-net.AspNetCore": {
         "type": "CentralTransitive",
