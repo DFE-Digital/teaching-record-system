@@ -1,8 +1,8 @@
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250627;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20260224;
 
 public abstract class TestBase : IntegrationTests.TestBase
 {
-    public const string Version = VersionRegistry.V3MinorVersions.V20250627;
+    public const string Version = VersionRegistry.V3MinorVersions.V20260224;
 
     public ReferenceDataCache ReferenceCache { get; }
 

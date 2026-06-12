@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20260612;
 
 public class GetPersonTests : TestBase
 {
@@ -111,7 +111,7 @@ public class GetPersonTests : TestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithQts_ReturnsExpectedQtsContentWithoutCertificateUrl()
+    public async Task Get_ValidRequestWithQts_ReturnsExpectedQtsContent()
     {
         // Arrange
         var qtsDate = new DateOnly(2021, 1, 1);
@@ -127,8 +127,29 @@ public class GetPersonTests : TestBase
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseQts = jsonResponse.RootElement.GetProperty("qts");
 
-        Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), responseQts.GetProperty("awarded").GetString());
+        Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), responseQts.GetProperty("holdsFrom").GetString());
+        Assert.True(responseQts.GetProperty("routes").GetArrayLength() >= 1);
+        Assert.False(responseQts.TryGetProperty("awarded", out _));
+        Assert.False(responseQts.TryGetProperty("awardedOrApprovedCount", out _));
         Assert.False(responseQts.TryGetProperty("certificateUrl", out _));
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithRoutesToProfessionalStatuses_ReturnsRoutesContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn!, Version);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=RoutesToProfessionalStatuses");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseRoutes = jsonResponse.RootElement.GetProperty("routesToProfessionalStatuses");
+        Assert.True(responseRoutes.GetArrayLength() >= 1);
     }
 
     [Fact]
@@ -159,7 +180,8 @@ public class GetPersonTests : TestBase
             {
                 status = InductionStatus.Passed.ToString(),
                 startDate = startDate.ToString("yyyy-MM-dd"),
-                completedDate = completedDate.ToString("yyyy-MM-dd")
+                completedDate = completedDate.ToString("yyyy-MM-dd"),
+                exemptionReasons = Array.Empty<object>()
             },
             responseInduction);
     }
@@ -185,7 +207,8 @@ public class GetPersonTests : TestBase
             {
                 status = InductionStatus.None.ToString(),
                 startDate = (DateOnly?)null,
-                completedDate = (DateOnly?)null
+                completedDate = (DateOnly?)null,
+                exemptionReasons = Array.Empty<object>()
             },
             responseInduction);
     }
@@ -255,7 +278,8 @@ public class GetPersonTests : TestBase
             {
                 new
                 {
-                    awarded = validMq.EndDate?.ToString("yyyy-MM-dd"),
+                    mandatoryQualificationId = validMq.QualificationId,
+                    endDate = validMq.EndDate?.ToString("yyyy-MM-dd"),
                     specialism = validMq.Specialism?.GetTitle()
                 }
             },

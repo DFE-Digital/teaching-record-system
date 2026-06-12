@@ -1,7 +1,6 @@
 using System.Text.Json;
-using TeachingRecordSystem.Api.V3.V20240920.Requests;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240920;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240814;
 
 public class GetPersonByTrnTests : TestBase
 {
@@ -23,7 +22,7 @@ public class GetPersonByTrnTests : TestBase
         Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
     }
 
-    [Theory, RoleNamesData(except: [ApiRoles.GetPerson, ApiRoles.AppropriateBody])]
+    [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
@@ -159,7 +158,8 @@ public class GetPersonByTrnTests : TestBase
                 endDate = completedDate.ToString("yyyy-MM-dd"),
                 status = "Pass",
                 statusDescription = "Pass",
-                certificateUrl = "/v3/certificates/induction"
+                certificateUrl = "/v3/certificates/induction",
+                periods = Array.Empty<object>()
             },
             responseInduction);
     }
@@ -219,14 +219,47 @@ public class GetPersonByTrnTests : TestBase
     }
 
     [Fact]
+    public async Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
+    {
+        // Arrange
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
+        var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).SingleRandom();
+
+        var person = await TestData.CreatePersonAsync(b => b
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
+
+        var alert = person.Alerts.Single();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Sanctions");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseSanctions = jsonResponse.RootElement.GetProperty("sanctions");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    code = alertType.DqtSanctionCode,
+                    startDate = alert.StartDate
+                }
+            },
+            responseSanctions);
+    }
+
+    [Fact]
     public async Task Get_ValidRequestWithAlerts_ReturnsExpectedAlertsContent()
     {
         // Arrange
         var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
-        var alertType = alertTypes.Where(at => !at.InternalOnly).SingleRandom();
+        var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyProhibitionSanctionCodes.Contains(at.DqtSanctionCode)).SingleRandom();
 
-        var person = await TestData.CreatePersonAsync(x => x
-            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
+        var person = await TestData.CreatePersonAsync(b => b
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
         var alert = person.Alerts.Single();
 
@@ -244,18 +277,8 @@ public class GetPersonByTrnTests : TestBase
             {
                 new
                 {
-                    alertId = alert.AlertId,
-                    alertType = new
-                    {
-                        alertTypeId = alert.AlertType!.AlertTypeId,
-                        name = alert.AlertType.Name,
-                        alertCategory = new
-                        {
-                            alertCategoryId = alert.AlertType.AlertCategory!.AlertCategoryId,
-                            name = alert.AlertType.AlertCategory.Name
-                        }
-                    },
-                    details = alert.Details,
+                    alertType = "Prohibition",
+                    dqtSanctionCode = alertType.DqtSanctionCode,
                     startDate = alert.StartDate,
                     endDate = alert.EndDate
                 }
@@ -294,65 +317,5 @@ public class GetPersonByTrnTests : TestBase
                 }
             },
             responsePreviousNames);
-    }
-
-    [Theory]
-    [InlineData(GetPersonRequestIncludes.Induction)]
-    [InlineData(GetPersonRequestIncludes.Alerts)]
-    [InlineData(GetPersonRequestIncludes.InitialTeacherTraining)]
-    public async Task Get_AsAppropriateBodyWithPermittedInclude_ReturnsOk(GetPersonRequestIncludes include)
-    {
-        // Arrange
-        SetCurrentApiClient([ApiRoles.AppropriateBody]);
-
-        var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}&include={Uri.EscapeDataString(include.ToString())}");
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData(GetPersonRequestIncludes.NpqQualifications)]
-    [InlineData(GetPersonRequestIncludes.MandatoryQualifications)]
-    [InlineData(GetPersonRequestIncludes.PendingDetailChanges)]
-    [InlineData(GetPersonRequestIncludes.HigherEducationQualifications)]
-    [InlineData(GetPersonRequestIncludes.PreviousNames)]
-    [InlineData(GetPersonRequestIncludes._AllowIdSignInWithProhibitions)]
-    public async Task Get_AsAppropriateBodyWithNotPermittedInclude_ReturnsForbidden(GetPersonRequestIncludes include)
-    {
-        // Arrange
-        SetCurrentApiClient([ApiRoles.AppropriateBody]);
-
-        var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}&include={Uri.EscapeDataString(include.ToString())}");
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_AsAppropriateBodyWithoutDateOfBirth_ReturnsForbidden()
-    {
-        // Arrange
-        SetCurrentApiClient([ApiRoles.AppropriateBody]);
-
-        var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 }

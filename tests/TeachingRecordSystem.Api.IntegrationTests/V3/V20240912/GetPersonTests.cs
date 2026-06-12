@@ -1,19 +1,18 @@
 using System.Text.Json;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240912;
 
-public class GetPersonByTrnTests : TestBase
+public class GetPersonTests : TestBase
 {
-    public GetPersonByTrnTests(HostFixture hostFixture) : base(hostFixture)
+    public GetPersonTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentApiClient([ApiRoles.GetPerson]);
     }
 
     [Fact]
     public async Task Get_UnauthenticatedRequest_ReturnsUnauthorized()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/persons/1234567");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
 
         // Act
         var response = await GetHttpClient(Version).SendAsync(request);
@@ -22,94 +21,33 @@ public class GetPersonByTrnTests : TestBase
         Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
     }
 
-    [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
-    public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    [Fact]
+    public async Task Get_PersonForTrnDoesNotExist_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentApiClient(roles);
-
-        var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
+        var httpClient = GetHttpClientWithIdentityAccessToken("1234567");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
 
         // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var response = await httpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]
-    public async Task Get_TrnNotFound_ReturnsNotFound()
-    {
-        // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/persons/1234567");
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_DateOfBirthDoesNotMatchTeachingRecord_ReturnsNotFound()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var dateOfBirth = person.DateOfBirth.AddDays(1);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={dateOfBirth:yyyy-MM-dd}");
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_DateOfBirthMatchesTeachingRecord_ReturnsOk()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}");
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_DateOfBirthNotProvided_ReturnsOk()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_ValidRequest_ReturnsExpectedResponse()
+    public async Task Get_WithTrnClaim_ReturnsExpectedResponse()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithNationalInsuranceNumber()
             .WithEmailAddress(Faker.Internet.Email()));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
 
         // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var response = await httpClient.SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEqualsAsync(
@@ -142,10 +80,11 @@ public class GetPersonByTrnTests : TestBase
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Induction");
 
         // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var response = await httpClient.SendAsync(request);
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
@@ -170,10 +109,11 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Induction");
 
         // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var response = await httpClient.SendAsync(request);
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
@@ -197,10 +137,11 @@ public class GetPersonByTrnTests : TestBase
 
         var validMq = person.MandatoryQualifications.Last();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=MandatoryQualifications");
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=MandatoryQualifications");
 
         // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var response = await httpClient.SendAsync(request);
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
@@ -230,10 +171,11 @@ public class GetPersonByTrnTests : TestBase
 
         var alert = person.Alerts.Single();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Sanctions");
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Sanctions");
 
         // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var response = await httpClient.SendAsync(request);
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
@@ -263,10 +205,11 @@ public class GetPersonByTrnTests : TestBase
 
         var alert = person.Alerts.Single();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Alerts");
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Alerts");
 
         // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var response = await httpClient.SendAsync(request);
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
@@ -297,10 +240,11 @@ public class GetPersonByTrnTests : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithPreviousNames((firstName, middleName, lastName, new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc))));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=PreviousNames");
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=PreviousNames");
 
         // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var response = await httpClient.SendAsync(request);
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
