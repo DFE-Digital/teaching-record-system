@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20260612;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class FindPersonsByTrnAndDateOfBirthTests : TestBase
@@ -97,7 +97,13 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
                         qts = (object?)null,
                         eyts = (object?)null,
                         alerts = Array.Empty<object>(),
-                        inductionStatus = "None",
+                        induction = new
+                        {
+                            status = InductionStatus.None.ToString(),
+                            startDate = (DateOnly?)null,
+                            completedDate = (DateOnly?)null,
+                            exemptionReasons = Array.Empty<object>()
+                        },
                         qtlsStatus = "None"
                     }
                 }
@@ -105,14 +111,17 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
     }
 
     [Fact]
-    public async Task Post_PersonHasInductionStatus_ReturnsExpectedStatus()
+    public async Task Post_PersonHasInduction_ReturnsExpectedInductionContent()
     {
         // Arrange
+        var startDate = new DateOnly(1996, 2, 3);
+        var completedDate = new DateOnly(1996, 6, 7);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithInductionStatus(i => i
                 .WithStatus(InductionStatus.Passed)
-                .WithStartDate(new DateOnly(1996, 2, 3))
-                .WithCompletedDate(new DateOnly(1996, 6, 7))));
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)));
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/v3/persons/find")
         {
@@ -124,8 +133,17 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
-        var inductionStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("inductionStatus").GetString();
-        Assert.Equal(InductionStatus.Passed.ToString(), inductionStatus);
+        var responseInduction = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("induction");
+
+        AssertEx.JsonObjectEquals(
+            new
+            {
+                status = InductionStatus.Passed.ToString(),
+                startDate = startDate.ToString("yyyy-MM-dd"),
+                completedDate = completedDate.ToString("yyyy-MM-dd"),
+                exemptionReasons = Array.Empty<object>()
+            },
+            responseInduction);
     }
 
     [Fact]
@@ -187,7 +205,9 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var qts = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qts");
 
-        Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), qts.GetProperty("awarded").GetString());
+        Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), qts.GetProperty("holdsFrom").GetString());
+        Assert.True(qts.GetProperty("routes").GetArrayLength() >= 1);
+        Assert.False(qts.TryGetProperty("awarded", out _));
         Assert.False(qts.TryGetProperty("awardedOrApprovedCount", out _));
     }
 }

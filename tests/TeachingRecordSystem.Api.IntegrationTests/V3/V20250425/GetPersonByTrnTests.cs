@@ -1,7 +1,7 @@
 using System.Text.Json;
-using TeachingRecordSystem.Api.V3.V20240920.Requests;
+using TeachingRecordSystem.Api.V3.V20250327.Requests;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240920;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
 public class GetPersonByTrnTests : TestBase
 {
@@ -100,6 +100,54 @@ public class GetPersonByTrnTests : TestBase
     }
 
     [Fact]
+    public async Task Get_WithNationalInsuranceNumberMatchingRecord_ReturnsOk()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?nationalInsuranceNumber={person.NationalInsuranceNumber}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_WithNationalInsuranceNumberNotMatchingRecord_ReturnsNotFound()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+        var requestNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?nationalInsuranceNumber={requestNino}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_BothNationalInsuranceNumberAndDateOfBirthSpecified_ReturnsBadRequest()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}&nationalInsuranceNumber={person.NationalInsuranceNumber}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
     public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
         // Arrange
@@ -125,9 +173,50 @@ public class GetPersonByTrnTests : TestBase
                 nationalInsuranceNumber = person.NationalInsuranceNumber,
                 qts = (object?)null,
                 eyts = (object?)null,
-                emailAddress = person.EmailAddress
+                emailAddress = person.EmailAddress,
+                qtlsStatus = "None"
             },
             expectedStatusCode: StatusCodes.Status200OK);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithQts_ReturnsExpectedQtsContentWithoutCertificateUrl()
+    {
+        // Arrange
+        var qtsDate = new DateOnly(2021, 1, 1);
+        var person = await TestData.CreatePersonAsync(p => p.WithQts(qtsDate));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseQts = jsonResponse.RootElement.GetProperty("qts");
+
+        Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), responseQts.GetProperty("awarded").GetString());
+        Assert.Equal(1, responseQts.GetProperty("awardedOrApprovedCount").GetInt32());
+        Assert.False(responseQts.TryGetProperty("certificateUrl", out _));
+    }
+
+    [Fact]
+    public async Task Get_PersonWithQtlsAndQtsViaAnotherRoute_ReturnsExpectedAwardedOrApprovedCount()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithQtls(Clock.Today));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var responseJson = await AssertEx.JsonResponseAsync(response);
+        var awardedOrApprovedCount = responseJson.RootElement.GetProperty("qts").GetProperty("awardedOrApprovedCount").GetInt32();
+        Assert.Equal(2, awardedOrApprovedCount);
     }
 
     [Fact]
@@ -155,17 +244,15 @@ public class GetPersonByTrnTests : TestBase
         AssertEx.JsonObjectEquals(
             new
             {
+                status = InductionStatus.Passed.ToString(),
                 startDate = startDate.ToString("yyyy-MM-dd"),
-                endDate = completedDate.ToString("yyyy-MM-dd"),
-                status = "Pass",
-                statusDescription = "Pass",
-                certificateUrl = "/v3/certificates/induction"
+                completedDate = completedDate.ToString("yyyy-MM-dd")
             },
             responseInduction);
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithInductionAndPersonHasNoInductionStatus_ReturnsNullInductionContent()
+    public async Task Get_ValidRequestWithInductionAndPersonHasNoInductionStatus_ReturnsNoneInductionStatus()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -178,7 +265,47 @@ public class GetPersonByTrnTests : TestBase
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseInduction = jsonResponse.RootElement.GetProperty("induction");
-        Assert.Equal(JsonValueKind.Null, responseInduction.ValueKind);
+
+        AssertEx.JsonObjectEquals(
+            new
+            {
+                status = InductionStatus.None.ToString(),
+                startDate = (DateOnly?)null,
+                completedDate = (DateOnly?)null
+            },
+            responseInduction);
+    }
+
+    [Fact]
+    public async Task Get_WithQtlsDate_ReturnsActiveQtlsStatus()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQtls(new DateOnly(2020, 1, 1)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        Assert.Equal("Active", jsonResponse.RootElement.GetProperty("qtlsStatus").GetString());
+    }
+
+    [Fact]
+    public async Task Get_WithExpiredQtls_ReturnsExpiredQtlsStatus()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQtlsStatus(QtlsStatus.Expired));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        Assert.Equal("Expired", jsonResponse.RootElement.GetProperty("qtlsStatus").GetString());
     }
 
     [Fact]
@@ -320,7 +447,6 @@ public class GetPersonByTrnTests : TestBase
     [InlineData(GetPersonRequestIncludes.NpqQualifications)]
     [InlineData(GetPersonRequestIncludes.MandatoryQualifications)]
     [InlineData(GetPersonRequestIncludes.PendingDetailChanges)]
-    [InlineData(GetPersonRequestIncludes.HigherEducationQualifications)]
     [InlineData(GetPersonRequestIncludes.PreviousNames)]
     [InlineData(GetPersonRequestIncludes._AllowIdSignInWithProhibitions)]
     public async Task Get_AsAppropriateBodyWithNotPermittedInclude_ReturnsForbidden(GetPersonRequestIncludes include)
@@ -348,6 +474,23 @@ public class GetPersonByTrnTests : TestBase
         var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_AsAppropriateBodySpecifiesNationalInsuranceNumber_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentApiClient([ApiRoles.AppropriateBody]);
+
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?nationalInsuranceNumber={person.NationalInsuranceNumber}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);

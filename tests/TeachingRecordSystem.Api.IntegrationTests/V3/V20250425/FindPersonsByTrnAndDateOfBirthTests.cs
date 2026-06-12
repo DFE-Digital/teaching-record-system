@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class FindPersonsByTrnAndDateOfBirthTests : TestBase
@@ -188,6 +188,6 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var qts = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qts");
 
         Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), qts.GetProperty("awarded").GetString());
-        Assert.False(qts.TryGetProperty("awardedOrApprovedCount", out _));
+        Assert.Equal(1, qts.GetProperty("awardedOrApprovedCount").GetInt32());
     }
 }

@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
 public class GetPersonTests : TestBase
 {
@@ -128,7 +128,28 @@ public class GetPersonTests : TestBase
         var responseQts = jsonResponse.RootElement.GetProperty("qts");
 
         Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), responseQts.GetProperty("awarded").GetString());
+        Assert.Equal(1, responseQts.GetProperty("awardedOrApprovedCount").GetInt32());
         Assert.False(responseQts.TryGetProperty("certificateUrl", out _));
+    }
+
+    [Fact]
+    public async Task Get_PersonWithQtlsAndQtsViaAnotherRoute_ReturnsExpectedAwardedOrApprovedCount()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithQtls(Clock.Today));
+
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn!, Version);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var responseJson = await AssertEx.JsonResponseAsync(response);
+        var awardedOrApprovedCount = responseJson.RootElement.GetProperty("qts").GetProperty("awardedOrApprovedCount").GetInt32();
+        Assert.Equal(2, awardedOrApprovedCount);
     }
 
     [Fact]
