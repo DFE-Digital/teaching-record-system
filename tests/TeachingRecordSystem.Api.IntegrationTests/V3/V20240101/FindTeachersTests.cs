@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240101;
@@ -12,22 +11,30 @@ public class FindTeachersTests : TestBase
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
 
+    [Fact]
+    public async Task Get_UnauthenticatedRequest_ReturnsUnauthorized()
+    {
+        // Arrange
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/v3/teachers?findBy=LastNameAndDateOfBirth&lastName=Smith&dateOfBirth=1990-01-01");
+
+        // Act
+        var response = await GetHttpClient(Version).SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
+    }
+
     [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
         SetCurrentApiClient(roles);
 
-        var findBy = "LastNameAndDateOfBirth";
-        var lastName = "Smith";
-        var dateOfBirth = new DateOnly(1990, 1, 1);
-
-        var person1 = await TestData.CreatePersonAsync(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-        var person2 = await TestData.CreatePersonAsync(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/v3/teachers?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
+            "/v3/teachers?findBy=LastNameAndDateOfBirth&lastName=Smith&dateOfBirth=1990-01-01");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -42,12 +49,9 @@ public class FindTeachersTests : TestBase
     public async Task Get_InvalidFindBy_ReturnsError(string findBy, string expectedErrorMessage)
     {
         // Arrange
-        var lastName = "Smith";
-        var dateOfBirth = "1990-01-01";
-
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/v3/teachers?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth}");
+            $"/v3/teachers?findBy={findBy}&lastName=Smith&dateOfBirth=1990-01-01");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -78,7 +82,33 @@ public class FindTeachersTests : TestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithMatchesOnLastName_ReturnsMappedContacts()
+    public async Task Get_NoMatch_ReturnsEmptyResults()
+    {
+        // Arrange
+        var findBy = "LastNameAndDateOfBirth";
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/teachers?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseEqualsAsync(
+            response,
+            new
+            {
+                total = 0,
+                query = new { findBy, lastName, dateOfBirth },
+                results = Array.Empty<object>()
+            });
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithMatchesOnLastName_ReturnsExpectedResults()
     {
         // Arrange
         var findBy = "LastNameAndDateOfBirth";
@@ -89,13 +119,11 @@ public class FindTeachersTests : TestBase
         var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).SingleRandom();
 
         var person1 = await TestData.CreatePersonAsync(p => p
-
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
@@ -113,12 +141,7 @@ public class FindTeachersTests : TestBase
             new
             {
                 total = 2,
-                query = new
-                {
-                    findBy,
-                    lastName,
-                    dateOfBirth
-                },
+                query = new { findBy, lastName, dateOfBirth },
                 results = new[]
                 {
                     new
@@ -126,14 +149,14 @@ public class FindTeachersTests : TestBase
                         trn = person1.Trn,
                         dateOfBirth = person1.DateOfBirth,
                         firstName = person1.FirstName,
-                        middleName = person1.MiddleName ?? "",
+                        middleName = person1.MiddleName,
                         lastName = person1.LastName,
                         sanctions = new[]
                         {
                             new
                             {
-                                code = person1.Alerts.First().AlertType!.DqtSanctionCode,
-                                startDate = person1.Alerts.First().StartDate
+                                code = person1.Alerts.Single().AlertType!.DqtSanctionCode,
+                                startDate = person1.Alerts.Single().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()
@@ -149,8 +172,8 @@ public class FindTeachersTests : TestBase
                         {
                             new
                             {
-                                code = person2.Alerts.First().AlertType!.DqtSanctionCode,
-                                startDate = person2.Alerts.First().StartDate
+                                code = person2.Alerts.Single().AlertType!.DqtSanctionCode,
+                                startDate = person2.Alerts.Single().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()
@@ -160,7 +183,7 @@ public class FindTeachersTests : TestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithMatchOnPreviousName_ReturnsMappedContacts()
+    public async Task Get_ValidRequestWithMatchOnPreviousName_ReturnsExpectedResults()
     {
         // Arrange
         var findBy = "LastNameAndDateOfBirth";
@@ -169,7 +192,6 @@ public class FindTeachersTests : TestBase
 
         var person1 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
         var person2 = await TestData.CreatePersonAsync(p => p.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
-        var person3 = await TestData.CreatePersonAsync(p => p.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -200,12 +222,7 @@ public class FindTeachersTests : TestBase
             new
             {
                 total = 2,
-                query = new
-                {
-                    findBy,
-                    lastName,
-                    dateOfBirth
-                },
+                query = new { findBy, lastName, dateOfBirth },
                 results = new[]
                 {
                     new
@@ -213,7 +230,7 @@ public class FindTeachersTests : TestBase
                         trn = person1.Trn,
                         dateOfBirth = person1.DateOfBirth,
                         firstName = person1.FirstName,
-                        middleName = person1.MiddleName ?? "",
+                        middleName = person1.MiddleName,
                         lastName = person1.LastName,
                         sanctions = Array.Empty<object>(),
                         previousNames = Array.Empty<object>()
@@ -248,14 +265,13 @@ public class FindTeachersTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var sanctionCode = "A17";
-        Debug.Assert(!Api.V3.Constants.LegacyExposableSanctionCodes.Contains(sanctionCode));
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync(sanctionCode);
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
+        var alertType = alertTypes.Where(at => !Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).SingleRandom();
 
-        var person = await TestData.CreatePersonAsync(p => p
+        var person = await TestData.CreatePersonAsync(b => b
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -270,12 +286,7 @@ public class FindTeachersTests : TestBase
             new
             {
                 total = 1,
-                query = new
-                {
-                    findBy,
-                    lastName,
-                    dateOfBirth
-                },
+                query = new { findBy, lastName, dateOfBirth },
                 results = new[]
                 {
                     new
@@ -283,7 +294,7 @@ public class FindTeachersTests : TestBase
                         trn = person.Trn,
                         dateOfBirth = person.DateOfBirth,
                         firstName = person.FirstName,
-                        middleName = person.MiddleName ?? "",
+                        middleName = person.MiddleName,
                         lastName = person.LastName,
                         sanctions = Array.Empty<object>(),
                         previousNames = Array.Empty<object>()

@@ -1,5 +1,3 @@
-using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsStatus;
-
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
@@ -11,9 +9,106 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
     }
 
     [Fact]
-    public async Task Get_PersonHasNullDqtInductionStatus_ReturnsNoneInductionStatus()
+    public async Task Get_UnauthenticatedRequest_ReturnsUnauthorized()
     {
         // Arrange
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/v3/persons?findBy=LastNameAndDateOfBirth&lastName=Smith&dateOfBirth=1990-01-01");
+
+        // Act
+        var response = await GetHttpClient(Version).SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
+    }
+
+    [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
+    public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/v3/persons?findBy=LastNameAndDateOfBirth&lastName=Smith&dateOfBirth=1990-01-01");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("", "Invalid matching policy.")]
+    [InlineData("BadFindBy", "The value 'BadFindBy' is not valid for FindBy.")]
+    public async Task Get_InvalidFindBy_ReturnsError(string findBy, string expectedErrorMessage)
+    {
+        // Arrange
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/persons?findBy={findBy}&lastName=Smith&dateOfBirth=1990-01-01");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "findBy", expectedErrorMessage);
+    }
+
+    [Theory]
+    [InlineData("", "1990-01-01", "lastName", "A value is required when findBy is 'LastNameAndDateOfBirth'.")]
+    [InlineData("Smith", "", "dateOfBirth", "A value is required when findBy is 'LastNameAndDateOfBirth'.")]
+    public async Task Get_MissingPropertiesForFindBy_ReturnsError(
+        string lastName,
+        string dateOfBirth,
+        string expectedErrorPropertyName,
+        string expectedErrorMessage)
+    {
+        // Arrange
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/persons?findBy=LastNameAndDateOfBirth&lastName={lastName}&dateOfBirth={dateOfBirth}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, expectedErrorPropertyName, expectedErrorMessage);
+    }
+
+    [Fact]
+    public async Task Get_NoMatch_ReturnsEmptyResults()
+    {
+        // Arrange
+        var findBy = "LastNameAndDateOfBirth";
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/persons?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseEqualsAsync(
+            response,
+            new
+            {
+                total = 0,
+                query = new { findBy, lastName, dateOfBirth },
+                results = Array.Empty<object>()
+            });
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithMatch_ReturnsExpectedResult()
+    {
+        // Arrange
+        var findBy = "LastNameAndDateOfBirth";
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
@@ -23,34 +118,52 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/v3/persons?findBy=LastNameAndDateOfBirth&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
+            $"/v3/persons?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
-        var responseInduction = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("inductionStatus").GetString();
-        Assert.Equal(InductionStatus.None.ToString(), responseInduction);
+        await AssertEx.JsonResponseEqualsAsync(
+            response,
+            new
+            {
+                total = 1,
+                query = new { findBy, lastName, dateOfBirth },
+                results = new[]
+                {
+                    new
+                    {
+                        trn = person.Trn,
+                        dateOfBirth = person.DateOfBirth,
+                        firstName = person.FirstName,
+                        middleName = person.MiddleName,
+                        lastName = person.LastName,
+                        previousNames = Array.Empty<object>(),
+                        qts = (object?)null,
+                        eyts = (object?)null,
+                        alerts = Array.Empty<object>(),
+                        inductionStatus = "None",
+                        qtlsStatus = "None"
+                    }
+                }
+            });
     }
 
     [Fact]
-    public async Task Get_PersonHasNonNullDqtInductionStatus_ReturnsExpectedStatus()
+    public async Task Get_PersonHasInductionStatus_ReturnsExpectedStatus()
     {
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var inductionStatus = InductionStatus.Passed;
-        var inductionStartDate = new DateOnly(1996, 2, 3);
-        var inductionCompletedDate = new DateOnly(1996, 6, 7);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithInductionStatus(i => i
-                .WithStatus(inductionStatus)
-                .WithStartDate(inductionStartDate)
-                .WithCompletedDate(inductionCompletedDate)));
+                .WithStatus(InductionStatus.Passed)
+                .WithStartDate(new DateOnly(1996, 2, 3))
+                .WithCompletedDate(new DateOnly(1996, 6, 7))));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -61,33 +174,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
-        var responseInduction = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("inductionStatus").GetString();
-        Assert.Equal(inductionStatus.ToString(), responseInduction);
-    }
-
-    [Fact]
-    public async Task Get_WithExpiredQtlsDate_ReturnsExpiredQtlsStatus()
-    {
-        // Arrange
-        var lastName = "Smith";
-        var dateOfBirth = new DateOnly(1990, 1, 1);
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithQtlsStatus(Core.Models.QtlsStatus.Expired));
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/v3/persons?findBy=LastNameAndDateOfBirth&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
-        var qtlsStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qtlsStatus").GetString();
-        Assert.Equal(QtlsStatus.Expired.ToString(), qtlsStatus!);
+        var inductionStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("inductionStatus").GetString();
+        Assert.Equal(InductionStatus.Passed.ToString(), inductionStatus);
     }
 
     [Fact]
@@ -96,12 +184,11 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var qtlsDate = new DateOnly(2020, 01, 01);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithQtls(qtlsDate));
+            .WithQtls(new DateOnly(2020, 1, 1)));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -113,11 +200,11 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var qtlsStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qtlsStatus").GetString();
-        Assert.Equal(QtlsStatus.Active.ToString(), qtlsStatus!);
+        Assert.Equal("Active", qtlsStatus);
     }
 
     [Fact]
-    public async Task Get_WithoutQtlsDate_ReturnsNoneQtlsStatus()
+    public async Task Get_WithExpiredQtls_ReturnsExpiredQtlsStatus()
     {
         // Arrange
         var lastName = "Smith";
@@ -125,7 +212,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth));
+            .WithDateOfBirth(dateOfBirth)
+            .WithQtlsStatus(QtlsStatus.Expired));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -137,25 +225,21 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var qtlsStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qtlsStatus").GetString();
-        Assert.Equal(QtlsStatus.None.ToString(), qtlsStatus!);
+        Assert.Equal("Expired", qtlsStatus);
     }
 
-    [Theory]
-    [InlineData("01/01/2019", "01/01/2022", "Qualified Teacher Learning and Skills status", "2019-01-01")]
-    [InlineData("01/01/2019", "01/01/1999", "Qualified", "1999-01-01")]
-    public async Task Get_QtsAndActiveQtls_ReturnsQtsStatusOfEarliestOfDates(string qtlsDateStr, string qtsDateStr, string expectedStatusDescription, string expectedAwardedDate)
+    [Fact]
+    public async Task Get_PersonWithQts_ReturnsExpectedQtsContent()
     {
         // Arrange
-        var qtlsDate = DateOnly.Parse(qtlsDateStr);
-        var qtsDate = DateOnly.Parse(qtsDateStr);
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
+        var qtsDate = new DateOnly(2021, 1, 1);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithQts(qtsDate)
-            .WithQtls(qtlsDate));
+            .WithQts(qtsDate));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -167,9 +251,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         // Assert
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var qts = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qts");
-        var statusDescription = qts.GetProperty("statusDescription").GetString();
-        var awarded = qts.GetProperty("awarded").GetString();
-        Assert.Equal(expectedStatusDescription, statusDescription!);
-        Assert.Equal(expectedAwardedDate, awarded!);
+
+        Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), qts.GetProperty("awarded").GetString());
+        Assert.False(qts.TryGetProperty("awardedOrApprovedCount", out _));
     }
 }

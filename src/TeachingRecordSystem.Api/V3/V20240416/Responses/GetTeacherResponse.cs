@@ -134,6 +134,7 @@ public record GetTeacherResponseNpqQualificationType
 [AutoMap(typeof(GetPersonResultMandatoryQualification))]
 public record GetTeacherResponseMandatoryQualification
 {
+    [SourceMember("EndDate")]
     public required DateOnly Awarded { get; init; }
     public required string Specialism { get; init; }
 }
