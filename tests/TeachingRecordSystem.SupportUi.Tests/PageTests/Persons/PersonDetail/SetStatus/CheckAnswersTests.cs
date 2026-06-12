@@ -34,7 +34,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         else
         {
             stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
-                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
+                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
 
         }
 
@@ -51,7 +51,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("Additional information", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
         var expectedFileUrl = $"http://localhost/files/evidence.pdf?fileUrl={expectedBlobStorageFileUrl}";
@@ -81,11 +82,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
+                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(

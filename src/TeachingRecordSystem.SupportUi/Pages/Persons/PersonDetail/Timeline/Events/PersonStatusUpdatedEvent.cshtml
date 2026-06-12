@@ -42,9 +42,9 @@
                         </value>
                     </row>
                     <row>
-                        <key>Additional details</key>
+                        <key>Additional information</key>
                         <value>
-                            @if (statusUpdatedEvent.ReasonDetail is not null)
+                            @if (statusUpdatedEvent.AdditionalInformation is not null)
                             {
                                 @Html.ConvertNewlinesToLineBreaks(statusUpdatedEvent.AdditionalInformation)
                             }
