@@ -1694,7 +1694,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             var selectedPerson = dbContext.Persons.Single(x => x.Trn == trn);
-            selectedPerson.SetStatus(PersonStatus.Deactivated, "de-activate", "de-activated", null, SystemUser.SystemUserId, Clock.UtcNow, out var _);
+            selectedPerson.SetStatus(PersonStatus.Deactivated, "de-activate", "de-activated", "",null, SystemUser.SystemUserId, Clock.UtcNow, out var _);
             await dbContext.SaveChangesAsync();
         });
     }
