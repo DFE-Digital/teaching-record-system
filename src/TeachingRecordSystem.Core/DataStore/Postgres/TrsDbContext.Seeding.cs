@@ -19,7 +19,6 @@ public partial class TrsDbContext
         this.BulkInsertOrUpdate(GetRouteToProfessionalStatusTypes());
         this.BulkInsertOrUpdate(GetTpsEstablishmentTypes());
         this.BulkInsertOrUpdate(GetTrainingSubjects());
-        this.BulkInsertOrUpdate(GetApplicationUsers());
         this.BulkInsertOrUpdate(GetSystemUsers());
         this.BulkInsertOrUpdate(GetEstablishments());
     }
@@ -38,7 +37,6 @@ public partial class TrsDbContext
         await this.BulkInsertOrUpdateAsync(GetRouteToProfessionalStatusTypes(), cancellationToken: cancellationToken);
         await this.BulkInsertOrUpdateAsync(GetTpsEstablishmentTypes(), cancellationToken: cancellationToken);
         await this.BulkInsertOrUpdateAsync(GetTrainingSubjects(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetApplicationUsers(), cancellationToken: cancellationToken);
         await this.BulkInsertOrUpdateAsync(GetSystemUsers(), cancellationToken: cancellationToken);
         await this.BulkInsertOrUpdateAsync(GetEstablishments(), cancellationToken: cancellationToken);
     }
@@ -2403,14 +2401,6 @@ public partial class TrsDbContext
             new TrainingSubject { TrainingSubjectId = new("0e1cfcf8-d7ae-40a9-a09b-61f369648b9e"), Reference = "H990", Name = "Engineering (Diploma)", IsActive = false },
             new TrainingSubject { TrainingSubjectId = new("94e13788-d55d-4d0a-8c7a-ef6b0c94257b"), Reference = "B990", Name = "Hair and Beauty", IsActive = false },
             new TrainingSubject { TrainingSubjectId = new("13a673ca-3bc4-4e7e-a8cc-0ca0da648a81"), Reference = "N900", Name = "Retail Business", IsActive = false }
-        ];
-    }
-
-    private static List<ApplicationUser> GetApplicationUsers()
-    {
-        return
-        [
-            new ApplicationUser { UserId = ApplicationUser.NpqApplicationUserGuid, Name = "NPQ", Active = true }
         ];
     }
 

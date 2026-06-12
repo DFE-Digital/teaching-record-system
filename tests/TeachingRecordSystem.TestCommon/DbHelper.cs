@@ -186,7 +186,6 @@ public sealed class DbHelper : IAsyncDisposable
         }
 
         AddUserIfNotExists(SystemUser.Instance);
-        AddUserIfNotExists(ApplicationUser.NpqApplicationUser);
         AddUserIfNotExists(ApplicationUser.CapitaTpsImportUser);
 
         if (!await dbContext.Set<TrnRange>().AnyAsync())
