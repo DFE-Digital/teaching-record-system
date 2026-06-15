@@ -76,6 +76,7 @@ public class Person
         PersonStatus targetStatus,
         string? reason,
         string? reasonDetail,
+        string? additionalInformation,
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
@@ -96,7 +97,8 @@ public class Person
             Reason = reason,
             ReasonDetail = reasonDetail,
             EvidenceFile = evidenceFile,
-            DateOfDeath = null
+            DateOfDeath = null,
+            AdditionalInformation = additionalInformation
         };
     }
 
