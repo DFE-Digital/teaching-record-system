@@ -173,7 +173,7 @@ public class OneLoginService(
         {
             EventId = Guid.NewGuid(),
             OneLoginUser = oneLoginUserEventModel,
-            OldOneLoginUser = oneLoginUserEventModel,
+            OldOneLoginUser = oldOneLoginUserEventModel,
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
@@ -210,7 +210,7 @@ public class OneLoginService(
         {
             EventId = Guid.NewGuid(),
             OneLoginUser = oneLoginUserEventModel,
-            OldOneLoginUser = oneLoginUserEventModel,
+            OldOneLoginUser = oldOneLoginUserEventModel,
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
@@ -234,7 +234,7 @@ public class OneLoginService(
         {
             EventId = Guid.NewGuid(),
             OneLoginUser = oneLoginUserEventModel,
-            OldOneLoginUser = oneLoginUserEventModel,
+            OldOneLoginUser = oldOneLoginUserEventModel,
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
