@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250627;
 
 public abstract class TestBase : IntegrationTests.TestBase
 {
-    public const string Version = VersionRegistry.V3MinorVersions.V20250327;
+    public const string Version = VersionRegistry.V3MinorVersions.V20250627;
 
     public ReferenceDataCache ReferenceCache { get; }
 

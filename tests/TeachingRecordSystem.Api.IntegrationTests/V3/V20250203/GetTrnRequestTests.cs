@@ -1,6 +1,5 @@
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
 
@@ -91,8 +90,6 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
-        var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(requestId);
-
         await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
@@ -138,23 +135,5 @@ public class GetTrnRequestTests : TestBase
                 status = "Pending"
             },
             expectedStatusCode: 200);
-    }
-
-    private async Task<string> GetAccessYourTeachingQualificationsLinkAsync(string requestId)
-    {
-        var trnToken = await WithDbContextAsync(async dbContext =>
-        {
-            var metadata = await dbContext.TrnRequestMetadata.SingleAsync(r => r.ApplicationUserId == ApplicationUserId && r.RequestId == requestId);
-
-            if (metadata.TrnToken is null)
-            {
-                throw new InvalidOperationException("TRN request does not have a TRN token.");
-            }
-
-            return metadata.TrnToken!;
-        });
-
-        return HostFixture.Services.GetRequiredService<TrnRequestService>()
-            .GetAccessYourTeachingQualificationsLink(trnToken);
     }
 }

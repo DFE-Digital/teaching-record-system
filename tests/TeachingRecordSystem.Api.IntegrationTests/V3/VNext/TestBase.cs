@@ -14,6 +14,12 @@ public abstract class TestBase : IntegrationTests.TestBase
     public HttpClient GetHttpClientWithApiKey() =>
         GetHttpClientWithApiKey(Version);
 
+    public HttpClient GetHttpClientWithAuthorizeAccessToken(string trn) =>
+        GetHttpClientWithAuthorizeAccessToken(trn, Version);
+
+    public HttpClient GetHttpClientWithAuthorizeAccessTokenForTrnRequest(Guid applicationUserId, string trnRequestId) =>
+        GetHttpClientWithAuthorizeAccessTokenForTrnRequest(applicationUserId, trnRequestId, Version);
+
     public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read") =>
         GetHttpClientWithIdentityAccessToken(trn, scope, Version);
 }

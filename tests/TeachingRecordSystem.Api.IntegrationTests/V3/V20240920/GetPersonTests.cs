@@ -1,7 +1,163 @@
+using System.Text.Json;
+
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240920;
 
-public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class GetPersonTests : TestBase
 {
+    public GetPersonTests(HostFixture hostFixture) : base(hostFixture)
+    {
+    }
+
+    [Fact]
+    public async Task Get_UnauthenticatedRequest_ReturnsUnauthorized()
+    {
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
+
+        // Act
+        var response = await GetHttpClient(Version).SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_PersonForTrnDoesNotExist_ReturnsForbidden()
+    {
+        // Arrange
+        var httpClient = GetHttpClientWithIdentityAccessToken("1234567");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_WithTrnClaim_ReturnsExpectedResponse()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithNationalInsuranceNumber()
+            .WithEmailAddress(Faker.Internet.Email()));
+
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseEqualsAsync(
+            response,
+            expected: new
+            {
+                firstName = person.FirstName,
+                middleName = person.MiddleName,
+                lastName = person.LastName,
+                trn = person.Trn,
+                dateOfBirth = person.DateOfBirth.ToString("yyyy-MM-dd"),
+                nationalInsuranceNumber = person.NationalInsuranceNumber,
+                qts = (object?)null,
+                eyts = (object?)null,
+                emailAddress = person.EmailAddress
+            },
+            expectedStatusCode: StatusCodes.Status200OK);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
+    {
+        // Arrange
+        var startDate = new DateOnly(1996, 2, 3);
+        var completedDate = new DateOnly(1996, 6, 7);
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(InductionStatus.Passed)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)));
+
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Induction");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseInduction = jsonResponse.RootElement.GetProperty("induction");
+
+        AssertEx.JsonObjectEquals(
+            new
+            {
+                startDate = startDate.ToString("yyyy-MM-dd"),
+                endDate = completedDate.ToString("yyyy-MM-dd"),
+                status = "Pass",
+                statusDescription = "Pass",
+                certificateUrl = "/v3/certificates/induction"
+            },
+            responseInduction);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithInductionAndPersonHasNoInductionStatus_ReturnsNullInductionContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Induction");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseInduction = jsonResponse.RootElement.GetProperty("induction");
+        Assert.Equal(JsonValueKind.Null, responseInduction.ValueKind);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            // MQ with no EndDate
+            .WithMandatoryQualification(b => b.WithStatus(MandatoryQualificationStatus.InProgress))
+            // MQ with no Specialism
+            .WithMandatoryQualification(b => b.WithSpecialism(null))
+            // MQ with EndDate and Specialism
+            .WithMandatoryQualification(b => b
+                .WithStatus(MandatoryQualificationStatus.Passed, endDate: new(2022, 9, 1))
+                .WithSpecialism(MandatoryQualificationSpecialism.Auditory)));
+
+        var validMq = person.MandatoryQualifications.Last();
+
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=MandatoryQualifications");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("mandatoryQualifications");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    awarded = validMq.EndDate?.ToString("yyyy-MM-dd"),
+                    specialism = validMq.Specialism?.GetTitle()
+                }
+            },
+            responseMandatoryQualifications);
+    }
+
     [Fact]
     public async Task Get_ValidRequestWithAlerts_ReturnsExpectedAlertsContent()
     {
@@ -14,9 +170,8 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var alert = person.Alerts.Single();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/person?include=Alerts");
-
         var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Alerts");
 
         // Act
         var response = await httpClient.SendAsync(request);
@@ -47,5 +202,39 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 }
             },
             responseAlerts);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent()
+    {
+        // Arrange
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPreviousNames((firstName, middleName, lastName, new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc))));
+
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=PreviousNames");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responsePreviousNames = jsonResponse.RootElement.GetProperty("previousNames");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    firstName,
+                    middleName,
+                    lastName
+                }
+            },
+            responsePreviousNames);
     }
 }

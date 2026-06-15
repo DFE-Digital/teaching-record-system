@@ -1,5 +1,5 @@
 using FluentValidation;
-using TeachingRecordSystem.Api.V3.V20240606.Requests;
+using TeachingRecordSystem.Api.V3.V20250627.Requests;
 
 namespace TeachingRecordSystem.Api.V3.V20250627.Validators;
 
