@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.DeleteRoute;
@@ -41,18 +42,22 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Single(i => i.IsChecked).Value;
         Assert.Equal(deleteRouteState.ChangeReason.ToString(), reasonChoiceSelection);
 
-        var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
+        var additionalDetailChoices = doc.GetElementByTestId("provide-more-information-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Single(i => i.IsChecked).Value;
-        Assert.Equal(true.ToString(), additionalDetailChoices);
+        Assert.Equal(ProvideMoreInformationOption.Yes.ToString(), additionalDetailChoices);
 
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Single(i => i.IsChecked).Value;
         Assert.Equal(false.ToString(), uploadEvidenceChoices);
 
+        var reasonDetailTextbox =
+            doc.GetElementById("ChangeReasonDetail") as IHtmlInputElement;
+        Assert.Equal(deleteRouteState.ChangeReasonDetail.ChangeReasonDetail, reasonDetailTextbox!.Value);
+
         var additionalDetailTextArea = doc.GetElementByTestId("additional-detail")!.GetElementsByTagName("textarea").Single() as IHtmlTextAreaElement;
-        Assert.Equal(deleteRouteState.ChangeReasonDetail.ChangeReasonDetail, additionalDetailTextArea!.Value);
+        Assert.Equal(deleteRouteState.ChangeReasonDetail.AdditionalInformation, additionalDetailTextArea!.Value);
     }
 
     [Fact]
@@ -95,10 +100,10 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
              .Select(i => i.Value);
         Assert.Equal(expectedChoices, reasonChoices);
 
-        var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
+        var additionalDetailChoices = doc.GetElementByTestId("provide-more-information-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Select(i => i.Value);
-        Assert.Equal(["True", "False"], additionalDetailChoices);
+        Assert.Equal([ProvideMoreInformationOption.Yes.ToString(), ProvideMoreInformationOption.No.ToString()], additionalDetailChoices);
 
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
@@ -110,7 +115,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidChangeReasonDetails_PersistsDetailsAndRedirects()
     {
         // Arrange
-        var changeReason = ChangeReasonOption.CreatedInError;
+        var changeReason = ChangeReasonOption.AnotherReason;
         var changeReasonDetails = "A description about why the deletion typed into the box";
 
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
@@ -130,7 +135,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "ChangeReason", changeReason },
-                { "HasAdditionalReasonDetail", true },
+                { "ProvideAdditionalInformation", ProvideMoreInformationOption.No },
                 { "ChangeReasonDetail", changeReasonDetails },
                 { "Evidence.UploadEvidence", false }
             }
@@ -176,7 +181,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re deleting this route");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information about why you’re deleting this route");
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
@@ -201,7 +206,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "ChangeReason", changeReason },
-                { "HasAdditionalReasonDetail", true },
+                { "ProvideAdditionalInformation", ProvideMoreInformationOption.Yes },
                 { "Evidence.UploadEvidence", false }
             }
         };
@@ -210,7 +215,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter details");
     }
 
     [Fact]
@@ -236,7 +241,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "ChangeReason", changeReason },
-                { "HasAdditionalReasonDetail", false },
+                { "ProvideAdditionalInformation", ProvideMoreInformationOption.No },
                 { "Evidence.UploadEvidence", true }
             }
         };
@@ -271,7 +276,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "ChangeReason", changeReason },
-                { "HasAdditionalReasonDetail", false },
+                { "ProvideAdditionalInformation", ProvideMoreInformationOption.No },
                 { "Evidence.UploadEvidence", true },
                 { "Evidence.EvidenceFile", (CreateEvidenceFileBinaryContent(), evidenceFileName) }
             }

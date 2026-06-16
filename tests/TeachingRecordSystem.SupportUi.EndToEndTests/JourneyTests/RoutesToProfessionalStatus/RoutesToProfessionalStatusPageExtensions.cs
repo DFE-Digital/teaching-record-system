@@ -16,10 +16,14 @@ public static class RoutesToProfessionalStatusPageExtensions
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
-    public static Task SelectRouteChangeReasonOption(this IPage page, string reason)
+    public static async Task SelectRouteChangeReasonOption(this IPage page, string reason, string? changeReasonDetails = null)
     {
         var radioButton = page.Locator($"input[type='radio'][value='{reason}']");
-        return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
+        await radioButton.Locator("xpath=following-sibling::label").ClickAsync();
+        if (changeReasonDetails != null)
+        {
+            await page.FillAsync($"label{TestBase.TextIsSelector("Enter a reason")}", changeReasonDetails);
+        }
     }
 
     public static Task EnterDegreeTypeAsync(this IPage page, string name) =>

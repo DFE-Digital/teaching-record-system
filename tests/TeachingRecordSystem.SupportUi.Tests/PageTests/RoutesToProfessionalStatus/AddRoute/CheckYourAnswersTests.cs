@@ -1,5 +1,6 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -671,7 +672,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 ChangeReason = ChangeReasonOption.AnotherReason,
                 ChangeReasonDetail = new ChangeReasonDetailsState
                 {
-                    HasAdditionalReasonDetail = false,
+                    ProvideAdditionalInformation = ProvideMoreInformationOption.No,
                     Evidence = new()
                     {
                         UploadEvidence = false
@@ -697,7 +698,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 ChangeReason = ChangeReasonOption.AnotherReason,
                 ChangeReasonDetail = new ChangeReasonDetailsState
                 {
-                    HasAdditionalReasonDetail = false,
+                    ProvideAdditionalInformation = ProvideMoreInformationOption.No,
                     Evidence = new()
                     {
                         UploadEvidence = false
@@ -723,7 +724,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 ChangeReason = ChangeReasonOption.AnotherReason,
                 ChangeReasonDetail = new ChangeReasonDetailsState
                 {
-                    HasAdditionalReasonDetail = false,
+                    ProvideAdditionalInformation = ProvideMoreInformationOption.No,
                     Evidence = new()
                     {
                         UploadEvidence = false
@@ -749,7 +750,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 ChangeReason = ChangeReasonOption.AnotherReason,
                 ChangeReasonDetail = new ChangeReasonDetailsState
                 {
-                    HasAdditionalReasonDetail = false,
+                    ProvideAdditionalInformation = ProvideMoreInformationOption.No,
                     Evidence = new()
                     {
                         UploadEvidence = false

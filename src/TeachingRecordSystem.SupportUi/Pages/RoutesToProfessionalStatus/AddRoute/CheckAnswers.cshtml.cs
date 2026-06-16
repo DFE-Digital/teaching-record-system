@@ -110,7 +110,8 @@ public class CheckAnswersModel(
             changeReason: JourneyInstance.State.ChangeReason?.GetDisplayName(),
             changeReasonDetail: JourneyInstance.State.ChangeReasonDetail.ChangeReasonDetail,
             evidenceFile: JourneyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
-            @event: out var @event);
+            @event: out var @event,
+            additionalInformation: JourneyInstance.State.ChangeReasonDetail.AdditionalInformation);
 
         dbContext.Qualifications.Add(professionalStatus);
         dbContext.AddEventWithoutBroadcast(@event);

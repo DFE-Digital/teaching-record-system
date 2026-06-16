@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProfessionalStatus;
@@ -69,8 +70,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddChangeReasonPage();
-        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
-        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString(), "some reason");
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickButtonAsync("Continue");
 
@@ -170,8 +171,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddChangeReasonPage();
-        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
-        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString(), "some reason");
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "This is an additional reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickButtonAsync("Continue");
 
@@ -216,8 +217,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddChangeReasonPage();
-        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
-        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString(), "some reason");
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickButtonAsync("Continue");
 
@@ -298,8 +299,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddChangeReasonPage();
-        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
-        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString(), "this is the change reason detail");
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "This is an additional reason");
+
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickButtonAsync("Continue");
 
@@ -368,8 +370,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddChangeReasonPage();
-        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
-        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString(), "some change reason");
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "This is an additional reason");
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickButtonAsync("Continue");
 
@@ -467,8 +469,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddChangeReasonPage();
-        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
-        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString(), "reason 1");
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickButtonAsync("Continue");
 

@@ -209,6 +209,7 @@ public class SetRouteToProfessionalStatusHandler(
                 evidenceFile: null,
                 currentUserId,
                 timeProvider.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             if (@event is not null)
@@ -241,6 +242,7 @@ public class SetRouteToProfessionalStatusHandler(
                 changeReason: null,
                 changeReasonDetail: null,
                 evidenceFile: null,
+                additionalInformation: null,
                 @event: out var @event);
 
             dbContext.RouteToProfessionalStatuses.Add(route);

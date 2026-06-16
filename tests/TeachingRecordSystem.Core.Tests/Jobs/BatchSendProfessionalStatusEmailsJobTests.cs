@@ -169,6 +169,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
                 evidenceFile: null,
                 deletedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
+                additionalInformation: null,
                 out var deletedEvent);
             dbContext.AddEventWithoutBroadcast(deletedEvent);
             await dbContext.SaveChangesAsync();

@@ -16,6 +16,7 @@ public record RouteToProfessionalStatusCreatedEvent : EventBase, IEventWithPerso
     public required ProfessionalStatusPersonAttributes OldPersonAttributes { get; init; }
     public required Induction Induction { get; init; }
     public required Induction OldInduction { get; init; }
+    public required string? AdditionalInformation { get; init; }
 }
 
 [Flags]

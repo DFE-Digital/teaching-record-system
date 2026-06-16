@@ -26,11 +26,19 @@
                     </row-actions>
                 </row>
                 <row>
-                    <key>Additional information</key>
+                    <key>Reason details</key>
                     <value use-empty-fallback="true">@Model.ChangeReasonDetail.ChangeReasonDetail</value>
                     <row-actions>
                         <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="additional information">Change</action>
+                                visually-hidden-text="additional information">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value use-empty-fallback="true">@Model.ChangeReasonDetail.AdditionalInformation</value>
+                    <row-actions>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
                 <row>

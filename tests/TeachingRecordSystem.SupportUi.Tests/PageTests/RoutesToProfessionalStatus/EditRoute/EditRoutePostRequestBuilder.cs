@@ -1,4 +1,5 @@
 using System.Reflection;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
@@ -10,9 +11,11 @@ public class EditRoutePostRequestBuilder
     private RouteToProfessionalStatusStatus? RouteStatus { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
     private ChangeReasonOption? ChangeReason { get; set; }
-    private bool? HasAdditionalReasonDetail { get; set; }
+    private ProvideMoreInformationOption ProvideAdditionalInformation { get; set; }
     private string? ChangeReasonDetail { get; set; }
     private bool? UploadEvidence { get; set; }
+    private string? AdditionalInformation { get; set; }
+
 
     private string? _evidenceFileName;
     private HttpContent? _evidenceFileContent;
@@ -47,10 +50,16 @@ public class EditRoutePostRequestBuilder
         return this;
     }
 
-    public EditRoutePostRequestBuilder WithChangeReasonDetailSelections(bool? hasAdditionalDetail, string? detail = null)
+    public EditRoutePostRequestBuilder WithChangeReasonDetailSelections(string? detail = null)
     {
-        HasAdditionalReasonDetail = hasAdditionalDetail;
         ChangeReasonDetail = detail;
+        return this;
+    }
+
+    public EditRoutePostRequestBuilder WithAdditionalInformation(ProvideMoreInformationOption provideAdditionalInformation, string? detail = null)
+    {
+        ProvideAdditionalInformation = provideAdditionalInformation;
+        AdditionalInformation = detail;
         return this;
     }
 

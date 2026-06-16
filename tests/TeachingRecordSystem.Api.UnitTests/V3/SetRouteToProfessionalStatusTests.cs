@@ -319,6 +319,7 @@ public class SetRouteToProfessionalStatusTests(OperationTestFixture operationTes
                 changeReason: null,
                 changeReasonDetail: null,
                 evidenceFile: null,
+                additionalInformation: null,
                 @event: out var createdEvent);
 
             dbContext.RouteToProfessionalStatuses.Add(route);

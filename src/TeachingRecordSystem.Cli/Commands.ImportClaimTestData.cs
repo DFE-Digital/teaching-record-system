@@ -162,6 +162,7 @@ public static partial class Commands
                     changeReason: null,
                     changeReasonDetail: null,
                     evidenceFile: null,
+                    additionalInformation: null,
                     @event: out var @event);
 
                 dbContext.Qualifications.Add(professionalStatus);

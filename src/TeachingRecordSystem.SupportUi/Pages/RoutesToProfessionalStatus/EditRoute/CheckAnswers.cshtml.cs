@@ -124,7 +124,9 @@ public class CheckYourAnswersModel(
             evidenceFile: ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
             User.GetUserId(),
             timeProvider.UtcNow,
-            out var updatedEvent);
+            additionalInformation: ChangeReasonDetail.AdditionalInformation,
+            out var updatedEvent
+            );
 
         if (updatedEvent is not null)
         {

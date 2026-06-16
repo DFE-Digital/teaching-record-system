@@ -21,12 +21,29 @@
                     <value>@Model.ChangeReason?.GetDisplayName()</value>
                     <row-actions>
                         <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="reason">Change</action>
+                                visually-hidden-text="reason">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Reason details</key>
+                    <value>
+                        @if (Model.ChangeReasonDetail.ChangeReasonDetail is not null)
+                        {
+                            @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail.ChangeReasonDetail)
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Additional information</key>
-                    <value use-empty-fallback="true">@Model.ChangeReasonDetail.ChangeReasonDetail</value>
+                    <value use-empty-fallback="true">@Model.ChangeReasonDetail.AdditionalInformation</value>
                     <row-actions>
                         <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
                                                        visually-hidden-text="additional information">Change</action>

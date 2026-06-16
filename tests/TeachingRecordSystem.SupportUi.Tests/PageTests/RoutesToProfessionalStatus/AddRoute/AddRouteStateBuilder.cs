@@ -1,3 +1,4 @@
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -56,6 +57,12 @@ public class AddRouteStateBuilder()
     public AddRouteStateBuilder WithStatus(RouteToProfessionalStatusStatus status)
     {
         _status = status;
+        return this;
+    }
+
+    public AddRouteStateBuilder WithProvideAdditionalInformation(ProvideMoreInformationOption provideMoreInformationOption, string? additionalInformation)
+    {
+        _changeReasonDetail = new ChangeReasonStateBuilder().WithAdditionalInformation(provideMoreInformationOption, additionalInformation).Build();
         return this;
     }
 
@@ -176,7 +183,7 @@ public class AddRouteStateBuilder()
             IsExemptFromInduction = _isExemptFromInduction,
             DegreeTypeId = _degreeTypeId,
             ChangeReason = _changeReasonOption,
-            ChangeReasonDetail = _changeReasonDetail
+            ChangeReasonDetail = _changeReasonDetail,
         };
     }
 }

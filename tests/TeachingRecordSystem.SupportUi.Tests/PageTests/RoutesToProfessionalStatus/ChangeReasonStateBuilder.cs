@@ -1,3 +1,4 @@
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -7,8 +8,9 @@ public class ChangeReasonStateBuilder
 {
     private string? _changeReasonDetail;
     private readonly EvidenceUploadModel _evidence = new();
+    private string? _additionalInormation;
 
-    private bool? _hasAdditionalReasonDetail;
+    private ProvideMoreInformationOption? _provideAdditionalInformation;
 
     public ChangeReasonStateBuilder WithChangeReasonDetail(string detail)
     {
@@ -16,11 +18,19 @@ public class ChangeReasonStateBuilder
         return this;
     }
 
+    public ChangeReasonStateBuilder WithAdditionalInformation(ProvideMoreInformationOption provideAdditionalInformation, string? additionalInformation)
+    {
+        _provideAdditionalInformation = provideAdditionalInformation;
+        _additionalInormation = additionalInformation;
+        return this;
+    }
+
     public ChangeReasonStateBuilder WithValidChangeReasonDetail()
     {
-        _hasAdditionalReasonDetail = true;
+        _provideAdditionalInformation = ProvideMoreInformationOption.Yes;
         _changeReasonDetail = "Some free text reason detail";
         _evidence.UploadEvidence = false;
+        _additionalInormation = "some additional information";
         return this;
     }
 
@@ -44,8 +54,9 @@ public class ChangeReasonStateBuilder
         return new ChangeReasonDetailsState
         {
             ChangeReasonDetail = _changeReasonDetail,
-            HasAdditionalReasonDetail = _hasAdditionalReasonDetail,
-            Evidence = _evidence
+            ProvideAdditionalInformation = _provideAdditionalInformation,
+            Evidence = _evidence,
+            AdditionalInformation = _additionalInormation,
         };
     }
 }
