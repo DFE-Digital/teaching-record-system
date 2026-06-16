@@ -1,3 +1,5 @@
+using PostgresModels = TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 
 public record Alert
@@ -7,6 +9,15 @@ public record Alert
     public required string? Details { get; init; }
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
+
+    public static Alert Create(PostgresModels.Alert source) => new()
+    {
+        AlertId = source.AlertId,
+        AlertType = AlertType.Create(source.AlertType!),
+        Details = source.Details,
+        StartDate = source.StartDate,
+        EndDate = source.EndDate
+    };
 
     public static async Task<Alert> FromEventAsync(EventModels.Alert alert, ReferenceDataCache referenceDataCache)
     {

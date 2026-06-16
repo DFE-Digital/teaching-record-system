@@ -11,7 +11,7 @@ using TeachingRecordSystem.Api.V3.V20240920.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240920.Controllers;
 
 [Route("person")]
-public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [HttpGet]
@@ -32,7 +32,7 @@ public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapp
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
+        return result.ToActionResult(r => Ok(GetPersonResponse.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);
     }
 }

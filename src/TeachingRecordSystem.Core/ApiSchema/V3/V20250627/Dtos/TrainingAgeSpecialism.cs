@@ -8,4 +8,12 @@ public record TrainingAgeSpecialism
     public required TrainingAgeSpecialismType Type { get; init; }
     public required Option<int> From { get; init; }
     public required Option<int> To { get; init; }
+
+    public static TrainingAgeSpecialism Create(Models.TrainingAgeSpecialismType source) => new()
+    {
+        Type = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.TrainingAgeSpecialismTypeExtensions
+            .ConvertFromTrainingAgeSpecialismType(source),
+        From = default,
+        To = default
+    };
 }

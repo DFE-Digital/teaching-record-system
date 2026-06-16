@@ -11,7 +11,6 @@ public record FindTeachersResponse
     public required IReadOnlyCollection<FindTeachersResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonsResultItem))]
 public record FindTeachersResponseResult
 {
     public required string Trn { get; init; }
@@ -21,4 +20,15 @@ public record FindTeachersResponseResult
     public required string LastName { get; init; }
     public required IReadOnlyCollection<SanctionInfo> Sanctions { get; init; }
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
+
+    public static FindTeachersResponseResult Create(FindPersonsResultItem source) => new()
+    {
+        Trn = source.Trn,
+        DateOfBirth = source.DateOfBirth,
+        FirstName = source.FirstName,
+        MiddleName = source.MiddleName,
+        LastName = source.LastName,
+        Sanctions = source.Sanctions.Select(s => SanctionInfo.Create(s)).AsReadOnly(),
+        PreviousNames = source.PreviousNames.Select(n => NameInfo.Create(n)).AsReadOnly()
+    };
 }

@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.ApiSchema.V3.V20260515.Dtos;
 namespace TeachingRecordSystem.Api.V3.V20260515.Controllers;
 
 [Route("trn-request")]
-public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper mapper, ICurrentUserProvider currentUserProvider) : ControllerBase
+public class TrnRequestController(ICommandDispatcher commandDispatcher, ICurrentUserProvider currentUserProvider) : ControllerBase
 {
     [HttpGet]
     [SwaggerOperation(
@@ -30,7 +30,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper 
             GetTrnRequestCommandOptions.SupportsDormantRequests | GetTrnRequestCommandOptions.SupportsRejectedRequests);
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+        return result.ToActionResult(r => Ok(TrnRequestInfo.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
     }
 
@@ -54,7 +54,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, IMapper 
         return result.ToActionResult(
                 r => StatusCode(
                     StatusCodes.Status200OK,
-                    mapper.Map<TrnRequestInfo>(r.TrnRequestInfo)))
+                    TrnRequestInfo.Create(r.TrnRequestInfo)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
     }
 }

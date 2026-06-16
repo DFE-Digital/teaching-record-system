@@ -9,7 +9,7 @@ using TeachingRecordSystem.Api.V3.V20240814.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240814.Controllers;
 
 [Route("persons")]
-public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPost("find")]
     [SwaggerOperation(
@@ -23,7 +23,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
     {
         var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
         var result = await commandDispatcher.DispatchAsync(command);
-        return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
+        return result.ToActionResult(r => Ok(FindPersonsResponse.Create(r)));
     }
 
     [HttpGet("")]
@@ -44,7 +44,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
             {
                 Total = r.Total,
                 Query = request,
-                Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
+                Results = r.Items.Select(i => FindPersonResponseResult.Create(i)).AsReadOnly()
             }));
     }
 }

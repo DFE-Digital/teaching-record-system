@@ -4,6 +4,7 @@ using Optional.Unsafe;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Operations;
+using TeachingRecordSystem.Api.V3.V20250203;
 using TeachingRecordSystem.Api.V3.V20250425.Requests;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;
 using Gender = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.Gender;
@@ -11,7 +12,7 @@ using Gender = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.Gender;
 namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 
 [Route("persons")]
-public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPut("{trn}/professional-statuses/{reference}")]
     [SwaggerOperation(
@@ -73,7 +74,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
             DateOfBirth = request.DateOfBirth,
             EmailAddress = request.EmailAddress,
             NationalInsuranceNumber = request.NationalInsuranceNumber,
-            Gender = request.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null
+            Gender = request.Gender is Gender gender ? Core.Models.Gender.Create(gender) : null
         };
 
         var result = await commandDispatcher.DispatchAsync(command);
