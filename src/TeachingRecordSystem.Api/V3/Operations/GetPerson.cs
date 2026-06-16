@@ -7,7 +7,8 @@ using InductionInfo = TeachingRecordSystem.Api.V3.Operations.Common.InductionInf
 using QtlsStatus = TeachingRecordSystem.Core.Models.QtlsStatus;
 using QtsInfo = TeachingRecordSystem.Api.V3.Operations.Common.QtsInfo;
 using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.Models.RouteToProfessionalStatusStatus;
-using TrainingAgeSpecialism = TeachingRecordSystem.Api.V3.Operations.Common.TrainingAgeSpecialism;
+using TrainingAgeSpecialism = TeachingRecordSystem.Core.Models.TrainingAgeSpecialismType;
+using TrainingCountry = TeachingRecordSystem.Core.DataStore.Postgres.Models.Country;
 
 namespace TeachingRecordSystem.Api.V3.Operations;
 
@@ -62,7 +63,7 @@ public record GetPersonResult
     public required Option<RoutesResult> RoutesToProfessionalStatuses { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
-    public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
+    public required Option<IReadOnlyCollection<PostgresModels.Alert>> Alerts { get; init; }
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
     public required QtlsStatus QtlsStatus { get; set; }
@@ -337,24 +338,6 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                         return !a.AlertType!.InternalOnly;
                     })
                     .OrderBy(a => a.CreatedOn)
-                    .Select(a => new Alert()
-                    {
-                        AlertId = a.AlertId,
-                        AlertType = new()
-                        {
-                            AlertTypeId = a.AlertType!.AlertTypeId,
-                            AlertCategory = new()
-                            {
-                                AlertCategoryId = a.AlertType.AlertCategory!.AlertCategoryId,
-                                Name = a.AlertType.AlertCategory.Name
-                            },
-                            Name = a.AlertType.Name,
-                            DqtSanctionCode = a.AlertType.DqtSanctionCode!
-                        },
-                        Details = a.Details,
-                        StartDate = a.StartDate,
-                        EndDate = a.EndDate
-                    })
                     .AsReadOnly()) :
                 default,
             PreviousNames = command.Include.HasFlag(GetPersonCommandIncludes.PreviousNames) ?
@@ -453,8 +436,8 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                 TrainingSubjects = await r.TrainingSubjectIds.ToAsyncEnumerable()
                     .Select(async (Guid id, CancellationToken _) => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
                     .ToArrayAsync(cancellationToken: ct),
-                TrainingAgeSpecialism = TrainingAgeSpecialismExtensions.FromRoute(r),
-                TrainingCountry = TrainingCountry.FromModel(r.TrainingCountry),
+                TrainingAgeSpecialism = r.TrainingAgeSpecialismType,
+                TrainingCountry = r.TrainingCountry,
                 TrainingProvider = r.TrainingProvider,
                 DegreeType = r.DegreeType,
                 InductionExemption = new GetPersonResultRouteToProfessionalStatusInductionExemption()

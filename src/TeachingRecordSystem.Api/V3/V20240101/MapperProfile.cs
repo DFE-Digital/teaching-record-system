@@ -10,7 +10,7 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Operations.Common.Alert, AlertInfo>().ConvertUsing<AlertInfoTypeConverter>();
+        CreateMap<PostgresModels.Alert, AlertInfo>().ConvertUsing<AlertInfoTypeConverter>();
         CreateMap<Operations.Common.NameInfo, NameInfo>();
         CreateMap<Operations.Common.SanctionInfo, SanctionInfo>();
         CreateMap<
@@ -26,13 +26,13 @@ public class MapperProfile : Profile
     }
 }
 
-public class AlertInfoTypeConverter : ITypeConverter<Operations.Common.Alert, AlertInfo>
+public class AlertInfoTypeConverter : ITypeConverter<PostgresModels.Alert, AlertInfo>
 {
-    public AlertInfo Convert(Operations.Common.Alert source, AlertInfo destination, ResolutionContext context) =>
+    public AlertInfo Convert(PostgresModels.Alert source, AlertInfo destination, ResolutionContext context) =>
         new()
         {
             AlertType = AlertType.Prohibition,
-            DqtSanctionCode = source.AlertType.DqtSanctionCode!,
+            DqtSanctionCode = source.AlertType!.DqtSanctionCode!,
             StartDate = source.StartDate,
             EndDate = source.EndDate
         };

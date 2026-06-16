@@ -6,8 +6,8 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Operations.Common.Alert, Alert>();
-        CreateMap<Operations.Common.AlertCategory, AlertCategory>();
-        CreateMap<Operations.Common.AlertType, AlertType>();
+        CreateMap<PostgresModels.Alert, Alert>();
+        CreateMap<PostgresModels.AlertCategory, AlertCategory>();
+        CreateMap<PostgresModels.AlertType, AlertType>();
     }
 }

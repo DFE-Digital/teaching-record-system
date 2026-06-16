@@ -13,7 +13,7 @@ public record FindPersonsResultItem
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }
     public required IReadOnlyCollection<SanctionInfo> Sanctions { get; init; }
-    public required IReadOnlyCollection<Alert> Alerts { get; init; }
+    public required IReadOnlyCollection<PostgresModels.Alert> Alerts { get; init; }
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
     public required InductionInfo Induction { get; init; }
     public required DqtInductionStatusInfo? DqtInductionStatus { get; init; }
@@ -58,24 +58,6 @@ public abstract class FindPersonsHandlerBase(
                     .AsReadOnly(),
                 Alerts = person.Alerts!
                     .Where(a => !a.AlertType!.InternalOnly)
-                    .Select(a => new Alert()
-                    {
-                        AlertId = a.AlertId,
-                        AlertType = new()
-                        {
-                            AlertTypeId = a.AlertType!.AlertTypeId,
-                            AlertCategory = new()
-                            {
-                                AlertCategoryId = a.AlertType.AlertCategory!.AlertCategoryId,
-                                Name = a.AlertType.AlertCategory.Name
-                            },
-                            Name = a.AlertType.Name,
-                            DqtSanctionCode = a.AlertType.DqtSanctionCode!
-                        },
-                        Details = a.Details,
-                        StartDate = a.StartDate,
-                        EndDate = a.EndDate
-                    })
                     .AsReadOnly(),
                 PreviousNames = person.PreviousNames!
                     .OrderByDescending(pn => pn.CreatedOn)
