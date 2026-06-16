@@ -1,6 +1,6 @@
 using OneOf;
 using Optional;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos;
 using Alert = TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos.Alert;
 using EytsInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.EytsInfo;

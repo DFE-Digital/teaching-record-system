@@ -1,7 +1,7 @@
 using AutoMapper.Configuration.Annotations;
 using OneOf;
 using Optional;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
@@ -34,18 +34,18 @@ public record GetPersonResponse
     public required QtlsStatus QtlsStatus { get; set; }
 }
 
-[AutoMap(typeof(Implementation.Dtos.QtsInfo))]
+[AutoMap(typeof(Operations.Common.QtsInfo))]
 public record GetPersonResponseQts
 {
-    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
+    [SourceMember(nameof(Operations.Common.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string? StatusDescription { get; init; }
 }
 
-[AutoMap(typeof(Implementation.Dtos.EytsInfo))]
+[AutoMap(typeof(Operations.Common.EytsInfo))]
 public record GetPersonResponseEyts
 {
-    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
+    [SourceMember(nameof(Operations.Common.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string? StatusDescription { get; init; }
 }

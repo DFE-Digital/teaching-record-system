@@ -1,5 +1,5 @@
 using AutoMapper.Configuration.Annotations;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos;
 using Alert = TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos.Alert;
 using NameInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.NameInfo;

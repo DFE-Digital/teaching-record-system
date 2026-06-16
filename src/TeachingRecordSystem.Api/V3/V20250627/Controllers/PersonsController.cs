@@ -4,7 +4,7 @@ using Optional.Unsafe;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20250627.Requests;
 using TeachingRecordSystem.Api.V3.V20250627.Responses;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;

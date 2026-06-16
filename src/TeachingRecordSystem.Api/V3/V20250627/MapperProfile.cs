@@ -11,12 +11,12 @@ public class MapperProfile : Profile
         CreateMap<PostgresModels.TrainingSubject, TrainingSubject>();
         CreateMap<PostgresModels.TrainingProvider, TrainingProvider>();
         CreateMap<PostgresModels.DegreeType, DegreeType>();
-        CreateMap<Implementation.Dtos.TrainingCountry, TrainingCountry>();
-        CreateMap<Implementation.Dtos.InductionInfo, InductionInfo>();
-        CreateMap<Implementation.Dtos.QtsInfo, QtsInfo>();
-        CreateMap<Implementation.Dtos.QtsInfoRoute, QtsInfoRoute>();
-        CreateMap<Implementation.Dtos.EytsInfo, EytsInfo>();
-        CreateMap<Implementation.Dtos.EytsInfoRoute, EytsInfoRoute>();
-        CreateMap<Implementation.Dtos.TrainingAgeSpecialism, TrainingAgeSpecialism>();
+        CreateMap<Operations.Common.TrainingCountry, TrainingCountry>();
+        CreateMap<Operations.Common.InductionInfo, InductionInfo>();
+        CreateMap<Operations.Common.QtsInfo, QtsInfo>();
+        CreateMap<Operations.Common.QtsInfoRoute, QtsInfoRoute>();
+        CreateMap<Operations.Common.EytsInfo, EytsInfo>();
+        CreateMap<Operations.Common.EytsInfoRoute, EytsInfoRoute>();
+        CreateMap<Operations.Common.TrainingAgeSpecialism, TrainingAgeSpecialism>();
     }
 }

@@ -7,8 +7,8 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.TrnRequestInfo, TrnRequestInfo>();
-        CreateMap<Implementation.Dtos.TrnRequestInfoPerson, TrnRequestPerson>()
+        CreateMap<Operations.Common.TrnRequestInfo, TrnRequestInfo>();
+        CreateMap<Operations.Common.TrnRequestInfoPerson, TrnRequestPerson>()
             .ForMember(p => p.Email, m => m.MapFrom(p => p.EmailAddress));
     }
 }

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using AutoMapper.Configuration.Annotations;
 using Optional;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Responses;
@@ -33,19 +33,19 @@ public record GetTeacherResponse
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
 
-[AutoMap(typeof(Implementation.Dtos.QtsInfo))]
+[AutoMap(typeof(Operations.Common.QtsInfo))]
 public record GetTeacherResponseQts
 {
-    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
+    [SourceMember(nameof(Operations.Common.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }
 }
 
-[AutoMap(typeof(Implementation.Dtos.EytsInfo))]
+[AutoMap(typeof(Operations.Common.EytsInfo))]
 public record GetTeacherResponseEyts
 {
-    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
+    [SourceMember(nameof(Operations.Common.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }

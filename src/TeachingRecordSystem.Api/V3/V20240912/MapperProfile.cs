@@ -6,6 +6,6 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.QtlsResult, QtlsResponse>();
+        CreateMap<Operations.Common.QtlsResult, QtlsResponse>();
     }
 }

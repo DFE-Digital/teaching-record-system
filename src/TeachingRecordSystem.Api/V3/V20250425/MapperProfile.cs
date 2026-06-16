@@ -6,6 +6,6 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.TrnRequestInfo, TrnRequestInfo>();
+        CreateMap<Operations.Common.TrnRequestInfo, TrnRequestInfo>();
     }
 }

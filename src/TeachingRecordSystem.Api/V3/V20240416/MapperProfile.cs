@@ -1,6 +1,6 @@
 using OneOf;
 using TeachingRecordSystem.Api.Infrastructure.Mapping;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20240416.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240416;

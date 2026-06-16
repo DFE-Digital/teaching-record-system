@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using CreateTrnRequestRequest = TeachingRecordSystem.Api.V3.V20250425.Requests.CreateTrnRequestRequest;
 using Gender = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.Gender;
 using TrnRequestInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20260515.Dtos.TrnRequestInfo;

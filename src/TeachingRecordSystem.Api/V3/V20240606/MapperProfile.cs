@@ -1,6 +1,6 @@
 using OneOf;
 using TeachingRecordSystem.Api.Infrastructure.Mapping;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20240606.Responses;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos;
 
@@ -10,7 +10,7 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.TrnRequestInfo, TrnRequestInfo>();
+        CreateMap<Operations.Common.TrnRequestInfo, TrnRequestInfo>();
         CreateMap<
                 OneOf<
                     IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,

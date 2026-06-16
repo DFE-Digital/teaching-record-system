@@ -1,5 +1,5 @@
 using AutoMapper.Configuration.Annotations;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.InductionStatus;

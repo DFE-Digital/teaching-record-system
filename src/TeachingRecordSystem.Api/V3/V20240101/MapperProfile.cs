@@ -1,6 +1,6 @@
 using OneOf;
 using TeachingRecordSystem.Api.Infrastructure.Mapping;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20240101.Responses;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
@@ -10,9 +10,9 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.Alert, AlertInfo>().ConvertUsing<AlertInfoTypeConverter>();
-        CreateMap<Implementation.Dtos.NameInfo, NameInfo>();
-        CreateMap<Implementation.Dtos.SanctionInfo, SanctionInfo>();
+        CreateMap<Operations.Common.Alert, AlertInfo>().ConvertUsing<AlertInfoTypeConverter>();
+        CreateMap<Operations.Common.NameInfo, NameInfo>();
+        CreateMap<Operations.Common.SanctionInfo, SanctionInfo>();
         CreateMap<
                 OneOf<
                     IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,
@@ -26,9 +26,9 @@ public class MapperProfile : Profile
     }
 }
 
-public class AlertInfoTypeConverter : ITypeConverter<Implementation.Dtos.Alert, AlertInfo>
+public class AlertInfoTypeConverter : ITypeConverter<Operations.Common.Alert, AlertInfo>
 {
-    public AlertInfo Convert(Implementation.Dtos.Alert source, AlertInfo destination, ResolutionContext context) =>
+    public AlertInfo Convert(Operations.Common.Alert source, AlertInfo destination, ResolutionContext context) =>
         new()
         {
             AlertType = AlertType.Prohibition,

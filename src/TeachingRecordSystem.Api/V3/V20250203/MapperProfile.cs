@@ -7,7 +7,7 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.TrnRequestInfo, TrnRequestInfo>();
-        CreateMap<Implementation.Dtos.InductionInfo, InductionInfo>();
+        CreateMap<Operations.Common.TrnRequestInfo, TrnRequestInfo>();
+        CreateMap<Operations.Common.InductionInfo, InductionInfo>();
     }
 }

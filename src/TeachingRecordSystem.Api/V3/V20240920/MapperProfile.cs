@@ -6,8 +6,8 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.Alert, Alert>();
-        CreateMap<Implementation.Dtos.AlertCategory, AlertCategory>();
-        CreateMap<Implementation.Dtos.AlertType, AlertType>();
+        CreateMap<Operations.Common.Alert, Alert>();
+        CreateMap<Operations.Common.AlertCategory, AlertCategory>();
+        CreateMap<Operations.Common.AlertType, AlertType>();
     }
 }

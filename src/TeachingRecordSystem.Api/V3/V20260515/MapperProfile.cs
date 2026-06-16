@@ -6,7 +6,7 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.TrnRequestInfo, TrnRequestInfo>();
+        CreateMap<Operations.Common.TrnRequestInfo, TrnRequestInfo>();
         CreateMap<Core.Models.TrnRequestStatus, Core.ApiSchema.V3.V20260515.Dtos.TrnRequestStatus>();
     }
 }
