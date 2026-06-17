@@ -70,24 +70,33 @@ public static class Modifiers
 
     public static void ChangeReasons(JsonTypeInfo typeInfo)
     {
-        if (typeInfo.Type != typeof(IChangeReasonInfo))
+        // Remove any required constraints;
+        // we want to be able to evolve the change reasons by adding new properties with the required modifier
+        // without breaking deserialization for older payloads.
+        if (typeInfo.Kind == JsonTypeInfoKind.Object)
         {
-            return;
+            foreach (var propertyInfo in typeInfo.Properties)
+            {
+                propertyInfo.IsRequired = false;
+            }
         }
 
-        typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+        if (typeInfo.Type == typeof(IChangeReasonInfo))
         {
-            TypeDiscriminatorPropertyName = "$change-reason-type",
-            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
-        };
+            typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+            {
+                TypeDiscriminatorPropertyName = "$change-reason-type",
+                UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
+            };
 
-        var changeReasonTypes = typeof(IChangeReasonInfo).Assembly.GetTypes()
-            .Where(t => typeof(IChangeReasonInfo).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
+            var changeReasonTypes = typeof(IChangeReasonInfo).Assembly.GetTypes()
+                .Where(t => typeof(IChangeReasonInfo).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
 
-        foreach (var changeReasonType in changeReasonTypes)
-        {
-            typeInfo.PolymorphismOptions.DerivedTypes.Add(
-                new JsonDerivedType(changeReasonType, changeReasonType.Name));
+            foreach (var changeReasonType in changeReasonTypes)
+            {
+                typeInfo.PolymorphismOptions.DerivedTypes.Add(
+                    new JsonDerivedType(changeReasonType, changeReasonType.Name));
+            }
         }
     }
 
@@ -95,7 +104,7 @@ public static class Modifiers
     {
         // Remove any required constraints;
         // we want to be able to evolve the events by adding new properties with the required modifier
-        // without breaking deserialization for older events.
+        // without breaking deserialization for older payloads.
         if (typeInfo.Kind == JsonTypeInfoKind.Object)
         {
             foreach (var propertyInfo in typeInfo.Properties)
