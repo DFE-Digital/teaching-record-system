@@ -86,7 +86,9 @@ public class CheckAnswersModel(
             ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
             User.GetUserId(),
             timeProvider.UtcNow,
-            out var deletedEvent);
+            additionalInformation: ChangeReasonDetail.AdditionalInformation,
+            out var deletedEvent
+            );
         if (deletedEvent is not null)
         {
             dbContext.AddEventWithoutBroadcast(deletedEvent);

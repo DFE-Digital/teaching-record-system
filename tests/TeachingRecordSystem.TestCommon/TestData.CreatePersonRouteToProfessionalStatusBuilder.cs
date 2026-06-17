@@ -179,6 +179,7 @@ public partial class TestData
                 changeReason: _changeReason,
                 changeReasonDetail: _changeReasonDetail,
                 evidenceFile: _evidenceFile,
+                additionalInformation: null,
                 @event: out var createdEvent);
 
             dbContext.RouteToProfessionalStatuses.Add(professionalStatus);

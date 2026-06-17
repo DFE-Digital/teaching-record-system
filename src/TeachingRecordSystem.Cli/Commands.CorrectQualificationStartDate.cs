@@ -147,6 +147,7 @@ public static partial class Commands
                         evidenceFile: null,
                         updatedBy: systemUser,
                         now: timeProvider.UtcNow,
+                        additionalInformation: null,
                         out var updateEvent);
 
                     if (updateEvent is null)

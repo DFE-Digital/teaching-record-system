@@ -1,6 +1,7 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -396,8 +397,12 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .WithTrainingCountryId(_countryCode)
-            .WithValidChangeReasonOption()
-            .WithDefaultChangeReasonNoUploadFileDetail()
+            .WithChangeReasonOption(ChangeReasonOption.AnotherReason)
+            .WithChangeReasonDetail(x =>
+            {
+                x.WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some additional information");
+                x.WithChangeReasonDetail("Some reason");
+            })
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -414,7 +419,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Reason", editRouteState.ChangeReason!.GetDisplayName()!);
-        doc.AssertSummaryListRowValueContentMatches("Additional information", editRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
+        doc.AssertSummaryListRowValueContentMatches("Additional information", editRouteState.ChangeReasonDetail!.AdditionalInformation!);
+        doc.AssertSummaryListRowValueContentMatches("Reason details", editRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
         doc.AssertSummaryListRowValueContentMatches("Evidence", "Not provided");
     }
 
@@ -670,10 +676,12 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         editRouteState.EnsureInitialized(qualification);
         action(editRouteState);
         editRouteState.ChangeReason = ChangeReasonOption.AnotherReason;
+
         editRouteState.ChangeReasonDetail = new ChangeReasonDetailsState
         {
-            HasAdditionalReasonDetail = false,
-            ChangeReasonDetail = null
+            ProvideAdditionalInformation = ProvideMoreInformationOption.No,
+            ChangeReasonDetail = "this is the change Reason",
+            AdditionalInformation = null
         };
 
         return CreateJourneyInstanceAsync(qualification.QualificationId, editRouteState);

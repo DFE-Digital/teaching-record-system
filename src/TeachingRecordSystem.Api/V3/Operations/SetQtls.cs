@@ -70,6 +70,7 @@ public class SetQtlsHandler(
                     changeReason: null,
                     changeReasonDetail: null,
                     evidenceFile: null,
+                    additionalInformation: null,
                     @event: out var @event);
 
                 dbContext.Qualifications.Add(professionalStatus);
@@ -86,6 +87,7 @@ public class SetQtlsHandler(
                     evidenceFile: null,
                     updatedBy: currentUserId,
                     now: timeProvider.UtcNow,
+                    additionalInformation: null,
                     out var @event);
 
                 if (@event is not null)
@@ -103,6 +105,7 @@ public class SetQtlsHandler(
                 evidenceFile: null,
                 deletedBy: currentUserId,
                 now: timeProvider.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             dbContext.AddEventWithoutBroadcast(@event);

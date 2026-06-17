@@ -215,6 +215,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 evidenceFile: null,
                 updatedBy: updatedByUser.UserId,
                 Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             Debug.Assert(@event is not null);
@@ -310,6 +311,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 evidenceFile: null,
                 updatedBy: updatedByUser.UserId,
                 Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
             Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
@@ -393,6 +395,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 evidenceFile: null,
                 updatedBy: updatedByUser.UserId,
                 Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
             Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
@@ -462,6 +465,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
                 Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             dbContext.AddEventWithoutBroadcast(@event);
@@ -517,6 +521,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
                 Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             dbContext.AddEventWithoutBroadcast(@event);
@@ -556,6 +561,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
                 Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             dbContext.AddEventWithoutBroadcast(@event);
@@ -595,6 +601,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
                 Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             dbContext.AddEventWithoutBroadcast(@event);
@@ -634,6 +641,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
                 Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             dbContext.AddEventWithoutBroadcast(@event);

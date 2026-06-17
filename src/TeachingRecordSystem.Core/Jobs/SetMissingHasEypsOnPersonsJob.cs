@@ -50,7 +50,8 @@ public class SetMissingHasEypsOnPersonsJob(
                 OldPersonAttributes = oldPersonAttributes,
                 Changes = RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps,
                 Induction = newInduction,
-                OldInduction = oldInduction
+                OldInduction = oldInduction,
+                AdditionalInformation = null
             });
 
             updatedPersons.Add(person.PersonId);

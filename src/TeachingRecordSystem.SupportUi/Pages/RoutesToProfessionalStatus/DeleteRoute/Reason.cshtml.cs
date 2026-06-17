@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
@@ -14,14 +15,17 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     {
         v => v.RuleFor(m => m.ChangeReason)
             .NotNull().WithMessage("Select a reason"),
-        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
-            .NotNull().WithMessage("Select yes if you want to add more information about why you\u2019re deleting this route"),
         v => v.RuleFor(m => m.ChangeReasonDetail)
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.ChangeReason == ChangeReasonOption.AnotherReason),
+        v => v.RuleFor(m => m.ProvideAdditionalInformation)
+            .NotNull().WithMessage("Select yes if you want to add more information about why you\u2019re deleting this route"),
+        v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
-        v => v.RuleFor(m => m.ChangeReasonDetail)
-            .NotEmpty().WithMessage("Enter additional detail")
-            .When(m => m.HasAdditionalReasonDetail == true),
+        v => v.RuleFor(m => m.AdditionalInformation)
+            .NotEmpty().WithMessage("Enter details")
+            .When(m => m.ProvideAdditionalInformation == ProvideMoreInformationOption.Yes),
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
@@ -39,13 +43,16 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     public ChangeReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public ProvideMoreInformationOption? ProvideAdditionalInformation { get; set; }
 
     [BindProperty]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
+
+    [BindProperty]
+    public string? AdditionalInformation { get; set; }
 
     public string NextPage => linkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId);
 
@@ -65,9 +72,10 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     public void OnGet()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
-        HasAdditionalReasonDetail = JourneyInstance.State.ChangeReasonDetail.HasAdditionalReasonDetail;
+        ProvideAdditionalInformation = JourneyInstance.State.ChangeReasonDetail.ProvideAdditionalInformation;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail.ChangeReasonDetail;
         Evidence = JourneyInstance.State.ChangeReasonDetail.Evidence;
+        AdditionalInformation = JourneyInstance.State.ChangeReasonDetail.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -83,10 +91,10 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
-            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
+            state.ChangeReasonDetail.ProvideAdditionalInformation = ProvideAdditionalInformation;
             state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
             state.ChangeReasonDetail.Evidence = Evidence;
+            state.ChangeReasonDetail.AdditionalInformation = AdditionalInformation;
         });
 
         return Redirect(NextPage);

@@ -133,6 +133,7 @@ public class QtsImporter
                            changeReason: null,
                            changeReasonDetail: null,
                            evidenceFile: null,
+                           additionalInformation: null,
                            out var routeevent);
 
                         _dbContext.AddEventWithoutBroadcast(routeevent);

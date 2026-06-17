@@ -64,6 +64,7 @@ public class RouteToProfessionalStatus : Qualification
         string? changeReason,
         string? changeReasonDetail,
         EventModels.File? evidenceFile,
+        string? additionalInformation,
         out RouteToProfessionalStatusCreatedEvent @event)
     {
         Debug.Assert(person.Qualifications is not null);
@@ -145,7 +146,8 @@ public class RouteToProfessionalStatus : Qualification
             OldPersonAttributes = oldPersonAttributes,
             Changes = changes,
             Induction = newInduction,
-            OldInduction = oldInduction
+            OldInduction = oldInduction,
+            AdditionalInformation = additionalInformation
         };
 
         return route;
@@ -159,6 +161,7 @@ public class RouteToProfessionalStatus : Qualification
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
+        string? additionalInformation,
         out RouteToProfessionalStatusUpdatedEvent? @event)
     {
         Debug.Assert(Person is not null);
@@ -236,7 +239,8 @@ public class RouteToProfessionalStatus : Qualification
             OldPersonAttributes = oldPersonAttributes,
             Changes = changes,
             Induction = newInduction,
-            OldInduction = oldInduction
+            OldInduction = oldInduction,
+            AdditionalInformation = additionalInformation
         };
     }
 
@@ -247,6 +251,7 @@ public class RouteToProfessionalStatus : Qualification
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo deletedBy,
         DateTime now,
+        string? additionalInformation,
         out RouteToProfessionalStatusDeletedEvent @event)
     {
         if (DeletedOn is not null)
@@ -312,7 +317,8 @@ public class RouteToProfessionalStatus : Qualification
             EvidenceFile = evidenceFile,
             Changes = changes,
             Induction = newInduction,
-            OldInduction = oldInduction
+            OldInduction = oldInduction,
+            AdditionalInformation = additionalInformation
         };
     }
 
