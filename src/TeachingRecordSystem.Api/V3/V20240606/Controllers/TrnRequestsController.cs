@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20240606.Requests;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos;
 
@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.CreateTrn)]
-public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class TrnRequestsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPost("")]
     [SwaggerOperation(
@@ -41,7 +41,7 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper
         };
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+        return result.ToActionResult(r => Ok(TrnRequestInfo.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestAlreadyCreated, StatusCodes.Status409Conflict);
     }
 
@@ -60,7 +60,7 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper
         var command = new GetTrnRequestCommand(requestId);
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+        return result.ToActionResult(r => Ok(TrnRequestInfo.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
     }
 }

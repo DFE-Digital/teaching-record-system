@@ -1,0 +1,34 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
+
+namespace TeachingRecordSystem.Api.V3.Operations;
+
+public record FindPersonsByTrnAndDateOfBirthCommand(IEnumerable<(string Trn, DateOnly DateOfBirth)> Persons) : ICommand<FindPersonsResult>;
+
+public class FindPersonsByTrnAndDateOfBirthHandler(
+    TrsDbContext dbContext,
+    ReferenceDataCache referenceDataCache) :
+    FindPersonsHandlerBase(dbContext, referenceDataCache),
+    ICommandHandler<FindPersonsByTrnAndDateOfBirthCommand, FindPersonsResult>
+{
+    public async Task<ApiResult<FindPersonsResult>> ExecuteAsync(FindPersonsByTrnAndDateOfBirthCommand command)
+    {
+        var trns = command.Persons
+            .Where(t => !string.IsNullOrEmpty(t.Trn))
+            .Select(t => t.Trn)
+            .ToArray();
+
+        var persons = await DbContext.Persons
+            .Where(p => trns.Contains(p.Trn) && p.DateOfBirth != null)
+            .Select(p => new { p.PersonId, p.DateOfBirth, p.Trn })
+            .ToArrayAsync();
+
+        // Remove any results where the request DOB doesn't match the contact's DOB
+        // (we can't easily do this in the query itself).
+        var matched = persons
+            .Where(t => command.Persons.First(p => p.Trn == t.Trn).DateOfBirth == t.DateOfBirth)
+            .Select(t => t.PersonId)
+            .ToArray();
+
+        return await CreateResultAsync(matched);
+    }
+}

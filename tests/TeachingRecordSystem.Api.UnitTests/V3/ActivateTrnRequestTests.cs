@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 

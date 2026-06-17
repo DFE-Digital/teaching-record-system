@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using TeachingRecordSystem.Api.V3.Implementation.Dtos;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
+using TeachingRecordSystem.Api.V3.Operations.Common;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 #pragma warning disable TRS0001

@@ -1,10 +1,12 @@
-using AutoMapper.Configuration.Annotations;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
+using TeachingRecordSystem.Api.V3.V20240101;
+using TeachingRecordSystem.Api.V3.V20240814;
 using TeachingRecordSystem.Api.V3.V20250327.Requests;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
 using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.InductionStatus;
+using NameInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.NameInfo;
 using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsStatus;
 using QtsInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250327.Dtos.QtsInfo;
 
@@ -17,7 +19,6 @@ public record FindPersonResponse
     public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonsResultItem))]
 public record FindPersonResponseResult
 {
     public required string Trn { get; init; }
@@ -29,7 +30,21 @@ public record FindPersonResponseResult
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
     public required IReadOnlyCollection<Alert> Alerts { get; init; }
-    [SourceMember("Induction.Status")]
     public required InductionStatus InductionStatus { get; init; }
     public required QtlsStatus QtlsStatus { get; set; }
+
+    public static FindPersonResponseResult Create(FindPersonsResultItem source) => new()
+    {
+        Trn = source.Trn,
+        DateOfBirth = source.DateOfBirth,
+        FirstName = source.FirstName,
+        MiddleName = source.MiddleName,
+        LastName = source.LastName,
+        PreviousNames = source.PreviousNames.Select(n => NameInfo.Create(n)).AsReadOnly(),
+        Qts = source.Qts is { } qts ? QtsInfo.Create(qts) : null,
+        Eyts = source.Eyts is { } eyts ? EytsInfo.Create(eyts) : null,
+        Alerts = source.Alerts.Select(a => Alert.Create(a)).AsReadOnly(),
+        InductionStatus = InductionStatus.Create(source.Induction.Status),
+        QtlsStatus = QtlsStatus.Create(source.QtlsStatus)
+    };
 }

@@ -1,0 +1,51 @@
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+
+namespace TeachingRecordSystem.Api.V3.Operations;
+
+public record SetWelshInductionStatusCommand(string Trn, bool Passed, DateOnly StartDate, DateOnly CompletedDate) : ICommand<SetWelshInductionStatusResult>;
+
+public record SetWelshInductionStatusResult;
+
+public class SetWelshInductionStatusHandler(
+    TrsDbContext dbContext,
+    ICurrentUserProvider currentUserProvider,
+    TimeProvider timeProvider) :
+    ICommandHandler<SetWelshInductionStatusCommand, SetWelshInductionStatusResult>
+{
+    public async Task<ApiResult<SetWelshInductionStatusResult>> ExecuteAsync(SetWelshInductionStatusCommand command)
+    {
+        var person = await dbContext.Persons
+            .Include(p => p.Qualifications)
+            .SingleOrDefaultAsync(p => p.Trn == command.Trn);
+
+        if (person is null)
+        {
+            return ApiError.PersonNotFound(command.Trn);
+        }
+
+        if (person.QtsDate is null)
+        {
+            return ApiError.PersonDoesNotHaveQts(command.Trn);
+        }
+
+        var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
+
+        person.TrySetWelshInductionStatus(
+            command.Passed,
+            !command.Passed ? command.StartDate : null,
+            !command.Passed ? command.CompletedDate : null,
+            currentUserId,
+            timeProvider.UtcNow,
+            out var updatedEvent);
+
+        if (updatedEvent is not null)
+        {
+            dbContext.AddEventWithoutBroadcast(updatedEvent);
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        return new SetWelshInductionStatusResult();
+    }
+}

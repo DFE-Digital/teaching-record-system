@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20240416.Requests;
 using TeachingRecordSystem.Api.V3.V20240416.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240416.Controllers;
 
 [Route("teachers")]
-public class TeachersController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
+public class TeachersController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -38,7 +38,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher, IMapper ma
 
         var result = await commandDispatcher.DispatchAsync(command);
 
-        return result.ToActionResult(r => Ok(mapper.Map<GetTeacherResponse>(r)))
+        return result.ToActionResult(r => Ok(GetTeacherResponse.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.RecordIsMerged, StatusCodes.Status404NotFound);
