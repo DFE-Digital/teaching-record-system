@@ -1,3 +1,4 @@
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -66,9 +67,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             person.PersonId,
             state =>
             {
-                state.HasAdditionalReasonDetail = true;
-                state.AddReason = AddMqReasonOption.NewInformationReceived;
-                state.AddReasonDetail = "Some additional details";
+                state.ProvideAdditionalInformation = true;
+                state.AddReason = AddMqReasonOption.AnotherReason;
+                state.AddReasonDetail = "Some reason";
                 state.Evidence = new EvidenceUploadModel
                 {
                     UploadEvidence = true,
@@ -79,6 +80,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                         FileSizeDescription = "5MB"
                     }
                 };
+                state.AdditionalInformation = "Additional information";
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -90,9 +92,14 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         AssertCheckedRadioOption("AddReason", journeyInstance.State.AddReason!.ToString()!);
-        AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
-        Assert.Equal(journeyInstance.State.AddReasonDetail, doc.GetElementsByName("AddReasonDetail")[0].TrimmedText());
+        AssertCheckedRadioOption("ProvideAdditionalInformation", bool.TrueString);
+        var reasonDetailTextbox =
+            doc.GetElementById("AddReasonDetail") as IHtmlInputElement;
+        Assert.Equal(journeyInstance.State.AddReasonDetail, reasonDetailTextbox!.Value);
         AssertCheckedRadioOption("Evidence.UploadEvidence", bool.TrueString);
+        var additionalInformation =
+            doc.GetElementById("AdditionalInformation") as IHtmlTextAreaElement;
+        Assert.Equal(journeyInstance.State.AdditionalInformation, additionalInformation!.Value);
 
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
         Assert.NotNull(uploadedEvidenceLink);
@@ -174,7 +181,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new MultipartFormDataContentBuilder
             {
-                { "AddReason", AddMqReasonOption.NewInformationReceived.ToString() },
+                { "AddReason", AddMqReasonOption.AnotherReason.ToString() },
                 { "Evidence.UploadEvidence", "false" }
             }
         };
@@ -183,7 +190,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re adding this mandatory qualification");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information about why you’re adding this mandatory qualification");
     }
 
     [Fact]
@@ -197,8 +204,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new MultipartFormDataContentBuilder
             {
-                { "AddReason", AddMqReasonOption.NewInformationReceived.ToString() },
-                { "HasAdditionalReasonDetail", "true" },
+                { "AddReason", AddMqReasonOption.AnotherReason.ToString() },
+                { "ProvideAdditionalInformation", "true" },
+                { "AdditionalInformation", "some additional information" },
                 { "AddReasonDetail", "" },
                 { "Evidence.UploadEvidence", "false" }
             }
@@ -208,7 +216,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Enter additional detail");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Enter a reason");
     }
 
     [Fact]
@@ -296,8 +304,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "AddReason", AddMqReasonOption.NewInformationReceived.ToString() },
-                { "HasAdditionalReasonDetail", "true" },
-                { "AddReasonDetail", new string('a', 4001) },
+                { "ProvideAdditionalInformation", "true" },
+                { "AddReasonDetail", "true" },
+                { "AdditionalInformation", new string('a', 4001) },
                 { "Evidence.UploadEvidence", "false" }
             }
         };
@@ -306,7 +315,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Additional detail must be 4000 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Additional detail must be 4000 characters or less");
     }
 
     [Fact]
@@ -316,16 +325,18 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
-        var addReason = AddMqReasonOption.NewInformationReceived;
+        var addReason = AddMqReasonOption.AnotherReason;
         var hasAdditionalReasonDetail = true;
         var addReasonDetail = "More details";
+        var additionalInformation = "Additional information";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder
             {
                 { "AddReason", addReason.ToString() },
-                { "HasAdditionalReasonDetail", hasAdditionalReasonDetail.ToString() },
+                { "ProvideAdditionalInformation", hasAdditionalReasonDetail.ToString() },
+                { "AdditionalInformation", additionalInformation},
                 { "AddReasonDetail", addReasonDetail },
                 { "Evidence.UploadEvidence", "false" }
             }
@@ -340,9 +351,10 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(addReason, journeyInstance.State.AddReason);
-        Assert.Equal(hasAdditionalReasonDetail, journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Equal(hasAdditionalReasonDetail, journeyInstance.State.ProvideAdditionalInformation);
         Assert.Equal(addReasonDetail, journeyInstance.State.AddReasonDetail);
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
+        Assert.Equal(additionalInformation, journeyInstance.State.AdditionalInformation);
     }
 
     [Fact]
@@ -360,7 +372,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "AddReason", addReason.ToString() },
-                { "HasAdditionalReasonDetail", hasAdditionalReasonDetail.ToString() },
+                { "AdditionalInformation", addReason.ToString() },
+                { "ProvideAdditionalInformation", hasAdditionalReasonDetail.ToString() },
                 { "Evidence.UploadEvidence", "true" },
                 { "Evidence.EvidenceFile", (CreateEvidenceFileBinaryContent(), evidenceFileName) }
             }
@@ -375,7 +388,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(addReason, journeyInstance.State.AddReason);
-        Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.False(journeyInstance.State.ProvideAdditionalInformation);
         Assert.Null(journeyInstance.State.AddReasonDetail);
         Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile);
         Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);

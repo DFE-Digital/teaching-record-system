@@ -30,6 +30,8 @@ public class CheckAnswersModel(
 
     public string? ChangeReasonDetail { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -48,6 +50,7 @@ public class CheckAnswersModel(
         NewSpecialism = JourneyInstance.State.Specialism;
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
     }
 
@@ -62,6 +65,7 @@ public class CheckAnswersModel(
             evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             timeProvider.UtcNow,
+            additionalInformation: AdditionalInformation,
             out var updatedEvent);
 
         if (updatedEvent is not null)

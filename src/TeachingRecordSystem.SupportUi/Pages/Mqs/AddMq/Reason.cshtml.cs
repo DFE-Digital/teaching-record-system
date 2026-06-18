@@ -14,14 +14,17 @@ public class ReasonModel(
     {
         v => v.RuleFor(m => m.AddReason)
             .NotNull().WithMessage("Select a reason"),
-        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
-            .NotNull().WithMessage("Select yes if you want to add more information about why you’re adding this mandatory qualification"),
         v => v.RuleFor(m => m.AddReasonDetail)
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.AddReason == AddMqReasonOption.AnotherReason),
+        v => v.RuleFor(m => m.ProvideAdditionalInformation)
+            .NotNull().WithMessage("Select yes if you want to add more information about why you’re adding this mandatory qualification"),
+        v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
-        v => v.RuleFor(m => m.AddReasonDetail)
+        v => v.RuleFor(m => m.AdditionalInformation)
             .NotEmpty().WithMessage("Enter additional detail")
-            .When(m => m.HasAdditionalReasonDetail == true),
+            .When(m => m.ProvideAdditionalInformation == true),
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
@@ -39,7 +42,7 @@ public class ReasonModel(
     public AddMqReasonOption? AddReason { get; set; }
 
     [BindProperty]
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
 
     [BindProperty]
     public string? AddReasonDetail { get; set; }
@@ -47,12 +50,16 @@ public class ReasonModel(
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
+    [BindProperty]
+    public string? AdditionalInformation { get; set; }
+
     public void OnGet()
     {
         AddReason = JourneyInstance!.State.AddReason;
-        HasAdditionalReasonDetail = JourneyInstance.State.HasAdditionalReasonDetail;
+        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
         AddReasonDetail = JourneyInstance.State.AddReasonDetail;
         Evidence = JourneyInstance.State.Evidence;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -68,9 +75,10 @@ public class ReasonModel(
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.AddReason = AddReason;
-            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.AddReasonDetail = AddReasonDetail;
+            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+            state.AddReasonDetail = AddReason == AddMqReasonOption.AnotherReason ? AddReasonDetail : null;
             state.Evidence = Evidence;
+            state.AdditionalInformation = ProvideAdditionalInformation == true ? AdditionalInformation : null;
         });
 
         return Redirect(linkGenerator.Mqs.AddMq.CheckAnswers(PersonId, JourneyInstance.InstanceId));

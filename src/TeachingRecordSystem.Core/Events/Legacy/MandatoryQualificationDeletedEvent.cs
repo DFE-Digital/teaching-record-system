@@ -10,4 +10,5 @@ public record MandatoryQualificationDeletedEvent : EventBase, IEventWithPersonId
     public required string? DeletionReason { get; init; }
     public required string? DeletionReasonDetail { get; init; }
     public required File? EvidenceFile { get; init; }
+    public required string? AdditionalInformation { get; init; }
 }

@@ -27,18 +27,23 @@
                     </govuk-radios-item>
                     <govuk-radios-item value="@MqChangeStartDateReasonOption.AnotherReason">
                         @MqChangeStartDateReasonOption.AnotherReason.GetDisplayName()
+                        <govuk-radios-item-conditional data-testid="start-date-reason-detail">
+                            <govuk-input data-testid="reason-detail" for="ChangeReasonDetail" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
+                                <govuk-input-label>Enter a reason</govuk-input-label>
+                            </govuk-input>
+                        </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <govuk-radios for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
+            <govuk-radios for="ProvideAdditionalInformation" data-testid="has-additional-reason_detail-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2></govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional data-testid="additional-detail">
-                            <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>Enter details about this change</govuk-character-count-label>
+                            <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
                             </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>

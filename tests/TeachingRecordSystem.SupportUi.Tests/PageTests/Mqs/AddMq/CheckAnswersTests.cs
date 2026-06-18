@@ -35,7 +35,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
         var addReason = AddMqReasonOption.NewInformationReceived;
-        var addReasonDetail = "More details about the MQ";
+        var additionalInformation = "More details about the MQ";
         var evidence = new EvidenceUploadModel
         {
             UploadEvidence = true,
@@ -57,9 +57,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Status = status,
                 EndDate = endDate,
                 AddReason = addReason,
-                HasAdditionalReasonDetail = true,
-                AddReasonDetail = addReasonDetail,
-                Evidence = evidence
+                ProvideAdditionalInformation = true,
+                AddReasonDetail = null,
+                Evidence = evidence,
+                AdditionalInformation = additionalInformation
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -83,8 +84,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
-        var addReason = AddMqReasonOption.NewInformationReceived;
+        var addReason = AddMqReasonOption.AnotherReason;
         var addReasonDetail = "More details about the MQ";
+        var additionalInformation = "some additional info";
         var evidence = new EvidenceUploadModel
         {
             UploadEvidence = true,
@@ -106,7 +108,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Status = status,
                 EndDate = endDate,
                 AddReason = addReason,
-                HasAdditionalReasonDetail = true,
+                ProvideAdditionalInformation = true,
+                AdditionalInformation = additionalInformation,
                 AddReasonDetail = addReasonDetail,
                 Evidence = evidence
             });
@@ -122,6 +125,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TrimmedText());
         Assert.Equal(startDate.ToString(WebConstants.DateDisplayFormat), doc.GetElementByTestId("start-date")!.TrimmedText());
         Assert.Equal(status.GetTitle(), doc.GetElementByTestId("status")!.TrimmedText());
+        Assert.Equal(addReasonDetail, doc.GetElementByTestId("reason-details")!.TrimmedText());
+        Assert.Equal(additionalInformation, doc.GetElementByTestId("additional-information")!.TrimmedText());
         if (status == MandatoryQualificationStatus.Passed)
         {
             Assert.Equal(endDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetElementByTestId("end-date")!.TrimmedText());
@@ -164,7 +169,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
-        var addReason = AddMqReasonOption.NewInformationReceived;
+        var addReason = AddMqReasonOption.AnotherReason;
         var addReasonDetail = "More details about the MQ";
         var evidence = new EvidenceUploadModel
         {
@@ -187,9 +192,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Status = status,
                 EndDate = endDate,
                 AddReason = addReason,
-                HasAdditionalReasonDetail = true,
+                ProvideAdditionalInformation = false,
                 AddReasonDetail = addReasonDetail,
-                Evidence = evidence
+                Evidence = evidence,
+                AdditionalInformation = null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -247,7 +253,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 },
                 AddReason = addReason.GetDisplayName(),
                 AddReasonDetail = addReasonDetail,
-                EvidenceFile = evidence.UploadedEvidenceFile?.ToEventModel()
+                EvidenceFile = evidence.UploadedEvidenceFile?.ToEventModel(),
+                AdditionalInformation = null
             };
 
             var actualMqCreatedEvent = Assert.IsType<MandatoryQualificationCreatedEvent>(e);
@@ -266,7 +273,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
         var addReason = AddMqReasonOption.NewInformationReceived;
-        var addReasonDetail = "More details about the MQ";
+        var additionalInformation = "More details about the MQ";
         var evidence = new EvidenceUploadModel
         {
             UploadEvidence = true,
@@ -288,8 +295,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Status = status,
                 EndDate = endDate,
                 AddReason = addReason,
-                HasAdditionalReasonDetail = true,
-                AddReasonDetail = addReasonDetail,
+                ProvideAdditionalInformation = true,
+                AddReasonDetail = null,
+                AdditionalInformation = additionalInformation,
                 Evidence = evidence
             });
 

@@ -11,4 +11,5 @@ public record MandatoryQualificationCreatedEvent : EventBase, IEventWithPersonId
     public required string? AddReason { get; init; }
     public required string? AddReasonDetail { get; init; }
     public required File? EvidenceFile { get; init; }
+    public required string? AdditionalInformation { get; init; }
 }

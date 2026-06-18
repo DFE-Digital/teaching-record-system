@@ -34,6 +34,7 @@ public class MandatoryQualification : Qualification
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo createdBy,
         DateTime now,
+        string? additionalInformation,
         out MandatoryQualificationCreatedEvent @event)
     {
         var qualificationId = Guid.NewGuid();
@@ -62,7 +63,8 @@ public class MandatoryQualification : Qualification
                 providerNameHint: MandatoryQualificationProvider.GetById(providerId).Name),
             AddReason = addReason,
             AddReasonDetail = addReasonDetail,
-            EvidenceFile = evidenceFile
+            EvidenceFile = evidenceFile,
+            AdditionalInformation = additionalInformation,
         };
 
         return qualification;
@@ -74,6 +76,7 @@ public class MandatoryQualification : Qualification
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo deletedBy,
         DateTime now,
+        string? additionalInformation,
         out MandatoryQualificationDeletedEvent @event)
     {
         if (DeletedOn is not null)
@@ -93,7 +96,8 @@ public class MandatoryQualification : Qualification
             MandatoryQualification = EventModels.MandatoryQualification.FromModel(this),
             DeletionReason = deletionReason,
             DeletionReasonDetail = deletionReasonDetail,
-            EvidenceFile = evidenceFile
+            EvidenceFile = evidenceFile,
+            AdditionalInformation = additionalInformation
         };
     }
 
@@ -104,6 +108,7 @@ public class MandatoryQualification : Qualification
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
+        string? additionalInformation,
         out MandatoryQualificationUpdatedEvent? @event)
     {
         var oldMqEventModel = EventModels.MandatoryQualification.FromModel(this);
@@ -138,7 +143,8 @@ public class MandatoryQualification : Qualification
             ChangeReason = changeReason,
             ChangeReasonDetail = changeReasonDetail,
             EvidenceFile = evidenceFile,
-            Changes = changes
+            Changes = changes,
+            AdditionalInformation = additionalInformation
         };
     }
 }

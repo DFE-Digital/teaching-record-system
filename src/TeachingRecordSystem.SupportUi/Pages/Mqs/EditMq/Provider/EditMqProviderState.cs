@@ -24,11 +24,17 @@ public class EditMqProviderState : IRegisterJourney
 
     public EvidenceUploadModel Evidence { get; set; } = new();
 
+    public string? AdditionalInformation { get; set; }
+
+    public bool? ProvideAdditionalInformation { get; set; }
+
     [JsonIgnore]
     [MemberNotNullWhen(true, nameof(ProviderId), nameof(ChangeReason))]
     public bool IsComplete =>
         ProviderId.HasValue &&
         ChangeReason.HasValue &&
+        (ChangeReason == MqChangeProviderReasonOption.AnotherReason && !string.IsNullOrEmpty(ChangeReasonDetail) || (ChangeReason != MqChangeProviderReasonOption.AnotherReason && string.IsNullOrEmpty(ChangeReasonDetail))) &&
+        (ProvideAdditionalInformation == true && !string.IsNullOrEmpty(AdditionalInformation) || (ProvideAdditionalInformation != true && string.IsNullOrEmpty(AdditionalInformation))) &&
         Evidence.IsComplete;
 
     public void EnsureInitialized(CurrentMandatoryQualificationFeature qualificationInfo)

@@ -12,14 +12,14 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     {
         v => v.RuleFor(m => m.ChangeReason)
             .NotNull().WithMessage("Select a reason"),
-        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+        v => v.RuleFor(m => m.ProvideAdditionalInformation)
             .NotNull().WithMessage("Select yes if you want to add more information"),
-        v => v.RuleFor(m => m.ChangeReasonDetail)
+        v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
-        v => v.RuleFor(m => m.ChangeReasonDetail)
+        v => v.RuleFor(m => m.AdditionalInformation)
             .NotEmpty().WithMessage("Enter additional detail")
-            .When(m => m.HasAdditionalReasonDetail == true),
+            .When(m => m.ProvideAdditionalInformation == true),
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
@@ -36,13 +36,16 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public MqChangeSpecialismReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
 
     [BindProperty]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
+
+    [BindProperty]
+    public string? AdditionalInformation { get; set; }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
@@ -63,6 +66,9 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         Evidence = JourneyInstance.State.Evidence;
+        ChangeReasonDetail = ChangeReason == MqChangeSpecialismReasonOption.AnotherReason ? JourneyInstance.State.ChangeReasonDetail : null;
+        AdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation == true ? JourneyInstance.State.AdditionalInformation : null;
+        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -78,8 +84,10 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
-            state.ChangeReasonDetail = ChangeReasonDetail;
+            state.ChangeReasonDetail = ChangeReason == MqChangeSpecialismReasonOption.AnotherReason ? ChangeReasonDetail : null;
             state.Evidence = Evidence;
+            state.AdditionalInformation = ProvideAdditionalInformation == true ? AdditionalInformation : null;
+            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
         });
 
         return Redirect(linkGenerator.Mqs.EditMq.Specialism.CheckAnswers(QualificationId, JourneyInstance!.InstanceId));

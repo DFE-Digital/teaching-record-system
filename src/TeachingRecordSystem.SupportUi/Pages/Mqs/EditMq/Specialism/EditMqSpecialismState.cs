@@ -24,10 +24,15 @@ public class EditMqSpecialismState : IRegisterJourney
 
     public EvidenceUploadModel Evidence { get; set; } = new();
 
+    public string? AdditionalInformation { get; set; }
+
+    public bool? ProvideAdditionalInformation { get; set; }
+
     [JsonIgnore]
     [MemberNotNullWhen(true, nameof(Specialism), nameof(ChangeReason))]
     public bool IsComplete => Specialism is not null &&
-        ChangeReason.HasValue &&
+                              (ChangeReason == MqChangeSpecialismReasonOption.AnotherReason && !string.IsNullOrEmpty(ChangeReasonDetail) || ChangeReason != MqChangeSpecialismReasonOption.AnotherReason && string.IsNullOrEmpty(ChangeReasonDetail)) &&
+                              (ProvideAdditionalInformation == true && !string.IsNullOrWhiteSpace(AdditionalInformation) || ProvideAdditionalInformation != true && string.IsNullOrWhiteSpace(AdditionalInformation)) &&
         Evidence.IsComplete;
 
     public void EnsureInitialized(CurrentMandatoryQualificationFeature qualificationInfo)

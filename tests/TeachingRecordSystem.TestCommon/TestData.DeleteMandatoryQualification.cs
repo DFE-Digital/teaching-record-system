@@ -59,7 +59,8 @@ public partial class TestData
                         FileId = FileId,
                         Name = Name
                     } :
-                    null
+                    null,
+                AdditionalInformation = null
             };
             dbContext.AddEventWithoutBroadcast(deletedEvent);
 

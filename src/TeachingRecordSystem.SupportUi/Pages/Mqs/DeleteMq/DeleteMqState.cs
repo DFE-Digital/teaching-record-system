@@ -18,10 +18,17 @@ public class DeleteMqState : IRegisterJourney
 
     public string? DeletionReasonDetail { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
+    public bool? ProvideAdditionalInformation { get; set; }
+
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
     [MemberNotNullWhen(true, nameof(DeletionReason))]
 
-    public bool IsComplete => DeletionReason.HasValue && Evidence.IsComplete;
+    public bool IsComplete => DeletionReason.HasValue &&
+        (DeletionReason == MqDeletionReasonOption.AnotherReason && !string.IsNullOrEmpty(DeletionReasonDetail) || DeletionReason != MqDeletionReasonOption.AnotherReason && string.IsNullOrEmpty(DeletionReasonDetail)) &&
+        (ProvideAdditionalInformation == true && !string.IsNullOrEmpty(AdditionalInformation) || ProvideAdditionalInformation == false && string.IsNullOrEmpty(AdditionalInformation)) &&
+        Evidence.IsComplete;
 }
