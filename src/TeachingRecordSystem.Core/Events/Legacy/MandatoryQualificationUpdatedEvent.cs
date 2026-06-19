@@ -13,6 +13,7 @@ public record MandatoryQualificationUpdatedEvent : EventBase, IEventWithPersonId
     public required string? ChangeReasonDetail { get; init; }
     public required File? EvidenceFile { get; init; }
     public required MandatoryQualificationUpdatedEventChanges Changes { get; init; }
+    public required string? AdditionalInformation { get; init; }
 }
 
 [Flags]

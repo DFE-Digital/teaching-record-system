@@ -47,9 +47,29 @@
                         <value data-testid="reason" use-empty-fallback>@createdEvent.AddReason</value>
                     </row>
                     <row>
+                        <key>Reason details</key>
+                        <value data-testid="reason-detail">
+                            @if (createdEvent.AddReasonDetail is not null)
+                            {
+                                @Html.ConvertNewlinesToLineBreaks(createdEvent.AddReasonDetail)
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </value>
+                    </row>
+                    <row>
                         <key>Additional information</key>
-                        <value data-testid="reason-detail" use-empty-fallback>
-                            @Html.ConvertNewlinesToLineBreaks(createdEvent.AddReasonDetail)
+                        <value data-testid="additional-information">
+                            @if (createdEvent.AdditionalInformation is not null)
+                            {
+                                @Html.ConvertNewlinesToLineBreaks(createdEvent.AdditionalInformation)
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
                         </value>
                     </row>
                     <row>

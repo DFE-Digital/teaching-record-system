@@ -35,6 +35,8 @@ public class EditMqStatusState : IRegisterJourney
     [JsonIgnore]
     public bool IsStatusChange => Status != CurrentStatus;
 
+    public string? AdditionalInformation { get; set; }
+
     [JsonIgnore]
     public bool IsComplete => Status.HasValue &&
         (Status != MandatoryQualificationStatus.Passed || Status == MandatoryQualificationStatus.Passed && EndDate.HasValue) &&

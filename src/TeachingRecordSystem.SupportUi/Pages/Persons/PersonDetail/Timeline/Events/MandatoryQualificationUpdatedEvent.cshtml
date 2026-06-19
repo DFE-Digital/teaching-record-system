@@ -32,7 +32,27 @@
                         <row>
                             <key>More detail</key>
                             <value data-testid="change-reason-detail">
-                                @Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(updatedEvent.ChangeReasonDetail) ? updatedEvent.ChangeReasonDetail : "None")
+                                @if (updatedEvent.ChangeReasonDetail is not null)
+                                {
+                                    @Html.ConvertNewlinesToLineBreaks(updatedEvent.ChangeReasonDetail)
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </value>
+                        </row>
+                        <row>
+                            <key>Additional information</key>
+                            <value data-testid="additional-information">
+                                @if (updatedEvent.AdditionalInformation is not null)
+                                {
+                                    @Html.ConvertNewlinesToLineBreaks(updatedEvent.AdditionalInformation)
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
                             </value>
                         </row>
                         @if (evidenceFileUrl is not null)

@@ -37,6 +37,8 @@ public class CheckAnswersModel(
 
     public string? AddReasonDetail { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
     [BindProperty]
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
@@ -54,6 +56,7 @@ public class CheckAnswersModel(
             evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             timeProvider.UtcNow,
+            additionalInformation: AdditionalInformation,
             out var createdEvent);
 
         dbContext.MandatoryQualifications.Add(qualification);
@@ -92,8 +95,8 @@ public class CheckAnswersModel(
         EndDate = JourneyInstance.State.EndDate;
         AddReason = JourneyInstance.State.AddReason!.Value;
         AddReasonDetail = JourneyInstance.State.AddReasonDetail;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-
         await next();
     }
 }

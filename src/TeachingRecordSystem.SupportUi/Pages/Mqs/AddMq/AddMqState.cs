@@ -24,11 +24,13 @@ public class AddMqState : IRegisterJourney
 
     public AddMqReasonOption? AddReason { get; set; }
 
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
 
     public string? AddReasonDetail { get; set; }
 
     public EvidenceUploadModel Evidence { get; set; } = new();
+
+    public string? AdditionalInformation { get; set; }
 
     [JsonIgnore]
     [MemberNotNullWhen(true, nameof(ProviderId), nameof(Specialism), nameof(StartDate), nameof(Status))]
@@ -37,9 +39,13 @@ public class AddMqState : IRegisterJourney
         Specialism.HasValue &&
         StartDate.HasValue &&
         Status.HasValue &&
-        (Status != MandatoryQualificationStatus.Passed || (Status == MandatoryQualificationStatus.Passed && EndDate.HasValue)) &&
+        (Status != MandatoryQualificationStatus.Passed ||
+         (Status == MandatoryQualificationStatus.Passed && EndDate.HasValue)) &&
         AddReason.HasValue &&
-        HasAdditionalReasonDetail is bool hasDetail &&
-        (!hasDetail || AddReasonDetail is not null) &&
-        Evidence.IsComplete;
+        (AddReason == AddMqReasonOption.AnotherReason && !string.IsNullOrEmpty(AddReasonDetail) ||
+         AddReason != AddMqReasonOption.AnotherReason && string.IsNullOrEmpty(AddReasonDetail)) &&
+         ProvideAdditionalInformation is bool proveAdditionalInfo &&
+         (proveAdditionalInfo == true && !string.IsNullOrEmpty(AdditionalInformation) ||
+          proveAdditionalInfo == false && string.IsNullOrEmpty(AdditionalInformation)) &&
+         Evidence.IsComplete;
 }

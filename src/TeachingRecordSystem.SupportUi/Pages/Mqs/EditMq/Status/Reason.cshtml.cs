@@ -10,9 +10,9 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
-        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+        v => v.RuleFor(m => m.ProvideAdditionalInformation)
             .NotNull().WithMessage("Select yes if you want to add more information"),
-        v => v.RuleFor(m => m.ChangeReasonDetail)
+        v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
         v => v.RuleFor(m => m.Evidence).Evidence()
@@ -34,10 +34,13 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public MqChangeEndDateReasonOption? EndDateChangeReason { get; set; }
 
     [BindProperty]
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
 
     [BindProperty]
     public string? ChangeReasonDetail { get; set; }
+
+    [BindProperty]
+    public string? AdditionalInformation { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();

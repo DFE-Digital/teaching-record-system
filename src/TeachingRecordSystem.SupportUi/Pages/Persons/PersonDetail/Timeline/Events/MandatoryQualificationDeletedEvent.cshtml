@@ -27,9 +27,11 @@
                     </row>
                     <row>
                         <key>More detail</key>
-                        <value data-testid="deletion-reason-detail">
-                            @Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(deletedEvent.DeletionReasonDetail) ? deletedEvent.DeletionReasonDetail : "None")
-                        </value>
+                        <value data-testid="deletion-reason-detail">@(!string.IsNullOrEmpty(deletedEvent.DeletionReasonDetail) ? deletedEvent.DeletionReasonDetail : "None")</value>
+                    </row>
+                    <row>
+                        <key>Additional information</key>
+                        <value data-testid="additional-information">@(!string.IsNullOrEmpty(deletedEvent.AdditionalInformation) ? deletedEvent.AdditionalInformation : "None")</value>
                     </row>
                     @if (evidenceFileUrl is not null)
                     {

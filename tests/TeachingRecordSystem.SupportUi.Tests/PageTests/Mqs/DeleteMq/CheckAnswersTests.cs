@@ -30,9 +30,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason", true)]
-    [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null, false)]
-    [InlineData(null, null, null, null, null, MqDeletionReasonOption.AnotherReason, null, false)]
+    [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.AnotherReason, "Some details about the deletion reason", true, "additional info", true)]
+    [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null, false, "additional info", true)]
+    [InlineData(null, null, null, null, null, MqDeletionReasonOption.AddedInError, null, false, "additional info", true)]
+    [InlineData(null, null, null, null, null, MqDeletionReasonOption.AddedInError, null, false, null, false)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
         string? providerName,
         MandatoryQualificationSpecialism? specialism,
@@ -41,7 +42,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         string? endDateString,
         MqDeletionReasonOption deletionReason,
         string? deletionReasonDetail,
-        bool uploadEvidence)
+        bool uploadEvidence,
+        string? additionalInformation,
+        bool provideAdditionalInformation)
     {
         // Arrange
         var provider = providerName is not null ? MandatoryQualificationProvider.All.Single(p => p.Name == providerName) : null;
@@ -52,7 +55,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithProvider(provider?.MandatoryQualificationProviderId)
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
-            .WithStatus(status, endDate)));
+            .WithStatus(status, endDate)
+            .WithAdditionalInformation("additional information")));
         var qualification = person.MandatoryQualifications.Single();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualification.QualificationId,
@@ -70,7 +74,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                         FileName = "test.pdf",
                         FileSizeDescription = "1MB"
                     } : null
-                }
+                },
+                ProvideAdditionalInformation = provideAdditionalInformation,
+                AdditionalInformation = additionalInformation
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualification.QualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -92,6 +98,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(deletionReasonSummary);
         Assert.Equal(deletionReason.GetDisplayName(), deletionReasonSummary.GetElementByTestId("deletion-reason")!.TrimmedText());
         Assert.Equal(!string.IsNullOrEmpty(deletionReasonDetail) ? deletionReasonDetail : "None", deletionReasonSummary.GetElementByTestId("deletion-reason-detail")!.TrimmedText());
+        Assert.Equal(provideAdditionalInformation ? additionalInformation : "None", deletionReasonSummary.GetElementByTestId("additional-information")!.TrimmedText());
         var uploadedEvidenceLink = deletionReasonSummary.GetElementByTestId("uploaded-evidence-file-link");
         if (uploadEvidence)
         {
@@ -138,8 +145,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = MandatoryQualificationStatus.Passed;
         var startDate = new DateOnly(2023, 09, 01);
         var endDate = new DateOnly(2023, 11, 05);
-        var deletionReason = MqDeletionReasonOption.ProviderRequest;
+        var deletionReason = MqDeletionReasonOption.AnotherReason;
         var deletionReasonDetail = "Some details about the deletion reason";
+        var additionalInformation = "this is some additional info";
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "test.pdf";
 
@@ -169,7 +177,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                         FileName = evidenceFileName,
                         FileSizeDescription = "1MB"
                     }
-                }
+                },
+                AdditionalInformation = additionalInformation,
+                ProvideAdditionalInformation = true
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -215,7 +225,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 {
                     FileId = evidenceFileId,
                     Name = evidenceFileName
-                }
+                },
+                AdditionalInformation = additionalInformation
             };
 
             var actualMqDeletedEvent = Assert.IsType<MandatoryQualificationDeletedEvent>(e);
@@ -237,12 +248,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new DeleteMqState
             {
                 Initialized = true,
-                DeletionReason = MqDeletionReasonOption.ProviderRequest,
+                DeletionReason = MqDeletionReasonOption.AnotherReason,
                 DeletionReasonDetail = "Some details about the deletion reason",
                 Evidence = new()
                 {
                     UploadEvidence = false
-                }
+                },
+                ProvideAdditionalInformation = false,
+                AdditionalInformation = null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -271,7 +284,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2023, 09, 01);
         var endDate = new DateOnly(2023, 11, 05);
         var deletionReason = MqDeletionReasonOption.ProviderRequest;
-        var deletionReasonDetail = "Some details about the deletion reason";
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "test.pdf";
 
@@ -295,7 +307,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Initialized = true,
                 DeletionReason = deletionReason,
-                DeletionReasonDetail = deletionReasonDetail,
+                DeletionReasonDetail = null,
                 Evidence = new()
                 {
                     UploadEvidence = true,
@@ -305,7 +317,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                         FileName = evidenceFileName,
                         FileSizeDescription = "1MB"
                     }
-                }
+                },
+                ProvideAdditionalInformation = false,
+                AdditionalInformation = null
             });
 
         var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");

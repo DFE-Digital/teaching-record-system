@@ -118,7 +118,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditMqProviderReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(changeReason.GetDisplayName())}");
-        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, changeReasonDetail);
+        await page.SelectReasonMoreDetailsAsync("Enter details", true, changeReasonDetail);
         await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
@@ -162,7 +162,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditMqSpecialismReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(changeReason.GetDisplayName())}");
-        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, changeReasonDetail);
+        await page.SelectReasonMoreDetailsAsync("Enter details", true, changeReasonDetail);
         await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
@@ -204,7 +204,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditMqStartDateReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(changeReason.GetDisplayName())}");
-        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, changeReasonDetail);
+        await page.SelectReasonMoreDetailsAsync("Enter details", true, changeReasonDetail);
         await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
@@ -292,7 +292,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditMqStatusReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(changeReason)}");
-        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, changeReasonDetail);
+        await page.SelectReasonMoreDetailsAsync("Enter details", true, changeReasonDetail);
         await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
@@ -326,7 +326,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnDeleteMqPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(deletionReason.GetDisplayName())}");
-        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, deletionReasonDetail);
+        await page.SelectReasonMoreDetailsAsync("Enter details", true, deletionReasonDetail);
         await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 

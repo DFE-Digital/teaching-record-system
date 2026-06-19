@@ -30,9 +30,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(null, false)]
-    [InlineData("Some reason", true)]
+    [InlineData(MqChangeSpecialismReasonOption.ChangeOfSpecialism, null, false)]
+    [InlineData(MqChangeSpecialismReasonOption.AnotherReason, "Some reason", true)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
+        MqChangeSpecialismReasonOption changeReason,
         string? changeReasonDetail,
         bool uploadEvidence)
     {
@@ -41,7 +42,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState
@@ -51,6 +51,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CurrentSpecialism = oldMqSpecialism,
                 ChangeReason = changeReason,
                 ChangeReasonDetail = changeReasonDetail,
+                ProvideAdditionalInformation = false,
                 Evidence = new()
                 {
                     UploadEvidence = uploadEvidence,
@@ -126,7 +127,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
         var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
-        var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
+        var changeReason = MqChangeSpecialismReasonOption.AnotherReason;
         var changeReasonDetail = "Some reason";
 
         EventObserver.Clear();
@@ -140,6 +141,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CurrentSpecialism = oldMqSpecialism,
                 ChangeReason = changeReason,
                 ChangeReasonDetail = changeReasonDetail,
+                ProvideAdditionalInformation = false,
+                AdditionalInformation = null,
                 Evidence = new()
                 {
                     UploadEvidence = false
@@ -210,7 +213,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 ChangeReason = changeReason.GetDisplayName(),
                 ChangeReasonDetail = changeReasonDetail,
                 EvidenceFile = null,
-                Changes = MandatoryQualificationUpdatedEventChanges.Specialism
+                Changes = MandatoryQualificationUpdatedEventChanges.Specialism,
+                AdditionalInformation = null
             };
 
             var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
@@ -233,7 +237,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 Specialism = newMqSpecialism,
                 ChangeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism,
-                ChangeReasonDetail = "Some reason",
+                ChangeReasonDetail = null,
+                ProvideAdditionalInformation = false,
                 Evidence = new()
                 {
                     UploadEvidence = false

@@ -229,7 +229,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var multipartContent = CreateFormFileUpload(".png");
         multipartContent.Add(new StringContent(MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString()), "ChangeReason");
-        multipartContent.Add(new StringContent("True"), "HasAdditionalReasonDetail");
+        multipartContent.Add(new StringContent("True"), "ProvideAdditionalInformation");
+        multipartContent.Add(new StringContent("More reasons"), "AdditionalInformation");
         multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
         multipartContent.Add(new StringContent("True"), "Evidence.UploadEvidence");
 

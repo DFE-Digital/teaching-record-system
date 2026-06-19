@@ -38,6 +38,8 @@ public class CheckAnswersModel(
 
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (!JourneyInstance!.State.IsComplete)
@@ -59,6 +61,7 @@ public class CheckAnswersModel(
         DeletionReason = JourneyInstance.State.DeletionReason;
         DeletionReasonDetail = JourneyInstance.State.DeletionReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -71,6 +74,7 @@ public class CheckAnswersModel(
             EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             timeProvider.UtcNow,
+            additionalInformation: AdditionalInformation,
             out var deletedEvent);
 
         dbContext.AddEventWithoutBroadcast(deletedEvent);

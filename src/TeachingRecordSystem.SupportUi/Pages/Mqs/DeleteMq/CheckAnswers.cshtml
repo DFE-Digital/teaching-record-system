@@ -43,9 +43,15 @@
                     <value data-testid="deletion-reason">@Model.DeletionReason!.GetDisplayName()</value>
                 </row>
                 <row>
-                    <key>Additional information</key>
+                    <key>Reason details</key>
                     <value data-testid="deletion-reason-detail">
                         @Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.DeletionReasonDetail) ? Model.DeletionReasonDetail : "None")
+                    </value>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value data-testid="additional-information">
+                        @Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.AdditionalInformation) ? Model.AdditionalInformation : "None")
                     </value>
                 </row>
                 <row>

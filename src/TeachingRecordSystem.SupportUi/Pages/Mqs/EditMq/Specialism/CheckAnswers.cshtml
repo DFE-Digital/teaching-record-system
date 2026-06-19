@@ -35,6 +35,10 @@
                     <value data-testid="change-reason-detail">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")</value>
                 </row>
                 <row>
+                    <key>Additional information</key>
+                    <value data-testid="additional-information">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.AdditionalInformation) ? Model.AdditionalInformation : "None")</value>
+                </row>
+                <row>
                     <key>Evidence</key>
                     <value data-testid="evidence">
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />

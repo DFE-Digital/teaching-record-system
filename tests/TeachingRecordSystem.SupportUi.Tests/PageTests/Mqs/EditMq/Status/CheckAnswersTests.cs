@@ -338,7 +338,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                         Name = evidenceFileName
                     } :
                     null,
-                Changes = changes
+                Changes = changes,
+                AdditionalInformation = null
             };
 
             var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);

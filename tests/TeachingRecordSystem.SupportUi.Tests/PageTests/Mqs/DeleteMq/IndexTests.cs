@@ -203,7 +203,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var multipartContent = CreateFormFileUpload(".png");
         multipartContent.Add(new StringContent(MqDeletionReasonOption.ProviderRequest.ToString()), "DeletionReason");
-        multipartContent.Add(new StringContent("True"), "HasAdditionalReasonDetail");
+        multipartContent.Add(new StringContent("True"), "ProvideAdditionalInformation");
+        multipartContent.Add(new StringContent("This is some additional information"), "AdditionalInformation");
         multipartContent.Add(new StringContent("My deletion reason detail"), "DeletionReasonDetail");
         multipartContent.Add(new StringContent("True"), "Evidence.UploadEvidence");
 

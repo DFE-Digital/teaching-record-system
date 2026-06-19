@@ -30,18 +30,20 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(null, false)]
-    [InlineData("Some reason", true)]
+    [InlineData(MqChangeStartDateReasonOption.IncorrectStartDate, null, false, true, "additional information")]
+    [InlineData(MqChangeStartDateReasonOption.AnotherReason, "Some reason", true, false, null)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
+        MqChangeStartDateReasonOption changeReason,
         string? changeReasonDetail,
-        bool uploadEvidence)
+        bool uploadEvidence,
+        bool provideAdditionalInformation,
+        string? additionalInformation)
     {
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var changeReason = MqChangeStartDateReasonOption.IncorrectStartDate;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState
@@ -60,7 +62,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                         FileName = "test.pdf",
                         FileSizeDescription = "1MB"
                     } : null
-                }
+                },
+                ProvideAdditionalInformation = provideAdditionalInformation,
+                AdditionalInformation = additionalInformation
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -78,6 +82,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(changeReasonSummary);
         Assert.Equal(changeReason.GetDisplayName(), changeReasonSummary.GetElementByTestId("change-reason")!.TrimmedText());
         Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeReasonSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
+        Assert.Equal(provideAdditionalInformation == true ? additionalInformation : "None", changeReasonSummary.GetElementByTestId("additional-information")!.TrimmedText());
         var uploadedEvidenceLink = changeReasonSummary.GetElementByTestId("uploaded-evidence-file-link");
         if (uploadEvidence)
         {
@@ -126,7 +131,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
         var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
-        var changeReason = MqChangeStartDateReasonOption.IncorrectStartDate;
+        var changeReason = MqChangeStartDateReasonOption.AnotherReason;
         var changeReasonDetail = "Some reason";
 
         EventObserver.Clear();
@@ -143,7 +148,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Evidence = new()
                 {
                     UploadEvidence = false
-                }
+                },
+                ProvideAdditionalInformation = false,
+                AdditionalInformation = null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -210,7 +217,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 ChangeReason = changeReason.GetDisplayName(),
                 ChangeReasonDetail = changeReasonDetail,
                 EvidenceFile = null,
-                Changes = MandatoryQualificationUpdatedEventChanges.StartDate
+                Changes = MandatoryQualificationUpdatedEventChanges.StartDate,
+                AdditionalInformation = null
             };
 
             var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
@@ -234,11 +242,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 StartDate = newStartDate,
                 CurrentStartDate = oldStartDate,
                 ChangeReason = MqChangeStartDateReasonOption.IncorrectStartDate,
-                ChangeReasonDetail = "Some reason",
+                ChangeReasonDetail = null,
                 Evidence = new()
                 {
                     UploadEvidence = false
-                }
+                },
+                ProvideAdditionalInformation = false,
+                AdditionalInformation = null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

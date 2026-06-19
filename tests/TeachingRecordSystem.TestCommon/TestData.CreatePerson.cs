@@ -710,6 +710,7 @@ public partial class TestData
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _endDate;
         private Option<string?> _reason;
+        private Option<string?> _additionalInformation;
         private Option<string?> _reasonDetail;
         private Option<(Guid FileId, string Name)?> _evidenceFile;
         private Option<DateTime?> _createdUtc;
@@ -782,6 +783,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonMandatoryQualificationBuilder WithAdditionalInformation(string? additionalInformation)
+        {
+            _additionalInformation = Option.Some(additionalInformation);
+            return this;
+        }
+
         public CreatePersonMandatoryQualificationBuilder WithCreatedUtc(DateTime? createdUtc)
         {
             _createdUtc = Option.Some(createdUtc);
@@ -831,6 +838,7 @@ public partial class TestData
             var reasonDetail = _reasonDetail.ValueOrDefault();
             var evidenceFile = _evidenceFile.ValueOrDefault();
             var createdUtc = _createdUtc.ValueOr(testData.TimeProvider.UtcNow);
+            var additionalInformation = _additionalInformation.ValueOrDefault();
 
             var provider = providerId.HasValue ?
                 await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
@@ -918,6 +926,7 @@ public partial class TestData
                             Name = evidenceFile.Value.Name
                         } :
                         null,
+                    AdditionalInformation = additionalInformation
                 };
 
                 dbContext.AddEventWithoutBroadcast(createdEvent);

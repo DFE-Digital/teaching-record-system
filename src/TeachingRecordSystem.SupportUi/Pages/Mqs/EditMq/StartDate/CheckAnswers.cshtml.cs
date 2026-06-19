@@ -32,6 +32,8 @@ public class CheckAnswersModel(
 
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (!JourneyInstance!.State.IsComplete)
@@ -49,6 +51,7 @@ public class CheckAnswersModel(
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -62,6 +65,7 @@ public class CheckAnswersModel(
             evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             timeProvider.UtcNow,
+            additionalInformation: AdditionalInformation,
             out var updatedEvent);
 
         if (updatedEvent is not null)

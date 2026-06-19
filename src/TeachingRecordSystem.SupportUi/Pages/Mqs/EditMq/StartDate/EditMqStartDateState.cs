@@ -22,12 +22,18 @@ public class EditMqStartDateState : IRegisterJourney
 
     public string? ChangeReasonDetail { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
+    public bool? ProvideAdditionalInformation { get; set; }
+
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
     [MemberNotNullWhen(true, nameof(StartDate), nameof(ChangeReason))]
     public bool IsComplete => StartDate is not null &&
         ChangeReason.HasValue &&
+        (ProvideAdditionalInformation == true && !string.IsNullOrWhiteSpace(AdditionalInformation) || (ProvideAdditionalInformation == false && string.IsNullOrWhiteSpace(AdditionalInformation))) &&
+        (ChangeReason == MqChangeStartDateReasonOption.AnotherReason && !string.IsNullOrWhiteSpace(ChangeReasonDetail) || (ChangeReason != MqChangeStartDateReasonOption.AnotherReason && string.IsNullOrWhiteSpace(ChangeReasonDetail))) &&
         Evidence.IsComplete;
 
     public void EnsureInitialized(CurrentMandatoryQualificationFeature qualificationInfo)

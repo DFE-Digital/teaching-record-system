@@ -42,6 +42,8 @@ public class CheckAnswersModel(
 
     public bool IsStatusChange { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (!JourneyInstance!.State.IsComplete)
@@ -64,6 +66,7 @@ public class CheckAnswersModel(
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
         IsEndDateChange = JourneyInstance.State.IsEndDateChange;
         IsStatusChange = JourneyInstance.State.IsStatusChange;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -81,6 +84,7 @@ public class CheckAnswersModel(
             evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             timeProvider.UtcNow,
+            additionalInformation: AdditionalInformation,
             out var updatedEvent);
 
         if (updatedEvent is not null)
