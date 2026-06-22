@@ -1,6 +1,4 @@
 using System.Data.Common;
-using Dfe.Analytics.EFCore;
-using Dfe.Analytics.EFCore.Description;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Npgsql;

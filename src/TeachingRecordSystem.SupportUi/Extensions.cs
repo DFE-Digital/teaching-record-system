@@ -21,6 +21,7 @@ using TeachingRecordSystem.SupportUi.Pages;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.SupportUi.Services.OneLogins;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.WebCommon.Filters;
@@ -103,7 +104,8 @@ public static class Extensions
             .AddScoped<SupportUiSortableTableContext>()
             .AddTransient<EvidenceUploadManager>()
             .AddSingleton<PersonChangeableAttributesService>()
-            .AddSupportTaskSearchService();
+            .AddSupportTaskSearchService()
+            .AddOneLoginSearchService();
 
         if (environment.IsProduction())
         {

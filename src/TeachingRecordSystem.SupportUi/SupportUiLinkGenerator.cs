@@ -15,8 +15,10 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
 {
     protected const string DateOnlyFormat = DateOnlyModelBinder.Format;
 
-    public string Index() =>
-        linkGenerator.GetRequiredPathByPage("/Index");
+    public string Index(string? selectedTab = null) =>
+        selectedTab is not null
+            ? linkGenerator.GetRequiredPathByPage("/Index", routeValues: new { selectedTab })
+            : linkGenerator.GetRequiredPathByPage("/Index");
 
     public string SignOut() =>
         linkGenerator.GetRequiredPathByPage("/SignOut");
