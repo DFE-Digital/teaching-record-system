@@ -135,8 +135,8 @@
       },
       "DfeAnalytics.Core": {
         "type": "Transitive",
-        "resolved": "0.4.3-alpha.0.3",
-        "contentHash": "+CFRCwVIUzXgu796NLyyLgdoggbJxYZ8TYfm+rBNqUcOFy26ofRVk7t7sJ97+mQSZCfZecKS5iS1GgugvreCEg==",
+        "resolved": "0.5.1-alpha.0.2",
+        "contentHash": "6JWEeQGlIlb7Rx963S1XCmUq3vp9sEKL978AG8RSdUWwYC1Zl+Wmo30pw+lQe3DNPuibksHVr1Yp2gZT43FWWw==",
         "dependencies": {
           "Google.Apis.Auth": "1.71.0",
           "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",
@@ -1722,7 +1722,7 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.99.0, )",
-          "DfeAnalytics.AspNetCore": "[0.4.3-alpha.0.3, )",
+          "DfeAnalytics.AspNetCore": "[0.5.1-alpha.0.2, )",
           "GovUk.Frontend.AspNetCore": "[4.1.1, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.3, )",
           "GovUk.Questions.AspNetCore": "[0.1.0-alpha.0.94, )",
@@ -1747,7 +1747,7 @@
           "CloudNative.CloudEvents": "[2.8.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[33.1.0, )",
-          "DfeAnalytics.EFCore": "[0.4.3-alpha.0.3, )",
+          "DfeAnalytics.EFCore": "[0.5.1-alpha.0.2, )",
           "EFCore.BulkExtensions.PostgreSql": "[10.0.1, )",
           "EFCore.NamingConventions": "[10.0.0, )",
           "EntityFrameworkCore.Projectables": "[6.0.4, )",
@@ -1957,20 +1957,20 @@
       },
       "DfeAnalytics.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[0.4.3-alpha.0.3, )",
-        "resolved": "0.4.3-alpha.0.3",
-        "contentHash": "u1umW2w5yId8rQMFD4tew44UmMEbGZtefGzjCdT/cMJSIjliVMxiWwhdLRIaxtgt2KJklMBx01OoEMsy8pwYtg==",
+        "requested": "[0.5.1-alpha.0.2, )",
+        "resolved": "0.5.1-alpha.0.2",
+        "contentHash": "Lq6+ba76rkoJBUxIgvwARjWVA3rrj/ExG2lKg0SqcxN0bg5eGitmtsdF+Y30nkrcBNoe0Azok8HsM2rsVhM+Gg==",
         "dependencies": {
-          "DfeAnalytics.Core": "0.4.3-alpha.0.3"
+          "DfeAnalytics.Core": "0.5.1-alpha.0.2"
         }
       },
       "DfeAnalytics.EFCore": {
         "type": "CentralTransitive",
-        "requested": "[0.4.3-alpha.0.3, )",
-        "resolved": "0.4.3-alpha.0.3",
-        "contentHash": "BHGUdAbvgx6ffEbe+Ov4SWEy8nJ/WPXqgSjZIGXebERh0FMZzaAQi/b1pSe4cEA+igkr7OraYtD2B12dqpCX1g==",
+        "requested": "[0.5.1-alpha.0.2, )",
+        "resolved": "0.5.1-alpha.0.2",
+        "contentHash": "AKpW/kC+1JDzMfPPScMerv1ltZUxlGMtAcvsRjljANAT+3a5N4dOXn3Rr8yO3wLDbYfJ5S7rLf2piRM5aRH1tA==",
         "dependencies": {
-          "DfeAnalytics.Core": "0.4.3-alpha.0.3",
+          "DfeAnalytics.Core": "0.5.1-alpha.0.2",
           "Microsoft.EntityFrameworkCore": "10.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "10.0.0",
           "Microsoft.Extensions.Http": "8.0.0",

@@ -1,4 +1,6 @@
 using System.Data.Common;
+using Dfe.Analytics.EFCore;
+using Dfe.Analytics.EFCore.Description;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Npgsql;
@@ -186,6 +188,8 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
                 });
             }
         }
+
+        modelBuilder.ConfigureAnalyticsSync(airbyteSyncMode: AirbyteSyncMode.IncrementalAppendDeduped);
     }
 
     private static DbContextOptions<TrsDbContext> CreateOptions(string? connectionString, int? commandTimeout)
