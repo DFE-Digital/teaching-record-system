@@ -1,3 +1,4 @@
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
@@ -82,8 +83,11 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
-        Assert.Equal(journeyInstance.State.DeleteReasonDetail, doc.GetElementsByName("DeleteReasonDetail")[0].TrimmedText());
+        AssertCheckedRadioOption("ProvideAdditionalInformation", bool.TrueString);
+        var reasonDetailTextbox =
+            doc.GetElementById("DeleteReasonDetail") as IHtmlInputElement;
+        Assert.Equal(journeyInstance.State.DeleteReasonDetail, reasonDetailTextbox!.Value);
+        Assert.Equal(journeyInstance.State.AdditionalInformation, doc.GetElementsByName("AdditionalInformation")[0].TrimmedText());
         AssertCheckedRadioOption("Evidence.UploadEvidence", bool.TrueString);
 
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
@@ -144,7 +148,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = CreatePostContent(changeReason: null, hasAdditionalReasonDetail: false, uploadEvidence: false)
+            Content = CreatePostContent(changeReason: null, provideAdditionalInformation: false, uploadEvidence: false)
         };
 
         // Act
@@ -166,14 +170,15 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
-                uploadEvidence: false)
+                uploadEvidence: false
+                )
         };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information");
     }
 
     [Theory]
@@ -188,7 +193,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
-                hasAdditionalReasonDetail: true,
+                changeReason: DeleteAlertReasonOption.AnotherReason,
                 deleteReasonDetail: null,
                 uploadEvidence: false)
         };
@@ -197,7 +202,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "DeleteReasonDetail", "Enter additional detail");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "DeleteReasonDetail", "Enter a reason");
     }
 
     [Theory]
@@ -212,7 +217,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
-                hasAdditionalReasonDetail: false,
+                provideAdditionalInformation: false,
                 uploadEvidence: true,
                 evidenceFile: null)
         };
@@ -236,7 +241,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
-                hasAdditionalReasonDetail: false,
+                provideAdditionalInformation: false,
                 uploadEvidence: true,
                 evidenceFile: (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
         };
@@ -258,15 +263,16 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var deleteReason = DeleteAlertReasonOption.AddedInError;
-        var hasAdditionalReasonDetail = true;
-        var reasonDetail = "More details";
+        var provideAdditionalInformation = true;
+        var additionalInformation = "More details";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 deleteReason,
-                hasAdditionalReasonDetail: hasAdditionalReasonDetail,
-                deleteReasonDetail: reasonDetail,
+                provideAdditionalInformation: provideAdditionalInformation,
+                additionalInformation: additionalInformation,
+                deleteReasonDetail: null,
                 uploadEvidence: false)
         };
 
@@ -278,8 +284,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.StartsWith($"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(hasAdditionalReasonDetail, journeyInstance.State.HasAdditionalReasonDetail);
-        Assert.Equal(reasonDetail, journeyInstance.State.DeleteReasonDetail);
+        Assert.Equal(provideAdditionalInformation, journeyInstance.State.ProvideAdditionalInformation);
+        Assert.Equal(additionalInformation, journeyInstance.State.AdditionalInformation);
+        Assert.Null(journeyInstance.State.DeleteReasonDetail);
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
@@ -293,14 +300,14 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var deleteReason = DeleteAlertReasonOption.AddedInError;
-        var hasAdditionalReasonDetail = false;
+        var provideAdditionalInformation = false;
         var evidenceFileName = "evidence.pdf";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 deleteReason,
-                hasAdditionalReasonDetail: hasAdditionalReasonDetail,
+                provideAdditionalInformation: provideAdditionalInformation,
                 uploadEvidence: true,
                 evidenceFile: (CreateEvidenceFileBinaryContent(), evidenceFileName))
         };
@@ -313,8 +320,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.StartsWith($"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.False(journeyInstance.State.ProvideAdditionalInformation);
         Assert.Null(journeyInstance.State.DeleteReasonDetail);
+        Assert.Null(journeyInstance.State.AdditionalInformation);
         Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
         Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
@@ -373,12 +381,13 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
 
     private static MultipartFormDataContentBuilder CreateMinimumValidPostContent() =>
         CreatePostContent(
-            hasAdditionalReasonDetail: false,
+            provideAdditionalInformation: false,
             uploadEvidence: false);
 
     private static MultipartFormDataContentBuilder CreatePostContent(
         DeleteAlertReasonOption? changeReason = null,
-        bool? hasAdditionalReasonDetail = null,
+        bool? provideAdditionalInformation = null,
+        string? additionalInformation = null,
         string? deleteReasonDetail = null,
         bool? uploadEvidence = null,
         (HttpContent Content, string FileName)? evidenceFile = null)
@@ -386,7 +395,8 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         return new MultipartFormDataContentBuilder
         {
             { "DeleteReason", changeReason },
-            { "HasAdditionalReasonDetail", hasAdditionalReasonDetail },
+            { "ProvideAdditionalInformation", provideAdditionalInformation },
+            { "AdditionalInformation", additionalInformation },
             { "DeleteReasonDetail", deleteReasonDetail },
             { "Evidence.UploadEvidence", uploadEvidence },
             { "Evidence.EvidenceFile", evidenceFile }

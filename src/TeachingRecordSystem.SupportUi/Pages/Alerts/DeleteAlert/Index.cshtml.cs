@@ -12,15 +12,18 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     {
         v => v.RuleFor(m => m.DeleteReason)
             .NotNull().WithMessage("Select a reason"),
-        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+        v => v.RuleFor(m => m.ProvideAdditionalInformation)
             .NotNull().WithMessage("Select yes if you want to add more information"),
         v => v.RuleFor(m => m.DeleteReasonDetail)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
-        v => v.RuleFor(m => m.DeleteReasonDetail)
+        v => v.RuleFor(m => m.AdditionalInformation)
             .NotEmpty().WithMessage("Enter additional detail")
-            .When(m => m.HasAdditionalReasonDetail == true),
-        v => v.RuleFor(m => m.Evidence).Evidence()
+            .When(m => m.ProvideAdditionalInformation == true),
+        v => v.RuleFor(m => m.Evidence).Evidence(),
+        v => v.RuleFor(m => m.DeleteReasonDetail)
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.DeleteReason == DeleteAlertReasonOption.AnotherReason),
     };
 
     public JourneyInstance<DeleteAlertState>? JourneyInstance { get; set; }
@@ -43,10 +46,13 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public DeleteAlertReasonOption? DeleteReason { get; set; }
 
     [BindProperty]
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
 
     [BindProperty]
     public string? DeleteReasonDetail { get; set; }
+
+    [BindProperty]
+    public string? AdditionalInformation { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
@@ -54,9 +60,10 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public void OnGet()
     {
         DeleteReason = JourneyInstance!.State.DeleteReason;
-        HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
+        ProvideAdditionalInformation = JourneyInstance!.State.ProvideAdditionalInformation;
         DeleteReasonDetail = JourneyInstance!.State.DeleteReasonDetail;
         Evidence = JourneyInstance!.State.Evidence;
+        AdditionalInformation = JourneyInstance!.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -72,7 +79,8 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.DeleteReason = DeleteReason;
-            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
+            state.AdditionalInformation = AdditionalInformation;
+            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
             state.DeleteReasonDetail = DeleteReasonDetail;
             state.Evidence = Evidence;
         });

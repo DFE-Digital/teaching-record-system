@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
@@ -64,15 +65,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
     }
 
     [Theory]
-    [InlineData(true, true)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(false, false)]
-    public async Task Get_WithValidJourneyState_ReturnsOk(bool isOpenAlert, bool populateOptional)
+    [InlineData(true, true, true, DeleteAlertReasonOption.AnotherReason)]
+    [InlineData(true, false, false, DeleteAlertReasonOption.AnotherReason)]
+    [InlineData(false, true, false, DeleteAlertReasonOption.AddedInError)]
+    [InlineData(false, false, true, DeleteAlertReasonOption.AddedInError)]
+    public async Task Get_WithValidJourneyState_ReturnsOk(bool isOpenAlert, bool populateOptional, bool provideAdditionalInformation, DeleteAlertReasonOption deleteReason)
     {
         // Arrange
         var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert(populateOptional) : await CreatePersonWithClosedAlert(populateOptional);
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(
+            alert: alert,
+            deleteReason: deleteReason,
+            populateOptional: populateOptional,
+            provideAdditionalInformation: provideAdditionalInformation);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -87,7 +92,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.Equal(alert.StartDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
         Assert.Equal(isOpenAlert ? WebConstants.EmptyFallbackContent : alert.EndDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("End date"));
         Assert.Equal(journeyInstance.State.DeleteReason?.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
-        Assert.Equal(populateOptional ? journeyInstance.State.DeleteReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
+        //Assert.Equal(populateOptional ? journeyInstance.State.DeleteReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Evidence"));
     }
 

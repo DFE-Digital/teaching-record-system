@@ -65,7 +65,7 @@
                     </row-actions>
                 </row>
                 <row>
-                    <key>Additional information</key>
+                    <key>Reason details</key>
                     <value>
                         @if (Model.AddReasonDetail is not null)
                         {
@@ -77,7 +77,23 @@
                         }
                     </value>
                     <row-actions>
-                        <action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</action>
+                        <action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason detauks">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value>
+                        @if (Model.AdditionalInformation is not null)
+                        {
+                            @Html.ConvertNewlinesToLineBreaks(Model.AdditionalInformation)
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
 

@@ -141,6 +141,12 @@
                             </value>
                         </row>
                         <row>
+                            <key>Additional information</key>
+                            <value use-empty-fallback>
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                            </value>
+                        </row>
+                        <row>
                             <key>Evidence</key>
                             <value>
                                 <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />

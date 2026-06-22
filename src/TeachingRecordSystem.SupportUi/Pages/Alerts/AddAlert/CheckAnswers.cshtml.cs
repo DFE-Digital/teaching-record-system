@@ -40,6 +40,8 @@ public class CheckAnswersModel(
 
     public string? AddReasonDetail { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
     [BindProperty]
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
@@ -63,6 +65,7 @@ public class CheckAnswersModel(
         AddReason = JourneyInstance.State.AddReason!.Value;
         AddReasonDetail = JourneyInstance.State.AddReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -76,7 +79,7 @@ public class CheckAnswersModel(
                 Reason = AddReason.GetDisplayName()!,
                 Details = AddReasonDetail,
                 EvidenceFile = EvidenceFile?.ToEventModel(),
-                AdditionalInformation = null
+                AdditionalInformation = AdditionalInformation
             });
 
         await alertService.CreateAlertAsync(

@@ -14,18 +14,21 @@ public class DeleteAlertState : IRegisterJourney
 
     public DeleteAlertReasonOption? DeleteReason { get; set; }
 
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
 
     public string? DeleteReasonDetail { get; set; }
+
+    public string? AdditionalInformation { get; set; }
 
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(HasAdditionalReasonDetail))]
+    [MemberNotNullWhen(true, nameof(ProvideAdditionalInformation))]
     public bool IsComplete =>
-        DeleteReason is not null &&
-        HasAdditionalReasonDetail is bool hasDetail &&
-        (!hasDetail || DeleteReasonDetail is not null) &&
+        (DeleteReason.HasValue && DeleteReason == DeleteAlertReasonOption.AnotherReason && !string.IsNullOrEmpty(DeleteReasonDetail) ||
+         DeleteReason != DeleteAlertReasonOption.AnotherReason && string.IsNullOrEmpty(DeleteReasonDetail)) &&
+        (ProvideAdditionalInformation == true && !string.IsNullOrEmpty(AdditionalInformation) ||
+         ProvideAdditionalInformation == false && string.IsNullOrEmpty(AdditionalInformation)) &&
         Evidence.IsComplete;
 
 }

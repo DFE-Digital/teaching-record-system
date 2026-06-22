@@ -8,15 +8,16 @@ public abstract class DetailsTestBase(HostFixture hostFixture) : TestBase(hostFi
     protected Task<JourneyInstance<EditAlertDetailsState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
         CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+    protected Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true, bool provideAdditionalInformation = false, AlertChangeDetailsReasonOption changeReasonOption = AlertChangeDetailsReasonOption.AnotherReason) =>
         CreateJourneyInstanceAsync(alert.AlertId, new EditAlertDetailsState
         {
             Initialized = true,
             CurrentDetails = alert.Details,
             Details = "New details",
-            ChangeReason = AlertChangeDetailsReasonOption.AnotherReason,
-            HasAdditionalReasonDetail = populateOptional ? true : false,
-            ChangeReasonDetail = populateOptional ? "More details" : null,
+            ChangeReason = changeReasonOption,
+            ProvideAdditionalInformation = provideAdditionalInformation,
+            AdditionalInformation = provideAdditionalInformation ? "some additional information" : null,
+            ChangeReasonDetail = changeReasonOption == AlertChangeDetailsReasonOption.AnotherReason ? "More details" : null,
             Evidence = new()
             {
                 UploadEvidence = populateOptional ? true : false,

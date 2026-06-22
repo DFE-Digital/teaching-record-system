@@ -23,6 +23,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2021, 1, 1);
         var reason = AddAlertReasonOption.AnotherReason;
         var reasonDetail = TestData.GenerateLoremIpsum();
+        var additionalInformation = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
         var evidenceFileMimeType = "image/jpeg";
         var personId = person.PersonId;
@@ -63,8 +64,9 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnAddAlertReasonPageAsync();
 
         await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.FillAsync("label:text-is('Enter a reason')", reasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
-        await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
+        await page.FillAsync("label:text-is('Enter details')", additionalInformation);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
         await page
             .GetByLabel("Upload a file")
@@ -116,7 +118,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
-        await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
+        await page.FillAsync("label:text-is('Enter details')", reasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
         await page
             .GetByLabel("Upload a file")
@@ -411,6 +413,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var alertId = person.Alerts.First().AlertId;
         var reason = DeleteAlertReasonOption.AnotherReason;
         var deleteReasonDetails = TestData.GenerateLoremIpsum();
+        var additionalInformation = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
         var evidenceFileMimeType = "image/jpeg";
 
@@ -423,7 +426,8 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
-        await page.FillAsync("label:text-is('Enter details')", deleteReasonDetails);
+        await page.FillAsync("label:text-is('Enter a reason')", deleteReasonDetails);
+        await page.FillAsync("label:text-is('Enter details')", additionalInformation);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
         await page
             .GetByLabel("Upload a file")

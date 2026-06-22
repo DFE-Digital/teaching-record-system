@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Details;
 
@@ -77,13 +78,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Get_WithValidJourneyState_ReturnsOk(bool populateOptional)
+    [InlineData(true, true, AlertChangeDetailsReasonOption.AnotherReason)]
+    [InlineData(false, false, AlertChangeDetailsReasonOption.IncorrectDetails)]
+    public async Task Get_WithValidJourneyState_ReturnsOk(bool populateOptional, bool provideAdditionalInformation, AlertChangeDetailsReasonOption changeReasonOption)
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert(!populateOptional);
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional, provideAdditionalInformation: provideAdditionalInformation, changeReasonOption: changeReasonOption);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -95,7 +96,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
         Assert.Equal(journeyInstance.State.Details, doc.GetSummaryListValueByKey("New details"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Previous details"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
-        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
+        Assert.Equal(changeReasonOption == AlertChangeDetailsReasonOption.AnotherReason ? journeyInstance.State.ChangeReasonDetail : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Reason details"));
+        Assert.Equal(provideAdditionalInformation == true ? journeyInstance.State.AdditionalInformation : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Additional information"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Evidence"));
     }
 
@@ -168,13 +170,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Post_Confirm_UpdatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool populateOptional)
+    [InlineData(true, false, AlertChangeDetailsReasonOption.AnotherReason)]
+    [InlineData(false, true, AlertChangeDetailsReasonOption.IncorrectDetails)]
+    public async Task Post_Confirm_UpdatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool populateOptional, bool provideAdditionalInformation, AlertChangeDetailsReasonOption changeReasonOption)
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert(!populateOptional);
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional, provideAdditionalInformation, changeReasonOption);
 
         EventObserver.Clear();
 
@@ -197,7 +199,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
 
             var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), changeReason.Reason);
-            Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : null, changeReason.Details);
+            Assert.Equal(changeReasonOption == AlertChangeDetailsReasonOption.AnotherReason ? journeyInstance.State.ChangeReasonDetail : null, changeReason.Details);
+            Assert.Equal(provideAdditionalInformation ? journeyInstance.State.AdditionalInformation : null, changeReason.AdditionalInformation);
             Assert.Equal(populateOptional ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel() : null, changeReason.EvidenceFile);
         });
 

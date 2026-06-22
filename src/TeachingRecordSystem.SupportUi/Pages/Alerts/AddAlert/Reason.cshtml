@@ -23,10 +23,15 @@
                 </govuk-radios-item>
                 <govuk-radios-item value="@AddAlertReasonOption.AnotherReason">
                     @AddAlertReasonOption.AnotherReason.GetDisplayName()
+                    <govuk-radios-item-conditional data-testid="add-reason-detail">
+                        <govuk-input data-testid="reason-detail" for="AddReasonDetail" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
+                            <govuk-input-label>Enter a reason</govuk-input-label>
+                        </govuk-input>
+                    </govuk-radios-item-conditional>
                 </govuk-radios-item>
             </govuk-radios>
 
-            <govuk-radios for="HasAdditionalReasonDetail">
+            <govuk-radios for="ProvideAdditionalInformation">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend>
                         <h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2>
@@ -34,8 +39,8 @@
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count for="AddReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>Add additional detail</govuk-character-count-label>
+                            <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
                             </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>

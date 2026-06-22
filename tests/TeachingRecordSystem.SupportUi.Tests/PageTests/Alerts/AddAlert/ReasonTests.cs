@@ -1,3 +1,4 @@
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
@@ -84,7 +85,9 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(
+            ThisStep,
+            person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -95,8 +98,11 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         AssertCheckedRadioOption("AddReason", journeyInstance.State.AddReason!.ToString()!);
-        AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
-        Assert.Equal(journeyInstance.State.AddReasonDetail, doc.GetElementsByName("AddReasonDetail")[0].TrimmedText());
+        AssertCheckedRadioOption("ProvideAdditionalInformation", bool.FalseString);
+        Assert.Empty(doc.GetElementsByName("AdditionalInformation")[0].TrimmedText());
+        var reasonDetailTextbox =
+            doc.GetElementById("AddReasonDetail") as IHtmlInputElement;
+        Assert.Equal(journeyInstance.State.AddReasonDetail, reasonDetailTextbox!.Value);
         AssertCheckedRadioOption("Evidence.UploadEvidence", bool.TrueString);
 
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
@@ -171,7 +177,7 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = CreatePostContent(addReason: null, hasAdditionalReasonDetail: false, uploadEvidence: false)
+            Content = CreatePostContent(addReason: null, provideAdditionalInformation: false, uploadEvidence: false)
         };
 
         // Act
@@ -192,18 +198,19 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         {
             Content = CreatePostContent(
                 addReason: AddAlertReasonOption.AnotherReason,
-                uploadEvidence: false)
+                uploadEvidence: false,
+                provideAdditionalInformation: null)
         };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information");
     }
 
     [Fact]
-    public async Task Post_WhenAdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError()
+    public async Task Post_WhenProvideAdditionalInformationIsYesButAdditionalInformationIsmpty_ReturnsError()
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
@@ -213,7 +220,32 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         {
             Content = CreatePostContent(
                 addReason: AddAlertReasonOption.AnotherReason,
-                hasAdditionalReasonDetail: true,
+                provideAdditionalInformation: true,
+                additionalInformation: null,
+                addReasonDetail: "Some reason",
+                uploadEvidence: false)
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter details");
+    }
+
+    [Fact]
+    public async Task Post_ReasonIsAnotherReasonAndReasonDetailIsEmpty_ReturnsError()
+    {
+        // Arrange
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(
+                addReason: AddAlertReasonOption.AnotherReason,
+                provideAdditionalInformation: true,
+                additionalInformation: "some additional information",
                 addReasonDetail: null,
                 uploadEvidence: false)
         };
@@ -222,7 +254,7 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Enter additional detail");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Enter a reason");
     }
 
     [Fact]
@@ -236,7 +268,7 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         {
             Content = CreatePostContent(
                 addReason: AddAlertReasonOption.AnotherReason,
-                hasAdditionalReasonDetail: false,
+                provideAdditionalInformation: false,
                 addReasonDetail: null)
         };
 
@@ -258,7 +290,7 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         {
             Content = CreatePostContent(
                 addReason: AddAlertReasonOption.AnotherReason,
-                hasAdditionalReasonDetail: false,
+                provideAdditionalInformation: false,
                 uploadEvidence: true,
                 evidenceFile: null)
         };
@@ -281,7 +313,7 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         {
             Content = CreatePostContent(
                 addReason: AddAlertReasonOption.AnotherReason,
-                hasAdditionalReasonDetail: false,
+                provideAdditionalInformation: false,
                 uploadEvidence: true,
                 evidenceFile: (CreateEvidenceFileBinaryContent(), "badevidence.exe"))
         };
@@ -304,8 +336,9 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         {
             Content = CreatePostContent(
                 addReason: AddAlertReasonOption.AnotherReason,
-                hasAdditionalReasonDetail: true,
-                addReasonDetail: new string('a', 4001),
+                provideAdditionalInformation: true,
+                addReasonDetail: "Some information",
+                additionalInformation: new string('a', 4001),
                 uploadEvidence: false)
         };
 
@@ -313,7 +346,7 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Additional detail must be 4000 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Additional detail must be 4000 characters or less");
     }
 
     [Fact]
@@ -324,14 +357,16 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var reason = AddAlertReasonOption.AnotherReason;
-        var hasAdditionalReasonDetail = true;
+        var provideAdditionalInformation = true;
         var reasonDetail = "More details";
+        var additionalInformation = "Additional info";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 addReason: reason,
-                hasAdditionalReasonDetail: hasAdditionalReasonDetail,
+                provideAdditionalInformation: provideAdditionalInformation,
+                additionalInformation: additionalInformation,
                 addReasonDetail: reasonDetail,
                 uploadEvidence: false)
         };
@@ -345,8 +380,9 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.AddReason);
-        Assert.Equal(hasAdditionalReasonDetail, journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Equal(provideAdditionalInformation, journeyInstance.State.ProvideAdditionalInformation);
         Assert.Equal(reasonDetail, journeyInstance.State.AddReasonDetail);
+        Assert.Equal(additionalInformation, journeyInstance.State.AdditionalInformation);
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
@@ -357,15 +393,18 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
-        var reason = AddAlertReasonOption.AnotherReason;
-        var hasAdditionalReasonDetail = false;
+        var reason = AddAlertReasonOption.IdentifiedDuringDataReconciliationWithStakeholder;
+        var provideAdditionalInformation = false;
         var evidenceFileName = "evidence.pdf";
+        var additionalInformation = string.Empty;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
+                additionalInformation: additionalInformation,
                 addReason: reason,
-                hasAdditionalReasonDetail: hasAdditionalReasonDetail,
+                addReasonDetail: null,
+                provideAdditionalInformation: provideAdditionalInformation,
                 uploadEvidence: true,
                 evidenceFile: (CreateEvidenceFileBinaryContent(), evidenceFileName))
         };
@@ -379,7 +418,7 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.AddReason);
-        Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.False(journeyInstance.State.ProvideAdditionalInformation);
         Assert.Null(journeyInstance.State.AddReasonDetail);
         Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
         Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
@@ -429,24 +468,27 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
 
     private static MultipartFormDataContentBuilder CreateMinimumValidPostContent() =>
         CreatePostContent(
-            addReason: AddAlertReasonOption.AnotherReason,
-            hasAdditionalReasonDetail: false,
-            uploadEvidence: false);
+            addReason: AddAlertReasonOption.IdentifiedDuringDataReconciliationWithStakeholder,
+            provideAdditionalInformation: false,
+            uploadEvidence: false,
+            additionalInformation: null);
 
     private static MultipartFormDataContentBuilder CreatePostContent(
         AddAlertReasonOption? addReason = null,
-        bool? hasAdditionalReasonDetail = null,
+        bool? provideAdditionalInformation = null,
         string? addReasonDetail = null,
         bool? uploadEvidence = null,
+        string? additionalInformation = null,
         (HttpContent Content, string FileName)? evidenceFile = null)
     {
         return new MultipartFormDataContentBuilder
         {
             { "AddReason", addReason },
-            { "HasAdditionalReasonDetail", hasAdditionalReasonDetail },
+            { "ProvideAdditionalInformation", provideAdditionalInformation },
             { "AddReasonDetail", addReasonDetail },
             { "Evidence.UploadEvidence", uploadEvidence },
-            { "Evidence.EvidenceFile", evidenceFile }
+            { "Evidence.EvidenceFile", evidenceFile },
+            { "AdditionalInformation", additionalInformation }
         };
     }
 }

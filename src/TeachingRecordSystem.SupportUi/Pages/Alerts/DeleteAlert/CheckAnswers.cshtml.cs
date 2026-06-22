@@ -39,6 +39,8 @@ public class CheckAnswersModel(
 
     public string? DeleteReasonDetail { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -63,6 +65,7 @@ public class CheckAnswersModel(
         DeleteReason = JourneyInstance.State.DeleteReason!.Value;
         DeleteReasonDetail = JourneyInstance.State.DeleteReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -77,7 +80,7 @@ public class CheckAnswersModel(
                 Reason = DeleteReason.GetDisplayName()!,
                 Details = DeleteReasonDetail,
                 EvidenceFile = EvidenceFile?.ToEventModel(),
-                AdditionalInformation = null
+                AdditionalInformation = AdditionalInformation
             });
 
         await alertService.DeleteAlertAsync(
