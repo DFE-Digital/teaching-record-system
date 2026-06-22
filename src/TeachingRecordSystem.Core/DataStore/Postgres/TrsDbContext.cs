@@ -189,7 +189,7 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
             }
         }
 
-        modelBuilder.ConfigureAnalyticsSync(AirbyteSyncMode.IncrementalAppendDeduped);
+        //modelBuilder.ConfigureAnalyticsSync(AirbyteSyncMode.IncrementalAppendDeduped);
     }
 
     private static DbContextOptions<TrsDbContext> CreateOptions(string? connectionString, int? commandTimeout)
