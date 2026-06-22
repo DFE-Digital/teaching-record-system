@@ -355,10 +355,11 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(expected, doc.GetElementByTestId("results")!
-            .QuerySelectorAll("tbody > tr")
-            .Select(row => row.GetElementByTestId("task-name-and-id")?.GetElementsByTagName("a").FirstOrDefault()?.TrimmedText())
-            .ToArray());
+        Assert.Equal(
+            expected,
+            doc.GetElementByTestId("results")!
+                .GetAllElementsByTestId("task-name")
+                .Select(e => e.TrimmedText()));
     }
 
     [Fact]
@@ -383,10 +384,11 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal([supportTasksList[0].SupportTaskReference], doc.GetElementByTestId("results")!
-            .QuerySelectorAll("tbody > tr")
-            .Select(row => row.GetElementByTestId("task-id")!.TrimmedText())
-            .ToArray());
+        Assert.Equal(
+            [supportTasksList[0].SupportTaskReference],
+            doc.GetElementByTestId("results")!
+                .GetAllElementsByTestId("task-reference")
+                .Select(e => e.TrimmedText()));
     }
 
     [Fact]

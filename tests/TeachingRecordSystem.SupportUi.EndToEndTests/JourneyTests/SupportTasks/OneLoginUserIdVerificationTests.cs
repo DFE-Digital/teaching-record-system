@@ -26,7 +26,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
         await page.ClickRadioByLabelAsync("Yes, find a matching record");
@@ -57,7 +57,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
         await page.ClickRadioByLabelAsync("Yes, find a matching record");
@@ -91,7 +91,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
         await page.ClickRadioByLabelAsync("Yes, find a matching record");
@@ -126,7 +126,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
 
         await page.ClickRadioByLabelAsync("No, reject this request");
         await page.ClickContinueButtonAsync();
@@ -163,7 +163,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/id-verification");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
         await page.ClickRadioByLabelAsync("Yes, find a matching record");
@@ -176,7 +176,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
 
         // Re-start the journey and check the saved values were persisted
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
         await page.ClickContinueButtonAsync();

@@ -113,9 +113,9 @@
                         {
                             <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                                 <th scope="row" class="govuk-table__header" data-testid="name">
-                                    <a href="@LinkGenerator.SupportTasks.TrnRequests.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
-                                        @result.FirstName @result.MiddleName @result.LastName<br/>
-                                        @result.SupportTaskReference
+                                    <a href="@LinkGenerator.SupportTasks.TrnRequests.Resolve.Index(result.SupportTaskReference)" class="govuk-link trs-task-link">
+                                        <span class="trs-task-link__name">@result.FirstName @result.MiddleName @result.LastName</span>
+                                        <span class="trs-task-link__reference">@result.SupportTaskReference</span>
                                     </a>
                                 </th>
                                 <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
