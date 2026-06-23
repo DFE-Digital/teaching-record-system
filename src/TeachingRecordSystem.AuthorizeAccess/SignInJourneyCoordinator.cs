@@ -90,12 +90,13 @@ public class SignInJourneyCoordinator(
         if (trn is null && State.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
         {
             var existingTrnRequest = await dbContext.TrnRequestMetadata
-                .Where(tr => tr.OneLoginUserSubject == sub)
+                .Where(tr => tr.OneLoginUserSubject == sub && tr.IdentityVerified == true)
                 .OrderByDescending(tr => tr.CreatedOn)
                 .FirstOrDefaultAsync();
 
             if (existingTrnRequest is not null)
             {
+                Debug.Assert(oneLoginUser.VerificationRoute is not null);
                 existingTrnRequestId = existingTrnRequest.RequestId;
             }
         }
