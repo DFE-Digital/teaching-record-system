@@ -52,6 +52,7 @@ public static class Extensions
         {
             options.IdleTimeout = TimeSpan.FromHours(2);
             options.Cookie.Name = "sess";
+            options.Cookie.IsEssential = true;
         });
 
         services.AddGovUkQuestions();
