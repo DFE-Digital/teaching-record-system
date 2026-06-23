@@ -1,5 +1,5 @@
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
-using PaginationOptions = TeachingRecordSystem.SupportUi.Services.SupportTasks.PaginationOptions;
+using PaginationOptions = TeachingRecordSystem.SupportUi.Services.PaginationOptions;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 

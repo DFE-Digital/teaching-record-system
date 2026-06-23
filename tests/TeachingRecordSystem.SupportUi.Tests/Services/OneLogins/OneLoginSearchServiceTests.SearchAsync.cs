@@ -1,5 +1,6 @@
 using Optional;
 using TeachingRecordSystem.SupportUi.Pages.OneLogins;
+using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.Services.OneLogins;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Services.OneLogins;
@@ -77,7 +78,7 @@ public partial class OneLoginSearchServiceTests
 
         // Act
         var result = await WithServiceAsync<OneLoginSearchService, OneLoginSearchResult>(service =>
-            service.SearchAsync(options));
+            service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
         var expectedResultsOrdered = (sortBy switch
@@ -132,7 +133,7 @@ public partial class OneLoginSearchServiceTests
 
         // Act
         var result = await WithServiceAsync<OneLoginSearchService, OneLoginSearchResult>(service =>
-            service.SearchAsync(options));
+            service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
         Assert.Equal(expectedCount, result.Results.Count);
@@ -171,7 +172,7 @@ public partial class OneLoginSearchServiceTests
 
         // Act
         var result = await WithServiceAsync<OneLoginSearchService, OneLoginSearchResult>(service =>
-            service.SearchAsync(options));
+            service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
         Assert.Equal(expectedNames, result.Results.Select(r => r.Name));
@@ -206,11 +207,11 @@ public partial class OneLoginSearchServiceTests
 
         // Act
         var result = await WithServiceAsync<OneLoginSearchService, OneLoginSearchResult>(service =>
-            service.SearchAsync(options));
+            service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
         Assert.Single(result.Results);
-        Assert.Equal("john.smith@example.com", result.Results[0].EmailAddress);
+        Assert.Equal("john.smith@example.com", result.Results.First().EmailAddress);
     }
 
     [Fact]
@@ -241,12 +242,12 @@ public partial class OneLoginSearchServiceTests
 
         // Act
         var result = await WithServiceAsync<OneLoginSearchService, OneLoginSearchResult>(service =>
-            service.SearchAsync(options));
+            service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
         Assert.Single(result.Results);
-        Assert.Equal(oneLoginUser1.Subject, result.Results[0].Subject);
-        Assert.Equal(person1.Person.Trn, result.Results[0].Trn);
+        Assert.Equal(oneLoginUser1.Subject, result.Results.First().Subject);
+        Assert.Equal(person1.Person.Trn, result.Results.First().Trn);
     }
 
     [Fact]
@@ -272,7 +273,7 @@ public partial class OneLoginSearchServiceTests
 
         // Act
         var result = await WithServiceAsync<OneLoginSearchService, OneLoginSearchResult>(service =>
-            service.SearchAsync(options));
+            service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
         Assert.Equal(2, result.Results.Count);
@@ -301,7 +302,7 @@ public partial class OneLoginSearchServiceTests
 
         // Act
         var result = await WithServiceAsync<OneLoginSearchService, OneLoginSearchResult>(service =>
-            service.SearchAsync(options));
+            service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
         Assert.Equal(2, result.Results.Count);
@@ -325,13 +326,13 @@ public partial class OneLoginSearchServiceTests
 
         // Act
         var result = await WithServiceAsync<OneLoginSearchService, OneLoginSearchResult>(service =>
-            service.SearchAsync(options));
+            service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
         Assert.Single(result.Results);
-        Assert.Null(result.Results[0].Trn);
-        Assert.Equal("Orphan User", result.Results[0].Name);
-        Assert.True(result.Results[0].DateOfBirth.HasValue);
-        Assert.Equal(new DateOnly(1990, 1, 1), result.Results[0].DateOfBirth!.Value);
+        Assert.Null(result.Results.First().Trn);
+        Assert.Equal("Orphan User", result.Results.First().Name);
+        Assert.True(result.Results.First().DateOfBirth.HasValue);
+        Assert.Equal(new DateOnly(1990, 1, 1), result.Results.First().DateOfBirth!.Value);
     }
 }
