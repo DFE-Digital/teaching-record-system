@@ -10,11 +10,11 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[4.1.1, )",
-        "resolved": "4.1.1",
-        "contentHash": "HAMWsNj1Z1jJg35Dq0fuE0MkSrrdYmND6f+44m6brvqLE1w5TGGzXN7hTFSU7OJ7hUw5hfVbH5VhKXf5AQhX5g==",
+        "requested": "[4.2.1, )",
+        "resolved": "4.2.1",
+        "contentHash": "pWuRZhx7AwjYY/CTllRiKrjcOPXEFWzBOJRzeAqrMj0OsEklnZcssVOlPVFm6XJ2ldaGRJi6xPmoTzVZrIcyGA==",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.26"
+          "Microsoft.Extensions.FileProviders.Embedded": "10.0.9"
         }
       },
       "Humanizer.Core": {
@@ -390,8 +390,8 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "8.0.26",
-        "contentHash": "aDii3fAsoPB9EwrbJgUMdZ48qXYIiJF5VIkRdw9rGBiwo4vZpxDGVgwRk6/bdmzhgQEG8jHlkg8MwIV5K8yFUQ=="
+        "resolved": "10.0.9",
+        "contentHash": "UpRgjjSUmF7KYZTIv1Zd2Y0Wv2oK9jE+Jmyp4UMynTowjvJGG1yrRe2JodYyVgcDgZF2auGwYEl+U0J1+YhBRw=="
       },
       "Microsoft.Graph": {
         "type": "Transitive",
