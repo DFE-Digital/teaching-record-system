@@ -487,3 +487,13 @@
 .trs-empty-fallback {
   color: govuk-colour("black", $variant: "tint-25");
 }
+
+.trs-task-link {
+  &__name {
+    white-space: pre;
+
+    &:after {
+      content: '\A';
+    }
+  }
+}

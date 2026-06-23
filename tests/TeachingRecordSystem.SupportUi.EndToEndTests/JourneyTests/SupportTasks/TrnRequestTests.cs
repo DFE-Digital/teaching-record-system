@@ -23,7 +23,7 @@ public class TrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GotoAsync("/support-tasks/trn-requests");
 
-        await page.ClickAsync($"a{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
 
         await page.WaitForUrlPathAsync($"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches");
 
@@ -89,7 +89,7 @@ public class TrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GotoAsync("/support-tasks/trn-requests");
 
-        await page.ClickAsync($"a{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
 
         await page.WaitForUrlPathAsync($"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches");
 
@@ -150,7 +150,7 @@ public class TrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GotoAsync("/support-tasks/trn-requests");
 
-        await page.ClickAsync($"a{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
 
         await page.WaitForUrlPathAsync($"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches");
         await page.ClickButtonAsync("Create a record from this request");
@@ -208,7 +208,7 @@ public class TrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GotoAsync("/support-tasks/trn-requests");
 
-        await page.ClickAsync($"a{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
 
         await page.WaitForUrlPathAsync($"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches");
         await page.ClickButtonAsync("Merge this request with Record A");

@@ -25,7 +25,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/record-matching");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
 
         await page.ClickRadioByLabelAsync("Connect it to Record A");
@@ -51,7 +51,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/record-matching");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches");
 
         await page.ClickButtonAsync("Confirm");
@@ -81,7 +81,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/record-matching");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
 
         await page.ClickRadioByLabelAsync("Do not connect it to a record");
@@ -118,7 +118,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
 
         await page.GotoAsync("/support-tasks/one-login-user-matching/record-matching");
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
 
         await page.ClickRadioByLabelAsync("Connect it to Record A");
@@ -127,7 +127,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
 
         // Re-start the journey and check the saved values were persisted
 
-        await page.ClickAsync($"a{TextIsSelector($"{firstName} {lastName}")}");
+        await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
 
         await page.ClickContinueButtonAsync();

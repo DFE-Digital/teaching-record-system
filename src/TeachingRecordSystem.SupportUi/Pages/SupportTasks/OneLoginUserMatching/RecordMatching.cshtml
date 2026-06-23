@@ -85,13 +85,10 @@
                         {
                             <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                                 <td class="govuk-table__cell" data-testid="task-name-and-id">
-                                    <a href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
-                                        @result.Name
+                                    <a href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(result.SupportTaskReference)" class="govuk-link trs-task-link">
+                                        <span class="trs-task-link__name" data-testid="task-name">@result.Name</span>
+                                        <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
                                     </a>
-                                    <br />
-                                    <span data-testid="task-id">
-                                        @result.SupportTaskReference
-                                    </span>
                                 </td>
                                 <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateDisplayFormat)</td>
                                 <td class="govuk-table__cell" data-testid="status">
