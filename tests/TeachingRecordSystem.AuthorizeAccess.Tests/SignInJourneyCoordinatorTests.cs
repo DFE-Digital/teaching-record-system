@@ -417,8 +417,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             async coordinator =>
             {
                 // Arrange
-                var subject = TestData.CreateOneLoginUserSubject();
-                var email = TestData.GenerateUniqueEmail();
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
                 var trnRequestId = Guid.NewGuid().ToString();
                 var trnRequestApplicationUser = await TestData.CreateApplicationUserAsync();
 
@@ -428,9 +427,9 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                     {
                         RequestId = trnRequestId,
                         ApplicationUserId = trnRequestApplicationUser.UserId,
-                        OneLoginUserSubject = subject,
+                        OneLoginUserSubject = oneLoginUser.Subject,
                         CreatedOn = Clock.UtcNow.AddDays(-1),
-                        EmailAddress = email,
+                        EmailAddress = oneLoginUser.EmailAddress,
                         FirstName = "Test",
                         MiddleName = null,
                         LastName = "User",
@@ -442,7 +441,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                     await dbContext.SaveChangesAsync();
                 });
 
-                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: subject, email: email);
+                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: oneLoginUser.Subject, email: oneLoginUser.EmailAddress);
 
                 // Act
                 var result = await coordinator.OnOneLoginCallbackAsync(authenticationTicket);
@@ -540,8 +539,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             async coordinator =>
             {
                 // Arrange
-                var subject = TestData.CreateOneLoginUserSubject();
-                var email = TestData.GenerateUniqueEmail();
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
                 var differentAppUser = await TestData.CreateApplicationUserAsync();
                 var trnRequestId = Guid.NewGuid().ToString();
 
@@ -551,9 +549,9 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                     {
                         RequestId = trnRequestId,
                         ApplicationUserId = differentAppUser.UserId,
-                        OneLoginUserSubject = subject,
+                        OneLoginUserSubject = oneLoginUser.Subject,
                         CreatedOn = Clock.UtcNow.AddDays(-7),
-                        EmailAddress = email,
+                        EmailAddress = oneLoginUser.EmailAddress,
                         FirstName = "Test",
                         MiddleName = null,
                         LastName = "User",
@@ -565,7 +563,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                     await dbContext.SaveChangesAsync();
                 });
 
-                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: subject, email: email);
+                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: oneLoginUser.Subject, email: oneLoginUser.EmailAddress);
 
                 // Act
                 var result = await coordinator.OnOneLoginCallbackAsync(authenticationTicket);
@@ -575,7 +573,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirstValue(AuthorizeAccessClaimTypes.TrnRequestId);
                 Assert.Equal(trnRequestId, trnRequestIdClaim);
                 var trnRequestCount = await WithDbContextAsync(dbContext =>
-                    dbContext.TrnRequestMetadata.CountAsync(tr => tr.OneLoginUserSubject == subject));
+                    dbContext.TrnRequestMetadata.CountAsync(tr => tr.OneLoginUserSubject == oneLoginUser.Subject));
                 Assert.Equal(1, trnRequestCount);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
