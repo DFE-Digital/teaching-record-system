@@ -9,6 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+    private const string AdditionalInformation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
 
     public static IEnumerable<object[]> GetInductionStatusData()
     {
@@ -86,8 +87,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-            .WithReasonDetailsChoice(false)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+            .WithAdditionalInformationChoice(false, null)
             .WithFileUploadChoice(false)
             .Build();
 
@@ -155,8 +156,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-            .WithReasonDetailsChoice(false)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+            .WithAdditionalInformationChoice(false)
             .WithFileUploadChoice(false)
             .Build();
 
@@ -230,8 +231,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-            .WithReasonDetailsChoice(false)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+            .WithAdditionalInformationChoice(false)
             .WithFileUploadChoice(false)
             .Build();
 
@@ -306,8 +307,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-            .WithReasonDetailsChoice(false)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+            .WithAdditionalInformationChoice(false)
             .WithFileUploadChoice(false)
             .Build();
 
@@ -351,8 +352,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status)
-                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-                .WithReasonDetailsChoice(false)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+                .WithAdditionalInformationChoice(false)
                 .WithFileUploadChoice(false)
                 .Build());
 
@@ -389,8 +390,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-            .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+            .WithAdditionalInformationChoice(addDetails: true, AdditionalInformation)
             .WithFileUploadChoice(uploadFile: false)
             .Build();
 
@@ -418,6 +419,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.NotNull(labelDetails);
         var valueDetails = labelDetails.NextElementSibling;
         Assert.Equal(ChangeReasonDetails, valueDetails!.TrimmedText());
+
+        var reasonDetailsElement = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Additional information");
+        Assert.NotNull(reasonDetailsElement);
+        var reasonDetails = reasonDetailsElement.NextElementSibling;
+        Assert.Equal(AdditionalInformation, reasonDetails!.TrimmedText());
 
         var labelFileUpload = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Evidence");
         Assert.NotNull(labelFileUpload);
@@ -447,8 +453,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-                .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+                .WithAdditionalInformationChoice(addDetails: true, AdditionalInformation)
                 .WithFileUploadChoice(uploadFile: false)
                 .Build());
 
@@ -489,8 +495,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-                .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+                .WithAdditionalInformationChoice(addDetails: true, AdditionalInformation)
                 .WithFileUploadChoice(uploadFile: false)
                 .Build());
 
@@ -530,8 +536,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
-                .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-                .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
+                .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+                .WithAdditionalInformationChoice(addDetails: true, AdditionalInformation)
                 .WithFileUploadChoice(uploadFile: true)
                 .Build());
 
@@ -581,10 +587,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Theory]
-    [InlineData(PersonInductionChangeReason.AnotherReason)]
-    [InlineData(PersonInductionChangeReason.IncompleteDetails)]
-    [InlineData(PersonInductionChangeReason.NewInformation)]
-    public async Task Get_ShowReasonDetails_AsExpected(PersonInductionChangeReason reason)
+    [InlineData(PersonInductionChangeReason.AnotherReason, "this is a reason")]
+    [InlineData(PersonInductionChangeReason.IncompleteDetails, null)]
+    [InlineData(PersonInductionChangeReason.NewInformation, null)]
+    public async Task Get_ShowReasonDetails_AsExpected(PersonInductionChangeReason reason, string? changeReasonDetail)
     {
         // Arrange
         var inductionStatus = InductionStatus.InProgress;
@@ -597,8 +603,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(reason)
-            .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
+            .WithReasonChoice(reason, changeReasonDetail)
+            .WithAdditionalInformationChoice(addDetails: true, AdditionalInformation)
             .WithFileUploadChoice(uploadFile: false)
             .Build();
 
@@ -626,7 +632,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
     [Theory]
     [InlineData(true, "this is some details", "this is some details")]
-    [InlineData(false, null, "Not provided")]
+    [InlineData(false, null, "")]
     public async Task Get_ShowAdditionalInformation_AsExpected(bool addDetail, string? details, string? expectedDetails)
     {
         // Arrange
@@ -640,8 +646,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-            .WithReasonDetailsChoice(addDetails: addDetail, details)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+            .WithAdditionalInformationChoice(addDetails: addDetail, details)
             .WithFileUploadChoice(uploadFile: false)
             .Build();
 
@@ -684,8 +690,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithExemptionReasonIds(exemptionReasonIds)
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
-            .WithReasonChoice(PersonInductionChangeReason.AnotherReason)
-            .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
+            .WithReasonChoice(PersonInductionChangeReason.AnotherReason, ChangeReasonDetails)
+            .WithAdditionalInformationChoice(addDetails: true, ChangeReasonDetails)
             .WithFileUploadChoice(uploadFile: uploadFile, evidenceFileId)
             .Build();
 

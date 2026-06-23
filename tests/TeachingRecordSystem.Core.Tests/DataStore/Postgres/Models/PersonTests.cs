@@ -25,6 +25,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Assert
@@ -48,6 +49,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Assert
@@ -71,6 +73,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Assert
@@ -94,6 +97,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Assert
@@ -117,6 +121,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Assert
@@ -140,6 +145,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Assert
@@ -163,6 +169,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Assert
@@ -211,6 +218,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
+            additionalInformation: null,
             out _);
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
@@ -251,6 +259,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
+            additionalInformation: null,
             out _);
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
@@ -297,6 +306,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         Clock.Advance(TimeSpan.FromDays(1));
@@ -332,6 +342,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         Clock.Advance(TimeSpan.FromDays(1));
@@ -367,6 +378,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         Clock.Advance(TimeSpan.FromDays(1));
@@ -467,6 +479,7 @@ public class PersonTests
             evidenceFile: null,
             SystemUser.SystemUserId,
             Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Act
@@ -496,6 +509,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Act
@@ -527,6 +541,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         // Act
@@ -560,6 +575,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         person.AddInductionExemptionReason(
@@ -599,6 +615,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         person.AddInductionExemptionReason(
@@ -636,6 +653,7 @@ public class PersonTests
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             now: Clock.UtcNow,
+            additionalInformation: null,
             out _);
 
         person.InductionExemptWithoutReason = true;

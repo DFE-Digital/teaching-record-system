@@ -187,7 +187,7 @@ public static partial class Commands
 
                     person.SetInductionStatus(parsedInduction, startDate, null, exemptionReasonIds: [],
                         changeReason: "Imported", changeReasonDetail: null, evidenceFile: null,
-                        updatedBy: SystemUser.SystemUserId, now: DateTime.UtcNow, out var inductionEvent);
+                        updatedBy: SystemUser.SystemUserId, now: DateTime.UtcNow, additionalInformation: null, out var inductionEvent);
                     if (inductionEvent is not null)
                     {
                         dbContext.AddEventWithoutBroadcast(inductionEvent);

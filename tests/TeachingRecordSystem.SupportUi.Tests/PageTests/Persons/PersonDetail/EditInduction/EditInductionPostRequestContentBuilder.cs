@@ -9,7 +9,8 @@ public class EditInductionPostRequestContentBuilder : PostRequestContentBuilder
     public InductionStatus? InductionStatus { get; set; }
     public Guid[]? ExemptionReasonIds { get; set; }
     public PersonInductionChangeReason? ChangeReason { get; set; }
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
+    public string? AdditionalInformation { get; set; }
     public string? ChangeReasonDetail { get; set; }
     public TestEvidenceUploadModel Evidence { get; set; } = new();
 
@@ -37,16 +38,17 @@ public class EditInductionPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public EditInductionPostRequestContentBuilder WithChangeReason(PersonInductionChangeReason changeReason)
+    public EditInductionPostRequestContentBuilder WithChangeReason(PersonInductionChangeReason changeReason, string? changeReasonDetail = null)
     {
         this.ChangeReason = changeReason;
+        ChangeReasonDetail = changeReasonDetail;
         return this;
     }
 
-    public EditInductionPostRequestContentBuilder WithChangeReasonDetailSelections(bool? hasAdditionalDetail, string? detail = null)
+    public EditInductionPostRequestContentBuilder WithProvideAdditionalInformation(bool? provideAdditionalInformation, string? additionalInformation = null)
     {
-        HasAdditionalReasonDetail = hasAdditionalDetail;
-        ChangeReasonDetail = detail;
+        ProvideAdditionalInformation = provideAdditionalInformation;
+        AdditionalInformation = additionalInformation;
         return this;
     }
 

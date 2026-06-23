@@ -14,16 +14,19 @@ public class ReasonModel(
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
+        v => v.RuleFor(m => m.ChangeReasonDetail)
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.ChangeReason == PersonInductionChangeReason.AnotherReason),
         v => v.RuleFor(m => m.ChangeReason)
             .NotNull().WithMessage("Select a reason"),
-        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+        v => v.RuleFor(m => m.ProvideAdditionalInformation)
             .NotNull().WithMessage("Select yes if you want to add more information about why you’re changing the induction details"),
-        v => v.RuleFor(m => m.ChangeReasonDetail)
+        v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
-        v => v.RuleFor(m => m.ChangeReasonDetail)
-            .NotEmpty().WithMessage("Enter additional detail")
-            .When(m => m.HasAdditionalReasonDetail == true),
+        v => v.RuleFor(m => m.AdditionalInformation)
+            .NotEmpty().WithMessage("Enter details")
+            .When(m => m.ProvideAdditionalInformation == true),
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
@@ -31,10 +34,13 @@ public class ReasonModel(
     public PersonInductionChangeReason? ChangeReason { get; set; }
 
     [BindProperty]
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
 
     [BindProperty]
     public string? ChangeReasonDetail { get; set; }
+
+    [BindProperty]
+    public string? AdditionalInformation { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
@@ -64,8 +70,9 @@ public class ReasonModel(
     public void OnGet()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
-        HasAdditionalReasonDetail = JourneyInstance.State.HasAdditionalReasonDetail;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
+        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
+        ChangeReasonDetail = JourneyInstance!.State.ChangeReason == PersonInductionChangeReason.AnotherReason ? JourneyInstance.State.ChangeReasonDetail : null;
+        AdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation == true ? JourneyInstance.State.AdditionalInformation : null;
         Evidence = JourneyInstance.State.Evidence;
     }
 
@@ -82,8 +89,9 @@ public class ReasonModel(
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
-            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.ChangeReasonDetail = HasAdditionalReasonDetail is true ? ChangeReasonDetail : null;
+            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+            state.AdditionalInformation = ProvideAdditionalInformation is true ? AdditionalInformation : null;
+            state.ChangeReasonDetail = ChangeReason == PersonInductionChangeReason.AnotherReason ? ChangeReasonDetail : null;
             state.Evidence = Evidence;
         });
 
