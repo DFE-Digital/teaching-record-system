@@ -41,12 +41,21 @@
                     </row-actions>
                 </row>
                 <row>
-                    <key>Additional information</key>
+                    <key>Reason details</key>
                     <value use-empty-fallback>
                         @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
                     </value>
                     <row-actions>
                         <action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</action>
+                    </row-actions>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value use-empty-fallback>
+                        @Html.ConvertNewlinesToLineBreaks(Model.AdditionalInformation)
+                    </value>
+                    <row-actions>
+                        <action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="additional details">Change</action>
                     </row-actions>
                 </row>
                 <row>

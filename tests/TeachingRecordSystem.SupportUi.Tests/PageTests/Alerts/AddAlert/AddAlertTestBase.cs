@@ -8,7 +8,7 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
     protected Task<JourneyInstance<AddAlertState>> CreateEmptyJourneyInstanceAsync(Guid personId) =>
         CreateJourneyInstanceAsync(personId, new());
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Guid personId, bool populateOptional = true)
+    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Guid personId, bool populateOptional = true, bool provideAdditionalInformation = false, AddAlertReasonOption addReasonOption = AddAlertReasonOption.AnotherReason)
     {
         var alertType = await GetKnownAlertTypeAsync();
 
@@ -20,9 +20,9 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
             AddLink = populateOptional,
             Link = populateOptional ? "https://www.example.com" : null,
             StartDate = Clock.Today.AddDays(-30),
-            AddReason = AddAlertReasonOption.AnotherReason,
-            HasAdditionalReasonDetail = populateOptional ? true : false,
-            AddReasonDetail = populateOptional ? "More details" : null,
+            AddReason = addReasonOption,
+            ProvideAdditionalInformation = provideAdditionalInformation ? true : false,
+            AddReasonDetail = addReasonOption == AddAlertReasonOption.AnotherReason ? "More details" : null,
             Evidence = new()
             {
                 UploadEvidence = populateOptional ? true : false,
@@ -32,7 +32,8 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
                     FileName = "evidence.jpeg",
                     FileSizeDescription = "5MB"
                 } : null
-            }
+            },
+            AdditionalInformation = provideAdditionalInformation == true ? "Some additional information" : null,
         });
     }
 

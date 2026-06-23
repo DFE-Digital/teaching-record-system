@@ -13,15 +13,19 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     {
         v => v.RuleFor(m => m.ChangeReason)
             .NotNull().WithMessage("Select a reason"),
-        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+        v => v.RuleFor(m => m.ProvideAdditionalInformation)
             .NotNull().WithMessage("Select yes if you want to add more information"),
-        v => v.RuleFor(m => m.ChangeReasonDetail)
+        v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+        v => v.RuleFor(m => m.AdditionalInformation)
+            .NotEmpty().WithMessage("Enter details")
+            .When(m => m.ProvideAdditionalInformation == true),
+        v => v.RuleFor(m => m.Evidence).Evidence(),
         v => v.RuleFor(m => m.ChangeReasonDetail)
-            .NotEmpty().WithMessage("Enter additional detail")
-            .When(m => m.HasAdditionalReasonDetail == true),
-        v => v.RuleFor(m => m.Evidence).Evidence()
+            .NotEmpty().WithMessage("Enter a reason")
+            .When(m => m.ChangeReason == AlertChangeDetailsReasonOption.AnotherReason),
+
     };
 
     public JourneyInstance<EditAlertDetailsState>? JourneyInstance { get; set; }
@@ -40,7 +44,10 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public AlertChangeDetailsReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
+
+    [BindProperty]
+    public string? AdditionalInformation { get; set; }
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
@@ -66,7 +73,8 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public void OnGet()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
-        HasAdditionalReasonDetail = JourneyInstance.State.HasAdditionalReasonDetail;
+        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         Evidence = JourneyInstance.State.Evidence;
     }
@@ -84,8 +92,9 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
-            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.ChangeReasonDetail = HasAdditionalReasonDetail!.Value ? ChangeReasonDetail : null;
+            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+            state.ChangeReasonDetail = ChangeReason == AlertChangeDetailsReasonOption.AnotherReason ? ChangeReasonDetail : null;
+            state.AdditionalInformation = ProvideAdditionalInformation!.Value ? AdditionalInformation : null;
             state.Evidence = Evidence;
         });
 

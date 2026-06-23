@@ -18,17 +18,21 @@ public class EditAlertDetailsState : IRegisterJourney
 
     public AlertChangeDetailsReasonOption? ChangeReason { get; set; }
 
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
 
     public string? ChangeReasonDetail { get; set; }
+
+    public string? AdditionalInformation { get; set; }
 
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     public bool IsComplete =>
         !string.IsNullOrWhiteSpace(Details) &&
         ChangeReason.HasValue &&
-        HasAdditionalReasonDetail is bool hasDetail &&
-        (!hasDetail || ChangeReasonDetail is not null) &&
+        (ChangeReason.HasValue && ChangeReason == AlertChangeDetailsReasonOption.AnotherReason && !string.IsNullOrEmpty(ChangeReasonDetail) ||
+         ChangeReason != AlertChangeDetailsReasonOption.AnotherReason && string.IsNullOrEmpty(ChangeReasonDetail)) &&
+        (ProvideAdditionalInformation == true && !string.IsNullOrEmpty(AdditionalInformation) ||
+         ProvideAdditionalInformation == false && string.IsNullOrEmpty(AdditionalInformation)) &&
         Evidence.IsComplete;
 
     public void EnsureInitialized(CurrentAlertFeature alertInfo)

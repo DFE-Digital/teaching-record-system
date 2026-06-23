@@ -34,6 +34,7 @@ public class CheckAnswersModel(
     public AlertChangeDetailsReasonOption ChangeReason { get; set; }
 
     public string? ChangeReasonDetail { get; set; }
+    public string? AdditionalInformation { get; set; }
 
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
@@ -55,6 +56,7 @@ public class CheckAnswersModel(
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -69,7 +71,7 @@ public class CheckAnswersModel(
                 Reason = ChangeReason.GetDisplayName()!,
                 Details = ChangeReasonDetail,
                 EvidenceFile = EvidenceFile?.ToEventModel(),
-                AdditionalInformation = null
+                AdditionalInformation = AdditionalInformation
             });
 
         await alertService.UpdateAlertAsync(
