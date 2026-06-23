@@ -32,22 +32,22 @@
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Email ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Email, direction))">
+                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Email, direction, Model.PageNumber))">
                         One Login email address
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-200"
                         sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Name ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Name, direction))">
+                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Name, direction, Model.PageNumber))">
                         Name
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-130"
                         sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.DateOfBirth ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.DateOfBirth, direction))">
+                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.DateOfBirth, direction, Model.PageNumber))">
                         DOB
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-80"
                         sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Trn ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Trn, direction))">
+                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Trn, direction, Model.PageNumber))">
                         TRN
                     </th>
                 </tr>
@@ -75,5 +75,10 @@
                 }
             </tbody>
         </table>
+
+        @if (Model.Pagination is not null)
+        {
+            <partial name="_Pagination" model="@Model.Pagination" />
+        }
     </div>
 </div>

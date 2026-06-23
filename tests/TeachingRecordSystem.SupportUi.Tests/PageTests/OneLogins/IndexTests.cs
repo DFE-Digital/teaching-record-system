@@ -131,4 +131,39 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var emailResults = doc.GetAllElementsByTestId("email");
         Assert.Single(emailResults);
     }
+
+    [Fact]
+    public async Task Get_WithMultiplePages_DisplaysPaginationControls()
+    {
+        // Arrange
+        var pageSize = 20;
+        var page = 2;
+
+        await Enumerable.Range(1, (pageSize * page) + 1)
+            .ToAsyncEnumerable()
+            .Select(async (int i, CancellationToken _) =>
+            {
+                var person = await TestData.CreatePersonAsync(p => p
+                    .WithFirstName($"User{i}")
+                    .WithLastName("Test"));
+                return await TestData.CreateOneLoginUserAsync(
+                    person,
+                    email: Option.Some<string?>($"user{i}@example.com"));
+            })
+            .ToArrayAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/one-logins?search=test");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var pagination = doc.QuerySelector(".govuk-pagination");
+        Assert.NotNull(pagination);
+
+        var emailResults = doc.GetAllElementsByTestId("email");
+        Assert.Equal(pageSize, emailResults.Count);
+    }
 }

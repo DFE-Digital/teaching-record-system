@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Services.OneLogins;
 
 public class OneLoginSearchResult
 {
-    public required IReadOnlyList<OneLoginSearchResultItem> Results { get; init; }
+    public required ResultPage<OneLoginSearchResultItem> Results { get; init; }
 }
 
 public record OneLoginSearchResultItem(

@@ -1,6 +1,7 @@
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
