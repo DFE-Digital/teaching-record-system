@@ -1,16 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
+    <EnableGovUkFrontendSupport>true</EnableGovUkFrontendSupport>
+    <RestoreGovUkFrontendStylesheet>false</RestoreGovUkFrontendStylesheet>
     <RestoreGovUkFrontendNpmPackage>true</RestoreGovUkFrontendNpmPackage>
-    <GovUkFrontendNpmPackageLocation>lib/govuk-frontend</GovUkFrontendNpmPackageLocation>
+    <RestoreGovUkFrontendSupportPackage>true</RestoreGovUkFrontendSupportPackage>
     <RequiresSharedAppsettings>true</RequiresSharedAppsettings>
   </PropertyGroup>
-
-  <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
-    <Copy SourceFiles="lib/govuk-frontend/govuk-frontend.min.js"
-          DestinationFolder="wwwroot"
-          SkipUnchangedFiles="true" />
-  </Target>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" />
@@ -38,8 +34,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\lib\**\*" CopyToPublishDirectory="Never" />
-    <Content Update="wwwroot\lib\govuk-one-login-service-header\dist\scripts\*.js" CopyToPublishDirectory="PreserveNewest" />
+    <Content Remove="sasscompiler.json" />
+    <None Include="sasscompiler.json" />
   </ItemGroup>
+
+  <Target Name="CopyServiceHeaderScriptToWebroot" AfterTargets="LibraryManagerRestore">
+    <Copy SourceFiles="lib\govuk-one-login\service-header\dist\scripts\init-service-header.js"
+          DestinationFiles="wwwroot\one-login-service-header.js"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <Content Remove="wwwroot\one-login-service-header.js" />
+      <Content Include="wwwroot\one-login-service-header.js" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
 
 </Project>

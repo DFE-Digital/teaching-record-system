@@ -231,6 +231,8 @@ public sealed class HostFixture : InitializeDbFixture
                     .UseUrls(Url)
                     .UseEnvironment("EndToEndTests");
 
+                builder.UseStaticWebAssets();
+
                 configureWebHostBuilder(builder);
             }
 

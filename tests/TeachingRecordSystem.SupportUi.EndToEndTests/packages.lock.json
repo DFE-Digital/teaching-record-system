@@ -418,8 +418,8 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "8.0.26",
-        "contentHash": "aDii3fAsoPB9EwrbJgUMdZ48qXYIiJF5VIkRdw9rGBiwo4vZpxDGVgwRk6/bdmzhgQEG8jHlkg8MwIV5K8yFUQ=="
+        "resolved": "10.0.9",
+        "contentHash": "UpRgjjSUmF7KYZTIv1Zd2Y0Wv2oK9jE+Jmyp4UMynTowjvJGG1yrRe2JodYyVgcDgZF2auGwYEl+U0J1+YhBRw=="
       },
       "Microsoft.Graph": {
         "type": "Transitive",
@@ -1063,7 +1063,7 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.99.0, )",
-          "GovUk.Frontend.AspNetCore": "[4.1.1, )",
+          "GovUk.Frontend.AspNetCore": "[4.2.1, )",
           "Humanizer.Core": "[3.0.10, )",
           "JetBrains.Annotations": "[2026.2.0, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
@@ -1281,11 +1281,11 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[4.1.1, )",
-        "resolved": "4.1.1",
-        "contentHash": "HAMWsNj1Z1jJg35Dq0fuE0MkSrrdYmND6f+44m6brvqLE1w5TGGzXN7hTFSU7OJ7hUw5hfVbH5VhKXf5AQhX5g==",
+        "requested": "[4.2.1, )",
+        "resolved": "4.2.1",
+        "contentHash": "pWuRZhx7AwjYY/CTllRiKrjcOPXEFWzBOJRzeAqrMj0OsEklnZcssVOlPVFm6XJ2ldaGRJi6xPmoTzVZrIcyGA==",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.26"
+          "Microsoft.Extensions.FileProviders.Embedded": "10.0.9"
         }
       },
       "GovukNotify": {
