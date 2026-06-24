@@ -496,7 +496,7 @@
 
 .trs-task-link {
   &__name {
-    white-space: pre;
+    white-space: pre-wrap;
 
     &:after {
       content: '\A';
