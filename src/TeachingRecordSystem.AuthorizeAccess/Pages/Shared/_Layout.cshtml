@@ -85,9 +85,6 @@
 
 @section BodyEnd {
     @Html.GovUkFrontendScriptImports(cspNonce: NonceService.GetNonce())
-    <script type="module" asp-add-nonce>
-        import { initCrossServiceHeader } from '/lib/govuk-one-login-service-header/dist/scripts/service-header.js';
-        initCrossServiceHeader();
-    </script>
+    <script src="~/one-login-service-header.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 }

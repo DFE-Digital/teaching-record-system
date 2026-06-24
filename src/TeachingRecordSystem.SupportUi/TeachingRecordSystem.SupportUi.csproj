@@ -1,14 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
+    <EnableGovUkFrontendSupport>true</EnableGovUkFrontendSupport>
+    <RestoreGovUkFrontendStylesheet>false</RestoreGovUkFrontendStylesheet>
     <RestoreGovUkFrontendNpmPackage>true</RestoreGovUkFrontendNpmPackage>
-    <GovUkFrontendNpmPackageLocation>lib/govuk-frontend</GovUkFrontendNpmPackageLocation>
+    <RestoreGovUkFrontendSupportPackage>true</RestoreGovUkFrontendSupportPackage>
     <RequiresSharedAppsettings>true</RequiresSharedAppsettings>
   </PropertyGroup>
-
-  <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
-    <Copy SourceFiles="lib/govuk-frontend/govuk-frontend.min.js" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
-  </Target>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" />
@@ -30,6 +28,11 @@
 
   <ItemGroup>
     <Using Include="TeachingRecordSystem.WebCommon" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="sasscompiler.json" />
+    <None Include="sasscompiler.json" />
   </ItemGroup>
 
 </Project>

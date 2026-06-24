@@ -1,5 +1,11 @@
-@import 'govuk-frontend';
-@import '../wwwroot/lib/govuk-one-login-service-header/dist/styles/service-header-no-imports';
+@use "sass:meta";
+@use "govuk-frontend-aspnetcore";
+@use "govuk-frontend" as * with (
+  $govuk-font-url-function: meta.get-function("versioned-font-url", $module: "govuk-frontend-aspnetcore"),
+  $govuk-image-url-function: meta.get-function("versioned-image-url", $module: "govuk-frontend-aspnetcore")
+);
+
+@import '../lib/govuk-one-login/service-header/dist/styles/service-header-no-imports';
 @import './Components/interruption-card.scss';
 
 .trs-panel--left {

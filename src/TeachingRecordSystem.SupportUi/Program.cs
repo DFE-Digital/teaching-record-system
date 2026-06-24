@@ -47,14 +47,11 @@ public class Program
 
         app.UseCsp(csp =>
         {
-            var pageTemplateHelper = app.Services.GetRequiredService<PageTemplateHelper>();
-
             csp.ByDefaultAllow
                 .FromSelf();
 
             csp.AllowScripts
                 .FromSelf()
-                .From(pageTemplateHelper.GetCspScriptHashes())
                 .AddNonce();
 
             csp.AllowStyles
@@ -72,7 +69,7 @@ public class Program
 
         app.UseMiddleware<AppendSecurityResponseHeadersMiddleware>();
 
-        app.UseStaticFiles();
+        app.MapStaticAssets();
 
         app.UseRouting();
         app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/_hangfire"), a => a.UseTransactions());
@@ -80,8 +77,8 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapRazorPages();
-        app.MapControllers();
+        app.MapRazorPages().WithStaticAssets();
+        app.MapControllers().WithStaticAssets();
 
         if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {

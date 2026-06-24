@@ -4,6 +4,7 @@ using Dfe.Analytics.AspNetCore;
 using GovUk.Frontend.AspNetCore;
 using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
+using Joonasw.AspNetCore.SecurityHeaders.Csp;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Features;
@@ -44,6 +45,11 @@ public static class Extensions
         {
             options.DefaultButtonPreventDoubleClick = true;
             options.DefaultFileUploadJavaScriptEnhancements = true;
+            options.GetCspNonceForRequest = context =>
+            {
+                var cspService = context.RequestServices.GetRequiredService<ICspNonceService>();
+                return cspService.GetNonce();
+            };
         });
 
         // One Login has a one hour timeout on IDV journeys; we need to make sure our session cookies last that long too

@@ -276,6 +276,8 @@ public sealed class HostFixture : InitializeDbFixture
         {
             builder.UseEnvironment("EndToEndTests");
 
+            builder.UseStaticWebAssets();
+
             var configuration = TestConfiguration.GetConfiguration();
             builder.UseConfiguration(configuration);
 

@@ -1,5 +1,4 @@
 using Dfe.Analytics.AspNetCore;
-using GovUk.Frontend.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Middleware;
@@ -55,14 +54,11 @@ public class Program
 
         app.UseCsp(csp =>
         {
-            var pageTemplateHelper = app.Services.GetRequiredService<PageTemplateHelper>();
-
             csp.ByDefaultAllow
                 .FromSelf();
 
             csp.AllowScripts
                 .FromSelf()
-                .From(pageTemplateHelper.GetCspScriptHashes())
                 .AddNonce();
 
             csp.AllowStyles
@@ -80,7 +76,7 @@ public class Program
 
         app.UseMiddleware<AppendSecurityResponseHeadersMiddleware>();
 
-        app.UseStaticFiles();
+        app.MapStaticAssets();
 
         if (builder.Environment.IsProduction())
         {
@@ -96,8 +92,8 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapRazorPages();
-        app.MapControllers();
+        app.MapRazorPages().WithStaticAssets();
+        app.MapControllers().WithStaticAssets();
 
         app.MapGet("/one-login-jwks", async ctx =>
         {

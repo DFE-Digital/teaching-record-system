@@ -2,3 +2,4 @@ lib
 wwwroot/app.css*
 wwwroot/assets
 wwwroot/govuk-frontend.min.js
+wwwroot/one-login-service-header.js
