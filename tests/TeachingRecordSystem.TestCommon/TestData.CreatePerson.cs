@@ -1010,6 +1010,7 @@ public partial class TestData
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
                 testData.TimeProvider.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             if (@event is not null)

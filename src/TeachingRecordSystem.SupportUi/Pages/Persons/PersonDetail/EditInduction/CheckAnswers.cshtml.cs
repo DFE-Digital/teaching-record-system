@@ -43,6 +43,8 @@ public class CheckAnswersModel(
 
     public string? ChangeReasonDetail { get; set; }
 
+    public string? AdditionalInformation { get; set; }
+
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public bool ShowStatusChangeLink => JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.Status;
@@ -69,6 +71,7 @@ public class CheckAnswersModel(
         ExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
         InductionStatus = JourneyInstance.State.InductionStatus;
         StartDate = JourneyInstance.State.StartDate;
         CompletedDate = JourneyInstance.State.CompletedDate;
@@ -102,6 +105,7 @@ public class CheckAnswersModel(
             EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             timeProvider.UtcNow,
+            additionalInformation: AdditionalInformation,
             out var updatedEvent);
 
         if (updatedEvent is not null)

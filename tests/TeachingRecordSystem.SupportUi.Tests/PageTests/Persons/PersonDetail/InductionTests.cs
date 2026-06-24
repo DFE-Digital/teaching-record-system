@@ -306,6 +306,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
+                additionalInformation: null,
                 out _);
             await dbContext.SaveChangesAsync();
         });

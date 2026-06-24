@@ -111,20 +111,20 @@
             <h2 class="govuk-heading-m">Why are you editing these induction details?</h2>
             <govuk-summary-list>
                 <row>
-					<key>Reason</key>
-					<value>@Model.ChangeReason.GetDisplayName()</value>
-					<row-actions>
-						<action
-						href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
-						visually-hidden-text="reason for change">Change</action>
-					</row-actions>
-				</row>
+                    <key>Reason</key>
+                    <value>@Model.ChangeReason.GetDisplayName()</value>
+                    <row-actions>
+                        <action
+                            href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
+                            visually-hidden-text="reason for change">Change</action>
+                    </row-actions>
+                </row>
 				<row>
 					<key>Additional information</key>
 					<value>
 						@if (Model.ChangeReasonDetail is not null)
 						{
-							@Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
+							@Html.ConvertNewlinesToLineBreaks(Model.AdditionalInformation)
 						}
 						else
 						{
@@ -134,7 +134,7 @@
 					<row-actions>
 						<action
 							href="@LinkGenerator.Persons.PersonDetail.EditInduction.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers)"
-							visually-hidden-text="reason details">Change</action>
+							visually-hidden-text="additional information">Change</action>
 					</row-actions>
 				</row>
 				<row>

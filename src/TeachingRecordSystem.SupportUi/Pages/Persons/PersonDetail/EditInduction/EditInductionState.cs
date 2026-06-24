@@ -20,8 +20,9 @@ public class EditInductionState : IRegisterJourney
     public DateOnly? CompletedDate { get; set; }
     public Guid[]? ExemptionReasonIds { get; set; } = [];
     public PersonInductionChangeReason? ChangeReason { get; set; }
-    public bool? HasAdditionalReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
     public string? ChangeReasonDetail { get; set; }
+    public string? AdditionalInformation { get; set; }
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     public bool Initialized { get; set; }
@@ -33,7 +34,11 @@ public class EditInductionState : IRegisterJourney
         (!InductionStatus.RequiresCompletedDate() || CompletedDate.HasValue) &&
         (!InductionStatus.RequiresExemptionReasons() || (ExemptionReasonIds != null && ExemptionReasonIds.Length != 0)) &&
         ChangeReason.HasValue &&
-        HasAdditionalReasonDetail.HasValue &&
+        (ChangeReason == PersonInductionChangeReason.AnotherReason && !string.IsNullOrEmpty(ChangeReasonDetail) ||
+         ChangeReason != PersonInductionChangeReason.AnotherReason && string.IsNullOrEmpty(ChangeReasonDetail)) &&
+        ProvideAdditionalInformation is bool proveAdditionalInfo &&
+        (proveAdditionalInfo == true && !string.IsNullOrEmpty(AdditionalInformation) ||
+         proveAdditionalInfo == false && string.IsNullOrEmpty(AdditionalInformation)) &&
         Evidence.IsComplete;
 
     public void EnsureInitialized(Person person, InductionJourneyPage startPage)

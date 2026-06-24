@@ -7,6 +7,7 @@ public record PersonInductionUpdatedEvent : EventBase, IEventWithPersonId, IEven
     public required EventModels.Induction OldInduction { get; init; }
     public required string? ChangeReason { get; init; }
     public required string? ChangeReasonDetail { get; init; }
+    public required string? AdditionalInformation { get; init; }
     public required EventModels.File? EvidenceFile { get; init; }
     public required PersonInductionUpdatedEventChanges Changes { get; init; }
 }

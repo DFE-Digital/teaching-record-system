@@ -582,6 +582,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         var changeReason = PersonInductionChangeReason.AnotherReason.GetDisplayName();
         var changeReasonDetail = "Reason detail";
+        var additionalInformation = "Additional information";
         var evidenceFile = new EventModels.File
         {
             FileId = Guid.NewGuid(),
@@ -621,7 +622,8 @@ public class ChangeLogInductionEventTests : TestBase
             Changes = changes,
             ChangeReason = changeReason,
             ChangeReasonDetail = changeReasonDetail,
-            EvidenceFile = evidenceFile
+            EvidenceFile = evidenceFile,
+            AdditionalInformation = additionalInformation
         };
 
         await WithDbContextAsync(async dbContext =>
@@ -752,6 +754,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         var changeReason = PersonInductionChangeReason.AnotherReason.GetDisplayName();
         var changeReasonDetail = "Reason detail";
+        var additionalInformation = "Additional information";
 
         var induction = new EventModels.Induction
         {
@@ -786,7 +789,8 @@ public class ChangeLogInductionEventTests : TestBase
             Changes = changes,
             ChangeReason = changeReason,
             ChangeReasonDetail = changeReasonDetail,
-            EvidenceFile = null
+            EvidenceFile = null,
+            AdditionalInformation = additionalInformation
         };
 
         await WithDbContextAsync(async dbContext =>

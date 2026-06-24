@@ -45,6 +45,7 @@ public class BatchSendInductionCompletedEmailsJobTests(JobFixture fixture) : Job
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
+                additionalInformation: null,
                 out var @event);
 
             Debug.Assert(@event is not null);

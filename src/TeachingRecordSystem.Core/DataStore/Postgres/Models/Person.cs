@@ -167,7 +167,8 @@ public class Person
             ChangeReason = null,
             ChangeReasonDetail = null,
             EvidenceFile = null,
-            Changes = changes
+            Changes = changes,
+            AdditionalInformation = null
         };
     }
 
@@ -196,6 +197,7 @@ public class Person
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
+        string? additionalInformation,
         out PersonInductionUpdatedEvent? @event)
     {
         // N.B. We allow missing data fields as some migrated data has missing fields
@@ -258,7 +260,8 @@ public class Person
             ChangeReason = changeReason,
             ChangeReasonDetail = changeReasonDetail,
             EvidenceFile = evidenceFile,
-            Changes = changes
+            Changes = changes,
+            AdditionalInformation = additionalInformation
         };
     }
 
@@ -298,7 +301,8 @@ public class Person
             ChangeReason = null,
             ChangeReasonDetail = null,
             EvidenceFile = null,
-            Changes = changes
+            Changes = changes,
+            AdditionalInformation = null
         };
 
         return true;
@@ -358,7 +362,8 @@ public class Person
             ChangeReason = null,
             ChangeReasonDetail = null,
             EvidenceFile = null,
-            Changes = changes
+            Changes = changes,
+            AdditionalInformation = null
         };
 
         return true;
@@ -417,7 +422,8 @@ public class Person
             ChangeReason = null,
             ChangeReasonDetail = null,
             EvidenceFile = null,
-            Changes = changes
+            Changes = changes,
+            AdditionalInformation = null
         };
 
         return true;

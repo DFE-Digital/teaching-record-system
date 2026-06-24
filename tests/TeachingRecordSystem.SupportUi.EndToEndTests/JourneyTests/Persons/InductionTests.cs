@@ -40,6 +40,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -76,6 +77,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -110,6 +112,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -164,6 +167,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -219,6 +223,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -268,6 +273,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
+
         await page.SelectReasonMoreDetailsAsync(true, TestData.GenerateLoremIpsum(), "Enter details");
         await page.SelectUploadEvidenceAsync(true, "document.jpeg");
         await page.ClickContinueButtonAsync();
@@ -347,6 +354,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -365,6 +373,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Reason details");
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -422,6 +431,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -479,6 +489,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -564,6 +575,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(PersonInductionChangeReason.AnotherReason);
+        await page.FillAsync("label:text-is('Enter a reason')", "A reason for editing induction");
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();

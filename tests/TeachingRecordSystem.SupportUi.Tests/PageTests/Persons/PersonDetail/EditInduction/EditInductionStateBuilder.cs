@@ -12,8 +12,9 @@ public class EditInductionStateBuilder
     private DateOnly? CompletedDate { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
     private PersonInductionChangeReason? ChangeReason { get; set; }
-    private bool? HasAdditionalReasonDetail { get; set; }
-    private string? AdditionalReasonDetail { get; set; }
+    private bool? ProvideAdditionalInformation { get; set; }
+    private string? AdditionalInformation { get; set; }
+    private string? ChangeReasonDetail { get; set; }
     private EvidenceUploadModel Evidence { get; set; } = new();
     private InductionJourneyPage? JourneyStartPage { get; set; }
     private bool Initialized { get; set; }
@@ -55,16 +56,17 @@ public class EditInductionStateBuilder
         return this;
     }
 
-    public EditInductionStateBuilder WithReasonChoice(PersonInductionChangeReason option)
+    public EditInductionStateBuilder WithReasonChoice(PersonInductionChangeReason option, string? changeReasonDetail = null)
     {
         ChangeReason = option;
+        ChangeReasonDetail = changeReasonDetail;
         return this;
     }
 
-    public EditInductionStateBuilder WithReasonDetailsChoice(bool addDetails, string? detailText = null)
+    public EditInductionStateBuilder WithAdditionalInformationChoice(bool addDetails, string? detailText = null)
     {
-        HasAdditionalReasonDetail = addDetails;
-        AdditionalReasonDetail = detailText;
+        AdditionalInformation = detailText;
+        ProvideAdditionalInformation = addDetails;
         return this;
     }
 
@@ -93,11 +95,12 @@ public class EditInductionStateBuilder
             CompletedDate = CompletedDate,
             ExemptionReasonIds = ExemptionReasonIds,
             ChangeReason = ChangeReason,
-            HasAdditionalReasonDetail = HasAdditionalReasonDetail,
-            ChangeReasonDetail = AdditionalReasonDetail,
+            ProvideAdditionalInformation = ProvideAdditionalInformation,
+            ChangeReasonDetail = ChangeReasonDetail,
             JourneyStartPage = JourneyStartPage,
             Evidence = Evidence,
-            Initialized = Initialized
+            Initialized = Initialized,
+            AdditionalInformation = AdditionalInformation
         };
     }
 }

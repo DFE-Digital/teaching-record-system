@@ -173,6 +173,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
+                additionalInformation: null,
                 out _);
             await dbContext.SaveChangesAsync();
         });
@@ -356,6 +357,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
+                additionalInformation: null,
                 out _);
 
             await dbContext.SaveChangesAsync();
@@ -411,6 +413,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
+                additionalInformation: null,
                 out _);
             await dbContext.SaveChangesAsync();
         });
