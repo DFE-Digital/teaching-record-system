@@ -1,4 +1,5 @@
 using Hangfire;
+using Htmx.TagHelpers;
 using Joonasw.AspNetCore.SecurityHeaders;
 using TeachingRecordSystem.SupportUi.Endpoints;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -76,6 +77,8 @@ public class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+
+        app.MapHtmxAntiforgeryScript();
 
         app.MapRazorPages().WithStaticAssets();
         app.MapControllers().WithStaticAssets();

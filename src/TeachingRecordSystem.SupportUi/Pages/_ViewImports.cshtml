@@ -1,13 +1,15 @@
 @using GovUk.Frontend.AspNetCore
+@using Htmx
 @using Microsoft.AspNetCore.Http.Features
 @using TeachingRecordSystem.Core.Models
 @using TeachingRecordSystem.WebCommon
 @using TeachingRecordSystem.SupportUi
 @using TagColor = TeachingRecordSystem.SupportUi.TagHelpers.TagColor;
 @namespace TeachingRecordSystem.SupportUi.Pages
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper *, GovUk.Frontend.AspNetCore
+@addTagHelper *, Htmx.TagHelpers
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper *, TeachingRecordSystem.SupportUi
-@inject TeachingRecordSystem.Core.IFeatureProvider FeatureProvider
-@inject TeachingRecordSystem.SupportUi.SupportUiLinkGenerator LinkGenerator
+@inject IFeatureProvider FeatureProvider
+@inject SupportUiLinkGenerator LinkGenerator
 
