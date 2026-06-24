@@ -1,5 +1,8 @@
+@using Htmx.TagHelpers
+@using Joonasw.AspNetCore.SecurityHeaders.Csp
 @using Microsoft.AspNetCore.Authorization;
 @using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @inject IAuthorizationService AuthorizationService
 @inject IWebHostEnvironment Environment
 @{
@@ -9,15 +12,21 @@
     var headerClass = Environment.IsDevelopment() ? "trs-header--local" :
         System.Environment.GetEnvironmentVariable("ENVIRONMENT_NAME") is string aksEnvName ? $"trs-header--{aksEnvName}" :
         null;
+
+    var cspService = Context.RequestServices.GetRequiredService<ICspNonceService>();
+    var cspNonce = ViewBag.CspNonce = cspService.GetNonce();
 }
 
 @section Head {
     <meta name="robots" content="noindex">
+    <meta name="htmx-config" includeAspNetAntiforgeryToken="true" includeIndicatorStyles="false">
     <link rel="stylesheet" href="~/app.css">
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/Components/accessible-autocomplete.min.css">
     <script src="~/Components/accessible-autocomplete.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/htmx.min.js"></script>
+    <script src="@HtmxAntiforgeryScriptEndpoints.Path" defer></script>
 }
 
 @section GovUkHeader {
@@ -97,4 +106,23 @@
             </govuk-footer-meta-items>
         </govuk-footer-meta>
     </govuk-footer>
+}
+
+@section BodyEnd {
+    <!script type="importmap" nonce="@cspNonce">
+        {
+            "imports": {
+                "govuk-frontend": "/govuk-frontend.min.js"
+            }
+        }
+    </!script>
+    <script type="module" asp-add-nonce="true">
+        import { initAll } from "govuk-frontend";
+        initAll();
+
+        document.addEventListener("htmx:afterSwap", function(evt) {
+            var el = evt.detail.elt;
+            initAll(el);
+        });
+    </script>
 }

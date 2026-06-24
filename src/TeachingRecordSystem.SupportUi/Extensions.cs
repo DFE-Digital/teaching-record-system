@@ -1,6 +1,5 @@
 using GovUk.Frontend.AspNetCore.TagHelpers;
 using Joonasw.AspNetCore.SecurityHeaders;
-using Joonasw.AspNetCore.SecurityHeaders.Csp;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
@@ -49,11 +48,6 @@ public static class Extensions
         {
             options.DefaultButtonPreventDoubleClick = true;
             options.DefaultFileUploadJavaScriptEnhancements = true;
-            options.GetCspNonceForRequest = context =>
-            {
-                var cspService = context.RequestServices.GetRequiredService<ICspNonceService>();
-                return cspService.GetNonce();
-            };
         });
 
         services.AddCsp(nonceByteAmount: 32);

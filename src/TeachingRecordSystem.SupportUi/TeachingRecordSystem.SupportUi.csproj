@@ -11,6 +11,8 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
+    <PackageReference Include="Htmx" />
+    <PackageReference Include="Htmx.TagHelpers" />
     <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
