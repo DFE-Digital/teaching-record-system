@@ -8,6 +8,4 @@ public record NotConnectingOutcomeOptions
     public required SupportTask SupportTask { get; init; }
     public required OneLoginUserNotConnectingReason NotConnectingReason { get; init; }
     public required string? NotConnectingAdditionalDetails { get; init; }
-    public required RecordMatchingPolicy RecordMatchingPolicy { get; init; }
-    public required string? EmailTemplateId { get; init; }
 }

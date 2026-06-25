@@ -43,6 +43,8 @@ public partial class OneLoginUserMatchingSupportTaskService
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
+        var appContent = await GetAppContentAsync(data.ClientApplicationUserId);
+
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
             {
@@ -62,7 +64,13 @@ public partial class OneLoginUserMatchingSupportTaskService
         var reason = options.RejectReason is OneLoginIdVerificationRejectReason.AnotherReason
             ? options.RejectionAdditionalDetails!
             : options.RejectReason.GetDisplayName()!;
-        await oneLoginService.EnqueueNotVerifiedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, reason, processContext, options.EmailTemplateId);
+
+        await oneLoginService.EnqueueNotVerifiedEmailAsync(
+            supportTask.OneLoginUser!.EmailAddress!,
+            name,
+            reason,
+            appContent?.OneLoginNotVerifiedEmailTemplateId,
+            processContext);
     }
 
     public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithMatchesOutcomeOptions options, ProcessContext processContext)
@@ -71,6 +79,10 @@ public partial class OneLoginUserMatchingSupportTaskService
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
+
+        var applicationUser = await GetApplicationUserAsync(supportTask);
+        var recordMatchingPolicy = applicationUser.RecordMatchingPolicy;
+        var appContent = applicationUser.AppContent;
 
         await oneLoginService.SetUserVerifiedAsync(
             new SetUserVerifiedOptions
@@ -83,13 +95,19 @@ public partial class OneLoginUserMatchingSupportTaskService
             },
             processContext);
 
-        if (options.RecordMatchingPolicy == RecordMatchingPolicy.Deferred && options.EmailTemplateId is not null)
+        if (recordMatchingPolicy == RecordMatchingPolicy.Deferred && appContent?.OneLoginNotConnectedEmailTemplateId is { } templateId)
         {
             var name = $"{data.StatedFirstName} {data.StatedLastName}";
             var reason = options.NotConnectingReason is OneLoginUserNotConnectingReason.AnotherReason
                 ? options.NotConnectingAdditionalDetails!
                 : options.NotConnectingReason.GetDisplayName()!;
-            await oneLoginService.EnqueueNotConnectedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, reason, processContext, options.EmailTemplateId);
+
+            await oneLoginService.EnqueueNotConnectedEmailAsync(
+                supportTask.OneLoginUser!.EmailAddress!,
+                name,
+                reason,
+                templateId,
+                processContext);
         }
 
         await supportTaskService.UpdateSupportTaskAsync(
@@ -114,6 +132,8 @@ public partial class OneLoginUserMatchingSupportTaskService
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
+
+        var appContent = await GetAppContentAsync(data.ClientApplicationUserId);
 
         await oneLoginService.SetUserVerifiedAsync(
             new SetUserVerifiedOptions
@@ -140,7 +160,13 @@ public partial class OneLoginUserMatchingSupportTaskService
             processContext);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
-        await oneLoginService.EnqueueRecordNotFoundEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId, options.EmailReplyToId);
+
+        await oneLoginService.EnqueueRecordNotFoundEmailAsync(
+            supportTask.OneLoginUser!.EmailAddress!,
+            name,
+            appContent?.OneLoginCannotFindRecordEmailTemplateId,
+            appContent?.SupportEmailAddressNotifyId,
+            processContext);
     }
 
     public async Task ResolveVerificationSupportTaskAsync(VerifiedAndConnectedOutcomeOptions options, ProcessContext processContext)
@@ -149,6 +175,8 @@ public partial class OneLoginUserMatchingSupportTaskService
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
+
+        var appContent = await GetAppContentAsync(data.ClientApplicationUserId);
 
         await oneLoginService.SetUserVerifiedAndMatchedAsync(
             new SetUserVerifiedAndMatchedOptions
@@ -165,7 +193,11 @@ public partial class OneLoginUserMatchingSupportTaskService
             processContext);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
-        await oneLoginService.EnqueueRecordMatchedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, processContext, options.EmailTemplateId, options.EmailReplyToId);
+        await oneLoginService.EnqueueRecordMatchedEmailAsync(
+            supportTask.OneLoginUser!.EmailAddress!,
+            name,
+            appContent?.OneLoginRecordMatchedEmailTemplateId,
+            appContent?.SupportEmailAddressNotifyId, processContext);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>

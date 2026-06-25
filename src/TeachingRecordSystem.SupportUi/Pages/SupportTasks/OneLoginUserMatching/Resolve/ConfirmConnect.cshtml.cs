@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
-using TeachingRecordSystem.SupportUi;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -68,9 +67,7 @@ public class ConfirmConnect(
                 {
                     SupportTask = _supportTask!,
                     MatchedPersonId = MatchedPersonId,
-                    MatchedAttributes = matchedPerson.MatchedAttributes,
-                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginRecordMatchedEmailTemplateId,
-                    EmailReplyToId = JourneyInstance.State.AppContent?.SupportEmailAddressNotifyId
+                    MatchedAttributes = matchedPerson.MatchedAttributes
                 },
                 processContext);
         }
@@ -84,9 +81,7 @@ public class ConfirmConnect(
                     SupportTask = _supportTask!,
                     MatchedPersonId = MatchedPersonId,
                     Trn = matchedPerson.Trn,
-                    MatchedAttributes = matchedPerson.MatchedAttributes,
-                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginRecordMatchedEmailTemplateId,
-                    EmailReplyToId = JourneyInstance.State.AppContent?.SupportEmailAddressNotifyId
+                    MatchedAttributes = matchedPerson.MatchedAttributes
                 },
                 processContext);
         }

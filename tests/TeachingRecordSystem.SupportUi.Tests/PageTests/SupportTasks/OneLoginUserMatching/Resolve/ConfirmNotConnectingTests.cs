@@ -492,10 +492,21 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
         // Assert
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
-            nextPageDoc,
-            "Email sent",
-            string.Format(customFlashMessage, $"{firstName} {lastName}"));
+        if (isRecordMatchingOnlySupportTask)
+        {
+            AssertEx.HtmlDocumentHasFlashNotificationBanner(
+                nextPageDoc,
+                "Email sent",
+                string.Format(customFlashMessage, $"{firstName} {lastName}"));
+        }
+        else
+        {
+            // Id verification support tasks do not report an email as sent, so the default banner is shown.
+            AssertEx.HtmlDocumentHasFlashNotificationBanner(
+                nextPageDoc,
+                "GOV.UK One Login not connected to a record",
+                $"Request closed for {firstName} {lastName}.");
+        }
     }
 
     [Theory]
@@ -514,7 +525,11 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
                 Name = TestData.GenerateApplicationUserName(),
                 ApiRoles = [],
                 IsOidcClient = false,
-                RecordMatchingPolicy = RecordMatchingPolicy.Deferred
+                RecordMatchingPolicy = RecordMatchingPolicy.Deferred,
+                AppContent = new AppContent
+                {
+                    OneLoginNotConnectedEmailTemplateId = Guid.NewGuid().ToString()
+                }
             };
             dbContext.ApplicationUsers.Add(applicationUser);
             await dbContext.SaveChangesAsync();
@@ -551,10 +566,21 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
         // Assert
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
-            nextPageDoc,
-            "Email sent",
-            $"Request closed for {firstName} {lastName}. We’ve sent them an email confirming their GOV.UK One Login is not connected to a teaching record.");
+        if (isRecordMatchingOnlySupportTask)
+        {
+            AssertEx.HtmlDocumentHasFlashNotificationBanner(
+                nextPageDoc,
+                "Email sent",
+                $"Request closed for {firstName} {lastName}. We’ve sent them an email confirming their GOV.UK One Login is not connected to a teaching record.");
+        }
+        else
+        {
+            // Id verification support tasks do not report an email as sent, so the default banner is shown.
+            AssertEx.HtmlDocumentHasFlashNotificationBanner(
+                nextPageDoc,
+                "GOV.UK One Login not connected to a record",
+                $"Request closed for {firstName} {lastName}.");
+        }
     }
 
     [Theory]

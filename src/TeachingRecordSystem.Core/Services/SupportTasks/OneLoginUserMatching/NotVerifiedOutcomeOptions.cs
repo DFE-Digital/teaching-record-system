@@ -8,5 +8,4 @@ public record NotVerifiedOutcomeOptions
     public required SupportTask SupportTask { get; init; }
     public required OneLoginIdVerificationRejectReason RejectReason { get; init; }
     public required string? RejectionAdditionalDetails { get; init; }
-    public required string? EmailTemplateId { get; init; }
 }

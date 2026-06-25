@@ -38,21 +38,37 @@ public partial class OneLoginUserMatchingSupportTaskService
         return supportTask;
     }
 
-    public async Task ResolveRecordMatchingSupportTaskAsync(NotConnectingOutcomeOptions options, ProcessContext processContext)
+    public async Task<ResolveRecordMatchingSupportTaskResult> ResolveRecordMatchingSupportTaskAsync(
+        NotConnectingOutcomeOptions options,
+        ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
 
-        if (options.RecordMatchingPolicy == RecordMatchingPolicy.Deferred && options.EmailTemplateId is not null)
+        var applicationUser = await GetApplicationUserAsync(supportTask);
+        var appContent = applicationUser.AppContent;
+        var recordMatchingPolicy = applicationUser.RecordMatchingPolicy;
+
+        bool emailSent = false;
+
+        if (recordMatchingPolicy == RecordMatchingPolicy.Deferred && appContent?.OneLoginNotConnectedEmailTemplateId is { } templateId)
         {
             var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
             var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
             var reason = options.NotConnectingReason is OneLoginUserNotConnectingReason.AnotherReason
                 ? options.NotConnectingAdditionalDetails!
                 : options.NotConnectingReason.GetDisplayName()!;
-            await oneLoginService.EnqueueNotConnectedEmailAsync(supportTask.OneLoginUser!.EmailAddress!, name, reason, processContext, options.EmailTemplateId);
+
+            await oneLoginService.EnqueueNotConnectedEmailAsync(
+                supportTask.OneLoginUser!.EmailAddress!,
+                name,
+                reason,
+                templateId,
+                processContext);
+
+            emailSent = true;
         }
 
         await supportTaskService.UpdateSupportTaskAsync(
@@ -68,14 +84,19 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
+
+        return new() { EmailSent = emailSent };
     }
 
-    public async Task ResolveRecordMatchingSupportTaskAsync(NoMatchesOutcomeOptions options, ProcessContext processContext)
+    public async Task<ResolveRecordMatchingSupportTaskResult> ResolveRecordMatchingSupportTaskAsync(NoMatchesOutcomeOptions options, ProcessContext processContext)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
+
+        var applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == data.ClientApplicationUserId);
+        var appContent = applicationUser.AppContent;
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
@@ -89,7 +110,11 @@ public partial class OneLoginUserMatchingSupportTaskService
             },
             processContext);
 
-        if (options.EmailTemplateId is not null)
+        var emailTemplateId = applicationUser.RecordMatchingPolicy is RecordMatchingPolicy.Deferred
+            ? null
+            : appContent?.OneLoginCannotFindRecordEmailTemplateId;
+
+        if (emailTemplateId is not null)
         {
             var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
             var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
@@ -97,10 +122,14 @@ public partial class OneLoginUserMatchingSupportTaskService
             await oneLoginService.EnqueueRecordNotFoundEmailAsync(
                 supportTask.OneLoginUser!.EmailAddress!,
                 name,
-                processContext,
-                options.EmailTemplateId,
-                options.EmailReplyToId);
+                emailTemplateId,
+                appContent?.SupportEmailAddressNotifyId,
+                processContext);
+
+            return new() { EmailSent = true };
         }
+
+        return new() { EmailSent = false };
     }
 
     public async Task ResolveRecordMatchingSupportTaskAsync(ConnectedOutcomeOptions options, ProcessContext processContext)
@@ -144,15 +173,16 @@ public partial class OneLoginUserMatchingSupportTaskService
         }
         else
         {
+            var appContent = await GetAppContentAsync(data.ClientApplicationUserId);
+
             var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
             var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
 
             await oneLoginService.EnqueueRecordMatchedEmailAsync(
                 supportTask.OneLoginUser!.EmailAddress!,
                 name,
-                processContext,
-                options.EmailTemplateId,
-                options.EmailReplyToId);
+                appContent?.OneLoginRecordMatchedEmailTemplateId,
+                appContent?.SupportEmailAddressNotifyId, processContext);
         }
     }
 }

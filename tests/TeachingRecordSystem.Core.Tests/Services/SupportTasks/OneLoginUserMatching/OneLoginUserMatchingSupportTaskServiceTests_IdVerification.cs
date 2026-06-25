@@ -76,8 +76,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         {
             SupportTask = supportTask,
             RejectReason = rejectReason,
-            RejectionAdditionalDetails = rejectionAdditionalDetails,
-            EmailTemplateId = null
+            RejectionAdditionalDetails = rejectionAdditionalDetails
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -136,8 +135,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         {
             SupportTask = supportTask,
             RejectReason = reason,
-            RejectionAdditionalDetails = rejectionAdditionalDetails,
-            EmailTemplateId = null
+            RejectionAdditionalDetails = rejectionAdditionalDetails
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -165,8 +163,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         {
             SupportTask = supportTask,
             RejectReason = OneLoginIdVerificationRejectReason.AnotherReason,
-            RejectionAdditionalDetails = rejectionAdditionalDetails,
-            EmailTemplateId = null
+            RejectionAdditionalDetails = rejectionAdditionalDetails
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -186,16 +183,19 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         var customTemplateId = "custom-template-id";
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            appContent: new AppContent { OneLoginNotVerifiedEmailTemplateId = customTemplateId });
+
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t.WithClientApplicationUserId(applicationUser.UserId));
 
         var options = new NotVerifiedOutcomeOptions
         {
             SupportTask = supportTask,
             RejectReason = OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest,
-            RejectionAdditionalDetails = null,
-            EmailTemplateId = customTemplateId
+            RejectionAdditionalDetails = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -226,9 +226,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         {
             SupportTask = supportTask,
             NotConnectingReason = notConnectingReason,
-            NotConnectingAdditionalDetails = notConnectingAdditionalDetails,
-            RecordMatchingPolicy = RecordMatchingPolicy.Required,
-            EmailTemplateId = null
+            NotConnectingAdditionalDetails = notConnectingAdditionalDetails
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -270,18 +268,22 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         var customTemplateId = "custom-template-id";
         var notConnectingReason = OneLoginUserNotConnectingReason.NoMatchingRecord;
+
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            recordMatchingPolicy: RecordMatchingPolicy.Deferred,
+            appContent: new AppContent { OneLoginNotConnectedEmailTemplateId = customTemplateId });
+
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t.WithClientApplicationUserId(applicationUser.UserId));
 
         var options = new VerifiedOnlyWithMatchesOutcomeOptions
         {
             SupportTask = supportTask,
             NotConnectingReason = notConnectingReason,
-            NotConnectingAdditionalDetails = null,
-            RecordMatchingPolicy = RecordMatchingPolicy.Deferred,
-            EmailTemplateId = customTemplateId
+            NotConnectingAdditionalDetails = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -305,18 +307,22 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         var customTemplateId = "custom-template-id";
         var notConnectingAdditionalDetails = Faker.Lorem.Paragraph();
+
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            recordMatchingPolicy: RecordMatchingPolicy.Deferred,
+            appContent: new AppContent { OneLoginNotConnectedEmailTemplateId = customTemplateId });
+
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t.WithClientApplicationUserId(applicationUser.UserId));
 
         var options = new VerifiedOnlyWithMatchesOutcomeOptions
         {
             SupportTask = supportTask,
             NotConnectingReason = OneLoginUserNotConnectingReason.AnotherReason,
-            NotConnectingAdditionalDetails = notConnectingAdditionalDetails,
-            RecordMatchingPolicy = RecordMatchingPolicy.Deferred,
-            EmailTemplateId = customTemplateId
+            NotConnectingAdditionalDetails = notConnectingAdditionalDetails
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -340,15 +346,19 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            recordMatchingPolicy: RecordMatchingPolicy.Required,
+            appContent: new AppContent { OneLoginNotConnectedEmailTemplateId = "custom-template-id" });
+
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t.WithClientApplicationUserId(applicationUser.UserId));
 
         var options = new VerifiedOnlyWithMatchesOutcomeOptions
         {
             SupportTask = supportTask,
             NotConnectingReason = OneLoginUserNotConnectingReason.AnotherReason,
-            NotConnectingAdditionalDetails = Faker.Lorem.Paragraph(),
-            RecordMatchingPolicy = RecordMatchingPolicy.Required,
-            EmailTemplateId = "custom-template-id"
+            NotConnectingAdditionalDetails = Faker.Lorem.Paragraph()
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -373,9 +383,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
 
         var options = new VerifiedOnlyWithoutMatchesOutcomeOptions
         {
-            SupportTask = supportTask,
-            EmailTemplateId = null,
-            EmailReplyToId = null
+            SupportTask = supportTask
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -420,15 +428,17 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         var customReplyToId = "custom-reply-to-id";
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            appContent: new AppContent { SupportEmailAddressNotifyId = customReplyToId });
+
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t.WithClientApplicationUserId(applicationUser.UserId));
 
         var options = new VerifiedOnlyWithoutMatchesOutcomeOptions
         {
-            SupportTask = supportTask,
-            EmailTemplateId = EmailTemplateIds.OneLoginCannotFindRecord,
-            EmailReplyToId = customReplyToId
+            SupportTask = supportTask
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -470,9 +480,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
                 KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
-            ],
-            EmailTemplateId = null,
-            EmailReplyToId = null
+            ]
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -519,14 +527,17 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var matchedPerson = await TestData.CreatePersonAsync();
 
+        var customTemplateId = "custom-template-id";
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            appContent: new AppContent { OneLoginRecordMatchedEmailTemplateId = customTemplateId });
+
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
             oneLoginUser.Subject, t => t
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
                 .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
-                .WithStatedTrn(matchedPerson.Trn!));
-
-        var customTemplateId = "custom-template-id";
+                .WithStatedTrn(matchedPerson.Trn!)
+                .WithClientApplicationUserId(applicationUser.UserId));
 
         var options = new VerifiedAndConnectedOutcomeOptions
         {
@@ -538,9 +549,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
                 KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
-            ],
-            EmailTemplateId = customTemplateId,
-            EmailReplyToId = null
+            ]
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -561,14 +570,17 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var matchedPerson = await TestData.CreatePersonAsync();
 
+        var customReplyToId = "custom-reply-to-id";
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            appContent: new AppContent { SupportEmailAddressNotifyId = customReplyToId });
+
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
             oneLoginUser.Subject, t => t
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
                 .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
-                .WithStatedTrn(matchedPerson.Trn!));
-
-        var customReplyToId = "custom-reply-to-id";
+                .WithStatedTrn(matchedPerson.Trn!)
+                .WithClientApplicationUserId(applicationUser.UserId));
 
         var options = new VerifiedAndConnectedOutcomeOptions
         {
@@ -580,9 +592,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
                 KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
-            ],
-            EmailTemplateId = null,
-            EmailReplyToId = customReplyToId
+            ]
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);

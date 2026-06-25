@@ -44,6 +44,8 @@ public class ConfirmNotConnecting(
             return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
         }
 
+        bool emailSent = false;
+
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
@@ -53,9 +55,7 @@ public class ConfirmNotConnecting(
                 {
                     SupportTask = _supportTask!,
                     NotConnectingReason = JourneyInstance.State.NotConnectingReason!.Value,
-                    NotConnectingAdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails,
-                    RecordMatchingPolicy = JourneyInstance.State.RecordMatchingPolicy!.Value,
-                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginNotConnectedEmailTemplateId
+                    NotConnectingAdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails
                 },
                 processContext);
         }
@@ -63,16 +63,16 @@ public class ConfirmNotConnecting(
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
-            await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
+            var resolveResult = await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new NotConnectingOutcomeOptions
                 {
                     SupportTask = _supportTask!,
                     NotConnectingReason = JourneyInstance.State.NotConnectingReason!.Value,
-                    NotConnectingAdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails,
-                    RecordMatchingPolicy = JourneyInstance.State.RecordMatchingPolicy!.Value,
-                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginNotConnectedEmailTemplateId
+                    NotConnectingAdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails
                 },
                 processContext);
+
+            emailSent = resolveResult.EmailSent;
         }
 
         await JourneyInstance.DeleteAsync();
@@ -81,15 +81,15 @@ public class ConfirmNotConnecting(
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         var personName = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
 
-        var emailSent = JourneyInstance.State.RecordMatchingPolicy == RecordMatchingPolicy.Deferred;
+        var appContent = await supportTaskService.GetAppContentAsync(_supportTask);
 
-        var emailSentMessage = JourneyInstance.State.AppContent?.OneLoginNotConnectedEmailSentFlashMessage is not null
-            ? string.Format(JourneyInstance.State.AppContent.OneLoginNotConnectedEmailSentFlashMessage, personName)
+        var emailSentMessage = appContent?.OneLoginNotConnectedEmailSentFlashMessage is not null
+            ? string.Format(appContent.OneLoginNotConnectedEmailSentFlashMessage, personName)
             : $"Request closed for {personName}. We’ve sent them an email confirming their GOV.UK One Login is not connected to a teaching record.";
 
         TempData.SetFlashNotificationBanner(
-            emailSent ? "Email sent" : "GOV.UK One Login not connected to a record",
-            emailSent ? emailSentMessage : $"Request closed for {personName}.",
+            heading: emailSent ? "Email sent" : "GOV.UK One Login not connected to a record",
+            messageText: emailSent ? emailSentMessage : $"Request closed for {personName}.",
             notificationBannerType: NotificationBannerType.Default);
 
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)

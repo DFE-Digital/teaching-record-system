@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
@@ -31,16 +30,11 @@ public record ResolveOneLoginUserMatchingState : IRegisterJourney, IJourneyWithS
     public OneLoginUserNotConnectingReason? NotConnectingReason { get; set; }
 
     public string? NotConnectingAdditionalDetails { get; set; }
-
-    public AppContent? AppContent { get; set; }
-
-    public RecordMatchingPolicy? RecordMatchingPolicy { get; set; }
 }
 
 [UsedImplicitly]
 public class ResolveOneLoginUserMatchingStateFactory(
-    OneLoginService oneLoginService,
-    TrsDbContext dbContext) :
+    OneLoginService oneLoginService) :
     IJourneyStateFactory<ResolveOneLoginUserMatchingState>
 {
     public Task<ResolveOneLoginUserMatchingState> CreateAsync(CreateJourneyStateContext context)
@@ -78,40 +72,16 @@ public class ResolveOneLoginUserMatchingStateFactory(
             }
         }
 
-        AppContent? appContent = null;
-        RecordMatchingPolicy? recordMatchingPolicy = null;
-        Guid clientApplicationUserId = requestData switch
-        {
-            OneLoginUserIdVerificationData idVerificationData => idVerificationData.ClientApplicationUserId,
-            OneLoginUserRecordMatchingData recordMatchingData => recordMatchingData.ClientApplicationUserId,
-            _ => Guid.Empty
-        };
-
-        if (clientApplicationUserId != Guid.Empty)
-        {
-            var applicationUser = await dbContext.ApplicationUsers
-                .Where(u => u.UserId == clientApplicationUserId)
-                .Select(u => new { u.AppContent, u.RecordMatchingPolicy })
-                .SingleOrDefaultAsync();
-
-            appContent = applicationUser?.AppContent;
-            recordMatchingPolicy = applicationUser?.RecordMatchingPolicy;
-        }
-
         return supportTask.ResolveJourneySavedState?.GetState<ResolveOneLoginUserMatchingState>() is { } existingState ?
             existingState with
             {
                 MatchedPersons = suggestedMatches,
-                AppContent = appContent,
-                RecordMatchingPolicy = recordMatchingPolicy,
                 SavedJourneyState = supportTask.ResolveJourneySavedState
             } :
             new ResolveOneLoginUserMatchingState
             {
                 MatchedPersons = suggestedMatches,
-                Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching ? true : null,
-                AppContent = appContent,
-                RecordMatchingPolicy = recordMatchingPolicy
+                Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching ? true : null
             };
     }
 }
