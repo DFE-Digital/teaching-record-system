@@ -12,7 +12,7 @@
             <key>Email address</key>
             <value use-empty-fallback>@Model.OneLoginUser!.EmailAddress</value>
         </row>
-        @if (!Model.OneLoginUser.IsConnected && Model.OneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.OneLogin)
+        @if (!Model.OneLoginUser!.IsConnected && Model.OneLoginUser!.VerificationRoute == OneLoginUserVerificationRoute.OneLogin)
         {
             <row>
                 <key>Name</key>
