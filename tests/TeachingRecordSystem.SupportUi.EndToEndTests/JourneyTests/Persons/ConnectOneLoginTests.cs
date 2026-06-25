@@ -44,7 +44,7 @@ public class ConnectOneLoginTests(HostFixture hostFixture) : TestBase(hostFixtur
             await page.CheckAsync("input[name='IdentityConfirmed']");
         }
 
-        await page.ClickButtonAsync("Confirm and connect account");
+        await page.ClickButtonAsync("Confirm and connect");
 
         await page.WaitForUrlPathAsync($"/persons/{person.PersonId}");
         var expectedFlashMessage = $"Record connected to {StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
