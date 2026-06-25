@@ -1,0 +1,37 @@
+@{
+    Layout = "_Layout";
+    var selectedTab = (OneLoginDetailSubNavigationTab)ViewBag.SelectedTab;
+    var oneLoginUser = Context.Features.GetRequiredFeature<CurrentOneLoginUserFeature>();
+    var oneLoginUserSubject = oneLoginUser.Subject;
+
+    string title;
+    if (oneLoginUser.PersonId.HasValue && oneLoginUser.VerifiedNames?.Length > 0)
+    {
+        title = StringHelper.JoinNonEmpty(' ', oneLoginUser.VerifiedNames[0]);
+    }
+    else
+    {
+        title = oneLoginUser.EmailAddress!;
+    }
+
+    ViewBag.Title = title;
+}
+
+@section BeforeContent {
+    @RenderSection("BeforeContent", required: false)
+}
+
+<h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <nav class="moj-sub-navigation" aria-label="Sub navigation">
+            <ul class="moj-sub-navigation__list">
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == OneLoginDetailSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUserSubject)">General</a>
+                </li>                
+            </ul>
+        </nav>
+        @RenderBody()
+    </div>
+</div>

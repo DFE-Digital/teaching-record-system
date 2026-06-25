@@ -1,17 +1,111 @@
 @page "/one-logins/{OneLoginUserSubject}"
 @model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.IndexModel
 @{
-    ViewBag.Title = "GOV.UK One Login details";
+    Layout = "Layout";
+    ViewBag.SelectedTab = OneLoginDetailSubNavigationTab.General;
 }
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<govuk-summary-card data-testid="one-login-details">
+    <title>GOV.UK One Login details</title>
+    <govuk-summary-list>
+        <row>
+            <key>Email address</key>
+            <value use-empty-fallback>@Model.OneLoginUser!.EmailAddress</value>
+        </row>
+        @if (!Model.OneLoginUser.IsConnected && Model.OneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.OneLogin)
+        {
+            <row>
+                <key>Name</key>
+                <value use-empty-fallback>@Model.OneLoginUser.VerifiedName</value>
+            </row>
+            <row>
+                <key>Date of birth</key>
+                <value use-empty-fallback>@Model.OneLoginUser.VerifiedDateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+    </govuk-summary-list>
+</govuk-summary-card>
 
-        <p class="govuk-body">This page is under construction.</p>
+@if (!Model.OneLoginUser!.IsConnected)
+{
+    if (Model.OneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.Support || Model.OneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.External)
+    {
+        <govuk-summary-card data-testid="verified-details">
+            <title>Verified details</title>
+            <govuk-summary-list>
+                <row>
+                    <key>Name</key>
+                    <value use-empty-fallback>@Model.OneLoginUser.VerifiedName</value>
+                </row>
+                <row>
+                    <key>Date of birth</key>
+                    <value use-empty-fallback>@Model.OneLoginUser.VerifiedDateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            </govuk-summary-list>
+        </govuk-summary-card>
+    }
+}
 
-        <govuk-button-link href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Index(Model.OneLoginUserSubject)">
+@if (Model.ConnectedPerson is not null)
+{
+    <govuk-summary-card data-testid="connected-record-details">
+        <title>Connected record details</title>
+        <card-actions>
+            <action data-testid="view-record-link" href="@LinkGenerator.Persons.PersonDetail.Index(Model.ConnectedPerson.PersonId)" target="_blank" visually-hidden-text="connected record">View record (opens in new tab)</action>
+        </card-actions>
+        <govuk-summary-list>
+            <row>
+                <key>Name</key>
+                <value>@Model.ConnectedPerson.Name</value>
+            </row>
+            <row>
+                <key>Email address</key>
+                <value use-empty-fallback>@Model.ConnectedPerson.EmailAddress</value>
+            </row>
+            <row>
+                <key>Date of birth</key>
+                <value use-empty-fallback>@Model.ConnectedPerson.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+            <row>
+                <key>TRN</key>
+                <value>@Model.ConnectedPerson.Trn</value>
+            </row>
+            <row>
+                <key>National Insurance number</key>
+                <value use-empty-fallback>@Model.ConnectedPerson.NationalInsuranceNumber</value>
+            </row>
+            <row>
+                <key>Gender</key>
+                <value use-empty-fallback>@Model.ConnectedPerson.Gender?.GetDisplayName()</value>
+            </row>
+            <row>
+                <key>Status</key>
+                <value use-empty-fallback>
+                    @if (Model.ConnectedPerson.Status == PersonStatus.Deactivated)
+                    {
+                        <tag color="TagColor.Grey">Deactivated</tag>
+                    }
+                    else
+                    {
+                        <tag color="TagColor.Green">Active</tag>
+                    }
+                </value>
+            </row>
+        </govuk-summary-list>
+    </govuk-summary-card>
+}
+
+<div class="govuk-button-group">
+    @if (Model.ConnectedPerson is not null)
+    {
+        <govuk-button-link data-testid="disconnect-record-button" href="#" class="govuk-button--secondary">
+            Disconnect record
+        </govuk-button-link>
+    }
+    else
+    {
+        <govuk-button-link data-testid="connect-to-record-button" href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Index(Model.OneLoginUserSubject)">
             Connect to a record
         </govuk-button-link>
-    </div>
+    }
 </div>
