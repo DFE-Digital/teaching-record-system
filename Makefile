@@ -66,7 +66,6 @@ terraform-init: vendor-modules
 	$(eval export TF_VAR_config=${CONFIG})
 	$(eval export TF_VAR_environment_short_name=$(CONFIG_SHORT))
 	$(eval export TF_VAR_azure_resource_prefix=$(AZURE_RESOURCE_PREFIX))
-	$(eval export TF_VAR_docker_image?=dummy-string)
 
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
 
