@@ -6,7 +6,8 @@ public record SupportTaskUpdatedEvent : IEvent
 {
     public required Guid EventId { get; init; }
     Guid[] IEvent.PersonIds => IEvent.CoalescePersonIds(SupportTask.PersonId);
-    string[] IEvent.OneLoginUserSubjects => [];
+    string[] IEvent.OneLoginUserSubjects => SupportTask.OneLoginUserSubject is { } oneLoginUserSubject ? [oneLoginUserSubject] : [];
+    string[] IEvent.SupportTaskReferences => [SupportTask.SupportTaskReference];
     [JsonIgnore]
     public Guid? PersonId => SupportTask.PersonId;
     public required string SupportTaskReference { get; init; }

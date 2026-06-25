@@ -9,6 +9,7 @@ public interface IEvent
     Guid EventId { get; }
     Guid[] PersonIds { get; }
     string[] OneLoginUserSubjects { get; }
+    string[] SupportTaskReferences { get; }
 
     public static JsonSerializerOptions SerializerOptions => new()
     {

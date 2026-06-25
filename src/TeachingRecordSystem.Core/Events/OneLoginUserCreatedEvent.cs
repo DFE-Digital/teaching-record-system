@@ -7,6 +7,7 @@ public record OneLoginUserCreatedEvent : IEvent
     public required Guid EventId { get; init; }
     Guid[] IEvent.PersonIds => IEvent.CoalescePersonIds(OneLoginUser.PersonId);
     public string[] OneLoginUserSubjects => [OneLoginUser.Subject];
+    string[] IEvent.SupportTaskReferences => [];
     [JsonIgnore]
     public Guid? PersonId => OneLoginUser.PersonId;
     public required EventModels.OneLoginUser OneLoginUser { get; init; }

@@ -5,6 +5,7 @@ public record TrnRequestUpdatedEvent : IEvent
     public required Guid EventId { get; init; }
     Guid[] IEvent.PersonIds => [];
     string[] IEvent.OneLoginUserSubjects => [];
+    string[] IEvent.SupportTaskReferences => [];
     public required Guid SourceApplicationUserId { get; init; }
     public required string RequestId { get; init; }
     public required TrnRequestUpdatedChanges Changes { get; init; }

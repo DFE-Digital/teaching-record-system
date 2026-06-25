@@ -6,5 +6,6 @@ public record EmailSentEvent : IEvent
     Guid[] IEvent.PersonIds => IEvent.CoalescePersonIds(PersonId);
     public required Guid? PersonId { get; set; }
     string[] IEvent.OneLoginUserSubjects => [];
+    string[] IEvent.SupportTaskReferences => [];
     public required EventModels.Email Email { get; init; }
 }

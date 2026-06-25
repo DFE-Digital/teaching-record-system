@@ -28,6 +28,8 @@ public partial class TestData
                 DqtUserId = null,
                 DqtUserName = null,
                 PersonIds = events.SelectMany(e => e.PersonIds).Distinct().ToList(),
+                OneLoginUserSubjects = events.SelectMany(e => e.OneLoginUserSubjects).Distinct().ToList(),
+                SupportTaskReferences = events.SelectMany(e => e.SupportTaskReferences).Distinct().ToList(),
                 ChangeReason = changeReason
             };
 
@@ -43,6 +45,7 @@ public partial class TestData
                     Payload = @event,
                     PersonIds = @event.PersonIds,
                     OneLoginUserSubjects = @event.OneLoginUserSubjects,
+                    SupportTaskReferences = @event.SupportTaskReferences,
                     CreatedOn = TimeProvider.UtcNow
                 });
             }

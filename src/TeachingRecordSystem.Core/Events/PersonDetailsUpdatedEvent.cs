@@ -5,6 +5,7 @@ public record PersonDetailsUpdatedEvent : IEvent
     public required Guid EventId { get; init; }
     Guid[] IEvent.PersonIds => [PersonId];
     string[] IEvent.OneLoginUserSubjects => [];
+    string[] IEvent.SupportTaskReferences => [];
     public required Guid PersonId { get; init; }
     public required EventModels.PersonDetails PersonDetails { get; init; }
     public required EventModels.PersonDetails OldPersonDetails { get; init; }
