@@ -18,11 +18,12 @@ public class OneLoginService(
     IBackgroundJobScheduler backgroundJobScheduler,
     TimeProvider timeProvider)
 {
-    // ID's database has a user_id column to indicate that a TRN token has been used already.
-    // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
-    private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
-
-    public async Task EnqueueNotVerifiedEmailAsync(string emailAddress, string personName, string reason, ProcessContext processContext, string? templateId = null)
+    public async Task EnqueueNotVerifiedEmailAsync(
+        string emailAddress,
+        string personName,
+        string reason,
+        string? templateId,
+        ProcessContext processContext)
     {
         var email = new Email
         {
@@ -38,7 +39,11 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task EnqueueRecordNotFoundEmailAsync(string emailAddress, string personName, ProcessContext processContext, string? templateId = null, string? emailReplyToId = null)
+    public async Task EnqueueRecordNotFoundEmailAsync(string emailAddress,
+        string personName,
+        string? templateId,
+        string? emailReplyToId,
+        ProcessContext processContext)
     {
         var email = new Email
         {
@@ -55,7 +60,11 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task EnqueueRecordMatchedEmailAsync(string emailAddress, string personName, ProcessContext processContext, string? templateId = null, string? emailReplyToId = null)
+    public async Task EnqueueRecordMatchedEmailAsync(string emailAddress,
+        string personName,
+        string? templateId,
+        string? emailReplyToId,
+        ProcessContext processContext)
     {
         var personalization = new Dictionary<string, string>
         {
@@ -77,7 +86,11 @@ public class OneLoginService(
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task EnqueueNotConnectedEmailAsync(string emailAddress, string personName, string reason, ProcessContext processContext, string? templateId = null)
+    public async Task EnqueueNotConnectedEmailAsync(string emailAddress,
+        string personName,
+        string reason,
+        string? templateId,
+        ProcessContext processContext)
     {
         var email = new Email
         {
@@ -130,7 +143,6 @@ public class OneLoginService(
 
     public async Task SetUserUnmatchedAsync(string oneLoginSubject, ProcessContext processContext)
     {
-
         var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject);
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
@@ -138,7 +150,6 @@ public class OneLoginService(
         user.SetUnmatched();
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         await dbContext.SaveChangesAsync();
-
 
         var updatedEvent = new OneLoginUserUpdatedEvent
         {

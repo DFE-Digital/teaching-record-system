@@ -86,14 +86,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
-            state =>
-            {
-                state.Verified = true;
-                state.AppContent = new Core.Models.AppContent
-                {
-                    OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString()
-                };
-            },
+            state => state.Verified = true,
             matchedPersons: []);
 
         var request = new HttpRequestMessage(
@@ -136,21 +129,22 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         var firstName = TestData.GenerateFirstName();
         var lastName = TestData.GenerateLastName();
+
+        // An email is only sent for a record matching task when the application user has a Required
+        // record matching policy and a "cannot find record" email template configured.
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            recordMatchingPolicy: RecordMatchingPolicy.Required,
+            appContent: new AppContent { OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString() });
+
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
             oneLoginUser.Subject, t => t
-                .WithVerifiedNames([firstName, lastName]));
+                .WithVerifiedNames([firstName, lastName])
+                .WithClientApplicationUserId(applicationUser.UserId));
         var supportTaskData = supportTask.GetData<OneLoginUserRecordMatchingData>();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
-            state =>
-            {
-                state.Verified = true;
-                state.AppContent = new AppContent
-                {
-                    OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString()
-                };
-            },
+            state => state.Verified = true,
             matchedPersons: []);
 
         var request = new HttpRequestMessage(
@@ -314,20 +308,21 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
         // Arrange
         var customFlashMessage = "Request closed for {0}. We’ve sent them an email with a link to continue their national professional qualification (NPQ) registration.";
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var applicationUser = await TestData.CreateApplicationUserAsync(
+            appContent: new AppContent
+            {
+                OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString(),
+                OneLoginNoMatchesEmailSentFlashMessage = customFlashMessage
+            });
+
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t.WithClientApplicationUserId(applicationUser.UserId));
         var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
-            state =>
-            {
-                state.Verified = true;
-                state.AppContent = new AppContent
-                {
-                    OneLoginCannotFindRecordEmailTemplateId = Guid.NewGuid().ToString(),
-                    OneLoginNoMatchesEmailSentFlashMessage = customFlashMessage
-                };
-            },
+            state => state.Verified = true,
             matchedPersons: []);
 
         var request = new HttpRequestMessage(
@@ -376,9 +371,11 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
     }
 
     [Fact]
-    public async Task Post_RecordMatchingSupportTaskWithoutAppContent_UsesDefaultTemplateAndSendsEmail()
+    public async Task Post_RecordMatchingSupportTaskWithoutAppContent_DoesNotSendEmailAndUsesRequestClosedFlashMessage()
     {
         // Arrange
+        // The default application user has a Deferred record matching policy and no app content, so no
+        // "cannot find record" email is sent for a record matching task.
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         var firstName = TestData.GenerateFirstName();
         var lastName = TestData.GenerateLastName();
@@ -403,7 +400,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
-            "Email sent",
-            $"Request closed for {firstName} {lastName}. We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.");
+            "Request closed",
+            $"Request closed for {firstName} {lastName}.");
     }
 }

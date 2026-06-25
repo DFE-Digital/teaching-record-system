@@ -41,6 +41,8 @@ public class NoMatches(
                 linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
         }
 
+        bool emailSent;
+
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
@@ -48,42 +50,37 @@ public class NoMatches(
             await supportTaskService.ResolveVerificationSupportTaskAsync(
                 new VerifiedOnlyWithoutMatchesOutcomeOptions
                 {
-                    SupportTask = _supportTask!,
-                    EmailTemplateId = JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId ?? EmailTemplateIds.OneLoginCannotFindRecord,
-                    EmailReplyToId = JourneyInstance.State.AppContent?.SupportEmailAddressNotifyId ?? null
+                    SupportTask = _supportTask!
                 },
                 processContext);
+
+            emailSent = true;
         }
         else
         {
             var processContext = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
-            var emailTemplateId = JourneyInstance.State.RecordMatchingPolicy == RecordMatchingPolicy.Deferred
-                ? null
-                : JourneyInstance.State.AppContent?.OneLoginCannotFindRecordEmailTemplateId ?? EmailTemplateIds.OneLoginCannotFindRecord;
-
-            await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
+            var resolveResult = await supportTaskService.ResolveRecordMatchingSupportTaskAsync(
                 new NoMatchesOutcomeOptions
                 {
-                    SupportTask = _supportTask!,
-                    EmailTemplateId = emailTemplateId,
-                    EmailReplyToId = JourneyInstance.State.AppContent?.SupportEmailAddressNotifyId ?? null
+                    SupportTask = _supportTask!
                 },
                 processContext);
+
+            emailSent = resolveResult.EmailSent;
         }
 
         await JourneyInstance.DeleteAsync();
 
-        var emailSent = _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification ||
-            JourneyInstance.State.RecordMatchingPolicy != RecordMatchingPolicy.Deferred;
+        var appContent = await supportTaskService.GetAppContentAsync(_supportTask);
 
-        var emailSentMessage = JourneyInstance.State.AppContent?.OneLoginNoMatchesEmailSentFlashMessage is not null
-            ? string.Format(JourneyInstance.State.AppContent.OneLoginNoMatchesEmailSentFlashMessage, Name)
+        var emailSentMessage = appContent?.OneLoginNoMatchesEmailSentFlashMessage is not null
+            ? string.Format(appContent.OneLoginNoMatchesEmailSentFlashMessage, Name)
             : $"Request closed for {Name}. We’ve sent them an email confirming we could not find a teaching record matching their GOV.UK One Login.";
 
         TempData.SetFlashNotificationBanner(
-            emailSent ? "Email sent" : "Request closed",
-            emailSent ? emailSentMessage : $"Request closed for {Name}.",
+            heading: emailSent ? "Email sent" : "Request closed",
+            messageText: emailSent ? emailSentMessage : $"Request closed for {Name}.",
             notificationBannerType: NotificationBannerType.Default);
 
         return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
@@ -113,7 +110,8 @@ public class NoMatches(
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         Name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
 
-        NoMatchesPageContent = JourneyInstance.State.AppContent?.OneLoginNoMatchesPageContentHtml;
+        var appContent = await supportTaskService.GetAppContentAsync(_supportTask);
+        NoMatchesPageContent = appContent?.OneLoginNoMatchesPageContentHtml;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
