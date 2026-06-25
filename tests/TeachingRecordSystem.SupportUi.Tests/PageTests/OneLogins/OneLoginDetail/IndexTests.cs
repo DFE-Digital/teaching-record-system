@@ -108,8 +108,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var verifiedDetailsCard = doc.GetElementByTestId("verified-details");
         Assert.NotNull(verifiedDetailsCard);
-        verifiedDetailsCard.AssertSummaryListRowValue("Verified name", v => Assert.Equal("Jane Smith", v.TrimmedText()));
-        verifiedDetailsCard.AssertSummaryListRowValue("Verified date of birth", v => Assert.Equal(verifiedDateOfBirth.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+        verifiedDetailsCard.AssertSummaryListRowValue("Name", v => Assert.Equal("Jane Smith", v.TrimmedText()));
+        verifiedDetailsCard.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(verifiedDateOfBirth.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
     }
 
     [Fact]
