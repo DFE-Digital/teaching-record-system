@@ -15,13 +15,15 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 name: "one_login_user_subjects",
                 table: "processes",
                 type: "text[]",
-                nullable: false);
+                nullable: false,
+                defaultValue: new string[0]);
 
             migrationBuilder.AddColumn<List<string>>(
                 name: "support_task_references",
                 table: "processes",
                 type: "text[]",
-                nullable: false);
+                nullable: false,
+                defaultValue: new string[0]);
 
             migrationBuilder.AddColumn<string[]>(
                 name: "support_task_references",
@@ -29,32 +31,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 type: "text[]",
                 nullable: false,
                 defaultValue: new string[0]);
-
-            migrationBuilder.Sql(
-                """
-                update process_events set one_login_user_subjects = ARRAY[payload->'SupportTask'->>'OneLoginUserSubject']::varchar[]
-                where event_name in ('SupportTaskCreatedEvent', 'SupportTaskDeletedEvent', 'SupportTaskUpdatedEvent')
-                and payload->'SupportTask'->>'OneLoginUserSubject' is not null;
-
-                update process_events set support_task_references = ARRAY[payload->'SupportTask'->>'SupportTaskReference']::varchar[]
-                where event_name in ('SupportTaskCreatedEvent', 'SupportTaskDeletedEvent', 'SupportTaskUpdatedEvent');
-
-                update processes set one_login_user_subjects = pe.one_login_user_subjects
-                from (
-                    select process_id, array_agg(distinct one_login_user_subject) one_login_user_subjects
-                    from process_events, unnest(one_login_user_subjects) as one_login_user_subject
-                	group by process_id
-                ) as pe
-                where processes.process_id = pe.process_id;
-
-                update processes set support_task_references = pe.support_task_references
-                from (
-                    select process_id, array_agg(distinct support_task_reference) support_task_references
-                    from process_events, unnest(support_task_references) as support_task_reference
-                	group by process_id
-                ) as pe
-                where processes.process_id = pe.process_id;
-                """);
 
             migrationBuilder.CreateIndex(
                 name: "ix_processes_one_login_user_subjects",
