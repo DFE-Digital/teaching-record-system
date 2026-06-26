@@ -71,6 +71,8 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
             processContext.Process.UpdatedOn = processContext.Now;
 
             @event.PersonIds.Except(processContext.Process.PersonIds).ForEach(e => processContext.Process.PersonIds.Add(e));
+            @event.OneLoginUserSubjects.Except(processContext.Process.OneLoginUserSubjects).ForEach(e => processContext.Process.OneLoginUserSubjects.Add(e));
+            @event.SupportTaskReferences.Except(processContext.Process.SupportTaskReferences).ForEach(e => processContext.Process.SupportTaskReferences.Add(e));
 
             var processEvent = new ProcessEvent
             {
@@ -80,6 +82,7 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
                 Payload = @event,
                 PersonIds = @event.PersonIds,
                 OneLoginUserSubjects = @event.OneLoginUserSubjects,
+                SupportTaskReferences = @event.SupportTaskReferences,
                 CreatedOn = processContext.Now
             };
             dbContext.Set<ProcessEvent>().Add(processEvent);
@@ -165,6 +168,8 @@ public class ProcessContext
             DqtUserId = raisedBy.DqtUserId,
             DqtUserName = raisedBy.DqtUserName,
             PersonIds = [],
+            OneLoginUserSubjects = [],
+            SupportTaskReferences = [],
             Events = [],
             ChangeReason = changeReason
         };

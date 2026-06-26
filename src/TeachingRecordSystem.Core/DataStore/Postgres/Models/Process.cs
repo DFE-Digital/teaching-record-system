@@ -14,5 +14,7 @@ public class Process
     public required string? DqtUserName { get; init; }
     public ICollection<ProcessEvent>? Events { get; init; }
     public required List<Guid> PersonIds { get; init; }
+    public required List<string> OneLoginUserSubjects { get; init; }
+    public required List<string> SupportTaskReferences { get; init; }
     public required IChangeReasonInfo? ChangeReason { get; init; }
 }

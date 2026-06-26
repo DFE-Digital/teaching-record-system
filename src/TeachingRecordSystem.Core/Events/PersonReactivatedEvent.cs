@@ -5,6 +5,7 @@ public record PersonReactivatedEvent : IEvent
     public required Guid EventId { get; init; }
     Guid[] IEvent.PersonIds => [PersonId];
     string[] IEvent.OneLoginUserSubjects => [];
+    string[] IEvent.SupportTaskReferences => [];
     public required PersonReactivatedEventChanges Changes { get; init; }
     public required Guid PersonId { get; init; }
 }

@@ -15,6 +15,8 @@ public class ProcessMapping : IEntityTypeConfiguration<Process>
         builder.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId);
         builder.HasIndex(p => p.ProcessType);
         builder.HasIndex(p => p.PersonIds).HasMethod("GIN");
+        builder.HasIndex(p => p.OneLoginUserSubjects).HasMethod("GIN").IsCreatedConcurrently();
+        builder.HasIndex(p => p.SupportTaskReferences).HasMethod("GIN").IsCreatedConcurrently();
         builder.Property(p => p.ChangeReason)
             .HasColumnType("jsonb")
             .HasConversion(
