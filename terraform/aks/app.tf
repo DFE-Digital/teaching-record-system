@@ -12,7 +12,7 @@ module "migrations_job_configuration" {
     ENVIRONMENT_NAME = var.environment_name
   }
   secret_variables = {
-    CONNECTION_STRING = module.postgres.dotnet_connection_string
+    CONNECTION_STRING = "${module.postgres.dotnet_connection_string};Command Timeout=0"
   }
 }
 
