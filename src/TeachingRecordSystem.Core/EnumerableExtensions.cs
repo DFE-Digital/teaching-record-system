@@ -5,11 +5,11 @@ public static class EnumerableExtensions
     public static IReadOnlyCollection<T> AsReadOnly<T>(this IEnumerable<T> enumerable) =>
         enumerable as IReadOnlyCollection<T> ?? enumerable.ToArray();
 
-    public static T First<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) =>
+    public static T First<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) where T : notnull =>
         source.FirstOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);
 
 #pragma warning disable CA1720
-    public static T Single<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) =>
+    public static T Single<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) where T : notnull =>
 #pragma warning restore CA1720
         source.SingleOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);
 
