@@ -17,7 +17,7 @@ public abstract class JobTestBase
 
     protected EventCapture Events => TestScopedServices.GetCurrent().Events;
 
-    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider TimeProvider => TestScopedServices.GetCurrent().TimeProvider;
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => _fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 

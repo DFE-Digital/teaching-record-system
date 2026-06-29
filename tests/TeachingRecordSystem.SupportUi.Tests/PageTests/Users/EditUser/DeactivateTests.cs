@@ -587,7 +587,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
             Assert.Null(userCreatedEvent.DeactivatedReason);
             Assert.Null(userCreatedEvent.DeactivatedReasonDetail);
@@ -636,7 +636,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
             Assert.Equal("Some additional reason", userCreatedEvent.DeactivatedReason);
             Assert.Equal("Some more information", userCreatedEvent.DeactivatedReasonDetail);
@@ -686,7 +686,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
             Assert.Null(userCreatedEvent.DeactivatedReason);
             Assert.Null(userCreatedEvent.DeactivatedReasonDetail);
@@ -736,7 +736,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
             Assert.Null(userCreatedEvent.DeactivatedReason);
             Assert.Null(userCreatedEvent.DeactivatedReasonDetail);

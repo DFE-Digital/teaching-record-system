@@ -141,7 +141,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var @event = new LegacyEvents.PersonDetailsUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = Clock.UtcNow.AddMinutes(-i),
+                    CreatedUtc = TimeProvider.UtcNow.AddMinutes(-i),
                     RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
                     PersonId = person.PersonId,
                     PersonAttributes = new EventModels.PersonDetails

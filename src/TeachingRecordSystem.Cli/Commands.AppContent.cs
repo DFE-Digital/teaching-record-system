@@ -132,7 +132,7 @@ public partial class Commands
                     }
 
                     var services = new ServiceCollection()
-                        .AddClock()
+                        .AddTimeProvider()
                         .AddDatabase(connectionString)
                         .AddMemoryCache()
                         .AddWebhookMessageFactory()

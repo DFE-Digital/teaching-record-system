@@ -49,7 +49,7 @@ public class SendTrnRecipientEmailJobTests(JobFixture fixture) : JobTestBase(fix
             It.IsAny<IReadOnlyDictionary<string, string>>()));
 
         email = await WithDbContextAsync(dbContext => dbContext.Emails.SingleAsync(e => e.EmailId == email.EmailId));
-        Assert.Equal(Clock.UtcNow, email.SentOn);
+        Assert.Equal(TimeProvider.UtcNow, email.SentOn);
 
         Events.AssertProcessesCreated(x =>
         {

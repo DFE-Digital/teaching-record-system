@@ -32,10 +32,10 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
+        TimeProvider.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
 
-        _oldDob = Clock.Today.AddYears(-30);
-        _dob = Clock.Today.AddYears(-20);
+        _oldDob = TimeProvider.Today.AddYears(-30);
+        _dob = TimeProvider.Today.AddYears(-20);
 
         _createdByUser = await TestData.CreateUserAsync();
         _person = await TestData.CreatePersonAsync();
@@ -115,7 +115,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         var item = doc.GetElementByTestId("timeline-item-persons-merged-event");
         Assert.NotNull(item);
         Assert.Equal($"By {_createdByUser!.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         var title = item.QuerySelector(".moj-timeline__title");
         Assert.NotNull(title);
@@ -213,7 +213,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal($"Record merged into TRN {_person!.Trn} and deactivated", title.TrimmedText());
 
         Assert.Equal($"By {_createdByUser!.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
@@ -316,7 +316,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         var mergedEvent = new LegacyEvents.PersonsMergedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = _createdByUser!.UserId,
             PersonId = _person!.PersonId,
             PersonTrn = _person!.Trn,

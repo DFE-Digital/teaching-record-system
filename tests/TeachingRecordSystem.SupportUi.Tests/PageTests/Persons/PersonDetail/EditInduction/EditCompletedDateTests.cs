@@ -56,7 +56,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
     public async Task Get_WithCompletedDate_ShowsDate()
     {
         // Arrange
-        var dateValid = Clock.Today;
+        var dateValid = TimeProvider.Today;
         var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -84,7 +84,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
     public async Task Post_SetValidCompletedDate_PersistsCompletedDate()
     {
         // Arrange
-        var dateValid = Clock.Today;
+        var dateValid = TimeProvider.Today;
         var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
@@ -92,7 +92,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
-                .WithStartDate(Clock.Today.AddDays(-1))
+                .WithStartDate(TimeProvider.Today.AddDays(-1))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/date-completed?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -118,7 +118,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
-                .WithStartDate(Clock.Today.AddDays(-1))
+                .WithStartDate(TimeProvider.Today.AddDays(-1))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/date-completed?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -134,14 +134,14 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
     public async Task Post_CompletedDateIsInTheFuture_ReturnsError()
     {
         // Arrange
-        var dateTomorrow = Clock.Today.AddDays(1);
+        var dateTomorrow = TimeProvider.Today.AddDays(1);
         var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
-                .WithStartDate(Clock.Today.AddDays(-1))
+                .WithStartDate(TimeProvider.Today.AddDays(-1))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/date-completed?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -160,7 +160,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
     public async Task Post_CompletedDateIsBeforeStartDate_ReturnsError()
     {
         // Arrange
-        var completedDate = Clock.Today.AddDays(-1);
+        var completedDate = TimeProvider.Today.AddDays(-1);
         var startDate = completedDate.AddDays(1);
         var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());

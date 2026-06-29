@@ -97,7 +97,7 @@ public static class Extensions
         }
 
         services
-            .AddClock()
+            .AddTimeProvider()
             .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
             .AddDatabase(configuration)
             .AddHangfire(environment)
@@ -152,7 +152,7 @@ public static class Extensions
         return services;
     }
 
-    public static IServiceCollection AddClock(this IServiceCollection services)
+    public static IServiceCollection AddTimeProvider(this IServiceCollection services)
     {
         services.AddSingleton(TimeProvider.System);
 

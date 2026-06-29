@@ -205,7 +205,7 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithQtls(Clock.Today));
+            .WithQtls(TimeProvider.Today));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
 

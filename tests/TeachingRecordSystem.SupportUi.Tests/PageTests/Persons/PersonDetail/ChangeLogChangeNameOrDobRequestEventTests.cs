@@ -78,7 +78,7 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTask = supportTask,
             OldSupportTask = oldSupportTask,
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = raisedByUser.UserId
         };
 
@@ -159,7 +159,7 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             OldSupportTask = oldSupportTask,
             RejectionReason = "No evidence supplied",
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = raisedByUser.UserId
         };
 
@@ -235,7 +235,7 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTask = supportTask,
             OldSupportTask = oldSupportTask,
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = raisedByUser.UserId,
             Changes = ChangeDateOfBirthRequestSupportTaskApprovedEventChanges.DateOfBirth,
             OldPersonAttributes = new PersonDetails
@@ -330,7 +330,7 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             OldSupportTask = oldSupportTask,
             RejectionReason = "No evidence supplied",
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = raisedByUser.UserId
         };
 

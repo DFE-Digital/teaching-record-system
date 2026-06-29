@@ -15,7 +15,7 @@ public partial class ChangeHistoryTests
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(matchedPerson);
         var user = await TestData.CreateUserAsync();
-        var process = new ProcessContext(ProcessType.PersonOneLoginUserConnecting, Clock.UtcNow, user.UserId);
+        var process = new ProcessContext(ProcessType.PersonOneLoginUserConnecting, TimeProvider.UtcNow, user.UserId);
 
         await OneLoginService.SetUserMatchedAsync(
             new SetUserMatchedOptions
@@ -64,7 +64,7 @@ public partial class ChangeHistoryTests
             Reason = "this is the reason",
             AdditionalInformation = null
         };
-        var process = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, Clock.UtcNow, user.UserId, reason);
+        var process = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, TimeProvider.UtcNow, user.UserId, reason);
 
         await OneLoginService.SetUserUnmatchedAsync(oneLoginUser.Subject!, process);
 
@@ -101,7 +101,7 @@ public partial class ChangeHistoryTests
                 .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
                 .WithStatedTrn(matchedPerson.Trn!));
 
-        var process = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, Clock.UtcNow, user.UserId);
+        var process = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, TimeProvider.UtcNow, user.UserId);
         await OneLoginSupportTaskService.ResolveRecordMatchingSupportTaskAsync(
             new ConnectedOutcomeOptions
             {
@@ -165,7 +165,7 @@ public partial class ChangeHistoryTests
             ]
         };
 
-        var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         await OneLoginSupportTaskService.ResolveVerificationSupportTaskAsync(options, processContext);
 

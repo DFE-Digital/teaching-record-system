@@ -72,7 +72,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
             {
                 ApplicationUserId = applicationUser.UserId,
                 RequestId = trnRequestId,
-                CreatedOn = Clock.UtcNow,
+                CreatedOn = TimeProvider.UtcNow,
                 OneLoginUserSubject = oneLoginUser.Subject,
                 IdentityVerified = true,
                 EmailAddress = oneLoginUser.EmailAddress,

@@ -122,7 +122,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenAwardDateIsEntered_SavesDateAndRedirectsToInductionExemptionPage()
     {
         // Arrange
-        var holdsFrom = Clock.Today.AddYears(-1);
+        var holdsFrom = TimeProvider.Today.AddYears(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory
                 && r.InductionExemptionRequired == FieldRequirement.Mandatory
@@ -168,7 +168,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ImplicitExemptionRoute_WhenAwardDateIsEntered_SavesDateAndRedirectsToNextPage()
     {
         // Arrange
-        var holdsFrom = Clock.Today.AddYears(-1);
+        var holdsFrom = TimeProvider.Today.AddYears(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
             .SingleRandom();
@@ -211,7 +211,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_FromCya_WhenAwardDateIsEntered_RedirectsToCya()
     {
         // Arrange
-        var holdsFrom = Clock.Today.AddYears(-1);
+        var holdsFrom = TimeProvider.Today.AddYears(-1);
         var newAwardDate = holdsFrom.AddMonths(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
@@ -288,7 +288,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenFutureDateIsEntered_ReturnsError()
     {
         // Arrange
-        var holdsDate = Clock.UtcNow.AddDays(1);
+        var holdsDate = TimeProvider.UtcNow.AddDays(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
             .SingleRandom();

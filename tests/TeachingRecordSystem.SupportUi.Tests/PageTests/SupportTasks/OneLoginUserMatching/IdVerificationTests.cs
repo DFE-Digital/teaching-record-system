@@ -78,7 +78,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
         var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject);
         var supportTasks = new[] { supportTask1, supportTask2 };
         var expectedResultsOrderedByReference = supportTasks.OrderBy(s => s.SupportTaskReference).ToArray();
@@ -115,7 +115,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
             .WithStatedFirstName("Aaron")
             .WithStatedLastName("Aerosmith")
             .WithClientApplicationUserId(applicationUser1.UserId));
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject, options => options
             .WithStatedFirstName("Sam")
             .WithStatedLastName("Smith")
@@ -180,7 +180,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
             .WithStatedFirstName("Aaron")
             .WithStatedLastName("Aerosmith")
             .WithClientApplicationUserId(applicationUser1.UserId));
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var supportTask2 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser2.Subject, options => options
             .WithStatedFirstName("Sam")
             .WithStatedLastName("Smith")

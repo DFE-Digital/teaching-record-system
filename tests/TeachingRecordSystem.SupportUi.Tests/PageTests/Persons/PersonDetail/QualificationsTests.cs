@@ -271,7 +271,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     {
         // Arrange
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
-        var holdsFromDate = Clock.Today.AddDays(-1);
+        var holdsFromDate = TimeProvider.Today.AddDays(-1);
         var status = RouteToProfessionalStatusStatus.Holds;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.NiRId);
         var person = await TestData.CreatePersonAsync(p => p

@@ -72,8 +72,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var labelContent = "Status";
 
-        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
-        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? TimeProvider.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? TimeProvider.Today : null;
 
         var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
             ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
@@ -141,8 +141,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var labelContent = "Start date";
 
-        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
-        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? TimeProvider.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? TimeProvider.Today : null;
 
         var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
             ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
@@ -216,8 +216,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var labelContent = "Completion date";
 
-        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
-        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? TimeProvider.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? TimeProvider.Today : null;
 
         var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
             ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
@@ -282,8 +282,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var labelContent = "Exemption reason";
 
-        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
-        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? TimeProvider.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? TimeProvider.Today : null;
 
         //var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
         //    ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
@@ -381,8 +381,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var inductionStatus = InductionStatus.InProgress;
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-2);
+        var completedDate = TimeProvider.Today;
         var exemptionReasonIds = Array.Empty<Guid>();
 
         var editInductionState = new EditInductionStateBuilder()
@@ -436,7 +436,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var inductionStatus = InductionStatus.RequiredToComplete;
-        var startDate = Clock.Today;
+        var startDate = TimeProvider.Today;
         var completedDate = startDate.AddYears(-2);
         var exemptionReasonIds = Array.Empty<Guid>();
 
@@ -475,8 +475,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var inductionStatus = InductionStatus.RequiredToComplete;
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-2);
+        var completedDate = TimeProvider.Today;
         var exemptionReasonIds = (await TestData.ReferenceDataCache
             .GetInductionExemptionReasonsAsync(activeOnly: true))
             .TakeRandom(1)
@@ -518,8 +518,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var inductionStatus = InductionStatus.InProgress;
 
-        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
-        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? TimeProvider.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? TimeProvider.Today : null;
 
         var exemptionReasonIds = Array.Empty<Guid>();
 
@@ -570,7 +570,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             var actualInductionUpdatedEvent = Assert.IsType<PersonInductionUpdatedEvent>(e);
 
-            Assert.Equal(actualInductionUpdatedEvent.CreatedUtc, Clock.UtcNow);
+            Assert.Equal(actualInductionUpdatedEvent.CreatedUtc, TimeProvider.UtcNow);
             Assert.Equal(actualInductionUpdatedEvent.PersonId, person.PersonId);
             Assert.Equal(actualInductionUpdatedEvent.Induction.Status, journeyInstance.State.InductionStatus);
             Assert.Equal(actualInductionUpdatedEvent.Induction.StartDate, journeyInstance.State.StartDate);
@@ -594,8 +594,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var inductionStatus = InductionStatus.InProgress;
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-2);
+        var completedDate = TimeProvider.Today;
         var exemptionReasonIds = Array.Empty<Guid>();
 
         var editInductionState = new EditInductionStateBuilder()
@@ -637,8 +637,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var inductionStatus = InductionStatus.InProgress;
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-2);
+        var completedDate = TimeProvider.Today;
         var exemptionReasonIds = Array.Empty<Guid>();
 
         var editInductionState = new EditInductionStateBuilder()
@@ -681,8 +681,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var evidenceFileId = uploadFile == true ? Guid.NewGuid() : default(Guid?);
         var inductionStatus = InductionStatus.InProgress;
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-2);
+        var completedDate = TimeProvider.Today;
         var exemptionReasonIds = Array.Empty<Guid>();
 
         var editInductionState = new EditInductionStateBuilder()

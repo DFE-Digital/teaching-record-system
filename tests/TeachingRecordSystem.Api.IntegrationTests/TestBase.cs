@@ -49,7 +49,7 @@ public abstract class TestBase
 
     protected Guid ApplicationUserId { get; } = HostFixture.DefaultApplicationUserId;
 
-    protected FakeTimeProvider Clock => _testServices.Clock;
+    protected FakeTimeProvider TimeProvider => _testServices.TimeProvider;
 
     protected ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
 

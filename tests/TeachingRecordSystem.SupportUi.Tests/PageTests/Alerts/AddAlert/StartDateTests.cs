@@ -170,7 +170,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
-        var startDate = Clock.Today.AddDays(2);
+        var startDate = TimeProvider.Today.AddDays(2);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -190,7 +190,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
-        var startDate = Clock.Today;
+        var startDate = TimeProvider.Today;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {

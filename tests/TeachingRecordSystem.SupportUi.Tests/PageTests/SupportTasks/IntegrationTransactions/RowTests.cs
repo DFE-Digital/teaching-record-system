@@ -20,7 +20,7 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
         var fileName1 = "FileName.csv";
         var importStatus1 = IntegrationTransactionImportStatus.Success;
         var interfaceType1 = IntegrationTransactionInterfaceType.EwcWales;
-        var createdOn1 = Clock.UtcNow;
+        var createdOn1 = TimeProvider.UtcNow;
         var integrationTransaction1 = await TestData.CreateIntegrationTransactionAsync(p =>
         {
             p.WithTotalCount(totalCount1);
@@ -69,7 +69,7 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
         var fileName1 = "FileName.csv";
         var importStatus1 = IntegrationTransactionImportStatus.Success;
         var interfaceType1 = IntegrationTransactionInterfaceType.EwcWales;
-        var createdOn1 = Clock.UtcNow;
+        var createdOn1 = TimeProvider.UtcNow;
         var integrationTransaction1 = await TestData.CreateIntegrationTransactionAsync(p =>
         {
             p.WithTotalCount(totalCount1);

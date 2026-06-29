@@ -211,7 +211,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             var updatedPersonRecord = await dbContext.Persons
                 .IgnoreQueryFilters()
                 .SingleAsync(p => p.PersonId == person.PersonId);
-            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(targetStatus, updatedPersonRecord.Status);
         });
 
@@ -221,7 +221,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         {
             var actualEvent = Assert.IsType<PersonStatusUpdatedEvent>(e);
 
-            Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualEvent.PersonId);
             Assert.Equal(targetStatus, actualEvent.Status);
             Assert.Equal(targetStatus == PersonStatus.Deactivated

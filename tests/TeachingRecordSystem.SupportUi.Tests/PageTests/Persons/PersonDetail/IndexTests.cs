@@ -51,8 +51,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 PreviousNameId = Guid.NewGuid(),
                 PersonId = person.PersonId,
-                CreatedOn = Clock.UtcNow.AddDays(-1),
-                UpdatedOn = Clock.UtcNow.AddDays(-1),
+                CreatedOn = TimeProvider.UtcNow.AddDays(-1),
+                UpdatedOn = TimeProvider.UtcNow.AddDays(-1),
                 FirstName = previousFirstName1,
                 MiddleName = previousMiddleName1,
                 LastName = previousLastName1
@@ -62,8 +62,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 PreviousNameId = Guid.NewGuid(),
                 PersonId = person.PersonId,
-                CreatedOn = Clock.UtcNow.AddDays(-2),
-                UpdatedOn = Clock.UtcNow.AddDays(-2),
+                CreatedOn = TimeProvider.UtcNow.AddDays(-2),
+                UpdatedOn = TimeProvider.UtcNow.AddDays(-2),
                 FirstName = previousFirstName2,
                 MiddleName = previousMiddleName2,
                 LastName = previousLastName2
@@ -204,7 +204,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasQts_ShowsDetails()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
 
@@ -233,7 +233,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasQtls_ShowsDetails()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
 
@@ -262,7 +262,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasEyts_ShowsDetails()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
 
@@ -291,7 +291,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasEyps_ShowsDetails()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
 
@@ -320,7 +320,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasPqts_ShowsDetails()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
 
@@ -781,7 +781,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth).WithEmailAddress());
         var email2 = TestData.GenerateUniqueEmail();
         await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some<string?>(email2), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 

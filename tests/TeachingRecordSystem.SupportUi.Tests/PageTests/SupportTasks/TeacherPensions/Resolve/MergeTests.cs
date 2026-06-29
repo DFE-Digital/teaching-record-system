@@ -30,7 +30,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData("fileName.csv", 1);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
         var journeyInstance = await CreateJourneyInstance(supportTask, null);
@@ -65,7 +65,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -160,7 +160,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -205,7 +205,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -253,7 +253,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -300,7 +300,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -365,7 +365,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 

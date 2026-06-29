@@ -19,7 +19,7 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
             Details = "Alert Details",
             AddLink = populateOptional,
             Link = populateOptional ? "https://www.example.com" : null,
-            StartDate = Clock.Today.AddDays(-30),
+            StartDate = TimeProvider.Today.AddDays(-30),
             AddReason = addReasonOption,
             ProvideAdditionalInformation = provideAdditionalInformation ? true : false,
             AddReasonDetail = addReasonOption == AddAlertReasonOption.AnotherReason ? "More details" : null,
@@ -88,7 +88,7 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
                         Details = "Alert Details",
                         AddLink = populateOptional,
                         Link = populateOptional ? "https://www.example.com" : null,
-                        StartDate = Clock.Today.AddDays(-30)
+                        StartDate = TimeProvider.Today.AddDays(-30)
                     }),
                 JourneySteps.Reason or JourneySteps.CheckAnswers =>
                     CreateJourneyInstanceForAllStepsCompletedAsync(personId, populateOptional: true),

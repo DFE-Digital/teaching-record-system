@@ -52,8 +52,8 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.ProhibitionBySoSMisconduct)
-                .WithStartDate(Clock.Today.AddDays(-10))
-                .WithEndDate(Clock.Today.AddDays(-3))));
+                .WithStartDate(TimeProvider.Today.AddDays(-10))
+                .WithEndDate(TimeProvider.Today.AddDays(-3))));
 
         var user = await TestData.CreateUserAsync(role: UserRoles.Administrator);
         SetCurrentUser(user);
@@ -89,12 +89,12 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var path = $"{RequestPath}?handler=NewSanctions";
-        var startDate = Clock.Today.AddDays(-10);
+        var startDate = TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.ProhibitionBySoSMisconduct)
                 .WithStartDate(startDate)
-                .WithCreatedUtc(Clock.UtcNow.AddDays(-10))));
+                .WithCreatedUtc(TimeProvider.UtcNow.AddDays(-10))));
         var user = await TestData.CreateUserAsync(role: UserRoles.Administrator);
         SetCurrentUser(user);
 
@@ -111,7 +111,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
             response.Content.Headers.ContentDisposition?.FileName?.Trim('"');
 
         Assert.Equal(
-            $"new-sanctions-{Clock.Today:yyyyMMdd}.csv",
+            $"new-sanctions-{TimeProvider.Today:yyyyMMdd}.csv",
             fileName);
 
         var csvContent = await response.Content.ReadAsStringAsync();
@@ -135,14 +135,14 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var path = $"{RequestPath}?handler=SpentSanctions";
-        var startDate = Clock.Today.AddDays(-10);
-        var endDate = Clock.Today.AddDays(-3);
+        var startDate = TimeProvider.Today.AddDays(-10);
+        var endDate = TimeProvider.Today.AddDays(-3);
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.ProhibitionBySoSMisconduct)
                 .WithStartDate(startDate)
                 .WithEndDate(endDate)
-                .WithCreatedUtc(Clock.UtcNow.AddDays(-10))));
+                .WithCreatedUtc(TimeProvider.UtcNow.AddDays(-10))));
         var user = await TestData.CreateUserAsync(role: UserRoles.Administrator);
         SetCurrentUser(user);
 
@@ -159,7 +159,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
             response.Content.Headers.ContentDisposition?.FileName?.Trim('"');
 
         Assert.Equal(
-            $"spent-sanctions-{Clock.Today:yyyyMMdd}.csv",
+            $"spent-sanctions-{TimeProvider.Today:yyyyMMdd}.csv",
             fileName);
 
         var csvContent = await response.Content.ReadAsStringAsync();

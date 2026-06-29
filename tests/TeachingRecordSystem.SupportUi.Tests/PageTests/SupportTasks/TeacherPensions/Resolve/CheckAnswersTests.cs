@@ -53,7 +53,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -135,7 +135,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -194,7 +194,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -252,7 +252,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -289,7 +289,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -350,7 +350,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -380,7 +380,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -431,7 +431,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         });
 
         EventObserver.AssertEventsSaved(e =>

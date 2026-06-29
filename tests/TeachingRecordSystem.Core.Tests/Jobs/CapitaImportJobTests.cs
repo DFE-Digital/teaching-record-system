@@ -454,7 +454,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         var gender = Gender.Female;
         var dob = new DateOnly(1981, 08, 20);
         var nino = Faker.Identification.UkNationalInsuranceNumber();
-        var dateOfDeath = DateOnly.FromDateTime(Clock.UtcNow.AddDays(-1));
+        var dateOfDeath = DateOnly.FromDateTime(TimeProvider.UtcNow.AddDays(-1));
 
         (var reader, var rowData) = BuildSingleRowCsv(trn, gender, lastName, firstName, dob, nino, dateOfDeath);
 
@@ -498,7 +498,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         var newFirstName = TestData.GenerateChangedFirstName(existingPerson.FirstName);
         var newGender = Gender.Female;
         var newDob = new DateOnly(1981, 08, 20);
-        var dateOfDeath = DateOnly.FromDateTime(Clock.UtcNow.AddDays(-1));
+        var dateOfDeath = DateOnly.FromDateTime(TimeProvider.UtcNow.AddDays(-1));
 
         (var reader, var rowData) = BuildSingleRowCsv(existingPerson.Trn, newGender, existingPerson.LastName, newFirstName, existingPerson.DateOfBirth, existingPerson.NationalInsuranceNumber, dateOfDeath);
 
@@ -543,7 +543,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
     public async Task Import_WhenDateOfDeathInvalid_DoesNothing_ReportsFailureWithValidationMessage(string dateOfDeath)
     {
         // Arrange
-        var dateOfBirth = Clock.UtcNow.AddDays(-25).ToString("yyyyMMdd");
+        var dateOfBirth = TimeProvider.UtcNow.AddDays(-25).ToString("yyyyMMdd");
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", "Lastname", "Firstname", dateOfBirth, "AB123456D", dateOfDeath);
 
         // Act
@@ -578,8 +578,8 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
     public async Task Import_WhenDateOfDeathInFuture_DoesNothing_ReportsFailureWithValidationMessage()
     {
         // Arrange
-        var dateOfBirth = Clock.UtcNow.AddDays(-25).ToString("yyyyMMdd");
-        var dateOfDeath = Clock.UtcNow.AddDays(25).ToString("yyyyMMdd");
+        var dateOfBirth = TimeProvider.UtcNow.AddDays(-25).ToString("yyyyMMdd");
+        var dateOfDeath = TimeProvider.UtcNow.AddDays(25).ToString("yyyyMMdd");
 
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", "Lastname", "Firstname", dateOfBirth, "AB123456D", dateOfDeath);
 
@@ -649,7 +649,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
     public async Task Import_WhenDateOfBirthInFuture_DoesNothing_ReportsFailureWithValidationMessage()
     {
         // Arrange
-        var dateOfBirth = Clock.UtcNow.AddDays(25).ToString("yyyyMMdd");
+        var dateOfBirth = TimeProvider.UtcNow.AddDays(25).ToString("yyyyMMdd");
 
         (var reader, var rowData) = BuildSingleRowCsv("1234567", "1", "Lastname", "Firstname", dateOfBirth, "AB123456D");
 
@@ -1694,7 +1694,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             var selectedPerson = dbContext.Persons.Single(x => x.Trn == trn);
-            selectedPerson.SetStatus(PersonStatus.Deactivated, "de-activate", "de-activated", "", null, SystemUser.SystemUserId, Clock.UtcNow, out var _);
+            selectedPerson.SetStatus(PersonStatus.Deactivated, "de-activate", "de-activated", "", null, SystemUser.SystemUserId, TimeProvider.UtcNow, out var _);
             await dbContext.SaveChangesAsync();
         });
     }

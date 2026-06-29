@@ -197,8 +197,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var apiKey = await dbContext.ApiKeys.Where(k => k.ApplicationUserId == applicationUser.UserId).SingleOrDefaultAsync();
             Assert.NotNull(apiKey);
-            Assert.Equal(Clock.UtcNow, apiKey.CreatedOn);
-            Assert.Equal(Clock.UtcNow, apiKey.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, apiKey.CreatedOn);
+            Assert.Equal(TimeProvider.UtcNow, apiKey.UpdatedOn);
             Assert.Equal(key, apiKey.Key);
 
             return apiKey;
@@ -208,7 +208,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             e =>
             {
                 var apiKeyCreatedEvent = Assert.IsType<ApiKeyCreatedEvent>(e);
-                Assert.Equal(Clock.UtcNow, apiKeyCreatedEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, apiKeyCreatedEvent.CreatedUtc);
                 Assert.Equal(GetCurrentUserId(), apiKeyCreatedEvent.RaisedBy.UserId);
                 Assert.Equal(apiKey.ApiKeyId, apiKeyCreatedEvent.ApiKey.ApiKeyId);
                 Assert.Equal(apiKey.ApplicationUserId, applicationUser.UserId);

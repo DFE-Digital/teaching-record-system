@@ -170,7 +170,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture),
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
-        var newEndDate = Clock.Today.AddDays(2);
+        var newEndDate = TimeProvider.Today.AddDays(2);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {

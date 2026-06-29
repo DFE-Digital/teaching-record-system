@@ -110,7 +110,7 @@ public class CreateTrnRequestTests : TestBase
     public async Task Post_RequestWithDateOfBirthEqualOrAfterToday_ReturnsError(int daysAfterToday)
     {
         // Arrange
-        var dateOfBirth = Clock.Today.AddDays(daysAfterToday);
+        var dateOfBirth = TimeProvider.Today.AddDays(daysAfterToday);
 
         var requestBody = CreateJsonContent(CreateDummyRequest() with
         {

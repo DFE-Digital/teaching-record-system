@@ -36,7 +36,7 @@ public abstract class TestBase
 
     protected CaptureEventObserver EventObserver => TestScopedServices.GetCurrent().EventObserver;
 
-    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider TimeProvider => TestScopedServices.GetCurrent().TimeProvider;
 
     protected OneLoginUserMatchingSupportTaskService OneLoginSupportTaskService => HostFixture.Services.GetRequiredService<OneLoginUserMatchingSupportTaskService>();
 
@@ -138,8 +138,8 @@ public abstract class TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a =>
             {
-                a.WithStartDate(Clock.Today.AddDays(-30));
-                a.WithEndDate(isOpenAlert ? null : Clock.Today.AddDays(-1));
+                a.WithStartDate(TimeProvider.Today.AddDays(-30));
+                a.WithEndDate(isOpenAlert ? null : TimeProvider.Today.AddDays(-1));
                 a.WithExternalLink(populateOptional ? TestData.GenerateUrl() : null);
             }));
 

@@ -569,7 +569,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             PersonMatchedAttribute.MiddleName);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
@@ -616,7 +616,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(person.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<TrnRequestData>();
@@ -653,7 +653,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             PersonMatchedAttribute.MiddleName);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
@@ -695,7 +695,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(person.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<TrnRequestData>();
@@ -734,7 +734,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             matchedPersonHasFlags: false);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
@@ -788,7 +788,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             matchedPersonHasFlags: true);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
@@ -869,7 +869,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         string? comments)
     {
         Assert.Equal(expectedPersonId, @event.PersonId);
-        Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
+        Assert.Equal(TimeProvider.UtcNow, @event.CreatedUtc);
         Assert.True(@event.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.Status));
 
         Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);

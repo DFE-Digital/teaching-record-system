@@ -187,7 +187,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = CreatePostContent(newStartDate: Clock.Today.AddDays(1))
+            Content = CreatePostContent(newStartDate: TimeProvider.Today.AddDays(1))
         };
 
         // Act

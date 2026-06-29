@@ -15,7 +15,7 @@ public class ChangeLogTrnAllocatedEventTests(HostFixture hostFixture) : TestBase
         var trnAllocatedEvent = new TrnAllocatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = SystemUser.SystemUserId,
             PersonId = person.PersonId,
             Trn = trn
@@ -41,7 +41,7 @@ public class ChangeLogTrnAllocatedEventTests(HostFixture hostFixture) : TestBase
         Assert.NotNull(title);
         Assert.Equal("TRN allocated", title.TrimmedText());
         Assert.Equal($"By {SystemUser.SystemUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("Trn", v => Assert.Equal(trn, v.TrimmedText()));
     }

@@ -180,7 +180,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = status,
-                AwardedDate = Clock.Today
+                AwardedDate = TimeProvider.Today
             });
 
         // Act
@@ -202,7 +202,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.Awarded,
-                AwardedDate = Clock.Today.AddDays(1)
+                AwardedDate = TimeProvider.Today.AddDays(1)
             });
 
         // Act
@@ -268,8 +268,8 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
-                TrainingStartDate = Clock.Today.AddMonths(-1),
-                TrainingEndDate = Clock.Today.AddMonths(-2)
+                TrainingStartDate = TimeProvider.Today.AddMonths(-1),
+                TrainingEndDate = TimeProvider.Today.AddMonths(-2)
             });
 
         // Act
@@ -450,7 +450,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = routeTypeId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = null
             });
 
@@ -497,7 +497,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = routeTypeId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = "GB"
             });
 
@@ -520,7 +520,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.ScotlandRId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = "PT"
             });
 
@@ -543,7 +543,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.ApplyForQtsId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = "GB-SCT"
             });
 
@@ -566,7 +566,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.NiRId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = "PT"
             });
 
@@ -589,7 +589,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.ApplyForQtsId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = "GB-NIR"
             });
 
@@ -612,7 +612,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.WelshRId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = "PT"
             });
 
@@ -682,7 +682,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = routeTypeId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = "PT"
             });
 
@@ -706,7 +706,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = routeTypeId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingCountryReference = trainingCountryReference,
                 TrainingProviderUkprn = routeTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId ? "11111111" : null
             });
@@ -796,7 +796,7 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatusType.ApplyForQtsId,
                 Status = ProfessionalStatusStatus.Approved,
-                AwardedDate = Clock.Today,
+                AwardedDate = TimeProvider.Today,
                 TrainingProviderUkprn = null,
                 TrainingCountryReference = "9999",
                 IsExemptFromInduction = true
@@ -858,8 +858,8 @@ public class SetProfessionalStatusTests : TestBase
             RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
             Status = ProfessionalStatusStatus.InTraining,
             AwardedDate = null,
-            TrainingStartDate = Clock.Today.AddMonths(-1),
-            TrainingEndDate = Clock.Today.AddMonths(9),
+            TrainingStartDate = TimeProvider.Today.AddMonths(-1),
+            TrainingEndDate = TimeProvider.Today.AddMonths(9),
             TrainingSubjectReferences = Option.Some<string[]>(["100343", "100300", "100079"]),
             TrainingAgeSpecialism = new()
             {

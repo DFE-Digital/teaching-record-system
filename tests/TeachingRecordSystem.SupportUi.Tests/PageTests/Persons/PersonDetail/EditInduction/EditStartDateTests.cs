@@ -34,7 +34,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithStartDate_ShowsDate()
     {
         // Arrange
-        var dateValid = Clock.Today;
+        var dateValid = TimeProvider.Today;
         var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -61,7 +61,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidStartDate_PersistsStartDate()
     {
         // Arrange
-        var dateValid = Clock.Today;
+        var dateValid = TimeProvider.Today;
         var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
@@ -109,7 +109,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StartDateIsInTheFuture_ReturnsError()
     {
         // Arrange
-        var dateTomorrow = Clock.Today.AddDays(1);
+        var dateTomorrow = TimeProvider.Today.AddDays(1);
         var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(

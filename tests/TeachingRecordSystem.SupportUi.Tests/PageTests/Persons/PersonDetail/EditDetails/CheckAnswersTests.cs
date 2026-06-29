@@ -405,7 +405,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
-            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(firstName, updatedPersonRecord.FirstName);
             Assert.Equal(middleName, updatedPersonRecord.MiddleName);
             Assert.Equal(lastName, updatedPersonRecord.LastName);
@@ -419,7 +419,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var actualEvent = Assert.IsType<LegacyEvents.PersonDetailsUpdatedEvent>(e);
 
-            Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualEvent.PersonId);
             Assert.Equal(firstName, actualEvent.PersonAttributes.FirstName);
             Assert.Equal(middleName, actualEvent.PersonAttributes.MiddleName);
@@ -498,7 +498,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .Include(p => p.PreviousNames)
                 .SingleAsync(p => p.PersonId == person.PersonId);
 
-            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal("Alfrede", updatedPersonRecord.FirstName);
             Assert.Equal("Thee", updatedPersonRecord.MiddleName);
             Assert.Equal("Greate", updatedPersonRecord.LastName);
@@ -552,13 +552,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .Include(p => p.PreviousNames)
                 .SingleAsync(p => p.PersonId == person.PersonId);
 
-            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal("Megan", updatedPersonRecord.FirstName);
             Assert.Equal("Thee", updatedPersonRecord.MiddleName);
             Assert.Equal("Stallion", updatedPersonRecord.LastName);
 
             Assert.Collection(updatedPersonRecord.PreviousNames!.OrderByDescending(pn => pn.CreatedOn),
-                pn => Assert.Equal(("Alfred", "The", "Great", Clock.UtcNow, Clock.UtcNow), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)),
+                pn => Assert.Equal(("Alfred", "The", "Great", TimeProvider.UtcNow, TimeProvider.UtcNow), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)),
                 pn => Assert.Equal(("Conan", "The", "Barbarian", conanDate, conanDate), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)),
                 pn => Assert.Equal(("Ethelred", "The", "Unready", ethelredDate, ethelredDate), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)));
         });

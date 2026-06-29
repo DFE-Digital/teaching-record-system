@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Tests.DataStore.Postgres.Models;
 
 public class PersonTests
 {
-    public FakeTimeProvider Clock { get; } = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
+    public FakeTimeProvider TimeProvider { get; } = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
 
     [Fact]
     public void SetInductionStatus_None_UpdatesStatus()
@@ -24,7 +24,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -48,7 +48,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -72,7 +72,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -96,7 +96,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -120,7 +120,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -144,7 +144,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -168,7 +168,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -190,16 +190,16 @@ public class PersonTests
             status,
             startDate: status != InductionStatus.RequiredToComplete ? new DateOnly(2024, 1, 1) : null,
             completedDate: status == InductionStatus.Passed ? new DateOnly(2024, 10, 1) : null,
-            cpdModifiedOn: Clock.UtcNow,
+            cpdModifiedOn: TimeProvider.UtcNow,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Assert
         Assert.Equal(status, person.InductionStatus);
         Assert.Equal(status, person.InductionStatusWithoutExemption);
-        Assert.Equal(Clock.UtcNow, person.InductionModifiedOn);
-        Assert.Equal(Clock.UtcNow, person.CpdInductionModifiedOn);
+        Assert.Equal(TimeProvider.UtcNow, person.InductionModifiedOn);
+        Assert.Equal(TimeProvider.UtcNow, person.CpdInductionModifiedOn);
     }
 
     [Fact]
@@ -217,28 +217,28 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.SetCpdInductionStatus(
             InductionStatus.Passed,
             startDate: new DateOnly(2024, 1, 1),
             completedDate: new DateOnly(2024, 10, 1),
-            cpdModifiedOn: Clock.UtcNow,
+            cpdModifiedOn: TimeProvider.UtcNow,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Assert
         Assert.Equal(InductionStatus.Passed, person.InductionStatus);
         Assert.Equal(InductionStatus.Passed, person.InductionStatusWithoutExemption);
-        Assert.Equal(Clock.UtcNow, person.InductionModifiedOn);
-        Assert.Equal(Clock.UtcNow, person.CpdInductionModifiedOn);
+        Assert.Equal(TimeProvider.UtcNow, person.InductionModifiedOn);
+        Assert.Equal(TimeProvider.UtcNow, person.CpdInductionModifiedOn);
     }
 
     [Theory]
@@ -258,28 +258,28 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.SetCpdInductionStatus(
             status,
             startDate: status == InductionStatus.InProgress ? new DateOnly(2024, 1, 1) : null,
             completedDate: null,
-            cpdModifiedOn: Clock.UtcNow,
+            cpdModifiedOn: TimeProvider.UtcNow,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Assert
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
         Assert.Equal(status, person.InductionStatusWithoutExemption);
-        Assert.Equal(Clock.UtcNow, person.InductionModifiedOn);
-        Assert.Equal(Clock.UtcNow, person.CpdInductionModifiedOn);
+        Assert.Equal(TimeProvider.UtcNow, person.InductionModifiedOn);
+        Assert.Equal(TimeProvider.UtcNow, person.CpdInductionModifiedOn);
     }
 
     [Theory]
@@ -305,11 +305,11 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.TrySetWelshInductionStatus(
@@ -317,7 +317,7 @@ public class PersonTests
             startDate: !passed ? new DateOnly(2024, 1, 1) : null,
             completedDate: !passed ? new DateOnly(2024, 10, 1) : null,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -341,11 +341,11 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.TrySetWelshInductionStatus(
@@ -353,7 +353,7 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -377,11 +377,11 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         // Act
         person.TrySetWelshInductionStatus(
@@ -389,7 +389,7 @@ public class PersonTests
             startDate: new DateOnly(2024, 1, 1),
             completedDate: new DateOnly(2024, 10, 1),
             updatedBy: SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -407,13 +407,13 @@ public class PersonTests
             status: InductionStatus.InProgress,
             startDate: new DateOnly(2024, 1, 1),
             completedDate: null,
-            cpdModifiedOn: Clock.UtcNow,
+            cpdModifiedOn: TimeProvider.UtcNow,
             SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Act
-        var result = person.InductionStatusManagedByCpd(Clock.Today);
+        var result = person.InductionStatusManagedByCpd(TimeProvider.Today);
 
         // Assert
         Assert.True(result);
@@ -427,15 +427,15 @@ public class PersonTests
 
         person.SetCpdInductionStatus(
             status: InductionStatus.Passed,
-            startDate: Clock.Today.AddYears(-1),
-            completedDate: Clock.Today,
-            cpdModifiedOn: Clock.UtcNow,
+            startDate: TimeProvider.Today.AddYears(-1),
+            completedDate: TimeProvider.Today,
+            cpdModifiedOn: TimeProvider.UtcNow,
             SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Act
-        var result = person.InductionStatusManagedByCpd(Clock.Today);
+        var result = person.InductionStatusManagedByCpd(TimeProvider.Today);
 
         // Assert
         Assert.True(result);
@@ -449,15 +449,15 @@ public class PersonTests
 
         person.SetCpdInductionStatus(
             status: InductionStatus.Passed,
-            startDate: Clock.Today.AddYears(-9),
-            completedDate: Clock.Today.AddYears(-7),
-            cpdModifiedOn: Clock.UtcNow,
+            startDate: TimeProvider.Today.AddYears(-9),
+            completedDate: TimeProvider.Today.AddYears(-7),
+            cpdModifiedOn: TimeProvider.UtcNow,
             SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             out _);
 
         // Act
-        var result = person.InductionStatusManagedByCpd(Clock.Today);
+        var result = person.InductionStatusManagedByCpd(TimeProvider.Today);
 
         // Assert
         Assert.False(result);
@@ -471,19 +471,19 @@ public class PersonTests
 
         person.SetInductionStatus(
             status: InductionStatus.InProgress,
-            startDate: Clock.Today,
+            startDate: TimeProvider.Today,
             completedDate: null,
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
             evidenceFile: null,
             SystemUser.SystemUserId,
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
         // Act
-        var result = person.InductionStatusManagedByCpd(Clock.Today);
+        var result = person.InductionStatusManagedByCpd(TimeProvider.Today);
 
         // Assert
         Assert.False(result);
@@ -508,7 +508,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -516,7 +516,7 @@ public class PersonTests
         person.AddInductionExemptionReason(
             InductionExemptionReason.QtlsId,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -540,7 +540,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -548,7 +548,7 @@ public class PersonTests
         person.AddInductionExemptionReason(
             InductionExemptionReason.QtlsId,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -574,14 +574,14 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
         person.AddInductionExemptionReason(
             InductionExemptionReason.QtlsId,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             out _);
 
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
@@ -590,7 +590,7 @@ public class PersonTests
         person.RemoveInductionExemptionReason(
             InductionExemptionReason.QtlsId,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -614,14 +614,14 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
         person.AddInductionExemptionReason(
             InductionExemptionReason.QtlsId,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             out _);
 
         Debug.Assert(person.InductionStatus == currentStatus);
@@ -630,7 +630,7 @@ public class PersonTests
         person.RemoveInductionExemptionReason(
             InductionExemptionReason.QtlsId,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -652,7 +652,7 @@ public class PersonTests
             changeReasonDetail: null,
             evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             additionalInformation: null,
             out _);
 
@@ -662,7 +662,7 @@ public class PersonTests
         person.RemoveInductionExemptionReason(
             InductionExemptionReason.QtlsId,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -686,7 +686,7 @@ public class PersonTests
         person.RemoveInductionExemptionReason(
             exemptionReasonId,
             updatedBy: SystemUser.SystemUserId,
-            now: Clock.UtcNow,
+            now: TimeProvider.UtcNow,
             out _);
 
         // Assert
@@ -703,10 +703,10 @@ public class PersonTests
         var allRoutes = new List<RouteToProfessionalStatusType>();
         var professionalStatuses = new List<RouteToProfessionalStatus>();
 
-        DateOnly? existingRouteHoldsFrom = Clock.Today.AddDays(-10);
+        DateOnly? existingRouteHoldsFrom = TimeProvider.Today.AddDays(-10);
         RouteToProfessionalStatusStatus existingRouteStatus =
             testCaseData.ExistingRouteIsHoldsStatus ? RouteToProfessionalStatusStatus.Holds : RouteToProfessionalStatusStatus.InTraining;
-        DateOnly? newRouteHoldsFrom = testCaseData.NewHoldsFromIsAfterExistingHoldsFrom ? Clock.Today.AddDays(-1) : Clock.Today.AddDays(-20);
+        DateOnly? newRouteHoldsFrom = testCaseData.NewHoldsFromIsAfterExistingHoldsFrom ? TimeProvider.Today.AddDays(-1) : TimeProvider.Today.AddDays(-20);
         RouteToProfessionalStatusStatus newRouteStatus =
             testCaseData.NewRouteIsHoldsStatus ? RouteToProfessionalStatusStatus.Holds : RouteToProfessionalStatusStatus.InTraining;
 
@@ -829,8 +829,8 @@ public class PersonTests
             new TestableRouteToProfessionalStatus()
             {
                 QualificationId = Guid.NewGuid(),
-                CreatedOn = Clock.UtcNow,
-                UpdatedOn = Clock.UtcNow,
+                CreatedOn = TimeProvider.UtcNow,
+                UpdatedOn = TimeProvider.UtcNow,
                 DeletedOn = null,
                 PersonId = person.PersonId,
                 RouteToProfessionalStatusTypeId = route.RouteToProfessionalStatusTypeId,
@@ -867,7 +867,7 @@ public class PersonTests
 
         // Act
         person.RefreshInductionStatusForQtsProfessionalStatusChanged(
-            Clock.UtcNow,
+            TimeProvider.UtcNow,
             []);
 
         // Assert
@@ -888,7 +888,7 @@ public class PersonTests
             .ToArray();
 
         // Act
-        person.RefreshInductionStatusForQtsProfessionalStatusChanged(Clock.UtcNow, allRouteTypes, newRoutes);
+        person.RefreshInductionStatusForQtsProfessionalStatusChanged(TimeProvider.UtcNow, allRouteTypes, newRoutes);
 
         // Assert
         Assert.Equal(expectedInductionStatus, person.InductionStatus);

@@ -47,7 +47,7 @@ public static partial class Commands
             }
 
             var services = new ServiceCollection()
-                .AddClock()
+                .AddTimeProvider()
                 .AddLogging()
                 .AddDatabase(connectionString)
                 .AddMemoryCache()

@@ -54,7 +54,7 @@ public partial class EwcWalesImportJobTests
     public async Task EwcWalesImportJobQts_WelshRAfterECDirectiveChange_Format1ImportsQtsFileSuccessfully(string qtsStatus)
     {
         // Arrange
-        var awardedDate = Clock.Today.AddDays(-10);
+        var awardedDate = TimeProvider.Today.AddDays(-10);
         var expectedTotalRowCount = 1;
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
@@ -531,7 +531,7 @@ public partial class EwcWalesImportJobTests
         var expectedFailureRowCount = 0;
         var person1 = await TestData.CreatePersonAsync();
         var trn1 = person1.Trn;
-        var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},{qtsStatus},{Clock.Today.AddDays(-10).ToString(QtsImporter.DateFormat)},,,,,,,,,,,,,,,,,,,,,,,,";
+        var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},{qtsStatus},{TimeProvider.Today.AddDays(-10).ToString(QtsImporter.DateFormat)},,,,,,,,,,,,,,,,,,,,,,,,";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);

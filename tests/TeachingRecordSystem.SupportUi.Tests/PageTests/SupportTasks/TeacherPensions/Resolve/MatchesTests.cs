@@ -45,7 +45,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Closed);
             });
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches");
@@ -82,7 +82,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
         var journeyInstance = await CreateJourneyInstance(
@@ -151,7 +151,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
         var journeyInstance = await CreateJourneyInstance(
@@ -201,7 +201,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData("", 0);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -409,7 +409,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData("", 0);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Closed);
             });
 
@@ -458,7 +458,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData("", 0);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -509,7 +509,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData("", 0);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
         var journeyInstance = await CreateJourneyInstance(
@@ -563,7 +563,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData("", 0);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
         var journeyInstance = await CreateJourneyInstance(

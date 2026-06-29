@@ -9,7 +9,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
     private Task<QtsImporter.QtsImportLookupData> GetLookupDataAsync(EwcWalesQtsFileImportData row) =>
         WithServiceAsync<QtsImporter, QtsImporter.QtsImportLookupData>(
             importer => importer.GetLookupDataAsync(row),
-            Clock);
+            TimeProvider);
 
     private Task<(List<string> ValidationFailures, List<string> Errors)> ValidateAsync(EwcWalesQtsFileImportData row) =>
         WithServiceAsync<QtsImporter, (List<string>, List<string>)>(
@@ -18,7 +18,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
                 var lookups = await importer.GetLookupDataAsync(row);
                 return importer.Validate(row, lookups);
             },
-            Clock);
+            TimeProvider);
 
     public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 
@@ -141,7 +141,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
     public async Task Validate_MatchesExistingWelshR_ReturnsErrorMessage()
     {
         // Arrange
-        var holdsDate = Clock.Today.AddDays(-10);
+        var holdsDate = TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithRouteToProfessionalStatus(s => s
@@ -168,7 +168,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
     public async Task Validate_ExistingWelshR_ReturnsNoErrors()
     {
         // Arrange
-        var holdsDate = Clock.Today.AddDays(-10);
+        var holdsDate = TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithRouteToProfessionalStatus(s => s
@@ -225,7 +225,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
             x.QtsRefNo = person.Trn;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsStatus = "67";
-            x.QtsDate = Clock.UtcNow.AddDays(1).ToString("dd/MM/yyyy");
+            x.QtsDate = TimeProvider.UtcNow.AddDays(1).ToString("dd/MM/yyyy");
             return x;
         });
 
@@ -338,7 +338,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         // Act
         var json = await WithServiceAsync<QtsImporter, string>(
             importer => Task.FromResult(importer.ConvertToCsvString(row)),
-            Clock);
+            TimeProvider);
 
         // Assert
         Assert.Contains(expectedJson, json);
@@ -375,7 +375,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.WelshRId)
-                .WithHoldsFrom(Clock.Today.AddDays(-10))
+                .WithHoldsFrom(TimeProvider.Today.AddDays(-10))
                 .WithStatus(RouteToProfessionalStatusStatus.Holds)));
         var row = GetDefaultRow(x =>
         {

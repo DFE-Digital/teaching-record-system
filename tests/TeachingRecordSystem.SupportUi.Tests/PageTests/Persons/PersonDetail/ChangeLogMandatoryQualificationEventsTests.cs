@@ -17,7 +17,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
+        TimeProvider.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
     }
 
     [Theory]
@@ -47,7 +47,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedText());
                 Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText());
                 Assert.Equal(mq.StartDate!.Value.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
@@ -122,7 +122,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item =>
             {
                 Assert.Equal($"By {deletedByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 Assert.Equal(deletionReason, item.GetElementByTestId("deletion-reason")?.TrimmedText());
                 Assert.Equal(deletionReasonDetail, item.GetElementByTestId("deletion-reason-detail")?.TrimmedText());
                 Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TrimmedText());
@@ -156,7 +156,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item =>
             {
                 Assert.Equal($"By {deletedByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 Assert.Equal(deletionReason, item.GetElementByTestId("deletion-reason")?.TrimmedText());
                 Assert.Equal("None", item.GetElementByTestId("deletion-reason-detail")?.TrimmedText());
                 Assert.Equal("None", item.GetElementByTestId("provider")?.TrimmedText());
@@ -236,7 +236,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var deactivatedByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         await DeactivateMq(mq.QualificationId, deactivatedByDqtUser);
 
@@ -253,7 +253,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item =>
             {
                 Assert.Equal($"By {deactivatedByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedText());
                 Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText());
                 Assert.Equal(mq.StartDate!.Value.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
@@ -267,7 +267,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq, legacyProvider) = await CreateMqWithLegacyProvider();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var deactivatedByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         await DeactivateMq(mq.QualificationId, deactivatedByDqtUser);
 
@@ -289,7 +289,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateMqWithoutProvider();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var deactivatedByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         await DeactivateMq(mq.QualificationId, deactivatedByDqtUser);
 
@@ -327,7 +327,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item =>
             {
                 Assert.Equal($"By {importedByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -336,14 +336,14 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq, legacyProvider) = await CreateMqWithLegacyProvider();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var dqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         await DeactivateMq(mq.QualificationId, dqtUser);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         await WithDbContextAsync(async dbContext =>
         {
-            var now = Clock.UtcNow;
+            var now = TimeProvider.UtcNow;
 
             var qualification = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleAsync(q => q.QualificationId == mq.QualificationId);
             qualification.DeletedOn = null;
@@ -396,7 +396,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item =>
             {
                 Assert.Equal($"By {dqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -405,7 +405,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -416,7 +416,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             var migratedEvent = new MandatoryQualificationMigratedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 Key = $"{mq.QualificationId}-migrated",
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = person.PersonId,
@@ -441,7 +441,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item =>
             {
                 Assert.Equal($"By {SystemUser.SystemUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -450,7 +450,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -461,7 +461,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             var migratedEvent = new MandatoryQualificationMigratedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 Key = $"{mq.QualificationId}-migrated",
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = person.PersonId,
@@ -493,7 +493,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
                 .WithDqtMqEstablishment(establishmentWithProviderMapping.Value)));
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var migratedProvider = await WithDbContextAsync(async dbContext =>
         {
@@ -509,7 +509,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             var migratedEvent = new MandatoryQualificationMigratedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 Key = $"{mq.QualificationId}-migrated",
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = person.PersonId,
@@ -546,7 +546,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             .WithMandatoryQualification(q => q
                 .WithSpecialism(specialism)
                 .WithDqtMqEstablishment(establishmentWithSpecialismMapping.Value)));
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var migratedSpecialism = await WithDbContextAsync(async dbContext =>
         {
@@ -564,7 +564,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             var migratedEvent = new MandatoryQualificationMigratedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 Key = $"{mq.QualificationId}-migrated",
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = person.PersonId,
@@ -596,7 +596,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var changeReason = "Update from provider";
         var changeReasonDetail = "More information";
@@ -624,7 +624,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item =>
             {
                 Assert.Equal($"By {updatedByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 Assert.Equal(changeReason, item.GetElementByTestId("change-reason")?.TrimmedText());
                 Assert.Equal(changeReasonDetail, item.GetElementByTestId("change-reason-detail")?.TrimmedText());
                 Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TrimmedText());
@@ -637,7 +637,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -669,7 +669,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldProviderId = mq.ProviderId!.Value;
         var oldProvider = MandatoryQualificationProvider.GetById(oldProviderId);
@@ -698,7 +698,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -725,7 +725,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldSpecialism = mq.Specialism!.Value;
 
@@ -753,7 +753,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -780,7 +780,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldStartDate = mq.StartDate!.Value;
 
@@ -808,7 +808,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -835,7 +835,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldStatus = mq.Status!.Value;
 
@@ -867,7 +867,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
@@ -894,7 +894,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var updatedByUser = await TestData.CreateUserAsync();
         var oldEndDate = mq.EndDate!.Value;
 
@@ -1020,7 +1020,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             throw new ArgumentException($"{nameof(deactivatedBy)} should be a DQT user.", nameof(deactivatedBy));
         }
 
-        var now = Clock.UtcNow;
+        var now = TimeProvider.UtcNow;
 
         var qualification = await dbContext.MandatoryQualifications
             .SingleAsync(q => q.QualificationId == qualificationId);
@@ -1073,7 +1073,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         return WithDbContextAsync(async dbContext =>
         {
-            var now = Clock.UtcNow;
+            var now = TimeProvider.UtcNow;
 
             var qualification = await dbContext.MandatoryQualifications
                 .SingleAsync(q => q.QualificationId == qualificationId);

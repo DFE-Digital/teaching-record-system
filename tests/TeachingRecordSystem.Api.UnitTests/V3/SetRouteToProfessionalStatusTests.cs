@@ -315,7 +315,7 @@ public class SetRouteToProfessionalStatusTests(OperationTestFixture operationTes
                 degreeTypeId: null,
                 isExemptFromInduction: null,
                 createdBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 changeReason: null,
                 changeReasonDetail: null,
                 evidenceFile: null,

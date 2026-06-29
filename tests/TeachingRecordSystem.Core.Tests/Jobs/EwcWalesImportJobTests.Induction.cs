@@ -65,10 +65,10 @@ public partial class EwcWalesImportJobTests
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
-        var qtlsDate = Clock.Today.AddYears(-2);
-        var holdsDate = Clock.Today.AddYears(-2).AddDays(1);
-        var startDate = Clock.Today.AddYears(-1).AddDays(1);
-        var passDate = Clock.Today.AddYears(-1).AddDays(2);
+        var qtlsDate = TimeProvider.Today.AddYears(-2);
+        var holdsDate = TimeProvider.Today.AddYears(-2).AddDays(1);
+        var startDate = TimeProvider.Today.AddYears(-1).AddDays(1);
+        var passDate = TimeProvider.Today.AddYears(-1).AddDays(2);
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithRouteToProfessionalStatus(s => s

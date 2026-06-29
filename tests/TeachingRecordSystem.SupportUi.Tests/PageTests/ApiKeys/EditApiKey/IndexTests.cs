@@ -159,18 +159,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContextAsync(async dbContext =>
         {
             apiKey = await dbContext.ApiKeys.SingleAsync(k => k.ApiKeyId == apiKey.ApiKeyId);
-            Assert.Equal(Clock.UtcNow, apiKey.Expires);
+            Assert.Equal(TimeProvider.UtcNow, apiKey.Expires);
         });
 
         EventObserver.AssertEventsSaved(
             e =>
             {
                 var apiKeyUpdatedEvent = Assert.IsType<ApiKeyUpdatedEvent>(e);
-                Assert.Equal(Clock.UtcNow, apiKeyUpdatedEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, apiKeyUpdatedEvent.CreatedUtc);
                 Assert.Equal(GetCurrentUserId(), apiKeyUpdatedEvent.RaisedBy.UserId);
                 Assert.Equal(ApiKeyUpdatedEventChanges.Expires, apiKeyUpdatedEvent.Changes);
                 Assert.Null(apiKeyUpdatedEvent.OldApiKey.Expires);
-                Assert.Equal(Clock.UtcNow, apiKeyUpdatedEvent.ApiKey.Expires);
+                Assert.Equal(TimeProvider.UtcNow, apiKeyUpdatedEvent.ApiKey.Expires);
             });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);

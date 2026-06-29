@@ -214,10 +214,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContextAsync(async dbContext =>
         {
             var updatedOneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);
-            Assert.Equal(Clock.UtcNow, updatedOneLoginUser.VerifiedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.VerifiedOn);
             Assert.Equal(OneLoginUserVerificationRoute.Support, updatedOneLoginUser.VerificationRoute);
             Assert.Equal(person.PersonId, updatedOneLoginUser.PersonId);
-            Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.MatchedOn);
             Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
             Assert.NotNull(updatedOneLoginUser.VerifiedNames);
             Assert.Single(updatedOneLoginUser.VerifiedNames);
@@ -288,7 +288,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.NotNull(updatedOneLoginUser.VerifiedOn);
             Assert.Equal(OneLoginUserVerificationRoute.OneLogin, updatedOneLoginUser.VerificationRoute);
             Assert.Equal(person.PersonId, updatedOneLoginUser.PersonId);
-            Assert.Equal(Clock.UtcNow, updatedOneLoginUser.MatchedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.MatchedOn);
             Assert.Equal(OneLoginUserMatchRoute.SupportUi, updatedOneLoginUser.MatchRoute);
         });
 

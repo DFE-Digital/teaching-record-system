@@ -13,8 +13,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusCreatedEvent_RendersExpectedContent()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today.AddDays(-1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
@@ -72,7 +72,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusCreatedEvent_AffectsPersonProfessionalStatus_RendersExpectedContent()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
 
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.EarlyYearsTeacherStatus)
@@ -83,7 +83,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             {
                 q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(RouteToProfessionalStatusStatus.Holds);
-                q.WithHoldsFrom(Clock.Today);
+                q.WithHoldsFrom(TimeProvider.Today);
                 q.WithInductionExemption(true);
             }));
 
@@ -108,7 +108,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusCreatedEvent_RendersExpectedChangeReasonContent()
     {
         // Arrange
-        var awardDate = Clock.Today.AddYears(-2).AddDays(1);
+        var awardDate = TimeProvider.Today.AddYears(-2).AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = RouteToProfessionalStatusStatus.Holds;
         var changeReason = "Text from change reason selection";
@@ -149,7 +149,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusUpdatedEvent_RendersExpectedContent()
     {
         // Arrange
-        var oldStartDate = Clock.Today.AddYears(-2);
+        var oldStartDate = TimeProvider.Today.AddYears(-2);
         var oldEndDate = oldStartDate.AddYears(1);
         var oldAwardDate = oldEndDate.AddDays(-1);
         var oldRoute = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
@@ -214,7 +214,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 changeReasonDetail: null,
                 evidenceFile: null,
                 updatedBy: updatedByUser.UserId,
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
 
@@ -236,7 +236,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
         Assert.NotNull(timelineItem);
         Assert.Equal($"By {updatedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("status"));
         Assert.Equal(holdsFrom.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
         Assert.Equal(startDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
@@ -267,7 +267,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     {
         // Arrange
         var oldStatus = RouteToProfessionalStatusStatus.InTraining;
-        var startDate = Clock.Today.AddYears(-2);
+        var startDate = TimeProvider.Today.AddYears(-2);
         var endDate = startDate.AddYears(1);
         var awardDate = endDate.AddDays(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -310,7 +310,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 changeReasonDetail: null,
                 evidenceFile: null,
                 updatedBy: updatedByUser.UserId,
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
             Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
@@ -331,7 +331,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
         Assert.NotNull(timelineItem);
         Assert.Equal($"By {updatedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal(awardDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
@@ -364,7 +364,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     {
         // Arrange
         var oldStatus = RouteToProfessionalStatusStatus.InTraining;
-        var startDate = Clock.Today.AddYears(-2);
+        var startDate = TimeProvider.Today.AddYears(-2);
         var endDate = startDate.AddYears(1);
         var awardDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
@@ -394,7 +394,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 changeReasonDetail: changeReasonDetail,
                 evidenceFile: null,
                 updatedBy: updatedByUser.UserId,
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
             Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
@@ -422,8 +422,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusDeletedEvent_RendersExpectedContent()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today.AddDays(-1);
         var holdsFrom = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync(ProfessionalStatusType.QualifiedTeacherStatus);
         var status = RouteToProfessionalStatusStatus.Holds;
@@ -439,7 +439,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             {
                 q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
-                q.WithHoldsFrom(Clock.Today);
+                q.WithHoldsFrom(TimeProvider.Today);
                 q.WithInductionExemption(true);
                 q.WithTrainingStartDate(startDate);
                 q.WithTrainingEndDate(endDate);
@@ -464,7 +464,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 deletionReasonDetail: null,
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
 
@@ -484,7 +484,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
         Assert.NotNull(timelineItem);
         Assert.Equal($"By {deletedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
@@ -520,7 +520,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 deletionReasonDetail: null,
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
 
@@ -560,7 +560,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 deletionReasonDetail: null,
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
 
@@ -600,7 +600,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 deletionReasonDetail: null,
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
 
@@ -640,7 +640,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 deletionReasonDetail: null,
                 evidenceFile: null,
                 deletedBy: deletedByUser.UserId,
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
 
@@ -670,8 +670,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today.AddDays(-1);
         var awardDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = populateOptional ? RouteToProfessionalStatusStatus.Holds : RouteToProfessionalStatusStatus.InTraining;
@@ -795,7 +795,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var migratedEvent = new RouteToProfessionalStatusMigratedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             RouteToProfessionalStatus = routeToProfessionalStatus,
@@ -874,7 +874,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var createdEvent = new DqtInitialTeacherTrainingCreatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining
@@ -915,7 +915,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var updatedEvent = new DqtInitialTeacherTrainingUpdatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining
@@ -961,14 +961,14 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync();
         var teacherStatusName = "Trainee teacher";
         var earlyYearsStatusName = "Early Years Trainee";
-        var qtsDate = Clock.Today.AddDays(-100);
-        var eytsDate = Clock.Today.AddDays(-50);
+        var qtsDate = TimeProvider.Today.AddDays(-100);
+        var eytsDate = TimeProvider.Today.AddDays(-50);
         var createdByUser = await TestData.CreateUserAsync();
 
         var createdEvent = new DqtQtsRegistrationCreatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             QtsRegistration = new EventModels.DqtQtsRegistration
@@ -1045,8 +1045,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync();
         var oldTeacherStatusName = "Trainee teacher";
         var oldEarlyYearsStatusName = "Early Years Trainee";
-        var oldQtsDate = Clock.Today.AddDays(-100);
-        var oldEytsDate = Clock.Today.AddDays(-50);
+        var oldQtsDate = TimeProvider.Today.AddDays(-100);
+        var oldEytsDate = TimeProvider.Today.AddDays(-50);
         var teacherStatusName = "Qualified Teacher (trained)";
         var earlyYearsStatusName = "Early Years Teacher Status";
         var qtsDate = oldQtsDate.AddDays(1);
@@ -1056,7 +1056,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var updatedEvent = new DqtQtsRegistrationUpdatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             QtsRegistration = new EventModels.DqtQtsRegistration

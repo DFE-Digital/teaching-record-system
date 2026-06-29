@@ -161,7 +161,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 Assert.Equal(requestData.FirstName, updatedPerson.FirstName);
                 Assert.Equal(requestData.MiddleName, updatedPerson.MiddleName);
                 Assert.Equal(requestData.LastName, updatedPerson.LastName);
-                Assert.Equal(Clock.UtcNow, updatedPerson.UpdatedOn);
+                Assert.Equal(TimeProvider.UtcNow, updatedPerson.UpdatedOn);
 
                 var previousName = await dbContext.PreviousNames
                     .SingleOrDefaultAsync(pn => pn.PersonId == createPersonResult.PersonId);
@@ -188,7 +188,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             if (isNameChange)
             {
                 var actualEvent = Assert.IsType<ChangeNameRequestSupportTaskApprovedEvent>(e);
-                Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
                 Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
                 Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
                 Assert.Equal(createPersonResult.PersonId, actualEvent.PersonId);
@@ -197,7 +197,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             else
             {
                 var actualEvent = Assert.IsType<ChangeDateOfBirthRequestSupportTaskApprovedEvent>(e);
-                Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
                 Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
                 Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
                 Assert.Equal(ChangeDateOfBirthRequestSupportTaskApprovedEventChanges.DateOfBirth, actualEvent.Changes);

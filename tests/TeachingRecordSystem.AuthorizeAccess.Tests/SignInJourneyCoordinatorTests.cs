@@ -37,7 +37,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(person);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: user.Subject);
 
@@ -69,7 +69,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(person, email: Option.Some((string?)null));
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 var email = Faker.Internet.Email();
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: user.Subject, email);
@@ -135,7 +135,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 // Arrange
                 var user = await TestData.CreateOneLoginUserAsync();
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(user.Subject);
 
@@ -353,7 +353,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 // Arrange
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: user.Subject);
 
@@ -428,7 +428,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                         RequestId = trnRequestId,
                         ApplicationUserId = trnRequestApplicationUser.UserId,
                         OneLoginUserSubject = oneLoginUser.Subject,
-                        CreatedOn = Clock.UtcNow.AddDays(-1),
+                        CreatedOn = TimeProvider.UtcNow.AddDays(-1),
                         EmailAddress = oneLoginUser.EmailAddress,
                         FirstName = "Test",
                         MiddleName = null,
@@ -486,7 +486,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             await dbContext.SaveChangesAsync();
         });
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
@@ -550,7 +550,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                         RequestId = trnRequestId,
                         ApplicationUserId = differentAppUser.UserId,
                         OneLoginUserSubject = oneLoginUser.Subject,
-                        CreatedOn = Clock.UtcNow.AddDays(-7),
+                        CreatedOn = TimeProvider.UtcNow.AddDays(-7),
                         EmailAddress = oneLoginUser.EmailAddress,
                         FirstName = "Test",
                         MiddleName = null,
@@ -595,7 +595,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 // Arrange
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(
                     vtr: AuthenticationOnly,
@@ -631,7 +631,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 // Arrange
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 var firstName = Faker.Name.First();
                 var lastName = Faker.Name.Last();
@@ -661,7 +661,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.Null(coordinator.State.AuthenticationTicket);
 
                 user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
-                Assert.Equal(Clock.UtcNow, user.VerifiedOn);
+                Assert.Equal(TimeProvider.UtcNow, user.VerifiedOn);
                 Assert.Equal(OneLoginUserVerificationRoute.OneLogin, user.VerificationRoute);
                 Assert.NotNull(user.VerifiedNames);
                 Assert.Collection(user.VerifiedNames,
@@ -691,7 +691,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var email = Faker.Internet.Email();
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Medium);
 
@@ -746,7 +746,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var email = Faker.Internet.Email();
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Low,
                     TrnAssociationSource.SupportUi);
@@ -802,7 +802,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var email = Faker.Internet.Email();
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Low,
                     TrnAssociationSource.TrnToken);
@@ -856,7 +856,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Low);
 
@@ -905,7 +905,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Medium);
 
@@ -954,7 +954,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Arrange
                 var person = await TestData.CreatePersonAsync();
                 var user = await TestData.CreateOneLoginUserAsync(personId: null);
-                Clock.Advance(TimeSpan.FromDays(1));
+                TimeProvider.Advance(TimeSpan.FromDays(1));
 
                 await CreateIdentityUser(person.FirstName, person.LastName, person.Trn, user.EmailAddress!, TrnVerificationLevel.Medium);
 
@@ -992,7 +992,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, isActive: true);
 
@@ -1048,7 +1048,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var trnToken = Guid.NewGuid().ToString();
 
@@ -1099,7 +1099,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, expires: TimeSpan.FromSeconds(-1));
 
@@ -1150,7 +1150,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!, userId: Guid.NewGuid(), isActive: false);
 
@@ -1197,7 +1197,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!);
 
@@ -1248,7 +1248,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var user = await TestData.CreateOneLoginUserAsync(personId: null);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var trnToken = await CreateTrnToken(person.Trn, user.EmailAddress!);
 
@@ -1301,7 +1301,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var verifiedLastName = Faker.Name.Last();
         var verifiedDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
         var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([verifiedFirstName, verifiedLastName], verifiedDateOfBirth));
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
@@ -1348,7 +1348,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var person = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
 
         var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
@@ -1431,7 +1431,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             idDbContext,
             eventPublisher,
             Mock.Of<IBackgroundJobScheduler>(),
-            Clock)
+            TimeProvider)
         {
             CallBase = true
         };
@@ -1462,7 +1462,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 return state;
             },
             pathUrls,
-            () => ActivatorUtilities.CreateInstance<SignInJourneyCoordinator>(scope.ServiceProvider, dbContext, oneLoginService, linkGenerator, options, Clock));
+            () => ActivatorUtilities.CreateInstance<SignInJourneyCoordinator>(scope.ServiceProvider, dbContext, oneLoginService, linkGenerator, options, TimeProvider));
 
         await action(signInJourneyCoordinator);
     }
@@ -1477,8 +1477,8 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 EmailAddress = email,
                 FirstName = firstName,
                 LastName = lastName,
-                Created = Clock.UtcNow,
-                Updated = Clock.UtcNow,
+                Created = TimeProvider.UtcNow,
+                Updated = TimeProvider.UtcNow,
                 UserType = IdModelTypes.UserType.Teacher,
                 TrnVerificationLevel = trnVerificationLevel,
                 TrnAssociationSource = trnAssociationSource,
@@ -1492,7 +1492,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     private async Task<string> CreateTrnToken(string trn, string email, TimeSpan? expires = null, Guid? userId = null, bool isActive = true)
     {
         var trnToken = Guid.NewGuid().ToString();
-        var expiresUtc = Clock.UtcNow.Add(expires ?? TimeSpan.FromHours(1));
+        var expiresUtc = TimeProvider.UtcNow.Add(expires ?? TimeSpan.FromHours(1));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -1500,7 +1500,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             {
                 Token = trnToken,
                 Trn = trn,
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 ExpiresUtc = expiresUtc,
                 EmailAddress = email,
                 IsActive = isActive

@@ -81,7 +81,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task Post_WhenExemptionEntered_SavesDataAndRedirectsToNextPage(string routeName, string page)
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
         var endDate = awardDate.AddDays(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == routeName)
@@ -200,7 +200,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
         var endDate = awardDate.AddDays(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Graduate Teacher Programme")

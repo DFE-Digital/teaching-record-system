@@ -17,10 +17,10 @@ public class TestScopedServices
 
     public TestScopedServices(IServiceProvider serviceProvider)
     {
-        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
+        TimeProvider = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
         AzureActiveDirectoryUserServiceMock = new();
         EventObserver = new();
-        Events = new(Clock);
+        Events = new(TimeProvider);
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         BlobStorageFileServiceMock = new();
         BlobStorageFileServiceMock
@@ -65,7 +65,7 @@ public class TestScopedServices
         return _current.Value = new(serviceProvider);
     }
 
-    public FakeTimeProvider Clock { get; }
+    public FakeTimeProvider TimeProvider { get; }
 
     public Mock<IAadUserService> AzureActiveDirectoryUserServiceMock { get; }
 
@@ -87,7 +87,7 @@ public class TestScopedServices
 
     private class ForwardToTestScopedTimeProvider : TimeProvider
     {
-        public override DateTimeOffset GetUtcNow() => GetCurrent().Clock.GetUtcNow();
+        public override DateTimeOffset GetUtcNow() => GetCurrent().TimeProvider.GetUtcNow();
     }
 
     private class ForwardToTestScopedEventObserver : IEventObserver
