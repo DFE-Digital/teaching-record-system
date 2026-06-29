@@ -4,5 +4,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEn
 
 public class ChangeHistoryEntryViewComponent : ViewComponent
 {
-    public IViewComponentResult Invoke(ChangeHistoryEntryViewModel model) => View(model);
+    public IViewComponentResult Invoke(ChangeHistoryEntryViewModel model) =>
+        View($"./Processes/{model.ProcessType}", model);
 }
