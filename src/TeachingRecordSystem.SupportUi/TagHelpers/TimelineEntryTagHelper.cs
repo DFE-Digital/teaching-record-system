@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
@@ -16,14 +15,6 @@ public class TimelineEntryTagHelper : TagHelper
     {
         var descriptionHtml = await output.GetChildContentAsync();
 
-        var timeline = CreateTimelineItem(descriptionHtml);
-
-        output.TagName = null;
-        output.Content.SetHtmlContent(timeline);
-    }
-
-    private TagBuilder CreateTimelineItem(IHtmlContent descriptionHtml)
-    {
         var timelineItem = new TagBuilder("div");
         timelineItem.AddCssClass("moj-timeline__item");
         timelineItem.AddCssClass("govuk-!-padding-bottom-2");
@@ -52,12 +43,19 @@ public class TimelineEntryTagHelper : TagHelper
         by.InnerHtml.AppendHtml(time);
 
         date.InnerHtml.AppendHtml(by);
+        header.InnerHtml.AppendHtml(date);
 
         var description = new TagBuilder("div");
         description.AddCssClass("moj-timeline__description");
         description.InnerHtml.AppendHtml(descriptionHtml);
         timelineItem.InnerHtml.AppendHtml(description);
 
-        return timelineItem;
+        output.TagName = timelineItem.TagName;
+        output.Content.SetHtmlContent(timelineItem.InnerHtml);
+
+        foreach (var attr in timelineItem.Attributes)
+        {
+            output.Attributes.Add(attr.Key, attr.Value);
+        }
     }
 }

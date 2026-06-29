@@ -1,0 +1,65 @@
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@inject ReferenceDataCache ReferenceDataCache
+@model ChangeHistoryEntryViewModel
+@{
+    var deletedEvent = Model.GetEvent<AlertDeletedEvent>();
+    var alert = deletedEvent.Alert;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+}
+
+<timeline-entry title="Alert deleted" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        @if (alertType is not null)
+        {
+            <row>
+                <key>Alert type</key>
+                <value use-empty-fallback>@alertType.Name</value>
+            </row>
+        }
+        else
+        {
+            <row>
+                <key>DQT sanction code</key>
+                <value use-empty-fallback>@alert.DqtSanctionCode?.Value</value>
+            </row>
+            <row>
+                <key>DQT sanction name</key>
+                <value use-empty-fallback>@alert.DqtSanctionCode?.Name</value>
+            </row>
+        }
+        <row>
+            <key>Start date</key>
+            <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+    </govuk-summary-list>
+
+    @if (changeReason is not null)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for deletion</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Deletion details</key>
+                        <value use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                        </value>
+                    </row>
+                    <row>
+                        <key>Additional information</key>
+                        <value use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                        </value>
+                    </row>
+                    <row>
+                        <key>Evidence</key>
+                        <value>
+                            <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                        </value>
+                    </row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+</timeline-entry>
