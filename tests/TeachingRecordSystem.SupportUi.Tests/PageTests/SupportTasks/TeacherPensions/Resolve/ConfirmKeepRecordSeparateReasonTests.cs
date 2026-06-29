@@ -48,7 +48,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -92,7 +92,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -136,7 +136,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -163,7 +163,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
             var supportTaskData = updatedSupportTask.GetData<TeacherPensionsPotentialDuplicateData>();
             Assert.Null(supportTaskData.ResolvedAttributes);
             Assert.Null(supportTaskData.SelectedPersonAttributes);
@@ -173,7 +173,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         {
             var actualEvent = Assert.IsType<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>(e);
             Assert.Equal(state.KeepSeparateReason.Value.GetDisplayName(), actualEvent.Comments);
-            Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualEvent.PersonId);
         });
 
@@ -221,7 +221,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -249,7 +249,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
             var supportTaskData = updatedSupportTask.GetData<TeacherPensionsPotentialDuplicateData>();
             Assert.Null(supportTaskData.ResolvedAttributes);
             Assert.Null(supportTaskData.SelectedPersonAttributes);
@@ -259,7 +259,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         {
             var actualEvent = Assert.IsType<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>(e);
             Assert.Equal(keepReason, actualEvent.Comments);
-            Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualEvent.PersonId);
         });
 

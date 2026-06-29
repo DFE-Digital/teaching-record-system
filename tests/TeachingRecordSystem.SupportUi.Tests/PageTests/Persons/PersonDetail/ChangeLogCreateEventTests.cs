@@ -13,7 +13,7 @@ public class ChangeLogCreateEventTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
+        TimeProvider.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class ChangeLogCreateEventTests : TestBase
         string firstName = "Alfred";
         string middleName = "The";
         string lastName = "Great";
-        DateOnly? dateOfBirth = Clock.Today.AddYears(-30);
+        DateOnly? dateOfBirth = TimeProvider.Today.AddYears(-30);
         string? emailAddress = "old@email-address.com";
         string? nationalInsuranceNumber = "AB 12 34 56 D";
         Gender? gender = Gender.Female;
@@ -54,7 +54,7 @@ public class ChangeLogCreateEventTests : TestBase
         var createdEvent = new LegacyEvents.PersonCreatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             PersonAttributes = details,
@@ -82,7 +82,7 @@ public class ChangeLogCreateEventTests : TestBase
         var item = doc.GetElementByTestId("timeline-item-created-event");
         Assert.NotNull(item);
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TrimmedText()));
         doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
@@ -106,7 +106,7 @@ public class ChangeLogCreateEventTests : TestBase
         string firstName = "Alfred";
         string middleName = "The";
         string lastName = "Great";
-        DateOnly? dateOfBirth = Clock.Today.AddYears(-30);
+        DateOnly? dateOfBirth = TimeProvider.Today.AddYears(-30);
 
         var createReason = PersonCreateReason.AnotherReason.GetDisplayName();
 
@@ -124,7 +124,7 @@ public class ChangeLogCreateEventTests : TestBase
         var createdEvent = new LegacyEvents.PersonCreatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             PersonAttributes = details,

@@ -106,7 +106,7 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
             Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches, updatedSupportTaskData.Outcome);
 
             var updatedOneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);
-            Assert.Equal(Clock.UtcNow, updatedOneLoginUser.VerifiedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.VerifiedOn);
         });
 
         Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType));

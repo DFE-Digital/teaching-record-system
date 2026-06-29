@@ -201,7 +201,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             var expectedMqDeletedEvent = new MandatoryQualificationDeletedEvent
             {
                 EventId = Guid.Empty,
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 RaisedBy = GetCurrentUserId(),
                 PersonId = person.PersonId,
                 MandatoryQualification = new()

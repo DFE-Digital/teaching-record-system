@@ -33,7 +33,7 @@ public class ScheduleTrnRecipientEmailsJobTests(JobFixture fixture) : JobTestBas
             EmailDelayDays = 1
         });
 
-        Clock.Advance(TimeSpan.FromDays(options.Value.EmailDelayDays + 1));
+        TimeProvider.Advance(TimeSpan.FromDays(options.Value.EmailDelayDays + 1));
 
         // Act
         await WithServiceAsync<ScheduleTrnRecipientEmailsJob>(job => job.ExecuteAsync(CancellationToken.None), options, backgroundJobScheduler.Object);

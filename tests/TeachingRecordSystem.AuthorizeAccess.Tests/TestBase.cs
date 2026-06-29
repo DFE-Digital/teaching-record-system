@@ -38,7 +38,7 @@ public abstract class TestBase
 
     protected CaptureEventObserver LegacyEventPublisher => _testServices.LegacyEventObserver;
 
-    protected FakeTimeProvider Clock => _testServices.Clock;
+    protected FakeTimeProvider TimeProvider => _testServices.TimeProvider;
 
     protected HttpClient HttpClient { get; }
 
@@ -202,9 +202,9 @@ public abstract class TestBase
 
         var trnToken = new IdTrnToken()
         {
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             Email = email,
-            ExpiresUtc = Clock.UtcNow.AddDays(30),
+            ExpiresUtc = TimeProvider.UtcNow.AddDays(30),
             Trn = trn,
             TrnToken = trnTokenStr,
             UserId = null

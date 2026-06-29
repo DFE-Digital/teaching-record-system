@@ -32,7 +32,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
             fileName: "SomeFileName.txt",
             integrationTransactionId: 1,
-            createdOn: Clock.UtcNow,
+            createdOn: TimeProvider.UtcNow,
             configurePerson: p => p.WithFirstName("John").WithMiddleName("Maynard").WithLastName("Smith").WithNationalInsuranceNumber());
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/teacher-pensions?_f=1");
@@ -52,7 +52,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertRowHasContent("name", "John Maynard Smith");
         AssertRowHasContent("filename", "SomeFileName.txt");
         AssertRowHasContent("integration-transaction-id", "1");
-        AssertRowHasContent("created-on", Clock.UtcNow.ToString("dd MMM yyyy"));
+        AssertRowHasContent("created-on", TimeProvider.UtcNow.ToString("dd MMM yyyy"));
 
         void AssertRowHasContent(string testId, string expectedText)
         {

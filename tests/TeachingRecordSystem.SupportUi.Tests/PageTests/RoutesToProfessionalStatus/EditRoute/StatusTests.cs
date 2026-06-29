@@ -126,7 +126,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StatusMovesFromHoldsToAnotherStatus_RemovesHoldsFromAndExemptionFlag()
     {
         // Arrange
-        var holdsFrom = Clock.Today;
+        var holdsFrom = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .SingleRandom();
         var newStatus = RouteToProfessionalStatusStatus.UnderAssessment;
@@ -222,7 +222,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StatusStaysHolds_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .SingleRandom();
         var status = RouteToProfessionalStatusStatus.Holds;

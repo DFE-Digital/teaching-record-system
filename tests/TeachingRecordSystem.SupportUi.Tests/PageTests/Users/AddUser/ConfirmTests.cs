@@ -397,7 +397,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserAddedEvent>(e);
-            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
             Assert.Equal(newName, userCreatedEvent.User.Name);
             Assert.Equal(email, userCreatedEvent.User.Email);

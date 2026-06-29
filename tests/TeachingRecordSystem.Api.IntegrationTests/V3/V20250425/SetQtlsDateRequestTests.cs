@@ -38,7 +38,7 @@ public class SetQtlsDateRequestTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var futureDate = Clock.Today.AddDays(1);
+        var futureDate = TimeProvider.Today.AddDays(1);
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
         {

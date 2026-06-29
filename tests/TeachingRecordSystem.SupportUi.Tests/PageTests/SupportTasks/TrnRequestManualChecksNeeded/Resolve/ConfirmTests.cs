@@ -77,7 +77,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(TrnRequestStatus.Completed, updatedSupportTask.TrnRequestMetadata!.Status);
 
         Events.AssertProcessesCreated(p =>

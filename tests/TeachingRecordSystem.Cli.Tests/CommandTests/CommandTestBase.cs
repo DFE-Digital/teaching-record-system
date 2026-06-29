@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 [Collection(nameof(DisableParallelization))]
 public abstract class CommandTestBase(IServiceProvider services)
 {
-    protected FakeTimeProvider Clock => (FakeTimeProvider)services.GetRequiredService<TimeProvider>();
+    protected FakeTimeProvider TimeProvider => (FakeTimeProvider)services.GetRequiredService<TimeProvider>();
 
     protected DbHelper DbHelper => services.GetRequiredService<DbHelper>();
 

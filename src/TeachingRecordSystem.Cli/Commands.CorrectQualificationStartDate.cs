@@ -45,7 +45,7 @@ public static partial class Commands
             }
 
             var services = new ServiceCollection()
-                .AddClock()
+                .AddTimeProvider()
                 .AddDatabase(connectionString);
 
             var serviceProvider = services.BuildServiceProvider();

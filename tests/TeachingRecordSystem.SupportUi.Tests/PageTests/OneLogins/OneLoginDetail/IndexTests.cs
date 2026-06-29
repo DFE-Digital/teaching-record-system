@@ -85,7 +85,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject);
             oneLoginUser.SetVerified(
-                Clock.UtcNow,
+                TimeProvider.UtcNow,
                 verificationRoute,
                 verifiedByApplicationUserId: verifiedByApplicationUserId,
                 [verifiedName],

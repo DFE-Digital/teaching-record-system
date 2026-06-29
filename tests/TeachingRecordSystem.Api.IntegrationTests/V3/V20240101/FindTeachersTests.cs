@@ -199,8 +199,8 @@ public class FindTeachersTests : TestBase
             {
                 PreviousNameId = Guid.NewGuid(),
                 PersonId = person2.PersonId,
-                CreatedOn = Clock.UtcNow,
-                UpdatedOn = Clock.UtcNow,
+                CreatedOn = TimeProvider.UtcNow,
+                UpdatedOn = TimeProvider.UtcNow,
                 FirstName = person2.FirstName,
                 MiddleName = person2.MiddleName,
                 LastName = lastName

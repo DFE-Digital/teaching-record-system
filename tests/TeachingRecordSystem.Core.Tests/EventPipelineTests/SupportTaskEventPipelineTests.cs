@@ -10,7 +10,7 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
     public async Task SupportTaskCreatedEventPublished_EmitsLegacySupportTaskCreatedEvent()
     {
         // Arrange
-        var processContext = new ProcessContext(default, Clock.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         var @event = new SupportTaskCreatedEvent
         {

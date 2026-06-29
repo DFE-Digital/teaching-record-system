@@ -309,7 +309,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             EventObserver.AssertEventsSaved(e =>
             {
                 var userCreatedEvent = Assert.IsType<UserUpdatedEvent>(e);
-                Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
                 Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
                 Assert.Equal(newName, userCreatedEvent.User.Name);
                 Assert.Equal(updatedUser.Email, userCreatedEvent.User.Email);
@@ -442,7 +442,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserActivatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
         });
 

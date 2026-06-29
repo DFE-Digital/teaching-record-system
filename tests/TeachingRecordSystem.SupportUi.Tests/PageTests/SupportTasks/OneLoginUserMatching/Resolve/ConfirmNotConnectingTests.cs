@@ -294,7 +294,7 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
             Assert.Equal(additionalDetails, updatedSupportTaskData.NotConnectingAdditionalDetails);
 
             var updatedOneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);
-            Assert.Equal(Clock.UtcNow, updatedOneLoginUser.VerifiedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.VerifiedOn);
         });
 
         Events.AssertProcessesCreated(p => Assert.Equal(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, p.ProcessContext.ProcessType));

@@ -47,7 +47,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -101,7 +101,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
@@ -155,7 +155,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
                 s.WithGender(person.Gender);
                 s.WithDateOfBirth(person.DateOfBirth);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
-                s.WithCreatedOn(Clock.UtcNow);
+                s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
 

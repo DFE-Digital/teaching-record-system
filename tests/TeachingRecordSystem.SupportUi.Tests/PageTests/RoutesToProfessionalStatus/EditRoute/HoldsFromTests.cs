@@ -238,7 +238,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StatusIsAlreadyHoldsJourney_HoldsFromIsEntered_SavesDateAndRedirectsToDetail()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -291,7 +291,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var status = RouteToProfessionalStatusStatus.Holds;
-        var startDate = Clock.Today.AddYears(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -343,7 +343,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var status = RouteToProfessionalStatusStatus.Holds;
-        var startDate = Clock.Today.AddYears(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()) // an induction exemption route who's exemption is implicit and therefore doesn't require the exemption question
@@ -441,9 +441,9 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenFutureHoldsFromDateIsEntered_ReturnsError()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
         var endDate = startDate.AddMonths(1);
-        var holdsFrom = Clock.Today.AddDays(1);
+        var holdsFrom = TimeProvider.Today.AddDays(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
             .SingleRandom();

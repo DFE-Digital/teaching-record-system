@@ -29,8 +29,8 @@ public class SendInductionCompletedEmailJobTests(JobFixture fixture) : JobTestBa
             var batchJob = new InductionCompletedEmailsJob
             {
                 InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,
-                PassedEndUtc = Clock.UtcNow.AddDays(-1),
-                ExecutedUtc = Clock.UtcNow
+                PassedEndUtc = TimeProvider.UtcNow.AddDays(-1),
+                ExecutedUtc = TimeProvider.UtcNow
             };
             dbContext.InductionCompletedEmailsJobs.Add(batchJob);
 

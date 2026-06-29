@@ -172,7 +172,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
-        var futureDate = Clock.Today.AddDays(2);
+        var futureDate = TimeProvider.Today.AddDays(2);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
         {

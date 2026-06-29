@@ -126,7 +126,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             sourcedFromSecondaryPersonAttribute.Attribute,
             useNullValues: useNullValues);
 
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "evidence.jpg";
@@ -217,7 +217,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             Assert.Equal(evidenceFileId, actualEvent.EvidenceFile?.FileId);
             Assert.Equal(evidenceFileName, actualEvent.EvidenceFile?.Name);
             Assert.Equal(comments, actualEvent.Comments);
-            Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
 
             var expectedChange = sourcedFromSecondaryPersonAttribute.Attribute switch
             {

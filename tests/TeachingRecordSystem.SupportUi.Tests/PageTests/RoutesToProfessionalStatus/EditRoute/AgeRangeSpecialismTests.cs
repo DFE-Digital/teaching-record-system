@@ -20,8 +20,8 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == routeName).Single();
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today.AddDays(-1);
         var holdsFrom = endDate.AddDays(1);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1).Select(s => s.TrainingSubjectId).ToArray();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
@@ -97,8 +97,8 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == routeName).Single();
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today.AddDays(-1);
         var holdsFrom = endDate.AddDays(1);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1).Select(s => s.TrainingSubjectId).ToArray();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();

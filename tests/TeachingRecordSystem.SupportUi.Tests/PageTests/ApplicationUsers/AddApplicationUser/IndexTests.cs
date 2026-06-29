@@ -158,7 +158,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             e =>
             {
                 var applicationUserCreatedEvent = Assert.IsType<ApplicationUserCreatedEvent>(e);
-                Assert.Equal(Clock.UtcNow, applicationUserCreatedEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, applicationUserCreatedEvent.CreatedUtc);
                 Assert.Equal(GetCurrentUserId(), applicationUserCreatedEvent.RaisedBy.UserId);
                 Assert.Equal(name, applicationUserCreatedEvent.ApplicationUser.Name);
                 Assert.Equal(shortName, applicationUserCreatedEvent.ApplicationUser.ShortName);

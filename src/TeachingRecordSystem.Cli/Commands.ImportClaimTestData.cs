@@ -44,7 +44,7 @@ public static partial class Commands
             var environment = new HostingEnvironment { EnvironmentName = Environments.Production };
 
             var services = new ServiceCollection()
-                .AddClock()
+                .AddTimeProvider()
                 .AddDatabase(connectionString)
                 .AddTrnRequestService(configuration)
                 .AddPersonService()

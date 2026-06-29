@@ -17,20 +17,20 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var jobMetaData = new JobMetadata()
             {
                 JobName = nameof(CapitaExportNewJob),
                 Metadata = new Dictionary<string, string>
                     {
                         {
-                            "LastRunDate", Clock.UtcNow.AddDays(-3).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                            "LastRunDate", TimeProvider.UtcNow.AddDays(-3).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                         }
                     }
             };
             dbContext.JobMetadata.Add(jobMetaData);
             await dbContext.SaveChangesAsync();
-            var lastRunDate = Clock.UtcNow.AddDays(-2);
+            var lastRunDate = TimeProvider.UtcNow.AddDays(-2);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
                 x.WithGender(Gender.Male);
@@ -57,14 +57,14 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var jobMetaData = new JobMetadata()
             {
                 JobName = nameof(CapitaExportNewJob),
                 Metadata = new Dictionary<string, string>
                     {
                         {
-                            "LastRunDate", Clock.UtcNow.AddDays(-3).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                            "LastRunDate", TimeProvider.UtcNow.AddDays(-3).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                         }
                     }
             };
@@ -90,8 +90,8 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
-            var lastRunDate = Clock.UtcNow.AddDays(1);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
+            var lastRunDate = TimeProvider.UtcNow.AddDays(1);
 
             // Act
             var newPersons = await job.GetNewPersonsAsync(lastRunDate);
@@ -107,7 +107,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var person1 = await TestData.CreatePersonAsync();
             var person2 = await TestData.CreatePersonAsync();
@@ -130,7 +130,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
                 x.WithGender(gender);
@@ -166,7 +166,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var newLastName = Faker.Name.Last();
             var person1 = await TestData.CreatePersonAsync(x =>
             {
@@ -177,7 +177,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow.AddYears(-2),
+                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = trsPerson.PersonId,
                 PersonAttributes = personDetails,
@@ -221,7 +221,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             Gender gender = Gender.Male;
             var person1 = await TestData.CreatePersonAsync(x =>
             {
@@ -257,7 +257,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
                 x.WithGender(Gender.Male);
@@ -292,7 +292,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
                 x.WithGender(Gender.Male);
@@ -329,7 +329,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
                 x.WithGender(Gender.Male);
@@ -368,7 +368,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var newLastName = Faker.Name.Last();
             var originalastName = Faker.Name.Last();
             var person1 = await TestData.CreatePersonAsync(x =>
@@ -383,7 +383,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow.AddYears(-2),
+                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = trsPerson.PersonId,
                 PersonAttributes = newPersonDetails,
@@ -419,7 +419,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var newLastName = Faker.Name.Last();
             var originalastName = Faker.Name.Last();
             var person1 = await TestData.CreatePersonAsync(x =>
@@ -433,7 +433,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow.AddYears(-2),
+                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = trsPerson.PersonId,
                 PersonAttributes = newPersonDetails,
@@ -469,7 +469,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var newLastName = new string('x', 60);
             var originalastName = new string('a', 75);
             var person1 = await TestData.CreatePersonAsync(x =>
@@ -483,7 +483,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow.AddYears(-2),
+                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = trsPerson.PersonId,
                 PersonAttributes = newPersonDetails,
@@ -519,7 +519,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var updateLastName1 = Faker.Name.Last();
             var updateLastName2 = Faker.Name.Last();
             var updateLastName3 = Faker.Name.Last();
@@ -537,7 +537,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent1 = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow.AddYears(-3),
+                CreatedUtc = TimeProvider.UtcNow.AddYears(-3),
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = trsPerson.PersonId,
                 PersonAttributes = newPersonDetails1,
@@ -558,7 +558,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent2 = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow.AddYears(-2),
+                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = trsPerson.PersonId,
                 PersonAttributes = newPersonDetails2,
@@ -579,7 +579,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent3 = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = trsPerson.PersonId,
                 PersonAttributes = newPersonDetails3,
@@ -615,7 +615,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             var expectedTotalRowCount = 1;
             var expectedTotalSuccessCount = 1;
@@ -627,7 +627,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 Metadata = new Dictionary<string, string>
                     {
                         {
-                            "LastRunDate", Clock.UtcNow.AddDays(-2).AddHours(-2).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                            "LastRunDate", TimeProvider.UtcNow.AddDays(-2).AddHours(-2).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                         }
                     }
             };
@@ -695,14 +695,14 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 Metadata = new Dictionary<string, string>
                     {
                         {
-                            "LastRunDate", Clock.UtcNow.AddDays(-1).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                            "LastRunDate", TimeProvider.UtcNow.AddDays(-1).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                         }
                     }
             };
             dbContext.JobMetadata.Add(jobMetaData);
             var originalastName = Faker.Name.Last();
             await dbContext.SaveChangesAsync();
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
 
             // Act
             var integrationTransactionJobId = await job.ExecuteAsync(CancellationToken.None);
@@ -737,13 +737,13 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 Metadata = new Dictionary<string, string>
                     {
                         {
-                            "LastRunDate", Clock.UtcNow.AddDays(-2).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                            "LastRunDate", TimeProvider.UtcNow.AddDays(-2).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                         }
                     }
             };
             dbContext.JobMetadata.Add(jobMetaData);
             await dbContext.SaveChangesAsync();
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var originalastName = Faker.Name.Last();
             var person1 = await TestData.CreatePersonAsync(x =>
             {
@@ -757,7 +757,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent1 = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = trsPerson.PersonId,
                 PersonAttributes = newPersonDetails,
@@ -804,7 +804,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
             var expectedTotalRowCount = 4;
             var expectedTotalSuccessCount = 4;
             var expectedFailureCount = 0;
@@ -815,7 +815,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
                 Metadata = new Dictionary<string, string>
                     {
                         {
-                            "LastRunDate", Clock.UtcNow.AddDays(-5).AddHours(-2).ToString("o")
+                            "LastRunDate", TimeProvider.UtcNow.AddDays(-5).AddHours(-2).ToString("o")
                         }
                     }
             };
@@ -843,7 +843,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent1 = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = person1.PersonId,
                 PersonAttributes = newPersonDetails1,
@@ -862,7 +862,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var nameChangeEvent2 = new LegacyEvents.PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = person2.PersonId,
                 PersonAttributes = newPersonDetails2,
@@ -939,11 +939,11 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, Clock);
-            var expectedFileName = $"Reg01_DTR_{Clock.UtcNow.ToString("yyyyMMdd")}_{Clock.UtcNow.ToString("HHmmss")}_New.txt"; ;
+            var job = new CapitaExportNewJob(CreateDataLakeServiceClientMock(), NullLogger<CapitaExportNewJob>.Instance, dbContext, TimeProvider);
+            var expectedFileName = $"Reg01_DTR_{TimeProvider.UtcNow.ToString("yyyyMMdd")}_{TimeProvider.UtcNow.ToString("HHmmss")}_New.txt"; ;
 
             // Act
-            var fileName = job.GetFileName(Clock);
+            var fileName = job.GetFileName(TimeProvider);
 
             // Assert
             Assert.Equal(expectedFileName, fileName);

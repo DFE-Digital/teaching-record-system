@@ -47,7 +47,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var fileName1 = "FileName.csv";
         var importStatus1 = IntegrationTransactionImportStatus.Success;
         var interfaceType1 = IntegrationTransactionInterfaceType.EwcWales;
-        var createdOn1 = Clock.UtcNow;
+        var createdOn1 = TimeProvider.UtcNow;
 
 
         var totalCount2 = 10;
@@ -58,7 +58,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var fileName2 = "MoreThanOneRow.csv";
         var importStatus2 = IntegrationTransactionImportStatus.Success;
         var interfaceType2 = IntegrationTransactionInterfaceType.EwcWales;
-        var createdOn2 = Clock.UtcNow;
+        var createdOn2 = TimeProvider.UtcNow;
 
 
         var integrationTransaction1 = await TestData.CreateIntegrationTransactionAsync(p =>
@@ -110,7 +110,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var fileName = "FileName.csv";
         var importStatus = IntegrationTransactionImportStatus.Success;
         var interfaceType = IntegrationTransactionInterfaceType.EwcWales;
-        var createdOn = Clock.UtcNow;
+        var createdOn = TimeProvider.UtcNow;
         var integrationTransaction = await TestData.CreateIntegrationTransactionAsync(p =>
         {
             p.WithTotalCount(totalCount);
@@ -178,7 +178,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var fileName = "FileName.csv";
         var importStatus = status;
         var interfaceType = IntegrationTransactionInterfaceType.EwcWales;
-        var createdOn = Clock.UtcNow;
+        var createdOn = TimeProvider.UtcNow;
         var integrationTransaction = await TestData.CreateIntegrationTransactionAsync(p =>
         {
             p.WithTotalCount(totalCount);

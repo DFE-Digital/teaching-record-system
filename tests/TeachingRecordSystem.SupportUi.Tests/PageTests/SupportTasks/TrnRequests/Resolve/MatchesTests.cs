@@ -273,7 +273,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts(Clock.Today.AddDays(-1)));
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts(TimeProvider.Today.AddDays(-1)));
         var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
         var journeyInstance = await CreateJourneyInstance(

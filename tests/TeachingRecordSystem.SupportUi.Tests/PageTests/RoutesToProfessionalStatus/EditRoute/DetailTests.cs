@@ -85,9 +85,9 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_RouteAndStatusWithAllFieldsApplicable_AllFieldsShown()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today;
-        var awardDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today;
+        var awardDate = TimeProvider.Today;
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).First();
@@ -152,8 +152,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ShowsOptionalAnswers_AsExpected()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today;
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsHaveFieldRequirementAsync(FieldRequirement.Optional);
         var status = ProfessionalStatusStatusRegistry.All.Where(s => s.Value == RouteToProfessionalStatusStatus.InTraining).SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p
@@ -236,9 +236,9 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_RouteAndStatusWithExemptionInduction_ShowsFieldAndChangeLink(RouteToProfessionalStatusStatus status, bool? hasExemption, string expectedContent)
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today;
-        var awardDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today;
+        var awardDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition")
             .SingleRandom();
@@ -280,9 +280,9 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_RouteAndStatusWithImplictExemptionInduction_ShowsFieldButNoChangeLink()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today;
-        var awardDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today;
+        var awardDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
             .SingleRandom();

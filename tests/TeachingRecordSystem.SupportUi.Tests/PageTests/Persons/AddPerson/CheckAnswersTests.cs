@@ -207,8 +207,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContextAsync(async dbContext =>
         {
             var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == personId);
-            Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);
-            Assert.Equal(Clock.UtcNow, createdPersonRecord.UpdatedOn);
+            Assert.Equal(TimeProvider.UtcNow, createdPersonRecord.CreatedOn);
+            Assert.Equal(TimeProvider.UtcNow, createdPersonRecord.UpdatedOn);
             Assert.Equal(firstName, createdPersonRecord.FirstName);
             Assert.Equal(middleName, createdPersonRecord.MiddleName);
             Assert.Equal(lastName, createdPersonRecord.LastName);
@@ -222,7 +222,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var actualEvent = Assert.IsType<LegacyEvents.PersonCreatedEvent>(e);
 
-            Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(personId, actualEvent.PersonId);
             Assert.Equal(firstName, actualEvent.PersonAttributes.FirstName);
             Assert.Equal(middleName, actualEvent.PersonAttributes.MiddleName);

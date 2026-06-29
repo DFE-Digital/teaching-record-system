@@ -103,7 +103,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // Arrange
         InductionStatus[] expectedStatuses = new List<InductionStatus> { InductionStatus.Exempt, InductionStatus.FailedInWales, currentInductionStatus }.OrderBy(i => i).ToArray();
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
-        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
+        var lessThanSevenYearsAgo = TimeProvider.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         await WithDbContextAsync(async dbContext =>
         {
@@ -112,9 +112,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 InductionStatus.Passed,
                 startDate: lessThanSevenYearsAgo.AddYears(-1),
                 completedDate: lessThanSevenYearsAgo,
-                cpdModifiedOn: Clock.UtcNow,
+                cpdModifiedOn: TimeProvider.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 out _);
             await dbContext.SaveChangesAsync();
         });
@@ -159,9 +159,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
                 completedDate: null,
-                cpdModifiedOn: Clock.UtcNow,
+                cpdModifiedOn: TimeProvider.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 out _);
             person.Person.SetInductionStatus(
                 status,
@@ -172,7 +172,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 changeReasonDetail: null,
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 additionalInformation: null,
                 out _);
             await dbContext.SaveChangesAsync();
@@ -274,7 +274,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [Fact]
     public async Task Post_PersonManagedByCpd_NoSelectedStatus_ShowsPageError()
     {
-        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
+        var lessThanSevenYearsAgo = TimeProvider.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         await WithDbContextAsync(async dbContext =>
         {
@@ -283,9 +283,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 InductionStatus.Passed,
                 startDate: lessThanSevenYearsAgo.AddYears(-1),
                 completedDate: lessThanSevenYearsAgo,
-                cpdModifiedOn: Clock.UtcNow,
+                cpdModifiedOn: TimeProvider.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 out _);
             await dbContext.SaveChangesAsync();
         });
@@ -318,7 +318,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ForPersonWithInductionStatusManagedByCPD_ShowsWarning(InductionStatus status, string statusSpecificText)
     {
         //Arrange
-        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
+        var lessThanSevenYearsAgo = TimeProvider.Today.AddYears(-1);
 
         // test setup here is convoluted because I need to set up a person,
         // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
@@ -342,9 +342,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
                 completedDate: null,
-                cpdModifiedOn: Clock.UtcNow,
+                cpdModifiedOn: TimeProvider.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 out _);
 
             person.Person.SetInductionStatus(
@@ -356,7 +356,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 changeReasonDetail: null,
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 additionalInformation: null,
                 out _);
 
@@ -385,7 +385,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ForPersonWithInductionStatusManagedByCPD_StatusExemptOrFailedInWales_NoWarning(InductionStatus status)
     {
         //Arrange
-        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
+        var lessThanSevenYearsAgo = TimeProvider.Today.AddYears(-1);
 
         // test setup here is convoluted because I need to set up a person,
         // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
@@ -399,9 +399,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
                 completedDate: null,
-                cpdModifiedOn: Clock.UtcNow,
+                cpdModifiedOn: TimeProvider.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 out _);
             person.Person.SetInductionStatus(
                 status,
@@ -412,7 +412,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 changeReasonDetail: null,
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 additionalInformation: null,
                 out _);
             await dbContext.SaveChangesAsync();

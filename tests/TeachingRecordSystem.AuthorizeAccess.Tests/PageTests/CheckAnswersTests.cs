@@ -111,8 +111,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 var supportTask = await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.OneLoginUserSubject == oneLoginUser.Subject));
                 Assert.NotNull(supportTask);
-                Assert.Equal(Clock.UtcNow, supportTask.CreatedOn);
-                Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+                Assert.Equal(TimeProvider.UtcNow, supportTask.CreatedOn);
+                Assert.Equal(TimeProvider.UtcNow, supportTask.UpdatedOn);
                 Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTask.SupportTaskType);
                 Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
                 Assert.Equal(oneLoginUser.Subject, supportTask.OneLoginUserSubject);
@@ -129,7 +129,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 LegacyEventPublisher.AssertEventsSaved(e =>
                 {
                     var supportTaskCreatedEvent = Assert.IsType<LegacyEvents.SupportTaskCreatedEvent>(e);
-                    Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
+                    Assert.Equal(TimeProvider.UtcNow, supportTaskCreatedEvent.CreatedUtc);
                     Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
                     Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);
                     Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTaskCreatedEvent.SupportTask.SupportTaskType);
@@ -205,8 +205,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 var supportTask = await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.OneLoginUserSubject == oneLoginUser.Subject));
                 Assert.NotNull(supportTask);
-                Assert.Equal(Clock.UtcNow, supportTask.CreatedOn);
-                Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+                Assert.Equal(TimeProvider.UtcNow, supportTask.CreatedOn);
+                Assert.Equal(TimeProvider.UtcNow, supportTask.UpdatedOn);
                 Assert.Equal(SupportTaskType.OneLoginUserIdVerification, supportTask.SupportTaskType);
                 Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
                 Assert.Equal(oneLoginUser.Subject, supportTask.OneLoginUserSubject);
@@ -226,7 +226,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 LegacyEventPublisher.AssertEventsSaved(e =>
                 {
                     var supportTaskCreatedEvent = Assert.IsType<LegacyEvents.SupportTaskCreatedEvent>(e);
-                    Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
+                    Assert.Equal(TimeProvider.UtcNow, supportTaskCreatedEvent.CreatedUtc);
                     Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
                     Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);
                     Assert.Equal(SupportTaskType.OneLoginUserIdVerification, supportTaskCreatedEvent.SupportTask.SupportTaskType);

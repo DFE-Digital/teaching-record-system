@@ -44,14 +44,14 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.DbsAlertTypeId)
-                .WithStartDate(Clock.Today.AddDays(-30))
-                .WithEndDate(Clock.Today.AddDays(-1))));
+                .WithStartDate(TimeProvider.Today.AddDays(-30))
+                .WithEndDate(TimeProvider.Today.AddDays(-1))));
 
         var expectedNoteText = "Note without attachment";
         var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
         var note1 = await TestData.CreateNoteFromDqtAsync(person.PersonId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
-        Clock.Advance(TimeSpan.FromDays(1));
+        TimeProvider.Advance(TimeSpan.FromDays(1));
         var note2 = await TestData.CreateNoteFromDqtAsync(person.PersonId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
@@ -76,8 +76,8 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.DbsAlertTypeId)
-                .WithStartDate(Clock.Today.AddDays(-30))
-                .WithEndDate(Clock.Today.AddDays(-1))));
+                .WithStartDate(TimeProvider.Today.AddDays(-30))
+                .WithEndDate(TimeProvider.Today.AddDays(-1))));
 
         var expectedNoteText = "Note without attachment";
         var expectedCreatedBy = TestData.GenerateName();
@@ -197,12 +197,12 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedCreatedBy1 = TestData.GenerateName();
         var createdByUserId1 = Guid.NewGuid();
         var expectedOriginalFileName1 = "file.png";
-        var expectedCreatedDate1 = Clock.UtcNow.AddMonths(-1);
+        var expectedCreatedDate1 = TimeProvider.UtcNow.AddMonths(-1);
         var expectedNoteText2 = "A second note that means something";
         var expectedCreatedBy2 = TestData.GenerateName();
         var createdByUserId2 = Guid.NewGuid();
         var expectedOriginalFileName2 = "file2.png";
-        var expectedCreatedDate2 = Clock.UtcNow;
+        var expectedCreatedDate2 = TimeProvider.UtcNow;
         var note1 = await TestData.CreateNoteFromDqtAsync(createPersonResult.PersonId, expectedNoteText1, createdByUserId1, expectedCreatedBy1, expectedOriginalFileName1, Guid.NewGuid(), expectedCreatedDate1);
         var note2 = await TestData.CreateNoteFromDqtAsync(createPersonResult.PersonId, expectedNoteText2, createdByUserId2, expectedCreatedBy2, expectedOriginalFileName2, Guid.NewGuid(), expectedCreatedDate2);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}/notes");

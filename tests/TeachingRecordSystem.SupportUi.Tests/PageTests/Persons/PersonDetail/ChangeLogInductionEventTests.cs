@@ -16,7 +16,7 @@ public class ChangeLogInductionEventTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
+        TimeProvider.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
     }
 
     [Theory]
@@ -34,8 +34,8 @@ public class ChangeLogInductionEventTests : TestBase
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
 
-        DateOnly? startDate = Clock.Today.AddYears(-1);
-        DateOnly? completionDate = Clock.Today.AddDays(-10);
+        DateOnly? startDate = TimeProvider.Today.AddYears(-1);
+        DateOnly? completionDate = TimeProvider.Today.AddDays(-10);
         var inductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? InductionStatus.Exempt : InductionStatus.InProgress;
         var inductionExemptionReasonId = InductionExemptionReason.QualifiedThroughEeaMutualRecognitionRouteId;
         var inductionExemptionReason = await ReferenceDataCache.GetInductionExemptionReasonByIdAsync(inductionExemptionReasonId);
@@ -53,7 +53,7 @@ public class ChangeLogInductionEventTests : TestBase
         {
             EventId = Guid.NewGuid(),
             Key = $"{induction.InductionId}-Created",
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
             Induction = induction
@@ -78,7 +78,7 @@ public class ChangeLogInductionEventTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 if (populatedFields.HasFlag(DqtInductionFields.StartDate))
                 {
                     Assert.Equal(startDate?.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
@@ -134,7 +134,7 @@ public class ChangeLogInductionEventTests : TestBase
         {
             EventId = Guid.NewGuid(),
             Key = $"{induction.InductionId}-Imported",
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
             Induction = induction,
@@ -160,7 +160,7 @@ public class ChangeLogInductionEventTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -184,7 +184,7 @@ public class ChangeLogInductionEventTests : TestBase
         {
             EventId = Guid.NewGuid(),
             Key = $"{induction.InductionId}-Deactivated",
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
             Induction = induction
@@ -209,7 +209,7 @@ public class ChangeLogInductionEventTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -233,7 +233,7 @@ public class ChangeLogInductionEventTests : TestBase
         {
             EventId = Guid.NewGuid(),
             Key = $"{induction.InductionId}-Reactivated",
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
             Induction = induction
@@ -258,7 +258,7 @@ public class ChangeLogInductionEventTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -291,13 +291,13 @@ public class ChangeLogInductionEventTests : TestBase
         var person = await TestData.CreatePersonAsync();
 
         var inductionId = Guid.NewGuid();
-        DateOnly? oldStartDate = Clock.Today.AddYears(-1);
-        DateOnly? oldCompletionDate = Clock.Today.AddDays(-10);
+        DateOnly? oldStartDate = TimeProvider.Today.AddYears(-1);
+        DateOnly? oldCompletionDate = TimeProvider.Today.AddDays(-10);
         var oldInductionStatus = changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason) ? InductionStatus.Exempt : InductionStatus.InProgress;
         var oldInductionExemptionReason = InductionExemptionReason.QualifiedThroughEeaMutualRecognitionRouteId;
 
-        DateOnly? startDate = Clock.Today.AddYears(-1).AddDays(1);
-        DateOnly? completionDate = Clock.Today.AddDays(-9);
+        DateOnly? startDate = TimeProvider.Today.AddYears(-1).AddDays(1);
+        DateOnly? completionDate = TimeProvider.Today.AddDays(-9);
         var inductionStatus = changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason) ? InductionStatus.Exempt : InductionStatus.Passed;
         var inductionExemptionReasonId = InductionExemptionReason.OverseasTrainedTeacherId;
         var inductionExemptionReason = await ReferenceDataCache.GetInductionExemptionReasonByIdAsync(inductionExemptionReasonId);
@@ -324,7 +324,7 @@ public class ChangeLogInductionEventTests : TestBase
         {
             EventId = Guid.NewGuid(),
             Key = $"{induction.InductionId}-Updated",
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
             Induction = induction,
@@ -351,7 +351,7 @@ public class ChangeLogInductionEventTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 if (changes.HasFlag(DqtInductionUpdatedEventChanges.StartDate))
                 {
                     Assert.Equal(newValueIsNull ? WebConstants.EmptyFallbackContent : startDate?.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
@@ -409,8 +409,8 @@ public class ChangeLogInductionEventTests : TestBase
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
 
-        DateOnly? startDate = Clock.Today.AddYears(-1);
-        DateOnly? completionDate = Clock.Today.AddDays(-10);
+        DateOnly? startDate = TimeProvider.Today.AddYears(-1);
+        DateOnly? completionDate = TimeProvider.Today.AddDays(-10);
         var inductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? InductionStatus.Exempt : InductionStatus.InProgress;
         string dqtInductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? "Exempt" : "In progress";
         var inductionExemptionReasonId = InductionExemptionReason.QualifiedThroughEeaMutualRecognitionRouteId;
@@ -432,7 +432,7 @@ public class ChangeLogInductionEventTests : TestBase
         {
             EventId = Guid.NewGuid(),
             Key = $"{induction.InductionId}-Migrated",
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
             InductionStatus = migratedInductionStatus,
@@ -462,7 +462,7 @@ public class ChangeLogInductionEventTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 if (populatedFields.HasFlag(DqtInductionFields.StartDate))
                 {
                     Assert.Equal(startDate?.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
@@ -506,7 +506,7 @@ public class ChangeLogInductionEventTests : TestBase
         {
             EventId = Guid.NewGuid(),
             Key = $"{person.PersonId}-StatusChanged",
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
             InductionStatus = inductionStatus.ToString(),
@@ -532,7 +532,7 @@ public class ChangeLogInductionEventTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 Assert.Equal(inductionStatus.ToString(), item.GetElementByTestId("induction-status")?.TrimmedText());
                 Assert.Equal(oldInductionStatus.ToString(), item.GetElementByTestId("old-induction-status")?.TrimmedText());
             });
@@ -566,19 +566,19 @@ public class ChangeLogInductionEventTests : TestBase
         var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync();
 
-        DateOnly? oldStartDate = Clock.Today.AddYears(-1);
-        DateOnly? oldCompletedDate = Clock.Today.AddDays(-10);
+        DateOnly? oldStartDate = TimeProvider.Today.AddYears(-1);
+        DateOnly? oldCompletedDate = TimeProvider.Today.AddDays(-10);
         InductionStatus oldInductionStatus = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons) ? InductionStatus.Exempt : InductionStatus.InProgress;
         Guid[] oldExemptionReasons = [Guid.Parse("5a80cee8-98a8-426b-8422-b0e81cb49b36"), Guid.Parse("15014084-2d8d-4f51-9198-b0e1881f8896")];
         string[] oldExemptionReasonNames = ["They qualified before 07 May 2000", "They qualified between 7 May 1999 and 1 April 2003 and first taught in Wales for at least 2 terms"];
-        var oldCpdModifiedOn = Clock.UtcNow.AddDays(-2);
+        var oldCpdModifiedOn = TimeProvider.UtcNow.AddDays(-2);
 
-        DateOnly? startDate = Clock.Today.AddYears(-1).AddDays(1);
-        DateOnly? completedDate = Clock.Today.AddDays(-9);
+        DateOnly? startDate = TimeProvider.Today.AddYears(-1).AddDays(1);
+        DateOnly? completedDate = TimeProvider.Today.AddDays(-9);
         InductionStatus inductionStatus = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons) ? InductionStatus.Exempt : InductionStatus.RequiredToComplete;
         Guid[] exemptionReasons = [Guid.Parse("0997ab13-7412-4560-8191-e51ed4d58d2a")];
         string[] exemptionReasonNames = ["They qualified through a further education route between 1 September 2001 and 1 September 2004"];
-        var cpdModifiedOn = Clock.UtcNow;
+        var cpdModifiedOn = TimeProvider.UtcNow;
 
         var changeReason = PersonInductionChangeReason.AnotherReason.GetDisplayName();
         var changeReasonDetail = "Reason detail";
@@ -614,7 +614,7 @@ public class ChangeLogInductionEventTests : TestBase
         var updatedEvent = new PersonInductionUpdatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             Induction = induction,
@@ -645,7 +645,7 @@ public class ChangeLogInductionEventTests : TestBase
             item =>
             {
                 Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 if (changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
                 {
                     Assert.Equal(newValueIsDefault ? WebConstants.EmptyFallbackContent : startDate?.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
@@ -738,19 +738,19 @@ public class ChangeLogInductionEventTests : TestBase
         var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync();
 
-        DateOnly? oldStartDate = Clock.Today.AddYears(-1);
-        DateOnly? oldCompletedDate = Clock.Today.AddDays(-10);
+        DateOnly? oldStartDate = TimeProvider.Today.AddYears(-1);
+        DateOnly? oldCompletedDate = TimeProvider.Today.AddDays(-10);
         InductionStatus oldInductionStatus = InductionStatus.Exempt;
         Guid[] oldExemptionReasons = [Guid.Parse("5a80cee8-98a8-426b-8422-b0e81cb49b36")];
         string[] oldExemptionReasonNames = ["Qualified before 07 May 2000"];
-        var oldCpdModifiedOn = Clock.UtcNow.AddDays(-2);
+        var oldCpdModifiedOn = TimeProvider.UtcNow.AddDays(-2);
 
         DateOnly? startDate = oldStartDate;
         DateOnly? completedDate = oldCompletedDate;
         InductionStatus inductionStatus = oldInductionStatus;
         Guid[] exemptionReasons = oldExemptionReasons;
         string[] exemptionReasonNames = oldExemptionReasonNames;
-        var cpdModifiedOn = Clock.UtcNow;
+        var cpdModifiedOn = TimeProvider.UtcNow;
 
         var changeReason = PersonInductionChangeReason.AnotherReason.GetDisplayName();
         var changeReasonDetail = "Reason detail";
@@ -781,7 +781,7 @@ public class ChangeLogInductionEventTests : TestBase
         var updatedEvent = new PersonInductionUpdatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             Induction = induction,

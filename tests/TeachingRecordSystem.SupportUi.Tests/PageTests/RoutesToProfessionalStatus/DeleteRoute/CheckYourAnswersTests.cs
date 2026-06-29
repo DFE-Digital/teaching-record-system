@@ -87,8 +87,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsAnswers_AsExpected()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today.AddDays(-1);
         var holdsFrom = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
@@ -226,7 +226,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
 
-            Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
             Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), deletedEvent.DeletionReason);
             Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, deletedEvent.DeletionReasonDetail);
@@ -245,7 +245,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .SingleRandom();
         var status = RouteToProfessionalStatusStatus.Holds;
-        var qtsDate = Clock.Today.AddYears(-1);
+        var qtsDate = TimeProvider.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -282,7 +282,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
             Assert.Equal(RaisedByUserId, deletedEvent.RaisedBy.UserId);
-            Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
             Assert.Equal(qtsDate, deletedEvent.OldPersonAttributes.QtsDate);
             Assert.Null(deletedEvent.PersonAttributes.QtsDate);
@@ -299,7 +299,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .SingleRandom();
-        var holdsFromEarliest = Clock.Today.AddYears(-1);
+        var holdsFromEarliest = TimeProvider.Today.AddYears(-1);
         var holdsFromLatest = holdsFromEarliest.AddMonths(1);
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -339,7 +339,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         EventObserver.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
-            Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
             Assert.Equal(holdsFromEarliest, deletedEvent.OldPersonAttributes.QtsDate);
             Assert.Equal(holdsFromLatest, deletedEvent.PersonAttributes.QtsDate);

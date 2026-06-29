@@ -207,7 +207,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         var matchedPerson3 = await TestData.CreatePersonAsync(p => p
             .WithFirstName(firstVerifiedOrStatedName.First())
             .WithLastName(TestData.GenerateChangedLastName(firstVerifiedOrStatedName.Last()))
-            .WithPreviousNames((TestData.GenerateChangedFirstName(firstVerifiedOrStatedName.First()), TestData.GenerateMiddleName(), firstVerifiedOrStatedName.Last(), Clock.UtcNow))
+            .WithPreviousNames((TestData.GenerateChangedFirstName(firstVerifiedOrStatedName.First()), TestData.GenerateMiddleName(), firstVerifiedOrStatedName.Last(), TimeProvider.UtcNow))
             .WithDateOfBirth(firstVerifiedOrStatedDateOfBirth));
 
         var journeyInstance = await CreateJourneyInstanceAsync(

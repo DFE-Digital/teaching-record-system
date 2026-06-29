@@ -35,7 +35,7 @@ public partial class Commands
                 var connectionString = parseResult.GetRequiredValue(connectionStringOption);
 
                 var services = new ServiceCollection()
-                    .AddClock()
+                    .AddTimeProvider()
                     .AddDatabase(connectionString)
                     .AddMemoryCache()
                     .AddWebhookMessageFactory()

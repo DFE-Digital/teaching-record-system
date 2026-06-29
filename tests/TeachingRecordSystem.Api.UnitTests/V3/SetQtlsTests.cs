@@ -55,7 +55,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         AssertSuccess(result);
 
         var route = await GetQtlsRoute(person.PersonId);
-        Assert.Equal(Clock.UtcNow, route?.DeletedOn);
+        Assert.Equal(TimeProvider.UtcNow, route?.DeletedOn);
 
         var qtlsStatus = await GetQtlsStatus(person.PersonId);
         Assert.Equal(QtlsStatus.Expired, qtlsStatus);
@@ -63,7 +63,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         LegacyEventObserver.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
-            Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), deletedEvent.RaisedBy);
         });
@@ -90,7 +90,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.NotNull(route);
         Assert.Equal(qtlsDate, route.HoldsFrom);
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
-        Assert.Equal(Clock.UtcNow, route.CreatedOn);
+        Assert.Equal(TimeProvider.UtcNow, route.CreatedOn);
 
         var qtlsStatus = await GetQtlsStatus(person.PersonId);
         Assert.Equal(QtlsStatus.Active, qtlsStatus);
@@ -98,7 +98,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         LegacyEventObserver.AssertEventsSaved(e =>
         {
             var createdEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, createdEvent.CreatedUtc);
             Assert.Equal(person.PersonId, createdEvent.PersonId);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), createdEvent.RaisedBy);
         });
@@ -146,12 +146,12 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.NotNull(route);
         Assert.Equal(newQtlsDate, route.HoldsFrom);
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
-        Assert.Equal(Clock.UtcNow, route.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, route.UpdatedOn);
 
         LegacyEventObserver.AssertEventsSaved(e =>
         {
             var updatedEvent = Assert.IsType<RouteToProfessionalStatusUpdatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, updatedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, updatedEvent.PersonId);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), updatedEvent.RaisedBy);
             Assert.True(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom));
@@ -180,12 +180,12 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.NotNull(route);
         Assert.Equal(QtsCutoff, route.HoldsFrom);
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
-        Assert.Equal(Clock.UtcNow, route.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, route.UpdatedOn);
 
         LegacyEventObserver.AssertEventsSaved(e =>
         {
             var updatedEvent = Assert.IsType<RouteToProfessionalStatusUpdatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, updatedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, updatedEvent.PersonId);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), updatedEvent.RaisedBy);
             Assert.True(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom));
@@ -214,12 +214,12 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.NotNull(route);
         Assert.Equal(newQtlsDate, route.HoldsFrom);
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
-        Assert.Equal(Clock.UtcNow, route.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, route.UpdatedOn);
 
         LegacyEventObserver.AssertEventsSaved(e =>
         {
             var updatedEvent = Assert.IsType<RouteToProfessionalStatusUpdatedEvent>(e);
-            Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, updatedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, updatedEvent.PersonId);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), updatedEvent.RaisedBy);
             Assert.True(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom));
@@ -251,7 +251,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.NotNull(route);
         Assert.Equal(QtsCutoff, route.HoldsFrom);
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
-        Assert.Equal(Clock.UtcNow, route.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, route.UpdatedOn);
 
         LegacyEventObserver.AssertEventsSaved(
             e1 =>
@@ -262,7 +262,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
                     RouteToProfessionalStatusType.QtlsAndSetMembershipId,
                     createdQtlsEventEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId
                 );
-                Assert.Equal(Clock.UtcNow, createdQtlsEventEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, createdQtlsEventEvent.CreatedUtc);
                 Assert.Equal(person.PersonId, createdQtlsEventEvent.PersonId);
                 Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), createdQtlsEventEvent.RaisedBy);
                 Assert.True(createdQtlsEventEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate));
@@ -300,7 +300,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.NotNull(route);
         Assert.Equal(QtsCutoff, route.HoldsFrom);
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
-        Assert.Equal(Clock.UtcNow, route.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, route.UpdatedOn);
 
         LegacyEventObserver.AssertEventsSaved(e1 =>
         {
@@ -310,7 +310,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
                 RouteToProfessionalStatusType.QtlsAndSetMembershipId,
                 updatedQtlsEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId
             );
-            Assert.Equal(Clock.UtcNow, updatedQtlsEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, updatedQtlsEvent.CreatedUtc);
             Assert.Equal(person.PersonId, updatedQtlsEvent.PersonId);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), updatedQtlsEvent.RaisedBy);
             Assert.True(updatedQtlsEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate));
@@ -343,7 +343,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.NotNull(route);
         Assert.Equal(QtsCutoff, route.HoldsFrom);
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
-        Assert.Equal(Clock.UtcNow, route.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, route.UpdatedOn);
 
         LegacyEventObserver.AssertEventsSaved(e1 =>
         {
@@ -353,7 +353,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
                 RouteToProfessionalStatusType.QtlsAndSetMembershipId,
                 updatedQtlsEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId
             );
-            Assert.Equal(Clock.UtcNow, updatedQtlsEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, updatedQtlsEvent.CreatedUtc);
             Assert.Equal(person.PersonId, updatedQtlsEvent.PersonId);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), updatedQtlsEvent.RaisedBy);
             Assert.True(updatedQtlsEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate));
@@ -391,7 +391,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         Assert.NotNull(route);
         Assert.Equal(QtsCutoff, route.HoldsFrom);
         Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
-        Assert.Equal(Clock.UtcNow, route.UpdatedOn);
+        Assert.Equal(TimeProvider.UtcNow, route.UpdatedOn);
 
         LegacyEventObserver.AssertEventsSaved(e1 =>
         {
@@ -401,7 +401,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
                 RouteToProfessionalStatusType.QtlsAndSetMembershipId,
                 createdQtlsEventEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId
             );
-            Assert.Equal(Clock.UtcNow, createdQtlsEventEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, createdQtlsEventEvent.CreatedUtc);
             Assert.Equal(person.PersonId, createdQtlsEventEvent.PersonId);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), createdQtlsEventEvent.RaisedBy);
             Assert.False(

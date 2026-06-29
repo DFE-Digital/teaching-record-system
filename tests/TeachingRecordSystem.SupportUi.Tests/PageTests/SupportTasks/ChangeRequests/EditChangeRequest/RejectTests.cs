@@ -199,7 +199,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             {
                 var actualEvent = Assert.IsType<ChangeNameRequestSupportTaskRejectedEvent>(e);
                 Assert.Equal("Request and proof don’t match", actualEvent.RejectionReason);
-                Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
                 Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
                 Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
             }
@@ -207,7 +207,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             {
                 var actualEvent = Assert.IsType<ChangeDateOfBirthRequestSupportTaskRejectedEvent>(e);
                 Assert.Equal("Request and proof don’t match", actualEvent.RejectionReason);
-                Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+                Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
                 Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
                 Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
             }
@@ -287,7 +287,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 actualEvent = Assert.IsType<ChangeDateOfBirthRequestSupportTaskCancelledEvent>(e);
             }
 
-            Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
             Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
         });

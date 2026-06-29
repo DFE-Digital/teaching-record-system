@@ -30,10 +30,10 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
+        TimeProvider.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
 
-        _oldDob = Clock.Today.AddYears(-30);
-        _dob = Clock.Today.AddYears(-20);
+        _oldDob = TimeProvider.Today.AddYears(-30);
+        _dob = TimeProvider.Today.AddYears(-20);
     }
 
     public static TheoryData<NpqTrnRequestSupportTaskResolvedEventChanges, bool, bool, NpqTrnRequestResolvedReason>
@@ -121,7 +121,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         }
 
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         if (changes.HasAnyFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNameChange))
         {
@@ -189,7 +189,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
 
         item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(Clock.UtcNow.ToString(WebConstants.DateAndTimeDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(TimeProvider.UtcNow.ToString(WebConstants.DateAndTimeDisplayFormat), v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateDisplayFormat) ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Email address", v => Assert.Equal(newEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
@@ -337,7 +337,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         {
             ApplicationUserId = applicationUserId,
             RequestId = "TEST-TRN-1",
-            CreatedOn = Clock.UtcNow,
+            CreatedOn = TimeProvider.UtcNow,
             IdentityVerified = null,
             EmailAddress = email,
             OneLoginUserSubject = null,
@@ -372,7 +372,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         var updatedEvent = new NpqTrnRequestSupportTaskResolvedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUserId,
             PersonId = personId,
             PersonAttributes = attributes,

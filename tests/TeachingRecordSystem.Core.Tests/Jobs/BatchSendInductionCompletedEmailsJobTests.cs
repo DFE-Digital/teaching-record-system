@@ -13,7 +13,7 @@ public class BatchSendInductionCompletedEmailsJobTests(JobFixture fixture) : Job
     public async Task Execute_EnqueuesEmailForInductionCompletees()
     {
         // Arrange
-        var initialLastAwardedToUtc = Clock.Today.AddDays(-5).ToDateTime();
+        var initialLastAwardedToUtc = TimeProvider.Today.AddDays(-5).ToDateTime();
         var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
 
         var jobOptions = Options.Create(
@@ -44,7 +44,7 @@ public class BatchSendInductionCompletedEmailsJobTests(JobFixture fixture) : Job
                 changeReasonDetail: null,
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var @event);
 
@@ -54,7 +54,7 @@ public class BatchSendInductionCompletedEmailsJobTests(JobFixture fixture) : Job
             await dbContext.SaveChangesAsync();
         });
 
-        Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
+        TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
         // Act
         await WithServiceAsync<BatchSendInductionCompletedEmailsJob>(

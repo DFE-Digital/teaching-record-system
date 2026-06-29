@@ -138,7 +138,7 @@ public class GetPersonTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithQtls(Clock.Today));
+            .WithQtls(TimeProvider.Today));
 
         var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn!, Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");

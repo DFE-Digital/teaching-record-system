@@ -15,7 +15,7 @@ public class TestScopedServices
 
     public TestScopedServices(IServiceProvider serviceProvider)
     {
-        Clock = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
+        TimeProvider = new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero));
         BlobStorageFileServiceMock = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         BackgroundJobScheduler = new(serviceProvider);
@@ -60,7 +60,7 @@ public class TestScopedServices
         return false;
     }
 
-    public FakeTimeProvider Clock { get; }
+    public FakeTimeProvider TimeProvider { get; }
 
     public IOptions<AccessYourTeachingQualificationsOptions> AccessYourTeachingQualificationsOptions { get; }
 
@@ -74,7 +74,7 @@ public class TestScopedServices
 
     private class ForwardToTestScopedTimeProvider : TimeProvider
     {
-        public override DateTimeOffset GetUtcNow() => GetCurrent().Clock.GetUtcNow();
+        public override DateTimeOffset GetUtcNow() => GetCurrent().TimeProvider.GetUtcNow();
     }
 }
 

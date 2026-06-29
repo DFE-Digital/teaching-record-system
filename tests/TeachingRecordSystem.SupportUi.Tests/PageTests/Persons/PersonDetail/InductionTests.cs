@@ -36,7 +36,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ForPersonWithRouteInductionExemption_RoutesFeatureFlagOn_DisplaysExpectedRowContent(Guid routeId, bool hasExemption)
     {
         // Arrange
-        var holdsFromDate = Clock.Today;
+        var holdsFromDate = TimeProvider.Today;
         var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.RouteToProfessionalStatusTypeId == routeId)
             .Single();
@@ -134,7 +134,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(InductionStatus.FailedInWales)]
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringStartDate_DisplaysExpectedContent(InductionStatus setInductionStatus)
     {
-        var setStartDate = Clock.Today.AddMonths(-1);
+        var setStartDate = TimeProvider.Today.AddMonths(-1);
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()
@@ -185,8 +185,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringCompletedDate_DisplaysExpectedCompletedDate(InductionStatus setInductionStatus)
     {
         // Arrange
-        var setStartDate = Clock.Today.AddMonths(-1);
-        var setCompletedDate = Clock.Today;
+        var setStartDate = TimeProvider.Today.AddMonths(-1);
+        var setCompletedDate = TimeProvider.Today;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()
@@ -224,7 +224,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             ? await TestData.CreateUserAsync(role: UserRoles.RecordManager)
             : await TestData.CreateUserAsync(role: UserRoles.Viewer));
 
-        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
+        var lessThanSevenYearsAgo = TimeProvider.Today.AddYears(-1);
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
@@ -244,9 +244,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 status,
                 startDate: status.RequiresStartDate() ? lessThanSevenYearsAgo.AddYears(-1) : null,
                 completedDate: status.RequiresCompletedDate() ? lessThanSevenYearsAgo : null,
-                cpdModifiedOn: Clock.UtcNow,
+                cpdModifiedOn: TimeProvider.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 out _);
             await dbContext.SaveChangesAsync();
         });
@@ -278,7 +278,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
-        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
+        var lessThanSevenYearsAgo = TimeProvider.Today.AddYears(-1);
 
         // test setup here is convoluted because I need to set up a person,
         // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
@@ -292,9 +292,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
                 completedDate: null,
-                cpdModifiedOn: Clock.UtcNow,
+                cpdModifiedOn: TimeProvider.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 out _);
             person.Person.SetInductionStatus(
                 trsInductionStatus,
@@ -305,7 +305,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 changeReasonDetail: null,
                 evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 additionalInformation: null,
                 out _);
             await dbContext.SaveChangesAsync();
@@ -326,7 +326,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCpd_DoesNotShowWarning()
     {
         //Arrange
-        var underSevenYearsAgo = Clock.Today.AddYears(-6);
+        var underSevenYearsAgo = TimeProvider.Today.AddYears(-6);
 
         var person = await TestData.CreatePersonAsync(
             builder => builder
@@ -374,7 +374,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: userRole));
 
-        var holdsFromDate = Clock.Today;
+        var holdsFromDate = TimeProvider.Today;
         var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.ScotlandRId)
             .Single();
@@ -453,7 +453,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_InductionExemption_PersonStatus_ShowsActionsAsExpected(PersonStatus personStatus, bool canSeeActions)
     {
         // Arrange
-        var holdsFromDate = Clock.Today;
+        var holdsFromDate = TimeProvider.Today;
         var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.ScotlandRId)
             .Single();

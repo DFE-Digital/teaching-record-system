@@ -16,7 +16,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
+        TimeProvider.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
     }
 
     [Theory]
@@ -45,7 +45,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
         string oldFirstName = "Alfred";
         string oldMiddleName = "The";
         string oldLastName = "Great";
-        DateOnly? oldDateOfBirth = Clock.Today.AddYears(-30);
+        DateOnly? oldDateOfBirth = TimeProvider.Today.AddYears(-30);
         string? oldEmailAddress = "old@email-address.com";
         string? oldNationalInsuranceNumber = "AB 12 34 56 D";
         Gender? oldGender = Gender.Male;
@@ -53,7 +53,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
         string firstName = "Megan";
         string middleName = "Thee";
         string lastName = "Stallion";
-        DateOnly? dateOfBirth = Clock.Today.AddYears(-20);
+        DateOnly? dateOfBirth = TimeProvider.Today.AddYears(-20);
         string emailAddress = "new@email-address.com";
         string? nationalInsuranceNumber = "XY 98 76 54 A";
         Gender? gender = Gender.Female;
@@ -112,7 +112,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
         var updatedEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             PersonAttributes = details,
@@ -142,7 +142,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
         var item = doc.GetElementByTestId("timeline-item-details-updated-event");
         Assert.NotNull(item);
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {

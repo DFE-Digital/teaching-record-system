@@ -30,7 +30,7 @@ public abstract class OperationTestBase : IDisposable
 
     public IServiceProvider Services { get; }
 
-    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider TimeProvider => TestScopedServices.GetCurrent().TimeProvider;
 
     protected ICurrentUserProvider CurrentUserProvider => Services.GetRequiredService<ICurrentUserProvider>();
 

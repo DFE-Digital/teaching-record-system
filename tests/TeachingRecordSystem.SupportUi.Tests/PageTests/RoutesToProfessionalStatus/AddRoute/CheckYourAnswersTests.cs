@@ -86,8 +86,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == routeName).Single();
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today.AddDays(-1);
         var holdsFrom = endDate.AddDays(1);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
@@ -210,8 +210,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsAnswers_AsExpected()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today.AddDays(-1);
         var holdsFrom = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
@@ -265,8 +265,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsExemptionAnswer_AsExpected()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today;
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync())
             .SingleRandom();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -311,8 +311,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsOptionalAnswersNotPopulated_AsExpected()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today;
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var endDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Postgraduate Teaching Apprenticeship").Single();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\''))
             .SingleRandom();
@@ -369,7 +369,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
-            .WithHoldsStatusFields(Clock)
+            .WithHoldsStatusFields(TimeProvider)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingCountryId(country.CountryId)
@@ -420,7 +420,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
-            Assert.Equal(Clock.UtcNow, actualCreatedEvent.CreatedUtc);
+            Assert.Equal(TimeProvider.UtcNow, actualCreatedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualCreatedEvent.PersonId);
             Assert.Equal(journeyInstance.State.Status, actualCreatedEvent.RouteToProfessionalStatus.Status);
             Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, actualCreatedEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
@@ -483,7 +483,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Holds)
-            .WithHoldsStatusFields(Clock)
+            .WithHoldsStatusFields(TimeProvider)
             .WithTrainingCountryId(country.CountryId)
             .WithInductionExemption(true)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
@@ -530,7 +530,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Holds)
-            .WithHoldsStatusFields(Clock)
+            .WithHoldsStatusFields(TimeProvider)
             .WithTrainingCountryId(country.CountryId)
             .WithInductionExemption(true)
             .WithDegreeTypeId(degreeType.DegreeTypeId)
@@ -575,7 +575,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Holds)
-            .WithHoldsStatusFields(Clock)
+            .WithHoldsStatusFields(TimeProvider)
             .WithTrainingCountryId(country.CountryId)
             .WithValidChangeReasonOption()
             .WithChangeReasonDetail("test", false)

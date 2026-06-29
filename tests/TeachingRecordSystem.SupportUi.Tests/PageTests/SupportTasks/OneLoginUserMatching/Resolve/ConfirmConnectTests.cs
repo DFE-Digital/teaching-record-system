@@ -130,7 +130,7 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserM
             Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedAndConnected, updatedSupportTaskData.Outcome);
 
             var updatedOneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginUser.Subject);
-            Assert.Equal(Clock.UtcNow, updatedOneLoginUser.VerifiedOn);
+            Assert.Equal(TimeProvider.UtcNow, updatedOneLoginUser.VerifiedOn);
             Assert.Equal(matchedPerson.PersonId, updatedOneLoginUser.PersonId);
         });
 

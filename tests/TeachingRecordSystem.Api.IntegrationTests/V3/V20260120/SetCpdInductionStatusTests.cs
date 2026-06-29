@@ -32,7 +32,7 @@ public class SetCpdInductionStatusTests : TestBase
             Content = CreateJsonContent(new
             {
                 status = InductionStatus.RequiredToComplete,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -54,7 +54,7 @@ public class SetCpdInductionStatusTests : TestBase
             Content = CreateJsonContent(new
             {
                 status = InductionStatus.RequiredToComplete,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -76,7 +76,7 @@ public class SetCpdInductionStatusTests : TestBase
             Content = CreateJsonContent(new
             {
                 status = InductionStatus.RequiredToComplete,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -101,7 +101,7 @@ public class SetCpdInductionStatusTests : TestBase
             Content = CreateJsonContent(new
             {
                 status = status,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -128,9 +128,9 @@ public class SetCpdInductionStatusTests : TestBase
                 InductionStatus.InProgress,
                 startDate,
                 completedDate: null,
-                cpdModifiedOn: Clock.UtcNow,
+                cpdModifiedOn: TimeProvider.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 out _);
 
             await dbContext.SaveChangesAsync();
@@ -145,7 +145,7 @@ public class SetCpdInductionStatusTests : TestBase
                 status = InductionStatus.Passed,
                 startDate = startDate,
                 completedDate = completedDate,
-                modifiedOn = Clock.UtcNow.AddDays(-1)
+                modifiedOn = TimeProvider.UtcNow.AddDays(-1)
             })
         };
 
@@ -170,7 +170,7 @@ public class SetCpdInductionStatusTests : TestBase
             {
                 status = InductionStatus.RequiredToComplete,
                 startDate = startDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -196,7 +196,7 @@ public class SetCpdInductionStatusTests : TestBase
             {
                 status = InductionStatus.RequiredToComplete,
                 completedDate = completedDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -218,7 +218,7 @@ public class SetCpdInductionStatusTests : TestBase
             Content = CreateJsonContent(new
             {
                 status = InductionStatus.InProgress,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -245,7 +245,7 @@ public class SetCpdInductionStatusTests : TestBase
                 status = InductionStatus.InProgress,
                 startDate = startDate,
                 completedDate = completedDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -271,7 +271,7 @@ public class SetCpdInductionStatusTests : TestBase
             {
                 status = InductionStatus.Failed,
                 completedDate = completedDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -297,7 +297,7 @@ public class SetCpdInductionStatusTests : TestBase
             {
                 status = InductionStatus.Failed,
                 startDate = startDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -323,7 +323,7 @@ public class SetCpdInductionStatusTests : TestBase
             {
                 status = InductionStatus.Passed,
                 completedDate = completedDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -348,7 +348,7 @@ public class SetCpdInductionStatusTests : TestBase
             {
                 status = InductionStatus.Passed,
                 startDate = startDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -373,7 +373,7 @@ public class SetCpdInductionStatusTests : TestBase
             Content = CreateJsonContent(new
             {
                 status = InductionStatus.RequiredToComplete,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -401,7 +401,7 @@ public class SetCpdInductionStatusTests : TestBase
             {
                 status = InductionStatus.InProgress,
                 startDate = startDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -431,7 +431,7 @@ public class SetCpdInductionStatusTests : TestBase
                 status = InductionStatus.Failed,
                 startDate = startDate,
                 completedDate = completedDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 
@@ -461,7 +461,7 @@ public class SetCpdInductionStatusTests : TestBase
                 status = InductionStatus.Passed,
                 startDate = startDate,
                 completedDate = completedDate,
-                modifiedOn = Clock.UtcNow
+                modifiedOn = TimeProvider.UtcNow
             })
         };
 

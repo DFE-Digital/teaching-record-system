@@ -8,7 +8,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
     private Task<InductionImporter.InductionImportLookupData> GetLookupDataAsync(EwcWalesInductionImportData row) =>
         WithServiceAsync<InductionImporter, InductionImporter.InductionImportLookupData>(
             importer => importer.GetLookupDataAsync(row),
-            Clock);
+            TimeProvider);
 
     private Task<(List<string> ValidationFailures, List<string> Errors)> ValidateAsync(EwcWalesInductionImportData row) =>
         WithServiceAsync<InductionImporter, (List<string>, List<string>)>(
@@ -17,7 +17,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
                 var lookups = await importer.GetLookupDataAsync(row);
                 return importer.Validate(row, lookups);
             },
-            Clock);
+            TimeProvider);
 
     [Fact]
     public async Task Validate_MissingReferenceNumber_ReturnsError()
@@ -137,8 +137,8 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
     {
         // Arrange
         var awardDate = new DateOnly(2011, 01, 1);
-        var person1AwardedDate = Clock.Today.AddDays(-100);
-        var qtsDate = Clock.Today.AddDays(-110);
+        var person1AwardedDate = TimeProvider.Today.AddDays(-100);
+        var qtsDate = TimeProvider.Today.AddDays(-110);
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithQtls(qtsDate);
@@ -269,7 +269,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         {
             x.WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.WelshRId)
-                .WithHoldsFrom(Clock.Today.AddDays(-10))
+                .WithHoldsFrom(TimeProvider.Today.AddDays(-10))
                 .WithStatus(RouteToProfessionalStatusStatus.Holds));
         });
         var row = GetDefaultRow(x =>

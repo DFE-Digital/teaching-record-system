@@ -17,10 +17,10 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.AssessmentOnlyRouteId, holdsFrom: Clock.Today)
+            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.AssessmentOnlyRouteId, holdsFrom: TimeProvider.Today)
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
-        Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
+        TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
         // Act
         await WithServiceAsync<BatchSendProfessionalStatusEmailsJob>(
@@ -52,10 +52,10 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, holdsFrom: Clock.Today)
+            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, holdsFrom: TimeProvider.Today)
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
-        Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
+        TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
         // Act
         await WithServiceAsync<BatchSendProfessionalStatusEmailsJob>(
@@ -87,10 +87,10 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: Clock.Today)
+            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: TimeProvider.Today)
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
-        Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
+        TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
         // Act
         await WithServiceAsync<BatchSendProfessionalStatusEmailsJob>(
@@ -120,10 +120,10 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, holdsFrom: Clock.Today)
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, holdsFrom: TimeProvider.Today)
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
-        Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
+        TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
         // Act
         await WithServiceAsync<BatchSendProfessionalStatusEmailsJob>(
@@ -155,7 +155,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: Clock.Today)
+            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: TimeProvider.Today)
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
         await WithDbContextAsync(async dbContext =>
@@ -168,14 +168,14 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
                 deletionReasonDetail: null,
                 evidenceFile: null,
                 deletedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
+                now: TimeProvider.UtcNow,
                 additionalInformation: null,
                 out var deletedEvent);
             dbContext.AddEventWithoutBroadcast(deletedEvent);
             await dbContext.SaveChangesAsync();
         });
 
-        Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
+        TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
         // Act
         await WithServiceAsync<BatchSendProfessionalStatusEmailsJob>(
@@ -201,7 +201,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
             new BatchSendProfessionalStatusEmailsOptions
             {
                 EmailDelayDays = 3,
-                InitialLastHoldsFromEndUtc = Clock.Today.AddDays(-5).ToDateTime(),
+                InitialLastHoldsFromEndUtc = TimeProvider.Today.AddDays(-5).ToDateTime(),
                 JobSchedule = Cron.Never(),
                 RaisedByUserIds = [SystemUser.SystemUserId]
             });

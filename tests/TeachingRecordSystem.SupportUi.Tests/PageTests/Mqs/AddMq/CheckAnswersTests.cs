@@ -233,7 +233,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             var expectedMqCreatedEvent = new MandatoryQualificationCreatedEvent
             {
                 EventId = Guid.Empty,
-                CreatedUtc = Clock.UtcNow,
+                CreatedUtc = TimeProvider.UtcNow,
                 RaisedBy = GetCurrentUserId(),
                 PersonId = person.PersonId,
                 MandatoryQualification = new()

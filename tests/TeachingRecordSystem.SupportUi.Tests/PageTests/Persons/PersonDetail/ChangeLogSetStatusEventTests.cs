@@ -14,7 +14,7 @@ public class ChangeLogSetStatusEventTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
+        TimeProvider.SetUtcNow(new DateTimeOffset(nows.SingleRandom(), TimeSpan.Zero));
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         var statusUpdatedEvent = new PersonStatusUpdatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             Status = PersonStatus.Deactivated,
@@ -77,7 +77,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         Assert.Equal($"Record deactivated", title.TrimmedText());
 
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
@@ -104,7 +104,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         var statusUpdatedEvent = new PersonStatusUpdatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
+            CreatedUtc = TimeProvider.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             Status = PersonStatus.Active,
@@ -138,7 +138,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         Assert.Equal($"Record reactivated", title.TrimmedText());
 
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));

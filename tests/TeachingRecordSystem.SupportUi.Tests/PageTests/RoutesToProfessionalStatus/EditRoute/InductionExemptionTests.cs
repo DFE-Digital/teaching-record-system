@@ -10,7 +10,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task Get_WithInvalidRoute_ThrowsException()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
             .SingleRandom();
@@ -49,7 +49,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task Get_WithPreviouslyStoredChoice_ShowsChoice()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition") // a route with mandatory induction exemption that isn't implicit (requires a yes/no answer)
             .SingleRandom();
@@ -92,7 +92,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task Post_WhenExemptionEntered_SavesDataAndRedirectsToDetail()
     {
         // Arrange
-        var holdsFrom = Clock.Today;
+        var holdsFrom = TimeProvider.Today;
         var endDate = holdsFrom.AddDays(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition")
@@ -146,7 +146,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task Post_WhenNoChoiceSelected_ReturnsError()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition")
             .SingleRandom();
@@ -187,7 +187,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition") // a route that requires the induction exemption question
             .SingleRandom();
@@ -237,7 +237,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange
-        var awardDate = Clock.Today;
+        var awardDate = TimeProvider.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
             .SingleRandom();

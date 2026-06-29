@@ -122,7 +122,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         // Arrange
         var allGuidsToDisplay = InductionExemptionService.RouteFeatureExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(RouteToProfessionalStatusType.ApplyForQtsId);
-        var holdsFromDate = Clock.Today;
+        var holdsFromDate = TimeProvider.Today;
         var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay
@@ -172,7 +172,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         // Arrange
         var allGuidsToDisplay = InductionExemptionService.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
-        var holdsFromDate = Clock.Today;
+        var holdsFromDate = TimeProvider.Today;
         var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay
@@ -234,7 +234,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         // Arrange
         var allGuidsToDisplay = InductionExemptionService.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
-        var holdsFromDate = Clock.Today;
+        var holdsFromDate = TimeProvider.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()

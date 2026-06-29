@@ -15,7 +15,7 @@ public class EventPipelineTestBase
         TestScopedServices.Reset();
     }
 
-    protected FakeTimeProvider Clock => TestScopedServices.GetCurrent().Clock;
+    protected FakeTimeProvider TimeProvider => TestScopedServices.GetCurrent().TimeProvider;
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => _fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
