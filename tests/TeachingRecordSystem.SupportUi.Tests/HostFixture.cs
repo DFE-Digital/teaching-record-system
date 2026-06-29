@@ -77,6 +77,9 @@ public class HostFixture : InitializeDbFixture
 
             builder.ConfigureServices((context, services) =>
             {
+                // Add controllers defined in this test assembly
+                services.AddMvc().AddApplicationPart(typeof(HostFixture).Assembly);
+
                 services.AddAuthentication()
                     .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 
