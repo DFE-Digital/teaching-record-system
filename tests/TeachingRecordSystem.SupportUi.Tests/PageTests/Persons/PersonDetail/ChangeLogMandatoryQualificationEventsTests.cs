@@ -2,7 +2,7 @@ using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
+using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;

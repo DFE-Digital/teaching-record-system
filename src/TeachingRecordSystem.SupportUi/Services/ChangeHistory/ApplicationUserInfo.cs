@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
+namespace TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
 public record ApplicationUserInfo
 {

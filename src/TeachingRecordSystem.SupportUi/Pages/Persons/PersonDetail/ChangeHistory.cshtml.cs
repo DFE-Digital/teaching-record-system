@@ -1,24 +1,13 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.SupportUi.Infrastructure.Security;
-using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Processes;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
+using TeachingRecordSystem.SupportUi.Services;
+using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [AllowDeactivatedPerson]
-public class ChangeHistoryModel(
-    TrsDbContext dbContext,
-    ReferenceDataCache referenceDataCache,
-    PersonInfoCache personInfoCache,
-    IAuthorizationService authorizationService,
-    SupportUiLinkGenerator linkGenerator) : PageModel
+public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int PageSize = 10;
 
@@ -28,7 +17,7 @@ public class ChangeHistoryModel(
     [FromQuery]
     public int? PageNumber { get; set; }
 
-    public TimelineItem[]? TimelineItems { get; set; }
+    public IReadOnlyCollection<TimelineItem>? TimelineItems { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }
 
@@ -41,225 +30,23 @@ public class ChangeHistoryModel(
             return BadRequest();
         }
 
-        var eventTypes = new[]
-        {
-            nameof(MandatoryQualificationDeletedEvent),
-            nameof(MandatoryQualificationDqtDeactivatedEvent),
-            nameof(MandatoryQualificationUpdatedEvent),
-            nameof(MandatoryQualificationDqtReactivatedEvent),
-            nameof(MandatoryQualificationCreatedEvent),
-            nameof(MandatoryQualificationDqtImportedEvent),
-            nameof(MandatoryQualificationMigratedEvent),
-            nameof(AlertMigratedEvent),
-            nameof(AlertDqtDeactivatedEvent),
-            nameof(AlertDqtImportedEvent),
-            nameof(AlertDqtReactivatedEvent),
-            nameof(DqtInductionImportedEvent),
-            nameof(DqtInductionCreatedEvent),
-            nameof(DqtInductionUpdatedEvent),
-            nameof(InductionMigratedEvent),
-            nameof(DqtInductionDeactivatedEvent),
-            nameof(DqtInductionReactivatedEvent),
-            nameof(DqtContactInductionStatusChangedEvent),
-            nameof(PersonInductionUpdatedEvent),
-            nameof(LegacyEvents.PersonDetailsUpdatedEvent),
-            nameof(LegacyEvents.PersonCreatedEvent),
-            nameof(RouteToProfessionalStatusCreatedEvent),
-            nameof(RouteToProfessionalStatusUpdatedEvent),
-            nameof(RouteToProfessionalStatusDeletedEvent),
-            nameof(RouteToProfessionalStatusMigratedEvent),
-            nameof(ApiTrnRequestSupportTaskUpdatedEvent),
-            nameof(NpqTrnRequestSupportTaskResolvedEvent),
-            nameof(DqtInitialTeacherTrainingCreatedEvent),
-            nameof(DqtInitialTeacherTrainingUpdatedEvent),
-            nameof(DqtQtsRegistrationCreatedEvent),
-            nameof(DqtQtsRegistrationUpdatedEvent),
-            nameof(PersonStatusUpdatedEvent),
-            nameof(LegacyEvents.PersonsMergedEvent),
-            nameof(TrnAllocatedEvent),
-            nameof(TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent),
-            nameof(LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent),
-            nameof(LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent),
-            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent),
-            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent),
-            nameof(OneLoginUserUpdatedEvent)
-        };
-
-        var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert", StringComparison.Ordinal)).ToArray();
-
-        var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypesAsync(activeOnly: false)
-            .ToAsyncEnumerableAsync()
-            .Select(async (AlertType at, CancellationToken _) => (
-                AlertType: at,
-                CanRead: (await authorizationService.AuthorizeAsync(User, at.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Read))) is { Succeeded: true }))
-            .Where(t => t.CanRead)
-            .ToArrayAsync();
-
-        var alertTypeIdsWithReadPermission = alertTypesWithReadPermission.Select(at => at.AlertType.AlertTypeId).ToArray();
-
-        var dqtSanctionCodesWithReadPermission = alertTypesWithReadPermission
-            .Select(at => at.AlertType.DqtSanctionCode)
-            .Where(sc => sc is not null)
-            .ToArray();
-
-        var eventsWithUser = await dbContext.Database
-            .SqlQuery<EventWithUser>($"""
-                SELECT
-                    e.event_name,
-                    e.payload as event_payload,
-                    u.name as trs_user_name,
-                    e.payload #>> Array['RaisedBy','DqtUserName'] as dqt_user_name,
-                    a.name as application_user_name,
-                    a.short_name as application_user_short_name
-                FROM
-                        events as e
-                    LEFT JOIN
-                        users as u ON
-                            CASE
-                                WHEN e.payload #>> Array['RaisedBy','DqtUserId'] is null THEN
-                                    (e.payload ->> 'RaisedBy')::uuid
-                                ELSE
-                                    null
-                            END = u.user_id
-                    LEFT JOIN
-                        users as a ON ((e.payload #>> Array['RequestData','ApplicationUserId']) :: uuid) = a.user_id
-                WHERE
-                    e.person_ids @> ARRAY[{PersonId}]
-                    AND e.event_name = any ({eventTypes})
-
-                    -- only tps resolved duplicate events that are merges and not where the imported record has been kept
-                    AND
-                    (
-                        e.event_name <> {nameof(TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)}
-                        OR (e.payload->> 'ChangeReason')::int != {TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordKept}
-                    )
-
-                    -- Only return alerts that have an alert type (or DQT sanction code) that the user is authorized to Read
-                    AND (
-                        NOT (e.event_name = any({alertEventTypes}))
-                        OR (e.payload #>> Array['Alert','AlertTypeId'])::uuid = any({alertTypeIdsWithReadPermission})
-                        OR (e.payload #>> Array['Alert','DqtSanctionCode','Value']) = any({dqtSanctionCodesWithReadPermission})
-                    )
-                """)
-            .ToListAsync();
-
-        var processTypesToQuery = new[]
-        {
-            ProcessType.PersonCreatingInDqt,
-            ProcessType.PersonImportingIntoDqt,
-            ProcessType.PersonUpdatingInDqt,
-            ProcessType.PersonDeactivatingInDqt,
-            ProcessType.PersonReactivatingInDqt,
-            ProcessType.PersonMergingInDqt,
-            ProcessType.AlertCreating,
-            ProcessType.AlertUpdating,
-            ProcessType.AlertDeleting,
-            ProcessType.PersonOneLoginUserDisconnecting,
-            ProcessType.PersonOneLoginUserConnecting,
-            ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting,
-            ProcessType.OneLoginUserIdVerificationSupportTaskCompleting,
-        };
-
-        var processes = await dbContext.Processes
-            .Where(p => p.PersonIds.Contains(PersonId) && processTypesToQuery.Contains(p.ProcessType))
-            .Include(p => p.User)
-            .Include(p => p.Events).AsSplitQuery()
-            .ToListAsync();
-
-        // Filter alert processes by alert type permissions
-        var alertProcessTypes = new[] { ProcessType.AlertCreating, ProcessType.AlertUpdating, ProcessType.AlertDeleting };
-        var filteredProcesses = processes.Where(p =>
-        {
-            if (!alertProcessTypes.Contains(p.ProcessType))
-            {
-                return true;
-            }
-
-            var alertEvent = p.Events!.First(e => e.Payload is Core.Events.AlertCreatedEvent or Core.Events.AlertUpdatedEvent or Core.Events.AlertDeletedEvent);
-            (Guid? alertTypeId, EventModels.AlertDqtSanctionCode? dqtSanctionCode) = alertEvent.Payload switch
-            {
-                Core.Events.AlertCreatedEvent created => (created.Alert.AlertTypeId, created.Alert.DqtSanctionCode),
-                Core.Events.AlertUpdatedEvent updated => (updated.Alert.AlertTypeId, updated.Alert.DqtSanctionCode),
-                Core.Events.AlertDeletedEvent deleted => (deleted.Alert.AlertTypeId, deleted.Alert.DqtSanctionCode),
-                _ => (null, null)
-            };
-
-            return (alertTypeId.HasValue && alertTypeIdsWithReadPermission.Contains(alertTypeId.Value))
-                || (dqtSanctionCode is not null && dqtSanctionCodesWithReadPermission.Contains(dqtSanctionCode.Value));
-        }).ToList();
-
-        var personInfo = await filteredProcesses
-            .SelectMany(p => p.PersonIds)
-            .Distinct()
-            .ToAsyncEnumerable()
-            .Select(async (Guid id, CancellationToken _) => await personInfoCache.GetPersonInfoAsync(id))
-            .Where(i => i is not null)
-            .ToDictionaryAsync(i => i!.PersonId, i => i!);
-
-        var allResults = eventsWithUser.Select(MapTimelineEvent)
-            .Concat(filteredProcesses.Select(p => MapTimelineProcess(p, personInfo)))
-            .ToArray();
-
-        TimelineItems = allResults
-            .OrderByDescending(i => i.Timestamp)
-            .Skip((PageNumber!.Value - 1) * PageSize)
-            .Take(PageSize)
-            .ToArray();
+        var items = await changeHistoryService.GetChangeHistoryByPersonAsync(
+            PersonId,
+            User,
+            new PaginationOptions(PageNumber, PageSize));
+        TimelineItems = items;
 
         // If an 'out of bounds' page was requested, redirect to the first page
-        if (TimelineItems.Length == 0 && PageNumber > 1)
+        if (TimelineItems.Count == 0 && PageNumber > 1)
         {
             return Redirect(linkGenerator.Persons.PersonDetail.ChangeHistory(PersonId, pageNumber: 1));
         }
 
-        var totalPages = (int)Math.Ceiling(allResults.Length / (decimal)PageSize);
         Pagination = new PaginationViewModel(
-            PageNumber.Value,
-            totalPages,
+            items.CurrentPage,
+            items.LastPage,
             pageNumber => linkGenerator.Persons.PersonDetail.ChangeHistory(PersonId, pageNumber));
 
         return Page();
-    }
-
-    private TimelineItem MapTimelineEvent(EventWithUser eventWithUser)
-    {
-        var @event = EventBase.Deserialize(eventWithUser.EventPayload, eventWithUser.EventName);
-
-        Timeline.RaisedByUserInfo raisedByUser = new()
-        {
-            Name = eventWithUser.TrsUserName ?? eventWithUser.DqtUserName!
-        };
-
-        ApplicationUserInfo? applicationUser = eventWithUser.ApplicationUserName == null ? null : new()
-        {
-            Name = eventWithUser.ApplicationUserName,
-            ShortName = eventWithUser.ApplicationUserShortName ?? eventWithUser.ApplicationUserName
-
-        };
-
-        var timelineEventType = typeof(TimelineEvent<>).MakeGenericType(@event.GetType()!);
-        var timelineEvent = (TimelineEvent)Activator.CreateInstance(timelineEventType, @event, raisedByUser, applicationUser)!;
-        var timelineItemType = typeof(TimelineItem<>).MakeGenericType(timelineEventType);
-        return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, PersonId, timelineEvent.Event.CreatedUtc.ToGmt(), timelineEvent)!;
-    }
-
-    private TimelineItem MapTimelineProcess(Process process, IReadOnlyDictionary<Guid, PersonInfo> personInfo) =>
-        new TimelineItem<TimelineProcess>(
-            TimelineItemType.Process,
-            PersonId,
-            process.CreatedOn.ToGmt(),
-            new TimelineProcess(process, new Timeline.RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }, personInfo));
-
-    /// <summary>
-    /// Flattened out record to allow Event, TRS User and DQT User to be returned in a single SQL query
-    /// </summary>
-    private record EventWithUser
-    {
-        public required string EventName { get; init; }
-        public required string EventPayload { get; init; }
-        public required string? TrsUserName { get; init; }
-        public required string? DqtUserName { get; init; }
-        public required string? ApplicationUserName { get; init; }
-        public required string? ApplicationUserShortName { get; init; }
     }
 }

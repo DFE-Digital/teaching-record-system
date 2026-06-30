@@ -189,7 +189,7 @@ public partial class SupportTaskSearchServiceTests
         };
 
         // Act
-        var result = await SearchTeachersPensionsPotentialDuplicatesAsync(new(), new(PageNumber: pageNumber, ItemsPerPage: 2));
+        var result = await SearchTeachersPensionsPotentialDuplicatesAsync(new(), new(PageNumber: pageNumber, PageSize: 2));
 
         // Assert
         Assert.Equal(5, result.TotalTaskCount);
@@ -214,7 +214,7 @@ public partial class SupportTaskSearchServiceTests
         // Act
         var result = await SearchTeachersPensionsPotentialDuplicatesAsync(
             new(SortBy: TeachersPensionsPotentialDuplicatesSortByOption.Name, SortDirection: SortDirection.Descending),
-            new(PageNumber: 2, ItemsPerPage: 2));
+            new(PageNumber: 2, PageSize: 2));
 
         // Assert
         Assert.Equal(6, result.TotalTaskCount);

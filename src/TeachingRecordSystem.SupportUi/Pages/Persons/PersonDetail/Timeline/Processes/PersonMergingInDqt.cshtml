@@ -1,5 +1,5 @@
 @using System.Diagnostics
-@model TimelineItem<TimelineProcess>
+@model TimelineItem<ProcessChangeHistoryEntry>
 @{
     var deactivatedEvent = Model.ItemModel.GetEvent<PersonDeactivatedEvent>();
     Debug.Assert(deactivatedEvent.MergedWithPersonId is not null);
@@ -18,7 +18,7 @@
     </div>
     <p class="moj-timeline__date">
         <span>By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         @if (updatedEvent is not null)

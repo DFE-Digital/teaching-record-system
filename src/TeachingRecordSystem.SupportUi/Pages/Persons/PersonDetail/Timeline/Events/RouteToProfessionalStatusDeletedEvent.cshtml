@@ -4,7 +4,7 @@
 @using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
 @inject ReferenceDataCache ReferenceDataCache
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.RouteToProfessionalStatusDeletedEvent>>
+@model TimelineItem<LegacyEventChangeHistoryEntry<TeachingRecordSystem.Core.Events.Legacy.RouteToProfessionalStatusDeletedEvent>>
 @{
     var deletedEvent = Model.ItemModel.Event;
     var professionalStatus = deletedEvent.RouteToProfessionalStatus;
@@ -25,7 +25,7 @@
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         <govuk-details class="govuk-!-margin-bottom-2">

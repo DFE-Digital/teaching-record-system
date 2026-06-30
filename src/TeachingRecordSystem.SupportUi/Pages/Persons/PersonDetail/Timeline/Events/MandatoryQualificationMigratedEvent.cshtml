@@ -1,6 +1,6 @@
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Events.Legacy
-@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.MandatoryQualificationMigratedEvent>>
+@model TimelineItem<LegacyEventChangeHistoryEntry<TeachingRecordSystem.Core.Events.Legacy.MandatoryQualificationMigratedEvent>>
 @{
     var migratedEvent = Model.ItemModel.Event;
     var mandatoryQualification = migratedEvent.MandatoryQualification;
@@ -12,7 +12,7 @@
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         @if (migratedEvent.Changes != MandatoryQualificationMigratedEventChanges.None)
@@ -38,6 +38,6 @@
                     </govuk-summary-list>
                 </govuk-details-text>
             </govuk-details>
-        }        
+        }
     </div>
 </div>

@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
+using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 

@@ -1,5 +1,5 @@
 @using TeachingRecordSystem.Core.Events.ChangeReasons
-@model TimelineItem<TimelineProcess>
+@model TimelineItem<ProcessChangeHistoryEntry>
 @{
     var changeReason = Model.ItemModel.Process.ChangeReason as ChangeReasonWithDetailsAndEvidence;
     var reasonText = changeReason?.Details ?? "No reason provided";
@@ -11,7 +11,7 @@
     </div>
     <p class="moj-timeline__date">
         <span>By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list>

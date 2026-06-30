@@ -125,7 +125,7 @@ public partial class SupportTaskSearchServiceTests
 
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: null, OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending);
 
-        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, ItemsPerPage: 2);
+        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, PageSize: 2);
 
         // Act
         var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserRecordMatchingSupportTasksSearchResult>(service =>
@@ -171,7 +171,7 @@ public partial class SupportTaskSearchServiceTests
 
         var options = new OneLoginUserRecordMatchingSupportTasksOptions(Search: search, OneLoginUserRecordMatchingSupportTasksSortByOption.Name, SortDirection.Ascending);
 
-        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, ItemsPerPage: 2);
+        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, PageSize: 2);
 
         // Act
         var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserRecordMatchingSupportTasksSearchResult>(service =>

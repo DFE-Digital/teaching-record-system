@@ -80,7 +80,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.TrnRequest.EmailAddress,
                 t.Task.CreatedOn,
                 t.ApplicationUser.ShortName ?? t.ApplicationUser.Name))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
 
         return new()
         {
@@ -144,7 +144,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 StringHelper.JoinNonEmpty(' ', t.Person.FirstName, t.Person.MiddleName, t.Person.LastName),
                 t.CreatedOn,
                 t.SupportTaskType))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
 
         return new()
         {
@@ -217,7 +217,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.TrnRequestMetadata!.DateOfBirth,
                 t.CreatedOn,
                 t.TrnRequestMetadata.ApplicationUser!.ShortName ?? t.TrnRequestMetadata.ApplicationUser!.Name))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
 
         return new()
         {
@@ -275,7 +275,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 .OrderBy(r => r.IntegrationTransactionId, sortDirection),
             _ => unorderedResults
                 .OrderBy(r => r.CreatedOn, sortDirection),
-        }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, tasks.Count);
+        }).GetPage(paginationOptions.PageNumber, paginationOptions.PageSize, tasks.Count);
 
         return new()
         {
@@ -359,7 +359,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection).ThenBy(r => r.SupportTaskReference, sortDirection),
             OneLoginUserIdVerificationSupportTasksSortByOption.Source => results.OrderBy(r => r.SourceApplicationName, sortDirection),
             _ => results
-        }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
+        }).GetPage(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
 
         return new()
         {
@@ -445,7 +445,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn => results.OrderBy(r => r.CreatedOn, sortDirection).ThenBy(r => r.SupportTaskReference, sortDirection),
             OneLoginUserRecordMatchingSupportTasksSortByOption.Source => results.OrderBy(r => r.SourceApplicationName, sortDirection),
             _ => results
-        }).GetPage(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalFilteredTaskCount);
+        }).GetPage(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
 
         return new()
         {

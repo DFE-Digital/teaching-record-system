@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers;
 using TeachingRecordSystem.SupportUi.Tests.Services;
 
 [assembly: AssemblyFixture(typeof(ServiceFixture))]
@@ -11,6 +13,11 @@ public class ServiceFixture : ServiceProviderFixture
         services
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
+            .AddSingleton<PersonInfoCache>()
+            .AddMemoryCache()
+            .AddLogging()
+            .AddAuthorizationCore()
+            .AddSingleton<IAuthorizationHandler, AlertTypeAuthorizationHandler>()
             .AddEventPublisher();
 
         TestScopedServices.ConfigureServices(services);

@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.Core.Events.Legacy
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.MandatoryQualificationUpdatedEvent>>
+@model TimelineItem<LegacyEventChangeHistoryEntry<TeachingRecordSystem.Core.Events.Legacy.MandatoryQualificationUpdatedEvent>>
 @{
     var updatedEvent = Model.ItemModel.Event;
     var mandatoryQualification = updatedEvent.MandatoryQualification;
@@ -16,7 +16,7 @@
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         @if (updatedEvent.ChangeReason is not null)
