@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
 using RecordMatchingPolicy = TeachingRecordSystem.Core.Models.RecordMatchingPolicy;
 
@@ -154,10 +153,10 @@ public abstract class TestBase
     protected SignInJourneyState CreateSignInJourneyState(
         JourneyInstanceId journeyInstanceId,
         Guid processId,
-        IdTrnToken? trnToken,
+        AuthzRegistrationToken? trnToken,
         string redirectUri = "/",
         Guid clientApplicationUserId = default) =>
-        CreateSignInJourneyState(journeyInstanceId, processId, redirectUri, clientApplicationUserId, trnToken?.TrnToken, trnToken?.Trn);
+        CreateSignInJourneyState(journeyInstanceId, processId, redirectUri, clientApplicationUserId, trnToken?.Token, trnToken?.Trn);
 
     protected SignInJourneyState CreateSignInJourneyState(JourneyInstanceId journeyInstanceId, Guid processId) =>
         CreateSignInJourneyState(journeyInstanceId, processId, "/");
@@ -189,29 +188,27 @@ public abstract class TestBase
         };
     }
 
-    private static int _lastTrnToken;
-
-    protected async Task<IdTrnToken> CreateTrnTokenAsync(string trn, string? email = null)
+    protected async Task<AuthzRegistrationToken> CreateTrnTokenAsync(string trn, string? email = null)
     {
-        var trnTokenStr = Interlocked.Increment(ref _lastTrnToken).ToString("D12");
+        var trnTokenStr = Guid.NewGuid().ToString();
 
         email ??= Faker.Internet.Email();
 
-        using var scope = HostFixture.Services.CreateScope();
-        using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
-
-        var trnToken = new IdTrnToken()
+        var trnToken = new AuthzRegistrationToken()
         {
             CreatedUtc = TimeProvider.UtcNow,
-            Email = email,
+            EmailAddress = email,
             ExpiresUtc = TimeProvider.UtcNow.AddDays(30),
             Trn = trn,
-            TrnToken = trnTokenStr,
-            UserId = null
+            Token = trnTokenStr,
+            IsActive = true
         };
 
-        idDbContext.TrnTokens.Add(trnToken);
-        await idDbContext.SaveChangesAsync();
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.AuthzRegistrationTokens.Add(trnToken);
+            await dbContext.SaveChangesAsync();
+        });
 
         return trnToken;
     }

@@ -261,7 +261,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true, recordMatchingPolicy: RecordMatchingPolicy.Deferred);
 
         await WithJourneyCoordinatorAsync(
-            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", applicationUser.UserId, trnToken.TrnToken, trnToken.Trn, RecordMatchingPolicy.Deferred),
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", applicationUser.UserId, trnToken.Token, trnToken.Trn, RecordMatchingPolicy.Deferred),
             async coordinator =>
             {
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
@@ -315,7 +315,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true, recordMatchingPolicy: RecordMatchingPolicy.Required);
 
         await WithJourneyCoordinatorAsync(
-            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", applicationUser.UserId, trnToken.TrnToken, trnToken.Trn, RecordMatchingPolicy.Required),
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", applicationUser.UserId, trnToken.Token, trnToken.Trn, RecordMatchingPolicy.Required),
             async coordinator =>
             {
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);

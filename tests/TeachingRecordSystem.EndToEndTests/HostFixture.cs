@@ -17,7 +17,6 @@ using TeachingRecordSystem.Core.EventHandlers;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.Notify;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.EndToEndTests;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Security;
@@ -249,11 +248,6 @@ public sealed class HostFixture : InitializeDbFixture
         });
 
         WebhookSender.Register(services);
-
-        services.AddDbContext<IdDbContext>(
-            options => options.UseInMemoryDatabase("TeacherAuthId"),
-            contextLifetime: ServiceLifetime.Transient);
-
 
         // Replace CreateWebhookMessages with SendWebhookMessagesEventHandler;
         // we want to dispatch webhook messages immediately instead of queueing them

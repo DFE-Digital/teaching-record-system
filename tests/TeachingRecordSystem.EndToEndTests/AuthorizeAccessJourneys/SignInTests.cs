@@ -1,10 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.OneLogin;
-using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
-using User = TeachingRecordSystem.Core.Services.OneLogin.User;
 
 namespace TeachingRecordSystem.EndToEndTests.AuthorizeAccessJourneys;
 
@@ -188,122 +184,6 @@ public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture
         var page = await context.NewPageAsync();
 
         await page.GoToAuthorizeAccessTestStartPageAsync(trnToken: trnToken);
-
-        await page.AssertSignedInAsync(person.Trn);
-    }
-
-    [Fact]
-    public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountAndMatchingDetails_MatchesWithTrn()
-    {
-        var person = await TestData.CreatePersonAsync();
-
-        var subject = TestData.CreateOneLoginUserSubject();
-        var email = Faker.Internet.Email();
-        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
-
-        using (var scope = HostFixture.AuthorizeAccessHostServices.CreateScope())
-        {
-            using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
-
-            idDbContext.Users.Add(new User()
-            {
-                UserId = Guid.NewGuid(),
-                EmailAddress = email,
-                FirstName = person.FirstName,
-                LastName = person.LastName,
-                Created = TimeProvider.UtcNow,
-                Updated = TimeProvider.UtcNow,
-                UserType = IdModelTypes.UserType.Teacher,
-                TrnVerificationLevel = TrnVerificationLevel.Medium,
-                Trn = person.Trn
-            });
-
-            await idDbContext.SaveChangesAsync();
-        }
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToAuthorizeAccessTestStartPageAsync();
-
-        await page.AssertSignedInAsync(person.Trn);
-    }
-
-    [Fact]
-    public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountWithTrnAssociatedByTrnTokenAndMatchingDetails_MatchesWithTrn()
-    {
-        var person = await TestData.CreatePersonAsync();
-
-        var subject = TestData.CreateOneLoginUserSubject();
-        var email = Faker.Internet.Email();
-        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
-
-        using (var scope = HostFixture.AuthorizeAccessHostServices.CreateScope())
-        {
-            using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
-
-            idDbContext.Users.Add(new User()
-            {
-                UserId = Guid.NewGuid(),
-                EmailAddress = email,
-                FirstName = person.FirstName,
-                LastName = person.LastName,
-                Created = TimeProvider.UtcNow,
-                Updated = TimeProvider.UtcNow,
-                UserType = IdModelTypes.UserType.Teacher,
-                TrnVerificationLevel = TrnVerificationLevel.Low,
-                TrnAssociationSource = TrnAssociationSource.TrnToken,
-                Trn = person.Trn
-            });
-
-            await idDbContext.SaveChangesAsync();
-        }
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToAuthorizeAccessTestStartPageAsync();
-
-        await page.AssertSignedInAsync(person.Trn);
-    }
-
-    [Fact]
-    public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountWithTrnAssociatedBySupportAndMatchingDetails_MatchesWithTrn()
-    {
-        var person = await TestData.CreatePersonAsync();
-
-        var subject = TestData.CreateOneLoginUserSubject();
-        var email = Faker.Internet.Email();
-        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
-
-        using (var scope = HostFixture.AuthorizeAccessHostServices.CreateScope())
-        {
-            using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
-
-            idDbContext.Users.Add(new User()
-            {
-                UserId = Guid.NewGuid(),
-                EmailAddress = email,
-                FirstName = person.FirstName,
-                LastName = person.LastName,
-                Created = TimeProvider.UtcNow,
-                Updated = TimeProvider.UtcNow,
-                UserType = IdModelTypes.UserType.Teacher,
-                TrnVerificationLevel = TrnVerificationLevel.Low,
-                TrnAssociationSource = TrnAssociationSource.SupportUi,
-                Trn = person.Trn
-            });
-
-            await idDbContext.SaveChangesAsync();
-        }
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToAuthorizeAccessTestStartPageAsync();
 
         await page.AssertSignedInAsync(person.Trn);
     }

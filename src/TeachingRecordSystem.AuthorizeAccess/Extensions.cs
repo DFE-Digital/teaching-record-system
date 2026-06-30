@@ -20,7 +20,6 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Notify;
-using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.WebCommon.Filters;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
@@ -182,17 +181,6 @@ public static class Extensions
             .Bind(configuration)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-
-        if (environment.IsProduction())
-        {
-            services.AddIdDbContext(configuration);
-        }
-        else
-        {
-            services.AddDbContext<IdDbContext>(
-                options => options.UseInMemoryDatabase("TeacherAuthId"),
-                contextLifetime: ServiceLifetime.Transient);
-        }
 
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
