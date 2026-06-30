@@ -33,7 +33,7 @@ public class DisconnectPersonTests(HostFixture hostFixture) : TestBase(hostFixtu
         await page.ClickButtonAsync("Confirm and disconnect");
         await page.WaitForUrlPathAsync($"/one-logins/{oneLogin.Subject}");
 
-        await page.AssertFlashMessageAsync($"{person.FirstName} {person.LastName}’s record disconnected from GOV.UK One Login");
+        await page.AssertFlashMessageAsync($"{person.FirstName} {person.LastName}\u2019s record disconnected from GOV.UK One Login");
     }
 
     [Fact]

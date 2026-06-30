@@ -64,7 +64,7 @@ public class CheckAnswers(
         }
 
         var personName = $"{person.FirstName} {person.LastName}";
-        TempData.SetFlashNotificationBanner($"{personName}’s record disconnected from GOV.UK One Login");
+        TempData.SetFlashNotificationBanner($"{personName}\u2019s record disconnected from GOV.UK One Login");
         return Redirect(linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject));
     }
 
