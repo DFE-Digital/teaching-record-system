@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
+using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 using ProfessionalStatusType = TeachingRecordSystem.Core.Models.ProfessionalStatusType;
 

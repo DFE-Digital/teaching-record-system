@@ -111,7 +111,7 @@ public partial class SupportTaskSearchServiceTests
 
         var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: null, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
 
-        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, ItemsPerPage: 2);
+        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, PageSize: 2);
 
         // Act
         var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>
@@ -147,7 +147,7 @@ public partial class SupportTaskSearchServiceTests
 
         var options = new OneLoginUserIdVerificationSupportTasksOptions(Search: search, OneLoginUserIdVerificationSupportTasksSortByOption.Name, SortDirection.Ascending);
 
-        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, ItemsPerPage: 2);
+        var paginationOptions = new PaginationOptions(PageNumber: pageNumber, PageSize: 2);
 
         // Act
         var results = await WithServiceAsync<SupportTaskSearchService, OneLoginUserIdVerificationSupportTasksSearchResult>(service =>

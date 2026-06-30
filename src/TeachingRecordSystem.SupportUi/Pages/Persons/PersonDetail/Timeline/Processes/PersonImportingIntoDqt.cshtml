@@ -1,4 +1,4 @@
-@model TimelineItem<TimelineProcess>
+@model TimelineItem<ProcessChangeHistoryEntry>
 @{
     var importedEvent = Model.ItemModel.GetEvent<PersonImportedIntoDqtEvent>();
     var name = StringHelper.JoinNonEmpty(' ', importedEvent.Details.FirstName, importedEvent.Details.MiddleName, importedEvent.Details.LastName);
@@ -10,7 +10,7 @@
     </div>
     <p class="moj-timeline__date">
         <span>By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list class="govuk-!-margin-bottom-0">

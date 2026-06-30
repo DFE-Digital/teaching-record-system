@@ -3,7 +3,7 @@
 @using TeachingRecordSystem.Core.Services.Files
 @using ChangeDateOfBirthRequestSupportTaskApprovedEvent = LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent;
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.ChangeDateOfBirthRequestSupportTaskApprovedEvent>>
+@model TimelineItem<LegacyEventChangeHistoryEntry<TeachingRecordSystem.Core.Events.Legacy.ChangeDateOfBirthRequestSupportTaskApprovedEvent>>
 @{
     var supportTaskEvent = Model.ItemModel.Event;
     var details = supportTaskEvent.PersonAttributes;
@@ -17,7 +17,7 @@
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         <div data-testid="details">

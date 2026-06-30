@@ -1,6 +1,7 @@
 @page "/persons/{personId}/change-history"
 @using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events
 @using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Processes
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ChangeHistoryModel
 @{
     Layout = "Layout";
@@ -12,7 +13,7 @@
     <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Index(person.PersonId)">Back to record</govuk-back-link>
 }
 
-@if (Model.TimelineItems!.Length == 0)
+@if (Model.TimelineItems!.Count == 0)
 {
     <p class="govuk-body" data-testid="no-changes">No changes</p>
 }
@@ -23,8 +24,8 @@ else
         {
             var viewName = timelineItem.ItemType switch
             {
-                TimelineItemType.Event => $"./Timeline/Events/{((TimelineEvent)timelineItem.ItemModel).Event.GetEventName()}.cshtml",
-                TimelineItemType.Process => $"./Timeline/Processes/{((TimelineProcess)timelineItem.ItemModel).Process.ProcessType.ToString()}.cshtml",
+                TimelineItemType.LegacyEvent => $"./Timeline/Events/{((LegacyEventChangeHistoryEntry)timelineItem.ItemModel).Event.GetEventName()}.cshtml",
+                TimelineItemType.Process => $"./Timeline/Processes/{((ProcessChangeHistoryEntry)timelineItem.ItemModel).Process.ProcessType.ToString()}.cshtml",
                 _ => $"./Timeline/{timelineItem.ItemType}.cshtml"
             };
 

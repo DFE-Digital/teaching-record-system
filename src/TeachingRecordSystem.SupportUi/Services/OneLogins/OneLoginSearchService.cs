@@ -78,7 +78,7 @@ public class OneLoginSearchService(TrsDbContext dbContext)
                 o.VerifiedNames,
                 o.VerifiedDatesOfBirth,
                 o.Person != null ? o.Person.Trn : null))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.ItemsPerPage, totalCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount);
 
         return new OneLoginSearchResult
         {

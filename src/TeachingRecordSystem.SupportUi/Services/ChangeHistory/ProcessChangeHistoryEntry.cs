@@ -2,9 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Processes;
+namespace TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
-public record TimelineProcess(Process Process, RaisedByUserInfo RaisedByUser, IReadOnlyDictionary<Guid, PersonInfo> PersonInfo)
+public record ProcessChangeHistoryEntry(Process Process, RaisedByUserInfo RaisedByUser, IReadOnlyDictionary<Guid, PersonInfo> PersonInfo)
 {
     public bool ContainsEvent<T>() where T : IEvent => Process.Events!.Select(pe => pe.Payload).OfType<T>().Any();
 
@@ -20,9 +20,9 @@ public record TimelineProcess(Process Process, RaisedByUserInfo RaisedByUser, IR
     }
 }
 
-public static class TimelineProcessExtensions
+public static class ProcessChangeHistoryEntryExtensions
 {
-    public static ChangeHistoryEntryViewModel ToChangeHistoryEntryViewModel(this TimelineItem<TimelineProcess> timelineItem) =>
+    public static ChangeHistoryEntryViewModel ToChangeHistoryEntryViewModel(this TimelineItem<ProcessChangeHistoryEntry> timelineItem) =>
         new()
         {
             ViewType = ChangeHistoryViewType.Person,

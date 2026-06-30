@@ -1,4 +1,4 @@
-@model TimelineItem<TimelineProcess>
+@model TimelineItem<ProcessChangeHistoryEntry>
 @{
     var updatedEvent = Model.ItemModel.GetEvent<PersonUpdatedInDqtEvent>();
 }
@@ -9,7 +9,7 @@
     </div>
     <p class="moj-timeline__date">
         <span>By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent" />
