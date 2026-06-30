@@ -1,6 +1,6 @@
-@page "/persons/{PersonId}/disconnect-one-login/{oneLoginSubject}/verified"
-@using TeachingRecordSystem.Core.Services.Persons
-@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLogin.Verified
+@page "/one-logins/{oneLoginUserSubject}/disconnect-person/{personId}/verified"
+@using TeachingRecordSystem.Core.Services.OneLogin
+@model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.DisconnectPerson.Verified
 @{
     Layout = "_Layout";
     ViewBag.Title = "Should this GOV.UK One Login stay verified?";
@@ -13,30 +13,31 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <form method="post" data-testid="submit-form">
+            <span class="govuk-caption-l" data-testid="disconnect-caption">Record Management</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-inset-text class="govuk-!-margin-top-0">
                 <p class="govuk-body">
-                    Verification means the personâ€™s identity has been confirmed.
+                    Verification means the person’s identity has been confirmed.
                 </p>
                 <p class="govuk-body">
                     Disconnecting a GOV.UK One Login from a record does not automatically remove verification.
                 </p>
             </govuk-inset-text>
 
-            <govuk-radios for="StayVerified" data-testid="disconnect-one-login-stay-verified">
-                <govuk-radios-item value="@nameof(DisconnectOneLoginStayVerified.Yes)">
-                    @DisconnectOneLoginStayVerified.Yes.GetDisplayName()
+            <govuk-radios for="StayVerified" data-testid="disconnect-person-stay-verified">
+                <govuk-radios-item value="@nameof(DisconnectPersonStayVerified.Yes)">
+                    @DisconnectPersonStayVerified.Yes.GetDisplayName()
                 </govuk-radios-item>
-                <govuk-radios-item value="@nameof(DisconnectOneLoginStayVerified.No)">
-                    @DisconnectOneLoginStayVerified.No.GetDisplayName()
+                <govuk-radios-item value="@nameof(DisconnectPersonStayVerified.No)">
+                    @DisconnectPersonStayVerified.No.GetDisplayName()
                 </govuk-radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
                 <govuk-button data-testid="cancel-button"
-                              formaction="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.VerifiedCancel(Model.PersonId, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId)"
+                              formaction="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.VerifiedCancel(Model.OneLoginUserSubject, Model.PersonId, Model.JourneyInstance!.InstanceId)"
                               class="govuk-button--secondary" type="submit">Cancel
                 </govuk-button>
             </div>

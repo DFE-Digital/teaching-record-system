@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
-public class DisconnectOneLogin(HostFixture hostFixture) : TestBase(hostFixture)
+public class DisconnectOneLoginTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task DisconnectOneLoginVerify_StayVerified()
@@ -23,7 +23,7 @@ public class DisconnectOneLogin(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnDisconnectOneLoginCheckYourAnswersPageAsync(person.PersonId, oneLogin.Subject);
-        await page.ClickButtonAsync("Confirm and disconnect account");
+        await page.ClickButtonAsync("Confirm and disconnect");
         await page.WaitForURLAsync(new Regex(@"/persons/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));
 
         await page.AssertFlashMessageAsync($"GOV.UK One Login disconnected from {person.FirstName} {person.LastName}’s record");
@@ -47,7 +47,7 @@ public class DisconnectOneLogin(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnDisconnectOneLoginCheckYourAnswersPageAsync(person.PersonId, oneLogin.Subject);
-        await page.ClickButtonAsync("Confirm and disconnect account");
+        await page.ClickButtonAsync("Confirm and disconnect");
         await page.WaitForURLAsync(new Regex(@"/persons/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));
 
         await page.AssertFlashMessageAsync($"GOV.UK One Login disconnected from {person.FirstName} {person.LastName}’s record");

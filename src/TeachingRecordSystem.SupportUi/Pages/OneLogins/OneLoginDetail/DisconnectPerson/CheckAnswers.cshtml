@@ -1,30 +1,30 @@
-@page "/persons/{PersonId}/disconnect-one-login/{oneLoginSubject}/check-answers"
-@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers
+@page "/one-logins/{oneLoginUserSubject}/disconnect-person/{personId}/check-answers"
+@model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.DisconnectPerson.CheckAnswers
 @{
     Layout = "_Layout";
-    ViewBag.Title = "Check details before disconnecting GOV.UK One Login from record";
+    ViewBag.Title = "Check details before disconnecting this record from GOV.UK One Login";
 }
 
 @section BeforeContent {
     <govuk-back-link data-testid="back-link"
-                     href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.Verified(Model.PersonId, Model.OneLoginSubject, Model!.JourneyInstance!.InstanceId)">
+                     href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Verified(Model.OneLoginUserSubject, Model.PersonId, Model!.JourneyInstance!.InstanceId)">
         Back
     </govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form method="post" data-testid="submit-form">
+        <form
+            method="post" data-testid="submit-form">
+            <span class="govuk-caption-l" data-testid="disconnect-caption">Record Management</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <govuk-summary-list>
                 <row>
-                    <key>GOV.UK One Login email address</key>
-                    <value>@Model.EmailAddress</value>
+                    <key>Person</key>
+                    <value>@Model.PersonName</value>
                 </row>
                 <row>
-                    <key>
-                        Why are you disconnecting GOV.UK One Login from this record?
-                    </key>
+                    <key>Why are you disconnecting this record from GOV.UK One Login?</key>
                     <value>
                         <div data-testid="disconnect-reason">
                             @Model.Reason?.GetDisplayName()
@@ -36,7 +36,7 @@
                     </value>
                     <row-actions>
                         <action
-                            href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(Model.PersonId, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                            href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Index(Model.OneLoginUserSubject, Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
                             visually-hidden-text="disconnect reason">Change
                         </action>
                     </row-actions>
@@ -48,7 +48,7 @@
                     </value>
                     <row-actions>
                         <action
-                            href="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.Verified(Model.PersonId, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                            href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Verified(Model.OneLoginUserSubject, Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
                             visually-hidden-text="stay verified">Change
                         </action>
                     </row-actions>
@@ -59,7 +59,7 @@
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Confirm and disconnect</govuk-button>
                 <govuk-button data-testid="cancel-button"
-                              formaction="@LinkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswersCancel(Model.PersonId!, Model.OneLoginSubject, Model.JourneyInstance!.InstanceId)"
+                              formaction="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.CheckAnswersCancel(Model.OneLoginUserSubject!, Model.PersonId, Model.JourneyInstance!.InstanceId)"
                               class="govuk-button--secondary" type="submit">Cancel
                 </govuk-button>
             </div>
