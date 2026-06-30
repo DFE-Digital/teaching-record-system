@@ -4,21 +4,46 @@ using System.Text.Json.Serialization;
 namespace TeachingRecordSystem.Core;
 
 [JsonConverter(typeof(SavedJourneyStateJsonConverter))]
-public class SavedJourneyState(
-    string pageName,
-    IReadOnlyDictionary<string, string?> modelStateValues,
-    object state,
-    Type stateType) : IEquatable<SavedJourneyState>
+public sealed class SavedJourneyState : IEquatable<SavedJourneyState>
 {
+    private readonly string _pageName;
+    private readonly IReadOnlyDictionary<string, string?> _modelStateValues;
+    private readonly JsonElement _state;
+    private readonly string _stateTypeName;
+
+    public SavedJourneyState(
+        string pageName,
+        IReadOnlyDictionary<string, string?> modelStateValues,
+        object state,
+        Type stateType)
+    {
+        _pageName = pageName;
+        _modelStateValues = modelStateValues;
+        _state = JsonSerializer.SerializeToElement(state, stateType, SerializerOptions);
+        _stateTypeName = stateType.AssemblyQualifiedName!;
+    }
+
+    private SavedJourneyState(
+        string pageName,
+        IReadOnlyDictionary<string, string?> modelStateValues,
+        JsonElement state,
+        string stateTypeName)
+    {
+        _pageName = pageName;
+        _modelStateValues = modelStateValues;
+        _state = state;
+        _stateTypeName = stateTypeName;
+    }
+
     internal static JsonSerializerOptions SerializerOptions { get; } = new(JsonSerializerDefaults.Web);
 
-    public string PageName => pageName;
+    public string PageName => _pageName;
 
-    public IReadOnlyDictionary<string, string?> ModelStateValues => modelStateValues;
+    public IReadOnlyDictionary<string, string?> ModelStateValues => _modelStateValues;
 
-    public T GetState<T>() => (T)state;
+    public T GetState<T>() => _state.Deserialize<T>(SerializerOptions)!;
 
-    private object State => state;
+    private object State => _state;
 
     public bool Equals(SavedJourneyState? other)
     {
@@ -44,7 +69,7 @@ public class SavedJourneyState(
             return false;
         }
 
-        return State.Equals(other.State);
+        return JsonElement.DeepEquals(_state, other._state);
     }
 
     public override bool Equals(object? obj)
@@ -91,25 +116,20 @@ public class SavedJourneyState(
             return null;
         }
 
-        var stateType = Type.GetType(deserialized.StateTypeName)!;
-        var state = deserialized.State.Deserialize(stateType, options)!;
-
         return new SavedJourneyState(
             deserialized.PageName,
             deserialized.ModelStateValues,
-            state,
-            stateType);
+            deserialized.State,
+            deserialized.StateTypeName);
     }
 
     internal void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
     {
-        var serializedState = JsonSerializer.SerializeToElement(state, stateType, options);
-
         var serializedSavedJourneyState = new SerializedSavedJourneyState(
             PageName,
             new Dictionary<string, string?>(ModelStateValues),
-            serializedState,
-            stateType.AssemblyQualifiedName!);
+            _state,
+            _stateTypeName);
 
         JsonSerializer.Serialize(writer, serializedSavedJourneyState);
     }
