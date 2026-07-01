@@ -26,7 +26,7 @@
         <div class="govuk-grid-column-two-thirds">
             <form method="get" asp-antiforgery="false">
                 <div class="govuk-!-margin-bottom-4">
-                    <govuk-input for="Search" type="search" autocomplete="off">
+                    <govuk-input for="Search" type="search">
                         <govuk-input-label>
                             <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
                         </govuk-input-label>
@@ -46,7 +46,7 @@
             {
                 <div class="trs-horizontal-filters govuk-!-margin-bottom-6">
                     @* autocomplete=off prevents the browser from remembering form state when the Back button is used *@
-                    <form method="get" asp-antiforgery="false" autocomplete="off">
+                    <form method="get" asp-antiforgery="false">
                         <h3 class="govuk-heading-s trs-horizontal-filters__heading">Filter by</h3>
 
                         <input asp-for="Search" type="hidden">
