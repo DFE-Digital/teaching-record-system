@@ -1,31 +1,37 @@
 @page "/persons"
+@using Microsoft.AspNetCore.Authorization
+@using TeachingRecordSystem.SupportUi.Infrastructure.Security
+@inject IAuthorizationService AuthorizationService
 @model TeachingRecordSystem.SupportUi.Pages.Persons.IndexModel
 @{
-    ViewBag.Title = "Find a record";
+    ViewBag.Title = "Records";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Index(selectedTab: "records")">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-        <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
+        <form method="get" asp-antiforgery="false" data-testid="search-form">
+            <span class="govuk-caption-l">Search</span>
+            <govuk-input for="Search" label-class="govuk-label--l" data-testid="search-input" type="search">
+                <govuk-input-label>@ViewBag.Title</govuk-input-label>
+                <govuk-input-hint>
+                    Enter a name, email address, date of birth or TRN
+                </govuk-input-hint>
+                <govuk-input-after-input>
+                    <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                </govuk-input-after-input>
+            </govuk-input>
+        </form>
 
-        <div class="govuk-!-margin-top-6">
-            <form method="get" asp-antiforgery="false" data-testid="search-form">
-                <div class="govuk-!-margin-bottom-4">
-                    <govuk-input for="Search" data-testid="search-input" type="search">
-                        <govuk-input-label>
-                            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
-                        </govuk-input-label>
-                        <govuk-input-hint>
-                            Enter a name, email address, date of birth or teacher reference number (TRN)
-                        </govuk-input-hint>
-                        <govuk-input-after-input>
-                            <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                        </govuk-input-after-input>
-                    </govuk-input>
-                </div>
-            </form>
-        </div>
+        @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
+        {
+            <p class="govuk-body govuk-!-margin-top-4">
+                <a href="@LinkGenerator.Persons.AddPerson.Index()" class="govuk-link">Or create a record</a>
+            </p>
+        }
     </div>
 </div>
 

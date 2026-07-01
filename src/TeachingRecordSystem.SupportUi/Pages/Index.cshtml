@@ -4,35 +4,60 @@
 @inject IAuthorizationService AuthorizationService
 @model IndexModel
 @{
-    ViewBag.Title = "Records";
+    ViewBag.Title = "Search";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h2 class="govuk-heading-m">@ViewBag.Title</h2>
-        <div class="govuk-!-margin-bottom-6">
-            <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
-                <div class="govuk-!-margin-bottom-4">
-                    <govuk-input name="Search" data-testid="search-input" type="search">
-                        <govuk-input-label>
-                            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Search for a record</h3>
-                        </govuk-input-label>
-                        <govuk-input-hint>
-                            Enter a name, email address, date of birth or teacher reference number (TRN)
-                        </govuk-input-hint>
-                        <govuk-input-after-input>
-                            <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                        </govuk-input-after-input>
-                    </govuk-input>
-                </div>
-            </form>
-        </div>
+        <h1 class="govuk-heading-m">@ViewBag.Title</h1>
 
-        @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
-        {
-            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Create a record</h3>
-            <govuk-button-link href="@LinkGenerator.Persons.AddPerson.Index()">Create a record</govuk-button-link>
-        }
+        <govuk-tabs>
+            <govuk-tabs-item label="Records" id="records">
+                <div class="govuk-!-margin-bottom-6">
+                    <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
+                        <div class="govuk-!-margin-bottom-4">
+                            <govuk-input name="Search" data-testid="search-input" type="search" autocomplete="off">
+                                <govuk-input-label>
+                                    <span class="govuk-visually-hidden">Search</span>
+                                </govuk-input-label>
+                                <govuk-input-hint>
+                                    Enter a name, email address, date of birth or TRN
+                                </govuk-input-hint>
+                                <govuk-input-after-input>
+                                    <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                                </govuk-input-after-input>
+                            </govuk-input>
+                        </div>
+                    </form>
+                </div>
+
+                @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
+                {
+                    <p class="govuk-body">
+                        <a href="@LinkGenerator.Persons.AddPerson.Index()" class="govuk-link">Or create a record</a>
+                    </p>
+                }
+            </govuk-tabs-item>
+            <govuk-tabs-item label="GOV.UK One Login" id="one-logins">
+                <div class="govuk-!-margin-bottom-6">
+                    <form action="@LinkGenerator.OneLogins.Index()" method="get" asp-antiforgery="false" data-testid="search-form-onelogin">
+                        <div class="govuk-!-margin-bottom-4">
+                            <govuk-input name="Search" data-testid="search-input-onelogin" type="search" autocomplete="off">
+                                <govuk-input-label>
+                                    <span class="govuk-visually-hidden">Search</span>
+                                </govuk-input-label>
+                                <govuk-input-hint>
+                                    Enter a GOV.UK One Login email address, name, date of birth or TRN
+                                </govuk-input-hint>
+                                <govuk-input-after-input>
+                                    <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
+                                </govuk-input-after-input>
+                            </govuk-input>
+                        </div>
+                    </form>
+                </div>
+            </govuk-tabs-item>
+        </govuk-tabs>
     </div>
 
     <div class="govuk-grid-column-full">
