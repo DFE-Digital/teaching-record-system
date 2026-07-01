@@ -16,7 +16,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal("/?selectedTab=one-logins", response.Headers.Location?.OriginalString);
+        Assert.Equal("/#one-logins", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
