@@ -215,6 +215,59 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
     }
 
     [Fact]
+    public async Task CreateTrnRequestAsync_WithTryResolveAndPotentialMatches_CreatesSupportTaskAndSetsStatusToPending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+
+        var options = GetCreateTrnRequestOptions(applicationUser.UserId, tryResolve: true) with
+        {
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth
+        };
+
+        // A potential (but not definite) match: same name + DOB, but no matching NINO
+        await TestData.CreatePersonAsync(p => p
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth));
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync(s => s.CreateTrnRequestAsync(options, processContext));
+
+        // Assert
+        Assert.True(result.TrnRequest.PotentialDuplicate);
+        Assert.Null(result.ResolvedPersonTrn);
+
+        var trnRequest = await WithDbContextAsync(dbContext =>
+            dbContext.TrnRequestMetadata.SingleAsync(m => m.ApplicationUserId == applicationUser.UserId && m.RequestId == options.RequestId));
+        Assert.Null(trnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var supportTask = await dbContext.SupportTasks
+                .SingleOrDefaultAsync(t =>
+                    t.TrnRequestApplicationUserId == applicationUser.UserId &&
+                    t.TrnRequestId == options.RequestId &&
+                    t.SupportTaskType == SupportTaskType.TrnRequest);
+
+            Assert.NotNull(supportTask);
+            Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+        });
+    }
+
+    [Fact]
     public async Task CreateTrnRequest_WithTryResolveFalse_DoesNotCreateSupportTaskForPotentialMatches()
     {
         // Arrange
@@ -405,6 +458,86 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
                     t.SupportTaskType == SupportTaskType.TrnRequest);
             Assert.NotNull(supportTask);
             Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+        });
+    }
+
+    [Fact]
+    public async Task ActivateTrnRequestAsync_WithDefiniteMatchAndFurtherChecksRequired_OnlyCreatesFurtherChecksSupportTask()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        TrnRequestOptionsAccessor.Value.FlagFurtherChecksRequiredFromUserIds = [applicationUser.UserId];
+
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
+
+        var definiteMatch = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(trnRequest.DateOfBirth)
+            .WithNationalInsuranceNumber(trnRequest.NationalInsuranceNumber!)
+            .WithAlert());
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+
+        // Assert
+        Assert.Equal(definiteMatch.PersonId, trnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var supportTasks = await dbContext.SupportTasks
+                .Where(t =>
+                    t.TrnRequestApplicationUserId == applicationUser.UserId &&
+                    t.TrnRequestId == trnRequest.RequestId)
+                .ToArrayAsync();
+
+            var supportTask = Assert.Single(supportTasks);
+            Assert.Equal(SupportTaskType.TrnRequestManualChecksNeeded, supportTask.SupportTaskType);
+        });
+    }
+
+    [Fact]
+    public async Task ActivateTrnRequestAsync_WithOutstandingResolvingSupportTask_DefersResolutionWithoutCreatingNewSupportTask()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync();
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId, oneLoginUser.Subject);
+
+        // A definite match exists, so the request *would* be resolved if resolution ran
+        await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(trnRequest.DateOfBirth)
+            .WithNationalInsuranceNumber(trnRequest.NationalInsuranceNumber!));
+
+        // ...but there's an outstanding support task for the request, so resolution should be left to that task
+        await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject,
+            t => t
+                .WithClientApplicationUserId(applicationUser.UserId)
+                .WithTrnRequestId(trnRequest.RequestId));
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+
+        // Assert
+        Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+        Assert.Null(trnRequest.ResolvedPersonId);
+        Assert.Null(result.ResolvedPersonTrn);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            // The existing matching task should be the only support task; no new TrnRequest task was created
+            var supportTasks = await dbContext.SupportTasks
+                .Where(t =>
+                    t.TrnRequestApplicationUserId == applicationUser.UserId &&
+                    t.TrnRequestId == trnRequest.RequestId)
+                .ToArrayAsync();
+
+            var supportTask = Assert.Single(supportTasks);
+            Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTask.SupportTaskType);
         });
     }
 
