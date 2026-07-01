@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Transactions;
 using Npgsql;
 using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -7,13 +6,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using static TeachingRecordSystem.Core.Services.OneLogin.IdModelTypes;
 
 namespace TeachingRecordSystem.Core.Services.OneLogin;
 
 public class OneLoginService(
     TrsDbContext dbContext,
-    IdDbContext idDbContext,
     IEventPublisher eventPublisher,
     IBackgroundJobScheduler backgroundJobScheduler,
     TimeProvider timeProvider)
@@ -252,7 +249,7 @@ public class OneLoginService(
         await eventScope.PublishEventAsync(updatedEvent);
     }
 
-    public async Task<FindTeacherIdentityUserResult?> FindTeacherIdentityUserAsync(
+    public async Task<FindPersonByTrnTokenResult?> FindPersonByTrnTokenAsync(
         IEnumerable<string[]> verifiedNames,
         IEnumerable<DateOnly> verifiedDatesOfBirth,
         string? trnToken,
@@ -276,23 +273,6 @@ public class OneLoginService(
             }
         }
 
-        // Couldn't match on TRN Token, try and match on email and TRN
-        if (getAnIdentityPerson is null)
-        {
-            var identityUser = await WithIdDbContextAsync(c => c.Users.SingleOrDefaultAsync(
-                u => u.EmailAddress == emailAddress
-                    && u.Trn != null
-                    && u.IsDeleted == false
-                    && (u.TrnVerificationLevel == TrnVerificationLevel.Medium
-                        || u.TrnAssociationSource == TrnAssociationSource.TrnToken
-                        || u.TrnAssociationSource == TrnAssociationSource.SupportUi)));
-            if (identityUser is not null)
-            {
-                getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == identityUser.Trn);
-                matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.GetAnIdentityUser : null;
-            }
-        }
-
         if (getAnIdentityPerson is null)
         {
             return null;
@@ -303,7 +283,7 @@ public class OneLoginService(
         var matchedDateOfBirth = verifiedDatesOfBirth.FirstOrDefault(dob => dob == getAnIdentityPerson.DateOfBirth);
         if (matchedLastName == default || matchedDateOfBirth == default)
         {
-            return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: null, MatchedAttributes: null);
+            return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchedAttributes: null);
         }
         var matchedAttributes = new Dictionary<PersonMatchedAttribute, string>()
         {
@@ -318,13 +298,7 @@ public class OneLoginService(
             await dbContext.SaveChangesAsync();
         }
 
-        return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, MatchRoute: matchRoute, matchedAttributes);
-
-        async Task<T> WithIdDbContextAsync<T>(Func<IdDbContext, Task<T>> action)
-        {
-            using var sc = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
-            return await action(idDbContext);
-        }
+        return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, matchedAttributes);
     }
 
     private static IReadOnlyDictionary<string, string> GetOneLoginCannotFindRecordEmailPersonalization(string personName) =>
@@ -716,10 +690,9 @@ public class OneLoginService(
         return new(resolvedPerson.Trn);
     }
 
-    public record FindTeacherIdentityUserResult(
+    public record FindPersonByTrnTokenResult(
         Guid PersonId,
         string Trn,
-        OneLoginUserMatchRoute? MatchRoute,
         IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>? MatchedAttributes);
 
     [UsedImplicitly]

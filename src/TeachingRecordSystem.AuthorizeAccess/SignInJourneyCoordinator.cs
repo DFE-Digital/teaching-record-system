@@ -173,27 +173,19 @@ public class SignInJourneyCoordinator(
         string? trn = null;
         string? trnTokenTrn = null;
 
-        if (await oneLoginService.FindTeacherIdentityUserAsync(verifiedNames, verifiedDatesOfBirth, State.TrnToken, email) is { } result)
+        if (await oneLoginService.FindPersonByTrnTokenAsync(verifiedNames, verifiedDatesOfBirth, State.TrnToken, email) is { MatchedAttributes: not null } result)
         {
-            if (result.MatchRoute is OneLoginUserMatchRoute.TrnToken)
-            {
-                trnTokenTrn = result.Trn;
-            }
+            await oneLoginService.SetUserMatchedAsync(
+                new SetUserMatchedOptions
+                {
+                    OneLoginUserSubject = sub,
+                    MatchedPersonId = result.PersonId,
+                    MatchRoute = OneLoginUserMatchRoute.TrnToken,
+                    MatchedAttributes = result.MatchedAttributes
+                },
+                processContext);
 
-            if (result.MatchRoute is not null)
-            {
-                await oneLoginService.SetUserMatchedAsync(
-                    new SetUserMatchedOptions
-                    {
-                        OneLoginUserSubject = sub,
-                        MatchedPersonId = result.PersonId,
-                        MatchRoute = result.MatchRoute.Value,
-                        MatchedAttributes = result.MatchedAttributes!
-                    },
-                    processContext);
-
-                trn = result.Trn;
-            }
+            trn = result.Trn;
         }
 
         UpdateState(state =>

@@ -58,10 +58,6 @@ public static partial class Commands
                 .AddBackgroundJobScheduler(environment)
                 .AddHangfire(environment);
 
-            services.AddDbContext<IdDbContext>(
-                options => options.UseInMemoryDatabase("TeacherAuthId"),
-                contextLifetime: ServiceLifetime.Transient);
-
             var serviceProvider = services.BuildServiceProvider();
 
             using var scope = serviceProvider.CreateScope();
