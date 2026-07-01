@@ -65,6 +65,8 @@ variable "run_dqt_reporting_service" {
   type = bool
 }
 
+variable "azure_maintenance_window" { default = null }
+
 variable "api_replicas" {
   type    = number
   default = 1

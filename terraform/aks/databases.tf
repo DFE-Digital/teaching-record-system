@@ -37,6 +37,7 @@ module "postgres" {
   azure_sku_name                 = var.postgres_flexible_server_sku
   azure_enable_high_availability = var.postgres_enable_high_availability
   azure_storage_mb               = var.postgres_azure_storage_mb
+  azure_maintenance_window       = var.azure_maintenance_window
 
   use_airbyte = var.pg_airbyte_enabled
 }
