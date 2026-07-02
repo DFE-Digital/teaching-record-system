@@ -30,6 +30,7 @@ public class User : UserBase
     public string? AzureAdUserId { get; set; }
     public required string? Role { get; set; }
     public Guid? DqtUserId { get; set; }
+    public DateTime? LastSignedInUtc { get; set; }
 }
 
 public class ApplicationUser : UserBase
