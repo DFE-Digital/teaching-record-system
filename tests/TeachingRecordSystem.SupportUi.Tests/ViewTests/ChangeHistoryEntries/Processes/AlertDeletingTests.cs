@@ -92,21 +92,11 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
 
         TimeProvider.Advance();
 
-        var processContext = new ProcessContext(
+        var process = await TestData.CreateProcessAsync(
             ProcessType.AlertDeleting,
-            TimeProvider.UtcNow,
-            SystemUser.SystemUserId,
-            changeReason);
+            changeReason: changeReason,
+            events: new AlertDeletedEvent { EventId = Guid.NewGuid(), PersonId = person.PersonId, Alert = EventModels.Alert.FromModel(alert) });
 
-        await WithEventPublisherAsync(publisher => publisher.PublishSingleEventAsync(
-            new AlertDeletedEvent
-            {
-                EventId = Guid.NewGuid(),
-                PersonId = person.PersonId,
-                Alert = EventModels.Alert.FromModel(alert)
-            },
-            processContext));
-
-        return await GetEntryHtmlAsync(processContext.ProcessId);
+        return await GetEntryHtmlAsync(process.ProcessId);
     }
 }
