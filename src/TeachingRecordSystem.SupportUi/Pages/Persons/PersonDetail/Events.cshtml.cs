@@ -38,7 +38,7 @@ public class EventsModel(TrsDbContext dbContext) : PageModel
                         p.Events!.OrderBy(e => e.CreatedOn).Select(x => new ProcessEventPayloadEvent(x.EventName, x.Payload)).ToArray(),
                         p.ChangeReason,
                         p.CreatedOn)))
-            .OrderBy(e => e.Timestamp)
+            .OrderByDescending(e => e.Timestamp)
             .ToArray();
     }
 

@@ -21,7 +21,7 @@
                 </div>
                 <p class="moj-timeline__date">
                     <time datetime="@legacyEvent.Timestamp.ToString("O")" data-testid="timeline-item-time">
-                        @legacyEvent.Timestamp.ToString(WebConstants.DateAndTimeDisplayFormat)
+                        @legacyEvent.Timestamp.ToGmt().ToString(WebConstants.DateAndTimeDisplayFormat)
                     </time>
                 </p>
                 <div class="moj-timeline__description">
@@ -37,11 +37,11 @@
                 </div>
                 <p class="moj-timeline__date">
                     <time datetime="@processEventPayload.Timestamp.ToString("O")" data-testid="timeline-item-time">
-                        @processEventPayload.Timestamp.ToString(WebConstants.DateAndTimeDisplayFormat)
+                        @processEventPayload.Timestamp.ToGmt().ToString(WebConstants.DateAndTimeDisplayFormat)
                     </time>
                 </p>
                 <div class="moj-timeline__description">
-                    @if (processEventPayload.GetFormattedChangeReasonJsonPayload() is var changeReasonJsonPayload)
+                    @if (processEventPayload.GetFormattedChangeReasonJsonPayload() is { } changeReasonJsonPayload)
                     {
                         <div>
                             <p class="govuk-body">Change reason</p>
