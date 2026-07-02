@@ -20,15 +20,16 @@ on:
                 options:
                     - "true"
                     - "false"
-    # schedule: # hourly every Sunday midnight until 9am
-    #     - cron: "0 0-9 * * 0"
+    schedule: # hourly every Sunday midnight until 9am
+        - cron: "0 0-9 * * 0"
 
 permissions:
     id-token: write
 
 env:
-    SERVICE_NAME: teaching-record-system
+    SERVICE_NAME: trs
     SERVICE_SHORT: trs
+    APP_NAME_SUFFIX: api
     TF_VARS_PATH: terraform/aks/config
 
 jobs:
@@ -57,7 +58,7 @@ jobs:
                   azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
                   azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
                   azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-                  app-name: ${{ env.SERVICE_NAME }}-${{ env.DEPLOY_ENV }}
+                  app-name: ${{ env.SERVICE_NAME }}-${{ env.DEPLOY_ENV }}-${{ env.APP_NAME_SUFFIX }}
                   namespace: ${{ env.NAMESPACE }}
                   cluster: ${{ env.CLUSTER }}
                   dry-run: ${{ env.DRY_RUN }}
