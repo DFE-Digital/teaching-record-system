@@ -1,0 +1,35 @@
+@page "/support-tasks/{supportTaskReference}/events"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail.Events
+
+<div class="moj-timeline">
+    @foreach (var p in Model.Processes!)
+    {
+        <div class="moj-timeline__item govuk-!-padding-bottom-2">
+            <div class="moj-timeline__header">
+                <h2 class="moj-timeline__title">@p.ProcessType</h2>
+            </div>
+            <p class="moj-timeline__date">
+                <time datetime="@p.Timestamp.ToString("O")" data-testid="timeline-item-time">
+                    @p.Timestamp.ToGmt().ToString(WebConstants.DateAndTimeDisplayFormat)
+                </time>
+            </p>
+            <div class="moj-timeline__description">
+                @if (p.GetFormattedChangeReasonJsonPayload() is { } changeReasonJsonPayload)
+                {
+                    <div>
+                        <p class="govuk-body">Change reason</p>
+                        <pre class="trs-event-payload">@changeReasonJsonPayload</pre>
+                    </div>
+                }
+
+                @foreach (var x in p.Events)
+                {
+                    <div>
+                        <p class="govuk-body">@x.EventName</p>
+                        <pre class="trs-event-payload">@x.GetFormattedJsonPayload()</pre>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
