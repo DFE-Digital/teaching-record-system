@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
@@ -51,7 +52,29 @@ public partial class OneLoginUserMatchingSupportTaskService
         var appContent = applicationUser.AppContent;
         var recordMatchingPolicy = applicationUser.RecordMatchingPolicy;
 
-        bool emailSent = false;
+        await supportTaskService.UpdateSupportTaskAsync(
+            new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
+            {
+                SupportTaskReference = supportTask.SupportTaskReference,
+                UpdateData = data => data with
+                {
+                    Outcome = OneLoginUserRecordMatchingOutcome.NotConnecting,
+                    NotConnectingReason = options.NotConnectingReason,
+                    NotConnectingAdditionalDetails = options.NotConnectingAdditionalDetails
+                },
+                Status = SupportTaskStatus.Closed
+            },
+            processContext);
+
+        if (supportTask.TrnRequestId is not null)
+        {
+            Debug.Assert(supportTask.TrnRequestMetadata is not null);
+
+            if (supportTask.TrnRequestMetadata.Status is TrnRequestStatus.Pending)
+            {
+                await trnRequestService.TryResolveAsync(supportTask.TrnRequestMetadata, processContext);
+            }
+        }
 
         if (recordMatchingPolicy == RecordMatchingPolicy.Deferred && appContent?.OneLoginNotConnectedEmailTemplateId is { } templateId)
         {
@@ -68,24 +91,10 @@ public partial class OneLoginUserMatchingSupportTaskService
                 templateId,
                 processContext);
 
-            emailSent = true;
+            return new() { EmailSent = true };
         }
 
-        await supportTaskService.UpdateSupportTaskAsync(
-            new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
-            {
-                SupportTaskReference = supportTask.SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    Outcome = OneLoginUserRecordMatchingOutcome.NotConnecting,
-                    NotConnectingReason = options.NotConnectingReason,
-                    NotConnectingAdditionalDetails = options.NotConnectingAdditionalDetails
-                },
-                Status = SupportTaskStatus.Closed
-            },
-            processContext);
-
-        return new() { EmailSent = emailSent };
+        return new() { EmailSent = false };
     }
 
     public async Task<ResolveRecordMatchingSupportTaskResult> ResolveRecordMatchingSupportTaskAsync(NoMatchesOutcomeOptions options, ProcessContext processContext)
@@ -109,6 +118,16 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed
             },
             processContext);
+
+        if (supportTask.TrnRequestId is not null)
+        {
+            Debug.Assert(supportTask.TrnRequestMetadata is not null);
+
+            if (supportTask.TrnRequestMetadata.Status is TrnRequestStatus.Pending)
+            {
+                await trnRequestService.TryResolveAsync(supportTask.TrnRequestMetadata, processContext);
+            }
+        }
 
         var emailTemplateId = applicationUser.RecordMatchingPolicy is RecordMatchingPolicy.Deferred
             ? null
