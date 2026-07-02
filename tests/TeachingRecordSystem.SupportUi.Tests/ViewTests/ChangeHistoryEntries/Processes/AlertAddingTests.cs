@@ -87,21 +87,11 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
 
         var alert = person.Alerts.Single();
 
-        var processContext = new ProcessContext(
+        var process = await TestData.CreateProcessAsync(
             ProcessType.AlertCreating,
-            TimeProvider.UtcNow,
-            SystemUser.SystemUserId,
-            changeReason);
+            changeReason: changeReason,
+            events: new AlertCreatedEvent { EventId = Guid.NewGuid(), PersonId = person.PersonId, Alert = EventModels.Alert.FromModel(alert) });
 
-        await WithEventPublisherAsync(publisher => publisher.PublishSingleEventAsync(
-            new AlertCreatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                PersonId = person.PersonId,
-                Alert = EventModels.Alert.FromModel(alert)
-            },
-            processContext));
-
-        return await GetEntryHtmlAsync(processContext.ProcessId);
+        return await GetEntryHtmlAsync(process.ProcessId);
     }
 }

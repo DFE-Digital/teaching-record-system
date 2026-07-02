@@ -17,11 +17,4 @@ public abstract class ChangeHistoryEntryTestBase(HostFixture hostFixture) : Test
         var title = entry.QuerySelector(".moj-timeline__title");
         Assert.Equal(expectedTitle, title?.TextContent);
     }
-
-    protected async Task WithEventPublisherAsync(Func<IEventPublisher, Task> action)
-    {
-        using var sc = HostFixture.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        var eventPublisher = sc.ServiceProvider.GetRequiredService<IEventPublisher>();
-        await action(eventPublisher);
-    }
 }
