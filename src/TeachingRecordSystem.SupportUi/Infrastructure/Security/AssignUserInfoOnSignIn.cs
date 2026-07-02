@@ -51,6 +51,8 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
                 return;
             }
 
+            user.LastSignedInUtc = DateTime.UtcNow;
+
             await SyncUserInfoAsync();
 
             var identityWithRoles = new ClaimsIdentity(
