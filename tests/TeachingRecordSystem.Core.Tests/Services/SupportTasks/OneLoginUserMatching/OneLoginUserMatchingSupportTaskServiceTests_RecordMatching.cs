@@ -557,4 +557,124 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             e => Assert.IsType<OneLoginUserUpdatedEvent>(e),
             e => Assert.IsType<SupportTaskUpdatedEvent>(e));
     }
+
+    [Fact]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNotConnectingOutcomeAndPendingTrnRequest_ResolvesTrnRequestWithMatchedPerson()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+        var trnRequestId = Guid.NewGuid().ToString();
+
+        // The support task's TRN request matches an existing person on date of birth + NINO (a definite match)
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
+                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber)
+                .WithTrnRequestId(trnRequestId));
+
+        // The TRN request has been activated and deferred to this support task, so it's Pending
+        await SetTrnRequestToPendingAsync(supportTask);
+
+        var options = new NotConnectingOutcomeOptions
+        {
+            SupportTask = supportTask,
+            NotConnectingReason = OneLoginUserNotConnectingReason.AnotherReason,
+            NotConnectingAdditionalDetails = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
+
+        // Assert
+        var updatedSupportTask =
+            await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
+        Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+
+        // Because the linked TRN request was Pending, it's resolved to the matched person
+        Assert.Equal(matchedPerson.PersonId, supportTask.TrnRequestMetadata!.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, supportTask.TrnRequestMetadata.Status);
+    }
+
+    [Fact]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNoMatchesOutcomeAndPendingTrnRequest_ResolvesTrnRequestWithNewRecord()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+        var trnRequestId = Guid.NewGuid().ToString();
+
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject, t => t.WithTrnRequestId(trnRequestId));
+
+        // The TRN request has been activated and deferred to this support task, so it's Pending
+        await SetTrnRequestToPendingAsync(supportTask);
+
+        var options = new NoMatchesOutcomeOptions { SupportTask = supportTask };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
+
+        // Assert
+        var updatedSupportTask =
+            await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
+        Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+
+        // Because the linked TRN request was Pending and had no match, it's resolved with a newly-created record
+        Assert.NotNull(supportTask.TrnRequestMetadata!.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, supportTask.TrnRequestMetadata.Status);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == supportTask.TrnRequestMetadata.ResolvedPersonId);
+            Assert.NotNull(person);
+        });
+    }
+
+    [Fact]
+    public async Task ResolveRecordMatchingSupportTaskAsync_WithNoMatchesOutcomeAndNonPendingTrnRequest_DoesNotResolveTrnRequest()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+        var trnRequestId = Guid.NewGuid().ToString();
+
+        // The linked TRN request is left Dormant (it has not been activated), so resolution should not be triggered
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject, t => t.WithTrnRequestId(trnRequestId));
+
+        var options = new NoMatchesOutcomeOptions { SupportTask = supportTask };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.ResolveRecordMatchingSupportTaskAsync(options, processContext));
+
+        // Assert
+        var updatedSupportTask =
+            await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
+        Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+
+        // The TRN request wasn't Pending, so it's untouched
+        var updatedTrnRequest =
+            await WithDbContextAsync(dbContext => dbContext.TrnRequestMetadata.SingleAsync(r => r.RequestId == trnRequestId));
+        Assert.Null(updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Dormant, updatedTrnRequest.Status);
+    }
+
+    private async Task SetTrnRequestToPendingAsync(SupportTask supportTask)
+    {
+        await WithDbContextAsync(async dbContext =>
+        {
+            var metadata = await dbContext.TrnRequestMetadata.SingleAsync(m => m.RequestId == supportTask.TrnRequestId);
+            metadata.Status = TrnRequestStatus.Pending;
+            await dbContext.SaveChangesAsync();
+        });
+
+        supportTask.TrnRequestMetadata!.Status = TrnRequestStatus.Pending;
+    }
 }

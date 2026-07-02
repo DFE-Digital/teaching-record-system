@@ -1,7 +1,5 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Operations.Common;
-using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using Gender = TeachingRecordSystem.Core.Models.Gender;
 using TrnRequestInfo = TeachingRecordSystem.Api.V3.Operations.Common.TrnRequestInfo;
@@ -24,7 +22,6 @@ public record CreateTrnRequestCommand : ICommand<TrnRequestInfo>
 
 public class CreateTrnRequestHandler(
     TrnRequestService trnRequestService,
-    SupportTaskService supportTaskService,
     ICurrentUserProvider currentUserProvider,
     TimeProvider timeProvider) :
     ICommandHandler<CreateTrnRequestCommand, TrnRequestInfo>
@@ -60,20 +57,6 @@ public class CreateTrnRequestHandler(
                 Gender = command.Gender
             },
             processContext);
-
-        if (trnRequest.PotentialDuplicate)
-        {
-            await supportTaskService.CreateSupportTaskAsync(
-                new CreateSupportTaskOptions
-                {
-                    SupportTaskType = SupportTaskType.TrnRequest,
-                    Data = new TrnRequestData(),
-                    PersonId = null,
-                    OneLoginUserSubject = null,  // This must be null as we likely won't have an entry in the one_login_users table yet
-                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
-                },
-                processContext);
-        }
 
         var trnToken = trnRequest.TrnToken;
         var aytqLink = trnToken is not null ? trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) : null;

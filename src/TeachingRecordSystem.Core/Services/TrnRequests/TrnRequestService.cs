@@ -24,6 +24,14 @@ public class TrnRequestService(
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
 {
+    /// The set of SupportTaskTypes that can resolve the attached TRN request
+    private static readonly HashSet<SupportTaskType> _trnRequestResolvingSupportTaskTypes =
+    [
+        SupportTaskType.TrnRequest,
+        SupportTaskType.OneLoginUserRecordMatching,
+        SupportTaskType.OneLoginUserIdVerification
+    ];
+
     public async Task<TrnRequestInfo> CreateTrnRequestAsync(CreateTrnRequestOptions options, ProcessContext processContext)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
@@ -489,36 +497,36 @@ public class TrnRequestService(
         }
 
         var results = (await GetMatchesFromTrnRequestAsync(request)).ToList();
-        results.RemoveAll(r => excludePersonIds.Contains(r.person_id));
+        results.RemoveAll(r => excludePersonIds.Contains(r.PersonId));
 
         if (results.Count == 0)
         {
             return MatchPersonsResult.NoMatches();
         }
 
-        var matchedOnDobAndNino = results.Where(r => r is { date_of_birth_matches: true, national_insurance_number_matches: true }).ToArray();
+        var matchedOnDobAndNino = results.Where(r => r is { DateOfBirthMatches: true, NationalInsuranceNumberMatches: true }).ToArray();
 
         if (matchedOnDobAndNino is [var singleDobAndNinoMatch])
         {
             var matchedAttributes = GetMatchedAttributes(singleDobAndNinoMatch);
-            return MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.person_id, singleDobAndNinoMatch.trn, matchedAttributes);
+            return MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.PersonId, singleDobAndNinoMatch.Trn, matchedAttributes);
         }
 
         var matchedOnNameDateOfBirthEmailAndGender = results
             .Where(r => r is
             {
-                first_name_matches: true,
-                last_name_matches: true,
-                date_of_birth_matches: true,
-                email_address_matches: true,
-                gender_matches: true
+                FirstNameMatches: true,
+                LastNameMatches: true,
+                DateOfBirthMatches: true,
+                EmailAddressMatches: true,
+                GenderMatches: true
             })
             .ToArray();
 
         if (matchedOnNameDateOfBirthEmailAndGender is [var singleNameDobEmailGenderMatch] && string.IsNullOrEmpty(request.NationalInsuranceNumber))
         {
             var matchedAttributes = GetMatchedAttributes(singleNameDobEmailGenderMatch);
-            return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.person_id, singleNameDobEmailGenderMatch.trn, matchedAttributes);
+            return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.PersonId, singleNameDobEmailGenderMatch.Trn, matchedAttributes);
         }
 
         request.PotentialDuplicate = true;
@@ -527,12 +535,12 @@ public class TrnRequestService(
             results
                 .Select(r =>
                 {
-                    var score = (r.date_of_birth_matches ? 1 : 0) +
-                        (r.first_name_matches ? 1 : 0) +
-                        (r.middle_name_matches ? 1 : 0) +
-                        (r.last_name_matches ? 1 : 0) +
-                        (r.email_address_matches ? 5 : 0) +
-                        (r.national_insurance_number_matches ? 10 : 0);
+                    var score = (r.DateOfBirthMatches ? 1 : 0) +
+                        (r.FirstNameMatches ? 1 : 0) +
+                        (r.MiddleNameMatches ? 1 : 0) +
+                        (r.LastNameMatches ? 1 : 0) +
+                        (r.EmailAddressMatches ? 5 : 0) +
+                        (r.NationalInsuranceNumberMatches ? 10 : 0);
 
                     var potentialMatch = GetMatchedPerson(r);
 
@@ -554,23 +562,30 @@ public class TrnRequestService(
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
         trnRequest.Status = TrnRequestStatus.Pending;
-        var result = await TryResolveAsync(trnRequest, processContext);
+        await dbContext.SaveChangesAsync();
 
-        if (result.TrnRequest.Status is TrnRequestStatus.Pending)
+        var changes = TrnRequestUpdatedChanges.Status;
+
+        TrnRequestInfo result;
+
+        // If there's an outstanding support task for this request then leave resolution to that task
+        if (await dbContext.SupportTasks.AnyAsync(
+            t => t.TrnRequestApplicationUserId == trnRequest.ApplicationUserId &&
+                t.TrnRequestId == trnRequest.RequestId &&
+                t.Status != SupportTaskStatus.Closed &&
+                _trnRequestResolvingSupportTaskTypes.Contains(t.SupportTaskType)))
         {
-            await supportTaskService.CreateSupportTaskAsync(
-                new CreateSupportTaskOptions
-                {
-                    SupportTaskType = SupportTaskType.TrnRequest,
-                    Data = new TrnRequestData(),
-                    PersonId = null,
-                    OneLoginUserSubject = null,
-                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
-                },
-                processContext);
+            result = new TrnRequestInfo(trnRequest, ResolvedPersonTrn: null);
         }
+        else
+        {
+            result = await TryResolveAsync(trnRequest, processContext);
 
-        var changes = TrnRequestUpdatedChanges.Status | (trnRequest.ResolvedPersonId is not null ? TrnRequestUpdatedChanges.ResolvedPersonId : 0);
+            if (result.TrnRequest.ResolvedPersonId is not null)
+            {
+                changes |= TrnRequestUpdatedChanges.ResolvedPersonId;
+            }
+        }
 
         await eventScope.PublishEventAsync(
             new TrnRequestUpdatedEvent
@@ -664,26 +679,26 @@ public class TrnRequestService(
 
     private MatchPersonsResultPerson GetMatchedPerson(TrnRequestMatchQueryResult result) =>
         new(
-            PersonId: result.person_id,
+            PersonId: result.PersonId,
             MatchedAttributes: GetMatchedAttributes(result)
         );
 
     private IReadOnlyCollection<PersonMatchedAttribute> GetMatchedAttributes(TrnRequestMatchQueryResult result) =>
         new[]
         {
-            result.first_name_matches ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
-            result.middle_name_matches ? PersonMatchedAttribute.MiddleName : null,
-            result.last_name_matches ? PersonMatchedAttribute.LastName : null,
-            result.date_of_birth_matches ? PersonMatchedAttribute.DateOfBirth : null,
-            result.email_address_matches ? PersonMatchedAttribute.EmailAddress : null,
-            result.national_insurance_number_matches ? PersonMatchedAttribute.NationalInsuranceNumber : null,
-            result.gender_matches ? PersonMatchedAttribute.Gender : null
+            result.FirstNameMatches ? PersonMatchedAttribute.FirstName : (PersonMatchedAttribute?)null,
+            result.MiddleNameMatches ? PersonMatchedAttribute.MiddleName : null,
+            result.LastNameMatches ? PersonMatchedAttribute.LastName : null,
+            result.DateOfBirthMatches ? PersonMatchedAttribute.DateOfBirth : null,
+            result.EmailAddressMatches ? PersonMatchedAttribute.EmailAddress : null,
+            result.NationalInsuranceNumberMatches ? PersonMatchedAttribute.NationalInsuranceNumber : null,
+            result.GenderMatches ? PersonMatchedAttribute.Gender : null
         }
         .Where(a => a is not null)
         .Select(a => a!.Value)
         .ToArray();
 
-    private async Task<TrnRequestInfo> TryResolveAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public async Task<TrnRequestInfo> TryResolveAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         string? trn = null;
         var matchResult = await MatchPersonsAsync(trnRequest);
@@ -700,28 +715,37 @@ public class TrnRequestService(
         else
         {
             Debug.Assert(matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches);
+
+            await supportTaskService.CreateSupportTaskAsync(
+                new CreateSupportTaskOptions
+                {
+                    SupportTaskType = SupportTaskType.TrnRequest,
+                    Data = new TrnRequestData(),
+                    PersonId = null,
+                    OneLoginUserSubject = null,
+                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
+                },
+                processContext);
         }
 
         return new TrnRequestInfo(trnRequest, trn);
     }
 
-#pragma warning disable IDE1006 // Naming Styles
     private record TrnRequestMatchQueryResult(
-        Guid person_id,
-        string trn,
-        string first_name,
-        string? middle_name,
-        string last_name,
-        DateOnly? date_of_birth,
-        string? email_address,
-        string? national_insurance_number,
-        Gender? gender,
-        bool first_name_matches,
-        bool middle_name_matches,
-        bool last_name_matches,
-        bool date_of_birth_matches,
-        bool email_address_matches,
-        bool national_insurance_number_matches,
-        bool gender_matches);
-#pragma warning restore IDE1006 // Naming Styles
+        Guid PersonId,
+        string Trn,
+        string FirstName,
+        string? MiddleName,
+        string LastName,
+        DateOnly? DateOfBirth,
+        string? EmailAddress,
+        string? NationalInsuranceNumber,
+        Gender? Gender,
+        bool FirstNameMatches,
+        bool MiddleNameMatches,
+        bool LastNameMatches,
+        bool DateOfBirthMatches,
+        bool EmailAddressMatches,
+        bool NationalInsuranceNumberMatches,
+        bool GenderMatches);
 }
