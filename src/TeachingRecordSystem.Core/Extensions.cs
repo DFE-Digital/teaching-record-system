@@ -21,6 +21,7 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core;
@@ -114,6 +115,7 @@ public static class Extensions
             .AddNoteService()
             .AddPersonService()
             .AddAlertService()
+            .AddUserService()
             .AddInductionExemptionService()
             .AddOneLoginService();
 

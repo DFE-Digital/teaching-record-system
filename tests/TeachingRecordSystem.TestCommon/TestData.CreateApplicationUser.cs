@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -65,15 +64,6 @@ public partial class TestData
             };
 
             dbContext.ApplicationUsers.Add(user);
-
-            var @event = new ApplicationUserCreatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                RaisedBy = SystemUser.SystemUserId,
-                CreatedUtc = TimeProvider.UtcNow,
-                ApplicationUser = EventModels.ApplicationUser.FromModel(user)
-            };
-            dbContext.AddEventWithoutBroadcast(@event);
 
             await dbContext.SaveChangesAsync();
             dbContext.Entry(user).State = EntityState.Detached;

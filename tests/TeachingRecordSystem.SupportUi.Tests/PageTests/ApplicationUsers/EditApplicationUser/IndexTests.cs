@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApplicationUsers.EditApplicationUser;
 
@@ -284,7 +283,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             }
         };
 
-        EventObserver.Clear();
+        Events.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -299,12 +298,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.True(new HashSet<string>(applicationUser.ApiRoles ?? []).SetEquals(new HashSet<string>(newRoles)));
         });
 
-        EventObserver.AssertEventsSaved(
-            e =>
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApplicationUserUpdating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<ApplicationUserUpdatedEvent>(applicationUserUpdatedEvent =>
             {
-                var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
-                Assert.Equal(TimeProvider.UtcNow, applicationUserUpdatedEvent.CreatedUtc);
-                Assert.Equal(GetCurrentUserId(), applicationUserUpdatedEvent.RaisedBy.UserId);
                 Assert.Equal(originalName, applicationUserUpdatedEvent.OldApplicationUser.Name);
                 Assert.Equal(newName, applicationUserUpdatedEvent.ApplicationUser.Name);
                 Assert.Equal(newShortName, applicationUserUpdatedEvent.ApplicationUser.ShortName);
@@ -352,6 +352,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ApplicationUserUpdatedEventChanges.RecordMatchingPolicy,
                     applicationUserUpdatedEvent.Changes);
             });
+        });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
@@ -398,7 +399,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             }
         };
 
-        EventObserver.Clear();
+        Events.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -418,10 +419,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(supportEmailAddress, applicationUser.AppContent.SupportEmailAddress);
         });
 
-        EventObserver.AssertEventsSaved(
-            e =>
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApplicationUserUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<ApplicationUserUpdatedEvent>(applicationUserUpdatedEvent =>
             {
-                var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
                 Assert.NotNull(applicationUserUpdatedEvent.ApplicationUser.AppContent);
                 Assert.Equal(emailTemplateId, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
                 Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
@@ -432,6 +434,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.AppContent);
                 Assert.True(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent));
             });
+        });
     }
 
     [Fact]
@@ -476,7 +479,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             }
         };
 
-        EventObserver.Clear();
+        Events.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -484,15 +487,17 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        EventObserver.AssertEventsSaved(
-            e =>
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApplicationUserUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<ApplicationUserUpdatedEvent>(applicationUserUpdatedEvent =>
             {
-                var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
                 Assert.Equal(ApplicationUserUpdatedEventChanges.Name, applicationUserUpdatedEvent.Changes); // Only Name changed
                 Assert.False(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent)); // AppContent flag NOT set
                 Assert.Equal(emailTemplateId, applicationUserUpdatedEvent.ApplicationUser.AppContent!.OneLoginCannotFindRecordEmailTemplateId);
                 Assert.Equal(pageContent, applicationUserUpdatedEvent.ApplicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
             });
+        });
     }
 
     [Fact]
@@ -530,7 +535,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             }
         };
 
-        EventObserver.Clear();
+        Events.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -546,12 +551,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Null(applicationUser.AppContent.OneLoginNoMatchesPageContentHtml);
         });
 
-        EventObserver.AssertEventsSaved(
-            e =>
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApplicationUserUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<ApplicationUserUpdatedEvent>(applicationUserUpdatedEvent =>
             {
-                var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
                 Assert.True(applicationUserUpdatedEvent.Changes.HasFlag(ApplicationUserUpdatedEventChanges.AppContent));
             });
+        });
     }
 
     public static (string ClientId,

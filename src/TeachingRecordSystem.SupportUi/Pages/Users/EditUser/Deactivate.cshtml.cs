@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -14,7 +14,8 @@ public class DeactivateModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     TrsDbContext dbContext,
-    TimeProvider timeProvider) : PageModel
+    TimeProvider timeProvider,
+    UserService userService) : PageModel
 {
     private readonly InlineValidator<DeactivateModel> _validator = new()
     {
@@ -89,20 +90,18 @@ public class DeactivateModel(
             return this.PageWithErrors();
         }
 
-        _user.Active = false;
+        var processContext = new ProcessContext(ProcessType.UserDeactivating, timeProvider.UtcNow, User.GetUserId());
 
-        dbContext.AddEventWithoutBroadcast(new UserDeactivatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            User = EventModels.User.FromModel(_user),
-            RaisedBy = User.GetUserId(),
-            CreatedUtc = timeProvider.UtcNow,
-            DeactivatedReason = HasAdditionalReason is true ? AdditionalReasonDetail : null,
-            DeactivatedReasonDetail = HasMoreInformation is true ? MoreInformationDetail : null,
-            EvidenceFileId = Evidence.UploadedEvidenceFile?.FileId
-        });
+        await userService.DeactivateUserAsync(
+            new DeactivateUserOptions
+            {
+                UserId = UserId,
+                DeactivatedReason = HasAdditionalReason is true ? AdditionalReasonDetail : null,
+                DeactivatedReasonDetail = HasMoreInformation is true ? MoreInformationDetail : null,
+                EvidenceFileId = Evidence.UploadedEvidenceFile?.FileId
+            },
+            processContext);
 
-        await dbContext.SaveChangesAsync();
         TempData.SetFlashNotificationBanner($"{_user.Name}\u2019s account has been deactivated");
 
         return Redirect(linkGenerator.Users.Index());

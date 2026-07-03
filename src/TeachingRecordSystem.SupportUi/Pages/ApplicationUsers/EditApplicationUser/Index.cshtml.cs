@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
@@ -15,7 +16,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.EditApplicationU
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 [BindProperties]
-public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider, UserService userService) : PageModel
 {
     // From PathString
     private static readonly SearchValues<char> _validPathChars =
@@ -218,17 +219,10 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             return this.PageWithErrors();
         }
 
-        var changes = ApplicationUserUpdatedEventChanges.None |
-            (Name != _user!.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
-            (ShortName != _user!.ShortName ? ApplicationUserUpdatedEventChanges.ShortName : 0) |
-            (!new HashSet<string>(_user.ApiRoles ?? []).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
-            (IsOidcClient != _user.IsOidcClient ? ApplicationUserUpdatedEventChanges.IsOidcClient : 0);
-
         AppContent? newAppContent = null;
 
         if (IsOidcClient)
         {
-            var oldAppContent = _user.AppContent;
             newAppContent = new AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = OneLoginCannotFindRecordEmailTemplateId,
@@ -243,78 +237,43 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 SupportEmailAddressNotifyId = SupportEmailAddressNotifyId,
                 SupportEmailAddress = SupportEmailAddress
             };
-            var appContentChanged = oldAppContent?.OneLoginCannotFindRecordEmailTemplateId != newAppContent.OneLoginCannotFindRecordEmailTemplateId ||
-                                   oldAppContent?.OneLoginNotVerifiedEmailTemplateId != newAppContent.OneLoginNotVerifiedEmailTemplateId ||
-                                   oldAppContent?.OneLoginRecordMatchedEmailTemplateId != newAppContent.OneLoginRecordMatchedEmailTemplateId ||
-                                   oldAppContent?.OneLoginNotConnectedEmailTemplateId != newAppContent.OneLoginNotConnectedEmailTemplateId ||
-                                   oldAppContent?.OneLoginNoMatchesPageContentHtml != newAppContent.OneLoginNoMatchesPageContentHtml ||
-                                   oldAppContent?.OneLoginNoMatchesEmailSentFlashMessage != newAppContent.OneLoginNoMatchesEmailSentFlashMessage ||
-                                   oldAppContent?.OneLoginNotConnectedEmailSentFlashMessage != newAppContent.OneLoginNotConnectedEmailSentFlashMessage ||
-                                   oldAppContent?.OneLoginFoundPageLinkText != newAppContent.OneLoginFoundPageLinkText ||
-                                   oldAppContent?.SignInUrl != newAppContent.SignInUrl ||
-                                   oldAppContent?.SupportEmailAddressNotifyId != newAppContent.SupportEmailAddressNotifyId ||
-                                   oldAppContent?.SupportEmailAddress != newAppContent.SupportEmailAddress;
-
-            changes |=
-                (ClientId != _user.ClientId ? ApplicationUserUpdatedEventChanges.ClientId : 0) |
-                (ClientSecret != _user.ClientSecret ? ApplicationUserUpdatedEventChanges.ClientSecret : 0) |
-                (!RedirectUris!.SequenceEqualIgnoringOrder(_user.RedirectUris ?? []) ? ApplicationUserUpdatedEventChanges.RedirectUris : 0) |
-                (!PostLogoutRedirectUris!.SequenceEqualIgnoringOrder(_user.PostLogoutRedirectUris ?? []) ? ApplicationUserUpdatedEventChanges.PostLogoutRedirectUris : 0) |
-                (OneLoginClientId != _user.OneLoginClientId ? ApplicationUserUpdatedEventChanges.OneLoginClientId : 0) |
-                (UseSharedOneLoginSigningKeys is false && OneLoginPrivateKeyPem != _user.OneLoginPrivateKeyPem ? ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem : 0) |
-                (OneLoginAuthenticationSchemeName != _user.OneLoginAuthenticationSchemeName ? ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName : 0) |
-                (OneLoginRedirectUriPath != _user.OneLoginRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath : 0) |
-                (OneLoginPostLogoutRedirectUriPath != _user.OneLoginPostLogoutRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath : 0) |
-                (UseSharedOneLoginSigningKeys != _user.UseSharedOneLoginSigningKeys ? ApplicationUserUpdatedEventChanges.UseSharedOneLoginSigningKeys : 0) |
-                (RecordMatchingPolicy != _user.RecordMatchingPolicy ? ApplicationUserUpdatedEventChanges.RecordMatchingPolicy : 0) |
-                (appContentChanged ? ApplicationUserUpdatedEventChanges.AppContent : 0);
         }
 
-        if (changes != ApplicationUserUpdatedEventChanges.None)
+        var options = new UpdateApplicationUserOptions
         {
-            var oldApplicationUser = EventModels.ApplicationUser.FromModel(_user);
+            UserId = UserId,
+            Name = Option.Some(Name!),
+            ShortName = Option.Some(ShortName),
+            ApiRoles = Option.Some<string[]?>(newApiRoles),
+            IsOidcClient = Option.Some(IsOidcClient)
+        };
 
-            _user.Name = Name!;
-            _user.ApiRoles = newApiRoles;
-            _user.IsOidcClient = IsOidcClient;
-            _user.ShortName = ShortName;
-
-            if (IsOidcClient)
+        if (IsOidcClient)
+        {
+            options = options with
             {
-                _user.IsOidcClient = IsOidcClient;
-                _user.ClientId = ClientId;
-                _user.ClientSecret = ClientSecret;
-                _user.RedirectUris = [.. RedirectUris!];
-                _user.PostLogoutRedirectUris = [.. PostLogoutRedirectUris!];
-                _user.OneLoginAuthenticationSchemeName = OneLoginAuthenticationSchemeName;
-                _user.OneLoginClientId = OneLoginClientId;
-                _user.UseSharedOneLoginSigningKeys = UseSharedOneLoginSigningKeys!.Value;
-                if (UseSharedOneLoginSigningKeys == false)
-                {
-                    _user.OneLoginPrivateKeyPem = OneLoginPrivateKeyPem;
-                }
-                _user.OneLoginRedirectUriPath = OneLoginRedirectUriPath;
-                _user.OneLoginPostLogoutRedirectUriPath = OneLoginPostLogoutRedirectUriPath;
-                _user.RecordMatchingPolicy = RecordMatchingPolicy;
-                _user.AppContent = newAppContent;
-            }
-
-            var @event = new ApplicationUserUpdatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = timeProvider.UtcNow,
-                RaisedBy = User.GetUserId(),
-                ApplicationUser = EventModels.ApplicationUser.FromModel(_user),
-                OldApplicationUser = oldApplicationUser,
-                Changes = changes
+                ClientId = Option.Some(ClientId),
+                ClientSecret = Option.Some(ClientSecret),
+                RedirectUris = Option.Some<IReadOnlyCollection<string>?>(RedirectUris),
+                PostLogoutRedirectUris = Option.Some<IReadOnlyCollection<string>?>(PostLogoutRedirectUris),
+                OneLoginClientId = Option.Some(OneLoginClientId),
+                UseSharedOneLoginSigningKeys = Option.Some<bool?>(UseSharedOneLoginSigningKeys),
+                OneLoginAuthenticationSchemeName = Option.Some(OneLoginAuthenticationSchemeName),
+                OneLoginRedirectUriPath = Option.Some(OneLoginRedirectUriPath),
+                OneLoginPostLogoutRedirectUriPath = Option.Some(OneLoginPostLogoutRedirectUriPath),
+                RecordMatchingPolicy = Option.Some(RecordMatchingPolicy),
+                AppContent = Option.Some<AppContent?>(newAppContent)
             };
-            dbContext.AddEventWithoutBroadcast(@event);
 
-            await dbContext.SaveChangesAsync();
-
-            // Notify TeacherAuth about changes to the application user
-            await dbContext.Database.ExecuteSqlRawAsync($"NOTIFY {ChannelNames.OneLoginClient}");
+            if (UseSharedOneLoginSigningKeys == false)
+            {
+                options = options with { OneLoginPrivateKeyPem = Option.Some(OneLoginPrivateKeyPem) };
+            }
         }
+
+        var processContext = new ProcessContext(ProcessType.ApplicationUserUpdating, timeProvider.UtcNow, User.GetUserId());
+
+        await userService.UpdateApplicationUserAsync(options, processContext);
 
         TempData.SetFlashNotificationBanner("Application user updated");
         return Redirect(linkGenerator.ApplicationUsers.Index());

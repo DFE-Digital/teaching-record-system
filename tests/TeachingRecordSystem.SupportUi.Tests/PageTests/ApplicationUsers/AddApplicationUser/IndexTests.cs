@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApplicationUsers.AddApplicationUser;
 
@@ -154,15 +153,17 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.Equal($"/application-users/{applicationUser.UserId}", response.Headers.Location?.OriginalString);
 
-        EventObserver.AssertEventsSaved(
-            e =>
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApplicationUserCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<ApplicationUserCreatedEvent>(applicationUserCreatedEvent =>
             {
-                var applicationUserCreatedEvent = Assert.IsType<ApplicationUserCreatedEvent>(e);
-                Assert.Equal(TimeProvider.UtcNow, applicationUserCreatedEvent.CreatedUtc);
-                Assert.Equal(GetCurrentUserId(), applicationUserCreatedEvent.RaisedBy.UserId);
                 Assert.Equal(name, applicationUserCreatedEvent.ApplicationUser.Name);
                 Assert.Equal(shortName, applicationUserCreatedEvent.ApplicationUser.ShortName);
             });
+        });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
