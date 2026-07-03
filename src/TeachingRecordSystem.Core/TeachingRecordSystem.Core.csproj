@@ -122,6 +122,7 @@
     <None Remove="Services\DqtReporting\Migrations\0106_UserRecordMatchingPolicy.sql" />
     <None Remove="Services\DqtReporting\Migrations\0107_UserShortName.sql" />
     <None Remove="Services\DqtReporting\Migrations\0108_UserAppContent.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0109_UserLastSignedInUtc.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -278,6 +279,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0106_UserRecordMatchingPolicy.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0107_UserShortName.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0108_UserAppContent.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0109_UserLastSignedInUtc.sql" />
   </ItemGroup>
 
   <ItemGroup>
