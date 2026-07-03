@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
@@ -394,15 +393,18 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(userId, newUser.AzureAdUserId);
         Assert.Equal(role, newUser.Role);
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var userCreatedEvent = Assert.IsType<UserAddedEvent>(e);
-            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Equal(newName, userCreatedEvent.User.Name);
-            Assert.Equal(email, userCreatedEvent.User.Email);
-            Assert.Equal(userId, userCreatedEvent.User.AzureAdUserId);
-            Assert.Equal(role, userCreatedEvent.User.Role);
+            Assert.Equal(ProcessType.UserAdding, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<UserAddedEvent>(userAddedEvent =>
+            {
+                Assert.Equal(newName, userAddedEvent.User.Name);
+                Assert.Equal(email, userAddedEvent.User.Email);
+                Assert.Equal(userId, userAddedEvent.User.AzureAdUserId);
+                Assert.Equal(role, userAddedEvent.User.Role);
+            });
         });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);

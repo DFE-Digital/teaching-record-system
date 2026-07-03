@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events.Legacy;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -306,21 +304,24 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (expectedEvent)
         {
-            EventObserver.AssertEventsSaved(e =>
+            Events.AssertProcessesCreated(p =>
             {
-                var userCreatedEvent = Assert.IsType<UserUpdatedEvent>(e);
-                Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
-                Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-                Assert.Equal(newName, userCreatedEvent.User.Name);
-                Assert.Equal(updatedUser.Email, userCreatedEvent.User.Email);
-                Assert.Equal(updatedUser.AzureAdUserId, userCreatedEvent.User.AzureAdUserId);
-                Assert.Equal(expectedChanges, userCreatedEvent.Changes);
-                Assert.Equal(newRole, userCreatedEvent.User.Role);
+                Assert.Equal(ProcessType.UserUpdating, p.ProcessContext.ProcessType);
+                Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+                Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+                p.AssertProcessHasEvents<UserUpdatedEvent>(userUpdatedEvent =>
+                {
+                    Assert.Equal(newName, userUpdatedEvent.User.Name);
+                    Assert.Equal(updatedUser.Email, userUpdatedEvent.User.Email);
+                    Assert.Equal(updatedUser.AzureAdUserId, userUpdatedEvent.User.AzureAdUserId);
+                    Assert.Equal(expectedChanges, userUpdatedEvent.Changes);
+                    Assert.Equal(newRole, userUpdatedEvent.User.Role);
+                });
             });
         }
         else
         {
-            EventObserver.AssertNoEventsSaved();
+            Events.AssertNoEventsPublished();
         }
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
@@ -439,11 +440,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.True(updatedUser.Active);
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var userCreatedEvent = Assert.IsType<UserActivatedEvent>(e);
-            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
+            Assert.Equal(ProcessType.UserActivating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<UserActivatedEvent>();
         });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);

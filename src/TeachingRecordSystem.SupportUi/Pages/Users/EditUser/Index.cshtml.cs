@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
@@ -12,6 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 public class IndexModel(
     TrsDbContext dbContext,
     TimeProvider timeProvider,
+    UserService userService,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
@@ -65,26 +66,16 @@ public class IndexModel(
 
         _validator.ValidateAndThrow(this);
 
-        var changes = UserUpdatedEventChanges.None |
-            (_user!.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
-            (_user.Role != Role ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
+        var processContext = new ProcessContext(ProcessType.UserUpdating, timeProvider.UtcNow, User.GetUserId());
 
-        if (changes != UserUpdatedEventChanges.None)
-        {
-            _user.Role = Role;
-            _user.Name = Name!;
-
-            dbContext.AddEventWithoutBroadcast(new UserUpdatedEvent
+        var changes = await userService.UpdateUserAsync(
+            new UpdateUserOptions
             {
-                EventId = Guid.NewGuid(),
-                User = EventModels.User.FromModel(_user),
-                RaisedBy = User.GetUserId(),
-                CreatedUtc = timeProvider.UtcNow,
-                Changes = changes
-            });
-
-            await dbContext.SaveChangesAsync();
-        }
+                UserId = UserId,
+                Name = Name!,
+                Role = Role
+            },
+            processContext);
 
         if ((changes & UserUpdatedEventChanges.Roles) != UserUpdatedEventChanges.None)
         {
@@ -115,17 +106,10 @@ public class IndexModel(
             return BadRequest();
         }
 
-        _user.Active = true;
+        var processContext = new ProcessContext(ProcessType.UserActivating, timeProvider.UtcNow, User.GetUserId());
 
-        dbContext.AddEventWithoutBroadcast(new UserActivatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            User = EventModels.User.FromModel(_user),
-            RaisedBy = User.GetUserId(),
-            CreatedUtc = timeProvider.UtcNow
-        });
+        await userService.ActivateUserAsync(UserId, processContext);
 
-        await dbContext.SaveChangesAsync();
         TempData.SetFlashNotificationBanner($"{_user.Name}\u2019s account has been reactivated");
 
         return Redirect(linkGenerator.Users.Index());

@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Users;
 
 namespace TeachingRecordSystem.Cli;
 
@@ -137,11 +137,13 @@ public partial class Commands
                         .AddMemoryCache()
                         .AddWebhookMessageFactory()
                         .AddEventPublisher()
+                        .AddUserService()
                         .BuildServiceProvider();
 
                     using var scope = services.CreateScope();
                     var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
                     var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
+                    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
 
                     var applicationUser = await dbContext.ApplicationUsers
                         .Where(u => u.UserId == userId)
@@ -153,26 +155,15 @@ public partial class Commands
                         return 1;
                     }
 
-                    var oldApplicationUser = EventModels.ApplicationUser.FromModel(applicationUser);
+                    var processContext = new ProcessContext(ProcessType.ApplicationUserUpdating, timeProvider.UtcNow, SystemUser.SystemUserId);
 
-                    applicationUser.AppContent = appContent;
-
-                    var @event = new ApplicationUserUpdatedEvent()
-                    {
-                        EventId = Guid.NewGuid(),
-                        CreatedUtc = timeProvider.UtcNow,
-                        RaisedBy = SystemUser.SystemUserId,
-                        ApplicationUser = EventModels.ApplicationUser.FromModel(applicationUser),
-                        OldApplicationUser = oldApplicationUser,
-                        Changes = ApplicationUserUpdatedEventChanges.AppContent
-                    };
-
-                    dbContext.AddEventWithoutBroadcast(@event);
-
-                    await dbContext.SaveChangesAsync();
-
-                    // Notify TeacherAuth about changes to the application user
-                    await dbContext.Database.ExecuteSqlRawAsync($"NOTIFY {ChannelNames.OneLoginClient}");
+                    await userService.UpdateApplicationUserAsync(
+                        new UpdateApplicationUserOptions
+                        {
+                            UserId = userId,
+                            AppContent = Optional.Option.Some<AppContent?>(appContent)
+                        },
+                        processContext);
 
                     Console.WriteLine($"AppContent imported successfully for user {userId}");
 

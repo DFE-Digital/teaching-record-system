@@ -2,8 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
@@ -11,9 +10,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class ConfirmModel(
-    TrsDbContext dbContext,
-    IAadUserService userService,
+    IAadUserService aadUserService,
     TimeProvider timeProvider,
+    UserService userService,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<ConfirmModel> _validator = new()
@@ -65,27 +64,17 @@ public class ConfirmModel(
 
         _validator.ValidateAndThrow(this);
 
-        var newUser = new Core.DataStore.Postgres.Models.User()
-        {
-            Active = true,
-            AzureAdUserId = AzureAdUserId,
-            Email = _user!.Email,
-            Name = Name!,
-            Role = Role,
-            UserId = Guid.NewGuid()
-        };
+        var processContext = new ProcessContext(ProcessType.UserAdding, timeProvider.UtcNow, User.GetUserId());
 
-        dbContext.Users.Add(newUser);
-
-        dbContext.AddEventWithoutBroadcast(new UserAddedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            User = EventModels.User.FromModel(newUser),
-            RaisedBy = User.GetUserId(),
-            CreatedUtc = timeProvider.UtcNow
-        });
-
-        await dbContext.SaveChangesAsync();
+        await userService.CreateUserAsync(
+            new CreateUserOptions
+            {
+                Name = Name!,
+                Email = _user!.Email,
+                AzureAdUserId = AzureAdUserId,
+                Role = Role
+            },
+            processContext);
 
         var roleText = UserRoles.GetDisplayNameForRole(Role!)
             .ToLowerInvariantFirstLetter()
@@ -97,7 +86,7 @@ public class ConfirmModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _user = await userService.GetUserByIdAsync(UserId!);
+        _user = await aadUserService.GetUserByIdAsync(UserId!);
 
         if (_user is null)
         {

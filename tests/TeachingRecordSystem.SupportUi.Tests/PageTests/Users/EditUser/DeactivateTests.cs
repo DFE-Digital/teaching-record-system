@@ -1,6 +1,5 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
@@ -584,14 +583,17 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.False(updatedUser.Active);
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
-            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Null(userCreatedEvent.DeactivatedReason);
-            Assert.Null(userCreatedEvent.DeactivatedReasonDetail);
-            Assert.Null(userCreatedEvent.EvidenceFileId);
+            Assert.Equal(ProcessType.UserDeactivating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<UserDeactivatedEvent>(userDeactivatedEvent =>
+            {
+                Assert.Null(userDeactivatedEvent.DeactivatedReason);
+                Assert.Null(userDeactivatedEvent.DeactivatedReasonDetail);
+                Assert.Null(userDeactivatedEvent.EvidenceFileId);
+            });
         });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
@@ -633,14 +635,17 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
-            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Equal("Some additional reason", userCreatedEvent.DeactivatedReason);
-            Assert.Equal("Some more information", userCreatedEvent.DeactivatedReasonDetail);
-            Assert.Equal(evidenceFileId, userCreatedEvent.EvidenceFileId);
+            Assert.Equal(ProcessType.UserDeactivating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<UserDeactivatedEvent>(userDeactivatedEvent =>
+            {
+                Assert.Equal("Some additional reason", userDeactivatedEvent.DeactivatedReason);
+                Assert.Equal("Some more information", userDeactivatedEvent.DeactivatedReasonDetail);
+                Assert.Equal(evidenceFileId, userDeactivatedEvent.EvidenceFileId);
+            });
         });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
@@ -683,14 +688,17 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         FileServiceMock.AssertFileWasNotUploaded();
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
-            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Null(userCreatedEvent.DeactivatedReason);
-            Assert.Null(userCreatedEvent.DeactivatedReasonDetail);
-            Assert.Equal(evidenceFileId, userCreatedEvent.EvidenceFileId);
+            Assert.Equal(ProcessType.UserDeactivating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<UserDeactivatedEvent>(userDeactivatedEvent =>
+            {
+                Assert.Null(userDeactivatedEvent.DeactivatedReason);
+                Assert.Null(userDeactivatedEvent.DeactivatedReasonDetail);
+                Assert.Equal(evidenceFileId, userDeactivatedEvent.EvidenceFileId);
+            });
         });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
@@ -733,14 +741,17 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         FileServiceMock.AssertFileWasNotUploaded();
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
-            Assert.Equal(TimeProvider.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Null(userCreatedEvent.DeactivatedReason);
-            Assert.Null(userCreatedEvent.DeactivatedReasonDetail);
-            Assert.Null(userCreatedEvent.EvidenceFileId);
+            Assert.Equal(ProcessType.UserDeactivating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<UserDeactivatedEvent>(userDeactivatedEvent =>
+            {
+                Assert.Null(userDeactivatedEvent.DeactivatedReason);
+                Assert.Null(userDeactivatedEvent.DeactivatedReasonDetail);
+                Assert.Null(userDeactivatedEvent.EvidenceFileId);
+            });
         });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);

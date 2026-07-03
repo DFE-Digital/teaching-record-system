@@ -108,16 +108,15 @@ public class AppContentTests(IServiceProvider services) : CommandTestBase(servic
             Assert.Equal(appContent.OneLoginCannotFindRecordEmailTemplateId, updatedUser.AppContent!.OneLoginCannotFindRecordEmailTemplateId);
             Assert.Equal(appContent.SupportEmailAddress, updatedUser.AppContent.SupportEmailAddress);
 
-            var @event = await WithDbContextAsync(async dbContext =>
-                await dbContext.Events
+            var processEvent = await WithDbContextAsync(async dbContext =>
+                await dbContext.ProcessEvents
                     .Where(e => e.EventName == "ApplicationUserUpdatedEvent")
-                    .OrderByDescending(e => e.Created)
+                    .OrderByDescending(e => e.CreatedOn)
                     .FirstOrDefaultAsync());
 
-            Assert.NotNull(@event);
-            var eventData = @event!.ToEventBase() as LegacyEvents.ApplicationUserUpdatedEvent;
-            Assert.NotNull(eventData);
-            Assert.Equal(LegacyEvents.ApplicationUserUpdatedEventChanges.AppContent, eventData!.Changes);
+            Assert.NotNull(processEvent);
+            var eventData = Assert.IsType<ApplicationUserUpdatedEvent>(processEvent!.Payload);
+            Assert.Equal(ApplicationUserUpdatedEventChanges.AppContent, eventData.Changes);
             Assert.Equal(applicationUser.UserId, eventData.ApplicationUser.UserId);
         }
         finally
@@ -169,16 +168,15 @@ public class AppContentTests(IServiceProvider services) : CommandTestBase(servic
             Assert.NotEqual(originalAppContent!.OneLoginCannotFindRecordEmailTemplateId, updatedUser.AppContent.OneLoginCannotFindRecordEmailTemplateId);
             Assert.NotEqual(originalAppContent.SupportEmailAddress, updatedUser.AppContent.SupportEmailAddress);
 
-            var @event = await WithDbContextAsync(async dbContext =>
-                await dbContext.Events
+            var processEvent = await WithDbContextAsync(async dbContext =>
+                await dbContext.ProcessEvents
                     .Where(e => e.EventName == "ApplicationUserUpdatedEvent")
-                    .OrderByDescending(e => e.Created)
+                    .OrderByDescending(e => e.CreatedOn)
                     .FirstOrDefaultAsync());
 
-            Assert.NotNull(@event);
-            var eventData = @event!.ToEventBase() as LegacyEvents.ApplicationUserUpdatedEvent;
-            Assert.NotNull(eventData);
-            Assert.Equal(LegacyEvents.ApplicationUserUpdatedEventChanges.AppContent, eventData!.Changes);
+            Assert.NotNull(processEvent);
+            var eventData = Assert.IsType<ApplicationUserUpdatedEvent>(processEvent!.Payload);
+            Assert.Equal(ApplicationUserUpdatedEventChanges.AppContent, eventData.Changes);
             Assert.Equal(applicationUser.UserId, eventData.ApplicationUser.UserId);
             Assert.NotNull(eventData.OldApplicationUser);
         }
