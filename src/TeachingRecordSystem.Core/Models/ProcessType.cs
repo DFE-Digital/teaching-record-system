@@ -50,5 +50,7 @@ public enum ProcessType
     UserActivating = 48,
     UserDeactivating = 49,
     ApplicationUserCreating = 50,
-    ApplicationUserUpdating = 51
+    ApplicationUserUpdating = 51,
+    ApiKeyCreating = 52,
+    ApiKeyUpdating = 53
 }

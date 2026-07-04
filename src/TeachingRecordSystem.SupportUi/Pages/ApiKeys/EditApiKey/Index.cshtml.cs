@@ -2,15 +2,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.EditApiKey;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider, UserService userService) : PageModel
 {
     private ApiKey? _apiKey;
 
@@ -36,22 +37,15 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             return BadRequest();
         }
 
-        var oldApiKey = EventModels.ApiKey.FromModel(_apiKey!);
+        var processContext = new ProcessContext(ProcessType.ApiKeyUpdating, timeProvider.UtcNow, User.GetUserId());
 
-        _apiKey!.Expires = timeProvider.UtcNow;
-
-        var @event = new ApiKeyUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = timeProvider.UtcNow,
-            RaisedBy = User.GetUserId(),
-            ApiKey = EventModels.ApiKey.FromModel(_apiKey),
-            OldApiKey = oldApiKey,
-            Changes = ApiKeyUpdatedEventChanges.Expires
-        };
-        dbContext.AddEventWithoutBroadcast(@event);
-
-        await dbContext.SaveChangesAsync();
+        await userService.UpdateApiKeyAsync(
+            new UpdateApiKeyOptions
+            {
+                ApiKeyId = ApiKeyId,
+                Expires = Option.Some<DateTime?>(timeProvider.UtcNow)
+            },
+            processContext);
 
         TempData.SetFlashNotificationBanner("API key expired");
         return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(ApplicationUserId));

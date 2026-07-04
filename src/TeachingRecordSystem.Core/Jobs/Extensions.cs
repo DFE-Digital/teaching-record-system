@@ -208,6 +208,16 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<BackfillApiKeyProcessesJob>(
+                $"{nameof(BackfillApiKeyProcessesJob)} (dry-run)",
+                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillApiKeyProcessesJob>(
+                nameof(BackfillApiKeyProcessesJob),
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.AddOrUpdate<BackfillSupportTasksInReportingDb>(
                 nameof(BackfillSupportTasksInReportingDb),
                 job => job.ExecuteAsync(CancellationToken.None),

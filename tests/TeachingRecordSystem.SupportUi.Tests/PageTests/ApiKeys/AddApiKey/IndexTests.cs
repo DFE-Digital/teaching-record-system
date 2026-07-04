@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys.AddApiKey;
 
@@ -184,7 +183,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             }
         };
 
-        EventObserver.Clear();
+        Events.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -204,17 +203,19 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             return apiKey;
         });
 
-        EventObserver.AssertEventsSaved(
-            e =>
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiKeyCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<ApiKeyCreatedEvent>(apiKeyCreatedEvent =>
             {
-                var apiKeyCreatedEvent = Assert.IsType<ApiKeyCreatedEvent>(e);
-                Assert.Equal(TimeProvider.UtcNow, apiKeyCreatedEvent.CreatedUtc);
-                Assert.Equal(GetCurrentUserId(), apiKeyCreatedEvent.RaisedBy.UserId);
                 Assert.Equal(apiKey.ApiKeyId, apiKeyCreatedEvent.ApiKey.ApiKeyId);
-                Assert.Equal(apiKey.ApplicationUserId, applicationUser.UserId);
+                Assert.Equal(applicationUser.UserId, apiKeyCreatedEvent.ApiKey.ApplicationUserId);
                 Assert.Equal(apiKey.Key, apiKeyCreatedEvent.ApiKey.Key);
                 Assert.Equal(apiKey.Expires, apiKeyCreatedEvent.ApiKey.Expires);
             });
+        });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
