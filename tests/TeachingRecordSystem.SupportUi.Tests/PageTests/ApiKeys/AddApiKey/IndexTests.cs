@@ -174,7 +174,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var key = new string('a', 20);
+        // Must be unique: api_keys.key is uniquely indexed and this test class doesn't clear the DB
+        // between runs, so a hardcoded value collides with a key inserted by a previous run.
+        var key = Guid.NewGuid().ToString("N");
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/add?applicationUserId={applicationUser.UserId}")
         {
