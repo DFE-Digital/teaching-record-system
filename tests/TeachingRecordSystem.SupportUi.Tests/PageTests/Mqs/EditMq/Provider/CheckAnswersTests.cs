@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
@@ -174,53 +174,24 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(newProvider.MandatoryQualificationProviderId, qualification.ProviderId);
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent
+            Assert.Equal(ProcessType.MandatoryQualificationUpdating, p.ProcessContext.ProcessType);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvent<MandatoryQualificationUpdatedEvent>(e =>
             {
-                EventId = Guid.Empty,
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                MandatoryQualification = new()
-                {
-                    QualificationId = qualificationId,
-                    Provider = new()
-                    {
-                        MandatoryQualificationProviderId = newProvider.MandatoryQualificationProviderId,
-                        Name = newProvider.Name,
-                        DqtMqEstablishmentName = null,
-                        DqtMqEstablishmentValue = null
-                    },
-                    Specialism = qualification.Specialism,
-                    Status = qualification.Status,
-                    StartDate = qualification.StartDate,
-                    EndDate = qualification.EndDate
-                },
-                OldMandatoryQualification = new()
-                {
-                    QualificationId = qualificationId,
-                    Provider = new()
-                    {
-                        MandatoryQualificationProviderId = oldProvider.MandatoryQualificationProviderId,
-                        Name = oldProvider.Name,
-                        DqtMqEstablishmentName = null,
-                        DqtMqEstablishmentValue = null
-                    },
-                    Specialism = qualification.Specialism,
-                    Status = qualification.Status,
-                    StartDate = qualification.StartDate,
-                    EndDate = qualification.EndDate
-                },
-                ChangeReason = MqChangeProviderReasonOption.AnotherReason.GetDisplayName(),
-                ChangeReasonDetail = "Some reason",
-                EvidenceFile = null,
-                Changes = MandatoryQualificationUpdatedEventChanges.Provider,
-                AdditionalInformation = "some Additional reason"
-            };
+                Assert.Equal(person.PersonId, e.PersonId);
+                Assert.Equal(qualificationId, e.MandatoryQualification.QualificationId);
+                Assert.Equal(MandatoryQualificationUpdatedEventChanges.Provider, e.Changes);
+                Assert.Equal(newProvider.MandatoryQualificationProviderId, e.MandatoryQualification.Provider?.MandatoryQualificationProviderId);
+                Assert.Equal(oldProvider.MandatoryQualificationProviderId, e.OldMandatoryQualification.Provider?.MandatoryQualificationProviderId);
+            });
 
-            var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
-            Assert.Equivalent(expectedMqUpdatedEvent with { EventId = actualMqUpdatedEvent.EventId }, actualMqUpdatedEvent);
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal(MqChangeProviderReasonOption.AnotherReason.GetDisplayName(), changeReason.Reason);
+            Assert.Equal("Some reason", changeReason.Details);
+            Assert.Equal("some Additional reason", changeReason.AdditionalInformation);
+            Assert.Null(changeReason.EvidenceFile);
         });
     }
 

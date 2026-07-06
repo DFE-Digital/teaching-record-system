@@ -1,0 +1,65 @@
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@model ChangeHistoryEntryViewModel
+@{
+    var deletedEvent = Model.GetEvent<MandatoryQualificationDeletedEvent>();
+    var mandatoryQualification = deletedEvent.MandatoryQualification;
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+}
+
+<timeline-entry title="Mandatory qualification deleted" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
+        <govuk-details-summary>Reason for deletion</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>Reason for deleting</key>
+                    <value data-testid="deletion-reason">@(!string.IsNullOrEmpty(changeReason?.Reason) ? changeReason.Reason : "None")</value>
+                </row>
+                <row>
+                    <key>More detail</key>
+                    <value data-testid="deletion-reason-detail">@(!string.IsNullOrEmpty(changeReason?.Details) ? changeReason.Details : "None")</value>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value data-testid="additional-information">@(!string.IsNullOrEmpty(changeReason?.AdditionalInformation) ? changeReason.AdditionalInformation : "None")</value>
+                </row>
+                @if (changeReason?.EvidenceFile is not null)
+                {
+                    <row>
+                        <key>Evidence</key>
+                        <value data-testid="evidence">
+                            <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                        </value>
+                    </row>
+                }
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="deleted-data">
+        <govuk-details-summary>Deleted data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>Training provider</key>
+                    <value data-testid="provider">@(mandatoryQualification.Provider?.Name ?? mandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")</value>
+                </row>
+                <row>
+                    <key>Specialism</key>
+                    <value data-testid="specialism">@(mandatoryQualification.Specialism?.GetTitle() ?? "None")</value>
+                </row>
+                <row>
+                    <key>Start date</key>
+                    <value data-testid="start-date">@(mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
+                </row>
+                <row>
+                    <key>Status</key>
+                    <value data-testid="status">@(mandatoryQualification.Status?.GetTitle() ?? "None")</value>
+                </row>
+                <row>
+                    <key>End date</key>
+                    <value data-testid="end-date">@(mandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>

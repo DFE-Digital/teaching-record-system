@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
@@ -291,59 +291,28 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(newEndDate, qualification.EndDate);
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent
+            Assert.Equal(ProcessType.MandatoryQualificationUpdating, p.ProcessContext.ProcessType);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvent<MandatoryQualificationUpdatedEvent>(e =>
             {
-                EventId = Guid.Empty,
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                MandatoryQualification = new()
-                {
-                    QualificationId = qualificationId,
-                    Provider = new()
-                    {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
-                        DqtMqEstablishmentName = null,
-                        DqtMqEstablishmentValue = null
-                    },
-                    Specialism = qualification.Specialism,
-                    Status = newStatus,
-                    StartDate = qualification.StartDate,
-                    EndDate = newEndDate
-                },
-                OldMandatoryQualification = new()
-                {
-                    QualificationId = qualificationId,
-                    Provider = new()
-                    {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
-                        DqtMqEstablishmentName = null,
-                        DqtMqEstablishmentValue = null
-                    },
-                    Specialism = qualification.Specialism,
-                    Status = oldStatus,
-                    StartDate = qualification.StartDate,
-                    EndDate = oldEndDate
-                },
-                ChangeReason = changeReason,
-                ChangeReasonDetail = changeReasonDetail,
-                EvidenceFile = uploadEvidence ?
-                    new EventModels.File
-                    {
-                        FileId = evidenceFileId,
-                        Name = evidenceFileName
-                    } :
-                    null,
-                Changes = changes,
-                AdditionalInformation = null
-            };
+                Assert.Equal(person.PersonId, e.PersonId);
+                Assert.Equal(qualificationId, e.MandatoryQualification.QualificationId);
+                Assert.Equal(changes, e.Changes);
+                Assert.Equal(newStatus, e.MandatoryQualification.Status);
+                Assert.Equal(newEndDate, e.MandatoryQualification.EndDate);
+                Assert.Equal(oldStatus, e.OldMandatoryQualification.Status);
+                Assert.Equal(oldEndDate, e.OldMandatoryQualification.EndDate);
+            });
 
-            var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
-            Assert.Equivalent(expectedMqUpdatedEvent with { EventId = actualMqUpdatedEvent.EventId }, actualMqUpdatedEvent);
+            var changeReasonInfo = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal(changeReason, changeReasonInfo.Reason);
+            Assert.Equal(changeReasonDetail, changeReasonInfo.Details);
+            Assert.Null(changeReasonInfo.AdditionalInformation);
+            Assert.Equal(
+                uploadEvidence ? new EventModels.File { FileId = evidenceFileId, Name = evidenceFileName } : null,
+                changeReasonInfo.EvidenceFile);
         });
     }
 

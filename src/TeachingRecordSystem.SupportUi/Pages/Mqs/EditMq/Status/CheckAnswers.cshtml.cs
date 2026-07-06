@@ -1,17 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Optional;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.MandatoryQualifications;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 [Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
-    TimeProvider timeProvider) : PageModel
+    TimeProvider timeProvider,
+    MandatoryQualificationService mandatoryQualificationService) : PageModel
 {
     public JourneyInstance<EditMqStatusState>? JourneyInstance { get; set; }
 
@@ -73,25 +75,26 @@ public class CheckAnswersModel(
     {
         var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
-        qualification.Update(
-            q =>
-            {
-                q.Status = NewStatus;
-                q.EndDate = NewEndDate;
-            },
-            changeReason: IsEndDateChange && !IsStatusChange ? EndDateChangeReason!.GetDisplayName() : StatusChangeReason!.GetDisplayName(),
-            ChangeReasonDetail,
-            evidenceFile: EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
+        var processContext = new ProcessContext(
+            ProcessType.MandatoryQualificationUpdating,
             timeProvider.UtcNow,
-            additionalInformation: AdditionalInformation,
-            out var updatedEvent);
+            User.GetUserId(),
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = IsEndDateChange && !IsStatusChange ? EndDateChangeReason!.GetDisplayName() : StatusChangeReason!.GetDisplayName(),
+                Details = ChangeReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel(),
+                AdditionalInformation = AdditionalInformation
+            });
 
-        if (updatedEvent is not null)
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        }
+        await mandatoryQualificationService.UpdateMandatoryQualificationAsync(
+            new UpdateMandatoryQualificationOptions
+            {
+                QualificationId = qualification.QualificationId,
+                Status = Option.Some(NewStatus),
+                EndDate = Option.Some(NewEndDate)
+            },
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashNotificationBanner("Mandatory qualification changed");

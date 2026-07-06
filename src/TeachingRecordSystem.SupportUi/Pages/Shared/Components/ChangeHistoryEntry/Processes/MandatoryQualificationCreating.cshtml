@@ -1,0 +1,65 @@
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@model ChangeHistoryEntryViewModel
+@{
+    var createdEvent = Model.GetEvent<MandatoryQualificationCreatedEvent>();
+    var mandatoryQualification = createdEvent.MandatoryQualification;
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+}
+
+<timeline-entry title="Mandatory qualification added" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        <row>
+            <key>Training provider</key>
+            <value data-testid="provider">@(mandatoryQualification.Provider?.Name ?? mandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")</value>
+        </row>
+        <row>
+            <key>Specialism</key>
+            <value data-testid="specialism">@(mandatoryQualification.Specialism?.GetTitle() ?? "None")</value>
+        </row>
+        <row>
+            <key>Start date</key>
+            <value data-testid="start-date">@(mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
+        </row>
+        <row>
+            <key>Status</key>
+            <value data-testid="status">@(mandatoryQualification.Status?.GetTitle() ?? "None")</value>
+        </row>
+        <row>
+            <key>End date</key>
+            <value data-testid="end-date">@(mandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
+        </row>
+    </govuk-summary-list>
+
+    @if (changeReason is not null)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
+            <govuk-details-summary>Reason for adding mandatory qualification</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Reason</key>
+                        <value data-testid="reason" use-empty-fallback>@changeReason.Reason</value>
+                    </row>
+                    <row>
+                        <key>Reason details</key>
+                        <value data-testid="reason-detail" use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                        </value>
+                    </row>
+                    <row>
+                        <key>Additional information</key>
+                        <value data-testid="additional-information" use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                        </value>
+                    </row>
+                    <row>
+                        <key>Evidence</key>
+                        <value data-testid="evidence">
+                            <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                        </value>
+                    </row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+</timeline-entry>

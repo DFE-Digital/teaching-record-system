@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.StartDate;
@@ -176,53 +176,24 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(newStartDate, qualification.StartDate);
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent
+            Assert.Equal(ProcessType.MandatoryQualificationUpdating, p.ProcessContext.ProcessType);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvent<MandatoryQualificationUpdatedEvent>(e =>
             {
-                EventId = Guid.Empty,
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                MandatoryQualification = new()
-                {
-                    QualificationId = qualificationId,
-                    Provider = new()
-                    {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
-                        DqtMqEstablishmentName = null,
-                        DqtMqEstablishmentValue = null
-                    },
-                    Specialism = qualification.Specialism,
-                    Status = qualification.Status,
-                    StartDate = newStartDate,
-                    EndDate = qualification.EndDate
-                },
-                OldMandatoryQualification = new()
-                {
-                    QualificationId = qualificationId,
-                    Provider = new()
-                    {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
-                        DqtMqEstablishmentName = null,
-                        DqtMqEstablishmentValue = null
-                    },
-                    Specialism = qualification.Specialism,
-                    Status = qualification.Status,
-                    StartDate = oldStartDate,
-                    EndDate = qualification.EndDate
-                },
-                ChangeReason = changeReason.GetDisplayName(),
-                ChangeReasonDetail = changeReasonDetail,
-                EvidenceFile = null,
-                Changes = MandatoryQualificationUpdatedEventChanges.StartDate,
-                AdditionalInformation = null
-            };
+                Assert.Equal(person.PersonId, e.PersonId);
+                Assert.Equal(qualificationId, e.MandatoryQualification.QualificationId);
+                Assert.Equal(MandatoryQualificationUpdatedEventChanges.StartDate, e.Changes);
+                Assert.Equal(newStartDate, e.MandatoryQualification.StartDate);
+                Assert.Equal(oldStartDate, e.OldMandatoryQualification.StartDate);
+            });
 
-            var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
-            Assert.Equivalent(expectedMqUpdatedEvent with { EventId = actualMqUpdatedEvent.EventId }, actualMqUpdatedEvent);
+            var changeReasonInfo = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal(changeReason.GetDisplayName(), changeReasonInfo.Reason);
+            Assert.Equal(changeReasonDetail, changeReasonInfo.Details);
+            Assert.Null(changeReasonInfo.AdditionalInformation);
+            Assert.Null(changeReasonInfo.EvidenceFile);
         });
     }
 

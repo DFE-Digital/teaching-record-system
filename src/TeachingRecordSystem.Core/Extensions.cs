@@ -15,6 +15,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.InductionExemptions;
+using TeachingRecordSystem.Core.Services.MandatoryQualifications;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.OneLogin;
@@ -115,6 +116,7 @@ public static class Extensions
             .AddNoteService()
             .AddPersonService()
             .AddAlertService()
+            .AddMandatoryQualificationService()
             .AddUserService()
             .AddInductionExemptionService()
             .AddOneLoginService();

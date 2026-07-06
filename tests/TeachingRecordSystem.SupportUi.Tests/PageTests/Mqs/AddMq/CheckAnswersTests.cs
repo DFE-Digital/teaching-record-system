@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -228,37 +228,27 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId = qualification.QualificationId;
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var expectedMqCreatedEvent = new MandatoryQualificationCreatedEvent
+            Assert.Equal(ProcessType.MandatoryQualificationCreating, p.ProcessContext.ProcessType);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvent<MandatoryQualificationCreatedEvent>(e =>
             {
-                EventId = Guid.Empty,
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                MandatoryQualification = new()
-                {
-                    QualificationId = qualificationId,
-                    Provider = new()
-                    {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
-                        DqtMqEstablishmentName = null,
-                        DqtMqEstablishmentValue = null
-                    },
-                    Specialism = specialism,
-                    Status = status,
-                    StartDate = startDate,
-                    EndDate = endDate
-                },
-                AddReason = addReason.GetDisplayName(),
-                AddReasonDetail = addReasonDetail,
-                EvidenceFile = evidence.UploadedEvidenceFile?.ToEventModel(),
-                AdditionalInformation = null
-            };
+                Assert.Equal(person.PersonId, e.PersonId);
+                Assert.Equal(qualificationId, e.MandatoryQualification.QualificationId);
+                Assert.Equal(provider.MandatoryQualificationProviderId, e.MandatoryQualification.Provider?.MandatoryQualificationProviderId);
+                Assert.Equal(provider.Name, e.MandatoryQualification.Provider?.Name);
+                Assert.Equal(specialism, e.MandatoryQualification.Specialism);
+                Assert.Equal(status, e.MandatoryQualification.Status);
+                Assert.Equal(startDate, e.MandatoryQualification.StartDate);
+                Assert.Equal(endDate, e.MandatoryQualification.EndDate);
+            });
 
-            var actualMqCreatedEvent = Assert.IsType<MandatoryQualificationCreatedEvent>(e);
-            Assert.Equivalent(expectedMqCreatedEvent with { EventId = actualMqCreatedEvent.EventId }, actualMqCreatedEvent);
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal(addReason.GetDisplayName(), changeReason.Reason);
+            Assert.Equal(addReasonDetail, changeReason.Details);
+            Assert.Null(changeReason.AdditionalInformation);
+            Assert.Equal(evidence.UploadedEvidenceFile?.ToEventModel(), changeReason.EvidenceFile);
         });
     }
 

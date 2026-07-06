@@ -1,0 +1,87 @@
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@model ChangeHistoryEntryViewModel
+@{
+    var updatedEvent = Model.GetEvent<MandatoryQualificationUpdatedEvent>();
+    var oldMandatoryQualification = updatedEvent.OldMandatoryQualification;
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+}
+
+<timeline-entry title="Mandatory qualification changed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (changeReason is not null)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Reason</key>
+                        <value data-testid="change-reason">@(!string.IsNullOrEmpty(changeReason.Reason) ? changeReason.Reason : "None")</value>
+                    </row>
+                    <row>
+                        <key>More detail</key>
+                        <value data-testid="change-reason-detail" use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                        </value>
+                    </row>
+                    <row>
+                        <key>Additional information</key>
+                        <value data-testid="additional-information" use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                        </value>
+                    </row>
+                    @if (changeReason.EvidenceFile is not null)
+                    {
+                        <row>
+                            <key>Evidence</key>
+                            <value data-testid="evidence">
+                                <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                            </value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+        <govuk-details-summary>Previous data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Provider))
+                {
+                    <row>
+                        <key>Training provider</key>
+                        <value data-testid="provider">@(oldMandatoryQualification.Provider?.Name ?? oldMandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")</value>
+                    </row>
+                }
+                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Specialism))
+                {
+                    <row>
+                        <key>Specialism</key>
+                        <value data-testid="specialism">@(oldMandatoryQualification.Specialism?.GetTitle() ?? "None")</value>
+                    </row>
+                }
+                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.StartDate))
+                {
+                    <row>
+                        <key>Start date</key>
+                        <value data-testid="start-date">@(oldMandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
+                    </row>
+                }
+                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Status))
+                {
+                    <row>
+                        <key>Status</key>
+                        <value data-testid="status">@(oldMandatoryQualification.Status?.GetTitle() ?? "None")</value>
+                    </row>
+                }
+                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.EndDate))
+                {
+                    <row>
+                        <key>End date</key>
+                        <value data-testid="end-date">@(oldMandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
+                    </row>
+                }
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>

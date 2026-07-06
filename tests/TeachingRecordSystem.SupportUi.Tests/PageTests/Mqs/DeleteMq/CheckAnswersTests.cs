@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
@@ -55,8 +55,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithProvider(provider?.MandatoryQualificationProviderId)
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
-            .WithStatus(status, endDate)
-            .WithAdditionalInformation("additional information")));
+            .WithStatus(status, endDate)));
         var qualification = person.MandatoryQualifications.Single();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualification.QualificationId,
@@ -196,41 +195,27 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification deleted");
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var expectedMqDeletedEvent = new MandatoryQualificationDeletedEvent
+            Assert.Equal(ProcessType.MandatoryQualificationDeleting, p.ProcessContext.ProcessType);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvent<MandatoryQualificationDeletedEvent>(e =>
             {
-                EventId = Guid.Empty,
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = GetCurrentUserId(),
-                PersonId = person.PersonId,
-                MandatoryQualification = new()
-                {
-                    QualificationId = qualificationId,
-                    Provider = new()
-                    {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
-                        DqtMqEstablishmentName = null,
-                        DqtMqEstablishmentValue = null
-                    },
-                    Specialism = specialism,
-                    Status = status,
-                    StartDate = startDate,
-                    EndDate = endDate
-                },
-                DeletionReason = deletionReason.GetDisplayName(),
-                DeletionReasonDetail = deletionReasonDetail,
-                EvidenceFile = new EventModels.File
-                {
-                    FileId = evidenceFileId,
-                    Name = evidenceFileName
-                },
-                AdditionalInformation = additionalInformation
-            };
+                Assert.Equal(person.PersonId, e.PersonId);
+                Assert.Equal(qualificationId, e.MandatoryQualification.QualificationId);
+                Assert.Equal(provider.MandatoryQualificationProviderId, e.MandatoryQualification.Provider?.MandatoryQualificationProviderId);
+                Assert.Equal(provider.Name, e.MandatoryQualification.Provider?.Name);
+                Assert.Equal(specialism, e.MandatoryQualification.Specialism);
+                Assert.Equal(status, e.MandatoryQualification.Status);
+                Assert.Equal(startDate, e.MandatoryQualification.StartDate);
+                Assert.Equal(endDate, e.MandatoryQualification.EndDate);
+            });
 
-            var actualMqDeletedEvent = Assert.IsType<MandatoryQualificationDeletedEvent>(e);
-            Assert.Equivalent(expectedMqDeletedEvent with { EventId = actualMqDeletedEvent.EventId }, actualMqDeletedEvent);
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
+            Assert.Equal(deletionReason.GetDisplayName(), changeReason.Reason);
+            Assert.Equal(deletionReasonDetail, changeReason.Details);
+            Assert.Equal(additionalInformation, changeReason.AdditionalInformation);
+            Assert.Equal(new EventModels.File { FileId = evidenceFileId, Name = evidenceFileName }, changeReason.EvidenceFile);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
