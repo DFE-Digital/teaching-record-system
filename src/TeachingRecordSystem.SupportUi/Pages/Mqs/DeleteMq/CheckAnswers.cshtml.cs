@@ -1,17 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.MandatoryQualifications;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
-    TimeProvider timeProvider) : PageModel
+    TimeProvider timeProvider,
+    MandatoryQualificationService mandatoryQualificationService) : PageModel
 {
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
@@ -68,17 +69,24 @@ public class CheckAnswersModel(
     {
         var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
-        qualification.Delete(
-            DeletionReason!.GetDisplayName(),
-            DeletionReasonDetail,
-            EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
+        var processContext = new ProcessContext(
+            ProcessType.MandatoryQualificationDeleting,
             timeProvider.UtcNow,
-            additionalInformation: AdditionalInformation,
-            out var deletedEvent);
+            User.GetUserId(),
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = DeletionReason!.GetDisplayName(),
+                Details = DeletionReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel(),
+                AdditionalInformation = AdditionalInformation
+            });
 
-        dbContext.AddEventWithoutBroadcast(deletedEvent);
-        await dbContext.SaveChangesAsync();
+        await mandatoryQualificationService.DeleteMandatoryQualificationAsync(
+            new DeleteMandatoryQualificationOptions
+            {
+                QualificationId = qualification.QualificationId
+            },
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashNotificationBanner("Mandatory qualification deleted");

@@ -709,12 +709,7 @@ public partial class TestData
         private Option<MandatoryQualificationStatus?> _status;
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _endDate;
-        private Option<string?> _reason;
-        private Option<string?> _additionalInformation;
-        private Option<string?> _reasonDetail;
-        private Option<(Guid FileId, string Name)?> _evidenceFile;
         private Option<DateTime?> _createdUtc;
-        private Option<EventModels.RaisedByUserInfo> _createdByUser;
         private Option<EventModels.RaisedByUserInfo> _importedByUser;
 
         public Guid QualificationId { get; } = Guid.NewGuid();
@@ -775,34 +770,9 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonMandatoryQualificationBuilder WithAddReason(string? reason, string? reasonDetail, (Guid FileId, string Name)? evidenceFile)
-        {
-            _reason = Option.Some(reason);
-            _reasonDetail = Option.Some(reasonDetail);
-            _evidenceFile = Option.Some(evidenceFile);
-            return this;
-        }
-
-        public CreatePersonMandatoryQualificationBuilder WithAdditionalInformation(string? additionalInformation)
-        {
-            _additionalInformation = Option.Some(additionalInformation);
-            return this;
-        }
-
         public CreatePersonMandatoryQualificationBuilder WithCreatedUtc(DateTime? createdUtc)
         {
             _createdUtc = Option.Some(createdUtc);
-            return this;
-        }
-
-        public CreatePersonMandatoryQualificationBuilder WithCreatedByUser(EventModels.RaisedByUserInfo user)
-        {
-            if (_importedByUser.HasValue)
-            {
-                throw new InvalidOperationException("Cannot define both an 'imported by' and 'created by' user.");
-            }
-
-            _createdByUser = Option.Some(user);
             return this;
         }
 
@@ -811,11 +781,6 @@ public partial class TestData
             if (!user.IsDqtUser)
             {
                 throw new ArgumentException("User must be a DQT user.", nameof(user));
-            }
-
-            if (_createdByUser.HasValue)
-            {
-                throw new InvalidOperationException("Cannot define both an 'imported by' and 'created by' user.");
             }
 
             _importedByUser = Option.Some(user);
@@ -834,11 +799,7 @@ public partial class TestData
             var status = _status.ValueOr(_endDate.ValueOrDefault() is DateOnly ? MandatoryQualificationStatus.Passed : MandatoryQualificationStatusRegistry.All.SingleRandom().Value);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr(status == MandatoryQualificationStatus.Passed ? testData.GenerateDate(min: (startDate ?? new DateOnly(2000, 1, 1)).AddYears(1)) : null);
-            var reason = _reason.ValueOrDefault();
-            var reasonDetail = _reasonDetail.ValueOrDefault();
-            var evidenceFile = _evidenceFile.ValueOrDefault();
             var createdUtc = _createdUtc.ValueOr(testData.TimeProvider.UtcNow);
-            var additionalInformation = _additionalInformation.ValueOrDefault();
 
             var provider = providerId.HasValue ?
                 await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
@@ -887,46 +848,6 @@ public partial class TestData
                         EndDate = endDate
                     },
                     DqtState = 0
-                };
-
-                dbContext.AddEventWithoutBroadcast(createdEvent);
-                events.Add(createdEvent);
-            }
-            else
-            {
-                var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(SystemUser.SystemUserId));
-
-                var createdEvent = new MandatoryQualificationCreatedEvent()
-                {
-                    EventId = Guid.NewGuid(),
-                    CreatedUtc = createdUtc!.Value,
-                    RaisedBy = createdByUser,
-                    PersonId = personId,
-                    MandatoryQualification = new()
-                    {
-                        QualificationId = QualificationId,
-                        Provider = provider is not null ?
-                            new()
-                            {
-                                MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                                Name = provider.Name
-                            } :
-                            null,
-                        Specialism = specialism,
-                        Status = status,
-                        StartDate = startDate,
-                        EndDate = endDate
-                    },
-                    AddReason = reason,
-                    AddReasonDetail = reasonDetail,
-                    EvidenceFile = evidenceFile is not null ?
-                        new EventModels.File
-                        {
-                            FileId = evidenceFile.Value.FileId,
-                            Name = evidenceFile.Value.Name
-                        } :
-                        null,
-                    AdditionalInformation = additionalInformation
                 };
 
                 dbContext.AddEventWithoutBroadcast(createdEvent);

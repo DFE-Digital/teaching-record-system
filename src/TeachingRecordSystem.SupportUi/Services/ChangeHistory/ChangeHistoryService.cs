@@ -20,11 +20,8 @@ public class ChangeHistoryService(
     {
         var eventTypes = new[]
         {
-            nameof(LegacyEvents.MandatoryQualificationDeletedEvent),
             nameof(LegacyEvents.MandatoryQualificationDqtDeactivatedEvent),
-            nameof(LegacyEvents.MandatoryQualificationUpdatedEvent),
             nameof(LegacyEvents.MandatoryQualificationDqtReactivatedEvent),
-            nameof(LegacyEvents.MandatoryQualificationCreatedEvent),
             nameof(LegacyEvents.MandatoryQualificationDqtImportedEvent),
             nameof(LegacyEvents.MandatoryQualificationMigratedEvent),
             nameof(LegacyEvents.AlertMigratedEvent),
@@ -131,6 +128,9 @@ public class ChangeHistoryService(
             ProcessType.AlertCreating,
             ProcessType.AlertUpdating,
             ProcessType.AlertDeleting,
+            ProcessType.MandatoryQualificationCreating,
+            ProcessType.MandatoryQualificationUpdating,
+            ProcessType.MandatoryQualificationDeleting,
             ProcessType.PersonOneLoginUserDisconnecting,
             ProcessType.PersonOneLoginUserConnecting,
             ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting,

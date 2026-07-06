@@ -52,5 +52,8 @@ public enum ProcessType
     ApplicationUserCreating = 50,
     ApplicationUserUpdating = 51,
     ApiKeyCreating = 52,
-    ApiKeyUpdating = 53
+    ApiKeyUpdating = 53,
+    MandatoryQualificationCreating = 54,
+    MandatoryQualificationUpdating = 55,
+    MandatoryQualificationDeleting = 56
 }

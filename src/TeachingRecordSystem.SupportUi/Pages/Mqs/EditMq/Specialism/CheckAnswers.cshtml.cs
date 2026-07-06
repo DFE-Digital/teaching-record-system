@@ -1,17 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Optional;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.MandatoryQualifications;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 [Journey(JourneyNames.EditMqSpecialism), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
-    TimeProvider timeProvider) : PageModel
+    TimeProvider timeProvider,
+    MandatoryQualificationService mandatoryQualificationService) : PageModel
 {
     public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
 
@@ -58,21 +60,25 @@ public class CheckAnswersModel(
     {
         var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
-        qualification.Update(
-            q => q.Specialism = NewSpecialism,
-            ChangeReason.GetDisplayName(),
-            ChangeReasonDetail,
-            evidenceFile: EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
+        var processContext = new ProcessContext(
+            ProcessType.MandatoryQualificationUpdating,
             timeProvider.UtcNow,
-            additionalInformation: AdditionalInformation,
-            out var updatedEvent);
+            User.GetUserId(),
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = ChangeReason.GetDisplayName(),
+                Details = ChangeReasonDetail,
+                EvidenceFile = EvidenceFile?.ToEventModel(),
+                AdditionalInformation = AdditionalInformation
+            });
 
-        if (updatedEvent is not null)
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        }
+        await mandatoryQualificationService.UpdateMandatoryQualificationAsync(
+            new UpdateMandatoryQualificationOptions
+            {
+                QualificationId = qualification.QualificationId,
+                Specialism = Option.Some(NewSpecialism)
+            },
+            processContext);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashNotificationBanner("Mandatory qualification changed");
