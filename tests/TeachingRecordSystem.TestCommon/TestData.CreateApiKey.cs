@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -21,15 +20,6 @@ public partial class TestData
         };
 
         dbContext.ApiKeys.Add(apiKey);
-
-        var @event = new ApiKeyCreatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = TimeProvider.UtcNow,
-            RaisedBy = SystemUser.SystemUserId,
-            ApiKey = EventModels.ApiKey.FromModel(apiKey)
-        };
-        dbContext.AddEventWithoutBroadcast(@event);
 
         await dbContext.SaveChangesAsync();
 

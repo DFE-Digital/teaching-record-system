@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events.Legacy;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys.EditApiKey;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -147,7 +145,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/{apiKey.ApiKeyId}/Expire");
 
-        EventObserver.Clear();
+        Events.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -162,16 +160,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(TimeProvider.UtcNow, apiKey.Expires);
         });
 
-        EventObserver.AssertEventsSaved(
-            e =>
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiKeyUpdating, p.ProcessContext.ProcessType);
+            Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Process.CreatedOn);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.Process.UserId);
+            p.AssertProcessHasEvents<ApiKeyUpdatedEvent>(apiKeyUpdatedEvent =>
             {
-                var apiKeyUpdatedEvent = Assert.IsType<ApiKeyUpdatedEvent>(e);
-                Assert.Equal(TimeProvider.UtcNow, apiKeyUpdatedEvent.CreatedUtc);
-                Assert.Equal(GetCurrentUserId(), apiKeyUpdatedEvent.RaisedBy.UserId);
                 Assert.Equal(ApiKeyUpdatedEventChanges.Expires, apiKeyUpdatedEvent.Changes);
                 Assert.Null(apiKeyUpdatedEvent.OldApiKey.Expires);
                 Assert.Equal(TimeProvider.UtcNow, apiKeyUpdatedEvent.ApiKey.Expires);
             });
+        });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();

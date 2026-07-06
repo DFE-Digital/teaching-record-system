@@ -180,4 +180,61 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
 
         return changes;
     }
+
+    public async Task<ApiKey> CreateApiKeyAsync(CreateApiKeyOptions options, ProcessContext processContext)
+    {
+        var apiKey = new ApiKey
+        {
+            ApiKeyId = Guid.NewGuid(),
+            CreatedOn = processContext.Now,
+            UpdatedOn = processContext.Now,
+            ApplicationUserId = options.ApplicationUserId,
+            Key = options.Key,
+            Expires = null
+        };
+
+        dbContext.ApiKeys.Add(apiKey);
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishSingleEventAsync(
+            new ApiKeyCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                ApiKey = EventModels.ApiKey.FromModel(apiKey)
+            },
+            processContext);
+
+        return apiKey;
+    }
+
+    public async Task<ApiKeyUpdatedEventChanges> UpdateApiKeyAsync(UpdateApiKeyOptions options, ProcessContext processContext)
+    {
+        var apiKey = await dbContext.ApiKeys.FindOrThrowAsync(options.ApiKeyId);
+
+        var oldApiKey = EventModels.ApiKey.FromModel(apiKey);
+
+        options.Expires.MatchSome(expires => apiKey.Expires = expires);
+
+        var changes = ApiKeyUpdatedEventChanges.None |
+            (apiKey.Expires != oldApiKey.Expires ? ApiKeyUpdatedEventChanges.Expires : 0);
+
+        if (changes == ApiKeyUpdatedEventChanges.None)
+        {
+            return changes;
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishSingleEventAsync(
+            new ApiKeyUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                ApiKey = EventModels.ApiKey.FromModel(apiKey),
+                OldApiKey = oldApiKey,
+                Changes = changes
+            },
+            processContext);
+
+        return changes;
+    }
 }

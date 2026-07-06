@@ -268,4 +268,109 @@ public class UserServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
         Assert.Equal(ApplicationUserUpdatedEventChanges.None, changes);
         Events.AssertNoEventsPublished();
     }
+
+    [Fact]
+    public async Task CreateApiKeyAsync_AddsApiKeyToDbAndPublishesEvent()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var key = Guid.NewGuid().ToString("N");
+
+        var options = new CreateApiKeyOptions
+        {
+            ApplicationUserId = applicationUser.UserId,
+            Key = key
+        };
+
+        var processContext = new ProcessContext(ProcessType.ApiKeyCreating, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var apiKey = await WithServiceAsync<UserService, ApiKey>(service => service.CreateApiKeyAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbApiKey = await dbContext.ApiKeys.FindAsync(apiKey.ApiKeyId);
+            Assert.NotNull(dbApiKey);
+            Assert.Equal(applicationUser.UserId, dbApiKey.ApplicationUserId);
+            Assert.Equal(key, dbApiKey.Key);
+            Assert.Null(dbApiKey.Expires);
+            Assert.Equal(TimeProvider.UtcNow, dbApiKey.CreatedOn);
+            Assert.Equal(TimeProvider.UtcNow, dbApiKey.UpdatedOn);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiKeyCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<ApiKeyCreatedEvent>(e =>
+            {
+                Assert.Equal(apiKey.ApiKeyId, e.ApiKey.ApiKeyId);
+                Assert.Equal(applicationUser.UserId, e.ApiKey.ApplicationUserId);
+                Assert.Equal(key, e.ApiKey.Key);
+            });
+        });
+    }
+
+    [Fact]
+    public async Task UpdateApiKeyAsync_WithChanges_UpdatesApiKeyAndPublishesEvent()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: false);
+        var expires = TimeProvider.UtcNow;
+
+        var options = new UpdateApiKeyOptions
+        {
+            ApiKeyId = apiKey.ApiKeyId,
+            Expires = Option.Some<DateTime?>(expires)
+        };
+
+        var processContext = new ProcessContext(ProcessType.ApiKeyUpdating, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var changes = await WithServiceAsync<UserService, ApiKeyUpdatedEventChanges>(service => service.UpdateApiKeyAsync(options, processContext));
+
+        // Assert
+        Assert.Equal(ApiKeyUpdatedEventChanges.Expires, changes);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbApiKey = await dbContext.ApiKeys.FindAsync(apiKey.ApiKeyId);
+            Assert.Equal(expires, dbApiKey!.Expires);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.ApiKeyUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<ApiKeyUpdatedEvent>(e =>
+            {
+                Assert.Equal(ApiKeyUpdatedEventChanges.Expires, e.Changes);
+                Assert.Null(e.OldApiKey.Expires);
+                Assert.Equal(expires, e.ApiKey.Expires);
+            });
+        });
+    }
+
+    [Fact]
+    public async Task UpdateApiKeyAsync_WithNoChanges_DoesNotPublishEvent()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: false);
+
+        var options = new UpdateApiKeyOptions
+        {
+            ApiKeyId = apiKey.ApiKeyId,
+            Expires = Option.Some<DateTime?>(apiKey.Expires)
+        };
+
+        var processContext = new ProcessContext(ProcessType.ApiKeyUpdating, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var changes = await WithServiceAsync<UserService, ApiKeyUpdatedEventChanges>(service => service.UpdateApiKeyAsync(options, processContext));
+
+        // Assert
+        Assert.Equal(ApiKeyUpdatedEventChanges.None, changes);
+        Events.AssertNoEventsPublished();
+    }
 }

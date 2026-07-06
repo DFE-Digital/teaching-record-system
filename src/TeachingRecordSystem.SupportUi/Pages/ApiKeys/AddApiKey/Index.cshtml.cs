@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.AddApiKey;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, UserService userService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
@@ -36,30 +36,17 @@ public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, Suppo
     {
         _validator.ValidateAndThrow(this);
 
-        var apiKey = new ApiKey()
-        {
-            ApiKeyId = Guid.NewGuid(),
-            CreatedOn = timeProvider.UtcNow,
-            UpdatedOn = timeProvider.UtcNow,
-            ApplicationUserId = ApplicationUserId,
-            Key = Key!,
-            Expires = null
-        };
-
-        dbContext.ApiKeys.Add(apiKey);
-
-        var @event = new ApiKeyCreatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = timeProvider.UtcNow,
-            RaisedBy = User.GetUserId(),
-            ApiKey = EventModels.ApiKey.FromModel(apiKey)
-        };
-        dbContext.AddEventWithoutBroadcast(@event);
+        var processContext = new ProcessContext(ProcessType.ApiKeyCreating, timeProvider.UtcNow, User.GetUserId());
 
         try
         {
-            await dbContext.SaveChangesAsync();
+            await userService.CreateApiKeyAsync(
+                new CreateApiKeyOptions
+                {
+                    ApplicationUserId = ApplicationUserId,
+                    Key = Key!
+                },
+                processContext);
         }
         catch (DbUpdateException ex) when (ex.IsUniqueIndexViolation(ApiKey.KeyUniqueIndexName))
         {
