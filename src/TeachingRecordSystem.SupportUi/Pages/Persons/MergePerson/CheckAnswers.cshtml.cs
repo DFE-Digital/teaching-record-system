@@ -145,8 +145,8 @@ public class CheckAnswersModel(
                 MiddleName = state.MiddleNameSource is not PersonAttributeSource.PrimaryPerson ? Option.Some(MiddleName ?? string.Empty) : default,
                 LastName = state.LastNameSource is not PersonAttributeSource.PrimaryPerson ? Option.Some(LastName!) : default,
                 DateOfBirth = state.DateOfBirthSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<DateOnly?>(DateOfBirth!.Value) : default,
-                EmailAddress = state.EmailAddressSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<EmailAddress?>(EmailAddress is var email ? Core.EmailAddress.Parse(email) : null) : default,
-                NationalInsuranceNumber = state.NationalInsuranceNumberSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<NationalInsuranceNumber?>(NationalInsuranceNumber is var nino ? Core.NationalInsuranceNumber.Parse(nino!) : null) : default,
+                EmailAddress = state.EmailAddressSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<EmailAddress?>(EmailAddress is { } email ? Core.EmailAddress.Parse(email) : null) : default,
+                NationalInsuranceNumber = state.NationalInsuranceNumberSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<NationalInsuranceNumber?>(NationalInsuranceNumber is { } nino ? Core.NationalInsuranceNumber.Parse(nino!) : null) : default,
                 Gender = state.GenderSource is not PersonAttributeSource.PrimaryPerson ? Option.Some(Gender) : default
             },
             processContext);
