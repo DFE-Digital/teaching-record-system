@@ -27,16 +27,16 @@ public static class RoutesToProfessionalStatusPageExtensions
     }
 
     public static Task EnterDegreeTypeAsync(this IPage page, string name) =>
-        page.FillAsync("#DegreeTypeId", name);
+        page.FillAutocompleteAsync("DegreeTypeId", name);
 
     public static Task EnterCountryAsync(this IPage page, string name) =>
-        page.FillAsync("#TrainingCountryId", name);
+        page.FillAutocompleteAsync("TrainingCountryId", name);
 
     public static Task EnterSubjectAsync(this IPage page, string name) =>
-        page.FillAsync("#SubjectId1", name);
+        page.FillAutocompleteAsync("SubjectId1", name);
 
     public static Task EnterTrainingProviderAsync(this IPage page, string name) =>
-        page.FillAsync("#TrainingProviderId", name);
+        page.FillAutocompleteAsync("TrainingProviderId", name);
 
     public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId) =>
         page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/status");

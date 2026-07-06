@@ -659,7 +659,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact(Skip = "Flaky on CI")]
+    [Fact]
     public async Task EditCountry_CanClearField_BackLinkReturnsToDetails()
     {
         // this route - status combo makes the country field mandatory

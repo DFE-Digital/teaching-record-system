@@ -100,6 +100,15 @@ public static class PageExtensions
     public static Task FillEmailInputAsync(this IPage page, string email) =>
         page.FillAsync("input[type='email']", email);
 
+    // Fields rendered as a <select> and enhanced by accessible-autocomplete (initialised on
+    // window.onload) are replaced with an <input> carrying the same id, with the now-hidden
+    // <select> renamed to "{id}-select". Matching on "#{id}" alone can race that enhancement and
+    // latch onto the hidden <select>, which never becomes visible so the fill times out (flaky on
+    // CI). Scoping the selector to the <input> tag means it only ever matches the enhanced control,
+    // and Playwright's auto-wait blocks until enhancement has produced it.
+    public static Task FillAutocompleteAsync(this IPage page, string id, string name) =>
+        page.FillAsync($"input#{id}", name);
+
     public static async Task AssertContentEqualsAsync(this IPage page, string content, string label)
     {
         var ddText = await page.FindContentForLabelAsync(label);
