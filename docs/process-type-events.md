@@ -403,16 +403,31 @@ Support UI *Edit application user*; CLI `app-content`.
 
 ---
 
-## Not currently emitted
+## NPQ TRN requests (legacy)
 
-These process types are defined but no current code path constructs a `ProcessContext` with them, so
-they emit no events today.
+### `NpqTrnRequestTaskCreating` (15)
 
-| `ProcessType` | Notes |
-| --- | --- |
-| `NpqTrnRequestTaskCreating` (15) | No live code path. |
-| `NpqTrnRequestApproving` (18) | No live code path. |
-| `NpqTrnRequestRejecting` (19) | No live code path. |
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskCreatedEvent` | Always | — |
+| `TrnRequestCreatedEvent` | Always | — |
+
+### `NpqTrnRequestApproving` (18)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskUpdatedEvent` | Always | — |
+| `TrnRequestUpdatedEvent` | Always | — |
+| `PersonCreatedEvent` | Sometimes | The support user chooses to create a new record. |
+| `PersonDetailsUpdatedEvent` | Sometimes | The support user merges into an existing record and updates its attributes. |
+| `EmailSentEvent` | Sometimes | A 'TRN Generated for NPQ' email was sent to the person. |
+
+### `NpqTrnRequestRejecting` (19)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskUpdatedEvent` | Always | — |
+| `TrnRequestUpdatedEvent` | Always | — |
 
 ---
 
@@ -420,21 +435,41 @@ they emit no events today.
 
 These "…InDqt" / "…FromDqt" process types are not produced by current application code. They were
 assigned during data migration to wrap pre-existing DQT-era records into the process model, and are
-only used for display grouping (e.g. in
-[`ChangeHistoryService`](../src/TeachingRecordSystem.SupportUi/Services/ChangeHistory/ChangeHistoryService.cs)).
+only used for display grouping (e.g. in [`ChangeHistoryService`](../src/TeachingRecordSystem.SupportUi/Services/ChangeHistory/ChangeHistoryService.cs)).
 
-| `ProcessType` | Historical action |
-| --- | --- |
-| `PersonMigratingFromDqt` (1) | Person migrated from DQT. |
-| `PersonCreatingInDqt` (2) | Person created in DQT. |
-| `PersonImportingIntoDqt` (3) | Person imported into DQT. |
-| `PersonUpdatingInDqt` (4) | Person details updated in DQT. |
-| `PersonDeactivatingInDqt` (5) | Person deactivated in DQT. |
-| `PersonReactivatingInDqt` (6) | Person reactivated in DQT. |
-| `PersonMergingInDqt` (7) | Person merged in DQT. |
+### `PersonCreatingInDqt` (2)
 
-> **Note on backfill jobs.** Several live process types above
-> (`UserAdding`/`UserUpdating`/`UserActivating`/`UserDeactivating`, `ApplicationUserCreating`/`ApplicationUserUpdating`,
-> `ApiKeyCreating`/`ApiKeyUpdating`, `MandatoryQualificationCreating`/`MandatoryQualificationUpdating`/`MandatoryQualificationDeleting`)
-> are also created retrospectively by `Backfill*ProcessesJob` jobs, which wrap historical records
-> into processes carrying the same event types shown in their tables.
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonCreatedEvent` | Always | — |
+
+### `PersonImportingIntoDqt` (3)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonImportedIntoDqtEvent` | Always | — |
+
+### `PersonUpdatingInDqt` (4) |
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonUpdatedInDqtEvent` | Always | — |
+
+### `PersonDeactivatingInDqt` (5)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonDeactivatedEvent` | Always | — |
+
+### `PersonReactivatingInDqt` (6)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonReactivatedEvent` | Always | — |
+
+### `PersonMergingInDqt` (7)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonDeactivatedEvent` | Always | — |
+| `PersonDeactivatedEvent` | Sometimes | The retained record's attributes are changed to values taken from the secondary record. |
