@@ -53,5 +53,6 @@ Before completing any work:
 1. The solution must build without any errors or warnings using `just build`.
 2. All tests affected by changes must pass using `just test-changed`.
 3. All code changes must be formatted using `just format-changed`.
+4. If there are any additional events created (or removed), update docs/process-type-events.md accordingly.
 
 These requirements ensure code quality and consistency across the codebase.
