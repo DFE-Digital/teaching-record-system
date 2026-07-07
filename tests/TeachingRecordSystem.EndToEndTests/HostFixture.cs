@@ -270,8 +270,6 @@ public sealed class HostFixture : InitializeDbFixture
         {
             builder.UseEnvironment("EndToEndTests");
 
-            builder.UseStaticWebAssets();
-
             var configuration = TestConfiguration.GetConfiguration();
             builder.UseConfiguration(configuration);
 
@@ -311,6 +309,8 @@ public sealed class HostFixture : InitializeDbFixture
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("EndToEndTests");
+
+            builder.UseStaticWebAssets();
 
             var configuration = TestConfiguration.GetConfiguration();
             builder.UseConfiguration(configuration);
