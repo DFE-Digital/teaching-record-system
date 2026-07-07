@@ -1,4 +1,4 @@
-# Copilot Coding Agent Instructions
+# Agent Instructions
 
 ## Build, Test, and Format Commands
 
@@ -25,6 +25,8 @@ var exception = Record.Exception(() => service.DoSomething());
 Assert.NotNull(exception);
 Assert.IsType<ArgumentException>(exception);
 ```
+
+Assume that dependencies for running tests (a local postgres database, Playwright etc.) are already configured.
 
 ### Boolean Expressions
 
