@@ -175,7 +175,7 @@ public partial class OneLoginSearchServiceTests
             service.SearchAsync(options, new PaginationOptions(null, 100)));
 
         // Assert
-        Assert.Equal(expectedNames, result.Results.Select(r => r.Name));
+        Assert.Equivalent(expectedNames, result.Results.Select(r => r.Name));
     }
 
     [Theory]

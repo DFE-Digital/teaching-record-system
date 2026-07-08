@@ -47,7 +47,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         if (string.IsNullOrEmpty(Search))
         {
-            return Redirect(linkGenerator.Index());
+            return Redirect(linkGenerator.Index(selectedTab: "records"));
         }
 
         var sortBy = SortBy ?? PersonSearchSortByOption.Name;

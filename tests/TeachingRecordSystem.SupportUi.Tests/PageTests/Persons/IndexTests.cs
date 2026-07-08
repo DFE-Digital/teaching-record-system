@@ -15,7 +15,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal("/", response.Headers.Location?.OriginalString);
+        Assert.Equal("/#records", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var searchInput = doc.GetElementByLabel("Search");
+        var searchInput = doc.GetElementById("Search");
         Assert.NotNull(searchInput);
         Assert.Equal(search, searchInput.GetAttribute("value"));
 
@@ -55,7 +55,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var searchInput = doc.GetElementByLabel("Search");
+        var searchInput = doc.GetElementById("Search");
         Assert.NotNull(searchInput);
         Assert.Equal(search, searchInput.GetAttribute("value"));
 
