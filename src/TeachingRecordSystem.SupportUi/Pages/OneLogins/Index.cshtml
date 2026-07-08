@@ -9,7 +9,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">        
+    <div class="govuk-grid-column-two-thirds">
         <form method="get" asp-antiforgery="false" data-testid="search-form">
             <span class="govuk-caption-l">Search</span>
             <govuk-input for="Search" label-class="govuk-label--l" data-testid="search-input" type="search">
@@ -40,12 +40,12 @@
                         link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Name, direction, Model.PageNumber))">
                         Name
                     </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-130"
+                    <th scope="col" class="govuk-table__header trs-!-width-160"
                         sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.DateOfBirth ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.DateOfBirth, direction, Model.PageNumber))">
                         DOB
                     </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-80"
+                    <th scope="col" class="govuk-table__header trs-!-width-130"
                         sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Trn ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Trn, direction, Model.PageNumber))">
                         TRN
