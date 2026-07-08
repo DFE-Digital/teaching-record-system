@@ -10,11 +10,11 @@
       },
       "DfeAnalytics.AspNetCore": {
         "type": "Direct",
-        "requested": "[0.5.1, )",
-        "resolved": "0.5.1",
-        "contentHash": "GKtS7ebDfODG3jdvG0PJKLiySGR0ce4t9flX4RXjpNud6eoOpt7I73pH0+9wwzPHFOseC3KdKGrKelQjYK1chA==",
+        "requested": "[0.5.2-alpha.0.1, )",
+        "resolved": "0.5.2-alpha.0.1",
+        "contentHash": "Jhdv7EaOSQEw8nYTDx09YOQeCddfP9YCACZFVJ8q50tY0gzSjgfox49ZduqbPi4SoFG3IBBfwasZAV2lk89nWg==",
         "dependencies": {
-          "DfeAnalytics.Core": "0.5.1"
+          "DfeAnalytics.Core": "0.5.2-alpha.0.1"
         }
       },
       "GovUk.Frontend.AspNetCore": {
@@ -167,8 +167,8 @@
       },
       "DfeAnalytics.Core": {
         "type": "Transitive",
-        "resolved": "0.5.1",
-        "contentHash": "x4Sh//vMpyzSUGxEhQqMghZpo6sKbdVZKAoAG9rPQQkGKkvXaPazxMT2s/ZEQrhw3VCX40LDm3sqfE08JJbNsQ==",
+        "resolved": "0.5.2-alpha.0.1",
+        "contentHash": "apMXLKo/FBgZT999GLedDEKc73c4C5J4URVW5LUyiLoFgLBKvcIkr5doEMChyiTvyiduwmkATFdxVXKCPIOxBw==",
         "dependencies": {
           "Google.Apis.Auth": "1.71.0",
           "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)"
@@ -938,7 +938,7 @@
           "CloudNative.CloudEvents": "[2.8.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[33.1.0, )",
-          "DfeAnalytics.EFCore": "[0.5.1, )",
+          "DfeAnalytics.EFCore": "[0.5.2-alpha.0.1, )",
           "EFCore.BulkExtensions.PostgreSql": "[10.0.1, )",
           "EFCore.NamingConventions": "[10.0.0, )",
           "EntityFrameworkCore.Projectables": "[6.0.4, )",
@@ -1084,11 +1084,11 @@
       },
       "DfeAnalytics.EFCore": {
         "type": "CentralTransitive",
-        "requested": "[0.5.1, )",
-        "resolved": "0.5.1",
-        "contentHash": "NWXWb4Wi5+huVLsei1uoI4v5ZbQ/lcGi4GvhJkcfQIWg5seb8HGGgJ/z+lV45wL1V3X0oDH25D1pdO0wlygoaQ==",
+        "requested": "[0.5.2-alpha.0.1, )",
+        "resolved": "0.5.2-alpha.0.1",
+        "contentHash": "0FM/G2SwGoeqqnHFYo/oHy/re/i5o/hElekYsZBedryudY0Ua1zEvOuKUkRyVHrb7p9vQAge4oVSJkP7X/g8Uw==",
         "dependencies": {
-          "DfeAnalytics.Core": "0.5.1",
+          "DfeAnalytics.Core": "0.5.2-alpha.0.1",
           "Microsoft.EntityFrameworkCore": "10.0.0",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0",
           "System.CommandLine": "2.0.0"
