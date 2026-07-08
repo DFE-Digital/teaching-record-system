@@ -15,8 +15,15 @@ public class EventEvidenceFileLinkViewComponent(
         {
             uploadedEvidenceFile = new UploadedEvidenceFile(file.FileId, file.Name);
 
-            var fileUrl = await fileService.GetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry);
-            uploadedEvidenceFile.PreviewUrl = linkGenerator.Files.File(file.Name, fileUrl);
+            var fileUrl = await fileService.TryGetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry);
+            if (fileUrl is not null)
+            {
+                uploadedEvidenceFile.PreviewUrl = linkGenerator.Files.File(file.Name, fileUrl);
+            }
+            else
+            {
+                uploadedEvidenceFile.IsDeleted = true;
+            }
         }
 
         return View(uploadedEvidenceFile);

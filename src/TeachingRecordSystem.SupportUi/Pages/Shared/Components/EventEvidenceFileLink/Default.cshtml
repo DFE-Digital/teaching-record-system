@@ -4,7 +4,16 @@
 
 @if (Model is not null)
 {
-    <a href="@Model.PreviewUrl" data-testid="uploaded-evidence-link" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.FileName} (opens in new tab)")</a>
+    if (Model.IsDeleted)
+    {
+        <span data-testid="uploaded-evidence-link" class="govuk-hint">
+            @Model.FileName (deleted due to data retention policy)
+        </span>
+    }
+    else
+    {
+        <a href="@Model.PreviewUrl" data-testid="uploaded-evidence-link" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.FileName} (opens in new tab)")</a>
+    }
 }
 else
 {

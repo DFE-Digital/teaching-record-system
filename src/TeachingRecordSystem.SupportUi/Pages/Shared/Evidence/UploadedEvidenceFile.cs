@@ -29,6 +29,7 @@ public class UploadedEvidenceFile
     public required string FileName { get; set; }
     public string? FileSizeDescription { get; set; }
     public string? PreviewUrl { get; set; }
+    public bool IsDeleted { get; set; }
 
     public EventModels.File ToEventModel() => new()
     {

@@ -235,4 +235,108 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         doc.AssertSummaryListRowValues("change-reason", "Evidence", assertions.ToArray());
     }
+
+    [Fact]
+    public async Task Person_WithPersonDetailsUpdatedEvent_WhenEvidenceFileDeleted_DisplaysDeletedMessage()
+    {
+        // Arrange
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+
+        var nameChangeEvidenceFileId = Guid.NewGuid();
+        var nameChangeEvidenceFileName = "name-change-evidence.jpg";
+        var detailsChangeEvidenceFileId = Guid.NewGuid();
+        var detailsChangeEvidenceFileName = "dob-change-evidence.jpg";
+
+        string firstName = "Megan";
+        string middleName = "Thee";
+        string lastName = "Stallion";
+        DateOnly? dateOfBirth = TimeProvider.Today.AddYears(-20);
+
+        var nameChangeReason = PersonNameChangeReason.DeedPollOrOtherLegalProcess.GetDisplayName();
+        var nameChangeEvidenceFile = new EventModels.File
+        {
+            FileId = nameChangeEvidenceFileId,
+            Name = nameChangeEvidenceFileName
+        };
+
+        var detailsChangeReason = PersonDetailsChangeReason.AnotherReason.GetDisplayName();
+        var detailsChangeReasonDetail = "Date of birth correction";
+        var detailsChangeEvidenceFile = new EventModels.File
+        {
+            FileId = detailsChangeEvidenceFileId,
+            Name = detailsChangeEvidenceFileName
+        };
+
+        var details = new EventModels.PersonDetails
+        {
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = null,
+            NationalInsuranceNumber = null,
+            Gender = null
+        };
+
+        var oldDetails = new EventModels.PersonDetails
+        {
+            FirstName = person.FirstName,
+            MiddleName = person.MiddleName,
+            LastName = person.LastName,
+            DateOfBirth = person.DateOfBirth,
+            EmailAddress = null,
+            NationalInsuranceNumber = null,
+            Gender = null
+        };
+
+        var updatedEvent = new PersonDetailsUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = TimeProvider.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = person.PersonId,
+            PersonAttributes = details,
+            OldPersonAttributes = oldDetails,
+            Changes = PersonDetailsUpdatedEventChanges.FirstName
+                    | PersonDetailsUpdatedEventChanges.MiddleName
+                    | PersonDetailsUpdatedEventChanges.LastName
+                    | PersonDetailsUpdatedEventChanges.DateOfBirth,
+            NameChangeReason = nameChangeReason,
+            NameChangeEvidenceFile = nameChangeEvidenceFile,
+            DetailsChangeReason = detailsChangeReason,
+            DetailsChangeReasonDetail = detailsChangeReasonDetail,
+            DetailsChangeEvidenceFile = detailsChangeEvidenceFile
+        };
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        // Mock the file service to return null for both deleted files
+        FileServiceMock
+            .Setup(s => s.TryGetFileUrlAsync(nameChangeEvidenceFileId, It.IsAny<TimeSpan>()))
+            .ReturnsAsync((string?)null);
+        FileServiceMock
+            .Setup(s => s.TryGetFileUrlAsync(detailsChangeEvidenceFileId, It.IsAny<TimeSpan>()))
+            .ReturnsAsync((string?)null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var item = doc.GetElementByTestId("timeline-item-details-updated-event");
+        Assert.NotNull(item);
+
+        doc.AssertSummaryListRowValues("change-reason", "Evidence",
+            v => Assert.Equal($"{nameChangeEvidenceFileName} (deleted due to data retention policy)", v.TrimmedText()),
+            v => Assert.Equal($"{detailsChangeEvidenceFileName} (deleted due to data retention policy)", v.TrimmedText()));
+    }
 }
+
