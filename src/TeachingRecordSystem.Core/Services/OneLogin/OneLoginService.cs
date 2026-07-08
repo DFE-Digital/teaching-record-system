@@ -555,7 +555,7 @@ public class OneLoginService(
 
     public Task<string?> GetPendingSupportTaskReferenceByUserAsync(string oneLoginUserSubject) =>
         dbContext.SupportTasks
-            .Where(t => t.OneLoginUserSubject == oneLoginUserSubject && t.Status != SupportTaskStatus.Closed)
+            .Where(t => t.OneLoginUserSubject == oneLoginUserSubject && t.IsOutstanding)
             .OrderBy(t => t.CreatedOn)
             .Select(t => t.SupportTaskReference)
             .FirstOrDefaultAsync();

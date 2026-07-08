@@ -10,7 +10,7 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
     public async Task OnGetAsync()
     {
         SupportTaskCounts = (await dbContext.SupportTasks
-                .Where(t => t.Status != SupportTaskStatus.Closed)
+                .Where(t => t.IsOutstanding)
                 .GroupBy(t => t.SupportTaskType)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToArrayAsync())

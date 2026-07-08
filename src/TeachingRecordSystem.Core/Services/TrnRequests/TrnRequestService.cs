@@ -572,7 +572,7 @@ public class TrnRequestService(
         if (await dbContext.SupportTasks.AnyAsync(
             t => t.TrnRequestApplicationUserId == trnRequest.ApplicationUserId &&
                 t.TrnRequestId == trnRequest.RequestId &&
-                t.Status != SupportTaskStatus.Closed &&
+                t.IsOutstanding &&
                 _trnRequestResolvingSupportTaskTypes.Contains(t.SupportTaskType)))
         {
             result = new TrnRequestInfo(trnRequest, ResolvedPersonTrn: null);
