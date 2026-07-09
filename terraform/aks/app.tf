@@ -216,7 +216,7 @@ locals {
 
   shared_secrets = merge({
     ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
-    ConnectionStrings__Redis             = "${module.redis.connection_string},defaultDatabase=1"
+    ConnectionStrings__Redis             = "${module.redis-managed-cache.connection_string},defaultDatabase=1"
     DATABASE_URL                         = module.postgres.url
     Sentry__Dsn                          = module.infrastructure_secrets.map.SENTRY-DSN
     StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
