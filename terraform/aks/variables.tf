@@ -122,21 +122,6 @@ variable "postgres_azure_storage_mb" {
   default = 32768
 }
 
-variable "redis_capacity" {
-  type    = number
-  default = 1
-}
-
-variable "redis_family" {
-  type    = string
-  default = "C"
-}
-
-variable "redis_sku_name" {
-  type    = string
-  default = "Standard"
-}
-
 variable "redis_managed_cache_sku_name" {
   type    = string
   default = "Balanced_B1"
