@@ -97,7 +97,7 @@
                         <key>Name</key>
                         <value>
                             @{
-                                var personFullName = StringHelper.JoinNonEmpty(' ', Model.PersonFirstName, Model.PersonMiddleName, Model.PersonLastName);
+                                var personFullName = string.JoinNonEmpty(' ', Model.PersonFirstName, Model.PersonMiddleName, Model.PersonLastName);
                                 var oneLoginNames = Model.OneLoginUserVerifiedNames?.Select(namePair =>
                                 {
                                     var firstName = namePair[0];

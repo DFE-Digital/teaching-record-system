@@ -7,7 +7,7 @@
     string title;
     if (oneLoginUser.PersonId.HasValue && oneLoginUser.VerifiedNames?.Length > 0)
     {
-        title = StringHelper.JoinNonEmpty(' ', oneLoginUser.VerifiedNames[0]);
+        title = string.JoinNonEmpty(' ', oneLoginUser.VerifiedNames[0]);
     }
     else
     {
@@ -29,7 +29,7 @@
             <ul class="moj-sub-navigation__list">
                 <li class="moj-sub-navigation__item">
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == OneLoginDetailSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUserSubject)">General</a>
-                </li>                
+                </li>
             </ul>
         </nav>
         @RenderBody()

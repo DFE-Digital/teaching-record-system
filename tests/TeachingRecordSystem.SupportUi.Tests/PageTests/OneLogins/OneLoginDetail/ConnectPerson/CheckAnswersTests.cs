@@ -240,7 +240,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        var expectedFlashMessage = $"Record connected to {StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
+        var expectedFlashMessage = $"Record connected to {string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
         AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, expectedFlashMessage);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -301,7 +301,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        var expectedFlashMessage = $"Record connected to {StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
+        var expectedFlashMessage = $"Record connected to {string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
         AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, expectedFlashMessage);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

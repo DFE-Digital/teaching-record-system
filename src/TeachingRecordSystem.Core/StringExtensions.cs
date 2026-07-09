@@ -2,24 +2,24 @@ namespace TeachingRecordSystem.Core;
 
 public static class StringExtensions
 {
-    private static readonly char[] Vowels = ['a', 'e', 'i', 'o', 'u'];
+    private static readonly string[] _vowels = ["a", "e", "i", "o", "u"];
 
-    public static string ToLowerInvariantFirstLetter(this string text)
+    extension(string str)
     {
-        return text.Length > 1
-            ? text.Substring(0, 1).ToLowerInvariant() + text[1..]
-            : text.ToLowerInvariant();
-    }
+        public static string JoinNonEmpty(char separator, params string?[] values) =>
+            string.Join(separator, values.Where(v => !string.IsNullOrEmpty(v)));
 
-    public static string WithIndefiniteArticle(this string text)
-    {
-        var article = Vowels.Any(v => text.StartsWith(v)) ? "an" : "a";
+        public string ToLowerInvariantFirstLetter()
+        {
+            return str.Length > 1
+                ? str[..1].ToLowerInvariant() + str[1..]
+                : str.ToLowerInvariant();
+        }
 
-        return $"{article} {text}";
-    }
-
-    public static string? ToNullIfEmpty(this string? text)
-    {
-        return string.IsNullOrEmpty(text) ? null : text;
+        public string WithIndefiniteArticle()
+        {
+            var article = _vowels.Any(v => str.StartsWith(v, StringComparison.OrdinalIgnoreCase)) ? "an" : "a";
+            return $"{article} {str}";
+        }
     }
 }

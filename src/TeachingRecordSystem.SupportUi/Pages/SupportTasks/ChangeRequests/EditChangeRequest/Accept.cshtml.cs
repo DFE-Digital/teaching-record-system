@@ -151,7 +151,7 @@ public class AcceptModel(
     {
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
-        PersonName = StringHelper.JoinNonEmpty(
+        PersonName = string.JoinNonEmpty(
             ' ',
             _supportTask.Person!.FirstName,
             _supportTask.Person.MiddleName,

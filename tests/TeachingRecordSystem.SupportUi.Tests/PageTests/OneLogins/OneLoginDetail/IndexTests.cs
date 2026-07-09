@@ -147,7 +147,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var connectedRecordCard = doc.GetElementByTestId("connected-record-details");
         Assert.NotNull(connectedRecordCard);
 
-        var expectedName = StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);
+        var expectedName = string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);
         connectedRecordCard.AssertSummaryListRowValue("Name", v => Assert.Equal(expectedName, v.TrimmedText()));
         connectedRecordCard.AssertSummaryListRowValue("Email address", v => Assert.Equal(person.EmailAddress, v.TrimmedText()));
         connectedRecordCard.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));

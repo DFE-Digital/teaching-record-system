@@ -152,7 +152,7 @@ public class CheckAnswersModel(
             processContext);
 
         TempData.SetFlashNotificationBanner(
-            $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
+            $"Records merged for {string.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId)));
 
         await JourneyInstance!.CompleteAsync();

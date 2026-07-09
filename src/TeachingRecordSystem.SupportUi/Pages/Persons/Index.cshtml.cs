@@ -218,7 +218,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         public required PersonStatus PersonStatus { get; init; }
         public required string[] OneLoginUserEmailAddresses { get; init; }
 
-        public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+        public string Name => string.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
     }
 
 #pragma warning disable IDE1006 // Naming Styles

@@ -39,7 +39,7 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
         if (oneLoginUser.VerifiedNames?.Length > 0)
         {
             var names = oneLoginUser.VerifiedNames[0];
-            verifiedName = StringHelper.JoinNonEmpty(' ', names);
+            verifiedName = string.JoinNonEmpty(' ', names);
         }
 
         if (oneLoginUser.VerifiedDatesOfBirth?.Length > 0)
@@ -63,7 +63,7 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
         return new ConnectedPersonInfo
         {
             PersonId = person.PersonId,
-            Name = StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
+            Name = string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
             EmailAddress = person.EmailAddress,
             DateOfBirth = person.DateOfBirth,
             Trn = person.Trn,

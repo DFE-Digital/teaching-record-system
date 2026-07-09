@@ -190,7 +190,7 @@ public class RejectModel(
             return;
         }
 
-        PersonName = StringHelper.JoinNonEmpty(
+        PersonName = string.JoinNonEmpty(
             ' ',
             person.FirstName,
             person.MiddleName,

@@ -10,7 +10,7 @@
     }
     @if (Model.Changes.HasAnyFlag(PersonUpdatedInDqtEventChanges.FirstName | PersonUpdatedInDqtEventChanges.MiddleName | PersonUpdatedInDqtEventChanges.LastName))
     {
-        var name = StringHelper.JoinNonEmpty(' ', Model.Details.FirstName, Model.Details.MiddleName, Model.Details.LastName);
+        var name = string.JoinNonEmpty(' ', Model.Details.FirstName, Model.Details.MiddleName, Model.Details.LastName);
         <row>
             <key>Name</key>
             <value use-empty-fallback>@name</value>
@@ -108,7 +108,7 @@
             }
             @if (Model.Changes.HasAnyFlag(PersonUpdatedInDqtEventChanges.FirstName | PersonUpdatedInDqtEventChanges.MiddleName | PersonUpdatedInDqtEventChanges.LastName))
             {
-                var name = StringHelper.JoinNonEmpty(' ', Model.OldDetails.FirstName, Model.OldDetails.MiddleName, Model.OldDetails.LastName);
+                var name = string.JoinNonEmpty(' ', Model.OldDetails.FirstName, Model.OldDetails.MiddleName, Model.OldDetails.LastName);
                 <row>
                     <key>Name</key>
                     <value use-empty-fallback>@name</value>

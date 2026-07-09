@@ -43,7 +43,7 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 
     public Guid PersonId { get; set; }
 
-    public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+    public string Name => string.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
     public void OnGet() { }
 
