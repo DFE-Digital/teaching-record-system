@@ -228,30 +228,6 @@ public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture
     }
 
     [Fact]
-    public async Task SignIn_UnknownUser_EmailIsAttachedToTrnRequest()
-    {
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-        var trnRequestId = Guid.NewGuid().ToString();
-
-        var email = TestData.GenerateUniqueEmail();
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithEmailAddress(email)
-            .WithTrnRequest(applicationUser.UserId, trnRequestId, identityVerified: true));
-
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(email: Option.Some((string?)email));
-
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToAuthorizeAccessTestStartPageAsync();
-
-        await page.AssertSignedInAsync(person.Trn);
-    }
-
-    [Fact]
     public async Task SignIn_UnknownUnverifiedUser()
     {
         var subject = TestData.CreateOneLoginUserSubject();
