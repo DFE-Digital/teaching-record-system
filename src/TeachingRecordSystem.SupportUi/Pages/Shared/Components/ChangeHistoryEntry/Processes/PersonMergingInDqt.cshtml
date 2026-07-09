@@ -1,0 +1,21 @@
+@using System.Diagnostics
+@model ChangeHistoryEntryViewModel
+@{
+    var deactivatedEvent = Model.GetEvent<PersonDeactivatedEvent>();
+    Debug.Assert(deactivatedEvent.MergedWithPersonId is not null);
+
+    var updatedEvent = Model.ContainsEvent<PersonUpdatedInDqtEvent>() ? Model.GetEvent<PersonUpdatedInDqtEvent>() : null ;
+
+    var thisRecordWasDeactivated = Model.PersonId == deactivatedEvent.PersonId;
+
+    var title = !thisRecordWasDeactivated
+        ? $"Record merged{(Model.PersonInfo!.TryGetValue(deactivatedEvent.PersonId, out var childRecordInfo) ? $" with TRN {childRecordInfo.Trn}" : null)}"
+        : $"Record merged{(Model.PersonInfo!.TryGetValue(deactivatedEvent.MergedWithPersonId!.Value, out var masterRecordInfo) ? $" with TRN {masterRecordInfo.Trn}" : null)}" + " and deactivated";
+}
+
+<timeline-entry title="@title" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (updatedEvent is not null)
+    {
+        <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent"/>
+    }
+</timeline-entry>

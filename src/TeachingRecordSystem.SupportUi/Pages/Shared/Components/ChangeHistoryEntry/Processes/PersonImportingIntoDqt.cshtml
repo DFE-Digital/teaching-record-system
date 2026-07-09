@@ -1,0 +1,88 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var importedEvent = Model.GetEvent<PersonImportedIntoDqtEvent>();
+    var name = string.JoinNonEmpty(' ', importedEvent.Details.FirstName, importedEvent.Details.MiddleName, importedEvent.Details.LastName);
+}
+
+<timeline-entry title="Record created" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+         @if (importedEvent.Details.Trn is string trn)
+            {
+                <row>
+                    <key>TRN</key>
+                    <value use-empty-fallback>@trn</value>
+                </row>
+            }
+            @if (!string.IsNullOrEmpty(name))
+            {
+                <row>
+                    <key>Name</key>
+                    <value use-empty-fallback>@name</value>
+                </row>
+            }
+            @if (importedEvent.Details.DateOfBirth is DateOnly dateOfBirth)
+            {
+                <row>
+                    <key>Date of birth</key>
+                    <value use-empty-fallback>@dateOfBirth.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (importedEvent.Details.EmailAddress is string emailAddress)
+            {
+                <row>
+                    <key>Email address</key>
+                    <value use-empty-fallback>@emailAddress</value>
+                </row>
+            }
+            @if (importedEvent.Details.NationalInsuranceNumber is string nationalInsuranceNumber)
+            {
+                <row>
+                    <key>National Insurance number</key>
+                    <value use-empty-fallback>@nationalInsuranceNumber</value>
+                </row>
+            }
+            @if (importedEvent.Details.Gender is Gender gender)
+            {
+                <row>
+                    <key>Gender</key>
+                    <value use-empty-fallback>@gender.GetDisplayName()</value>
+                </row>
+            }
+            @if (importedEvent.Details.DateOfDeath is DateOnly dateOfDeath)
+            {
+                <row>
+                    <key>Date of death</key>
+                    <value use-empty-fallback>@dateOfDeath.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (importedEvent.Details.QtsDate is DateOnly qtsDate)
+            {
+                <row>
+                    <key>QTS held since</key>
+                    <value use-empty-fallback>@qtsDate.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (importedEvent.Details.EytsDate is DateOnly eytsDate)
+            {
+                <row>
+                    <key>EYTS held since</key>
+                    <value use-empty-fallback>@eytsDate.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (importedEvent.Details.InductionStatus is InductionStatus inductionStatus)
+            {
+                <row>
+                    <key>Induction status</key>
+                    <value use-empty-fallback>@inductionStatus.GetDisplayName()</value>
+                </row>
+            }
+            @if (importedEvent.Details.DqtInductionStatus is string dqtInductionStatus)
+            {
+                <row>
+                    <key>DQT induction status</key>
+                    <value use-empty-fallback>@dqtInductionStatus</value>
+                </row>
+            }
+    </govuk-summary-list>
+</timeline-entry>
+

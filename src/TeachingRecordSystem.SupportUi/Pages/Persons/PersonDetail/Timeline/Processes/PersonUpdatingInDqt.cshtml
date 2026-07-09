@@ -1,17 +1,2 @@
 @model TimelineItem<ProcessChangeHistoryEntry>
-@{
-    var updatedEvent = Model.ItemModel.GetEvent<PersonUpdatedInDqtEvent>();
-}
-
-<div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">
-    <div class="moj-timeline__header">
-        <h2 class="moj-timeline__title">Record updated</h2>
-    </div>
-    <p class="moj-timeline__date">
-        <span>By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedGmtTimestamp</time>
-    </p>
-    <div class="moj-timeline__description">
-        <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent" />
-    </div>
-</div>
+<vc:change-history-entry model="@Model.ToChangeHistoryEntryViewModel()" />

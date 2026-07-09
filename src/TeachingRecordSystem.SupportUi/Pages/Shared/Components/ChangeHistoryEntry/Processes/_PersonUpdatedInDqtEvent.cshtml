@@ -1,0 +1,196 @@
+@model PersonUpdatedInDqtEvent
+
+<govuk-summary-list>
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.Trn))
+    {
+        <row>
+            <key>TRN</key>
+            <value use-empty-fallback>@Model.Details.Trn</value>
+        </row>
+    }
+    @if (Model.Changes.HasAnyFlag(PersonUpdatedInDqtEventChanges.FirstName | PersonUpdatedInDqtEventChanges.MiddleName | PersonUpdatedInDqtEventChanges.LastName))
+    {
+        var name = string.JoinNonEmpty(' ', Model.Details.FirstName, Model.Details.MiddleName, Model.Details.LastName);
+        <row>
+            <key>Name</key>
+            <value use-empty-fallback>@name</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DateOfBirth))
+    {
+        <row>
+            <key>Date of birth</key>
+            <value use-empty-fallback>@Model.Details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EmailAddress))
+    {
+        <row>
+            <key>Email address</key>
+            <value use-empty-fallback>@Model.Details.EmailAddress</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.NationalInsuranceNumber))
+    {
+        <row>
+            <key>National Insurance number</key>
+            <value use-empty-fallback>@Model.Details.NationalInsuranceNumber</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.Gender))
+    {
+        <row>
+            <key>Gender</key>
+            <value>@Model.Details.Gender?.GetDisplayName()</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DateOfDeath))
+    {
+        <row>
+            <key>Date of death</key>
+            <value use-empty-fallback>@Model.Details.DateOfDeath?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtsDate))
+    {
+        <row>
+            <key>QTS held since</key>
+            <value use-empty-fallback>@Model.Details.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EytsDate))
+    {
+        <row>
+            <key>EYTS held since</key>
+            <value use-empty-fallback>@Model.Details.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsDate))
+    {
+        <row>
+            <key>QTLS held since</key>
+            <value use-empty-fallback>@Model.Details.QtlsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsStatus))
+    {
+        <row>
+            <key>Qualified teacher learning and skills status (QTLS)</key>
+            <value use-empty-fallback>@Model.Details.QtlsStatus.GetDisplayName()</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.InductionStatus))
+    {
+        <row>
+            <key>Induction status</key>
+            <value use-empty-fallback>@Model.Details.InductionStatus?.GetDisplayName()</value>
+        </row>
+    }
+    @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DqtInductionStatus))
+    {
+        <row>
+            <key>DQT induction status</key>
+            <value use-empty-fallback>@Model.Details.DqtInductionStatus</value>
+        </row>
+    }
+</govuk-summary-list>
+
+<govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+    <govuk-details-summary>Previous data</govuk-details-summary>
+    <govuk-details-text>
+        <govuk-summary-list>
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.Trn))
+            {
+                <row>
+                    <key>TRN</key>
+                    <value use-empty-fallback>@Model.OldDetails.Trn</value>
+                </row>
+            }
+            @if (Model.Changes.HasAnyFlag(PersonUpdatedInDqtEventChanges.FirstName | PersonUpdatedInDqtEventChanges.MiddleName | PersonUpdatedInDqtEventChanges.LastName))
+            {
+                var name = string.JoinNonEmpty(' ', Model.OldDetails.FirstName, Model.OldDetails.MiddleName, Model.OldDetails.LastName);
+                <row>
+                    <key>Name</key>
+                    <value use-empty-fallback>@name</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DateOfBirth))
+            {
+                <row>
+                    <key>Date of birth</key>
+                    <value use-empty-fallback>@Model.OldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EmailAddress))
+            {
+                <row>
+                    <key>Email address</key>
+                    <value use-empty-fallback>@Model.OldDetails.EmailAddress</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.NationalInsuranceNumber))
+            {
+                <row>
+                    <key>National Insurance number</key>
+                    <value use-empty-fallback>@Model.OldDetails.NationalInsuranceNumber</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.Gender))
+            {
+                <row>
+                    <key>Gender</key>
+                    <value>@Model.OldDetails.Gender?.GetDisplayName()</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DateOfDeath))
+            {
+                <row>
+                    <key>Date of death</key>
+                    <value use-empty-fallback>@Model.OldDetails.DateOfDeath?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtsDate))
+            {
+                <row>
+                    <key>QTS held since</key>
+                    <value use-empty-fallback>@Model.OldDetails.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EytsDate))
+            {
+                <row>
+                    <key>EYTS held since</key>
+                    <value use-empty-fallback>@Model.OldDetails.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsDate))
+            {
+                <row>
+                    <key>QTLS held since</key>
+                    <value use-empty-fallback>@Model.OldDetails.QtlsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsStatus))
+            {
+                <row>
+                    <key>Qualified teacher learning and skills status (QTLS)</key>
+                    <value use-empty-fallback>@Model.OldDetails.QtlsStatus.GetDisplayName()</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.InductionStatus))
+            {
+                <row>
+                    <key>Induction status</key>
+                    <value use-empty-fallback>@Model.OldDetails.InductionStatus?.GetDisplayName()</value>
+                </row>
+            }
+            @if (Model.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DqtInductionStatus))
+            {
+                <row>
+                    <key>DQT induction status</key>
+                    <value use-empty-fallback>@Model.OldDetails.DqtInductionStatus</value>
+                </row>
+            }
+        </govuk-summary-list>
+    </govuk-details-text>
+</govuk-details>

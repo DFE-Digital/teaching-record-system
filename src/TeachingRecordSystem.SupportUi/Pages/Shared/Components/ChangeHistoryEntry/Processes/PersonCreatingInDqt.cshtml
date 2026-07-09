@@ -1,0 +1,47 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var createdEvent = Model.GetEvent<PersonCreatedEvent>();
+    var name = string.JoinNonEmpty(' ', createdEvent.Details.FirstName, createdEvent.Details.MiddleName, createdEvent.Details.LastName);
+}
+
+<timeline-entry title="Record created" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        @if (!string.IsNullOrEmpty(name))
+        {
+            <row>
+                <key>Name</key>
+                <value use-empty-fallback>@name</value>
+            </row>
+        }
+        @if (createdEvent.Details.DateOfBirth is DateOnly dateOfBirth)
+        {
+            <row>
+                <key>Date of birth</key>
+                <value use-empty-fallback>@dateOfBirth.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+        @if (createdEvent.Details.EmailAddress is string emailAddress)
+        {
+            <row>
+                <key>Email address</key>
+                <value use-empty-fallback>@emailAddress</value>
+            </row>
+        }
+        @if (createdEvent.Details.NationalInsuranceNumber is string nationalInsuranceNumber)
+        {
+            <row>
+                <key>National Insurance number</key>
+                <value use-empty-fallback>@nationalInsuranceNumber</value>
+            </row>
+        }
+        @if (createdEvent.Details.Gender is Gender gender)
+        {
+            <row>
+                <key>Gender</key>
+                <value use-empty-fallback>@gender.GetDisplayName()</value>
+            </row>
+        }
+    </govuk-summary-list>
+</timeline-entry>
+
+
