@@ -137,6 +137,11 @@ variable "redis_sku_name" {
   default = "Standard"
 }
 
+variable "redis_managed_cache_sku_name" {
+  type    = string
+  default = "Balanced_B1"
+}
+
 # StatusCake variables
 variable "ssl_urls" {
   type    = list(string)
