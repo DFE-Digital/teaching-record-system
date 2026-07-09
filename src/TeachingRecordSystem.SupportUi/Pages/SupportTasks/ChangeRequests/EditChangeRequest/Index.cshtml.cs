@@ -56,7 +56,7 @@ public class IndexModel(
             return;
         }
 
-        PersonName = StringHelper.JoinNonEmpty(
+        PersonName = string.JoinNonEmpty(
             ' ',
             person.FirstName,
             person.MiddleName,

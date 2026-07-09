@@ -75,7 +75,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var doc = await response.GetDocumentAsync();
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.MiddleName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(string.JoinNonEmpty(' ', supportTask.TrnRequestMetadata!.FirstName, supportTask.TrnRequestMetadata!.MiddleName, supportTask.TrnRequestMetadata!.LastName), requestDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(WebConstants.DateDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
@@ -117,9 +117,9 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Assert
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
-        var expectedPreviousName = firstMatch.PreviousNames is not null ? StringHelper.JoinNonEmpty(' ', firstMatch.PreviousNames.First().FirstName, firstMatch.PreviousNames.First().MiddleName, firstMatch.PreviousNames.First().LastName) : null;
+        var expectedPreviousName = firstMatch.PreviousNames is not null ? string.JoinNonEmpty(' ', firstMatch.PreviousNames.First().FirstName, firstMatch.PreviousNames.First().MiddleName, firstMatch.PreviousNames.First().LastName) : null;
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', firstMatch.FirstName, firstMatch.MiddleName, firstMatch.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
+        Assert.Equal(string.JoinNonEmpty(' ', firstMatch.FirstName, firstMatch.MiddleName, firstMatch.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
         if (expectedPreviousName is not null)
         {
             Assert.Equal(expectedPreviousName, firstMatchDetails.GetSummaryListValueByKey("Previous names"));

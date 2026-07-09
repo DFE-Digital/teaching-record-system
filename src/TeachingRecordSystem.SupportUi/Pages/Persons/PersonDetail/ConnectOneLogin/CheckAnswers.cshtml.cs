@@ -118,7 +118,7 @@ public class CheckAnswersModel(
                 processContext);
         }
 
-        var personName = StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);
+        var personName = string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);
         TempData.SetFlashNotificationBanner($"Record connected to {personName}’s GOV.UK One Login");
 
         await JourneyInstance!.CompleteAsync();

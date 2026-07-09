@@ -91,7 +91,7 @@
                             <row>
                                 <key>Name</key>
                                 <value use-empty-fallback highlight="@hasNameMismatch">
-                                    @StringHelper.JoinNonEmpty(' ', match.FirstName, match.MiddleName, match.LastName)
+                                    @string.JoinNonEmpty(' ', match.FirstName, match.MiddleName, match.LastName)
                                 </value>
                             </row>
                             @if (match.PreviousNames!.Count > 0)

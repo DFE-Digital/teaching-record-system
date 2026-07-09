@@ -48,7 +48,7 @@ public class ConnectPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and connect");
 
         await page.WaitForUrlPathAsync($"/persons/{person.PersonId}");
-        var expectedFlashMessage = $"Record connected to {StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
+        var expectedFlashMessage = $"Record connected to {string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
         await page.AssertFlashMessageAsync(expectedHeader: expectedFlashMessage);
     }
 
