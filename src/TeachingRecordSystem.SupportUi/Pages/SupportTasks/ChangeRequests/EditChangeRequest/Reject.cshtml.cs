@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest;
@@ -16,6 +16,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditC
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public class RejectModel(
     TrsDbContext dbContext,
+    ChangeRequestSupportTaskService changeRequestSupportTaskService,
     IBackgroundJobScheduler backgroundJobScheduler,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider) : PageModel
@@ -45,110 +46,55 @@ public class RejectModel(
     {
         _validator.ValidateAndThrow(this);
 
-        var requestStatus = "rejected";
-        var flashMessage = "The user’s record has not been changed and they have been notified.";
-
-        var changeNameRequestData = ChangeType == SupportTaskType.ChangeNameRequest ? EventModels.ChangeNameRequestData.FromModel((ChangeNameRequestData)SupportTask!.Data) : null;
-        var changeDateOfBirthRequestData = ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? EventModels.ChangeDateOfBirthRequestData.FromModel((ChangeDateOfBirthRequestData)SupportTask!.Data) : null;
-        var oldSupportTask = EventModels.SupportTask.FromModel(SupportTask!);
-        SupportTask!.Status = SupportTaskStatus.Closed;
-        SupportTask.UpdatedOn = timeProvider.UtcNow;
+        string requestStatus;
+        string flashMessage;
 
         if (RejectionReasonChoice!.Value == CaseRejectionReasonOption.ChangeNoLongerRequired)
         {
             requestStatus = "cancelled";
             flashMessage = "The user’s record has not been changed and they have not been notified.";
 
-            EventBase cancelledEvent = null!;
-            if (ChangeType == SupportTaskType.ChangeNameRequest)
-            {
-                SupportTask.UpdateData<ChangeNameRequestData>(data => data with
-                {
-                    ChangeRequestOutcome = SupportRequestOutcome.Cancelled
-                });
+            var processContext = new ProcessContext(
+                ChangeType is SupportTaskType.ChangeNameRequest
+                    ? ProcessType.ChangeOfNameRequestCancelling
+                    : ProcessType.ChangeOfDateOfBirthRequestCancelling,
+                timeProvider.UtcNow,
+                User.GetUserId());
 
-                cancelledEvent = new ChangeNameRequestSupportTaskCancelledEvent()
-                {
-                    PersonId = Person!.PersonId,
-                    RequestData = changeNameRequestData!,
-                    SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
-                    OldSupportTask = oldSupportTask,
-                    EventId = Guid.NewGuid(),
-                    CreatedUtc = timeProvider.UtcNow,
-                    RaisedBy = User.GetUserId()
-                };
-            }
-            else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
-            {
-                SupportTask.UpdateData<ChangeDateOfBirthRequestData>(data => data with
-                {
-                    ChangeRequestOutcome = SupportRequestOutcome.Cancelled
-                });
-
-                cancelledEvent = new ChangeDateOfBirthRequestSupportTaskCancelledEvent()
-                {
-                    PersonId = Person!.PersonId,
-                    RequestData = changeDateOfBirthRequestData!,
-                    SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
-                    OldSupportTask = oldSupportTask,
-                    EventId = Guid.NewGuid(),
-                    CreatedUtc = timeProvider.UtcNow,
-                    RaisedBy = User.GetUserId()
-                };
-            }
-
-            dbContext.AddEventWithoutBroadcast(cancelledEvent);
+            await changeRequestSupportTaskService.CancelChangeRequestAsync(
+                new CancelChangeRequestSupportTaskOptions { SupportTask = SupportTask! },
+                processContext);
         }
         else
         {
-            EventBase rejectedEvent = null!;
-            string? emailAddress = null;
-            string emailTemplateId = null!;
-            if (ChangeType == SupportTaskType.ChangeNameRequest)
+            requestStatus = "rejected";
+            flashMessage = "The user’s record has not been changed and they have been notified.";
+
+            var processContext = new ProcessContext(
+                ChangeType is SupportTaskType.ChangeNameRequest
+                    ? ProcessType.ChangeOfNameRequestRejecting
+                    : ProcessType.ChangeOfDateOfBirthRequestRejecting,
+                timeProvider.UtcNow,
+                User.GetUserId());
+
+            await changeRequestSupportTaskService.RejectChangeRequestAsync(
+                new RejectChangeRequestSupportTaskOptions
+                {
+                    SupportTask = SupportTask!,
+                    RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!
+                },
+                processContext);
+
+            var (requestEmailAddress, emailTemplateId) = ChangeType switch
             {
-                SupportTask.UpdateData<ChangeNameRequestData>(data => data with
-                {
-                    ChangeRequestOutcome = SupportRequestOutcome.Rejected
-                });
-                rejectedEvent = new ChangeNameRequestSupportTaskRejectedEvent()
-                {
-                    PersonId = Person!.PersonId,
-                    RequestData = changeNameRequestData!,
-                    SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
-                    OldSupportTask = oldSupportTask,
-                    RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!,
-                    EventId = Guid.NewGuid(),
-                    CreatedUtc = timeProvider.UtcNow,
-                    RaisedBy = User.GetUserId()
-                };
+                SupportTaskType.ChangeNameRequest =>
+                    (((ChangeNameRequestData)SupportTask!.Data).EmailAddress, EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation),
+                SupportTaskType.ChangeDateOfBirthRequest =>
+                    (((ChangeDateOfBirthRequestData)SupportTask!.Data).EmailAddress, EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation),
+                _ => throw new InvalidOperationException($"Unexpected change type: '{ChangeType}'.")
+            };
 
-                emailAddress = string.IsNullOrEmpty(changeNameRequestData!.EmailAddress) ? Person!.EmailAddress : changeNameRequestData.EmailAddress;
-                emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation;
-            }
-            else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
-            {
-                SupportTask.UpdateData<ChangeDateOfBirthRequestData>(data => data with
-                {
-                    ChangeRequestOutcome = SupportRequestOutcome.Rejected
-                });
-
-                rejectedEvent = new ChangeDateOfBirthRequestSupportTaskRejectedEvent()
-                {
-                    PersonId = Person!.PersonId,
-                    RequestData = changeDateOfBirthRequestData!,
-                    SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
-                    OldSupportTask = oldSupportTask,
-                    RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!,
-                    EventId = Guid.NewGuid(),
-                    CreatedUtc = timeProvider.UtcNow,
-                    RaisedBy = User.GetUserId()
-                };
-
-                emailAddress = string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress) ? Person!.EmailAddress : changeDateOfBirthRequestData.EmailAddress;
-                emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation;
-            }
-
-            dbContext.AddEventWithoutBroadcast(rejectedEvent);
+            var emailAddress = string.IsNullOrEmpty(requestEmailAddress) ? Person!.EmailAddress : requestEmailAddress;
 
             if (!string.IsNullOrEmpty(emailAddress))
             {
@@ -156,7 +102,7 @@ public class RejectModel(
                 {
                     EmailId = Guid.NewGuid(),
                     TemplateId = emailTemplateId,
-                    EmailAddress = emailAddress!,
+                    EmailAddress = emailAddress,
                     Personalization = new Dictionary<string, string>
                     {
                         [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = Person!.FirstName,
@@ -165,11 +111,10 @@ public class RejectModel(
                 };
 
                 dbContext.Emails.Add(email);
+                await dbContext.SaveChangesAsync();
                 await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
             }
         }
-
-        await dbContext.SaveChangesAsync();
 
         TempData.SetFlashNotificationBanner(
             $"The request has been {requestStatus}",

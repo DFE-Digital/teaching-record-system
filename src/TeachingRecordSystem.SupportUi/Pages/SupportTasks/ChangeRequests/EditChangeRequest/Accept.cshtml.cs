@@ -10,7 +10,7 @@ using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest;
@@ -19,7 +19,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditC
 public class AcceptModel(
     TrsDbContext dbContext,
     PersonService personService,
-    SupportTaskService supportTaskService,
+    ChangeRequestSupportTaskService changeRequestSupportTaskService,
     IBackgroundJobScheduler backgroundJobScheduler,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider) : PageModel
@@ -69,13 +69,8 @@ public class AcceptModel(
                 },
                 processContext);
 
-            await supportTaskService.UpdateSupportTaskAsync(
-                new UpdateSupportTaskOptions<ChangeNameRequestData>
-                {
-                    UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Approved },
-                    SupportTaskReference = _supportTask.SupportTaskReference,
-                    Status = SupportTaskStatus.Closed
-                },
+            await changeRequestSupportTaskService.ApproveChangeRequestAsync(
+                new ApproveChangeRequestSupportTaskOptions { SupportTask = _supportTask },
                 processContext);
 
             if (!string.IsNullOrEmpty(changeNameRequestData.EmailAddress))
@@ -104,13 +99,8 @@ public class AcceptModel(
                 },
                 processContext);
 
-            await supportTaskService.UpdateSupportTaskAsync(
-                new UpdateSupportTaskOptions<ChangeDateOfBirthRequestData>
-                {
-                    UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Approved },
-                    SupportTaskReference = _supportTask.SupportTaskReference,
-                    Status = SupportTaskStatus.Closed
-                },
+            await changeRequestSupportTaskService.ApproveChangeRequestAsync(
+                new ApproveChangeRequestSupportTaskOptions { SupportTask = _supportTask },
                 processContext);
 
             if (!string.IsNullOrEmpty(changeDateOfBirthRequestData.EmailAddress))

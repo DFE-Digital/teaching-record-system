@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 
 namespace TeachingRecordSystem.Api.V3.Operations;
 
@@ -27,7 +27,7 @@ public class CreateNameChangeRequestHandler(
     IBackgroundJobScheduler backgroundJobScheduler,
     IHttpClientFactory httpClientFactory,
     TrsDbContext dbContext,
-    SupportTaskService supportTaskService,
+    ChangeRequestSupportTaskService changeRequestSupportTaskService,
     IFileService fileService,
     TimeProvider timeProvider,
     ICurrentUserProvider currentUserProvider) :
@@ -74,29 +74,20 @@ public class CreateNameChangeRequestHandler(
         await using var stream = await evidenceFileResponse.Content.ReadAsStreamAsync();
         var evidenceFileId = await fileService.UploadFileAsync(stream, evidenceFileMimeType);
 
-        var changeRequestData = new ChangeNameRequestData()
-        {
-            FirstName = command.FirstName,
-            MiddleName = command.MiddleName,
-            LastName = command.LastName,
-            EvidenceFileId = evidenceFileId,
-            EvidenceFileName = command.EvidenceFileName,
-            EmailAddress = command.EmailAddress,
-            ChangeRequestOutcome = null
-        };
-
         var userId = currentUserProvider.GetCurrentApplicationUserId();
 
         var processContext = new ProcessContext(ProcessType.ChangeOfNameRequestCreating, timeProvider.UtcNow, userId);
 
-        var supportTask = await supportTaskService.CreateSupportTaskAsync(
-            new CreateSupportTaskOptions
+        var supportTask = await changeRequestSupportTaskService.CreateNameChangeRequestAsync(
+            new CreateNameChangeRequestSupportTaskOptions
             {
-                SupportTaskType = SupportTaskType.ChangeNameRequest,
-                Data = changeRequestData,
                 PersonId = person.PersonId,
-                OneLoginUserSubject = null,
-                TrnRequest = null
+                FirstName = command.FirstName,
+                MiddleName = command.MiddleName,
+                LastName = command.LastName,
+                EvidenceFileId = evidenceFileId,
+                EvidenceFileName = command.EvidenceFileName,
+                EmailAddress = command.EmailAddress
             },
             processContext);
 

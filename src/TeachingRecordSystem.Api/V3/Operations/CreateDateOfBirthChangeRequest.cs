@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 
 namespace TeachingRecordSystem.Api.V3.Operations;
 
@@ -25,7 +25,7 @@ public class CreateDateOfBirthChangeRequestHandler(
     IBackgroundJobScheduler backgroundJobScheduler,
     IHttpClientFactory httpClientFactory,
     TrsDbContext dbContext,
-    SupportTaskService supportTaskService,
+    ChangeRequestSupportTaskService changeRequestSupportTaskService,
     IFileService fileService,
     TimeProvider timeProvider,
     ICurrentUserProvider currentUserProvider) :
@@ -72,27 +72,18 @@ public class CreateDateOfBirthChangeRequestHandler(
         await using var stream = await evidenceFileResponse.Content.ReadAsStreamAsync();
         var evidenceFileId = await fileService.UploadFileAsync(stream, evidenceFileMimeType);
 
-        var changeRequestData = new ChangeDateOfBirthRequestData()
-        {
-            DateOfBirth = command.DateOfBirth,
-            EvidenceFileId = evidenceFileId,
-            EvidenceFileName = command.EvidenceFileName,
-            EmailAddress = command.EmailAddress,
-            ChangeRequestOutcome = null
-        };
-
         var userId = currentUserProvider.GetCurrentApplicationUserId();
 
         var processContext = new ProcessContext(ProcessType.ChangeOfDateOfBirthRequestCreating, timeProvider.UtcNow, userId);
 
-        var supportTask = await supportTaskService.CreateSupportTaskAsync(
-            new CreateSupportTaskOptions
+        var supportTask = await changeRequestSupportTaskService.CreateDateOfBirthChangeRequestAsync(
+            new CreateDateOfBirthChangeRequestSupportTaskOptions
             {
-                SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
-                Data = changeRequestData,
                 PersonId = person.PersonId,
-                OneLoginUserSubject = null,
-                TrnRequest = null
+                DateOfBirth = command.DateOfBirth,
+                EvidenceFileId = evidenceFileId,
+                EvidenceFileName = command.EvidenceFileName,
+                EmailAddress = command.EmailAddress
             },
             processContext);
 
