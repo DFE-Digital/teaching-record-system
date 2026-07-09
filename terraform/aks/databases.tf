@@ -18,6 +18,25 @@ module "redis" {
   azure_sku_name          = var.redis_sku_name
 }
 
+module "redis-managed-cache" {
+  source = "./vendor/modules/aks//aks/redis_managed"
+
+  name                  = "cache"
+  namespace             = var.namespace
+  environment           = local.app_name_suffix
+  azure_resource_prefix = var.azure_resource_prefix
+  service_name          = var.service_name
+  service_short         = var.service_short_name
+  config_short          = var.environment_short_name
+
+  cluster_configuration_map = module.cluster_data.configuration_map
+
+  use_azure               = var.deploy_azure_backing_services
+  azure_enable_monitoring = var.enable_monitoring
+
+  azure_managed_redis_sku = var.redis_managed_cache_sku_name
+}
+
 module "postgres" {
   source = "./vendor/modules/aks//aks/postgres"
 
