@@ -12,6 +12,21 @@ public abstract class ChangeHistoryEntryTestBase(HostFixture hostFixture) : Test
         return doc.QuerySelector(".moj-timeline__item") as IHtmlElement ?? throw new InvalidOperationException("Element not found.");
     }
 
+    protected async Task<IHtmlElement> GetEntryHtmlAsync(Guid processId, IReadOnlyDictionary<string, object?> modelProperties)
+    {
+        var response = await HttpClient.PostAsJsonAsync(
+            "_change-history-entry",
+            new
+            {
+                processId,
+                modelProperties
+            });
+
+        response.EnsureSuccessStatusCode();
+        var doc = await response.GetDocumentAsync();
+        return doc.QuerySelector(".moj-timeline__item") as IHtmlElement ?? throw new InvalidOperationException("Element not found.");
+    }
+
     protected void AssertTitle(IHtmlElement entry, string expectedTitle)
     {
         var title = entry.QuerySelector(".moj-timeline__title");

@@ -31,6 +31,8 @@ public static class ProcessChangeHistoryEntryExtensions
             ProcessId = timelineItem.ItemModel.Process.ProcessId,
             ProcessType = timelineItem.ItemModel.Process.ProcessType,
             ChangeReason = timelineItem.ItemModel.Process.ChangeReason,
-            Events = timelineItem.ItemModel.Process.Events!.Select(e => e.Payload).AsReadOnly()
+            Events = timelineItem.ItemModel.Process.Events!.Select(e => e.Payload).AsReadOnly(),
+            PersonInfo = timelineItem.ItemModel.PersonInfo,
+            PersonId = timelineItem.PersonId
         };
 }

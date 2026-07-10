@@ -12,6 +12,8 @@ public record ChangeHistoryEntryViewModel
     public required ProcessType ProcessType { get; init; }
     public required IChangeReasonInfo? ChangeReason { get; init; }
     public required IReadOnlyCollection<IEvent> Events { get; init; }
+    public required IReadOnlyDictionary<Guid, PersonInfo>? PersonInfo { get; init; }
+    public required Guid? PersonId { get; init; }
 
     public bool ContainsEvent<T>() where T : IEvent => Events.OfType<T>().Any();
 

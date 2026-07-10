@@ -1,0 +1,8 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var updatedEvent = Model.GetEvent<PersonUpdatedInDqtEvent>();
+}
+
+<timeline-entry title="Record updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent" />
+</timeline-entry>
