@@ -188,7 +188,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
             });
 
     [Fact]
-    public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithResolvedTrnRequestMatchedOnEmail_SetsUserVerifiedAssignsTrnAndCompletesJourney() =>
+    public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithResolvedTrnRequestMatchedOnEmailOnly_RequestsIdentityVerification() =>
         WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
                 processId,
@@ -211,43 +211,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                     .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true));
 
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: subject, email: email);
-
-                // Act
-                var result = await coordinator.OnOneLoginCallbackAsync(authenticationTicket);
-
-                // Assert
-                Assert.NotNull(coordinator.State.AuthenticationTicket);
-
-                var user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject));
-
-                var redirectResult = Assert.IsType<RedirectHttpResult>(result);
-                Assert.Equal(coordinator.GetRedirectUri(), redirectResult.Url);
-            });
-
-    [Fact]
-    public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithPendingTrnRequestMatchedOnEmail_RequestsIdentityVerification() =>
-        WithJourneyCoordinatorAsync(
-            (instanceId, processId) => new SignInJourneyState(
-                processId,
-                redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
-                serviceName: "Test Service",
-                serviceUrl: "https://service",
-                oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default,
-                recordMatchingPolicy: RecordMatchingPolicy.Required),
-            async coordinator =>
-            {
-                // Arrange
-                var subject = TestData.CreateOneLoginUserSubject();
-                var email = TestData.GenerateUniqueEmail();
-
-                var trnRequestId = Guid.NewGuid().ToString();
-                var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
-                await TestData.CreatePersonAsync(p => p
-                    .WithEmailAddress(email)
-                    .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true));
-
-                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: subject);
 
                 // Act
                 var result = await coordinator.OnOneLoginCallbackAsync(authenticationTicket);
@@ -282,44 +245,6 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
                 await TestData.CreatePersonAsync(p => p
                     .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: false, oneLoginUserSubject: subject));
-
-                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: subject);
-
-                // Act
-                var result = await coordinator.OnOneLoginCallbackAsync(authenticationTicket);
-
-                // Assert
-                Assert.NotNull(coordinator.State.OneLoginAuthenticationTicket);
-                Assert.Null(coordinator.State.AuthenticationTicket);
-
-                var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
-                Assert.Collection(
-                    challengeResult.Properties!.GetVectorsOfTrust(),
-                    vtr => Assert.Equal(AuthenticationAndIdentityVerification, vtr));
-            });
-
-    [Fact]
-    public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithTrnRequestMatchedOnEmailWithoutIdentityVerified_RequestsIdentityVerification() =>
-        WithJourneyCoordinatorAsync(
-            (instanceId, processId) => new SignInJourneyState(
-                processId,
-                redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
-                serviceName: "Test Service",
-                serviceUrl: "https://service",
-                oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default,
-                recordMatchingPolicy: RecordMatchingPolicy.Required),
-            async coordinator =>
-            {
-                // Arrange
-                var subject = TestData.CreateOneLoginUserSubject();
-                var email = TestData.GenerateUniqueEmail();
-
-                var trnRequestId = Guid.NewGuid().ToString();
-                var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
-                await TestData.CreatePersonAsync(p => p
-                    .WithEmailAddress(email)
-                    .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: false));
 
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: subject);
 

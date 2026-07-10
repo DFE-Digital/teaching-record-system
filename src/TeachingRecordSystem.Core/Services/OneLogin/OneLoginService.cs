@@ -652,7 +652,8 @@ public class OneLoginService(
 
         var requestAndResolvedPerson = await dbContext.TrnRequestMetadata
             .Join(dbContext.Persons, r => r.ResolvedPersonId, p => p.PersonId, (m, p) => new { TrnRequestMetadata = m, ResolvedPerson = p })
-            .Where(m => m.TrnRequestMetadata.OneLoginUserSubject == oneLoginUser.Subject || m.TrnRequestMetadata.EmailAddress == oneLoginUser.EmailAddress)
+            .Where(m => m.TrnRequestMetadata.OneLoginUserSubject == oneLoginUser.Subject)
+            .Where(m => m.TrnRequestMetadata.IdentityVerified == true && m.TrnRequestMetadata.Status == TrnRequestStatus.Completed)
             .ToArrayAsync();
 
         if (requestAndResolvedPerson is not [{ TrnRequestMetadata: var trnRequestMetadata, ResolvedPerson: var resolvedPerson }])
@@ -660,15 +661,6 @@ public class OneLoginService(
             return null;
         }
 
-        if (trnRequestMetadata.IdentityVerified != true)
-        {
-            return null;
-        }
-
-        if (trnRequestMetadata.Status is not TrnRequestStatus.Completed)
-        {
-            return null;
-        }
         Debug.Assert(trnRequestMetadata.ResolvedPersonId.HasValue);
 
         var verifiedInfo = trnRequestMetadata.GetVerifiedInfo()!.Value;
