@@ -76,6 +76,8 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
 
     public DbSet<SupportTask> SupportTasks => Set<SupportTask>();
 
+    public DbSet<SupportTaskNote> SupportTaskNotes => Set<SupportTaskNote>();
+
     public DbSet<TpsEstablishment> TpsEstablishments => Set<TpsEstablishment>();
 
     public DbSet<TpsEstablishmentType> TpsEstablishmentTypes => Set<TpsEstablishmentType>();
