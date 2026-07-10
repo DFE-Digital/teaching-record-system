@@ -168,28 +168,26 @@ public partial class TestData
                 Gender = gender,
                 PotentialDuplicate = true
             };
-            var supportTask = SupportTask.Create(
-                SupportTaskType.TeacherPensionsPotentialDuplicate,
-                new Core.Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
+            var supportTask = new SupportTask
+            {
+                CreatedOn = createdOn!.Value,
+                UpdatedOn = createdOn!.Value,
+                SupportTaskType = SupportTaskType.TeacherPensionsPotentialDuplicate,
+                Status = _status.ValueOr(SupportTaskStatus.Open),
+                Data = new Core.Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
                 {
                     FileName = fileName,
                     IntegrationTransactionId = integrationTransactionId
                 },
-                personId: personId,
-                null,
-                trnRequestApplicationUserId: userId,
-                trnRequestId: trnRequestMetadata.RequestId,
-                createdBy: userId,
-                now: createdOn!.Value,
-                out var supportTaskCreatedEvent);
-
-            supportTask.Status = _status.ValueOr(SupportTaskStatus.Open);
+                PersonId = personId,
+                TrnRequestApplicationUserId = userId,
+                TrnRequestId = trnRequestMetadata.RequestId
+            };
 
             return await testData.WithDbContextAsync(async dbContext =>
             {
                 dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
                 dbContext.SupportTasks.Add(supportTask);
-                dbContext.AddEventWithoutBroadcast(supportTaskCreatedEvent);
                 await dbContext.SaveChangesAsync();
 
                 return supportTask;

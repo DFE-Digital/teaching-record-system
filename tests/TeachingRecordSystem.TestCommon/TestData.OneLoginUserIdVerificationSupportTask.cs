@@ -203,20 +203,17 @@ public partial class TestData
                     ClientApplicationUserId = clientApplicationUserId
                 };
 
-                var supportTask = SupportTask.Create(
-                    supportTaskType: SupportTaskType.OneLoginUserIdVerification,
-                    data: data,
-                    personId: null,
-                    oneLoginUserSubject: oneLoginUserSubject,
-                    trnRequestApplicationUserId: null,
-                    trnRequestId: null,
-                    createdBy: SystemUser.SystemUserId,
-                    now: createdOn,
-                    out var createdEvent);
-                supportTask.Status = status;
+                var supportTask = new SupportTask
+                {
+                    CreatedOn = createdOn,
+                    UpdatedOn = createdOn,
+                    SupportTaskType = SupportTaskType.OneLoginUserIdVerification,
+                    Status = status,
+                    Data = data,
+                    OneLoginUserSubject = oneLoginUserSubject
+                };
 
                 dbContext.SupportTasks.Add(supportTask);
-                dbContext.AddEventWithoutBroadcast(createdEvent);
                 await dbContext.SaveChangesAsync();
 
                 return await dbContext.SupportTasks

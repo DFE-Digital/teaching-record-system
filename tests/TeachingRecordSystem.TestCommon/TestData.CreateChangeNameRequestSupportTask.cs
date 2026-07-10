@@ -125,22 +125,19 @@ public partial class TestData
                 ChangeRequestOutcome = null
             };
 
-            var supportTask = SupportTask.Create(
-                SupportTaskType.ChangeNameRequest,
-                data,
-                personId: personId,
-                oneLoginUserSubject: null,
-                trnRequestApplicationUserId: null,
-                trnRequestId: null,
-                createdBy: SystemUser.SystemUserId,
-                createdOn,
-                out var createdEvent);
-            supportTask.Status = status;
+            var supportTask = new SupportTask
+            {
+                CreatedOn = createdOn,
+                UpdatedOn = createdOn,
+                SupportTaskType = SupportTaskType.ChangeNameRequest,
+                Status = status,
+                Data = data,
+                PersonId = personId
+            };
 
             return testData.WithDbContextAsync(async dbContext =>
             {
                 dbContext.SupportTasks.Add(supportTask);
-                dbContext.AddEventWithoutBroadcast(createdEvent);
                 await dbContext.SaveChangesAsync();
 
                 return supportTask;

@@ -177,20 +177,19 @@ public partial class TestData
                     TrnTokenTrn = trnTokenTrn
                 };
 
-                var supportTask = SupportTask.Create(
-                    supportTaskType: SupportTaskType.OneLoginUserRecordMatching,
-                    data: data,
-                    personId: null,
-                    oneLoginUserSubject: oneLoginUserSubject,
-                    trnRequestApplicationUserId: trnRequestId is not null ? clientApplicationUserId : null,
-                    trnRequestId: trnRequestId,
-                    createdBy: SystemUser.SystemUserId,
-                    now: createdOn,
-                    out var createdEvent);
-                supportTask.Status = status;
+                var supportTask = new SupportTask
+                {
+                    CreatedOn = createdOn,
+                    UpdatedOn = createdOn,
+                    SupportTaskType = SupportTaskType.OneLoginUserRecordMatching,
+                    Status = status,
+                    Data = data,
+                    OneLoginUserSubject = oneLoginUserSubject,
+                    TrnRequestApplicationUserId = trnRequestId is not null ? clientApplicationUserId : null,
+                    TrnRequestId = trnRequestId
+                };
 
                 dbContext.SupportTasks.Add(supportTask);
-                dbContext.AddEventWithoutBroadcast(createdEvent);
                 await dbContext.SaveChangesAsync();
 
                 return await dbContext.SupportTasks
