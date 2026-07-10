@@ -43,20 +43,20 @@ public partial class TestData
     {
         return WithDbContextAsync(async dbContext =>
         {
-            var task = SupportTask.Create(
-                SupportTaskType.TrnRequestManualChecksNeeded,
-                new TrnRequestManualChecksNeededData(),
-                personId: null,
-                oneLoginUserSubject: null,
-                trnRequestApplicationUserId,
-                trnRequestId,
-                SystemUser.SystemUserId,
-                (createdOn ?? TimeProvider.UtcNow).ToUniversalTime(),
-                out var createdEvent);
-            task.Status = status;
+            var createdOnUtc = (createdOn ?? TimeProvider.UtcNow).ToUniversalTime();
+
+            var task = new SupportTask
+            {
+                CreatedOn = createdOnUtc,
+                UpdatedOn = createdOnUtc,
+                SupportTaskType = SupportTaskType.TrnRequestManualChecksNeeded,
+                Status = status,
+                Data = new TrnRequestManualChecksNeededData(),
+                TrnRequestApplicationUserId = trnRequestApplicationUserId,
+                TrnRequestId = trnRequestId
+            };
 
             dbContext.SupportTasks.Add(task);
-            dbContext.AddEventWithoutBroadcast(createdEvent);
             await dbContext.SaveChangesAsync();
 
             // Re-query what we've just added so we return a SupportTask with TrnRequestMetadata populated

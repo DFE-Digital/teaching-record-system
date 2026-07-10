@@ -264,24 +264,21 @@ public partial class TestData
 
             var status = _status.ValueOr(() => SupportTaskStatus.Open);
 
-            var task = SupportTask.Create(
-                SupportTaskType.TrnRequest,
-                new TrnRequestData(),
-                personId: null,
-                oneLoginUserSubject: null,
-                applicationUserId,
-                trnRequestId,
-                SystemUser.SystemUserId,
-                createdOn,
-                out var createdEvent);
-
-            task.Status = status;
+            var task = new SupportTask
+            {
+                CreatedOn = createdOn,
+                UpdatedOn = createdOn,
+                SupportTaskType = SupportTaskType.TrnRequest,
+                Status = status,
+                Data = new TrnRequestData(),
+                TrnRequestApplicationUserId = applicationUserId,
+                TrnRequestId = trnRequestId
+            };
 
             return await testData.WithDbContextAsync(async dbContext =>
             {
                 dbContext.TrnRequestMetadata.Add(metadata);
                 dbContext.SupportTasks.Add(task);
-                dbContext.AddEventWithoutBroadcast(createdEvent);
                 await dbContext.SaveChangesAsync();
 
                 // Re-query what we've just added so we return a SupportTask with TrnRequestMetadata populated
