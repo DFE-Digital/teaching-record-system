@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks;
@@ -16,6 +17,7 @@ public static class Extensions
     {
         services.AddSupportTaskService();
         services.AddTransient<OneLoginUserMatchingSupportTaskService>();
+        services.AddTransient<ChangeRequestSupportTaskService>();
 
         return services;
     }

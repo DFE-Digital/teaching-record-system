@@ -55,5 +55,9 @@ public enum ProcessType
     ApiKeyUpdating = 53,
     MandatoryQualificationCreating = 54,
     MandatoryQualificationUpdating = 55,
-    MandatoryQualificationDeleting = 56
+    MandatoryQualificationDeleting = 56,
+    ChangeOfNameRequestRejecting = 57,
+    ChangeOfDateOfBirthRequestRejecting = 58,
+    ChangeOfNameRequestCancelling = 59,
+    ChangeOfDateOfBirthRequestCancelling = 60
 }

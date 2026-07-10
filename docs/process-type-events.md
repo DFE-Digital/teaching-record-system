@@ -259,7 +259,7 @@ API `CreateDateOfBirthChangeRequest`.
 
 ---
 
-## Change requests (approved in the Support UI)
+## Change requests (resolved in the Support UI)
 
 ### `ChangeOfNameRequestApproving` (30)
 Support UI *Change requests → accept* (name change).
@@ -280,6 +280,38 @@ Support UI *Change requests → accept* (date-of-birth change).
 | `PersonDetailsUpdatedEvent` | Sometimes | Only when the approved date of birth differs from the current record. |
 
 *The approval email is sent without a process context, so it produces no `EmailSentEvent`.*
+
+### `ChangeOfNameRequestRejecting` (57)
+Support UI *Change requests → reject* (name change).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskUpdatedEvent` | Always | The support task is closed as rejected. |
+
+*The rejection email is sent without a process context, so it produces no `EmailSentEvent`.*
+
+### `ChangeOfDateOfBirthRequestRejecting` (58)
+Support UI *Change requests → reject* (date-of-birth change).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskUpdatedEvent` | Always | The support task is closed as rejected. |
+
+*The rejection email is sent without a process context, so it produces no `EmailSentEvent`.*
+
+### `ChangeOfNameRequestCancelling` (59)
+Support UI *Change requests → reject* with reason *Change no longer required* (name change).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskUpdatedEvent` | Always | The support task is closed as cancelled. |
+
+### `ChangeOfDateOfBirthRequestCancelling` (60)
+Support UI *Change requests → reject* with reason *Change no longer required* (date-of-birth change).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskUpdatedEvent` | Always | The support task is closed as cancelled. |
 
 ---
 

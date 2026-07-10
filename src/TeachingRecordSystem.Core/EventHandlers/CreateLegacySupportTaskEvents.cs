@@ -290,5 +290,67 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
                 await dbContext.SaveChangesAsync();
             }
         }
+        else if (processContext.ProcessType is ProcessType.ChangeOfNameRequestRejecting or ProcessType.ChangeOfDateOfBirthRequestRejecting)
+        {
+            var supportTask = (await dbContext.SupportTasks.FindAsync(@event.SupportTask.SupportTaskReference))!;
+
+            LegacyEvents.EventBase legacyEvent = processContext.ProcessType is ProcessType.ChangeOfNameRequestRejecting
+                ? new LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent
+                {
+                    PersonId = @event.SupportTask.PersonId!.Value,
+                    RequestData = EventModels.ChangeNameRequestData.FromModel(supportTask.GetData<ChangeNameRequestData>()),
+                    RejectionReason = @event.RejectionReason,
+                    SupportTask = @event.SupportTask,
+                    OldSupportTask = @event.OldSupportTask,
+                    EventId = @event.EventId,
+                    CreatedUtc = processContext.Now,
+                    RaisedBy = processContext.UserId
+                }
+                : new LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent
+                {
+                    PersonId = @event.SupportTask.PersonId!.Value,
+                    RequestData = EventModels.ChangeDateOfBirthRequestData.FromModel(supportTask.GetData<ChangeDateOfBirthRequestData>()),
+                    RejectionReason = @event.RejectionReason,
+                    SupportTask = @event.SupportTask,
+                    OldSupportTask = @event.OldSupportTask,
+                    EventId = @event.EventId,
+                    CreatedUtc = processContext.Now,
+                    RaisedBy = processContext.UserId
+                };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
+        else if (processContext.ProcessType is ProcessType.ChangeOfNameRequestCancelling or ProcessType.ChangeOfDateOfBirthRequestCancelling)
+        {
+            var supportTask = (await dbContext.SupportTasks.FindAsync(@event.SupportTask.SupportTaskReference))!;
+
+            LegacyEvents.EventBase legacyEvent = processContext.ProcessType is ProcessType.ChangeOfNameRequestCancelling
+                ? new LegacyEvents.ChangeNameRequestSupportTaskCancelledEvent
+                {
+                    PersonId = @event.SupportTask.PersonId!.Value,
+                    RequestData = EventModels.ChangeNameRequestData.FromModel(supportTask.GetData<ChangeNameRequestData>()),
+                    SupportTask = @event.SupportTask,
+                    OldSupportTask = @event.OldSupportTask,
+                    EventId = @event.EventId,
+                    CreatedUtc = processContext.Now,
+                    RaisedBy = processContext.UserId
+                }
+                : new LegacyEvents.ChangeDateOfBirthRequestSupportTaskCancelledEvent
+                {
+                    PersonId = @event.SupportTask.PersonId!.Value,
+                    RequestData = EventModels.ChangeDateOfBirthRequestData.FromModel(supportTask.GetData<ChangeDateOfBirthRequestData>()),
+                    SupportTask = @event.SupportTask,
+                    OldSupportTask = @event.OldSupportTask,
+                    EventId = @event.EventId,
+                    CreatedUtc = processContext.Now,
+                    RaisedBy = processContext.UserId
+                };
+
+            dbContext.AddEventWithoutBroadcast(legacyEvent);
+
+            await dbContext.SaveChangesAsync();
+        }
     }
 }
