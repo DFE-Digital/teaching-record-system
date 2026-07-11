@@ -83,7 +83,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var note = await WithDbContextAsync(dbContext => 
+        var note = await WithDbContextAsync(dbContext =>
             dbContext.SupportTaskNotes.SingleOrDefaultAsync(n => n.SupportTaskReference == supportTask.SupportTask.SupportTaskReference));
         Assert.NotNull(note);
         Assert.Equal(content, note.Content);
