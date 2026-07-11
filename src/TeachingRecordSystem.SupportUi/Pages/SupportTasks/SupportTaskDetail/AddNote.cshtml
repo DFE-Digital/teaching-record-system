@@ -1,0 +1,25 @@
+@page "/support-tasks/{supportTaskReference}/notes/add"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail.AddNote
+@{
+    ViewBag.Title = "Add a note";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <span class="govuk-caption-l">@Model.SupportTaskTypeTitle</span>
+            <span class="govuk-caption-m">@Model.SupportTaskReference</span>
+
+            <govuk-textarea for="Content" data-testid="text">
+                <govuk-textarea-label class="govuk-label--l" is-page-heading="true">Add a note</govuk-textarea-label>
+            </govuk-textarea>
+
+            <p class="govuk-hint">Your note will be saved to the task.</p>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button-link href="@LinkGenerator.SupportTaskDetail(@Model.SupportTaskReference, Model.SupportTaskType)" class="govuk-button--secondary">Cancel</govuk-button-link>
+            </div>
+        </form>
+    </div>
+</div>
