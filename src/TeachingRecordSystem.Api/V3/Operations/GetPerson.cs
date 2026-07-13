@@ -155,6 +155,8 @@ public record GetPersonResultRouteToProfessionalStatus
     public required DateOnly? TrainingEndDate { get; init; }
     public required IReadOnlyCollection<PostgresModels.TrainingSubject> TrainingSubjects { get; init; }
     public required TrainingAgeSpecialism? TrainingAgeSpecialism { get; init; }
+    public required int? TrainingAgeSpecialismRangeFrom { get; init; }
+    public required int? TrainingAgeSpecialismRangeTo { get; init; }
     public required TrainingCountry? TrainingCountry { get; init; }
     public required PostgresModels.TrainingProvider? TrainingProvider { get; init; }
     public required PostgresModels.DegreeType? DegreeType { get; init; }
@@ -437,6 +439,8 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                     .Select(async (Guid id, CancellationToken _) => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
                     .ToArrayAsync(cancellationToken: ct),
                 TrainingAgeSpecialism = r.TrainingAgeSpecialismType,
+                TrainingAgeSpecialismRangeFrom = r.TrainingAgeSpecialismRangeFrom,
+                TrainingAgeSpecialismRangeTo = r.TrainingAgeSpecialismRangeTo,
                 TrainingCountry = r.TrainingCountry,
                 TrainingProvider = r.TrainingProvider,
                 DegreeType = r.DegreeType,

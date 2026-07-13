@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Api.V3.V20250627.Requests;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250627;
 
@@ -345,6 +346,63 @@ public class GetPersonByTrnTests : TestBase
         var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseRoutes = jsonResponse.RootElement.GetProperty("routesToProfessionalStatuses");
         Assert.True(responseRoutes.GetArrayLength() >= 1);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithRangeTrainingAgeSpecialism_ReturnsFromAndTo()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(RouteToProfessionalStatusType.HeiProgrammeTypeId)
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)
+                .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.Range)
+                .WithTrainingAgeSpecialismRangeFrom(11)
+                .WithTrainingAgeSpecialismRangeTo(18)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=RoutesToProfessionalStatuses");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseRoutes = jsonResponse.RootElement.GetProperty("routesToProfessionalStatuses");
+        var responseTrainingAgeSpecialism = responseRoutes.EnumerateArray().Single().GetProperty("trainingAgeSpecialism");
+
+        AssertEx.JsonObjectEquals(
+            new
+            {
+                type = "Range",
+                from = 11,
+                to = 18
+            },
+            responseTrainingAgeSpecialism);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithNonRangeTrainingAgeSpecialism_OmitsFromAndTo()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(RouteToProfessionalStatusType.HeiProgrammeTypeId)
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)
+                .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.KeyStage1)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=RoutesToProfessionalStatuses");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseRoutes = jsonResponse.RootElement.GetProperty("routesToProfessionalStatuses");
+        var responseTrainingAgeSpecialism = responseRoutes.EnumerateArray().Single().GetProperty("trainingAgeSpecialism");
+
+        Assert.Equal("KeyStage1", responseTrainingAgeSpecialism.GetProperty("type").GetString());
+        Assert.False(responseTrainingAgeSpecialism.TryGetProperty("from", out _));
+        Assert.False(responseTrainingAgeSpecialism.TryGetProperty("to", out _));
     }
 
     [Fact]
