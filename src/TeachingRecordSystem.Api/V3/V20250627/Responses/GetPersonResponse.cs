@@ -101,7 +101,9 @@ public record GetPersonResponseRouteToProfessionalStatus
         TrainingStartDate = source.TrainingStartDate,
         TrainingEndDate = source.TrainingEndDate,
         TrainingSubjects = source.TrainingSubjects.Select(s => TrainingSubject.Create(s)).AsReadOnly(),
-        TrainingAgeSpecialism = source.TrainingAgeSpecialism is { } ageSpecialism ? TrainingAgeSpecialism.Create(ageSpecialism) : null,
+        TrainingAgeSpecialism = source.TrainingAgeSpecialism is { } ageSpecialism
+            ? TrainingAgeSpecialism.Create(ageSpecialism, source.TrainingAgeSpecialismRangeFrom, source.TrainingAgeSpecialismRangeTo)
+            : null,
         TrainingCountry = source.TrainingCountry is { } country ? TrainingCountry.Create(country) : null,
         TrainingProvider = source.TrainingProvider is { } provider ? TrainingProvider.Create(provider) : null,
         DegreeType = source.DegreeType is { } degreeType ? DegreeType.Create(degreeType) : null,
