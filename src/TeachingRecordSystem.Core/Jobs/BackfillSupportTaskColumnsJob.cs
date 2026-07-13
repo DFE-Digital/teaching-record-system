@@ -80,6 +80,7 @@ public class BackfillSupportTaskColumnsJob(TrsDbContext dbContext)
                 (await GetPersonNameAtCreationAsync(supportTask, cancellationToken), (string?)null),
 
             // Subject name comes from the TRN request that the task was raised against.
+            SupportTaskType.NpqTrnRequest or
             SupportTaskType.TrnRequest or
             SupportTaskType.TeacherPensionsPotentialDuplicate =>
                 SubjectParts(SupportTask.Subject.FromTrnRequest(supportTask.TrnRequestMetadata!)),
