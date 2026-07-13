@@ -88,6 +88,18 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(note);
         Assert.Equal(content, note.Content);
         Assert.Equal(supportTask.SupportTask.SupportTaskReference, note.SupportTaskReference);
+
+        Events.AssertProcessesCreated(x =>
+        {
+            Assert.Equal(ProcessType.SupportTaskNoteCreating, x.ProcessContext.ProcessType);
+            Assert.Collection(x.Events, e =>
+            {
+                var noteCreatedEvent = Assert.IsType<SupportTaskNoteCreatedEvent>(e);
+                Assert.Equal(note.SupportTaskNoteId, noteCreatedEvent.SupportTaskNote.SupportTaskNoteId);
+                Assert.Equal(supportTask.SupportTask.SupportTaskReference, noteCreatedEvent.SupportTaskNote.SupportTaskReference);
+                Assert.Equal(content, noteCreatedEvent.SupportTaskNote.Content);
+            });
+        });
     }
 
     [Fact]

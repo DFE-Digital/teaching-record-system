@@ -11,6 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
 public class AddNote(
     TrsDbContext dbContext,
     SupportTaskService supportTaskService,
+    TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<AddNote> _validator = new()
@@ -41,13 +42,16 @@ public class AddNote(
 
         _validator.ValidateAndThrow(this);
 
+        var processContext = new ProcessContext(ProcessType.SupportTaskNoteCreating, timeProvider.UtcNow, User.GetUserId());
+
         await supportTaskService.CreateNoteAsync(
             new CreateSupportTaskNoteOptions
             {
                 SupportTaskReference = SupportTaskReference,
                 Content = Content!,
                 CreatedByUserId = User.GetUserId()
-            });
+            },
+            processContext);
 
         return Redirect(linkGenerator.SupportTaskDetail(SupportTaskReference, SupportTaskType));
     }

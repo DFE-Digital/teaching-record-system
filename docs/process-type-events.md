@@ -324,6 +324,13 @@ CLI `delete-support-task`.
 | --- | --- | --- |
 | `SupportTaskDeletedEvent` | Always | — |
 
+### `SupportTaskNoteCreating` (61)
+Support UI *Add note* (support task).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskNoteCreatedEvent` | Always | — |
+
 ---
 
 ## Notes

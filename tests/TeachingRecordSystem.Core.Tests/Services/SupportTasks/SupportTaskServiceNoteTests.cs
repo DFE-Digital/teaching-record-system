@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks;
 public class SupportTaskServiceNoteTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
-    public async Task CreateNoteAsync_AddsNoteToDb()
+    public async Task CreateNoteAsync_AddsNoteToDbAndPublishesEvent()
     {
         // Arrange
         var user = await TestData.CreateUserAsync();
@@ -21,8 +21,10 @@ public class SupportTaskServiceNoteTests(ServiceFixture fixture) : ServiceTestBa
             CreatedByUserId = user.UserId
         };
 
+        var processContext = new ProcessContext(ProcessType.SupportTaskNoteCreating, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
         // Act
-        var note = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options));
+        var note = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -33,6 +35,14 @@ public class SupportTaskServiceNoteTests(ServiceFixture fixture) : ServiceTestBa
             Assert.Equal(options.Content, dbNote.Content);
             Assert.Equal(options.CreatedByUserId, dbNote.CreatedByUserId);
             Assert.True((TimeProvider.UtcNow - dbNote.CreatedOn).TotalSeconds < 1);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var noteCreatedEvent = Assert.IsType<SupportTaskNoteCreatedEvent>(e);
+            Assert.Equal(note.SupportTaskNoteId, noteCreatedEvent.SupportTaskNote.SupportTaskNoteId);
+            Assert.Equal(options.SupportTaskReference, noteCreatedEvent.SupportTaskNote.SupportTaskReference);
+            Assert.Equal(options.Content, noteCreatedEvent.SupportTaskNote.Content);
         });
     }
 
@@ -52,8 +62,10 @@ public class SupportTaskServiceNoteTests(ServiceFixture fixture) : ServiceTestBa
             CreatedByUserId = user.UserId
         };
 
+        var processContext = new ProcessContext(ProcessType.SupportTaskNoteCreating, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
         // Act
-        var note = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options));
+        var note = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options, processContext));
 
         // Assert
         Assert.NotNull(note);
@@ -85,8 +97,10 @@ public class SupportTaskServiceNoteTests(ServiceFixture fixture) : ServiceTestBa
         };
 
         // Act
-        var note1 = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options1));
-        var note2 = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options2));
+        var note1 = await WithServiceAsync<SupportTaskService, SupportTaskNote>(
+            service => service.CreateNoteAsync(options1, new ProcessContext(ProcessType.SupportTaskNoteCreating, TimeProvider.UtcNow, SystemUser.SystemUserId)));
+        var note2 = await WithServiceAsync<SupportTaskService, SupportTaskNote>(
+            service => service.CreateNoteAsync(options2, new ProcessContext(ProcessType.SupportTaskNoteCreating, TimeProvider.UtcNow, SystemUser.SystemUserId)));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
