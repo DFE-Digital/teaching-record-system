@@ -1,9 +1,9 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.SupportTaskNotes;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 
-namespace TeachingRecordSystem.Core.Tests.Services.SupportTaskNotes;
+namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks;
 
-public class SupportTaskNoteServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
+public class SupportTaskServiceNoteTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
     public async Task CreateNoteAsync_AddsNoteToDb()
@@ -22,7 +22,7 @@ public class SupportTaskNoteServiceTests(ServiceFixture fixture) : ServiceTestBa
         };
 
         // Act
-        var note = await WithServiceAsync<SupportTaskNoteService, SupportTaskNote>(service => service.CreateNoteAsync(options));
+        var note = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -53,7 +53,7 @@ public class SupportTaskNoteServiceTests(ServiceFixture fixture) : ServiceTestBa
         };
 
         // Act
-        var note = await WithServiceAsync<SupportTaskNoteService, SupportTaskNote>(service => service.CreateNoteAsync(options));
+        var note = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options));
 
         // Assert
         Assert.NotNull(note);
@@ -85,8 +85,8 @@ public class SupportTaskNoteServiceTests(ServiceFixture fixture) : ServiceTestBa
         };
 
         // Act
-        var note1 = await WithServiceAsync<SupportTaskNoteService, SupportTaskNote>(service => service.CreateNoteAsync(options1));
-        var note2 = await WithServiceAsync<SupportTaskNoteService, SupportTaskNote>(service => service.CreateNoteAsync(options2));
+        var note1 = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options1));
+        var note2 = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options2));
 
         // Assert
         await WithDbContextAsync(async dbContext =>

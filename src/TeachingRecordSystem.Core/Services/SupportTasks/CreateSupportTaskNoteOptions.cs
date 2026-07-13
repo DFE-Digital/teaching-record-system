@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core.Services.SupportTaskNotes;
+namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
 public record CreateSupportTaskNoteOptions
 {

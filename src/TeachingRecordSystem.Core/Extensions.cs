@@ -20,7 +20,6 @@ using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.Core.Services.SupportTaskNotes;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Users;
@@ -115,7 +114,6 @@ public static class Extensions
             .AddSupportTaskServices()
             .AddSingleton<PersonInfoCache>()
             .AddNoteService()
-            .AddSupportTaskNoteService()
             .AddPersonService()
             .AddAlertService()
             .AddMandatoryQualificationService()

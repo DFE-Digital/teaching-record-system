@@ -4,8 +4,25 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
-public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPublisher)
+public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPublisher, TimeProvider timeProvider)
 {
+    public async Task<SupportTaskNote> CreateNoteAsync(CreateSupportTaskNoteOptions options)
+    {
+        var note = new SupportTaskNote
+        {
+            SupportTaskNoteId = Guid.NewGuid(),
+            SupportTaskReference = options.SupportTaskReference,
+            Content = options.Content,
+            CreatedOn = timeProvider.GetUtcNow().UtcDateTime,
+            CreatedByUserId = options.CreatedByUserId
+        };
+
+        dbContext.SupportTaskNotes.Add(note);
+        await dbContext.SaveChangesAsync();
+
+        return note;
+    }
+
     public async Task<SupportTask> CreateSupportTaskAsync(CreateSupportTaskOptions options, ProcessContext processContext)
     {
         if (options.SupportTaskType.GetDataType() != options.Data.GetType())

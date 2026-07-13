@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.SupportTaskNotes;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
 [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
 public class AddNote(
     TrsDbContext dbContext,
-    SupportTaskNoteService supportTaskNoteService,
+    SupportTaskService supportTaskService,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<AddNote> _validator = new()
@@ -41,7 +41,7 @@ public class AddNote(
 
         _validator.ValidateAndThrow(this);
 
-        await supportTaskNoteService.CreateNoteAsync(
+        await supportTaskService.CreateNoteAsync(
             new CreateSupportTaskNoteOptions
             {
                 SupportTaskReference = SupportTaskReference,
