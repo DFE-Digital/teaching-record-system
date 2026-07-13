@@ -130,6 +130,29 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(content, note.Content);
     }
 
+    [Theory]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
+    public async Task SupportTaskIsClosed_ReturnsNotFound(HttpMethod httpMethod)
+    {
+        // Arrange
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync(configure: t => t.WithStatus(SupportTaskStatus.Closed));
+
+        var request = new HttpRequestMessage(httpMethod, $"/support-tasks/{supportTask.SupportTask.SupportTaskReference}/notes/add");
+        if (httpMethod == HttpMethod.Post)
+        {
+            request.Content = new FormUrlEncodedContentBuilder
+            {
+                { "Content", Faker.Lorem.Paragraph() }
+            };
+        }
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Post_MultipleTasks_CreatesNoteForCorrectTask()
     {

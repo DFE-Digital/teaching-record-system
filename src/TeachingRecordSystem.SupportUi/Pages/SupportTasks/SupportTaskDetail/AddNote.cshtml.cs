@@ -1,24 +1,23 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.SupportTasks;
-using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
 
-[Authorize(Policy = AuthorizationPolicies.AdminOnly)]
 public class AddNote(
-    TrsDbContext dbContext,
     SupportTaskService supportTaskService,
     TimeProvider timeProvider,
-    SupportUiLinkGenerator linkGenerator) : PageModel
+    SupportUiLinkGenerator linkGenerator) :
+    PageModel
 {
     private readonly InlineValidator<AddNote> _validator = new()
     {
         v => v.RuleFor(m => m.Content)
-            .NotEmpty().WithMessage("Enter text for the note")
-            .MaximumLength(4000).WithMessage("Note must be 4000 characters or less")
+            .SupportTaskNoteContent(
+                notEmptyMessage: "Enter text for the note",
+                maxLengthMessage: maxLength => $"Note must be {maxLength} characters or less")
     };
 
     [FromRoute]
@@ -31,16 +30,13 @@ public class AddNote(
     [BindProperty]
     public new string? Content { get; set; }
 
-    public async Task OnGetAsync()
+    public void OnGet()
     {
-        await LoadSupportTaskAsync();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await LoadSupportTaskAsync();
-
-        _validator.ValidateAndThrow(this);
+        await _validator.ValidateAndThrowAsync(this);
 
         var processContext = new ProcessContext(ProcessType.SupportTaskNoteCreating, timeProvider.UtcNow, User.GetUserId());
 
@@ -56,11 +52,9 @@ public class AddNote(
         return Redirect(linkGenerator.SupportTaskDetail(SupportTaskReference, SupportTaskType));
     }
 
-    private async Task LoadSupportTaskAsync()
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var supportTask = await dbContext.SupportTasks
-            .Where(t => t.SupportTaskReference == SupportTaskReference)
-            .SingleAsync();
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
         SupportTaskType = supportTask.SupportTaskType;
         SupportTaskTypeTitle = supportTask.SupportTaskType.GetTitle();

@@ -63,8 +63,13 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
     }
 }
 
-public class CheckSupportTaskExistsFilterFactory(bool excludeClosed, params SupportTaskType[] supportTaskTypes) : IFilterFactory, IOrderedFilter
+public class CheckSupportTaskExistsFilterFactory(bool excludeClosed, params IEnumerable<SupportTaskType> supportTaskTypes) : IFilterFactory, IOrderedFilter
 {
+    public CheckSupportTaskExistsFilterFactory(bool excludeClosed) :
+        this(excludeClosed, SupportTaskTypeRegistry.AllTypes)
+    {
+    }
+
     public bool IsReusable => false;
 
     public int Order => -200;

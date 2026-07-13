@@ -36,7 +36,9 @@ public static class SupportTaskTypeRegistry
         Enum.GetValues<SupportTaskType>().ToDictionary(s => s, GetInfo);
 
     public static IReadOnlyCollection<SupportTaskTypeDescription> All { get; } =
-    _info.Values.OrderBy(s => s.Title).ToArray();
+        _info.Values.OrderBy(s => s.Title).ToArray();
+
+    public static IReadOnlyCollection<SupportTaskType> AllTypes => All.Select(t => t.SupportTaskType).ToArray();
 
     public static SupportTaskCategory GetCategory(this SupportTaskType supportTaskType) =>
         _info[supportTaskType].SupportTaskCategory;
