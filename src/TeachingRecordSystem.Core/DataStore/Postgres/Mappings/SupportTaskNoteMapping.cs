@@ -13,7 +13,7 @@ public class SupportTaskNoteMapping : IEntityTypeConfiguration<SupportTaskNote>
         builder.HasKey(x => x.SupportTaskNoteId);
         builder.Property(x => x.SupportTaskNoteId);
         builder.Property(x => x.SupportTaskReference).HasMaxLength(16).IsRequired();
-        builder.Property(x => x.Content).HasMaxLength(4000).IsRequired().ConfigureAnalyticsSync(hidden: true);
+        builder.Property(x => x.Content).HasMaxLength(SupportTaskNote.ContentMaxLength).IsRequired().ConfigureAnalyticsSync(hidden: true);
         builder.Property(x => x.CreatedOn).IsRequired();
         builder.HasOne(x => x.CreatedBy).WithMany().HasForeignKey(x => x.CreatedByUserId);
         builder.HasOne<SupportTask>().WithMany().HasForeignKey(x => x.SupportTaskReference);

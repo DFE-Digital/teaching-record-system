@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeClosed, params SupportTaskType[] supportTaskTypes) : IAsyncResourceFilter
+public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeClosed, params IEnumerable<SupportTaskType> supportTaskTypes) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -63,8 +63,13 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
     }
 }
 
-public class CheckSupportTaskExistsFilterFactory(bool excludeClosed, params SupportTaskType[] supportTaskTypes) : IFilterFactory, IOrderedFilter
+public class CheckSupportTaskExistsFilterFactory(bool excludeClosed, params IEnumerable<SupportTaskType> supportTaskTypes) : IFilterFactory, IOrderedFilter
 {
+    public CheckSupportTaskExistsFilterFactory(bool excludeClosed) :
+        this(excludeClosed, SupportTaskTypeRegistry.AllTypes)
+    {
+    }
+
     public bool IsReusable => false;
 
     public int Order => -200;

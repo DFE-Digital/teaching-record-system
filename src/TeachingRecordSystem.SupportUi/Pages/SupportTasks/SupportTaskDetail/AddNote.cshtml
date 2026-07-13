@@ -1,0 +1,26 @@
+@page "/support-tasks/{supportTaskReference}/notes/add"
+@using TeachingRecordSystem.Core.DataStore.Postgres.Models
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail.AddNote
+@{
+    ViewBag.Title = "Add a note";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <span class="govuk-caption-l">@Model.SupportTaskTypeTitle</span>
+            <span class="govuk-caption-m">@Model.SupportTaskReference</span>
+
+            <govuk-character-count for="Content" max-words="@SupportTaskNote.ContentMaxLength" data-testid="text">
+                <govuk-character-count-label class="govuk-label--l" is-page-heading="true">Add a note</govuk-character-count-label>
+            </govuk-character-count>
+
+            <p class="govuk-hint">Your note will be saved to the task.</p>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Save note</govuk-button>
+                <govuk-button-link href="@LinkGenerator.SupportTaskDetail(Model.SupportTaskReference, Model.SupportTaskType)" class="govuk-button--secondary">Cancel</govuk-button-link>
+            </div>
+        </form>
+    </div>
+</div>

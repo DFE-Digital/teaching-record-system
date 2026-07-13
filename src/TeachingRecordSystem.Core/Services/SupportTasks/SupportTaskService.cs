@@ -6,6 +6,31 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
 public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPublisher)
 {
+    public async Task<SupportTaskNote> CreateNoteAsync(CreateSupportTaskNoteOptions options, ProcessContext processContext)
+    {
+        var note = new SupportTaskNote
+        {
+            SupportTaskNoteId = Guid.NewGuid(),
+            SupportTaskReference = options.SupportTaskReference,
+            Content = options.Content,
+            CreatedOn = processContext.Now,
+            CreatedByUserId = options.CreatedByUserId
+        };
+
+        dbContext.SupportTaskNotes.Add(note);
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishSingleEventAsync(
+            new SupportTaskNoteCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskNote = EventModels.SupportTaskNote.FromModel(note)
+            },
+            processContext);
+
+        return note;
+    }
+
     public async Task<SupportTask> CreateSupportTaskAsync(CreateSupportTaskOptions options, ProcessContext processContext)
     {
         if (options.SupportTaskType.GetDataType() != options.Data.GetType())
