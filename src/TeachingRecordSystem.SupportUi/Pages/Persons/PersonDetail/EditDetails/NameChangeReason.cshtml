@@ -29,6 +29,32 @@
                     <govuk-radios-item value="@PersonNameChangeReason.CorrectingAnError">
                         @PersonNameChangeReason.CorrectingAnError.GetDisplayName()
                     </govuk-radios-item>
+                    <govuk-radios-item value="@PersonNameChangeReason.AnotherReason">
+                        @PersonNameChangeReason.AnotherReason.GetDisplayName()
+
+                        <govuk-radios-item-conditional data-testid="create-reason-detail">
+                            <govuk-input data-testid="reason-detail" for="ReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
+                                <govuk-input-label>Enter a reason</govuk-input-label>
+                            </govuk-input>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <govuk-radios for="ProvideAdditionalInformation" data-testid="has-additional-reason_detail-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2></govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@true">
+                        Yes
+                        <govuk-radios-item-conditional data-testid="additional-detail">
+                            <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
+                    </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
 

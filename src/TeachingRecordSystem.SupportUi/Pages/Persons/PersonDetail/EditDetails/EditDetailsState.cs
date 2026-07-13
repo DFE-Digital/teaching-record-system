@@ -30,6 +30,9 @@ public class EditDetailsState : IRegisterJourney
     public Gender? Gender { get; set; }
 
     public PersonNameChangeReason? NameChangeReason { get; set; }
+    public string? NameChangeReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
+    public string? AdditionalInformation { get; set; }
     public EvidenceUploadModel NameChangeEvidence { get; set; } = new();
 
     public PersonDetailsChangeReason? OtherDetailsChangeReason { get; set; }
@@ -68,6 +71,9 @@ public class EditDetailsState : IRegisterJourney
     public bool IsNameChangeReasonComplete =>
         !NameChanged ||
             (NameChangeReason.HasValue &&
+            (NameChangeReason.Value is not PersonNameChangeReason.AnotherReason || NameChangeReasonDetail is not null) &&
+            ProvideAdditionalInformation is not null &&
+            (ProvideAdditionalInformation != true || AdditionalInformation is not null) &&
             NameChangeEvidence.IsComplete);
 
     [JsonIgnore]

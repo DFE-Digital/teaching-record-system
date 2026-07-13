@@ -69,6 +69,38 @@
                             </row-actions>
                         </row>
                         <row>
+                            <key>Reason details</key>
+                            <value>
+                                @if (Model.NameChangeReasonDetail is not null)
+                                {
+                                    @Html.ConvertNewlinesToLineBreaks(Model.NameChangeReasonDetail)
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </value>
+                            <row-actions>
+                                <action href=@Model.ChangeNameChangeReasonLink visually-hidden-text="reason details">Change</action>
+                            </row-actions>
+                        </row>
+                        <row>
+                            <key>Additional information</key>
+                            <value>
+                                @if (Model.AdditionalInformation is not null)
+                                {
+                                    @Html.ConvertNewlinesToLineBreaks(Model.AdditionalInformation)
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </value>
+                            <row-actions>
+                                <action href=@Model.ChangeNameChangeReasonLink visually-hidden-text="additional information">Change</action>
+                            </row-actions>
+                        </row>
+                        <row>
                             <key>@(Model.OtherDetailsChangeReason is not null ? "Evidence" : "Evidence uploaded")</key>
                             <value>
                                 <vc:evidence-file-link evidence-file="@Model.NameChangeEvidenceFile" />

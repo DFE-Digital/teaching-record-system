@@ -25,6 +25,9 @@ public class CheckAnswersModel(
     public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
     public PersonNameChangeReason? NameChangeReason { get; set; }
+    public string? NameChangeReasonDetail { get; set; }
+    public bool? ProvideAdditionalInformation { get; set; }
+    public string? AdditionalInformation { get; set; }
     public UploadedEvidenceFile? NameChangeEvidenceFile { get; set; }
     public PersonDetailsChangeReason? OtherDetailsChangeReason { get; set; }
     public string? OtherDetailsChangeReasonDetail { get; set; }
@@ -61,9 +64,9 @@ public class CheckAnswersModel(
                 NameChangeReason = NameChangeReason?.GetDisplayName(),
                 NameChangeEvidenceFile = NameChangeEvidenceFile?.ToEventModel(),
                 Reason = OtherDetailsChangeReason?.GetDisplayName(),
-                Details = OtherDetailsChangeReasonDetail,
+                Details = NameChangeReasonDetail,
                 EvidenceFile = OtherDetailsChangeEvidenceFile?.ToEventModel(),
-                AdditionalInformation = null
+                AdditionalInformation = AdditionalInformation
             });
 
         await PersonService.UpdatePersonDetailsAsync(
@@ -112,6 +115,9 @@ public class CheckAnswersModel(
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
         Gender = JourneyInstance.State.Gender;
         NameChangeReason = JourneyInstance.State.NameChangeReason;
+        NameChangeReasonDetail = JourneyInstance.State.NameChangeReasonDetail;
+        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
+        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
         NameChangeEvidenceFile = JourneyInstance.State.NameChangeEvidence.UploadedEvidenceFile;
         OtherDetailsChangeReason = JourneyInstance.State.OtherDetailsChangeReason;
         OtherDetailsChangeReasonDetail = JourneyInstance.State.OtherDetailsChangeReasonDetail;

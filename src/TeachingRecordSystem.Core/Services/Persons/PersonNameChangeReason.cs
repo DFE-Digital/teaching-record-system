@@ -9,5 +9,7 @@ public enum PersonNameChangeReason
     [Display(Name = "Name has changed by deed poll or another legal process")]
     DeedPollOrOtherLegalProcess,
     [Display(Name = "Correcting an error")]
-    CorrectingAnError
+    CorrectingAnError,
+    [Display(Name = "Another reason")]
+    AnotherReason
 }

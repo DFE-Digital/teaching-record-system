@@ -8,6 +8,7 @@ public record PersonDetailsUpdatedEvent : EventBase, IEventWithPersonId, IEventW
     public required string? NameChangeReason { get; init; }
     public required EventModels.File? NameChangeEvidenceFile { get; init; }
     public required string? DetailsChangeReason { get; init; }
+    public required string? AdditionalInformation { get; init; }
     public required string? DetailsChangeReasonDetail { get; init; }
     public required EventModels.File? DetailsChangeEvidenceFile { get; init; }
     public required PersonDetailsUpdatedEventChanges Changes { get; init; }

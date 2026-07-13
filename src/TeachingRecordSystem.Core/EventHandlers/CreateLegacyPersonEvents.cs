@@ -56,7 +56,8 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 NameChangeEvidenceFile = changeReason?.NameChangeEvidenceFile,
                 DetailsChangeReason = changeReason?.Reason,
                 DetailsChangeReasonDetail = changeReason?.Details,
-                DetailsChangeEvidenceFile = changeReason?.EvidenceFile
+                DetailsChangeEvidenceFile = changeReason?.EvidenceFile,
+                AdditionalInformation = changeReason?.AdditionalInformation
             };
 
             dbContext.AddEventWithoutBroadcast(legacyEvent);
