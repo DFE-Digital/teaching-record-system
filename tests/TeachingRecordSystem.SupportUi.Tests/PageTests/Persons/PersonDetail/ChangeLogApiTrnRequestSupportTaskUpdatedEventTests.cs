@@ -255,7 +255,9 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Closed,
             Data = new TrnRequestData(),
-            ResolveJourneySavedState = null
+            ResolveJourneySavedState = null,
+            AssignedToUserId = null,
+            OutcomeLabel = "Resolved"
         };
 
         var oldSupportTask = new EventModels.SupportTask
@@ -266,7 +268,9 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Open,
             Data = new TrnRequestData(),
-            ResolveJourneySavedState = null
+            ResolveJourneySavedState = null,
+            AssignedToUserId = null,
+            OutcomeLabel = null
         };
 
         var requestData = new EventModels.TrnRequestMetadata

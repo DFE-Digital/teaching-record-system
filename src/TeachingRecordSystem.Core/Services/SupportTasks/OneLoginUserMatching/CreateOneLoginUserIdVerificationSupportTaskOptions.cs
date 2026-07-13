@@ -3,6 +3,7 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 public record CreateOneLoginUserIdVerificationSupportTaskOptions
 {
     public required string OneLoginUserSubject { get; init; }
+    public required string OneLoginUserEmailAddress { get; init; }
     public required string? StatedNationalInsuranceNumber { get; init; }
     public required string? StatedTrn { get; init; }
     public required Guid ClientApplicationUserId { get; init; }

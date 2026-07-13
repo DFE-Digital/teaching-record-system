@@ -60,7 +60,7 @@ public class CheckAnswersModel(
                 new CreateOneLoginUserRecordMatchingSupportTaskOptions
                 {
                     OneLoginUserSubject = subject,
-                    OneLoginUserEmail = email,
+                    OneLoginUserEmailAddress = email,
                     VerifiedNames = state.VerifiedNames,
                     VerifiedDatesOfBirth = state.VerifiedDatesOfBirth,
                     StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
@@ -77,6 +77,7 @@ public class CheckAnswersModel(
                 new CreateOneLoginUserIdVerificationSupportTaskOptions
                 {
                     OneLoginUserSubject = subject,
+                    OneLoginUserEmailAddress = email,
                     StatedNationalInsuranceNumber = state.NationalInsuranceNumber,
                     StatedTrn = state.Trn,
                     ClientApplicationUserId = state.ClientApplicationUserId,

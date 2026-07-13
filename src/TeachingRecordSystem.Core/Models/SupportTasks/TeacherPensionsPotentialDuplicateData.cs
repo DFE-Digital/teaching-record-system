@@ -6,6 +6,7 @@ public record TeacherPensionsPotentialDuplicateData : ISupportTaskData
     public TeacherPensionsPotentialDuplicateAttributes? ResolvedAttributes { get; init; }
     public required string FileName { get; init; }
     public required long IntegrationTransactionId { get; init; }
+    string ISupportTaskData.GetOutcomeLabel() => "Resolved";
 }
 
 public record TeacherPensionsPotentialDuplicateAttributes

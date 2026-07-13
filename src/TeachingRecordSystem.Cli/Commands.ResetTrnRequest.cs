@@ -99,16 +99,19 @@ public partial class Commands
                 var changes = (oldTrnRequest.Status != request.Status ? TrnRequestUpdatedChanges.Status : 0) |
                     (oldTrnRequest.ResolvedPersonId != request.ResolvedPersonId ? TrnRequestUpdatedChanges.ResolvedPersonId : 0);
 
-                var supportTask = SupportTask.Create(
-                    SupportTaskType.TrnRequest,
-                    new TrnRequestData(),
-                    personId: null,
-                    request.OneLoginUserSubject,
-                    request.ApplicationUserId,
-                    request.RequestId,
-                    createdBy: SystemUser.SystemUserId,
-                    now,
-                    out _);
+                var subject = SupportTask.Subject.FromTrnRequest(request);
+                var supportTask = new SupportTask
+                {
+                    CreatedOn = now,
+                    UpdatedOn = now,
+                    SupportTaskType = SupportTaskType.TrnRequest,
+                    OneLoginUserSubject = request.OneLoginUserSubject,
+                    TrnRequestApplicationUserId = request.ApplicationUserId,
+                    TrnRequestId = request.RequestId,
+                    SubjectName = subject.Name,
+                    SubjectEmailAddress = subject.EmailAddress,
+                    Data = new TrnRequestData()
+                };
 
                 dbContext.SupportTasks.Add(supportTask);
                 await dbContext.SaveChangesAsync();

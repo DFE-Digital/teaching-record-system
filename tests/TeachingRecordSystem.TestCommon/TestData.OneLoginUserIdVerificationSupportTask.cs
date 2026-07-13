@@ -189,19 +189,7 @@ public partial class TestData
                     }
                 }
 
-                var data = new OneLoginUserIdVerificationData
-                {
-                    OneLoginUserSubject = oneLoginUserSubject,
-                    StatedFirstName = statedFirstName,
-                    StatedLastName = statedLastName,
-                    StatedDateOfBirth = statedDateOfBirth,
-                    StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
-                    StatedTrn = statedTrn,
-                    EvidenceFileId = evidenceFileId,
-                    EvidenceFileName = evidenceFileName,
-                    TrnTokenTrn = trnTokenTrn,
-                    ClientApplicationUserId = clientApplicationUserId
-                };
+                var subject = SupportTask.Subject.FromOneLoginUser(statedFirstName, statedLastName);
 
                 var supportTask = new SupportTask
                 {
@@ -209,8 +197,22 @@ public partial class TestData
                     UpdatedOn = createdOn,
                     SupportTaskType = SupportTaskType.OneLoginUserIdVerification,
                     Status = status,
-                    Data = data,
-                    OneLoginUserSubject = oneLoginUserSubject
+                    Data = new OneLoginUserIdVerificationData
+                    {
+                        OneLoginUserSubject = oneLoginUserSubject,
+                        StatedFirstName = statedFirstName,
+                        StatedLastName = statedLastName,
+                        StatedDateOfBirth = statedDateOfBirth,
+                        StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
+                        StatedTrn = statedTrn,
+                        EvidenceFileId = evidenceFileId,
+                        EvidenceFileName = evidenceFileName,
+                        TrnTokenTrn = trnTokenTrn,
+                        ClientApplicationUserId = clientApplicationUserId
+                    },
+                    OneLoginUserSubject = oneLoginUserSubject,
+                    SubjectName = subject.Name,
+                    SubjectEmailAddress = subject.EmailAddress
                 };
 
                 dbContext.SupportTasks.Add(supportTask);

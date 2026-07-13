@@ -9,4 +9,6 @@ public record ChangeNameRequestData : ISupportTaskData
     public required string EvidenceFileName { get; init; }
     public required string? EmailAddress { get; init; }
     public required SupportRequestOutcome? ChangeRequestOutcome { get; init; }
+
+    string ISupportTaskData.GetOutcomeLabel() => Enum.GetName(ChangeRequestOutcome!.Value)!;
 }

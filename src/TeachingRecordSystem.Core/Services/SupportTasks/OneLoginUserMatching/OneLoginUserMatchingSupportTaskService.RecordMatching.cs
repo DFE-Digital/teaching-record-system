@@ -22,7 +22,7 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Data = new OneLoginUserRecordMatchingData
                 {
                     OneLoginUserSubject = options.OneLoginUserSubject,
-                    OneLoginUserEmail = options.OneLoginUserEmail,
+                    OneLoginUserEmail = options.OneLoginUserEmailAddress,
                     VerifiedNames = options.VerifiedNames,
                     VerifiedDatesOfBirth = options.VerifiedDatesOfBirth,
                     StatedNationalInsuranceNumber = options.StatedNationalInsuranceNumber,
@@ -32,7 +32,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 },
                 PersonId = null,
                 OneLoginUserSubject = options.OneLoginUserSubject,
-                TrnRequest = trnRequest
+                TrnRequest = trnRequest,
+                Subject = SupportTask.Subject.FromOneLoginUser(options.VerifiedNames!)
             },
             processContext);
 
@@ -186,7 +187,7 @@ public partial class OneLoginUserMatchingSupportTaskService
             await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
                 supportTask.TrnRequestApplicationUserId!.Value,
                 supportTask.TrnRequestId,
-                (options.MatchedPersonId, options.Trn),
+                options.MatchedPersonId,
                 options.MatchedAttributes.Select(kvp => kvp.Key).ToArray(),
                 processContext);
         }

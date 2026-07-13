@@ -1,15 +1,18 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 
-public class ChangeRequestSupportTaskService(SupportTaskService supportTaskService)
+public class ChangeRequestSupportTaskService(SupportTaskService supportTaskService, TrsDbContext dbContext)
 {
-    public Task<SupportTask> CreateNameChangeRequestAsync(
+    public async Task<SupportTask> CreateNameChangeRequestAsync(
         CreateNameChangeRequestSupportTaskOptions options,
         ProcessContext processContext)
     {
-        return supportTaskService.CreateSupportTaskAsync(
+        var person = (await dbContext.Persons.FindAsync(options.PersonId))!;
+
+        return await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
             {
                 SupportTaskType = SupportTaskType.ChangeNameRequest,
@@ -25,16 +28,19 @@ public class ChangeRequestSupportTaskService(SupportTaskService supportTaskServi
                 },
                 PersonId = options.PersonId,
                 OneLoginUserSubject = null,
-                TrnRequest = null
+                TrnRequest = null,
+                Subject = SupportTask.Subject.FromPerson(person)
             },
             processContext);
     }
 
-    public Task<SupportTask> CreateDateOfBirthChangeRequestAsync(
+    public async Task<SupportTask> CreateDateOfBirthChangeRequestAsync(
         CreateDateOfBirthChangeRequestSupportTaskOptions options,
         ProcessContext processContext)
     {
-        return supportTaskService.CreateSupportTaskAsync(
+        var person = (await dbContext.Persons.FindAsync(options.PersonId))!;
+
+        return await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
             {
                 SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
@@ -48,7 +54,8 @@ public class ChangeRequestSupportTaskService(SupportTaskService supportTaskServi
                 },
                 PersonId = options.PersonId,
                 OneLoginUserSubject = null,
-                TrnRequest = null
+                TrnRequest = null,
+                Subject = SupportTask.Subject.FromPerson(person)
             },
             processContext);
     }

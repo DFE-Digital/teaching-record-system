@@ -7,10 +7,15 @@ public class SupportTask
 {
     public string SupportTaskReference { get; } = null!;
     public required DateTime CreatedOn { get; init; }
+    public Guid? AssignedToUserId { get; set; }
+    public User? AssignedTo { get; }
     public required DateTime UpdatedOn { get; set; }
+    public DateTime? CompletedOn { get; set; }
+    public Guid? CompletedByUserId { get; set; }
+    public User? CompletedBy { get; }
     public DateTime? DeletedOn { get; set; }
     public required SupportTaskType SupportTaskType { get; init; }
-    public required SupportTaskStatus Status { get; set; }
+    public SupportTaskStatus Status { get; set; } = SupportTaskStatus.Open;
     public string? OneLoginUserSubject { get; init; }
     public OneLoginUser? OneLoginUser { get; }
     public Guid? PersonId { get; init; }
@@ -18,53 +23,61 @@ public class SupportTask
     public Guid? TrnRequestApplicationUserId { get; init; }
     public string? TrnRequestId { get; init; }
     public TrnRequestMetadata? TrnRequestMetadata { get; }
+    public required string? SubjectName { get; init; }
+    public required string? SubjectEmailAddress { get; init; }
     public required ISupportTaskData Data { get; set; }
     public SavedJourneyState? ResolveJourneySavedState { get; set; }
+    public string? OutcomeLabel { get; set; }
 
     [Projectable]
     public bool IsOutstanding => Status != SupportTaskStatus.Closed;
 
-    public static SupportTask Create(
-        SupportTaskType supportTaskType,
-        ISupportTaskData data,
-        Guid? personId,
-        string? oneLoginUserSubject,
-        Guid? trnRequestApplicationUserId,
-        string? trnRequestId,
-        EventModels.RaisedByUserInfo createdBy,
-        DateTime now,
-        out LegacyEvents.SupportTaskCreatedEvent createdEvent)
-    {
-        var task = new SupportTask
-        {
-            CreatedOn = now,
-            UpdatedOn = now,
-            SupportTaskType = supportTaskType,
-            Status = SupportTaskStatus.Open,
-            Data = data,
-            PersonId = personId,
-            OneLoginUserSubject = oneLoginUserSubject,
-            TrnRequestApplicationUserId = trnRequestApplicationUserId,
-            TrnRequestId = trnRequestId
-        };
-
-        createdEvent = new LegacyEvents.SupportTaskCreatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = createdBy,
-            SupportTask = EventModels.SupportTask.FromModel(task)
-        };
-
-        return task;
-    }
-
     public T GetData<T>() where T : ISupportTaskData => (T)Data;
 
-    public T UpdateData<T>(Func<T, T> update) where T : ISupportTaskData
+    public sealed record Subject
     {
-        var currentValue = GetData<T>();
-        Data = update(currentValue);
-        return (T)Data;
+        private Subject(string? name, string? emailAddress)
+        {
+            if (name is null && emailAddress is null)
+            {
+                throw new ArgumentException("Either name or email address must be specified.");
+            }
+
+            if (name is not null && emailAddress is not null)
+            {
+                throw new ArgumentException("Either name or email address must be specified.");
+            }
+
+            Name = name;
+            EmailAddress = emailAddress;
+        }
+
+        public string? Name { get; }
+
+        public string? EmailAddress { get; }
+
+        public static Subject FromPerson(Person person) => new(
+            string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
+            null);
+
+        public static Subject FromTrnRequest(TrnRequestMetadata trnRequest) => new(
+            string.JoinNonEmpty(' ', trnRequest.FirstName, trnRequest.MiddleName, trnRequest.LastName),
+            null);
+
+        public static Subject FromOneLoginUser(OneLoginUser oneLoginUser) =>
+            oneLoginUser.VerifiedNames is not null
+                ? FromOneLoginUser(oneLoginUser.VerifiedNames!)
+                : FromOneLoginUser(oneLoginUser.EmailAddress!);
+
+        public static Subject FromOneLoginUser(string firstName, string lastName) => new(
+            string.JoinNonEmpty(' ', firstName, lastName),
+            null);
+
+        public static Subject FromOneLoginUser(string[][] verifiedNames) => new(
+            string.JoinNonEmpty(' ', verifiedNames.First()),
+            null);
+
+        public static Subject FromOneLoginUser(string emailAddress) =>
+            new(name: null, emailAddress);
     }
 }

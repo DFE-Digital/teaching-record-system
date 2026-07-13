@@ -168,6 +168,9 @@ public partial class TestData
                 Gender = gender,
                 PotentialDuplicate = true
             };
+
+            var subject = SupportTask.Subject.FromTrnRequest(trnRequestMetadata);
+
             var supportTask = new SupportTask
             {
                 CreatedOn = createdOn!.Value,
@@ -181,7 +184,9 @@ public partial class TestData
                 },
                 PersonId = personId,
                 TrnRequestApplicationUserId = userId,
-                TrnRequestId = trnRequestMetadata.RequestId
+                TrnRequestId = trnRequestMetadata.RequestId,
+                SubjectName = subject.Name,
+                SubjectEmailAddress = subject.EmailAddress
             };
 
             return await testData.WithDbContextAsync(async dbContext =>

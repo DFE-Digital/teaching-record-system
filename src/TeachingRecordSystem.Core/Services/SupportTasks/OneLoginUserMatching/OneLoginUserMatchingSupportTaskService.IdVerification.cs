@@ -29,7 +29,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 },
                 PersonId = null,
                 OneLoginUserSubject = options.OneLoginUserSubject,
-                TrnRequest = null
+                TrnRequest = null,
+                Subject = SupportTask.Subject.FromOneLoginUser(options.StatedFirstName, options.StatedLastName)
             },
             processContext);
 

@@ -616,6 +616,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.Equal("Resolved", updatedSupportTask.OutcomeLabel);
         Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(person.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
@@ -695,6 +696,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.Equal("Resolved", updatedSupportTask.OutcomeLabel);
         Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(person.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);

@@ -28,7 +28,8 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             },
             PersonId = person.PersonId,
             OneLoginUserSubject = null,
-            TrnRequest = null
+            TrnRequest = null,
+            Subject = SupportTask.Subject.FromPerson(person.Person)
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -62,7 +63,8 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             },
             PersonId = person.PersonId,
             OneLoginUserSubject = null,
-            TrnRequest = null
+            TrnRequest = null,
+            Subject = SupportTask.Subject.FromPerson(person.Person)
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -77,6 +79,8 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         Assert.Equal(options.Data, result.Data);
         Assert.Equal(options.PersonId, result.PersonId);
         Assert.Equal(SupportTaskStatus.Open, result.Status);
+        Assert.Equal(string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName), result.SubjectName);
+        Assert.Null(result.SubjectEmailAddress);
 
         Events.AssertEventsPublished(e =>
         {
@@ -87,6 +91,43 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Assert.Equal(result.Data, supportTaskCreatedEvent.SupportTask.Data);
             Assert.Equal(result.Status, supportTaskCreatedEvent.SupportTask.Status);
         });
+    }
+
+    [Fact]
+    public async Task CreateSupportTaskAsync_SubjectHasEmailAddress_SetsSubjectEmailAddressAndNotSubjectName()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
+        var emailAddress = TestData.GenerateUniqueEmail();
+
+        var options = new CreateSupportTaskOptions
+        {
+            SupportTaskType = SupportTaskType.ChangeNameRequest,
+            Data = new ChangeNameRequestData
+            {
+                FirstName = person.FirstName,
+                MiddleName = person.MiddleName,
+                LastName = TestData.GenerateChangedLastName(person.LastName),
+                EvidenceFileId = Guid.NewGuid(),
+                EvidenceFileName = "evidence.jpeg",
+                EmailAddress = person.EmailAddress!,
+                ChangeRequestOutcome = null
+            },
+            PersonId = person.PersonId,
+            OneLoginUserSubject = null,
+            TrnRequest = null,
+            Subject = SupportTask.Subject.FromOneLoginUser(emailAddress)
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, SupportTask>(
+            service => service.CreateSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.Equal(emailAddress, result.SubjectEmailAddress);
+        Assert.Null(result.SubjectName);
     }
 
     [Fact]
@@ -243,7 +284,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         {
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
-            Status = SupportTaskStatus.Closed,
+            Status = SupportTaskStatus.InProgress,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -344,6 +385,94 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Assert.Equal(TimeProvider.UtcNow, supportTask.UpdatedOn);
             Assert.Equal(options.Comments, supportTaskUpdatedEvent.Comments);
             Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.ResolveJourneySavedState, supportTaskUpdatedEvent.Changes);
+        });
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_TaskIsAlreadyClosed_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            person.PersonId,
+            t => t.WithStatus(SupportTaskStatus.Closed));
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Approved },
+            Status = SupportTaskStatus.Closed,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(
+            service => service.UpdateSupportTaskAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+        Events.AssertNoEventsPublished();
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_StatusIsClosed_SetsOutcomeLabelFromUpdatedData()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.GetData<ChangeNameRequestData>().ChangeRequestOutcome is null);
+
+        var outcome = SupportRequestOutcome.Rejected;
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data with { ChangeRequestOutcome = outcome },
+            Status = SupportTaskStatus.Closed,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(Enum.GetName(outcome), dbSupportTask.OutcomeLabel);
+        });
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_StatusIsNotClosed_DoesNotSetOutcomeLabel()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data,
+            Status = SupportTaskStatus.InProgress,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Null(dbSupportTask.OutcomeLabel);
         });
     }
 

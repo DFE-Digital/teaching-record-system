@@ -134,6 +134,7 @@
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_delete_tps_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_generate_trn_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_person_attrs_v1.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_support_task_subject_names_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_tps_employments_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_previous_names_person_attrs_v1.sql" />
@@ -143,6 +144,7 @@
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_split_names_v3.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_split_names_v4.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_attrs_v1.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_support_task_subject_names_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v3.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_previous_names_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_tps_employments_person_attrs_v1.sql" />
@@ -152,6 +154,7 @@
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_ninos_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v8.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_previous_names_person_search_attributes_v4.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_support_task_subject_names_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_tps_employments_person_search_attributes_v2.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_delete_previous_names_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_delete_previous_names_person_search_attributes_v1.sql" />
@@ -162,10 +165,12 @@
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_delete_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_insert_previous_names_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_insert_previous_names_person_search_attributes_v1.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_insert_support_task_subject_names_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_insert_tps_employments_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_insert_tps_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_update_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_update_person_search_attributes_v2.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_update_support_task_subject_names_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_update_previous_names_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_update_previous_names_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_update_tps_employments_person_attrs_v1.sql" />

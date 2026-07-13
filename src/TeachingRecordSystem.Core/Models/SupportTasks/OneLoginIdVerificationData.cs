@@ -16,13 +16,14 @@ public record OneLoginUserIdVerificationData : IOneLoginUserMatchingData
     public required Guid ClientApplicationUserId { get; init; }
     public bool? Verified { get; init; }
     public Guid? PersonId { get; init; }
-    public OneLoginUserIdVerificationOutcome Outcome { get; init; }
+    public OneLoginUserIdVerificationOutcome? Outcome { get; init; }
     public OneLoginIdVerificationRejectReason? RejectReason { get; init; }
     public string? RejectionAdditionalDetails { get; init; }
     public OneLoginUserNotConnectingReason? NotConnectingReason { get; init; }
     public string? NotConnectingAdditionalDetails { get; init; }
-    public string[][]? VerifiedOrStatedNames => [[StatedFirstName, StatedLastName]];
-    public DateOnly[]? VerifiedOrStatedDatesOfBirth => [StatedDateOfBirth];
+    public string[][] VerifiedOrStatedNames => [[StatedFirstName, StatedLastName]];
+    public DateOnly[] VerifiedOrStatedDatesOfBirth => [StatedDateOfBirth];
+    string ISupportTaskData.GetOutcomeLabel() => Enum.GetName(Outcome!.Value)!;
 }
 
 public enum OneLoginUserIdVerificationOutcome

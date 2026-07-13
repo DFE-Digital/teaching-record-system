@@ -194,20 +194,31 @@ public class CapitaImportJob(
                         if (potentialMatches.Outcome is MatchPersonsResultOutcome.PotentialMatches or MatchPersonsResultOutcome.DefiniteMatch)
                         {
                             potentialDuplicate = true;
-                            var supportTask = SupportTask.Create(
-                                SupportTaskType.TeacherPensionsPotentialDuplicate,
-                                new Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
+
+                            var supportTask = new SupportTask()
+                            {
+                                SupportTaskType = SupportTaskType.TeacherPensionsPotentialDuplicate,
+                                Data = new Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
                                 {
                                     FileName = fileName,
                                     IntegrationTransactionId = integrationJob.IntegrationTransactionId
                                 },
-                                personId: personId.Value,
-                                oneLoginUserSubject: null,
-                                trnRequestApplicationUserId: capitaUser.Value.CapitaTpsUserId,
-                                trnRequestId: trnRequestMetadata.RequestId,
-                                createdBy: capitaUser.Value.CapitaTpsUserId,
-                                now: now,
-                                out var supportTaskCreatedEvent);
+                                PersonId = personId.Value,
+                                TrnRequestApplicationUserId = capitaUser.Value.CapitaTpsUserId,
+                                TrnRequestId = trnRequestMetadata.RequestId,
+                                SubjectName = string.JoinNonEmpty(' ', trnRequestMetadata.Name),
+                                SubjectEmailAddress = trnRequestMetadata.EmailAddress,
+                                CreatedOn = now,
+                                UpdatedOn = now
+                            };
+
+                            var supportTaskCreatedEvent = new LegacyEvents.SupportTaskCreatedEvent
+                            {
+                                SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                                EventId = Guid.NewGuid(),
+                                CreatedUtc = now,
+                                RaisedBy = capitaUser.Value.CapitaTpsUserId
+                            };
 
                             dbContext.SupportTasks.Add(supportTask);
                             dbContext.AddEventWithoutBroadcast(supportTaskCreatedEvent);

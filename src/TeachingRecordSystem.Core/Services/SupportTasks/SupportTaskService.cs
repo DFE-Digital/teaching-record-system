@@ -21,12 +21,13 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             CreatedOn = processContext.Now,
             UpdatedOn = processContext.Now,
             SupportTaskType = options.SupportTaskType,
-            Status = SupportTaskStatus.Open,
             Data = options.Data,
             PersonId = options.PersonId,
             OneLoginUserSubject = options.OneLoginUserSubject,
             TrnRequestApplicationUserId = options.TrnRequest?.ApplicationUserId,
-            TrnRequestId = options.TrnRequest?.RequestId
+            TrnRequestId = options.TrnRequest?.RequestId,
+            SubjectName = options.Subject.Name,
+            SubjectEmailAddress = options.Subject.EmailAddress
         };
 
         dbContext.SupportTasks.Add(supportTask);
@@ -98,6 +99,11 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 
         var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
 
+        if (supportTask.Status is SupportTaskStatus.Closed)
+        {
+            throw new InvalidOperationException("Support task is closed.");
+        }
+
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
 
         supportTask.Status = options.Status;
@@ -116,6 +122,16 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         if (updateAction is not null)
         {
             changes = updateAction(supportTask, changes);
+        }
+
+        // Derived from Data, so this must run after updateAction has applied any changes to it.
+        if (options.Status is SupportTaskStatus.Closed)
+        {
+            supportTask.OutcomeLabel = supportTask.Data.GetOutcomeLabel();
+        }
+        else
+        {
+            supportTask.OutcomeLabel = null;
         }
 
         if (changes is not SupportTaskUpdatedEventChanges.None)

@@ -45,6 +45,14 @@ public partial class TestData
         {
             var createdOnUtc = (createdOn ?? TimeProvider.UtcNow).ToUniversalTime();
 
+            var trnRequestMetadata = await dbContext.TrnRequestMetadata.FindAsync(trnRequestApplicationUserId, trnRequestId) ??
+                throw new InvalidOperationException("TRN request does not exist.");
+
+            var person = await dbContext.Persons.FindAsync(trnRequestMetadata.ResolvedPersonId) ??
+                throw new InvalidOperationException("Person does not exist.");
+
+            var subject = SupportTask.Subject.FromPerson(person);
+
             var task = new SupportTask
             {
                 CreatedOn = createdOnUtc,
@@ -53,7 +61,9 @@ public partial class TestData
                 Status = status,
                 Data = new TrnRequestManualChecksNeededData(),
                 TrnRequestApplicationUserId = trnRequestApplicationUserId,
-                TrnRequestId = trnRequestId
+                TrnRequestId = trnRequestId,
+                SubjectName = subject.Name,
+                SubjectEmailAddress = subject.EmailAddress
             };
 
             dbContext.SupportTasks.Add(task);

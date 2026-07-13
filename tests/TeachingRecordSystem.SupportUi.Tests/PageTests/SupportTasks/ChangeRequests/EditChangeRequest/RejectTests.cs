@@ -168,6 +168,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         {
             var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
             Assert.Equal(SupportTaskStatus.Closed, supportTask!.Status);
+            Assert.Equal(nameof(SupportRequestOutcome.Rejected), supportTask.OutcomeLabel);
 
             if (isNameChange)
             {
@@ -262,6 +263,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         {
             var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
             Assert.Equal(SupportTaskStatus.Closed, supportTask!.Status);
+            Assert.Equal(nameof(SupportRequestOutcome.Cancelled), supportTask.OutcomeLabel);
 
             if (isNameChange)
             {

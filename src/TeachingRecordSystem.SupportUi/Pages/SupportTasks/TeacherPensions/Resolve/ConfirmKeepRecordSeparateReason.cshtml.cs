@@ -46,8 +46,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
 
         var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, timeProvider.UtcNow, User.GetUserId());
 
-        var person = await DbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);
-        await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (person.PersonId, person.Trn), processContext);
+        await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, supportTask.PersonId!.Value, processContext);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
