@@ -128,10 +128,14 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         if (options.Status is SupportTaskStatus.Closed)
         {
             supportTask.OutcomeLabel = supportTask.Data.GetOutcomeLabel();
+            supportTask.CompletedOn = processContext.Now;
+            supportTask.CompletedByUserId = processContext.Process.UserId;
         }
         else
         {
             supportTask.OutcomeLabel = null;
+            supportTask.CompletedOn = null;
+            supportTask.CompletedByUserId = null;
         }
 
         if (changes is not SupportTaskUpdatedEventChanges.None)

@@ -476,5 +476,64 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         });
     }
 
+    [Fact]
+    public async Task UpdateSupportTaskAsync_StatusIsClosed_SetsCompletedOnAndCompletedByUserId()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Rejected },
+            Status = SupportTaskStatus.Closed,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(TimeProvider.UtcNow, dbSupportTask.CompletedOn);
+            Assert.Equal(SystemUser.SystemUserId, dbSupportTask.CompletedByUserId);
+        });
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_StatusIsNotClosed_DoesNotSetCompletedOnOrCompletedByUserId()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data,
+            Status = SupportTaskStatus.InProgress,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync<SupportTaskService>(service => service.UpdateSupportTaskAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Null(dbSupportTask.CompletedOn);
+            Assert.Null(dbSupportTask.CompletedByUserId);
+        });
+    }
+
     private record DummyJourneyState;
 }
