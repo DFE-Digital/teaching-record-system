@@ -195,6 +195,8 @@ public class CapitaImportJob(
                         {
                             potentialDuplicate = true;
 
+                            var subject = SupportTask.Subject.FromTrnRequest(trnRequestMetadata);
+
                             var supportTask = new SupportTask()
                             {
                                 SupportTaskType = SupportTaskType.TeacherPensionsPotentialDuplicate,
@@ -206,8 +208,8 @@ public class CapitaImportJob(
                                 PersonId = personId.Value,
                                 TrnRequestApplicationUserId = capitaUser.Value.CapitaTpsUserId,
                                 TrnRequestId = trnRequestMetadata.RequestId,
-                                SubjectName = string.JoinNonEmpty(' ', trnRequestMetadata.Name),
-                                SubjectEmailAddress = trnRequestMetadata.EmailAddress,
+                                SubjectName = subject.Name,
+                                SubjectEmailAddress = subject.EmailAddress,
                                 CreatedOn = now,
                                 UpdatedOn = now
                             };
