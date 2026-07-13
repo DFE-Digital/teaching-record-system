@@ -144,6 +144,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         {
             var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
             Assert.Equal(SupportTaskStatus.Closed, supportTask!.Status);
+            Assert.Equal(nameof(SupportRequestOutcome.Approved), supportTask.OutcomeLabel);
 
             if (isNameChange)
             {

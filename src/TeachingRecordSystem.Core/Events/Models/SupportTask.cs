@@ -10,7 +10,9 @@ public record SupportTask
     public required string? OneLoginUserSubject { get; init; }
     public required Guid? PersonId { get; init; }
     public required ISupportTaskData Data { get; init; }
-    public required SavedJourneyState? ResolveJourneySavedState { get; set; }
+    public required SavedJourneyState? ResolveJourneySavedState { get; init; }
+    public required Guid? AssignedToUserId { get; init; }
+    public required string? OutcomeLabel { get; init; }
 
     public static SupportTask FromModel(DataStore.Postgres.Models.SupportTask model) => new()
     {
@@ -20,6 +22,8 @@ public record SupportTask
         OneLoginUserSubject = model.OneLoginUserSubject,
         PersonId = model.PersonId,
         Data = model.Data,
-        ResolveJourneySavedState = model.ResolveJourneySavedState
+        ResolveJourneySavedState = model.ResolveJourneySavedState,
+        AssignedToUserId = model.AssignedToUserId,
+        OutcomeLabel = model.OutcomeLabel
     };
 }

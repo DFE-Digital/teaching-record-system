@@ -34,5 +34,18 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
                 v => JsonSerializer.Serialize(v, SavedJourneyState.SerializerOptions),
                 v => JsonSerializer.Deserialize<SavedJourneyState>(v, SavedJourneyState.SerializerOptions))
             .ConfigureAnalyticsSync(included: false);
+        builder.HasOne(p => p.AssignedTo).WithMany().HasForeignKey(p => p.AssignedToUserId);
+        builder.HasOne(p => p.CompletedBy).WithMany().HasForeignKey(p => p.CompletedByUserId);
+        builder.Property(p => p.SubjectEmailAddress).HasMaxLength(200).UseCollation(Collations.CaseInsensitive);
+        builder.Property(p => p.OutcomeLabel).HasMaxLength(200);
+        builder
+            .Property<string[]>("SubjectNames")
+            .HasColumnType("varchar[]")
+            .UseCollation(Collations.CaseInsensitive)
+            .ConfigureAnalyticsSync(included: false);
+        builder.HasIndex("SubjectEmailAddress", "SubjectNames")
+            .HasMethod("GIN")
+            .UseCollation(Collations.CaseInsensitive)
+            .IsCreatedConcurrently();
     }
 }

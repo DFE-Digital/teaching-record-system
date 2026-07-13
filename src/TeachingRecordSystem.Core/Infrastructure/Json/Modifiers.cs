@@ -50,21 +50,27 @@ public static class Modifiers
 
     public static void SupportTaskData(JsonTypeInfo typeInfo)
     {
-        if (typeInfo.Type != typeof(ISupportTaskData))
+        if (typeInfo.Kind == JsonTypeInfoKind.Object)
         {
-            return;
+            foreach (var propertyInfo in typeInfo.Properties)
+            {
+                propertyInfo.IsRequired = false;
+            }
         }
 
-        typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+        if (typeInfo.Type == typeof(ISupportTaskData))
         {
-            TypeDiscriminatorPropertyName = "$support-task-type",
-            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
-        };
+            typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+            {
+                TypeDiscriminatorPropertyName = "$support-task-type",
+                UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
+            };
 
-        foreach (var supportTaskType in SupportTaskTypeRegistry.All)
-        {
-            typeInfo.PolymorphismOptions.DerivedTypes.Add(
-                new JsonDerivedType(supportTaskType.DataType, (int)supportTaskType.SupportTaskType));
+            foreach (var supportTaskType in SupportTaskTypeRegistry.All)
+            {
+                typeInfo.PolymorphismOptions.DerivedTypes.Add(
+                    new JsonDerivedType(supportTaskType.DataType, (int)supportTaskType.SupportTaskType));
+            }
         }
     }
 

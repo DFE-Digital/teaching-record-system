@@ -86,25 +86,31 @@ public class TrnRequestService(
         return result;
     }
 
-    public Task ResolveTrnRequestWithMatchedPersonAsync(
-            TrnRequestMetadata trnRequest,
-            (Guid PersonId, string Trn) person,
-            ProcessContext processContext) =>
-        ResolveTrnRequestWithMatchedPersonAsync(
+    public async Task ResolveTrnRequestWithMatchedPersonAsync(
+        TrnRequestMetadata trnRequest,
+        Guid personId,
+        ProcessContext processContext)
+    {
+        var person = (await dbContext.Persons.FindAsync(personId))!;
+
+        await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
-            (person.PersonId, person.Trn),
+            person,
             publishTrnRequestUpdatedEvent: true,
             processContext);
+    }
 
     public async Task ResolveTrnRequestWithMatchedPersonAsync(
         Guid applicationUserId,
         string requestId,
-        (Guid PersonId, string Trn) person,
+        Guid personId,
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
         ProcessContext processContext)
     {
-        var trnRequest = await dbContext.TrnRequestMetadata
-            .SingleAsync(tr => tr.ApplicationUserId == applicationUserId && tr.RequestId == requestId);
+        var trnRequest = (await dbContext.TrnRequestMetadata
+            .FindAsync(applicationUserId, requestId))!;
+
+        var person = (await dbContext.Persons.FindAsync(personId))!;
 
         await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
@@ -136,7 +142,7 @@ public class TrnRequestService(
     {
         await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
-            (person.PersonId, person.Trn),
+            person,
             publishTrnRequestUpdatedEvent: true,
             processContext);
 
@@ -158,7 +164,7 @@ public class TrnRequestService(
 
     private async Task ResolveTrnRequestWithMatchedPersonAsync(
         TrnRequestMetadata trnRequest,
-        (Guid PersonId, string Trn) person,
+        Person person,
         bool publishTrnRequestUpdatedEvent,
         ProcessContext processContext)
     {
@@ -191,7 +197,8 @@ public class TrnRequestService(
                     Data = new TrnRequestManualChecksNeededData(),
                     PersonId = person.PersonId,
                     OneLoginUserSubject = null,
-                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
+                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId),
+                    Subject = SupportTask.Subject.FromPerson(person)
                 },
                 processContext);
         }
@@ -706,7 +713,8 @@ public class TrnRequestService(
         if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
         {
             trn = matchResult.Trn;
-            await ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchResult.PersonId, trn), publishTrnRequestUpdatedEvent: false, processContext);
+            var person = (await dbContext.Persons.FindAsync(matchResult.PersonId))!;
+            await ResolveTrnRequestWithMatchedPersonAsync(trnRequest, person, publishTrnRequestUpdatedEvent: false, processContext);
         }
         else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
         {
@@ -723,7 +731,8 @@ public class TrnRequestService(
                     Data = new TrnRequestData(),
                     PersonId = null,
                     OneLoginUserSubject = null,
-                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId)
+                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId),
+                    Subject = SupportTask.Subject.FromTrnRequest(trnRequest)
                 },
                 processContext);
         }

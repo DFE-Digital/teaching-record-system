@@ -252,6 +252,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal("Resolved", updatedSupportTask.OutcomeLabel);
             Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         });
 
@@ -350,6 +351,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal("Resolved", updatedSupportTask.OutcomeLabel);
             Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         });
 
@@ -431,6 +433,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal("Resolved", updatedSupportTask.OutcomeLabel);
             Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         });
 

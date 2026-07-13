@@ -61,8 +61,10 @@ public partial class SignInTests
             dbContext.Attach(supportTask);
 
             supportTask.Status = SupportTaskStatus.Closed;
-            supportTask.UpdateData<OneLoginUserIdVerificationData>(
-                data => data with { Outcome = OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches });
+            supportTask.Data = (OneLoginUserIdVerificationData)supportTask.Data with
+            {
+                Outcome = OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches
+            };
 
             await dbContext.SaveChangesAsync();
         });

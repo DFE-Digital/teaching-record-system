@@ -112,8 +112,7 @@ public partial class ChangeHistoryTests
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
                     KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
                 ],
-                SupportTask = supportTask,
-                Trn = matchedPerson.Trn
+                SupportTask = supportTask
             },
             process);
 

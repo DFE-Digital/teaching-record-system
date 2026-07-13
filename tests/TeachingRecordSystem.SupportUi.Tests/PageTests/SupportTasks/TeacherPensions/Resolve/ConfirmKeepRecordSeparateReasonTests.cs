@@ -163,6 +163,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal("Resolved", updatedSupportTask.OutcomeLabel);
             Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
             var supportTaskData = updatedSupportTask.GetData<TeacherPensionsPotentialDuplicateData>();
             Assert.Null(supportTaskData.ResolvedAttributes);
@@ -249,6 +250,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
                 .Include(st => st.TrnRequestMetadata)
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal("Resolved", updatedSupportTask.OutcomeLabel);
             Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
             var supportTaskData = updatedSupportTask.GetData<TeacherPensionsPotentialDuplicateData>();
             Assert.Null(supportTaskData.ResolvedAttributes);

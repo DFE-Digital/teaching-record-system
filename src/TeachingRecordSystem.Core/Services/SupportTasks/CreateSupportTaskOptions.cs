@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks;
@@ -9,4 +10,5 @@ public record CreateSupportTaskOptions
     public required Guid? PersonId { get; init; }
     public required string? OneLoginUserSubject { get; init; }
     public required (Guid ApplicationUserId, string RequestId)? TrnRequest { get; init; }
+    public required SupportTask.Subject Subject { get; init; }
 }

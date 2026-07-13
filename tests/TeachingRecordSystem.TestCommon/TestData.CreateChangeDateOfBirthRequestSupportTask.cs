@@ -85,7 +85,7 @@ public partial class TestData
             return this;
         }
 
-        public Task<SupportTask> ExecuteAsync(TestData testData)
+        public Task<SupportTask> ExecuteAsync(TestData testData) => testData.WithDbContextAsync(async dbContext =>
         {
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid);
@@ -94,14 +94,10 @@ public partial class TestData
             var status = _status.ValueOr(SupportTaskStatus.Open);
             var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow).ToUniversalTime();
 
-            var data = new ChangeDateOfBirthRequestData()
-            {
-                DateOfBirth = dateOfBirth,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName,
-                EmailAddress = emailAddress,
-                ChangeRequestOutcome = null
-            };
+            var person = await dbContext.Persons.FindAsync(personId) ??
+                throw new InvalidOperationException("Person does not exist.");
+
+            var subject = SupportTask.Subject.FromPerson(person);
 
             var supportTask = new SupportTask
             {
@@ -109,18 +105,23 @@ public partial class TestData
                 UpdatedOn = createdOn,
                 SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
                 Status = status,
-                Data = data,
-                PersonId = personId
+                Data = new ChangeDateOfBirthRequestData()
+                {
+                    DateOfBirth = dateOfBirth,
+                    EvidenceFileId = evidenceFileId,
+                    EvidenceFileName = evidenceFileName,
+                    EmailAddress = emailAddress,
+                    ChangeRequestOutcome = null
+                },
+                PersonId = personId,
+                SubjectName = subject.Name,
+                SubjectEmailAddress = subject.EmailAddress
             };
 
-            return testData.WithDbContextAsync(async dbContext =>
-            {
-                dbContext.SupportTasks.Add(supportTask);
-                await dbContext.SaveChangesAsync();
+            dbContext.SupportTasks.Add(supportTask);
+            await dbContext.SaveChangesAsync();
 
-                return supportTask;
-            });
-
-        }
+            return supportTask;
+        });
     }
 }

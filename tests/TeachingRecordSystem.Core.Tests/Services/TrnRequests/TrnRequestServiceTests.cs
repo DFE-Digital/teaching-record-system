@@ -554,7 +554,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
-            (matchedPerson.PersonId, matchedPerson.Trn),
+            matchedPerson.PersonId,
             processContext));
 
         // Assert
@@ -577,7 +577,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
-            (matchedPerson.PersonId, matchedPerson.Trn),
+            matchedPerson.PersonId,
             processContext));
 
         // Assert
@@ -1006,7 +1006,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchedPerson.PersonId, matchedPerson.Trn), processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, matchedPerson.PersonId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -1031,7 +1031,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
 
         // Act
         var ex = await Record.ExceptionAsync(() =>
-            WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchedPerson.PersonId, matchedPerson.Trn), processContext)));
+            WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, matchedPerson.PersonId, processContext)));
 
         // Assert
         Assert.Null(ex);
@@ -1096,7 +1096,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchedPerson.PersonId, matchedPerson.Trn), processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, matchedPerson.PersonId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -1121,7 +1121,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, (matchedPerson.PersonId, matchedPerson.Trn), processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, matchedPerson.PersonId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>

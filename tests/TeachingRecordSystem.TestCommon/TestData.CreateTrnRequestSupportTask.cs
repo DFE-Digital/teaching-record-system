@@ -264,6 +264,8 @@ public partial class TestData
 
             var status = _status.ValueOr(() => SupportTaskStatus.Open);
 
+            var subject = SupportTask.Subject.FromTrnRequest(metadata);
+
             var task = new SupportTask
             {
                 CreatedOn = createdOn,
@@ -272,7 +274,9 @@ public partial class TestData
                 Status = status,
                 Data = new TrnRequestData(),
                 TrnRequestApplicationUserId = applicationUserId,
-                TrnRequestId = trnRequestId
+                TrnRequestId = trnRequestId,
+                SubjectName = subject.Name,
+                SubjectEmailAddress = subject.EmailAddress
             };
 
             return await testData.WithDbContextAsync(async dbContext =>

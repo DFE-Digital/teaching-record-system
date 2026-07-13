@@ -6,6 +6,8 @@ namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
 public interface ISupportTaskData
 {
+    string GetOutcomeLabel();
+
     static JsonSerializerOptions SerializerOptions => new()
     {
         AllowOutOfOrderMetadataProperties = true,  // jsonb columns may have properties in any order

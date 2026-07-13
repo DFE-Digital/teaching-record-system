@@ -165,17 +165,7 @@ public partial class TestData
                     }
                 }
 
-                var data = new OneLoginUserRecordMatchingData()
-                {
-                    OneLoginUserSubject = oneLoginUserSubject,
-                    OneLoginUserEmail = emailAddress,
-                    VerifiedNames = verifiedNames,
-                    VerifiedDatesOfBirth = [verifiedDateOfBirth],
-                    StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
-                    StatedTrn = statedTrn,
-                    ClientApplicationUserId = clientApplicationUserId,
-                    TrnTokenTrn = trnTokenTrn
-                };
+                var subject = SupportTask.Subject.FromOneLoginUser(verifiedNames);
 
                 var supportTask = new SupportTask
                 {
@@ -183,10 +173,22 @@ public partial class TestData
                     UpdatedOn = createdOn,
                     SupportTaskType = SupportTaskType.OneLoginUserRecordMatching,
                     Status = status,
-                    Data = data,
+                    Data = new OneLoginUserRecordMatchingData()
+                    {
+                        OneLoginUserSubject = oneLoginUserSubject,
+                        OneLoginUserEmail = emailAddress,
+                        VerifiedNames = verifiedNames,
+                        VerifiedDatesOfBirth = [verifiedDateOfBirth],
+                        StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
+                        StatedTrn = statedTrn,
+                        ClientApplicationUserId = clientApplicationUserId,
+                        TrnTokenTrn = trnTokenTrn
+                    },
                     OneLoginUserSubject = oneLoginUserSubject,
                     TrnRequestApplicationUserId = trnRequestId is not null ? clientApplicationUserId : null,
-                    TrnRequestId = trnRequestId
+                    TrnRequestId = trnRequestId,
+                    SubjectName = subject.Name,
+                    SubjectEmailAddress = subject.EmailAddress,
                 };
 
                 dbContext.SupportTasks.Add(supportTask);

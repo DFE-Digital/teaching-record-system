@@ -103,7 +103,7 @@ public partial class TestData
             return this;
         }
 
-        public Task<SupportTask> ExecuteAsync(TestData testData)
+        public Task<SupportTask> ExecuteAsync(TestData testData) => testData.WithDbContextAsync(async dbContext =>
         {
             var firstName = _firstName.ValueOr(testData.GenerateFirstName);
             var middleName = _middleName.ValueOr(testData.GenerateMiddleName);
@@ -114,16 +114,10 @@ public partial class TestData
             var status = _status.ValueOr(SupportTaskStatus.Open);
             var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow).ToUniversalTime();
 
-            var data = new ChangeNameRequestData
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName,
-                EmailAddress = emailAddress,
-                ChangeRequestOutcome = null
-            };
+            var person = await dbContext.Persons.FindAsync(personId) ??
+                throw new InvalidOperationException("Person does not exist.");
+
+            var subject = SupportTask.Subject.FromPerson(person);
 
             var supportTask = new SupportTask
             {
@@ -131,17 +125,25 @@ public partial class TestData
                 UpdatedOn = createdOn,
                 SupportTaskType = SupportTaskType.ChangeNameRequest,
                 Status = status,
-                Data = data,
-                PersonId = personId
+                Data = new ChangeNameRequestData
+                {
+                    FirstName = firstName,
+                    MiddleName = middleName,
+                    LastName = lastName,
+                    EvidenceFileId = evidenceFileId,
+                    EvidenceFileName = evidenceFileName,
+                    EmailAddress = emailAddress,
+                    ChangeRequestOutcome = null
+                },
+                PersonId = personId,
+                SubjectName = subject.Name,
+                SubjectEmailAddress = subject.EmailAddress
             };
 
-            return testData.WithDbContextAsync(async dbContext =>
-            {
-                dbContext.SupportTasks.Add(supportTask);
-                await dbContext.SaveChangesAsync();
+            dbContext.SupportTasks.Add(supportTask);
+            await dbContext.SaveChangesAsync();
 
-                return supportTask;
-            });
-        }
+            return supportTask;
+        });
     }
 }

@@ -11,11 +11,12 @@ public record OneLoginUserRecordMatchingData : IOneLoginUserMatchingData
     public required string? TrnTokenTrn { get; init; }
     public required Guid ClientApplicationUserId { get; init; }
     public Guid? PersonId { get; init; }
-    public OneLoginUserRecordMatchingOutcome Outcome { get; init; }
+    public OneLoginUserRecordMatchingOutcome? Outcome { get; init; }
     public OneLoginUserNotConnectingReason? NotConnectingReason { get; init; }
     public string? NotConnectingAdditionalDetails { get; init; }
     public string[][]? VerifiedOrStatedNames => VerifiedNames;
     public DateOnly[]? VerifiedOrStatedDatesOfBirth => VerifiedDatesOfBirth;
+    string ISupportTaskData.GetOutcomeLabel() => Enum.GetName(Outcome!.Value)!;
 }
 
 public enum OneLoginUserRecordMatchingOutcome
