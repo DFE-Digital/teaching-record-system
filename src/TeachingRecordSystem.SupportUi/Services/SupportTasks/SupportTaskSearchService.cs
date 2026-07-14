@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Linq.Expressions;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Services.SupportTasks;
@@ -452,6 +454,89 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             TotalTaskCount = taskCount,
             SearchResults = searchResults
         };
+    }
+
+    public async Task<SupportTasksSearchResult> SearchSupportTasksAsync(SupportTasksSearchOptions searchOptions, PaginationOptions paginationOptions)
+    {
+        var sortBy = searchOptions.SortBy ?? SupportTasksSortByOption.RequestedOn;
+        var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
+
+        var tasks = dbContext.SupportTasks.AsQueryable();
+
+        if (searchOptions.SupportTaskType is { } supportTaskType)
+        {
+            tasks = tasks.Where(t => t.SupportTaskType == supportTaskType);
+        }
+
+        if (searchOptions.AssignedToUserId is { } assignedToUserId)
+        {
+            tasks = tasks.Where(t => t.AssignedToUserId == assignedToUserId);
+        }
+
+        if (searchOptions.Statuses is { Count: not 0 } statuses)
+        {
+            tasks = tasks.Where(t => statuses.Contains(t.Status));
+        }
+
+        var totalFilteredTaskCount = await tasks.CountAsync();
+
+        tasks = sortBy switch
+        {
+            SupportTasksSortByOption.Subject => tasks
+                .OrderBy(t => t.SubjectName ?? t.SubjectEmailAddress, sortDirection),
+            SupportTasksSortByOption.TaskType => tasks
+                .OrderBy(GetOrderByTypeExpression(), sortDirection),
+            SupportTasksSortByOption.Status => tasks
+                .OrderBy(t => t.Status, sortDirection),
+            SupportTasksSortByOption.AssignedTo => tasks
+                .OrderBy(t => t.AssignedTo!.Name, sortDirection),
+            SupportTasksSortByOption.RequestedOn => tasks
+                .OrderBy(t => t.CreatedOn, sortDirection),
+            _ => tasks
+                .OrderBy(t => t.SupportTaskReference, sortDirection)
+        };
+
+        var searchResults = await tasks
+            .Select(t => new SupportTasksSearchResultItem(
+                t.SupportTaskReference,
+                (t.SubjectName ?? t.SubjectEmailAddress)!,
+                t.SupportTaskType,
+                t.Status,
+                t.AssignedToUserId,
+                t.AssignedTo != null ? t.AssignedTo.Name : null,
+                t.CreatedOn))
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
+
+        return new()
+        {
+            TotalTaskCount = totalFilteredTaskCount,
+            SearchResults = searchResults
+        };
+
+        Expression<Func<SupportTask, int>> GetOrderByTypeExpression()
+        {
+            var typesOrderedByTitle = SupportTaskTypeRegistry.All
+                .OrderBy(t => t.Title)
+                .Select(t => (int)t.SupportTaskType)
+                .ToArray();
+
+            var parameter = Expression.Parameter(typeof(SupportTask), "t");
+            var typeAsInt = Expression.Convert(
+                Expression.Property(parameter, nameof(SupportTask.SupportTaskType)),
+                typeof(int));
+
+            // Build a CASE expression that maps each task type to its position in typesOrderedByTitle.
+            Expression body = Expression.Constant(typesOrderedByTitle.Length);
+            for (var i = typesOrderedByTitle.Length - 1; i >= 0; i--)
+            {
+                body = Expression.Condition(
+                    Expression.Equal(typeAsInt, Expression.Constant(typesOrderedByTitle[i])),
+                    Expression.Constant(i),
+                    body);
+            }
+
+            return Expression.Lambda<Func<SupportTask, int>>(body, parameter);
+        }
     }
 
     private bool SearchTextIsDate(string searchText, out DateTime minDate, out DateTime maxDate)

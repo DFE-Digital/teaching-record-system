@@ -43,7 +43,7 @@
                 </row>
                 <row>
                     <key>Additional information</key>
-                    <value use-empty-fallback="true">@Model.ChangeReasonDetail.AdditionalInformation</value>
+                    <value use-empty-fallback>@Model.ChangeReasonDetail.AdditionalInformation</value>
                     <row-actions>
                         <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
                                                        visually-hidden-text="additional information">Change</action>

@@ -1,0 +1,83 @@
+@page "/support-tasks/active"
+@using TeachingRecordSystem.SupportUi.Services.SupportTasks
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Active
+@{
+    ViewBag.Title = "Active tasks";
+}
+
+<span class="govuk-caption-m">Tasks overview</span>
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+@if (Model.Results!.Count == 0)
+{
+    <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
+        No matching tasks found
+    </p>
+    <p class="govuk-body-m">Try searching again with different details.</p>
+}
+else
+{
+    <table class="govuk-table trs-table-layout-fixed">
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header trs-!-width-200"
+                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.Subject ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Subject, direction))">
+                    Name and task ID
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-130"
+                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.RequestedOn, direction))">
+                    Requested on
+                </th>
+                <th scope="col" class="govuk-table__header"
+                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.TaskType ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.TaskType, direction))">
+                    Type
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-120"
+                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.Status ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Status, direction))">
+                    Status
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-120"
+                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.AssignedTo ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.AssignedTo, direction))">
+                    Assigned to
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-100">
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body" data-testid="results">
+            @foreach (var result in Model.Results!)
+            {
+                <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                    <td class="govuk-table__cell" data-testid="task-name-and-id">
+                        <a href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(result.SupportTaskReference)" class="govuk-link trs-task-link">
+                            <span class="trs-task-link__name" data-testid="task-name">@result.Subject</span>
+                            <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
+                        </a>
+                    </td>
+                    <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateDisplayFormat)</td>
+                    <td class="govuk-table__cell">@result.SupportTaskType.GetTitle()</td>
+                    <td class="govuk-table__cell" data-testid="status">
+                        <support-task-status-tag status="@result.Status"/>
+                    </td>
+                    <td class="govuk-table__cell" data-testid="assigned-to" use-empty-fallback="Not assigned">
+                        @result.AssignedToName
+                    </td>
+                    <td class="govuk-table__cell">
+                        <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference)"
+                           class="govuk-link">
+                            Manage
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <partial name="_Pagination" model=@Model.Pagination />
+}
