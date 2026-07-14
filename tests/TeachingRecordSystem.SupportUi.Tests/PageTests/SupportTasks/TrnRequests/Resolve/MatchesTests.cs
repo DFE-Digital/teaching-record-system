@@ -116,7 +116,9 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         // Assert
         var doc = await response.GetDocumentAsync();
-        var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
+        // The order matches are rendered in (and which records get pulled into the match set) is determined by the
+        // matching service, not the order of matchedPersonIds, so select the card for the specific record under test.
+        var firstMatchDetails = doc.GetAllElementsByTestId("match").Single(e => Guid.Parse(e.GetAttribute("data-personid")!) == firstMatch.PersonId);
         var expectedPreviousName = firstMatch.PreviousNames is not null ? string.JoinNonEmpty(' ', firstMatch.PreviousNames.First().FirstName, firstMatch.PreviousNames.First().MiddleName, firstMatch.PreviousNames.First().LastName) : null;
         Assert.NotNull(firstMatchDetails);
         Assert.Equal(string.JoinNonEmpty(' ', firstMatch.FirstName, firstMatch.MiddleName, firstMatch.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
