@@ -1,0 +1,178 @@
+@page "/support-tasks/{supportTaskReference}"
+@using Microsoft.AspNetCore.Html
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail.Index
+@{
+    ViewBag.Title = $"{Model.Subject} {Model.SupportTaskReference}";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="#TODO" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <span class="govuk-caption-m">Manage task</span>
+
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
+                @Model.Subject<br/>
+                @Model.SupportTaskReference
+            </h1>
+
+            @{
+                var linksBuilder = new HtmlContentBuilder();
+            }
+
+            @if (Model.IsOutstanding)
+            {
+                <capture-content to="linksBuilder">
+                    <a href="@LinkGenerator.SupportTaskResolve(Model.SupportTaskReference, Model.SupportTaskType)" class="govuk-link">View task</a>
+                </capture-content>
+            }
+
+            @if (Model.Subject is not null)
+            {
+                if (linksBuilder.Count > 0)
+                {
+                    <capture-content to="linksBuilder">
+                        <span class="trs-link-separator" aria-hidden="true">｜</span>
+                    </capture-content>
+                }
+
+                <capture-content to="linksBuilder">
+                    <a href="@Model.SubjectLink" target="_blank" class="govuk-link">@Model.SubjectLinkText (opens in a new tab)</a>
+                </capture-content>
+            }
+
+            @if (linksBuilder.Count > 0)
+            {
+                <div class="govuk-!-margin-bottom-6">
+                    @linksBuilder
+                </div>
+            }
+        </form>
+    </div>
+
+    @if (Model.IsOutstanding)
+    {
+        <div class="govuk-grid-column-full">
+            <form method="post">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Overview</h2>
+
+                <div class="trs-support-task__overview-actions">
+                    <govuk-select for="AssignedToUserId">
+                        <govuk-select-label>Assigned to</govuk-select-label>
+                        <govuk-select-item value=""></govuk-select-item>
+                        @foreach (var option in Model.AssignToOptions!)
+                        {
+                            <govuk-select-item value="@option.UserId">@option.Name</govuk-select-item>
+                        }
+                    </govuk-select>
+
+                    <govuk-select for="Status">
+                        <govuk-select-label>Status</govuk-select-label>
+                        <govuk-select-item value="@SupportTaskStatus.Open">Not started</govuk-select-item>
+                        <govuk-select-item value="@SupportTaskStatus.InProgress">In progress</govuk-select-item>
+                    </govuk-select>
+                </div>
+
+                <div class="govuk-button-group">
+                    <govuk-button type="submit">Update details</govuk-button>
+                    <govuk-button-link href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(Model.SupportTaskReference)"
+                                       class="govuk-button--secondary">
+                        Cancel
+                    </govuk-button-link>
+                </div>
+            </form>
+        </div>
+
+        <div class="govuk-grid-column-full trs-task-detail__section">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Notes</h2>
+
+            <p class="govuk-body">View and add notes related to this task.</p>
+
+            <govuk-details open="@Model.ExpandNotes">
+                <govuk-details-summary>View notes</govuk-details-summary>
+                <govuk-details-text>
+                    <div class="moj-timeline">
+                        @foreach (var note in Model.Notes!)
+                        {
+                            <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn.ToGmt()">
+                                @note.Content
+                            </timeline-entry>
+                        }
+                    </div>
+                </govuk-details-text>
+            </govuk-details>
+
+            <govuk-button-link href="@LinkGenerator.SupportTasks.SupportTaskDetail.AddNote(Model.SupportTaskReference)"
+                               class="govuk-button--secondary">
+                Add a note
+            </govuk-button-link>
+        </div>
+
+        <div class="govuk-grid-column-full trs-task-detail__section">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Zendesk tickets</h2>
+
+            <p class="govuk-body">View and add Zendesk tickets related to this task.</p>
+
+            <govuk-details>
+                <govuk-details-summary>View tickets</govuk-details-summary>
+                <govuk-details-text>
+                    TODO
+                </govuk-details-text>
+            </govuk-details>
+
+            <govuk-button class="govuk-button--secondary">Add a Zendesk ticket</govuk-button>
+        </div>
+
+        <div class="govuk-grid-column-full trs-task-detail__section">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">History</h2>
+
+            <govuk-details>
+                <govuk-details-summary>View activity</govuk-details-summary>
+                <govuk-details-text>
+                    TODO
+                </govuk-details-text>
+            </govuk-details>
+        </div>
+    }
+    else
+    {
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Key task details</h2>
+
+            <govuk-summary-list>
+                <row>
+                    <key>Outcome</key>
+                    <value>
+                        <govuk-tag class="govuk-tag--green">@Model.OutcomeLabel</govuk-tag>
+                    </value>
+                </row>
+                <row>
+                    <key>Type</key>
+                    <value>@Model.SupportTaskTypeTitle</value>
+                </row>
+                <row>
+                    <key>Completed on</key>
+                    <value>@Model.CompletedOn?.ToString(DateDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>Completed by</key>
+                    <value>@Model.CompletedByUserName</value>
+                </row>
+                <row>
+                    <key>Zendesk tickets</key>
+                    <value>
+                        TODO
+                    </value>
+                </row>
+            </govuk-summary-list>
+
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Task history</h2>
+
+            <div class="moj-timeline">
+            </div>
+        </div>
+    }
+</div>

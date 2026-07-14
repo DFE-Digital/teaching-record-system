@@ -49,7 +49,9 @@ public class AddNote(
             },
             processContext);
 
-        return Redirect(linkGenerator.SupportTaskDetail(SupportTaskReference, SupportTaskType));
+        TempData.SetFlashNotificationBanner("Note added");
+
+        return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(SupportTaskReference, expandNotes: true));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

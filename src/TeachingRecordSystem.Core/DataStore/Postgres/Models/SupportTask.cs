@@ -34,6 +34,9 @@ public class SupportTask
 
     public T GetData<T>() where T : ISupportTaskData => (T)Data;
 
+    public string GetSubject() => SubjectName ??
+        SubjectEmailAddress ?? throw new InvalidOperationException($"Subject has not been set.");
+
     public sealed record Subject
     {
         private Subject(string? name, string? emailAddress)

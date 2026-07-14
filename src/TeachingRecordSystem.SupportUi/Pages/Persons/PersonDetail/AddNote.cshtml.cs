@@ -26,6 +26,7 @@ public class AddNote(NoteService noteService, SupportUiLinkGenerator linkGenerat
                 .WithMessage($"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")
                 .When(m => m.File is not null)
     };
+
     [FromRoute]
     public Guid PersonId { get; set; }
 

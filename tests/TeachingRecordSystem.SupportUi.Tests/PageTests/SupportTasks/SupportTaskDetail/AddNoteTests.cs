@@ -103,6 +103,36 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_ValidContent_RedirectsToDetailWithNotesExpandedAndShowsFlashMessage()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/{supportTask.SupportTask.SupportTaskReference}/notes/add")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Content", Faker.Lorem.Paragraph() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var location = response.Headers.Location?.OriginalString;
+        Assert.NotNull(location);
+        Assert.StartsWith($"/support-tasks/{supportTask.SupportTask.SupportTaskReference}", location);
+        Assert.Contains("xpandNotes=True", location);
+
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "Note added");
+    }
+
+    [Fact]
     public async Task Post_MaxLengthContent_CreatesNoteSuccessfully()
     {
         // Arrange

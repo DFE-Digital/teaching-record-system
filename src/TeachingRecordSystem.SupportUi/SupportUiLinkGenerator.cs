@@ -27,7 +27,7 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
     public string SignedOut() =>
         linkGenerator.GetRequiredPathByPage("/SignedOut");
 
-    public string SupportTaskDetail(string supportTaskReference, SupportTaskType supportTaskType) =>
+    public string SupportTaskResolve(string supportTaskReference, SupportTaskType supportTaskType) =>
         supportTaskType switch
         {
             SupportTaskType.OneLoginUserRecordMatching => SupportTasks.OneLoginUserMatching.Resolve.Index(supportTaskReference),
