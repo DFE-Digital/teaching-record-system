@@ -188,7 +188,7 @@ public partial class OneLoginUserMatchingSupportTaskService
                 supportTask.TrnRequestApplicationUserId!.Value,
                 supportTask.TrnRequestId,
                 options.MatchedPersonId,
-                options.MatchedAttributes.Select(kvp => kvp.Key).ToArray(),
+                [],
                 processContext);
         }
         else
