@@ -26,6 +26,7 @@ public class RecordMatching(SupportTaskSearchService searchService, SupportUiLin
     public int? PageNumber { get; set; }
 
     public int? TotalTaskCount { get; set; }
+
     public PaginationViewModel? Pagination { get; set; }
 
     public ResultPage<OneLoginUserRecordMatchingSupportTasksSearchResultItem>? Results { get; set; }

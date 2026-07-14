@@ -6,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="#TODO" />
+    <govuk-back-link href="@(Model.Status is not SupportTaskStatus.Closed ? LinkGenerator.SupportTasks.Active() : "#TODO")" />
 }
 
 <div class="govuk-grid-row">
