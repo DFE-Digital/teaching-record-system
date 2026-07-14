@@ -331,6 +331,13 @@ Support UI *Add note* (support task).
 | --- | --- | --- |
 | `SupportTaskNoteCreatedEvent` | Always | — |
 
+### `SupportTaskAllocating` (62)
+Support UI *Allocate* (support task) — sets the status and assigned user.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskUpdatedEvent` | Always | — |
+
 ---
 
 ## Notes

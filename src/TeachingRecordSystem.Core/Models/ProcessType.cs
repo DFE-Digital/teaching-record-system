@@ -60,5 +60,6 @@ public enum ProcessType
     ChangeOfDateOfBirthRequestRejecting = 58,
     ChangeOfNameRequestCancelling = 59,
     ChangeOfDateOfBirthRequestCancelling = 60,
-    SupportTaskNoteCreating = 61
+    SupportTaskNoteCreating = 61,
+    SupportTaskAllocating = 62
 }

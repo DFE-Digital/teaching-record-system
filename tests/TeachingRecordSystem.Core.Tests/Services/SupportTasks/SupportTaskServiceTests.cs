@@ -535,5 +535,131 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         });
     }
 
+    [Fact]
+    public async Task AllocateSupportTaskAsync_TaskDoesNotExist_ReturnsNotFoundAndDoesNotPublishEvent()
+    {
+        // Arrange
+        var options = new AllocateSupportTaskOptions
+        {
+            SupportTaskReference = "ABC-123",
+            Status = SupportTaskStatus.InProgress,
+            AssignToUserId = null
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(
+            service => service.AllocateSupportTaskAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<NotFoundException>(ex);
+        Events.AssertNoEventsPublished();
+    }
+
+    [Fact]
+    public async Task AllocateSupportTaskAsync_TaskIsAlreadyClosed_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            person.PersonId,
+            t => t.WithStatus(SupportTaskStatus.Closed));
+
+        var options = new AllocateSupportTaskOptions
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            Status = SupportTaskStatus.InProgress,
+            AssignToUserId = null
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(
+            service => service.AllocateSupportTaskAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+        Events.AssertNoEventsPublished();
+    }
+
+    [Fact]
+    public async Task AllocateSupportTaskAsync_ChangesStatusAndAssignedUser_UpdatesTaskAndPublishesEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
+        Debug.Assert(supportTask.AssignedToUserId is null);
+        var user = await TestData.CreateUserAsync();
+
+        var options = new AllocateSupportTaskOptions
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            Status = SupportTaskStatus.InProgress,
+            AssignToUserId = user.UserId
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, bool>(service => service.AllocateSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.True(result);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(options.Status, dbSupportTask.Status);
+            Assert.Equal(user.UserId, dbSupportTask.AssignedToUserId);
+            Assert.Equal(TimeProvider.UtcNow, dbSupportTask.UpdatedOn);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+            Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
+            Assert.Equal(user.UserId, supportTaskUpdatedEvent.SupportTask.AssignedToUserId);
+            Assert.Equal(
+                SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.AssignedToUserId,
+                supportTaskUpdatedEvent.Changes);
+        });
+    }
+
+    [Fact]
+    public async Task AllocateSupportTaskAsync_NoChanges_DoesNotPublishEventOrSetUpdatedOn()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.AssignedToUserId is null);
+        TimeProvider.Advance(TimeSpan.FromDays(1));
+
+        var options = new AllocateSupportTaskOptions
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            Status = supportTask.Status,
+            AssignToUserId = supportTask.AssignedToUserId
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, bool>(service => service.AllocateSupportTaskAsync(options, processContext));
+
+        // Assert
+        Assert.False(result);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(supportTask.CreatedOn, dbSupportTask.UpdatedOn);
+        });
+
+        Events.AssertNoEventsPublished();
+    }
+
     private record DummyJourneyState;
 }

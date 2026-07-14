@@ -11,15 +11,15 @@
             <span class="govuk-caption-l">@Model.SupportTaskTypeTitle</span>
             <span class="govuk-caption-m">@Model.SupportTaskReference</span>
 
-            <govuk-character-count for="Content" max-words="@SupportTaskNote.ContentMaxLength" data-testid="text">
-                <govuk-character-count-label class="govuk-label--l" is-page-heading="true">Add a note</govuk-character-count-label>
-            </govuk-character-count>
+            <govuk-textarea for="Content" max-length="@SupportTaskNote.ContentMaxLength" data-testid="text">
+                <govuk-textarea-label class="govuk-label--l" is-page-heading="true">Add a note</govuk-textarea-label>
+            </govuk-textarea>
 
             <p class="govuk-hint">Your note will be saved to the task.</p>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Save note</govuk-button>
-                <govuk-button-link href="@LinkGenerator.SupportTaskDetail(Model.SupportTaskReference, Model.SupportTaskType)" class="govuk-button--secondary">Cancel</govuk-button-link>
+                <govuk-button-link href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(Model.SupportTaskReference)" class="govuk-button--secondary">Cancel</govuk-button-link>
             </div>
         </form>
     </div>

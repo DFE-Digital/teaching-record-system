@@ -89,6 +89,50 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             });
     }
 
+    public async Task<bool> AllocateSupportTaskAsync(AllocateSupportTaskOptions options, ProcessContext processContext)
+    {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
+
+        if (supportTask.Status is SupportTaskStatus.Closed)
+        {
+            throw new InvalidOperationException("Support task is closed.");
+        }
+
+        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
+
+        supportTask.Status = options.Status;
+        supportTask.AssignedToUserId = options.AssignToUserId;
+
+        var changes = SupportTaskUpdatedEventChanges.None |
+            (supportTask.Status != oldSupportTaskEventModel.Status ? SupportTaskUpdatedEventChanges.Status : 0) |
+            (supportTask.AssignedToUserId != oldSupportTaskEventModel.AssignedToUserId ? SupportTaskUpdatedEventChanges.AssignedToUserId : 0);
+
+        if (changes is not SupportTaskUpdatedEventChanges.None)
+        {
+            supportTask.UpdatedOn = processContext.Now;
+
+            await dbContext.SaveChangesAsync();
+
+            await eventScope.PublishEventAsync(
+                new SupportTaskUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    SupportTaskReference = supportTask.SupportTaskReference,
+                    Changes = changes,
+                    OldSupportTask = oldSupportTaskEventModel,
+                    SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                    Comments = null,
+                    RejectionReason = null
+                });
+
+            return true;
+        }
+
+        return false;
+    }
+
     public Task UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext)
     {
         return UpdateSupportTaskCoreAsync(options, updateAction: null, processContext);

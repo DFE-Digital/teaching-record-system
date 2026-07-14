@@ -17,6 +17,11 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
 
         _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required.");
 
+        if (context.ActionDescriptor.EndpointMetadata.Any(e => e is AllowClosedSupportTaskMetadata))
+        {
+            excludeClosed = false;
+        }
+
         var currentSupportTaskQuery = dbContext.SupportTasks
             .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update");  // https://github.com/dotnet/efcore/issues/26042
 
@@ -46,6 +51,10 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
             currentSupportTaskQuery = currentSupportTaskQuery
                 .Include(t => t.Person);
         }
+
+        currentSupportTaskQuery = currentSupportTaskQuery
+            .Include(t => t.AssignedTo)
+            .Include(t => t.CompletedBy);
 
         var currentSupportTask = await currentSupportTaskQuery.SingleOrDefaultAsync();
 
