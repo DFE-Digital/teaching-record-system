@@ -49,7 +49,7 @@ public class Index(
     [FromQuery]
     public bool ExpandNotes { get; set; }
 
-    public IReadOnlyCollection<AssignToOption>? AssignToOptions { get; set; }
+    public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
     public void OnGet()
     {
@@ -113,16 +113,10 @@ public class Index(
             .Select(t => new Note(t.Content, t.CreatedOn, t.CreatedBy!.Name))
             .ToArrayAsync();
 
-        AssignToOptions = await dbContext.Users
-            .Where(u => u.Role == UserRoles.AccessManager || u.Role == UserRoles.RecordManager)
-            .OrderBy(u => u.Name)
-            .Select(u => new AssignToOption(u.UserId, u.Name))
-            .ToArrayAsync();
+        AssignToOptions = await supportTaskService.GetAssignableUsersAsync();
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
-
-    public record AssignToOption(Guid UserId, string Name);
 
     public record Note(string Content, DateTime CreatedOn, string CreatedBy);
 }

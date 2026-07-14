@@ -22,11 +22,11 @@ public class SupportTasksLinkGenerator(LinkGenerator linkGenerator)
     public string Active(
         SupportTaskType? type = null,
         Guid? assignedToUserId = null,
-        SupportTaskStatus? status = null,
+        IEnumerable<SupportTaskStatus>? statuses = null,
         SupportTasksSortByOption? sortBy = null,
         SortDirection? sortDirection = null,
         int? pageNumber = null) =>
         linkGenerator.GetRequiredPathByPage(
             "/SupportTasks/Active",
-            routeValues: new { type, assignedToUserId, status, sortBy, sortDirection, pageNumber });
+            routeValues: new { type, assignedToUserId, status = statuses, sortBy, sortDirection, pageNumber });
 }
