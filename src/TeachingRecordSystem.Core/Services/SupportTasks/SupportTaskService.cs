@@ -6,6 +6,15 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
 public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPublisher)
 {
+    public async Task<IReadOnlyCollection<AssignableUserInfo>> GetAssignableUsersAsync()
+    {
+        return await dbContext.Users
+            .Where(u => u.Role == UserRoles.AccessManager || u.Role == UserRoles.RecordManager)
+            .OrderBy(u => u.Name)
+            .Select(u => new AssignableUserInfo(u.UserId, u.Name))
+            .ToArrayAsync();
+    }
+
     public async Task<SupportTaskNote> CreateNoteAsync(CreateSupportTaskNoteOptions options, ProcessContext processContext)
     {
         var note = new SupportTaskNote
@@ -227,3 +236,5 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         }
     }
 }
+
+public record AssignableUserInfo(Guid UserId, string UserName);

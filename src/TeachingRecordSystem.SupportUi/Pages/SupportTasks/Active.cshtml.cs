@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks;
 
-public class Active(SupportTaskSearchService searchService, SupportUiLinkGenerator linkGenerator) : PageModel
+public class Active(SupportTaskSearchService searchService, SupportTaskService supportTaskService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int TasksPerPage = 20;
 
@@ -14,7 +15,7 @@ public class Active(SupportTaskSearchService searchService, SupportUiLinkGenerat
     public SupportTaskType? Type { get; set; }
 
     [BindProperty(SupportsGet = true)]
-    public SupportTaskStatus? Status { get; set; }
+    public SupportTaskStatus[]? Status { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public Guid? AssignedToUserId { get; set; }
@@ -36,11 +37,13 @@ public class Active(SupportTaskSearchService searchService, SupportUiLinkGenerat
 
     public ResultPage<SupportTasksSearchResultItem>? Results { get; set; }
 
+    public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
+
     public async Task OnGetAsync()
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
         var sortBy = SortBy ?? SupportTasksSortByOption.RequestedOn;
-        var statuses = Status is { } status ? new[] { status } : new[] { SupportTaskStatus.Open, SupportTaskStatus.InProgress };
+        var statuses = Status?.Length > 0 ? Status : [SupportTaskStatus.Open, SupportTaskStatus.InProgress];
         var searchOptions = new SupportTasksSearchOptions(Type, AssignedToUserId, statuses, sortBy, sortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
@@ -52,5 +55,7 @@ public class Active(SupportTaskSearchService searchService, SupportUiLinkGenerat
         Pagination = PaginationViewModel.Create(
             Results,
             pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber));
+
+        AssignToOptions = await supportTaskService.GetAssignableUsersAsync();
     }
 }

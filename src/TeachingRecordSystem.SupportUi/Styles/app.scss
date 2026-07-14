@@ -235,9 +235,22 @@
   }
 }
 
-.trs-horizontal-filters {
+@mixin trs-filters {
+  @extend .govuk-\!-margin-bottom-6;
   background-color: govuk-colour("black", $variant: "tint-95");
   padding: 20px;
+}
+
+.trs-vertical-filters {
+  @include trs-filters;
+
+  &__heading {
+    @extend .govuk-\!-margin-bottom-3;
+  }
+}
+
+.trs-horizontal-filters {
+  @include trs-filters;
 
   &__heading {
     @extend .govuk-\!-margin-bottom-3;
@@ -536,4 +549,21 @@
       margin: 10px 20px 10px 0;
     }
   }
+}
+
+.trs-checkboxes--horizontal {
+  .govuk-checkboxes {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+  }
+
+  .govuk-checkboxes__item {
+    @extend .trs-nowrap;
+  }
+}
+
+.trs-column-gap-1 {
+  column-gap: 1rem;
 }

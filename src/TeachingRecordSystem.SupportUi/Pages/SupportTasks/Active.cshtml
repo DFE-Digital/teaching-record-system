@@ -8,6 +8,47 @@
 <span class="govuk-caption-m">Tasks overview</span>
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
+<div class="trs-vertical-filters">
+    <form method="get" asp-antiforgery="false">
+        <h2 class="govuk-heading-m trs-vertical-filters__heading">Filter tasks</h2>
+
+        <div class="trs-display-flex trs-column-gap-1 govuk-!-margin-bottom-3">
+            <govuk-select for="Type" class="govuk-!-width-one-half govuk-!-margin-bottom-0" select-class="govuk-!-width-full">
+                <govuk-select-label class="govuk-label--s">Task type</govuk-select-label>
+                <govuk-select-item value="">All types</govuk-select-item>
+                @foreach (var type in SupportTaskTypeRegistry.AllTypes.OrderBy(t => t.GetTitle()))
+                {
+                    <govuk-select-item value="@type">@type.GetTitle()</govuk-select-item>
+                }
+            </govuk-select>
+
+            <govuk-select for="AssignedToUserId" class="govuk-!-width-one-half govuk-!-margin-bottom-0" select-class="govuk-!-width-full">
+                <govuk-select-label class="govuk-label--s">Assigned to</govuk-select-label>
+                <govuk-select-item value="">All owners</govuk-select-item>
+                @foreach (var user in Model.AssignToOptions!)
+                {
+                    <govuk-select-item value="@user.UserId">@user.UserName</govuk-select-item>
+                }
+            </govuk-select>
+        </div>
+
+        <govuk-checkboxes for="Status" class="govuk-checkboxes--small trs-checkboxes--horizontal govuk-!-margin-bottom-3">
+            <govuk-checkboxes-fieldset>
+                <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">Status</govuk-checkboxes-fieldset-legend>
+                <govuk-checkboxes-item value="@SupportTaskStatus.Open" checked="@Model.Status.Contains(SupportTaskStatus.Open)">Not started</govuk-checkboxes-item>
+                <govuk-checkboxes-item value="@SupportTaskStatus.InProgress" checked="@Model.Status.Contains(SupportTaskStatus.InProgress)">In progress</govuk-checkboxes-item>
+            </govuk-checkboxes-fieldset>
+        </govuk-checkboxes>
+
+        <div class="trs-vertical-filters__actions">
+            <div class="govuk-button-group govuk-!-margin-bottom-0">
+                <govuk-button type="submit">Apply filters</govuk-button>
+                <a href="@LinkGenerator.SupportTasks.Active()" class="govuk-link">Clear all</a>
+            </div>
+        </div>
+    </form>
+</div>
+
 @if (Model.Results!.Count == 0)
 {
     <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">

@@ -661,5 +661,29 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         Events.AssertNoEventsPublished();
     }
 
+    [Fact]
+    public async Task GetAssignableUsersAsync_ReturnsAccessManagersAndRecordManagersOrderedByNameAndExcludesOtherRoles()
+    {
+        // Arrange
+        var accessManager = await TestData.CreateUserAsync(name: "ZZZ Assignable AccessManager", role: UserRoles.AccessManager);
+        var recordManager = await TestData.CreateUserAsync(name: "AAA Assignable RecordManager", role: UserRoles.RecordManager);
+        var viewer = await TestData.CreateUserAsync(name: "MMM Assignable Viewer", role: UserRoles.Viewer);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, IReadOnlyCollection<AssignableUserInfo>>(
+            service => service.GetAssignableUsersAsync());
+
+        // Assert
+        Assert.Contains(result, u => u.UserId == accessManager.UserId && u.UserName == accessManager.Name);
+        Assert.Contains(result, u => u.UserId == recordManager.UserId && u.UserName == recordManager.Name);
+        Assert.DoesNotContain(result, u => u.UserId == viewer.UserId);
+
+        var createdUsersInResult = result
+            .Where(u => u.UserId == accessManager.UserId || u.UserId == recordManager.UserId)
+            .Select(u => u.UserId)
+            .ToArray();
+        Assert.Equal(new[] { recordManager.UserId, accessManager.UserId }, createdUsersInResult);
+    }
+
     private record DummyJourneyState;
 }

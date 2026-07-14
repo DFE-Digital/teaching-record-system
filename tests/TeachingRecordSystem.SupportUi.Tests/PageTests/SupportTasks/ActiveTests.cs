@@ -139,6 +139,28 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
+    [Fact]
+    public async Task Get_FilterByMultipleStatuses_ShowsTasksWithAnyGivenStatus()
+    {
+        // Arrange
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20)).WithStatus(SupportTaskStatus.Open)),
+            ["ST2"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 21)).WithStatus(SupportTaskStatus.InProgress)),
+            ["ST3"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 22)).WithStatus(SupportTaskStatus.Closed)),
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/active?status={SupportTaskStatus.Open}&status={SupportTaskStatus.Closed}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(["ST1", "ST3"], GetResultTaskKeys(doc, tasks));
+    }
+
     [Theory]
     [InlineData(SupportTaskType.ChangeNameRequest, new[] { "ST1" })]
     [InlineData(SupportTaskType.ChangeDateOfBirthRequest, new[] { "ST2" })]
