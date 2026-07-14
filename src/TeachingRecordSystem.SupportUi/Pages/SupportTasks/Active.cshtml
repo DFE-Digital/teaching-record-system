@@ -13,7 +13,15 @@
         <h2 class="govuk-heading-m trs-vertical-filters__heading">Filter tasks</h2>
 
         <div class="trs-display-flex trs-column-gap-1 govuk-!-margin-bottom-3">
-            <govuk-select for="Type" class="govuk-!-width-one-half govuk-!-margin-bottom-0" select-class="govuk-!-width-full">
+            <govuk-select for="Type"
+                          select-hx-get="@LinkGenerator.SupportTasks.Active(type: null, Model.AssignedToUserId, Model.Status, Model.SortBy, Model.SortDirection)"
+                          select-hx-trigger="change"
+                          select-hx-select="main"
+                          select-hx-target="main"
+                          select-hx-swap="outerHTML"
+                          select-hx-push-url="true"
+                          class="govuk-!-width-one-half govuk-!-margin-bottom-0"
+                          select-class="govuk-!-width-full">
                 <govuk-select-label class="govuk-label--s">Task type</govuk-select-label>
                 <govuk-select-item value="">All types</govuk-select-item>
                 @foreach (var type in SupportTaskTypeRegistry.AllTypes.OrderBy(t => t.GetTitle()))
@@ -22,31 +30,74 @@
                 }
             </govuk-select>
 
-            <govuk-select for="AssignedToUserId" class="govuk-!-width-one-half govuk-!-margin-bottom-0" select-class="govuk-!-width-full">
+            <govuk-select for="AssignedToUserId"
+                          select-hx-get="@LinkGenerator.SupportTasks.Active(Model.Type, assignedToUserId: null, Model.Status, Model.SortBy, Model.SortDirection)"
+                          select-hx-trigger="change"
+                          select-hx-select="main"
+                          select-hx-target="main"
+                          select-hx-swap="outerHTML"
+                          select-hx-push-url="true"
+                          class="govuk-!-width-one-half govuk-!-margin-bottom-0"
+                          select-class="govuk-!-width-full">
                 <govuk-select-label class="govuk-label--s">Assigned to</govuk-select-label>
                 <govuk-select-item value="">All owners</govuk-select-item>
                 @foreach (var user in Model.AssignToOptions!)
                 {
-                    <govuk-select-item value="@user.UserId">@user.UserName</govuk-select-item>
+                    <govuk-select-item value="@user.UserId">
+                        @user.UserName
+                    </govuk-select-item>
                 }
             </govuk-select>
         </div>
 
         <govuk-checkboxes for="Status" class="govuk-checkboxes--small trs-checkboxes--horizontal govuk-!-margin-bottom-3">
             <govuk-checkboxes-fieldset>
-                <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">Status</govuk-checkboxes-fieldset-legend>
-                <govuk-checkboxes-item value="@SupportTaskStatus.Open" checked="@Model.Status.Contains(SupportTaskStatus.Open)">Not started</govuk-checkboxes-item>
-                <govuk-checkboxes-item value="@SupportTaskStatus.InProgress" checked="@Model.Status.Contains(SupportTaskStatus.InProgress)">In progress</govuk-checkboxes-item>
+                <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s govuk-!-margin-bottom-1">Status</govuk-checkboxes-fieldset-legend>
+                @foreach (var status in new[] { SupportTaskStatus.Open, SupportTaskStatus.InProgress })
+                {
+                    var toggledStatuses = (Model.Status ?? []).ToHashSet();
+                    toggledStatuses.SymmetricExceptWith([status]);
+
+                    <govuk-checkboxes-item value="@status"
+                                           checked="@Model.Status.Contains(status)"
+                                           input-hx-get="@LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, toggledStatuses, Model.SortBy, Model.SortDirection)"
+                                           input-hx-select="main"
+                                           input-hx-target="main"
+                                           input-hx-swap="outerHTML"
+                                           input-hx-push-url="true">
+                        @status.GetDisplayName()
+                    </govuk-checkboxes-item>
+                }
             </govuk-checkboxes-fieldset>
         </govuk-checkboxes>
 
         <div class="trs-vertical-filters__actions">
             <div class="govuk-button-group govuk-!-margin-bottom-0">
-                <govuk-button type="submit">Apply filters</govuk-button>
-                <a href="@LinkGenerator.SupportTasks.Active()" class="govuk-link">Clear all</a>
+                <noscript class="trs-display-flex">
+                    <govuk-button type="submit">Apply filters</govuk-button>
+                </noscript>
+                <a href="@LinkGenerator.SupportTasks.Active()"
+                   hx-get="@LinkGenerator.SupportTasks.Active()"
+                   hx-select="main"
+                   hx-target="main"
+                   hx-swap="outerHTML"
+                   hx-push-url="true"
+                   class="govuk-link">Clear all</a>
             </div>
         </div>
     </form>
+</div>
+
+@* Announces the updated results to assistive technology after each HTMX swap of the filtered list *@
+<div class="govuk-visually-hidden" aria-live="polite" aria-atomic="true" data-testid="results-status">
+    @if (Model.Results!.Count == 0)
+    {
+        <text>No matching tasks found.</text>
+    }
+    else
+    {
+        <text>Showing @Model.Results!.Count of @Model.TotalTaskCount matching tasks.</text>
+    }
 </div>
 
 @if (Model.Results!.Count == 0)
