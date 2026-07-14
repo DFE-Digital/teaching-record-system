@@ -176,7 +176,6 @@ Resolve a record-matching task.
 | `SupportTaskUpdatedEvent` | Always | The support task is closed. |
 | `OneLoginUserUpdatedEvent` | Sometimes | The "connected" outcome matches the One Login user to a record. |
 | `TrnRequestUpdatedEvent` | Sometimes | The task is linked to a TRN request that gets resolved. |
-| `PersonDetailsUpdatedEvent` | Sometimes | A linked TRN request is resolved to an existing record whose attributes are updated. |
 | `PersonCreatedEvent` | Sometimes | A linked TRN request is auto-resolved with no match, so a new record is created. |
 | `SupportTaskCreatedEvent` | Sometimes | A linked TRN request has potential duplicates or needs further checks. |
 | `EmailSentEvent` | Sometimes | An outcome email is sent to the user (record-matched, record-not-found or not-connected, depending on outcome and matching policy). |
