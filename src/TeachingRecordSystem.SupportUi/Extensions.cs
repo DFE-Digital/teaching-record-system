@@ -102,7 +102,6 @@ public static class Extensions
             .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
             .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>()
             .AddScoped<SupportUiFormContext>()
-            .AddScoped<SupportUiSortableTableContext>()
             .AddTransient<EvidenceUploadManager>()
             .AddSingleton<PersonChangeableAttributesService>()
             .AddSupportTaskSearchService()

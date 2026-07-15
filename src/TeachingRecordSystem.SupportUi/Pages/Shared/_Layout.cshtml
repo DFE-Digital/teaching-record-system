@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="~/app.css">
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/Components/accessible-autocomplete.min.css">
+    <link rel="stylesheet" href="~/moj-frontend-9.0.0.min.css">
     <script src="~/Components/accessible-autocomplete.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script src="~/htmx.min.js"></script>
@@ -109,20 +110,38 @@
 }
 
 @section BodyEnd {
-    <!script type="importmap" nonce="@cspNonce">
+    @{
+        var assetCollection = Context.GetEndpoint()!.Metadata.GetMetadata<Microsoft.AspNetCore.Components.ResourceAssetCollection>()!;
+
+        var govukFrontend = GetFingerprintedAssetUrl("govuk-frontend.min.js");
+        var mojFrontend = GetFingerprintedAssetUrl("moj-frontend-9.0.0.min.js");
+
+        var imports = new Dictionary<string, string>()
         {
-            "imports": {
-                "govuk-frontend": "/govuk-frontend.min.js"
-            }
-        }
-    </!script>
+            { "govuk-frontend", govukFrontend },
+            { "moj-frontend", mojFrontend }
+        };
+
+        var importMap = new Microsoft.AspNetCore.Components.ImportMapDefinition(
+            imports: imports,
+            scopes: null,
+            integrity: null);
+
+        string GetFingerprintedAssetUrl(string url) =>
+            "/" + assetCollection.Single(a => a.Properties?.Any(p => p.Name == "label" && p.Value == url) is true).Url;
+    }
+    <script type="importmap" asp-importmap="@importMap" asp-add-nonce="true"></script>
     <script type="module" asp-add-nonce="true">
-        import { initAll } from "govuk-frontend";
-        initAll();
+        import * as GOVUKFrontend from "govuk-frontend";
+        import * as MOJFrontend from "moj-frontend";
+        GOVUKFrontend.initAll();
+        MOJFrontend.initAll();
 
         document.addEventListener("htmx:afterSwap", function(evt) {
             var el = evt.detail.elt;
-            initAll(el);
+            GOVUKFrontend.initAll(el);
+            MOJFrontend.initAll(el);
         });
     </script>
+
 }
