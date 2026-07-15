@@ -39,6 +39,9 @@ public class SortableTableColumnTagHelper : TagHelper
     [HtmlAttributeName("link-template")]
     public Func<SortDirection, string>? LinkTemplate { get; set; }
 
+    [HtmlAttributeName("use-htmx")]
+    public bool UseHtmx { get; set; }
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         var content = await output.GetChildContentAsync();
@@ -90,6 +93,18 @@ public class SortableTableColumnTagHelper : TagHelper
 
         var button = new TagBuilder("button");
         button.Attributes.Add("type", "submit");
+
+        if (UseHtmx)
+        {
+            button.Attributes.Add("hx-get", link);
+
+            foreach (var attr in output.Attributes.Where(a => a.Name.StartsWith("hx-")).ToArray())
+            {
+                button.Attributes.Add(attr.Name, attr.Value.ToString());
+                output.Attributes.RemoveAll(attr.Name);
+            }
+        }
+
         button.InnerHtml.AppendHtml(content);
         button.InnerHtml.AppendHtml(directionIndicator);
 
@@ -127,15 +142,5 @@ public class SortableTableTagHelper : TagHelper
         caption.Attributes.Add("class", "govuk-visually-hidden");
         caption.InnerHtml.Append(ScreenReaderCaptionText);
         output.PreContent.AppendHtml(caption);
-
-        // The MOJ component inserts a visually-hidden live region immediately after the table to
-        // announce sort changes to screen readers. We render the same element (as a sibling of the
-        // table) to keep the DOM structure aligned with the enhanced component.
-        var status = new TagBuilder("div");
-        status.Attributes.Add("aria-atomic", "true");
-        status.Attributes.Add("aria-live", "polite");
-        status.Attributes.Add("class", "govuk-visually-hidden");
-        status.Attributes.Add("role", "status");
-        output.PostElement.AppendHtml(status);
     }
 }

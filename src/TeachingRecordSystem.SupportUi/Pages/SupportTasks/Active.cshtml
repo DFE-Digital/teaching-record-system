@@ -16,8 +16,8 @@
             <govuk-select for="Type"
                           select-hx-get="@LinkGenerator.SupportTasks.Active(type: null, Model.AssignedToUserId, Model.Status, Model.SortBy, Model.SortDirection)"
                           select-hx-trigger="change"
-                          select-hx-select="main"
-                          select-hx-target="main"
+                          select-hx-select="#results-table"
+                          select-hx-target="#results-table"
                           select-hx-swap="outerHTML"
                           select-hx-push-url="true"
                           class="govuk-!-width-one-half govuk-!-margin-bottom-0"
@@ -33,8 +33,8 @@
             <govuk-select for="AssignedToUserId"
                           select-hx-get="@LinkGenerator.SupportTasks.Active(Model.Type, assignedToUserId: null, Model.Status, Model.SortBy, Model.SortDirection)"
                           select-hx-trigger="change"
-                          select-hx-select="main"
-                          select-hx-target="main"
+                          select-hx-select="#results-table"
+                          select-hx-target="#results-table"
                           select-hx-swap="outerHTML"
                           select-hx-push-url="true"
                           class="govuk-!-width-one-half govuk-!-margin-bottom-0"
@@ -61,8 +61,8 @@
                     <govuk-checkboxes-item value="@status"
                                            checked="@Model.Status.Contains(status)"
                                            input-hx-get="@LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, toggledStatuses, Model.SortBy, Model.SortDirection)"
-                                           input-hx-select="main"
-                                           input-hx-target="main"
+                                           input-hx-select="#results-table"
+                                           input-hx-target="#results-table"
                                            input-hx-swap="outerHTML"
                                            input-hx-push-url="true">
                         @status.GetDisplayName()
@@ -78,8 +78,8 @@
                 </noscript>
                 <a href="@LinkGenerator.SupportTasks.Active()"
                    hx-get="@LinkGenerator.SupportTasks.Active()"
-                   hx-select="main"
-                   hx-target="main"
+                   hx-select="#results-table"
+                   hx-target="#results-table"
                    hx-swap="outerHTML"
                    hx-push-url="true"
                    class="govuk-link">
@@ -88,18 +88,6 @@
             </div>
         </div>
     </form>
-</div>
-
-@* Announces the updated results to assistive technology after each HTMX swap of the filtered list *@
-<div class="govuk-visually-hidden" aria-live="polite" aria-atomic="true" data-testid="results-status">
-    @if (Model.Results!.Count == 0)
-    {
-        <text>No matching tasks found.</text>
-    }
-    else
-    {
-        <text>Showing @Model.Results!.Count of @Model.TotalTaskCount matching tasks.</text>
-    }
 </div>
 
 @if (Model.Results!.Count == 0)
@@ -111,32 +99,58 @@
 }
 else
 {
-    <table class="govuk-table trs-table-layout-fixed" sortable>
+    <table class="govuk-table trs-table-layout-fixed" id="results-table" sortable data-module="moj-multi-select" data-id-prefix="AssignSupportTask-">
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header trs-!-width-200"
+                <th scope="col" class="govuk-table__header trs-!-width-25" id="AssignSupportTask-select-all"></th>
+                <th scope="col" class="govuk-table__header trs-!-width-180"
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.Subject ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Subject, direction))">
-                    Name and task ID
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Subject, direction))"
+                    use-htmx="true"
+                    hx-select="#results-table"
+                    hx-target="#results-table"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
+                    Task
                 </th>
-                <th scope="col" class="govuk-table__header trs-!-width-130"
+                <th scope="col" class="govuk-table__header trs-!-width-150"
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.RequestedOn, direction))">
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.RequestedOn, direction))"
+                    use-htmx="true"
+                    hx-select="#results-table"
+                    hx-target="#results-table"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
                     Requested on
                 </th>
                 <th scope="col" class="govuk-table__header"
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.TaskType ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.TaskType, direction))">
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.TaskType, direction))"
+                    use-htmx="true"
+                    hx-select="#results-table"
+                    hx-target="#results-table"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
                     Type
                 </th>
                 <th scope="col" class="govuk-table__header trs-!-width-120"
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.Status ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Status, direction))">
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Status, direction))"
+                    use-htmx="true"
+                    hx-select="#results-table"
+                    hx-target="#results-table"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
                     Status
                 </th>
-                <th scope="col" class="govuk-table__header trs-!-width-120"
+                <th scope="col" class="govuk-table__header trs-!-width-130"
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.AssignedTo ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.AssignedTo, direction))">
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.AssignedTo, direction))"
+                    use-htmx="true"
+                    hx-select="#results-table"
+                    hx-target="#results-table"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
                     Assigned to
                 </th>
                 <th scope="col" class="govuk-table__header trs-!-width-100">
@@ -159,7 +173,8 @@ else
                                    hx-get
                                    hx-page-handler="SelectionBanner"
                                    hx-include="[form='assign-tasks-form']"
-                                   hx-target="#selected-tasks-banner" />
+                                   hx-target="#selected-tasks-banner"
+                                   hx-swap="innerHTML" />
                             <label for="AssignSupportTask-@(result.SupportTaskReference)" class="govuk-label govuk-checkboxes__label">
                                 <span class="govuk-visually-hidden">Select @result.SupportTaskReference</span>
                             </label>
@@ -189,14 +204,30 @@ else
             }
         </tbody>
     </table>
-
-    <form id="assign-tasks-form" action="xxx" method="get" asp-antiforgery="false">
-        <noscript>
-            <govuk-button type="submit">Assign tasks</govuk-button>
-        </noscript>
-    </form>
-
-    <partial name="_Pagination" model=@Model.Pagination />
 }
+
+<div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden" hx-swap-oob="innerHTML">
+    @if (Model.Results!.Count == 0)
+    {
+        <text>No matching tasks found.</text>
+    }
+    else
+    {
+        <text>
+            Showing @Model.Results!.Count of @Model.TotalTaskCount matching tasks
+            sorted by @Model.OrderedByLabel (@Model.OrderDirectionLabel).
+        </text>
+    }
+</div>
+
+<form id="assign-tasks-form" action="xxx" method="get" asp-antiforgery="false">
+    <noscript>
+        <govuk-button type="submit">Assign tasks</govuk-button>
+    </noscript>
+</form>
+
+<div id="pagination-container" hx-swap-oob="innerHTML">
+    <partial name="_Pagination" model="@Model.Pagination" />
+</div>
 
 <div id="selected-tasks-banner" aria-live="polite" aria-atomic="true"></div>
