@@ -17,6 +17,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 
     public async Task<SupportTaskNote> CreateNoteAsync(CreateSupportTaskNoteOptions options, ProcessContext processContext)
     {
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
+
         var note = new SupportTaskNote
         {
             SupportTaskNoteId = Guid.NewGuid(),
@@ -36,6 +38,18 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 SupportTaskNote = EventModels.SupportTaskNote.FromModel(note)
             },
             processContext);
+
+        if (supportTask.Status is SupportTaskStatus.Open)
+        {
+            await UpdateSupportTaskCoreAsync(
+                new UpdateSupportTaskOptions
+                {
+                    SupportTaskReference = supportTask.SupportTaskReference,
+                    Status = SupportTaskStatus.InProgress
+                },
+                updateAction: null,
+                processContext);
+        }
 
         return note;
     }

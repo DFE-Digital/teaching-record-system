@@ -65,7 +65,8 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidContent_CreatesNoteAndRedirects()
     {
         // Arrange
-        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync();
+        // In progress so that adding a note doesn't also transition the status (covered separately)
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync(configure: t => t.WithStatus(SupportTaskStatus.InProgress));
 
         var content = Faker.Lorem.Paragraph();
 
@@ -99,6 +100,47 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(supportTask.SupportTask.SupportTaskReference, noteCreatedEvent.SupportTaskNote.SupportTaskReference);
                 Assert.Equal(content, noteCreatedEvent.SupportTaskNote.Content);
             });
+        });
+    }
+
+    [Fact]
+    public async Task Post_SupportTaskIsOpen_SetsStatusToInProgressAndPublishesUpdatedEvent()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync(configure: t => t.WithStatus(SupportTaskStatus.Open));
+        var supportTaskReference = supportTask.SupportTask.SupportTaskReference;
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/{supportTaskReference}/notes/add")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Content", Faker.Lorem.Paragraph() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTaskReference);
+            Assert.Equal(SupportTaskStatus.InProgress, dbSupportTask.Status);
+        });
+
+        Events.AssertProcessesCreated(x =>
+        {
+            Assert.Equal(ProcessType.SupportTaskNoteCreating, x.ProcessContext.ProcessType);
+            x.AssertProcessHasEvents<SupportTaskNoteCreatedEvent, SupportTaskUpdatedEvent>(
+                inspector2: supportTaskUpdatedEvent =>
+                {
+                    Assert.Equal(supportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
+                    Assert.Equal(SupportTaskStatus.Open, supportTaskUpdatedEvent.OldSupportTask.Status);
+                    Assert.Equal(SupportTaskStatus.InProgress, supportTaskUpdatedEvent.SupportTask.Status);
+                    Assert.Equal(SupportTaskUpdatedEventChanges.Status, supportTaskUpdatedEvent.Changes);
+                });
         });
     }
 
