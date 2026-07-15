@@ -10,7 +10,8 @@ public class SupportTaskServiceNoteTests(ServiceFixture fixture) : ServiceTestBa
     {
         // Arrange
         var user = await TestData.CreateUserAsync();
-        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync();
+        // In progress so that adding a note doesn't also transition the status (covered separately)
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync(configure: t => t.WithStatus(SupportTaskStatus.InProgress));
 
         var content = Faker.Lorem.Paragraph();
 
@@ -113,5 +114,81 @@ public class SupportTaskServiceNoteTests(ServiceFixture fixture) : ServiceTestBa
             Assert.Contains(notes, n => n.Content == content1);
             Assert.Contains(notes, n => n.Content == content2);
         });
+    }
+
+    [Fact]
+    public async Task CreateNoteAsync_TaskIsOpen_SetsStatusToInProgressAndPublishesUpdatedEvent()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync();
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync(configure: t => t.WithStatus(SupportTaskStatus.Open));
+        var supportTaskReference = supportTask.SupportTask.SupportTaskReference;
+
+        var options = new CreateSupportTaskNoteOptions
+        {
+            SupportTaskReference = supportTaskReference,
+            Content = Faker.Lorem.Paragraph(),
+            CreatedByUserId = user.UserId
+        };
+
+        var processContext = new ProcessContext(ProcessType.SupportTaskNoteCreating, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var note = await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTaskReference);
+            Assert.Equal(SupportTaskStatus.InProgress, dbSupportTask.Status);
+        });
+
+        Events.AssertEventsPublished(
+            e =>
+            {
+                var noteCreatedEvent = Assert.IsType<SupportTaskNoteCreatedEvent>(e);
+                Assert.Equal(note.SupportTaskNoteId, noteCreatedEvent.SupportTaskNote.SupportTaskNoteId);
+            },
+            e =>
+            {
+                var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+                Assert.Equal(supportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
+                Assert.Equal(SupportTaskStatus.Open, supportTaskUpdatedEvent.OldSupportTask.Status);
+                Assert.Equal(SupportTaskStatus.InProgress, supportTaskUpdatedEvent.SupportTask.Status);
+                Assert.Equal(SupportTaskUpdatedEventChanges.Status, supportTaskUpdatedEvent.Changes);
+            });
+    }
+
+    [Theory]
+    [InlineData(SupportTaskStatus.InProgress)]
+    [InlineData(SupportTaskStatus.Closed)]
+    public async Task CreateNoteAsync_TaskIsNotOpen_DoesNotChangeStatusOrPublishUpdatedEvent(SupportTaskStatus status)
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync();
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync(configure: t => t.WithStatus(status));
+        var supportTaskReference = supportTask.SupportTask.SupportTaskReference;
+
+        var options = new CreateSupportTaskNoteOptions
+        {
+            SupportTaskReference = supportTaskReference,
+            Content = Faker.Lorem.Paragraph(),
+            CreatedByUserId = user.UserId
+        };
+
+        var processContext = new ProcessContext(ProcessType.SupportTaskNoteCreating, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync<SupportTaskService, SupportTaskNote>(service => service.CreateNoteAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTaskReference);
+            Assert.Equal(status, dbSupportTask.Status);
+        });
+
+        // Only the note-created event is published; the status is untouched so there's no SupportTaskUpdatedEvent
+        Events.AssertEventsPublished(e => Assert.IsType<SupportTaskNoteCreatedEvent>(e));
     }
 }
