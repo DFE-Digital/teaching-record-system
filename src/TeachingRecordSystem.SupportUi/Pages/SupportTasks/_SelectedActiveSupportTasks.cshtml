@@ -1,0 +1,16 @@
+@model int
+
+@if (Model > 0)
+{
+    <div class="trs-tasks-selection">
+        <div class="govuk-width-container">
+            <div class="trs-tasks-selection__summary">
+                <strong>Selection</strong><br/>
+                @Model tasks selected
+            </div>
+            <div class="trs-tasks-selection__actions">
+                <govuk-button form="assign-tasks-form" class="govuk-button--inverse">Assign selected tasks</govuk-button>
+            </div>
+        </div>
+    </div>
+}

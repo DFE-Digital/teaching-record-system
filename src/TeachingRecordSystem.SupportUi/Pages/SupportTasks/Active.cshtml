@@ -1,4 +1,4 @@
-@page "/support-tasks/active"
+@page "/support-tasks/active/{handler?}"
 @using TeachingRecordSystem.SupportUi.Services.SupportTasks
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Active
 @{
@@ -82,7 +82,9 @@
                    hx-target="main"
                    hx-swap="outerHTML"
                    hx-push-url="true"
-                   class="govuk-link">Clear all</a>
+                   class="govuk-link">
+                    Clear all
+                </a>
             </div>
         </div>
     </form>
@@ -146,6 +148,23 @@ else
             @foreach (var result in Model.Results!)
             {
                 <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                    <td class="govuk-table__cell">
+                        <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
+                            <input type="checkbox"
+                                   class="govuk-checkboxes__input"
+                                   id="AssignSupportTask-@(result.SupportTaskReference)"
+                                   value="@result.SupportTaskReference"
+                                   name="SupportTaskReference"
+                                   form="assign-tasks-form"
+                                   hx-get
+                                   hx-page-handler="SelectionBanner"
+                                   hx-include="[form='assign-tasks-form']"
+                                   hx-target="#selected-tasks-banner" />
+                            <label for="AssignSupportTask-@(result.SupportTaskReference)" class="govuk-label govuk-checkboxes__label">
+                                <span class="govuk-visually-hidden">Select @result.SupportTaskReference</span>
+                            </label>
+                        </div>
+                    </td>
                     <td class="govuk-table__cell" data-testid="task-name-and-id">
                         <a href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(result.SupportTaskReference)" class="govuk-link trs-task-link">
                             <span class="trs-task-link__name" data-testid="task-name">@result.Subject</span>
@@ -171,5 +190,13 @@ else
         </tbody>
     </table>
 
+    <form id="assign-tasks-form" action="xxx" method="get" asp-antiforgery="false">
+        <noscript>
+            <govuk-button type="submit">Assign tasks</govuk-button>
+        </noscript>
+    </form>
+
     <partial name="_Pagination" model=@Model.Pagination />
 }
+
+<div id="selected-tasks-banner" aria-live="polite" aria-atomic="true"></div>
