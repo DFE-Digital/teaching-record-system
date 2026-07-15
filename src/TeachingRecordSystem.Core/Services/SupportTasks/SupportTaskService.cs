@@ -302,6 +302,33 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 });
         }
     }
+
+    public async Task UpdateZendeskUrlsAsync(string supportTaskReference, string[] zendeskUrls, ProcessContext processContext)
+    {
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(supportTaskReference);
+
+        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
+
+        supportTask.UpdatedOn = processContext.Now;
+        supportTask.ZendeskTickets = zendeskUrls
+            .Where(ticket => !string.IsNullOrEmpty(ticket))
+            .ToArray();
+
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishSingleEventAsync(
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTaskReference,
+                Changes = SupportTaskUpdatedEventChanges.ZendeskTicketUrls,
+                SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                OldSupportTask = oldSupportTaskEventModel,
+                Comments = null,
+                RejectionReason = null
+            },
+            processContext);
+    }
 }
 
 public record AssignableUserInfo(Guid UserId, string UserName);

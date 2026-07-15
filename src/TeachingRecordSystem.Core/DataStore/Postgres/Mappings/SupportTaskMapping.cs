@@ -47,5 +47,9 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
             .HasMethod("GIN")
             .UseCollation(Collations.CaseInsensitive)
             .IsCreatedConcurrently();
+        builder
+            .Property(x => x.ZendeskTickets)
+            .HasColumnType("varchar[]")
+            .HasDefaultValueSql("'{}'::varchar[]");
     }
 }

@@ -125,6 +125,7 @@
     <None Remove="Services\DqtReporting\Migrations\0109_UserLastSignedInUtc.sql" />
     <None Remove="Services\DqtReporting\Migrations\0110_ProcessReferences.sql" />
     <None Remove="Services\DqtReporting\Migrations\0111_SupportTaskColumns.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0112_SupportTaskZendeskColumn.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -289,6 +290,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0109_UserLastSignedInUtc.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0110_ProcessReferences.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0111_SupportTaskColumns.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0112_SupportTaskZendeskColumn.sql" />
   </ItemGroup>
 
   <ItemGroup>

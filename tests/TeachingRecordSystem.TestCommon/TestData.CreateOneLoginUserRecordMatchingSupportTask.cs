@@ -28,6 +28,7 @@ public partial class TestData
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
         private Option<string> _trnRequestId;
+        private Option<string[]> _zendeskTickets;
 
         public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithEmailAddress(string emailAddress)
         {
@@ -89,6 +90,13 @@ public partial class TestData
             return this;
         }
 
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithZendeskTickets(
+            params string[] zendeskTickets)
+        {
+            _zendeskTickets = Option.Some(zendeskTickets);
+            return this;
+        }
+
         public Task<SupportTask> ExecuteAsync(TestData testData) =>
             testData.WithDbContextAsync(async dbContext =>
             {
@@ -100,6 +108,7 @@ public partial class TestData
                 var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
                 var status = _status.ValueOr(SupportTaskStatus.Open);
                 var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
+                var zendeskTickets = _zendeskTickets.ValueOr([]);
 
                 Guid clientApplicationUserId;
                 string? trnRequestId = _trnRequestId.ValueOrDefault();
@@ -189,6 +198,7 @@ public partial class TestData
                     TrnRequestId = trnRequestId,
                     SubjectName = subject.Name,
                     SubjectEmailAddress = subject.EmailAddress,
+                    ZendeskTickets = zendeskTickets
                 };
 
                 dbContext.SupportTasks.Add(supportTask);

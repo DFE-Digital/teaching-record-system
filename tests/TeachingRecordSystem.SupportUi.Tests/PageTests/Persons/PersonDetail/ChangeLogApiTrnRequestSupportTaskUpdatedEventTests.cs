@@ -257,7 +257,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             Data = new TrnRequestData(),
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = "Resolved"
+            OutcomeLabel = "Resolved",
+            ZendeskTickets = []
         };
 
         var oldSupportTask = new EventModels.SupportTask
@@ -270,7 +271,8 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             Data = new TrnRequestData(),
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = null
+            OutcomeLabel = null,
+            ZendeskTickets = []
         };
 
         var requestData = new EventModels.TrnRequestMetadata
