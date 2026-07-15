@@ -58,4 +58,7 @@ public class Active(SupportTaskSearchService searchService, SupportTaskService s
 
         AssignToOptions = await supportTaskService.GetAssignableUsersAsync();
     }
+
+    public IActionResult OnGetSelectionBanner([FromQuery(Name = "SupportTaskReference")] string[] supportTaskReferences) =>
+        Partial("_SelectedActiveSupportTasks", supportTaskReferences.Length);
 }
