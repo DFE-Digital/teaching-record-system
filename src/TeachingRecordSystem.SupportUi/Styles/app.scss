@@ -76,7 +76,7 @@
   display: inline;
 }
 
-@each $size in 70, 80, 90, 100, 110, 120, 130, 150, 160, 200 {
+@each $size in 25, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 200 {
   .trs-\!-width-#{$size} {
     width: #{$size}px !important;
   }
@@ -504,4 +504,29 @@
 
 .trs-column-gap-1 {
   column-gap: 1rem;
+}
+
+.trs-tasks-selection {
+  position: fixed;
+  bottom: 0;
+  left:  0;
+  right: 0;
+  background-color: govuk-colour("blue");
+  padding: 1rem;
+
+    &__summary {
+      float: left;
+      @extend .govuk-body-s;
+      margin-bottom: 0;
+      color: govuk-colour("white");
+    }
+
+    &__actions {
+      float: right;
+
+        .govuk-button {
+          margin-bottom: 0;
+          font-size: 1rem;
+        }
+    }
 }

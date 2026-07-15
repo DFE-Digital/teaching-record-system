@@ -39,6 +39,10 @@ public class Active(SupportTaskSearchService searchService, SupportTaskService s
 
     public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
+    public string? OrderedByLabel { get; set; }
+
+    public string? OrderDirectionLabel { get; set; }
+
     public async Task OnGetAsync()
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
@@ -57,6 +61,19 @@ public class Active(SupportTaskSearchService searchService, SupportTaskService s
             pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber));
 
         AssignToOptions = await supportTaskService.GetAssignableUsersAsync();
+
+        OrderedByLabel = sortBy switch
+        {
+            SupportTasksSortByOption.SupportTaskReference => "task reference",
+            SupportTasksSortByOption.Subject => "subject",
+            SupportTasksSortByOption.TaskType => "type",
+            SupportTasksSortByOption.Status => "status",
+            SupportTasksSortByOption.AssignedTo => "assigned to",
+            SupportTasksSortByOption.RequestedOn => "requested on",
+            _ => throw new NotSupportedException($"Unknown sortBy value: '{sortBy}'.")
+        };
+
+        OrderDirectionLabel = sortDirection is SupportUi.SortDirection.Ascending ? "ascending" : "descending";
     }
 
     public IActionResult OnGetSelectionBanner([FromQuery(Name = "SupportTaskReference")] string[] supportTaskReferences) =>
