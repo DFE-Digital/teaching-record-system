@@ -29,4 +29,6 @@ public class SupportTasksLinkGenerator(LinkGenerator linkGenerator)
         linkGenerator.GetRequiredPathByPage(
             "/SupportTasks/Active",
             routeValues: new { type, assignedToUserId, status = statuses, sortBy, sortDirection, pageNumber });
+
+    public string Assign() => linkGenerator.GetRequiredPathByPage("/SupportTasks/Assign");
 }

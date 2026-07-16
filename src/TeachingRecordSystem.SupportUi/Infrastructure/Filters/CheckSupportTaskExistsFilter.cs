@@ -75,7 +75,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
 public class CheckSupportTaskExistsFilterFactory(bool excludeClosed, params IEnumerable<SupportTaskType> supportTaskTypes) : IFilterFactory, IOrderedFilter
 {
     public CheckSupportTaskExistsFilterFactory(bool excludeClosed) :
-        this(excludeClosed, SupportTaskTypeRegistry.AllTypes)
+        this(excludeClosed, SupportTaskTypeRegistry.GetAllTypes())
     {
     }
 

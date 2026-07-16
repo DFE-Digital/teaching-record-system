@@ -156,6 +156,45 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         return false;
     }
 
+    public async Task AssignSupportTasksAsync(AssignSupportTasksOptions options, ProcessContext processContext)
+    {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
+        foreach (var supportTaskReference in options.SupportTaskReferences)
+        {
+            var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(supportTaskReference);
+
+            if (supportTask.Status is SupportTaskStatus.Closed)
+            {
+                throw new InvalidOperationException("Support task is closed.");
+            }
+
+            if (supportTask.AssignedToUserId == options.UserId)
+            {
+                continue;
+            }
+
+            var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
+
+            supportTask.AssignedToUserId = options.UserId;
+            supportTask.UpdatedOn = processContext.Now;
+
+            await dbContext.SaveChangesAsync();
+
+            await eventScope.PublishEventAsync(
+                new SupportTaskUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    SupportTaskReference = supportTask.SupportTaskReference,
+                    Changes = SupportTaskUpdatedEventChanges.AssignedToUserId,
+                    OldSupportTask = oldSupportTaskEventModel,
+                    SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                    Comments = null,
+                    RejectionReason = null
+                });
+        }
+    }
+
     public Task UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext)
     {
         return UpdateSupportTaskCoreAsync(options, updateAction: null, processContext);
