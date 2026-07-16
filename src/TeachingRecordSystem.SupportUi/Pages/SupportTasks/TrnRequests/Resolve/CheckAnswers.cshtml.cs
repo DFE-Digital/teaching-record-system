@@ -162,13 +162,14 @@ public class CheckAnswers(
                 .SingleAsync();
 
             CreatingNewRecord = false;
-            FirstName = state.FirstNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.FirstName : requestData.FirstName;
-            MiddleName = state.MiddleNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.MiddleName : requestData.MiddleName;
-            LastName = state.LastNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.LastName : requestData.LastName;
-            DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.ExistingRecord ? selectedPerson.DateOfBirth : requestData.DateOfBirth;
-            EmailAddress = state.EmailAddressSource == PersonAttributeSource.ExistingRecord ? selectedPerson.EmailAddress : requestData.EmailAddress;
-            NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.ExistingRecord ? selectedPerson.NationalInsuranceNumber : requestData.NationalInsuranceNumber;
-            Gender = state.GenderSource == PersonAttributeSource.ExistingRecord ? selectedPerson.Gender : requestData.Gender;
+            // Mirrors GetResolvedPersonAttributes: only a TrnRequest source changes the record.
+            FirstName = state.FirstNameSource is PersonAttributeSource.TrnRequest ? requestData.FirstName : selectedPerson.FirstName;
+            MiddleName = state.MiddleNameSource is PersonAttributeSource.TrnRequest ? requestData.MiddleName : selectedPerson.MiddleName;
+            LastName = state.LastNameSource is PersonAttributeSource.TrnRequest ? requestData.LastName : selectedPerson.LastName;
+            DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? requestData.DateOfBirth : selectedPerson.DateOfBirth;
+            EmailAddress = state.EmailAddressSource is PersonAttributeSource.TrnRequest ? requestData.EmailAddress : selectedPerson.EmailAddress;
+            NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? requestData.NationalInsuranceNumber : selectedPerson.NationalInsuranceNumber;
+            Gender = state.GenderSource is PersonAttributeSource.TrnRequest ? requestData.Gender : selectedPerson.Gender;
             Trn = selectedPerson.Trn;
         }
 

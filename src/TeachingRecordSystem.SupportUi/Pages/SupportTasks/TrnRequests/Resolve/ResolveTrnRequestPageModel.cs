@@ -141,15 +141,17 @@ public abstract class ResolveTrnRequestPageModel(TrsDbContext dbContext) : PageM
         {
             Debug.Assert(selectedPersonAttributes is not null);
 
+            // Only a TrnRequest source updates the person (see GetAttributesToUpdate), so anything else —
+            // including a source left unset because the page didn't offer a choice — keeps the existing value.
             return new TrnRequestDataPersonAttributes()
             {
-                FirstName = state.FirstNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.FirstName : trnRequestPersonAttributes.FirstName,
-                MiddleName = state.MiddleNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.MiddleName : trnRequestPersonAttributes.MiddleName,
-                LastName = state.LastNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.LastName : trnRequestPersonAttributes.LastName,
-                DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.DateOfBirth : trnRequestPersonAttributes.DateOfBirth,
-                EmailAddress = state.EmailAddressSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.EmailAddress : trnRequestPersonAttributes.EmailAddress,
-                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.NationalInsuranceNumber : trnRequestPersonAttributes.NationalInsuranceNumber,
-                Gender = state.GenderSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.Gender : trnRequestPersonAttributes.Gender
+                FirstName = state.FirstNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.FirstName : selectedPersonAttributes.FirstName,
+                MiddleName = state.MiddleNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.MiddleName : selectedPersonAttributes.MiddleName,
+                LastName = state.LastNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.LastName : selectedPersonAttributes.LastName,
+                DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.DateOfBirth : selectedPersonAttributes.DateOfBirth,
+                EmailAddress = state.EmailAddressSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.EmailAddress : selectedPersonAttributes.EmailAddress,
+                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.NationalInsuranceNumber : selectedPersonAttributes.NationalInsuranceNumber,
+                Gender = state.GenderSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.Gender : selectedPersonAttributes.Gender
             };
         }
     }
