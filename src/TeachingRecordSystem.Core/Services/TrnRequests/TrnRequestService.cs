@@ -6,9 +6,10 @@ using NpgsqlTypes;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -18,7 +19,7 @@ public class TrnRequestService(
     TrsDbContext dbContext,
     IEventPublisher eventPublisher,
     OneLoginService oneLoginService,
-    TrnRequestSupportTaskService trnRequestSupportTaskService,
+    SupportTaskService supportTaskService,
     PersonService personService,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
@@ -189,7 +190,7 @@ public class TrnRequestService(
 
         if (furtherChecksNeeded)
         {
-            await trnRequestSupportTaskService.CreateManualChecksNeededSupportTaskAsync(
+            await CreateManualChecksNeededSupportTaskAsync(
                 new CreateManualChecksNeededSupportTaskOptions
                 {
                     Person = person,
@@ -350,13 +351,72 @@ public class TrnRequestService(
 
         await CompleteResolvedTrnRequestAsync(applicationUserId, requestId, processContext);
 
-        await trnRequestSupportTaskService.CompleteManualChecksNeededSupportTaskAsync(
+        await CompleteManualChecksNeededSupportTaskAsync(
             new CompleteManualChecksNeededSupportTaskOptions
             {
                 SupportTaskReference = supportTaskReference
             },
             processContext);
     }
+
+    public Task<SupportTask> CreateTrnRequestSupportTaskAsync(
+        CreateTrnRequestSupportTaskOptions options,
+        ProcessContext processContext) =>
+        supportTaskService.CreateSupportTaskAsync(
+            new CreateSupportTaskOptions
+            {
+                SupportTaskType = SupportTaskType.TrnRequest,
+                Data = new TrnRequestData(),
+                PersonId = null,
+                OneLoginUserSubject = null,
+                TrnRequest = (options.TrnRequest.ApplicationUserId, options.TrnRequest.RequestId),
+                Subject = SupportTask.Subject.FromTrnRequest(options.TrnRequest)
+            },
+            processContext);
+
+    public Task<SupportTask> CreateManualChecksNeededSupportTaskAsync(
+        CreateManualChecksNeededSupportTaskOptions options,
+        ProcessContext processContext) =>
+        supportTaskService.CreateSupportTaskAsync(
+            new CreateSupportTaskOptions
+            {
+                SupportTaskType = SupportTaskType.TrnRequestManualChecksNeeded,
+                Data = new TrnRequestManualChecksNeededData(),
+                PersonId = options.Person.PersonId,
+                OneLoginUserSubject = null,
+                TrnRequest = (options.TrnRequest.ApplicationUserId, options.TrnRequest.RequestId),
+                Subject = SupportTask.Subject.FromPerson(options.Person)
+            },
+            processContext);
+
+    public Task ResolveTrnRequestSupportTaskAsync(
+        ResolveTrnRequestSupportTaskOptions options,
+        ProcessContext processContext) =>
+        supportTaskService.UpdateSupportTaskAsync<TrnRequestData>(
+            new UpdateSupportTaskOptions<TrnRequestData>
+            {
+                SupportTaskReference = options.SupportTaskReference,
+                UpdateData = data => data with
+                {
+                    ResolvedAttributes = options.ResolvedAttributes,
+                    SelectedPersonAttributes = options.SelectedPersonAttributes
+                },
+                Status = SupportTaskStatus.Closed,
+                Comments = options.Comments
+            },
+            processContext);
+
+    public Task CompleteManualChecksNeededSupportTaskAsync(
+        CompleteManualChecksNeededSupportTaskOptions options,
+        ProcessContext processContext) =>
+        supportTaskService.UpdateSupportTaskAsync<TrnRequestManualChecksNeededData>(
+            new UpdateSupportTaskOptions<TrnRequestManualChecksNeededData>
+            {
+                SupportTaskReference = options.SupportTaskReference,
+                UpdateData = data => data,
+                Status = SupportTaskStatus.Closed
+            },
+            processContext);
 
     public async Task<TrnRequestInfo?> GetTrnRequestAsync(Guid applicationUserId, string requestId)
     {
@@ -761,7 +821,7 @@ public class TrnRequestService(
         {
             Debug.Assert(matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches);
 
-            await trnRequestSupportTaskService.CreateTrnRequestSupportTaskAsync(
+            await CreateTrnRequestSupportTaskAsync(
                 new CreateTrnRequestSupportTaskOptions
                 {
                     TrnRequest = trnRequest
