@@ -156,6 +156,10 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
                 Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation, email.TemplateId);
+                // The name change has been applied by the time we email, so we address them by their new name
+                Assert.Equal(
+                    requestData.FirstName,
+                    email.Personalization[ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey]);
 
                 var updatedPerson = await dbContext.Persons
                     .SingleAsync(p => p.PersonId == createPersonResult.PersonId);
@@ -181,6 +185,9 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
                 Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation, email.TemplateId);
+                Assert.Equal(
+                    createPersonResult.FirstName,
+                    email.Personalization[ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey]);
             }
         });
 
