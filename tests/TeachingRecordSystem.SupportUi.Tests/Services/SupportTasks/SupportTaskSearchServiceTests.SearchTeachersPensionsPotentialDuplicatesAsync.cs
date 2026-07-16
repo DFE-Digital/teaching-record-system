@@ -72,6 +72,40 @@ public partial class SupportTaskSearchServiceTests
         });
     }
 
+    [Fact]
+    public async Task SearchTeachersPensionsPotentialDuplicatesAsync_SearchTextIsSupportTaskReference_ReturnsTaskWithMatchingReference()
+    {
+        // Arrange
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(),
+            ["ST2"] = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync()
+        };
+
+        // Act
+        var result = await SearchTeachersPensionsPotentialDuplicatesAsync(new(Search: tasks["ST2"].SupportTaskReference.ToLowerInvariant()), new());
+
+        // Assert
+        Assert.Equal(2, result.TotalTaskCount);
+        Assert.Equal(1, result.SearchResults.TotalItemCount);
+        Assert.Equal(["ST2"], tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Fact]
+    public async Task SearchTeachersPensionsPotentialDuplicatesAsync_SearchTextIsUnusedSupportTaskReference_ReturnsNoTasks()
+    {
+        // Arrange
+        await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync();
+
+        // Act
+        var result = await SearchTeachersPensionsPotentialDuplicatesAsync(new(Search: "TRS-0"), new());
+
+        // Assert
+        Assert.Equal(1, result.TotalTaskCount);
+        Assert.Equal(0, result.SearchResults.TotalItemCount);
+        Assert.Empty(result.SearchResults);
+    }
+
     [Theory]
     [InlineData(SortDirection.Ascending)]
     [InlineData(SortDirection.Descending)]
