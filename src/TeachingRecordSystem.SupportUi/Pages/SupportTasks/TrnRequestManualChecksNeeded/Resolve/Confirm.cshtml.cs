@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded.Resolve;
 
-public class Confirm(TrnRequestService trnRequestService, SupportTaskService supportTaskService, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
+public class Confirm(TrnRequestService trnRequestService, TrnRequestSupportTaskService trnRequestSupportTaskService, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     [FromRoute]
     public string? SupportTaskReference { get; set; }
@@ -24,12 +23,10 @@ public class Confirm(TrnRequestService trnRequestService, SupportTaskService sup
 
         await trnRequestService.CompleteResolvedTrnRequestAsync(trnRequest, processContext);
 
-        await supportTaskService.UpdateSupportTaskAsync(
-            new UpdateSupportTaskOptions<TrnRequestManualChecksNeededData>
+        await trnRequestSupportTaskService.CompleteManualChecksNeededSupportTaskAsync(
+            new()
             {
-                SupportTaskReference = SupportTaskReference!,
-                UpdateData = data => data,
-                Status = SupportTaskStatus.Closed
+                SupportTaskReference = SupportTaskReference!
             },
             processContext);
 

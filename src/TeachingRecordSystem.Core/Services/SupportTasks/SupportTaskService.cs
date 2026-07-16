@@ -1,3 +1,4 @@
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -54,7 +55,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         return note;
     }
 
-    public async Task<SupportTask> CreateSupportTaskAsync(CreateSupportTaskOptions options, ProcessContext processContext)
+    internal async Task<SupportTask> CreateSupportTaskAsync(CreateSupportTaskOptions options, ProcessContext processContext)
     {
         if (options.SupportTaskType.GetDataType() != options.Data.GetType())
         {
@@ -195,12 +196,12 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         }
     }
 
-    public Task UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext)
+    internal Task UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext)
     {
         return UpdateSupportTaskCoreAsync(options, updateAction: null, processContext);
     }
 
-    public Task UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
+    internal Task UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
         where TData : ISupportTaskData, IEquatable<TData>
     {
         return UpdateSupportTaskCoreAsync(
@@ -221,7 +222,20 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             processContext);
     }
 
-    public async Task UpdateSupportTaskCoreAsync(
+    public Task SaveProgressAsync(SaveSupportTaskProgressOptions options, ProcessContext processContext)
+    {
+        return UpdateSupportTaskCoreAsync(
+            new UpdateSupportTaskOptions
+            {
+                SupportTaskReference = options.SupportTaskReference,
+                Status = SupportTaskStatus.InProgress,
+                SavedJourneyState = Option.Some(options.SavedJourneyState)!
+            },
+            updateAction: null,
+            processContext);
+    }
+
+    private async Task UpdateSupportTaskCoreAsync(
         UpdateSupportTaskOptions options,
         Func<SupportTask, SupportTaskUpdatedEventChanges, SupportTaskUpdatedEventChanges>? updateAction,
         ProcessContext processContext)

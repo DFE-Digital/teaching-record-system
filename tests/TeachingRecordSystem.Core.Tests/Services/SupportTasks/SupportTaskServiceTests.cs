@@ -536,6 +536,82 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
     }
 
     [Fact]
+    public async Task SaveProgressAsync_ValidRequest_SetsStatusToInProgressAndSavesJourneyStateAndPublishesEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
+
+        var savedJourneyState = new SavedJourneyState(
+            "Page",
+            new Dictionary<string, string?>(),
+            new DummyJourneyState(),
+            typeof(DummyJourneyState));
+
+        var options = new SaveSupportTaskProgressOptions
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            SavedJourneyState = savedJourneyState
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync<SupportTaskService>(service => service.SaveProgressAsync(options, processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(SupportTaskStatus.InProgress, dbSupportTask.Status);
+            Assert.Equal(savedJourneyState, dbSupportTask.ResolveJourneySavedState);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+            Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
+            Assert.Equal(TimeProvider.UtcNow, supportTask.UpdatedOn);
+            Assert.Equal(
+                SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.ResolveJourneySavedState,
+                supportTaskUpdatedEvent.Changes);
+        });
+    }
+
+    [Fact]
+    public async Task SaveProgressAsync_TaskIsAlreadyClosed_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            person.PersonId,
+            t => t.WithStatus(SupportTaskStatus.Closed));
+
+        var savedJourneyState = new SavedJourneyState(
+            "Page",
+            new Dictionary<string, string?>(),
+            new DummyJourneyState(),
+            typeof(DummyJourneyState));
+
+        var options = new SaveSupportTaskProgressOptions
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            SavedJourneyState = savedJourneyState
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(
+            service => service.SaveProgressAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+        Events.AssertNoEventsPublished();
+    }
+
+    [Fact]
     public async Task AllocateSupportTaskAsync_TaskDoesNotExist_ReturnsNotFoundAndDoesNotPublishEvent()
     {
         // Arrange

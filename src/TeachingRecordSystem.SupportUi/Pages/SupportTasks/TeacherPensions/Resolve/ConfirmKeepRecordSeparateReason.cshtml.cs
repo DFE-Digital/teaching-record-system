@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -12,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 public class ConfirmKeepRecordSeparateReasonModel(
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
-    SupportTaskService supportTaskService,
+    TeacherPensionsSupportTaskService teacherPensionsSupportTaskService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
     TimeProvider timeProvider) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
@@ -48,16 +47,10 @@ public class ConfirmKeepRecordSeparateReasonModel(
 
         await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, supportTask.PersonId!.Value, processContext);
 
-        await supportTaskService.UpdateSupportTaskAsync(
-            new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
+        await teacherPensionsSupportTaskService.ResolveWithoutMergeAsync(
+            new()
             {
                 SupportTaskReference = SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    ResolvedAttributes = null,
-                    SelectedPersonAttributes = null
-                },
-                Status = SupportTaskStatus.Closed,
                 Comments = Reason
             },
             processContext);
