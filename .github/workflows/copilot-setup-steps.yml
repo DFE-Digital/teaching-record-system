@@ -22,7 +22,7 @@ jobs:
           terraform_version: 1.14.5
           terraform_wrapper: false
 
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 9.0.x
 
