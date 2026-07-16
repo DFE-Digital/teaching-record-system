@@ -1,0 +1,60 @@
+@page "/support-tasks/assign"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Assign
+@{
+    ViewBag.Title = "Assign tasks";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.SupportTasks.Active()" />
+}
+
+<span class="govuk-caption-m">Bulk assignment</span>
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<table class="govuk-table trs-table-layout-fixed">
+    <caption class="govuk-table__caption govuk-table__caption--m">Selected tasks</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Task</th>
+            <th scope="col" class="govuk-table__header trs-!-width-150">Requested on</th>
+            <th scope="col" class="govuk-table__header trs-!-width-180">Type</th>
+            <th scope="col" class="govuk-table__header trs-!-width-120">Status</th>
+            <th scope="col" class="govuk-table__header trs-!-width-150">Assigned to</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        @foreach (var task in Model.Tasks!)
+        {
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__cell">
+                    <a href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(task.SupportTaskReference)" class="govuk-link trs-task-link">
+                        <span class="trs-task-link__name" data-testid="task-name">@task.Subject</span>
+                        <span class="trs-task-link__reference" data-testid="task-reference">@task.SupportTaskReference</span>
+                    </a>
+                </th>
+                <td class="govuk-table__cell">@task.CreatedOn.ToGmt().ToString(DateDisplayFormat)</td>
+                <td class="govuk-table__cell">@task.Type.GetTitle()</td>
+                <td class="govuk-table__cell">
+                    <support-task-status-tag status="@task.Status"/>
+                </td>
+                <td class="govuk-table__cell" use-empty-fallback="Unassigned">@task.AssignedTo</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form method="post">
+    <govuk-select for="AssignToUserId" select-class="govuk-!-width-one-third">
+        <govuk-select-label class="govuk-label--s">Who do you want to assign these tasks to?</govuk-select-label>
+        <govuk-select-item value=""></govuk-select-item>
+        @foreach (var assignOption in Model.AssignToOptions!)
+        {
+            <govuk-select-item value="@assignOption.UserId">@assignOption.UserName</govuk-select-item>
+        }
+    </govuk-select>
+
+    <div class="govuk-button-group">
+        <govuk-button type="submit">Assign tasks</govuk-button>
+        <govuk-button-link href="@LinkGenerator.SupportTasks.Active()" class="govuk-button--secondary">Cancel</govuk-button-link>
+    </div>
+</form>

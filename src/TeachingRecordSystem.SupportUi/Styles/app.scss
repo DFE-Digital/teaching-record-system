@@ -76,7 +76,7 @@
   display: inline;
 }
 
-@each $size in 25, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 200 {
+@each $size in 25, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 180, 200 {
   .trs-\!-width-#{$size} {
     width: #{$size}px !important;
   }
@@ -452,6 +452,10 @@
     &:after {
       content: '\A';
     }
+  }
+
+  &__reference {
+    font-size: 1rem;
   }
 }
 

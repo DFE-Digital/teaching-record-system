@@ -364,7 +364,7 @@ public partial class TrsDbContext
 
     private static List<SupportTaskTypeInfo> GetSupportTaskTypes()
     {
-        return [.. SupportTaskTypeRegistry.All.Select(i => new SupportTaskTypeInfo { SupportTaskType = i.SupportTaskType, Name = i.Name })];
+        return [.. SupportTaskTypeRegistry.GetAll().Select(i => new SupportTaskTypeInfo { SupportTaskType = i.SupportTaskType, Name = i.Name })];
     }
 
     private static List<DegreeType> GetDegreeTypes()

@@ -337,6 +337,13 @@ Support UI *Allocate* (support task) — sets the status and assigned user.
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | — |
 
+### `SupportTasksAssigning` (63)
+Support UI *Assign tasks* (bulk assignment) — sets the assigned user on multiple support tasks.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `SupportTaskUpdatedEvent` | Conditional | One per task whose assigned user changed. |
+
 ---
 
 ## Notes

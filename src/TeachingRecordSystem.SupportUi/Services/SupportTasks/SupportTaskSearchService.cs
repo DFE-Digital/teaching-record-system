@@ -515,7 +515,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         Expression<Func<SupportTask, int>> GetOrderByTypeExpression()
         {
-            var typesOrderedByTitle = SupportTaskTypeRegistry.All
+            var typesOrderedByTitle = SupportTaskTypeRegistry.GetAll()
                 .OrderBy(t => t.Title)
                 .Select(t => (int)t.SupportTaskType)
                 .ToArray();

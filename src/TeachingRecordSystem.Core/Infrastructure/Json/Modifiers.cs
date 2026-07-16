@@ -66,7 +66,7 @@ public static class Modifiers
                 UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
             };
 
-            foreach (var supportTaskType in SupportTaskTypeRegistry.All)
+            foreach (var supportTaskType in SupportTaskTypeRegistry.GetAll())
             {
                 typeInfo.PolymorphismOptions.DerivedTypes.Add(
                     new JsonDerivedType(supportTaskType.DataType, (int)supportTaskType.SupportTaskType));
