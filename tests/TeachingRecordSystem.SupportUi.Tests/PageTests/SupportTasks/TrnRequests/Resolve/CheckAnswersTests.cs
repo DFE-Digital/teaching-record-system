@@ -1,3 +1,4 @@
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -641,6 +642,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
+        AssertBannerLinksToRecord(nextPageDoc, person.PersonId);
     }
 
     [Fact]
@@ -721,6 +723,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         AssertEx.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"Records merged for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
+        AssertBannerLinksToRecord(nextPageDoc, matchedPerson.PersonId);
     }
 
     [Fact]
@@ -848,6 +851,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.GenderSource = attribute is PersonMatchedAttribute.Gender ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+    }
+
+    private static void AssertBannerLinksToRecord(IHtmlDocument doc, Guid expectedPersonId)
+    {
+        var banner = doc.GetElementsByClassName("govuk-notification-banner").Single();
+        var viewRecordLink = banner.QuerySelector("a");
+        Assert.NotNull(viewRecordLink);
+        Assert.Contains(expectedPersonId.ToString(), viewRecordLink.GetAttribute("href"));
     }
 
     private void AssertPersonAttributesMatchPerson(

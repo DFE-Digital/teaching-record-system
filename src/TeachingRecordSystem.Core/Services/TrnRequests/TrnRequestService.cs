@@ -341,6 +341,41 @@ public class TrnRequestService(
             });
     }
 
+    /// Resolves the request to the record in <paramref name="options"/> (or a new one) and closes its support task,
+    /// returning the ID of the record it resolved to.
+    public async Task<Guid> ResolveTrnRequestAsync(ResolveTrnRequestOptions options, ProcessContext processContext)
+    {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
+        if (options.PersonId is Guid personId)
+        {
+            await ResolveTrnRequestWithMatchedPersonAsync(
+                options.ApplicationUserId,
+                options.RequestId,
+                personId,
+                options.AttributesToUpdate,
+                processContext);
+        }
+        else
+        {
+            await ResolveTrnRequestWithNewRecordAsync(options.ApplicationUserId, options.RequestId, processContext);
+        }
+
+        await ResolveTrnRequestSupportTaskAsync(
+            new ResolveTrnRequestSupportTaskOptions
+            {
+                SupportTaskReference = options.SupportTaskReference,
+                ResolvedAttributes = options.ResolvedAttributes,
+                SelectedPersonAttributes = options.SelectedPersonAttributes,
+                Comments = options.Comments
+            },
+            processContext);
+
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(options.ApplicationUserId, options.RequestId);
+        Debug.Assert(trnRequest.ResolvedPersonId is not null);
+        return trnRequest.ResolvedPersonId.Value;
+    }
+
     public async Task CompleteManualChecksNeededTrnRequestAsync(
         Guid applicationUserId,
         string requestId,
