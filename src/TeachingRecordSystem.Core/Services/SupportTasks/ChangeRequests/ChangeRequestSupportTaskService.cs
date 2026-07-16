@@ -141,8 +141,49 @@ public class ChangeRequestSupportTaskService(
         }
     }
 
-    public Task RejectChangeRequestAsync(RejectChangeRequestSupportTaskOptions options, ProcessContext processContext) =>
-        ResolveChangeRequestAsync(options.SupportTask, SupportRequestOutcome.Rejected, options.RejectionReason, processContext);
+    public async Task RejectChangeRequestAsync(RejectChangeRequestSupportTaskOptions options, ProcessContext processContext)
+    {
+        var supportTask = options.SupportTask;
+
+        await ResolveChangeRequestAsync(
+            supportTask,
+            SupportRequestOutcome.Rejected,
+            options.RejectionReason.GetDisplayName()!,
+            processContext);
+
+        var (requestEmailAddress, emailTemplateId) = supportTask.SupportTaskType switch
+        {
+            SupportTaskType.ChangeNameRequest =>
+                (supportTask.GetData<ChangeNameRequestData>().EmailAddress, EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation),
+            SupportTaskType.ChangeDateOfBirthRequest =>
+                (supportTask.GetData<ChangeDateOfBirthRequestData>().EmailAddress, EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation),
+            _ => throw new ArgumentException(
+                $"Unexpected support task type: '{supportTask.SupportTaskType}'.", nameof(options))
+        };
+
+        var person = await dbContext.Persons.FindOrThrowAsync(supportTask.PersonId!.Value);
+        var emailAddress = !string.IsNullOrEmpty(requestEmailAddress) ? requestEmailAddress : person.EmailAddress;
+
+        if (!string.IsNullOrEmpty(emailAddress))
+        {
+            await SendEmailAsync(
+                emailTemplateId,
+                emailAddress,
+                new Dictionary<string, string>
+                {
+                    [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = person.FirstName,
+                    [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = GetRejectionReasonEmailText(options.RejectionReason)
+                });
+        }
+    }
+
+    private static string GetRejectionReasonEmailText(CaseRejectionReasonOption reason) => reason switch
+    {
+        CaseRejectionReasonOption.RequestAndProofDontMatch => "This is because the proof you provided did not match your request.",
+        CaseRejectionReasonOption.WrongTypeOfDocument => "This is because you provided the wrong type of document.",
+        CaseRejectionReasonOption.ImageQuality => "This is because the image you provided was not clear enough.",
+        _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
+    };
 
     public Task CancelChangeRequestAsync(CancelChangeRequestSupportTaskOptions options, ProcessContext processContext) =>
         ResolveChangeRequestAsync(options.SupportTask, SupportRequestOutcome.Cancelled, rejectionReason: null, processContext);

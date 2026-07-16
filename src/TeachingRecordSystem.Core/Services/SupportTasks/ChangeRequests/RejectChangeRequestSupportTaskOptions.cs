@@ -1,9 +1,10 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 
 public record RejectChangeRequestSupportTaskOptions
 {
     public required SupportTask SupportTask { get; init; }
-    public required string RejectionReason { get; init; }
+    public required CaseRejectionReasonOption RejectionReason { get; init; }
 }
