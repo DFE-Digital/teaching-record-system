@@ -767,6 +767,44 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
     }
 
     [Fact]
+    public async Task CompleteManualChecksNeededTrnRequestAsync_CompletesRequestAndClosesTask()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync();
+        var trnRequest = supportTask.TrnRequestMetadata!;
+        Debug.Assert(trnRequest.Status is TrnRequestStatus.Pending);
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s =>
+            s.CompleteManualChecksNeededTrnRequestAsync(trnRequest, supportTask.SupportTaskReference, processContext));
+
+        // Assert
+        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        });
+
+        Events.AssertEventsPublished(
+            e =>
+            {
+                var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+                Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
+                Assert.Equal(SupportTaskUpdatedEventChanges.Status, supportTaskUpdatedEvent.Changes);
+            },
+            e =>
+            {
+                var trnRequestUpdatedEvent = Assert.IsType<TrnRequestUpdatedEvent>(e);
+                Assert.Equal(TrnRequestStatus.Completed, trnRequestUpdatedEvent.TrnRequest.Status);
+                Assert.Equal(TrnRequestUpdatedChanges.Status, trnRequestUpdatedEvent.Changes);
+            });
+    }
+
+    [Fact]
     public async Task GetTrnRequestAsync_RequestDoesNotExist_ReturnsNull()
     {
         // Arrange

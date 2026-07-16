@@ -355,6 +355,23 @@ public class TrnRequestService(
             });
     }
 
+    public async Task CompleteManualChecksNeededTrnRequestAsync(
+        TrnRequestMetadata trnRequest,
+        string supportTaskReference,
+        ProcessContext processContext)
+    {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
+        await CompleteResolvedTrnRequestAsync(trnRequest, processContext);
+
+        await trnRequestSupportTaskService.CompleteManualChecksNeededSupportTaskAsync(
+            new CompleteManualChecksNeededSupportTaskOptions
+            {
+                SupportTaskReference = supportTaskReference
+            },
+            processContext);
+    }
+
     public async Task<TrnRequestInfo?> GetTrnRequestAsync(Guid applicationUserId, string requestId)
     {
         var result = await dbContext.TrnRequestMetadata
