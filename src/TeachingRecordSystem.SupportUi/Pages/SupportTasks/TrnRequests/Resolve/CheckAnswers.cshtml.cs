@@ -72,17 +72,16 @@ public class CheckAnswers(
         var processContext = new ProcessContext(ProcessType.TrnRequestResolving, timeProvider.UtcNow, User.GetUserId());
 
         Guid? existingPersonId = null;
-        TrnRequestDataPersonAttributes? selectedPersonAttributes = null;
-        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate = [];
+
+        // A new record takes every value from the request, so it has no sources to choose and never visits
+        // the page that sets them.
+        var attributeSources = new PersonAttributeSources();
 
         if (!CreatingNewRecord)
         {
             Debug.Assert(state.PersonId is not null);
             existingPersonId = state.PersonId!.Value;
-            var selectedPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
-
-            selectedPersonAttributes = GetPersonAttributes(selectedPerson);
-            attributesToUpdate = GetAttributesToUpdate();
+            attributeSources = GetPersonAttributeSources();
         }
 
         var resolvedPersonId = await trnRequestService.ResolveTrnRequestAsync(
@@ -92,9 +91,7 @@ public class CheckAnswers(
                 RequestId = trnRequest.RequestId,
                 SupportTaskReference = supportTask.SupportTaskReference,
                 PersonId = existingPersonId,
-                AttributesToUpdate = attributesToUpdate,
-                ResolvedAttributes = GetResolvedPersonAttributes(selectedPersonAttributes),
-                SelectedPersonAttributes = selectedPersonAttributes,
+                AttributeSources = attributeSources,
                 Comments = state.Comments
             },
             processContext);

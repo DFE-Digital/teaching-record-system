@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Models.SupportTasks;
+
 namespace TeachingRecordSystem.SupportUi.Services;
 
 public class PersonChangeableAttributesService
@@ -19,10 +21,3 @@ public class PersonChangeableAttributesService
 public record ResolvedAttribute(PersonMatchedAttribute Attribute, PersonAttributeSource? Source);
 public record ResolvedMergedAttribute(PersonMatchedAttribute Attribute, TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson.PersonAttributeSource? Source);
 #pragma warning restore CA1711
-
-
-public enum PersonAttributeSource
-{
-    ExistingRecord = 0,
-    TrnRequest = 1
-}

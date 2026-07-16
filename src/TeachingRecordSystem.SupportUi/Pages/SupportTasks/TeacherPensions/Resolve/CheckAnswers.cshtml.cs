@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
@@ -129,16 +130,12 @@ public class CheckAnswersModel(
 
         var existingPersonId = JourneyInstance!.State.PersonId!.Value;
 
-        var selectedPersonAttributes = await GetPersonAttributesAsync(existingPersonId);
-
         await teacherPensionsSupportTaskService.ResolveWithMergeAsync(
             new()
             {
                 SupportTaskReference = SupportTaskReference,
                 ExistingPersonId = existingPersonId,
-                AttributesToUpdate = GetAttributesToUpdate(),
-                ResolvedAttributes = GetResolvedPersonAttributes(selectedPersonAttributes),
-                SelectedPersonAttributes = selectedPersonAttributes,
+                AttributeSources = GetPersonAttributeSources(),
                 Comments = MergeComments
             },
             processContext);

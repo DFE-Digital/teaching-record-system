@@ -3,7 +3,6 @@ using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
-using TeachingRecordSystem.SupportUi.Services;
 using PersonDetailsUpdatedEvent = TeachingRecordSystem.Core.Events.PersonDetailsUpdatedEvent;
 using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpdatedEvent;
 

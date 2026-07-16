@@ -9,8 +9,9 @@ public record ResolveTeacherPensionsPotentialDuplicateWithMergeOptions
     /// The pre-existing record the task's record is merged into, and that the request resolves to
     public required Guid ExistingPersonId { get; init; }
 
-    public IReadOnlyCollection<PersonMatchedAttribute> AttributesToUpdate { get; init; } = [];
-    public required TeacherPensionsPotentialDuplicateAttributes? ResolvedAttributes { get; init; }
-    public required TeacherPensionsPotentialDuplicateAttributes? SelectedPersonAttributes { get; init; }
+    /// Where each of the record's attributes takes its value from. This journey offers no email address or
+    /// middle name choice, so those are always unset and keep the existing record's value.
+    public PersonAttributeSources AttributeSources { get; init; } = new();
+
     public string? Comments { get; init; }
 }

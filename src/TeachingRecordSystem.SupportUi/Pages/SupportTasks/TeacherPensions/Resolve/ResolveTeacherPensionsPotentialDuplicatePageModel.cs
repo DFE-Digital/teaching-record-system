@@ -1,11 +1,8 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.SupportUi.Services;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
@@ -27,7 +24,9 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
         return supportTask;
     }
 
-    protected IReadOnlyCollection<PersonMatchedAttribute> GetAttributesToUpdate()
+    /// This journey offers no middle name choice, so that source is always unset and the existing record's
+    /// middle name is kept.
+    protected PersonAttributeSources GetPersonAttributeSources()
     {
         var state = JourneyInstance!.State;
 
@@ -36,53 +35,16 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
             throw new InvalidOperationException("Attribute sources not set.");
         }
 
-        return Impl().AsReadOnly();
-
-        IEnumerable<PersonMatchedAttribute> Impl()
+        return new PersonAttributeSources()
         {
-            if (state.FirstNameSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.FirstName;
-            }
-
-            if (state.MiddleNameSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.MiddleName;
-            }
-
-            if (state.LastNameSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.LastName;
-            }
-
-            if (state.DateOfBirthSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.DateOfBirth;
-            }
-
-            if (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.NationalInsuranceNumber;
-            }
-
-            if (state.GenderSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.Gender;
-            }
-        }
-    }
-
-    protected TeacherPensionsPotentialDuplicateAttributes GetPersonAttributes(Person person) =>
-        new()
-        {
-            FirstName = person.FirstName,
-            MiddleName = person.MiddleName,
-            LastName = person.LastName,
-            DateOfBirth = person.DateOfBirth,
-            NationalInsuranceNumber = person.NationalInsuranceNumber,
-            Gender = person.Gender,
-            Trn = person.Trn
+            FirstName = state.FirstNameSource,
+            MiddleName = state.MiddleNameSource,
+            LastName = state.LastNameSource,
+            DateOfBirth = state.DateOfBirthSource,
+            NationalInsuranceNumber = state.NationalInsuranceNumberSource,
+            Gender = state.GenderSource
         };
+    }
 
     protected async Task<TeacherPensionsPotentialDuplicateAttributes> GetPersonAttributesAsync(Guid personId)
     {
@@ -113,52 +75,5 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
         };
     }
 
-    protected TeacherPensionsPotentialDuplicateAttributes GetPersonAttributesFromRequestData()
-    {
-        var supportTask = GetSupportTask();
-        var person = DbContext.Persons.Single(x => x.PersonId == supportTask.PersonId);
-        var requestData = supportTask.TrnRequestMetadata!;
-
-        return new TeacherPensionsPotentialDuplicateAttributes()
-        {
-            FirstName = requestData.FirstName!,
-            MiddleName = requestData.MiddleName ?? string.Empty,
-            LastName = requestData.LastName!,
-            DateOfBirth = requestData.DateOfBirth,
-            NationalInsuranceNumber = requestData.NationalInsuranceNumber,
-            Gender = requestData.Gender,
-            Trn = person.Trn
-        };
-    }
-
-    protected TeacherPensionsPotentialDuplicateAttributes GetResolvedPersonAttributes(
-        TeacherPensionsPotentialDuplicateAttributes? selectedPersonAttributes)
-    {
-        var state = JourneyInstance!.State;
-        var trnRequestPersonAttributes = GetPersonAttributesFromRequestData();
-
-        if (state.PersonId == CreateNewRecordPersonIdSentinel)
-        {
-            Debug.Assert(selectedPersonAttributes is null);
-            return trnRequestPersonAttributes;
-        }
-        else
-        {
-            Debug.Assert(selectedPersonAttributes is not null);
-
-            // Only a TrnRequest source updates the person (see GetAttributesToUpdate), so anything else —
-            // including MiddleName, which this journey never offers a choice for — keeps the existing value.
-            return new TeacherPensionsPotentialDuplicateAttributes()
-            {
-                FirstName = state.FirstNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.FirstName : selectedPersonAttributes.FirstName,
-                MiddleName = state.MiddleNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.MiddleName : selectedPersonAttributes.MiddleName,
-                LastName = state.LastNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.LastName : selectedPersonAttributes.LastName,
-                DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.DateOfBirth : selectedPersonAttributes.DateOfBirth,
-                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.NationalInsuranceNumber : selectedPersonAttributes.NationalInsuranceNumber,
-                Gender = state.GenderSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.Gender : selectedPersonAttributes.Gender,
-                Trn = selectedPersonAttributes.Trn
-            };
-        }
-    }
 }
 
