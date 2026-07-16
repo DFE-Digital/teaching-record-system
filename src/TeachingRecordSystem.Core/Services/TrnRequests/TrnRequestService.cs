@@ -86,11 +86,14 @@ public class TrnRequestService(
     }
 
     public async Task ResolveTrnRequestWithMatchedPersonAsync(
-        TrnRequestMetadata trnRequest,
+        Guid applicationUserId,
+        string requestId,
         Guid personId,
         ProcessContext processContext)
     {
-        var person = (await dbContext.Persons.FindAsync(personId))!;
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+
+        var person = await dbContext.Persons.FindOrThrowAsync(personId);
 
         await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
@@ -106,10 +109,9 @@ public class TrnRequestService(
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
         ProcessContext processContext)
     {
-        var trnRequest = (await dbContext.TrnRequestMetadata
-            .FindAsync(applicationUserId, requestId))!;
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
 
-        var person = (await dbContext.Persons.FindAsync(personId))!;
+        var person = await dbContext.Persons.FindOrThrowAsync(personId);
 
         await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
@@ -160,11 +162,14 @@ public class TrnRequestService(
     }
 
     public async Task ResolveTrnRequestWithMatchedPersonAsync(
-        TrnRequestMetadata trnRequest,
+        Guid applicationUserId,
+        string requestId,
         Person person,
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
         ProcessContext processContext)
     {
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+
         await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
             person,
@@ -240,8 +245,15 @@ public class TrnRequestService(
         }
     }
 
-    public Task<string> ResolveTrnRequestWithNewRecordAsync(TrnRequestMetadata trnRequest, ProcessContext processContext) =>
-        ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: true, processContext);
+    public async Task<string> ResolveTrnRequestWithNewRecordAsync(
+        Guid applicationUserId,
+        string requestId,
+        ProcessContext processContext)
+    {
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+
+        return await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: true, processContext);
+    }
 
     private async Task<string> ResolveTrnRequestWithNewRecordAsync(
         TrnRequestMetadata trnRequest,
@@ -298,8 +310,10 @@ public class TrnRequestService(
         return person.Trn;
     }
 
-    public async Task RejectTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public async Task RejectTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext)
     {
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
             throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be rejected.");
@@ -324,8 +338,10 @@ public class TrnRequestService(
             });
     }
 
-    public async Task CompleteResolvedTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public async Task CompleteResolvedTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext)
     {
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
             throw new InvalidOperationException($"Only {TrnRequestStatus.Pending} requests can be completed.");
@@ -356,13 +372,14 @@ public class TrnRequestService(
     }
 
     public async Task CompleteManualChecksNeededTrnRequestAsync(
-        TrnRequestMetadata trnRequest,
+        Guid applicationUserId,
+        string requestId,
         string supportTaskReference,
         ProcessContext processContext)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        await CompleteResolvedTrnRequestAsync(trnRequest, processContext);
+        await CompleteResolvedTrnRequestAsync(applicationUserId, requestId, processContext);
 
         await trnRequestSupportTaskService.CompleteManualChecksNeededSupportTaskAsync(
             new CompleteManualChecksNeededSupportTaskOptions
@@ -504,7 +521,9 @@ public class TrnRequestService(
         }
     }
 
-    // internal for testing
+    // internal for testing.
+    // Takes the entity rather than the request's keys as it's called mid-update by the Resolve* methods and relies on
+    // them to save the token it assigns.
     internal async Task<bool> TryEnsureTrnTokenAsync(TrnRequestMetadata trnRequest, string resolvedPersonTrn)
     {
         if (trnRequest.Status is not TrnRequestStatus.Completed || trnRequest.TrnToken is not null || trnRequest.EmailAddress is null)
@@ -597,8 +616,10 @@ public class TrnRequestService(
                 .Select(r => r.potentialMatch));
     }
 
-    public async Task<TrnRequestInfo> ActivateTrnRequestAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public async Task<TrnRequestInfo> ActivateTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext)
     {
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+
         if (trnRequest.Status is not TrnRequestStatus.Dormant)
         {
             throw new InvalidOperationException($"Only {TrnRequestStatus.Dormant} requests can be activated.");
@@ -745,7 +766,14 @@ public class TrnRequestService(
         .Select(a => a!.Value)
         .ToArray();
 
-    public async Task<TrnRequestInfo> TryResolveAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    public async Task<TrnRequestInfo> TryResolveAsync(Guid applicationUserId, string requestId, ProcessContext processContext)
+    {
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+
+        return await TryResolveAsync(trnRequest, processContext);
+    }
+
+    private async Task<TrnRequestInfo> TryResolveAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
     {
         string? trn = null;
         var matchResult = await MatchPersonsAsync(trnRequest);

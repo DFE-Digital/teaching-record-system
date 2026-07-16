@@ -20,7 +20,11 @@ public class Confirm(TrnRequestService trnRequestService, TimeProvider timeProvi
 
         var processContext = new ProcessContext(ProcessType.TrnRequestManualChecksNeededTaskCompleting, timeProvider.UtcNow, User.GetUserId());
 
-        await trnRequestService.CompleteManualChecksNeededTrnRequestAsync(trnRequest, SupportTaskReference!, processContext);
+        await trnRequestService.CompleteManualChecksNeededTrnRequestAsync(
+            trnRequest.ApplicationUserId,
+            trnRequest.RequestId,
+            SupportTaskReference!,
+            processContext);
 
         TempData.SetFlashNotificationBanner($"TRN request for {trnRequest.FirstName} {trnRequest.MiddleName} {trnRequest.LastName} completed");
 

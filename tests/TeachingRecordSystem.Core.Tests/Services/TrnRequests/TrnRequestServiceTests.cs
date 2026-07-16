@@ -371,12 +371,13 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
         trnRequest.Status = TrnRequestStatus.Pending;
+        await SaveTrnRequestAsync(trnRequest);
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(() =>
-            WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext)));
+            WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext)));
 
         // Assert
         Assert.IsType<InvalidOperationException>(ex);
@@ -396,11 +397,12 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
-        Assert.Equal(definiteMatch.PersonId, trnRequest.ResolvedPersonId);
-        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(definiteMatch.PersonId, updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
     }
 
     [Fact]
@@ -413,16 +415,17 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
-        Assert.NotNull(trnRequest.ResolvedPersonId);
-        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.NotNull(updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
 
         await WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p =>
-                p.PersonId == trnRequest.ResolvedPersonId);
+                p.PersonId == updatedTrnRequest.ResolvedPersonId);
             Assert.NotNull(person);
         });
     }
@@ -444,10 +447,11 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
-        Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(TrnRequestStatus.Pending, updatedTrnRequest.Status);
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -478,11 +482,12 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
-        Assert.Equal(definiteMatch.PersonId, trnRequest.ResolvedPersonId);
-        Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(definiteMatch.PersonId, updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Pending, updatedTrnRequest.Status);
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -520,11 +525,12 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest, processContext));
+        var result = await WithServiceAsync(s => s.ActivateTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
-        Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
-        Assert.Null(trnRequest.ResolvedPersonId);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(TrnRequestStatus.Pending, updatedTrnRequest.Status);
+        Assert.Null(updatedTrnRequest.ResolvedPersonId);
         Assert.Null(result.ResolvedPersonTrn);
 
         await WithDbContextAsync(async dbContext =>
@@ -553,14 +559,16 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
 
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
-            trnRequest,
+            trnRequest.ApplicationUserId,
+            trnRequest.RequestId,
             matchedPerson.PersonId,
             processContext));
 
         // Assert
-        Assert.Equal(matchedPerson.PersonId, trnRequest.ResolvedPersonId);
-        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
-        Assert.NotNull(trnRequest.TrnToken);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(matchedPerson.PersonId, updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
+        Assert.NotNull(updatedTrnRequest.TrnToken);
     }
 
     [Fact]
@@ -576,13 +584,15 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
 
         // Act
         await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(
-            trnRequest,
+            trnRequest.ApplicationUserId,
+            trnRequest.RequestId,
             matchedPerson.PersonId,
             processContext));
 
         // Assert
-        Assert.Equal(matchedPerson.PersonId, trnRequest.ResolvedPersonId);
-        Assert.Equal(TrnRequestStatus.Pending, trnRequest.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(matchedPerson.PersonId, updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Pending, updatedTrnRequest.Status);
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -605,9 +615,14 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(
+            trnRequest.ApplicationUserId,
+            trnRequest.RequestId,
+            processContext));
 
         // Assert
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+
         await WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p =>
@@ -621,8 +636,8 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
             Assert.Equal(trnRequest.Gender, person.Gender);
             Assert.Equal(trnRequest.EmailAddress, person.EmailAddress);
 
-            Assert.Equal(person.PersonId, trnRequest.ResolvedPersonId);
-            Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+            Assert.Equal(person.PersonId, updatedTrnRequest.ResolvedPersonId);
+            Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
         });
 
         Events.AssertEventsPublished(
@@ -638,13 +653,14 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
 
         var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
         trnRequest.Status = TrnRequestStatus.Rejected;
+        await SaveTrnRequestAsync(trnRequest);
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(async () =>
         {
-            await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest, processContext));
+            await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
         });
 
         // Assert
@@ -660,13 +676,14 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
         trnRequest.ResolvedPersonId = matchingPerson.PersonId;
         trnRequest.Status = TrnRequestStatus.Completed;
+        await SaveTrnRequestAsync(trnRequest);
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(async () =>
         {
-            await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest, processContext));
+            await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
         });
 
         // Assert
@@ -684,10 +701,11 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.RejectTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
-        Assert.Equal(TrnRequestStatus.Rejected, trnRequest.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(TrnRequestStatus.Rejected, updatedTrnRequest.Status);
 
         Events.AssertEventsPublished(e =>
         {
@@ -705,13 +723,14 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
 
         var (trnRequest, _) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
         trnRequest.Status = TrnRequestStatus.Rejected;
+        await SaveTrnRequestAsync(trnRequest);
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(async () =>
         {
-            await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest, processContext));
+            await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
         });
 
         // Assert
@@ -727,13 +746,14 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
         trnRequest.ResolvedPersonId = matchingPerson.PersonId;
         trnRequest.Status = TrnRequestStatus.Completed;
+        await SaveTrnRequestAsync(trnRequest);
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var ex = await Record.ExceptionAsync(async () =>
         {
-            await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest, processContext));
+            await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
         });
 
         // Assert
@@ -749,14 +769,16 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var (trnRequest, matchingPerson) = await CreatePendingTrnRequestAndMatchingPerson(applicationUser.UserId);
         trnRequest.ResolvedPersonId = matchingPerson.PersonId;
         trnRequest.Status = TrnRequestStatus.Pending;
+        await SaveTrnRequestAsync(trnRequest);
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.CompleteResolvedTrnRequestAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
-        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
 
         Events.AssertEventsPublished(e =>
         {
@@ -777,11 +799,15 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s =>
-            s.CompleteManualChecksNeededTrnRequestAsync(trnRequest, supportTask.SupportTaskReference, processContext));
+        await WithServiceAsync(s => s.CompleteManualChecksNeededTrnRequestAsync(
+            trnRequest.ApplicationUserId,
+            trnRequest.RequestId,
+            supportTask.SupportTaskReference,
+            processContext));
 
         // Assert
-        Assert.Equal(TrnRequestStatus.Completed, trnRequest.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -1044,7 +1070,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, matchedPerson.PersonId, processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, matchedPerson.PersonId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -1069,7 +1095,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
 
         // Act
         var ex = await Record.ExceptionAsync(() =>
-            WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, matchedPerson.PersonId, processContext)));
+            WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, matchedPerson.PersonId, processContext)));
 
         // Assert
         Assert.Null(ex);
@@ -1089,13 +1115,15 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+
         await WithDbContextAsync(async dbContext =>
         {
             var updatedUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject);
-            Assert.Equal(trnRequest.ResolvedPersonId, updatedUser.PersonId);
+            Assert.Equal(updatedTrnRequest.ResolvedPersonId, updatedUser.PersonId);
         });
     }
 
@@ -1114,7 +1142,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
 
         // Act
         var ex = await Record.ExceptionAsync(() =>
-            WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext)));
+            WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext)));
 
         // Assert
         Assert.Null(ex);
@@ -1134,7 +1162,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, matchedPerson.PersonId, processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, matchedPerson.PersonId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -1159,7 +1187,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, matchedPerson.PersonId, processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithMatchedPersonAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, matchedPerson.PersonId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -1183,13 +1211,15 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
+        var updatedTrnRequest = await ReloadTrnRequestAsync(trnRequest);
+
         await WithDbContextAsync(async dbContext =>
         {
             var updatedUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject);
-            Assert.Equal(trnRequest.ResolvedPersonId, updatedUser.PersonId);
+            Assert.Equal(updatedTrnRequest.ResolvedPersonId, updatedUser.PersonId);
             Assert.Equal(OneLoginUserVerificationRoute.External, updatedUser.VerificationRoute);
         });
     }
@@ -1208,7 +1238,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext));
+        await WithServiceAsync(s => s.ResolveTrnRequestWithNewRecordAsync(trnRequest.ApplicationUserId, trnRequest.RequestId, processContext));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -1305,6 +1335,19 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
             NpqEvidenceFileName = "NPQ Evidence.pdf",
             WorkEmailAddress = TestData.GenerateUniqueEmail()
         };
+
+    // The service resolves its own TrsDbContext, so changes made to a TrnRequestMetadata here are only visible to it once saved
+    private Task SaveTrnRequestAsync(TrnRequestMetadata trnRequest) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            dbContext.TrnRequestMetadata.Update(trnRequest);
+            await dbContext.SaveChangesAsync();
+        });
+
+    // ...and for the same reason the service updates its own instance, so re-read the request to assert on it
+    private Task<TrnRequestMetadata> ReloadTrnRequestAsync(TrnRequestMetadata trnRequest) =>
+        WithDbContextAsync(dbContext => dbContext.TrnRequestMetadata.SingleAsync(r =>
+            r.ApplicationUserId == trnRequest.ApplicationUserId && r.RequestId == trnRequest.RequestId));
 
     private Task WithServiceAsync(Func<TrnRequestService, Task> action, params object[] arguments) =>
         WithServiceAsync<TrnRequestService>(action, GetServiceDependencies(arguments));

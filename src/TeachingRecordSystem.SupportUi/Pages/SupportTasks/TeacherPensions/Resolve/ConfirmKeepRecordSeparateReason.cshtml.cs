@@ -45,7 +45,11 @@ public class ConfirmKeepRecordSeparateReasonModel(
 
         var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, timeProvider.UtcNow, User.GetUserId());
 
-        await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(trnRequest, supportTask.PersonId!.Value, processContext);
+        await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
+            trnRequest.ApplicationUserId,
+            trnRequest.RequestId,
+            supportTask.PersonId!.Value,
+            processContext);
 
         await teacherPensionsSupportTaskService.ResolveWithoutMergeAsync(
             new()

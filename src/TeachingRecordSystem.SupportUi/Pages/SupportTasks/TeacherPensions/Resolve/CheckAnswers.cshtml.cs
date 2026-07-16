@@ -146,7 +146,8 @@ public class CheckAnswersModel(
             processContext);
 
         await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
-            trnRequest,
+            trnRequest.ApplicationUserId,
+            trnRequest.RequestId,
             existingPerson,
             attributesToUpdate,
             processContext);
