@@ -13,8 +13,8 @@ namespace TeachingRecordSystem.Core.Jobs;
 ///
 /// The import creates the person and raises the task within a single row, under one
 /// <see cref="ProcessType.TeacherPensionsRecordImporting"/> process, so — as with the current code — the
-/// back-filled event is attached to that same process. A process is only created for the rare event that no
-/// matching one is found.
+/// back-filled event is attached to that same process. Every task is expected to have one; the job throws if
+/// no matching process is found.
 /// </summary>
 public class BackfillTeacherPensionsSupportTaskProcessesJob(TrsDbContext dbContext)
 {
@@ -51,7 +51,9 @@ public class BackfillTeacherPensionsSupportTaskProcessesJob(TrsDbContext dbConte
 
             var process =
                 await FindImportProcessAsync(legacyEventData, legacyEvent.Created, cancellationToken) ??
-                CreateProcess(legacyEventData, legacyEvent.Created);
+                throw new InvalidOperationException(
+                    $"No {ProcessType.TeacherPensionsRecordImporting} process found for support task " +
+                    $"'{legacyEventData.SupportTask.SupportTaskReference}'.");
 
             AddProcessEvent(process, newEvent, legacyEvent.Created);
 
@@ -88,28 +90,6 @@ public class BackfillTeacherPensionsSupportTaskProcessesJob(TrsDbContext dbConte
         return candidates.Count <= 1
             ? candidates.SingleOrDefault()
             : candidates.FirstOrDefault(p => p.CreatedOn == created);
-    }
-
-    private Process CreateProcess(LegacySupportTaskCreatedEvent legacyEventData, DateTime created)
-    {
-        var process = new Process
-        {
-            ProcessId = Guid.NewGuid(),
-            ProcessType = ProcessType.TeacherPensionsRecordImporting,
-            CreatedOn = created,
-            UpdatedOn = created,
-            UserId = legacyEventData.RaisedBy.UserId,
-            DqtUserId = legacyEventData.RaisedBy.DqtUserId,
-            DqtUserName = legacyEventData.RaisedBy.DqtUserName,
-            PersonIds = [],
-            OneLoginUserSubjects = [],
-            SupportTaskReferences = [],
-            ChangeReason = null
-        };
-
-        dbContext.Processes.Add(process);
-
-        return process;
     }
 
     private void AddProcessEvent(Process process, IEvent newEvent, DateTime created)

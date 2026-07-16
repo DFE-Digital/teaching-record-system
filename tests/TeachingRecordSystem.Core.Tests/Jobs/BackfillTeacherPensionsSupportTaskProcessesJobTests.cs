@@ -38,27 +38,26 @@ public class BackfillTeacherPensionsSupportTaskProcessesJobTests(JobFixture fixt
     }
 
     [Fact]
-    public async Task Execute_NoImportProcessExists_CreatesOne()
+    public async Task Execute_NoImportProcessExists_Throws()
     {
         // Arrange
         var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync();
         var legacyEvent = await AddLegacyCreatedEventAsync(supportTask);
 
         // Act
-        await WithServiceAsync<BackfillTeacherPensionsSupportTaskProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+        var exception = await Record.ExceptionAsync(() =>
+            WithServiceAsync<BackfillTeacherPensionsSupportTaskProcessesJob>(
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None)));
 
         // Assert
+        Assert.NotNull(exception);
+        Assert.IsType<InvalidOperationException>(exception);
+        Assert.Contains(supportTask.SupportTaskReference, exception.Message);
+
         await WithDbContextAsync(async dbContext =>
         {
             var processEvent = await dbContext.ProcessEvents.SingleOrDefaultAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
-            Assert.NotNull(processEvent);
-
-            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
-            Assert.Equal(ProcessType.TeacherPensionsRecordImporting, process.ProcessType);
-            Assert.Equal(legacyEvent.CreatedUtc, process.CreatedOn);
-            Assert.Contains(supportTask.SupportTaskReference, process.SupportTaskReferences);
-            Assert.Contains(supportTask.PersonId!.Value, process.PersonIds);
+            Assert.Null(processEvent);
         });
     }
 
