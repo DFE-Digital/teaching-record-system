@@ -575,6 +575,8 @@ public class TrnRequestService(
                     return (potentialMatch, score);
                 })
                 .OrderByDescending(r => r.score)
+                // Tie-break on PersonId so equally-scored matches have a deterministic order
+                .ThenBy(r => r.potentialMatch.PersonId)
                 .Select(r => r.potentialMatch));
     }
 
