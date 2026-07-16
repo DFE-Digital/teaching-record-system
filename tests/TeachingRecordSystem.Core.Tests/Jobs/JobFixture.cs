@@ -29,7 +29,7 @@ public class JobFixture : ServiceProviderFixture
             .AddWebhookMessageFactory()
             .AddOneLoginService()
             .AddPersonService()
-            .AddSupportTaskService()
+            .AddSupportTaskServices()
             .AddTrnRequestService(configuration)
             .AddSingleton<IBackgroundJobScheduler>(_ => Mock.Of<IBackgroundJobScheduler>())
             .AddSingleton(Options.Create(new AccessYourTeachingQualificationsOptions { BaseAddress = "https://aytq.example.com/" }))

@@ -977,6 +977,49 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
     }
 
     [Fact]
+    public async Task Import_CreatesPotentialDuplicateSupportTask_RaisesProcessEventOnImportProcessAndLegacyEvent()
+    {
+        // Arrange
+        var existingPerson = await TestData.CreatePersonAsync(p => p
+            .WithGender(Gender.Male)
+            .WithDateOfBirth(new DateOnly(1981, 08, 20)));
+
+        var newTrn = "1234567";
+        var newNino = Faker.Identification.UkNationalInsuranceNumber();
+        (var reader, _) = BuildSingleRowCsv(newTrn, existingPerson.Gender, existingPerson.LastName, existingPerson.FirstName, existingPerson.DateOfBirth, newNino);
+
+        // Act
+        await WithServiceAsync<CapitaImportJob, long>(job => job.ImportAsync(reader, "SingleFile.txt"));
+
+        // Assert
+        var newPerson = await AssertSinglePersonAsync(newTrn);
+        var task = await AssertSingleSupportTaskAsync(SupportTaskType.TeacherPensionsPotentialDuplicate, newPerson.PersonId);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleOrDefaultAsync(pe =>
+                pe.EventName == nameof(SupportTaskCreatedEvent) &&
+                pe.SupportTaskReferences.Contains(task.SupportTaskReference));
+            Assert.NotNull(processEvent);
+
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+            Assert.Equal(ProcessType.TeacherPensionsRecordImporting, process.ProcessType);
+            Assert.Contains(task.SupportTaskReference, process.SupportTaskReferences);
+
+            // The person and the task come from the same import row, so they share a process.
+            var personCreatedProcessEvent = await dbContext.ProcessEvents.SingleAsync(pe =>
+                pe.EventName == nameof(PersonCreatedEvent) &&
+                pe.PersonIds.Contains(newPerson.PersonId));
+            Assert.Equal(personCreatedProcessEvent.ProcessId, processEvent.ProcessId);
+        });
+
+        // The legacy event is still written, now by the event handler rather than the job itself.
+        var legacyEvent = await AssertSingleEventAsync<LegacyEvents.SupportTaskCreatedEvent>(newPerson.PersonId);
+        Assert.Equal(task.SupportTaskReference, legacyEvent.SupportTask.SupportTaskReference);
+        Assert.Equal(ApplicationUser.CapitaTpsImportUser.UserId, legacyEvent.RaisedBy.UserId);
+    }
+
+    [Fact]
     public async Task Import_MatchesExistingPersonWithNinoOnFirstNameAndLastNameAndDob_CreatesPersonAndCreatesPotentialDuplicateSupportTask_ReportsDuplicate()
     {
         // Arrange

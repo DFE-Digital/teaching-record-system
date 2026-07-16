@@ -54,7 +54,7 @@ public static partial class Commands
                 .AddWebhookMessageFactory()
                 .AddEventPublisher()
                 .AddPersonService()
-                .AddSupportTaskService()
+                .AddSupportTaskServices()
                 .AddTrnRequestService(configuration)
                 .BuildServiceProvider();
 
