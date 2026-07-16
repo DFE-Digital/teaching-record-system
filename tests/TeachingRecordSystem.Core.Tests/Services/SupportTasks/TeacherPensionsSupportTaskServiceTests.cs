@@ -59,6 +59,8 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
             integrationTransactionId: 42);
         Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
 
+        var existingPerson = await TestData.CreatePersonAsync();
+
         var resolvedAttributes = new TeacherPensionsPotentialDuplicateAttributes
         {
             FirstName = "Resolved",
@@ -89,6 +91,7 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
                 new ResolveTeacherPensionsPotentialDuplicateWithMergeOptions
                 {
                     SupportTaskReference = supportTask.SupportTaskReference,
+                    ExistingPersonId = existingPerson.PersonId,
                     ResolvedAttributes = resolvedAttributes,
                     SelectedPersonAttributes = selectedPersonAttributes,
                     Comments = comments
@@ -106,17 +109,37 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
             // The rest of the data is preserved by the update.
             Assert.Equal("duplicates.csv", data.FileName);
             Assert.Equal(42, data.IntegrationTransactionId);
+
+            // The task's record is merged into the existing one, which the request resolves to
+            var mergedPerson = await dbContext.Persons.IgnoreQueryFilters().SingleAsync(p => p.PersonId == supportTask.PersonId);
+            Assert.Equal(PersonStatus.Deactivated, mergedPerson.Status);
+            Assert.Equal(existingPerson.PersonId, mergedPerson.MergedWithPersonId);
+
+            var trnRequest = await dbContext.TrnRequestMetadata.SingleAsync(r => r.RequestId == supportTask.TrnRequestId);
+            Assert.Equal(existingPerson.PersonId, trnRequest.ResolvedPersonId);
         });
 
-        Events.AssertEventsPublished(e =>
-        {
-            var updatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
-            Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
-            Assert.Equal(comments, updatedEvent.Comments);
-            Assert.Equal(
-                SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data,
-                updatedEvent.Changes);
-        });
+        Events.AssertEventsPublished(
+            e =>
+            {
+                var deactivatedEvent = Assert.IsType<PersonDeactivatedEvent>(e);
+                Assert.Equal(supportTask.PersonId, deactivatedEvent.PersonId);
+                Assert.Equal(existingPerson.PersonId, deactivatedEvent.MergedWithPersonId);
+            },
+            e =>
+            {
+                var updatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+                Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
+                Assert.Equal(comments, updatedEvent.Comments);
+                Assert.Equal(
+                    SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data,
+                    updatedEvent.Changes);
+            },
+            e =>
+            {
+                var trnRequestUpdatedEvent = Assert.IsType<TrnRequestUpdatedEvent>(e);
+                Assert.Equal(existingPerson.PersonId, trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
+            });
     }
 
     [Fact]
@@ -133,11 +156,14 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
+        var existingPerson = await TestData.CreatePersonAsync();
+
         var ex = await Record.ExceptionAsync(() => WithServiceAsync<TeacherPensionsSupportTaskService>(
             service => service.ResolveWithMergeAsync(
                 new ResolveTeacherPensionsPotentialDuplicateWithMergeOptions
                 {
                     SupportTaskReference = supportTask.SupportTaskReference,
+                    ExistingPersonId = existingPerson.PersonId,
                     ResolvedAttributes = null,
                     SelectedPersonAttributes = null
                 },
@@ -177,14 +203,27 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
             var data = Assert.IsType<TeacherPensionsPotentialDuplicateData>(dbTask.Data);
             Assert.Null(data.ResolvedAttributes);
             Assert.Null(data.SelectedPersonAttributes);
+
+            // The task's record is kept, and the request resolves to it rather than being merged away
+            var keptPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);
+            Assert.Equal(PersonStatus.Active, keptPerson.Status);
+
+            var trnRequest = await dbContext.TrnRequestMetadata.SingleAsync(r => r.RequestId == supportTask.TrnRequestId);
+            Assert.Equal(supportTask.PersonId, trnRequest.ResolvedPersonId);
         });
 
-        Events.AssertEventsPublished(e =>
-        {
-            var updatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
-            Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
-            Assert.Equal(comments, updatedEvent.Comments);
-            Assert.Equal(SupportTaskUpdatedEventChanges.Status, updatedEvent.Changes);
-        });
+        Events.AssertEventsPublished(
+            e =>
+            {
+                var updatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+                Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
+                Assert.Equal(comments, updatedEvent.Comments);
+                Assert.Equal(SupportTaskUpdatedEventChanges.Status, updatedEvent.Changes);
+            },
+            e =>
+            {
+                var trnRequestUpdatedEvent = Assert.IsType<TrnRequestUpdatedEvent>(e);
+                Assert.Equal(supportTask.PersonId, trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
+            });
     }
 }

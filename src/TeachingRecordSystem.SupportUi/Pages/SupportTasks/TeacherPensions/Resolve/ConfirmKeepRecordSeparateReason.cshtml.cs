@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
@@ -10,7 +9,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class ConfirmKeepRecordSeparateReasonModel(
     TrsDbContext dbContext,
-    TrnRequestService trnRequestService,
     TeacherPensionsSupportTaskService teacherPensionsSupportTaskService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
@@ -40,16 +38,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
             Reason = JourneyInstance!.State.Reason;
         }
 
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var trnRequest = supportTask.TrnRequestMetadata!;
-
         var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, timeProvider.UtcNow, User.GetUserId());
-
-        await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
-            trnRequest.ApplicationUserId,
-            trnRequest.RequestId,
-            supportTask.PersonId!.Value,
-            processContext);
 
         await teacherPensionsSupportTaskService.ResolveWithoutMergeAsync(
             new()

@@ -462,6 +462,12 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             nextPageDoc,
             "Teachers’ Pensions duplicate task completed");
 
+        // The banner links to the record that was kept, not the one that was merged away
+        var banner = nextPageDoc.GetElementsByClassName("govuk-notification-banner").Single();
+        var viewRecordLink = banner.QuerySelector("a");
+        Assert.NotNull(viewRecordLink);
+        Assert.Contains(duplicatePerson1.PersonId.ToString(), viewRecordLink.GetAttribute("href"));
+
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
     }
