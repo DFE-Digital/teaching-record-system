@@ -161,37 +161,6 @@ public class TrnRequestService(
         }
     }
 
-    public async Task ResolveTrnRequestWithMatchedPersonAsync(
-        Guid applicationUserId,
-        string requestId,
-        Person person,
-        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
-        ProcessContext processContext)
-    {
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
-
-        await ResolveTrnRequestWithMatchedPersonAsync(
-            trnRequest,
-            person,
-            publishTrnRequestUpdatedEvent: true,
-            processContext);
-
-        await personService.UpdatePersonDetailsAsync(
-            new UpdatePersonDetailsOptions
-            {
-                PersonId = person.PersonId,
-                CreatePreviousName = false,
-                FirstName = attributesToUpdate.Contains(PersonMatchedAttribute.FirstName) ? Option.Some(trnRequest.FirstName!) : default,
-                MiddleName = attributesToUpdate.Contains(PersonMatchedAttribute.MiddleName) ? Option.Some(trnRequest.MiddleName ?? string.Empty) : default,
-                LastName = attributesToUpdate.Contains(PersonMatchedAttribute.LastName) ? Option.Some(trnRequest.LastName!) : default,
-                DateOfBirth = attributesToUpdate.Contains(PersonMatchedAttribute.DateOfBirth) ? Option.Some<DateOnly?>(trnRequest.DateOfBirth) : default,
-                EmailAddress = attributesToUpdate.Contains(PersonMatchedAttribute.EmailAddress) && !string.IsNullOrEmpty(trnRequest.EmailAddress) ? Option.Some<EmailAddress?>(EmailAddress.Parse(trnRequest.EmailAddress)) : default,
-                NationalInsuranceNumber = attributesToUpdate.Contains(PersonMatchedAttribute.NationalInsuranceNumber) && !string.IsNullOrEmpty(trnRequest.NationalInsuranceNumber) ? Option.Some<NationalInsuranceNumber?>(NationalInsuranceNumber.Parse(trnRequest.NationalInsuranceNumber)) : default,
-                Gender = attributesToUpdate.Contains(PersonMatchedAttribute.Gender) ? Option.Some(trnRequest.Gender) : default
-            },
-            processContext);
-    }
-
     private async Task ResolveTrnRequestWithMatchedPersonAsync(
         TrnRequestMetadata trnRequest,
         Person person,

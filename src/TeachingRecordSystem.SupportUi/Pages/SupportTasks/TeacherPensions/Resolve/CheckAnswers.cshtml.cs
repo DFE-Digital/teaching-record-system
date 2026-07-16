@@ -135,7 +135,6 @@ public class CheckAnswersModel(
 
         var existingPersonId = JourneyInstance!.State.PersonId!.Value;
         var teacherPensionPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);
-        var existingPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
 
         var attributesToUpdate = GetAttributesToUpdate();
         var selectedPersonAttributes = await GetPersonAttributesAsync(existingPersonId);
@@ -148,7 +147,7 @@ public class CheckAnswersModel(
         await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest.ApplicationUserId,
             trnRequest.RequestId,
-            existingPerson,
+            existingPersonId,
             attributesToUpdate,
             processContext);
 

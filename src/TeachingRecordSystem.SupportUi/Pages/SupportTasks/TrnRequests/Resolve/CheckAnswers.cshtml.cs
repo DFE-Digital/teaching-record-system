@@ -96,7 +96,7 @@ public class CheckAnswers(
             await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
                 trnRequest.ApplicationUserId,
                 trnRequest.RequestId,
-                selectedPerson,
+                existingPersonId,
                 attributesToUpdate,
                 processContext);
         }
