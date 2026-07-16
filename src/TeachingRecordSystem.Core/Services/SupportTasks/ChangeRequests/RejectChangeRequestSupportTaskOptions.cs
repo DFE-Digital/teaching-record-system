@@ -6,5 +6,5 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 public record RejectChangeRequestSupportTaskOptions
 {
     public required SupportTask SupportTask { get; init; }
-    public required CaseRejectionReasonOption RejectionReason { get; init; }
+    public required ChangeRequestRejectReason RejectionReason { get; init; }
 }

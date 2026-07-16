@@ -177,11 +177,11 @@ public class ChangeRequestSupportTaskService(
         }
     }
 
-    private static string GetRejectionReasonEmailText(CaseRejectionReasonOption reason) => reason switch
+    private static string GetRejectionReasonEmailText(ChangeRequestRejectReason reason) => reason switch
     {
-        CaseRejectionReasonOption.RequestAndProofDontMatch => "This is because the proof you provided did not match your request.",
-        CaseRejectionReasonOption.WrongTypeOfDocument => "This is because you provided the wrong type of document.",
-        CaseRejectionReasonOption.ImageQuality => "This is because the image you provided was not clear enough.",
+        ChangeRequestRejectReason.RequestAndProofDontMatch => "This is because the proof you provided did not match your request.",
+        ChangeRequestRejectReason.WrongTypeOfDocument => "This is because you provided the wrong type of document.",
+        ChangeRequestRejectReason.ImageQuality => "This is because the image you provided was not clear enough.",
         _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
     };
 

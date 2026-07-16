@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
-public enum CaseRejectionReasonOption
+public enum ChangeRequestRejectReason
 {
     [Display(Name = "Request and proof don’t match")]
     RequestAndProofDontMatch,

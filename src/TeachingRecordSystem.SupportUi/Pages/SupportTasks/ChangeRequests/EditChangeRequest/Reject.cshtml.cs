@@ -37,7 +37,7 @@ public class RejectModel(
 
     [BindProperty]
     [Display(Name = " ")]
-    public CaseRejectionReasonOption? RejectionReasonChoice { get; set; }
+    public ChangeRequestRejectReason? RejectionReasonChoice { get; set; }
 
     public async Task<IActionResult> OnPostAsync()
     {
@@ -46,7 +46,7 @@ public class RejectModel(
         string requestStatus;
         string flashMessage;
 
-        if (RejectionReasonChoice!.Value == CaseRejectionReasonOption.ChangeNoLongerRequired)
+        if (RejectionReasonChoice!.Value == ChangeRequestRejectReason.ChangeNoLongerRequired)
         {
             requestStatus = "cancelled";
             flashMessage = "The user’s record has not been changed and they have not been notified.";
