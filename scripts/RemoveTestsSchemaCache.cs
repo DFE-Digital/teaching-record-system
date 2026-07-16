@@ -1,4 +1,8 @@
 #!/usr/bin/env -S dotnet --
 
-var appDataDir = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TeachingRecordSystem.Tests");
-Directory.GetFiles(appDataDir, "*-dbversion.txt").ToList().ForEach(File.Delete);
+var schemaVersionFilePath = Path.Join(Environment.CurrentDirectory, ".tests-schema-version.txt");
+
+if (File.Exists(schemaVersionFilePath))
+{
+    File.Delete(schemaVersionFilePath);
+}
