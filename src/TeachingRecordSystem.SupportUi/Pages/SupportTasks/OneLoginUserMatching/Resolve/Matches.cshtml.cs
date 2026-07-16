@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -93,12 +92,11 @@ public class Matches(
 
         var processContext = new ProcessContext(processType, timeProvider.UtcNow, User.GetUserId());
 
-        await supportTaskService.UpdateSupportTaskAsync(
+        await supportTaskService.SaveProgressAsync(
             new()
             {
                 SupportTaskReference = _supportTask.SupportTaskReference,
-                Status = SupportTaskStatus.InProgress,
-                SavedJourneyState = Option.Some(savedJourneyState)!
+                SavedJourneyState = savedJourneyState
             },
             processContext);
 

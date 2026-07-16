@@ -6,10 +6,9 @@ using NpgsqlTypes;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -19,7 +18,7 @@ public class TrnRequestService(
     TrsDbContext dbContext,
     IEventPublisher eventPublisher,
     OneLoginService oneLoginService,
-    SupportTaskService supportTaskService,
+    TrnRequestSupportTaskService trnRequestSupportTaskService,
     PersonService personService,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
@@ -216,15 +215,11 @@ public class TrnRequestService(
 
         if (furtherChecksNeeded)
         {
-            await supportTaskService.CreateSupportTaskAsync(
-                new CreateSupportTaskOptions
+            await trnRequestSupportTaskService.CreateManualChecksNeededSupportTaskAsync(
+                new CreateManualChecksNeededSupportTaskOptions
                 {
-                    SupportTaskType = SupportTaskType.TrnRequestManualChecksNeeded,
-                    Data = new TrnRequestManualChecksNeededData(),
-                    PersonId = person.PersonId,
-                    OneLoginUserSubject = null,
-                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId),
-                    Subject = SupportTask.Subject.FromPerson(person)
+                    Person = person,
+                    TrnRequest = trnRequest
                 },
                 processContext);
         }
@@ -750,15 +745,10 @@ public class TrnRequestService(
         {
             Debug.Assert(matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches);
 
-            await supportTaskService.CreateSupportTaskAsync(
-                new CreateSupportTaskOptions
+            await trnRequestSupportTaskService.CreateTrnRequestSupportTaskAsync(
+                new CreateTrnRequestSupportTaskOptions
                 {
-                    SupportTaskType = SupportTaskType.TrnRequest,
-                    Data = new TrnRequestData(),
-                    PersonId = null,
-                    OneLoginUserSubject = null,
-                    TrnRequest = (trnRequest.ApplicationUserId, trnRequest.RequestId),
-                    Subject = SupportTask.Subject.FromTrnRequest(trnRequest)
+                    TrnRequest = trnRequest
                 },
                 processContext);
         }

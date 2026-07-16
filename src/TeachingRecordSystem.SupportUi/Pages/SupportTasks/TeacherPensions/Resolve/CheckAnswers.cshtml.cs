@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
@@ -19,7 +18,7 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     TrnRequestService trnRequestService,
     PersonService personService,
-    SupportTaskService supportTaskService,
+    TeacherPensionsSupportTaskService teacherPensionsSupportTaskService,
     EvidenceUploadManager evidenceController,
     TimeProvider timeProvider,
     PersonChangeableAttributesService changedService) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
@@ -152,16 +151,12 @@ public class CheckAnswersModel(
             attributesToUpdate,
             processContext);
 
-        await supportTaskService.UpdateSupportTaskAsync(
-            new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
+        await teacherPensionsSupportTaskService.ResolveWithMergeAsync(
+            new()
             {
                 SupportTaskReference = SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    ResolvedAttributes = resolvedPersonAttributes,
-                    SelectedPersonAttributes = selectedPersonAttributes
-                },
-                Status = SupportTaskStatus.Closed,
+                ResolvedAttributes = resolvedPersonAttributes,
+                SelectedPersonAttributes = selectedPersonAttributes,
                 Comments = MergeComments
             },
             processContext);

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve.ResolveTrnRequestState;
@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 public class CheckAnswers(
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
-    SupportTaskService supportTaskService,
+    TrnRequestSupportTaskService trnRequestSupportTaskService,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider,
     PersonChangeableAttributesService changedService) :
@@ -101,18 +101,13 @@ public class CheckAnswers(
 
         var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
-        await supportTaskService.UpdateSupportTaskAsync<TrnRequestData>(
+        await trnRequestSupportTaskService.ResolveTrnRequestSupportTaskAsync(
             new()
             {
                 SupportTaskReference = supportTask.SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    ResolvedAttributes = resolvedPersonAttributes,
-                    SelectedPersonAttributes = selectedPersonAttributes
-                },
-                Status = SupportTaskStatus.Closed,
-                Comments = state.Comments,
-                RejectionReason = null
+                ResolvedAttributes = resolvedPersonAttributes,
+                SelectedPersonAttributes = selectedPersonAttributes,
+                Comments = state.Comments
             },
             processContext);
 
