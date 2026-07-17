@@ -12,28 +12,28 @@ updates:
           - 'Microsoft.EntityFrameworkCore.*'
           - 'Microsoft.Extensions.*'
           - 'System.Net.Http.Json'
-      serilog:
+      Serilog:
         patterns:
           - 'Serilog.*'
-      openiddict:
+      OpenIddict:
         patterns:
           - 'OpenIddict.*'
-      hangfire:
+      Hangfire:
         patterns:
           - 'Hangfire.*'
-      sentry:
+      Sentry:
         patterns:
           - 'Sentry.*'
-      nsign:
+      NSign:
         patterns:
           - 'NSign.*'
       xunit:
         patterns:
           - 'xunit.*'
-      dfeanalytics:
+      DfeAnalytics:
         patterns:
           - 'DfeAnalytics.*'
-      htmx:
+      Htmx:
         patterns:
           - 'Htmx*'
 
