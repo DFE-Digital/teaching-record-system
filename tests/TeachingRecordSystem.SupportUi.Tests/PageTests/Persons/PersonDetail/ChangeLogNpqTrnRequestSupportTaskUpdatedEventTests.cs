@@ -321,7 +321,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             Data = new NpqTrnRequestData(),
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = "Resolved",
+            Outcome = SupportTaskOutcome.NpqTrnRequest_ResolvedWithNewPerson,
             ZendeskTickets = []
         };
 
@@ -335,7 +335,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             Data = new NpqTrnRequestData(),
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = null,
+            Outcome = null,
             ZendeskTickets = []
         };
 

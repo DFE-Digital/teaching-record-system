@@ -165,7 +165,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var completedOn = TimeProvider.UtcNow;
-        var (supportTask, completedByUser) = await CreateClosedSupportTaskAsync(outcomeLabel: "Approved", completedOn: completedOn);
+        var (supportTask, completedByUser) = await CreateClosedSupportTaskAsync(
+            outcome: SupportTaskOutcome.ChangeNameRequest_Approved,
+            completedOn: completedOn);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}");
 
@@ -330,7 +332,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Events.AssertNoEventsPublished();
     }
 
-    private async Task<(SupportTask SupportTask, User CompletedByUser)> CreateClosedSupportTaskAsync(string outcomeLabel = "Approved", DateTime? completedOn = null)
+    private async Task<(SupportTask SupportTask, User CompletedByUser)> CreateClosedSupportTaskAsync(
+        SupportTaskOutcome outcome = SupportTaskOutcome.ChangeNameRequest_Approved,
+        DateTime? completedOn = null)
     {
         var completedByUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
@@ -339,7 +343,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContextAsync(async dbContext =>
         {
             var dbTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
-            dbTask.OutcomeLabel = outcomeLabel;
+            dbTask.Outcome = outcome;
             dbTask.CompletedOn = completedOn ?? TimeProvider.UtcNow;
             dbTask.CompletedByUserId = completedByUser.UserId;
             await dbContext.SaveChangesAsync();

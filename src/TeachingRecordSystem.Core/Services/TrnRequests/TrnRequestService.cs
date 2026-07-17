@@ -352,8 +352,12 @@ public class TrnRequestService(
         TrnRequestDataPersonAttributes? selectedPersonAttributes = null;
         TrnRequestDataPersonAttributes resolvedAttributes;
 
+        SupportTaskOutcome outcome;
+
         if (options.PersonId is Guid personId)
         {
+            outcome = SupportTaskOutcome.TrnRequest_ResolvedWithExistingPerson;
+
             var person = await dbContext.Persons.FindOrThrowAsync(personId);
 
             // Snapshot the record before resolving, which updates it.
@@ -369,6 +373,8 @@ public class TrnRequestService(
         }
         else
         {
+            outcome = SupportTaskOutcome.TrnRequest_ResolvedWithNewPerson;
+
             // A new record takes every value from the request.
             resolvedAttributes = GetRequestAttributes(trnRequest);
 
@@ -379,6 +385,7 @@ public class TrnRequestService(
             new ResolveTrnRequestSupportTaskOptions
             {
                 SupportTaskReference = options.SupportTaskReference,
+                Outcome = outcome,
                 ResolvedAttributes = resolvedAttributes,
                 SelectedPersonAttributes = selectedPersonAttributes,
                 Comments = options.Comments
@@ -483,22 +490,28 @@ public class TrnRequestService(
             },
             processContext);
 
-    public Task ResolveTrnRequestSupportTaskAsync(
+    internal Task ResolveTrnRequestSupportTaskAsync(
         ResolveTrnRequestSupportTaskOptions options,
-        ProcessContext processContext) =>
-        supportTaskService.UpdateSupportTaskAsync<TrnRequestData>(
+        ProcessContext processContext)
+    {
+        Debug.Assert(options.Outcome is SupportTaskOutcome.TrnRequest_ResolvedWithExistingPerson or SupportTaskOutcome.TrnRequest_ResolvedWithNewPerson);
+
+        return supportTaskService.UpdateSupportTaskAsync<TrnRequestData>(
             new UpdateSupportTaskOptions<TrnRequestData>
             {
                 SupportTaskReference = options.SupportTaskReference,
-                UpdateData = data => data with
-                {
-                    ResolvedAttributes = options.ResolvedAttributes,
-                    SelectedPersonAttributes = options.SelectedPersonAttributes
-                },
+                UpdateData =
+                    data => data with
+                    {
+                        ResolvedAttributes = options.ResolvedAttributes,
+                        SelectedPersonAttributes = options.SelectedPersonAttributes
+                    },
                 Status = SupportTaskStatus.Closed,
+                Outcome = options.Outcome,
                 Comments = options.Comments
             },
             processContext);
+    }
 
     public Task CompleteManualChecksNeededSupportTaskAsync(
         CompleteManualChecksNeededSupportTaskOptions options,
@@ -508,7 +521,8 @@ public class TrnRequestService(
             {
                 SupportTaskReference = options.SupportTaskReference,
                 UpdateData = data => data,
-                Status = SupportTaskStatus.Closed
+                Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.TrnRequestManualChecksNeeded_Completed
             },
             processContext);
 

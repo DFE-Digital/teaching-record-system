@@ -72,6 +72,7 @@ public class TeacherPensionsSupportTaskService(
                     SelectedPersonAttributes = selectedPersonAttributes
                 },
                 Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.TeacherPensionsPotentialDuplicate_ResolvedWithMerge,
                 Comments = options.Comments
             },
             processContext);
@@ -145,6 +146,7 @@ public class TeacherPensionsSupportTaskService(
                     SelectedPersonAttributes = null
                 },
                 Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.TeacherPensionsPotentialDuplicate_ResolvedWithoutMerge,
                 Comments = options.Comments
             },
             processContext);

@@ -33,7 +33,7 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
                 },
                 ResolveJourneySavedState = null,
                 AssignedToUserId = null,
-                OutcomeLabel = null,
+                Outcome = null,
             }
         };
 
@@ -59,7 +59,7 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
                 Assert.Equal(@event.SupportTask.Data, legacyEvent.SupportTask.Data);
                 Assert.Equal(@event.SupportTask.ResolveJourneySavedState, legacyEvent.SupportTask.ResolveJourneySavedState);
                 Assert.Equal(@event.SupportTask.AssignedToUserId, legacyEvent.SupportTask.AssignedToUserId);
-                Assert.Equal(@event.SupportTask.OutcomeLabel, legacyEvent.SupportTask.OutcomeLabel);
+                Assert.Equal(@event.SupportTask.Outcome, legacyEvent.SupportTask.Outcome);
                 Assert.Equal(@event.SupportTask.ZendeskTickets, legacyEvent.SupportTask.ZendeskTickets);
                 Assert.Equal(processContext.Now, legacyEvent.CreatedUtc);
                 Assert.Equal(@event.PersonId, legacyEvent.PersonId.ToNullable());

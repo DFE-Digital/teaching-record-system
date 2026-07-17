@@ -32,7 +32,7 @@ public class Index(
 
     public bool IsOutstanding { get; set; }
 
-    public string? OutcomeLabel { get; set; }
+    public SupportTaskOutcome? Outcome { get; set; }
 
     public DateTime? CompletedOn { get; set; }
 
@@ -98,7 +98,7 @@ public class Index(
         SupportTaskType = _supportTask.SupportTaskType;
         SupportTaskTypeTitle = _supportTask.SupportTaskType.GetTitle();
         IsOutstanding = _supportTask.IsOutstanding;
-        OutcomeLabel = _supportTask.OutcomeLabel;
+        Outcome = _supportTask.Outcome;
         CompletedOn = _supportTask.CompletedOn;
         CompletedByUserName = _supportTask.CompletedBy?.Name;
 

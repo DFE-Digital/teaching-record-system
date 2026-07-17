@@ -820,7 +820,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
             {
                 var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
                 Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
-                Assert.Equal(SupportTaskUpdatedEventChanges.Status, supportTaskUpdatedEvent.Changes);
+                Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Outcome, supportTaskUpdatedEvent.Changes);
             },
             e =>
             {

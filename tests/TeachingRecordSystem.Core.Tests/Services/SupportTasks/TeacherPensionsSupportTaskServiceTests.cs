@@ -132,7 +132,7 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
                 Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
                 Assert.Equal(comments, updatedEvent.Comments);
                 Assert.Equal(
-                    SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data,
+                    SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data | SupportTaskUpdatedEventChanges.Outcome,
                     updatedEvent.Changes);
             },
             e =>
@@ -274,7 +274,7 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
                 var updatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
                 Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
                 Assert.Equal(comments, updatedEvent.Comments);
-                Assert.Equal(SupportTaskUpdatedEventChanges.Status, updatedEvent.Changes);
+                Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Outcome, updatedEvent.Changes);
             },
             e =>
             {

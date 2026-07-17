@@ -206,27 +206,41 @@ public class ChangeRequestSupportTaskService(
 
     private Task ResolveChangeRequestAsync(
         SupportTask supportTask,
-        SupportRequestOutcome outcome,
+        SupportRequestOutcome supportRequestOutcome,
         string? rejectionReason,
         ProcessContext processContext)
     {
+#pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+        var outcome = (supportTask.SupportTaskType, supportRequestOutcome) switch
+        {
+            (SupportTaskType.ChangeDateOfBirthRequest, SupportRequestOutcome.Approved) => SupportTaskOutcome.ChangeDateOfBirthRequest_Approved,
+            (SupportTaskType.ChangeDateOfBirthRequest, SupportRequestOutcome.Rejected) => SupportTaskOutcome.ChangeDateOfBirthRequest_Rejected,
+            (SupportTaskType.ChangeDateOfBirthRequest, SupportRequestOutcome.Cancelled) => SupportTaskOutcome.ChangeDateOfBirthRequest_Cancelled,
+            (SupportTaskType.ChangeNameRequest, SupportRequestOutcome.Approved) => SupportTaskOutcome.ChangeNameRequest_Approved,
+            (SupportTaskType.ChangeNameRequest, SupportRequestOutcome.Rejected) => SupportTaskOutcome.ChangeNameRequest_Rejected,
+            (SupportTaskType.ChangeNameRequest, SupportRequestOutcome.Cancelled) => SupportTaskOutcome.ChangeNameRequest_Cancelled
+        };
+#pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+
         return supportTask.SupportTaskType switch
         {
             SupportTaskType.ChangeNameRequest => supportTaskService.UpdateSupportTaskAsync(
                 new UpdateSupportTaskOptions<ChangeNameRequestData>
                 {
-                    UpdateData = data => data with { ChangeRequestOutcome = outcome },
+                    UpdateData = data => data with { ChangeRequestOutcome = supportRequestOutcome },
                     SupportTaskReference = supportTask.SupportTaskReference,
                     Status = SupportTaskStatus.Closed,
+                    Outcome = outcome,
                     RejectionReason = rejectionReason
                 },
                 processContext),
             SupportTaskType.ChangeDateOfBirthRequest => supportTaskService.UpdateSupportTaskAsync(
                 new UpdateSupportTaskOptions<ChangeDateOfBirthRequestData>
                 {
-                    UpdateData = data => data with { ChangeRequestOutcome = outcome },
+                    UpdateData = data => data with { ChangeRequestOutcome = supportRequestOutcome },
                     SupportTaskReference = supportTask.SupportTaskReference,
                     Status = SupportTaskStatus.Closed,
+                    Outcome = outcome,
                     RejectionReason = rejectionReason
                 },
                 processContext),

@@ -217,6 +217,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.Closed,
+            Outcome = SupportTaskOutcome.ChangeNameRequest_Approved,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -246,6 +247,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data with { ChangeRequestOutcome = outcome },
             Status = SupportTaskStatus.Closed,
+            Outcome = SupportTaskOutcome.ChangeNameRequest_Approved,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -268,7 +270,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             Assert.Equal(supportTask.SupportTaskReference, supportTaskUpdatedEvent.SupportTaskReference);
             Assert.Equal(TimeProvider.UtcNow, supportTask.UpdatedOn);
             Assert.Equal(options.Comments, supportTaskUpdatedEvent.Comments);
-            Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data, supportTaskUpdatedEvent.Changes);
+            Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data | SupportTaskUpdatedEventChanges.Outcome, supportTaskUpdatedEvent.Changes);
         });
     }
 
@@ -285,6 +287,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.InProgress,
+            Outcome = null,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -323,6 +326,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = supportTask.Status,
+            Outcome = null,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -361,6 +365,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.InProgress,
+            Outcome = null,
             SavedJourneyState = Option.Some(savedJourneyState)!,
             Comments = Faker.Lorem.Paragraph()
         };
@@ -402,6 +407,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Approved },
             Status = SupportTaskStatus.Closed,
+            Outcome = SupportTaskOutcome.ChangeNameRequest_Approved,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -417,20 +423,21 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
     }
 
     [Fact]
-    public async Task UpdateSupportTaskAsync_StatusIsClosed_SetsOutcomeLabelFromUpdatedData()
+    public async Task UpdateSupportTaskAsync_StatusIsClosed_SetsOutcome()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
-        Debug.Assert(supportTask.GetData<ChangeNameRequestData>().ChangeRequestOutcome is null);
+        Debug.Assert(supportTask.Outcome is null);
 
-        var outcome = SupportRequestOutcome.Rejected;
+        var outcome = SupportTaskOutcome.ChangeNameRequest_Rejected;
 
         var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
         {
             SupportTaskReference = supportTask.SupportTaskReference,
-            UpdateData = data => data with { ChangeRequestOutcome = outcome },
+            UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Rejected },
             Status = SupportTaskStatus.Closed,
+            Outcome = outcome,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -443,12 +450,19 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         await WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
-            Assert.Equal(Enum.GetName(outcome), dbSupportTask.OutcomeLabel);
+            Assert.Equal(outcome, dbSupportTask.Outcome);
+        });
+
+        Events.AssertEventsPublished(e =>
+        {
+            var supportTaskUpdatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+            Assert.Equal(outcome, supportTaskUpdatedEvent.SupportTask.Outcome);
+            Assert.True(supportTaskUpdatedEvent.Changes.HasFlag(SupportTaskUpdatedEventChanges.Outcome));
         });
     }
 
     [Fact]
-    public async Task UpdateSupportTaskAsync_StatusIsNotClosed_DoesNotSetOutcomeLabel()
+    public async Task UpdateSupportTaskAsync_StatusIsNotClosed_DoesNotSetOutcome()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -460,6 +474,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.InProgress,
+            Outcome = null,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -472,8 +487,62 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         await WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
-            Assert.Null(dbSupportTask.OutcomeLabel);
+            Assert.Null(dbSupportTask.Outcome);
         });
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_StatusIsClosedWithoutOutcome_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Rejected },
+            Status = SupportTaskStatus.Closed,
+            Outcome = null,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(
+            service => service.UpdateSupportTaskAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+        Events.AssertNoEventsPublished();
+    }
+
+    [Fact]
+    public async Task UpdateSupportTaskAsync_StatusIsNotClosedWithOutcome_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+
+        var options = new UpdateSupportTaskOptions<ChangeNameRequestData>
+        {
+            SupportTaskReference = supportTask.SupportTaskReference,
+            UpdateData = data => data,
+            Status = SupportTaskStatus.InProgress,
+            Outcome = SupportTaskOutcome.ChangeNameRequest_Rejected,
+            Comments = Faker.Lorem.Paragraph()
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync<SupportTaskService>(
+            service => service.UpdateSupportTaskAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+        Events.AssertNoEventsPublished();
     }
 
     [Fact]
@@ -488,6 +557,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data with { ChangeRequestOutcome = SupportRequestOutcome.Rejected },
             Status = SupportTaskStatus.Closed,
+            Outcome = SupportTaskOutcome.ChangeNameRequest_Rejected,
             Comments = Faker.Lorem.Paragraph()
         };
 
@@ -518,6 +588,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskReference = supportTask.SupportTaskReference,
             UpdateData = data => data,
             Status = SupportTaskStatus.InProgress,
+            Outcome = null,
             Comments = Faker.Lorem.Paragraph()
         };
 

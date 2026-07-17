@@ -57,7 +57,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                     RejectReason = options.RejectReason,
                     RejectionAdditionalDetails = options.RejectionAdditionalDetails
                 },
-                Status = SupportTaskStatus.Closed
+                Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.OneLoginUserIdVerification_NotVerified
             },
             processContext);
 
@@ -122,7 +123,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                     NotConnectingReason = options.NotConnectingReason,
                     NotConnectingAdditionalDetails = options.NotConnectingAdditionalDetails
                 },
-                Status = SupportTaskStatus.Closed
+                Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithMatches
             },
             processContext);
     }
@@ -156,7 +158,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                     Verified = true,
                     Outcome = OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches
                 },
-                Status = SupportTaskStatus.Closed
+                Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithoutMatches
             },
             processContext);
 
@@ -210,7 +213,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                     PersonId = options.MatchedPersonId,
                     Outcome = OneLoginUserIdVerificationOutcome.VerifiedAndConnected
                 },
-                Status = SupportTaskStatus.Closed
+                Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.OneLoginUserIdVerification_VerifiedAndConnected
             },
             processContext);
     }

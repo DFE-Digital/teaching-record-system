@@ -6,6 +6,7 @@ public record UpdateSupportTaskOptions
 {
     public required string SupportTaskReference { get; init; }
     public required SupportTaskStatus Status { get; init; }
+    public required SupportTaskOutcome? Outcome { get; init; }
     public string? Comments { get; init; }
     public string? RejectionReason { get; init; }
     public Option<SavedJourneyState?> SavedJourneyState { get; init; }

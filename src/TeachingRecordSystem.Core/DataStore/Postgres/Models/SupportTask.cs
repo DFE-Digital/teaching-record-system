@@ -27,8 +27,8 @@ public class SupportTask
     public required string? SubjectEmailAddress { get; init; }
     public required ISupportTaskData Data { get; set; }
     public SavedJourneyState? ResolveJourneySavedState { get; set; }
-    public string? OutcomeLabel { get; set; }
     public string[] ZendeskTickets { get; set; } = Array.Empty<string>();
+    public SupportTaskOutcome? Outcome { get; set; }
 
     [Projectable]
     public bool IsOutstanding => Status != SupportTaskStatus.Closed;

@@ -4,7 +4,6 @@ public record TrnRequestData : ISupportTaskData
 {
     public TrnRequestDataPersonAttributes? SelectedPersonAttributes { get; init; }
     public TrnRequestDataPersonAttributes? ResolvedAttributes { get; init; }
-    string ISupportTaskData.GetOutcomeLabel() => "Resolved";
 }
 
 public record TrnRequestDataPersonAttributes

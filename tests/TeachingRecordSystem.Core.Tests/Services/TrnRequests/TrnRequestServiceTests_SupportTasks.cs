@@ -113,6 +113,7 @@ public partial class TrnRequestServiceTests
                 new ResolveTrnRequestSupportTaskOptions
                 {
                     SupportTaskReference = supportTask.SupportTaskReference,
+                    Outcome = SupportTaskOutcome.TrnRequest_ResolvedWithExistingPerson,
                     ResolvedAttributes = resolvedAttributes,
                     SelectedPersonAttributes = selectedPersonAttributes,
                     Comments = comments
@@ -135,7 +136,7 @@ public partial class TrnRequestServiceTests
             Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
             Assert.Equal(comments, updatedEvent.Comments);
             Assert.Equal(
-                SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data,
+                SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Data | SupportTaskUpdatedEventChanges.Outcome,
                 updatedEvent.Changes);
         });
     }
@@ -156,6 +157,7 @@ public partial class TrnRequestServiceTests
                 new ResolveTrnRequestSupportTaskOptions
                 {
                     SupportTaskReference = supportTask.SupportTaskReference,
+                    Outcome = SupportTaskOutcome.TrnRequest_ResolvedWithNewPerson,
                     ResolvedAttributes = null,
                     SelectedPersonAttributes = null
                 },
@@ -195,7 +197,7 @@ public partial class TrnRequestServiceTests
         {
             var updatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
             Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
-            Assert.Equal(SupportTaskUpdatedEventChanges.Status, updatedEvent.Changes);
+            Assert.Equal(SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Outcome, updatedEvent.Changes);
         });
     }
 }

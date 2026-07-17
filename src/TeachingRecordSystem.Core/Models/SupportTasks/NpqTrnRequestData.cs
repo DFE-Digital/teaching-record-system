@@ -5,8 +5,6 @@ public record NpqTrnRequestData : ISupportTaskData
     public NpqTrnRequestDataPersonAttributes? SelectedPersonAttributes { get; init; }
     public NpqTrnRequestDataPersonAttributes? ResolvedAttributes { get; init; }
     public SupportRequestOutcome? SupportRequestOutcome { get; init; }
-
-    string ISupportTaskData.GetOutcomeLabel() => Enum.GetName(SupportRequestOutcome!.Value)!;
 }
 
 public record NpqTrnRequestDataPersonAttributes
