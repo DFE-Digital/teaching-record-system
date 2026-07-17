@@ -37,6 +37,7 @@ public partial class TestData
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
         private bool _hasEmailAddress = true;
+        private Option<string[]> _zendeskTickets;
 
         public CreateChangeDateOfBirthRequestSupportTaskBuilder WithDateOfBirth(DateOnly dateOfBirth)
         {
@@ -85,6 +86,13 @@ public partial class TestData
             return this;
         }
 
+        public CreateChangeDateOfBirthRequestSupportTaskBuilder WithZendeskTickets(
+            params string[] zendeskTickets)
+        {
+            _zendeskTickets = Option.Some(zendeskTickets);
+            return this;
+        }
+
         public Task<SupportTask> ExecuteAsync(TestData testData) => testData.WithDbContextAsync(async dbContext =>
         {
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
@@ -93,6 +101,7 @@ public partial class TestData
             var emailAddress = _hasEmailAddress ? _emailAddress.ValueOr(testData.GenerateUniqueEmail) : null;
             var status = _status.ValueOr(SupportTaskStatus.Open);
             var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow).ToUniversalTime();
+            var zendeskTickets = _zendeskTickets.ValueOr([]);
 
             var person = await dbContext.Persons.FindAsync(personId) ??
                 throw new InvalidOperationException("Person does not exist.");
@@ -115,7 +124,8 @@ public partial class TestData
                 },
                 PersonId = personId,
                 SubjectName = subject.Name,
-                SubjectEmailAddress = subject.EmailAddress
+                SubjectEmailAddress = subject.EmailAddress,
+                ZendeskTickets = zendeskTickets
             };
 
             dbContext.SupportTasks.Add(supportTask);

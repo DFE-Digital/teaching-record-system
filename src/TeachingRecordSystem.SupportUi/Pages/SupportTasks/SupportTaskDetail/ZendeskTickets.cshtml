@@ -1,0 +1,106 @@
+@page "/support-tasks/{supportTaskReference}/zendesk-tickets"
+@using TeachingRecordSystem.Core.DataStore.Postgres.Models
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail.ZendeskTickets
+
+@{
+    ViewBag.Title = "Zendesk tickets";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form method="post">
+            <span class="govuk-caption-l">@Model.SupportTaskTypeTitle</span>
+            <span class="govuk-caption-m">@Model.SupportTaskReference</span>
+
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
+                Add a Zendesk ticket
+            </h1>
+
+            <table class="govuk-table trs-table-layout-fixed">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">
+                            Link to ticket
+                        </th>
+                        <th scope="col" class="govuk-table__header trs-!-width-200">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody class="govuk-table__body">
+                    @if (Model.TicketUrls is null || Model.TicketUrls.Count == 0)
+                    {
+                        <tr class="govuk-table__row" data-testid="no-tickets">
+                            <td class="govuk-table__cell" colspan="2">
+                                No tickets added
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @for (var i = 0; i < Model.TicketUrls.Count; i++)
+                        {
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
+                                    <govuk-input
+                                        data-testid="zendesk-ticket-@i"
+                                        for="TicketUrls[@i]"
+                                        type="url">
+                                        <govuk-input-label class="govuk-label--s">
+                                            <span class="govuk-visually-hidden">Zendesk URL</span>
+                                        </govuk-input-label>
+                                    </govuk-input>
+                                </td>
+
+                                <td class="govuk-table__cell govuk-!-text-align-right">
+                                    <govuk-button
+                                        type="submit"
+                                        asp-page-handler="RemoveTicket"
+                                        asp-route-removeIndex="@i"
+                                        class="govuk-button--secondary"
+                                        data-testid="remove-ticket-@i">
+                                        Remove
+                                    </govuk-button>
+
+                                    <span class="trs-link-separator" aria-hidden="true">｜</span>
+
+                                    <a
+                                        href="@Model.TicketUrls[i]"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="govuk-link">
+                                        View ticket
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div class="govuk-!-margin-top-4">
+                <govuk-button
+                    type="submit"
+                    asp-page-handler="AddTicket"
+                    class="govuk-button--secondary">
+                    Add another
+                </govuk-button>
+            </div>
+
+            <div class="govuk-button-group govuk-!-margin-top-4">
+                <govuk-button
+                    type="submit"
+                    asp-page-handler="Save">
+                    Continue
+                </govuk-button>
+
+                <govuk-button-link
+                    href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(Model.SupportTaskReference)"
+                    class="govuk-button--secondary">
+                    Cancel
+                </govuk-button-link>
+            </div>
+        </form>
+    </div>
+</div>

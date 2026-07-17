@@ -25,5 +25,6 @@ public enum SupportTaskUpdatedEventChanges
     Status = 1 << 0,
     Data = 1 << 1,
     ResolveJourneySavedState = 1 << 2,
-    AssignedToUserId = 1 << 3
+    AssignedToUserId = 1 << 3,
+    ZendeskTicketUrls = 1 << 4
 }

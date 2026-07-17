@@ -22,6 +22,7 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
                 Status = SupportTaskStatus.Open,
                 OneLoginUserSubject = null,
                 PersonId = Guid.NewGuid(),
+                ZendeskTickets = [],
                 Data = new ChangeDateOfBirthRequestData
                 {
                     DateOfBirth = new(2000, 1, 1),
@@ -32,7 +33,7 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
                 },
                 ResolveJourneySavedState = null,
                 AssignedToUserId = null,
-                OutcomeLabel = null
+                OutcomeLabel = null,
             }
         };
 
@@ -48,7 +49,21 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
             {
                 var legacyEvent = Assert.IsType<LegacyEvents.SupportTaskCreatedEvent>(e);
                 Assert.Equal(@event.EventId, legacyEvent.EventId);
-                Assert.Equal(@event.SupportTask, legacyEvent.SupportTask);
+                Assert.Equal(@event.EventId, legacyEvent.EventId);
+
+                Assert.Equal(@event.SupportTask.SupportTaskReference, legacyEvent.SupportTask.SupportTaskReference);
+                Assert.Equal(@event.SupportTask.SupportTaskType, legacyEvent.SupportTask.SupportTaskType);
+                Assert.Equal(@event.SupportTask.Status, legacyEvent.SupportTask.Status);
+                Assert.Equal(@event.SupportTask.OneLoginUserSubject, legacyEvent.SupportTask.OneLoginUserSubject);
+                Assert.Equal(@event.SupportTask.PersonId, legacyEvent.SupportTask.PersonId);
+                Assert.Equal(@event.SupportTask.Data, legacyEvent.SupportTask.Data);
+                Assert.Equal(@event.SupportTask.ResolveJourneySavedState, legacyEvent.SupportTask.ResolveJourneySavedState);
+                Assert.Equal(@event.SupportTask.AssignedToUserId, legacyEvent.SupportTask.AssignedToUserId);
+                Assert.Equal(@event.SupportTask.OutcomeLabel, legacyEvent.SupportTask.OutcomeLabel);
+                Assert.Equal(@event.SupportTask.ZendeskTickets, legacyEvent.SupportTask.ZendeskTickets);
+                Assert.Equal(processContext.Now, legacyEvent.CreatedUtc);
+                Assert.Equal(@event.PersonId, legacyEvent.PersonId.ToNullable());
+
                 Assert.Equal(processContext.Now, legacyEvent.CreatedUtc);
                 Assert.Equal(@event.PersonId, legacyEvent.PersonId.ToNullable());
             });

@@ -37,7 +37,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTaskType = SupportTaskType.ChangeNameRequest,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = null
+            OutcomeLabel = null,
+            ZendeskTickets = []
         };
         var supportTask = new SupportTask
         {
@@ -49,7 +50,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTaskType = SupportTaskType.ChangeNameRequest,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = "Approved"
+            OutcomeLabel = "Approved",
+            ZendeskTickets = []
         };
 
         var updatedEvent = new ChangeNameRequestSupportTaskApprovedEvent()
@@ -144,7 +146,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTaskType = SupportTaskType.ChangeNameRequest,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = null
+            OutcomeLabel = null,
+            ZendeskTickets = []
         };
         var supportTask = new SupportTask
         {
@@ -156,7 +159,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTaskType = SupportTaskType.ChangeNameRequest,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = "Rejected"
+            OutcomeLabel = "Rejected",
+            ZendeskTickets = []
         };
 
         var updatedEvent = new ChangeNameRequestSupportTaskRejectedEvent()
@@ -225,7 +229,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = null
+            OutcomeLabel = null,
+            ZendeskTickets = []
         };
         var supportTask = new SupportTask
         {
@@ -237,7 +242,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = "Approved"
+            OutcomeLabel = "Approved",
+            ZendeskTickets = []
         };
 
         var updatedEvent = new ChangeDateOfBirthRequestSupportTaskApprovedEvent()
@@ -323,7 +329,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = null
+            OutcomeLabel = null,
+            ZendeskTickets = []
         };
         var supportTask = new SupportTask
         {
@@ -335,7 +342,8 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
             SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,
-            OutcomeLabel = "Rejected"
+            OutcomeLabel = "Rejected",
+            ZendeskTickets = []
         };
 
         var updatedEvent = new ChangeDateOfBirthRequestSupportTaskRejectedEvent()
