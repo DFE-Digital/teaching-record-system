@@ -404,6 +404,8 @@ FodyWeavers.xsd
 
 **/.DS_Store
 
+.tests-schema-version.txt
+
 terraform/domains/environment_domains/vendor/
 terraform/domains/infrastructure/vendor/
 terraform/aks/vendor/

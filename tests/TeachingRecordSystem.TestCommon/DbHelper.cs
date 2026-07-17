@@ -14,6 +14,9 @@ namespace TeachingRecordSystem.TestCommon;
 
 public sealed class DbHelper : IAsyncDisposable
 {
+    private const int DefaultTestContainersPostgresPort = 43007;
+    private const string SchemaVersionFileName = ".tests-schema-version.txt";
+
     private readonly IServiceProvider _serviceProvider;
     private readonly PostgreSqlContainer? _postgresContainer;
 
@@ -31,8 +34,11 @@ public sealed class DbHelper : IAsyncDisposable
 
     public IDbContextFactory<TrsDbContext> DbContextFactory => _serviceProvider.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    public static string GetTestContainersConnectionString() =>
-        "Host=localhost;Port=43007;Database=trs;Username=postgres;Password=postgres;";
+    public static string GetTestContainersConnectionString(int port) =>
+        $"Host=localhost;Port={port};Database=trs;Username=postgres;Password=postgres;";
+
+    public static int GetTestContainersPostgresPort(IConfiguration configuration) =>
+        configuration.GetValue<int?>("TestContainersPostgresPort") ?? DefaultTestContainersPostgresPort;
 
     private static DbHelper CreateInstance()
     {
@@ -47,7 +53,7 @@ public sealed class DbHelper : IAsyncDisposable
             postgresContainer = new PostgreSqlBuilder("postgres:17")
                 .WithDatabase("trs")
                 .WithReuse(true)
-                .WithPortBinding(43007, 5432)
+                .WithPortBinding(GetTestContainersPostgresPort(configuration), 5432)
                 .Build();
         }
 
@@ -114,12 +120,8 @@ public sealed class DbHelper : IAsyncDisposable
         using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
         var connection = dbContext.Database.GetDbConnection();
-        var dbName = connection.Database;
 
-        var cachedMigrationsVersionPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "TeachingRecordSystem.Tests",
-            $"{dbName}-dbversion.txt");
+        var cachedMigrationsVersionPath = Path.Combine(GetRepositoryRootPath(), SchemaVersionFileName);
 
         var currentDbVersion = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(dbContext.Database.GenerateCreateScript())));
 
@@ -139,12 +141,24 @@ public sealed class DbHelper : IAsyncDisposable
         string? GetPreviousMigrationsVersion() =>
             File.Exists(cachedMigrationsVersionPath) ? File.ReadAllText(cachedMigrationsVersionPath) : null;
 
-        void WriteMigrationsVersion()
+        void WriteMigrationsVersion() => File.WriteAllText(cachedMigrationsVersionPath, currentDbVersion);
+    }
+
+    private static string GetRepositoryRootPath()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+
+        while (directory is not null)
         {
-            var directory = Path.GetDirectoryName(cachedMigrationsVersionPath)!;
-            Directory.CreateDirectory(directory);
-            File.WriteAllText(cachedMigrationsVersionPath, currentDbVersion);
+            if (File.Exists(Path.Combine(directory.FullName, "TeachingRecordSystem.slnx")))
+            {
+                return directory.FullName;
+            }
+
+            directory = directory.Parent;
         }
+
+        throw new InvalidOperationException($"Could not find the repository root from '{AppContext.BaseDirectory}'.");
     }
 
     private async Task EnsureRespawnerAsync(DbConnection connection) =>

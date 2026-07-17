@@ -16,7 +16,7 @@ public static class TestConfiguration
         var connectionString = configuration.GetConnectionString(TrsDbContext.ConnectionName);
         if (connectionString is null)
         {
-            connectionString = DbHelper.GetTestContainersConnectionString();
+            connectionString = DbHelper.GetTestContainersConnectionString(DbHelper.GetTestContainersPostgresPort(configuration));
 
             configuration.AddInMemoryCollection([
                 KeyValuePair.Create($"ConnectionStrings:{TrsDbContext.ConnectionName}", (string?)connectionString),
