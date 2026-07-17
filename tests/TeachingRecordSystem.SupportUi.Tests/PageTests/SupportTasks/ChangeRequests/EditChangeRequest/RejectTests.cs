@@ -168,7 +168,9 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         {
             var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
             Assert.Equal(SupportTaskStatus.Closed, supportTask!.Status);
-            Assert.Equal(nameof(SupportRequestOutcome.Rejected), supportTask.OutcomeLabel);
+            Assert.Equal(
+                isNameChange ? SupportTaskOutcome.ChangeNameRequest_Rejected : SupportTaskOutcome.ChangeDateOfBirthRequest_Rejected,
+                supportTask.Outcome);
 
             if (isNameChange)
             {
@@ -265,7 +267,9 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         {
             var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
             Assert.Equal(SupportTaskStatus.Closed, supportTask!.Status);
-            Assert.Equal(nameof(SupportRequestOutcome.Cancelled), supportTask.OutcomeLabel);
+            Assert.Equal(
+                isNameChange ? SupportTaskOutcome.ChangeNameRequest_Cancelled : SupportTaskOutcome.ChangeDateOfBirthRequest_Cancelled,
+                supportTask.Outcome);
 
             if (isNameChange)
             {

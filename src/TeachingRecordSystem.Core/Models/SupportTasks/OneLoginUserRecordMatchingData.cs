@@ -16,7 +16,6 @@ public record OneLoginUserRecordMatchingData : IOneLoginUserMatchingData
     public string? NotConnectingAdditionalDetails { get; init; }
     public string[][]? VerifiedOrStatedNames => VerifiedNames;
     public DateOnly[]? VerifiedOrStatedDatesOfBirth => VerifiedDatesOfBirth;
-    string ISupportTaskData.GetOutcomeLabel() => Enum.GetName(Outcome!.Value)!;
 }
 
 public enum OneLoginUserRecordMatchingOutcome

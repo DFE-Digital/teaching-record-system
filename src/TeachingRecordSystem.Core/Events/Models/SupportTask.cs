@@ -12,8 +12,8 @@ public record SupportTask
     public required ISupportTaskData Data { get; init; }
     public required SavedJourneyState? ResolveJourneySavedState { get; init; }
     public required Guid? AssignedToUserId { get; init; }
-    public required string? OutcomeLabel { get; init; }
     public required string[] ZendeskTickets { get; init; }
+    public required SupportTaskOutcome? Outcome { get; init; }
 
     public static SupportTask FromModel(DataStore.Postgres.Models.SupportTask model) => new()
     {
@@ -25,7 +25,7 @@ public record SupportTask
         Data = model.Data,
         ResolveJourneySavedState = model.ResolveJourneySavedState,
         AssignedToUserId = model.AssignedToUserId,
-        OutcomeLabel = model.OutcomeLabel,
-        ZendeskTickets = model.ZendeskTickets
+        ZendeskTickets = model.ZendeskTickets,
+        Outcome = model.Outcome
     };
 }

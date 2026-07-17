@@ -63,7 +63,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                     NotConnectingReason = options.NotConnectingReason,
                     NotConnectingAdditionalDetails = options.NotConnectingAdditionalDetails
                 },
-                Status = SupportTaskStatus.Closed
+                Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.OneLoginUserRecordMatching_NotConnecting
             },
             processContext);
 
@@ -119,7 +120,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 {
                     Outcome = OneLoginUserRecordMatchingOutcome.NoMatches
                 },
-                Status = SupportTaskStatus.Closed
+                Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.OneLoginUserRecordMatching_NoMatches
             },
             processContext);
 
@@ -184,7 +186,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                     PersonId = options.MatchedPersonId,
                     Outcome = OneLoginUserRecordMatchingOutcome.Connected
                 },
-                Status = SupportTaskStatus.Closed
+                Status = SupportTaskStatus.Closed,
+                Outcome = SupportTaskOutcome.OneLoginUserRecordMatching_Connected
             },
             processContext);
 

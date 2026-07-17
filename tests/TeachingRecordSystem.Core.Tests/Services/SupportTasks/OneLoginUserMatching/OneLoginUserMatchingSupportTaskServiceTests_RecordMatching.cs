@@ -84,7 +84,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.NotConnecting), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserRecordMatching_NotConnecting, updatedSupportTask.Outcome);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.NotConnecting, updatedData.Outcome);
         Assert.Equal(notConnectingReason, updatedData.NotConnectingReason);
@@ -240,7 +240,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.NoMatches), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserRecordMatching_NoMatches, updatedSupportTask.Outcome);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.NoMatches, updatedData.Outcome);
 
@@ -333,7 +333,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.Connected), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserRecordMatching_Connected, updatedSupportTask.Outcome);
         Assert.NotNull(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.Connected, updatedData.Outcome);
 
@@ -479,7 +479,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.Connected), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserRecordMatching_Connected, updatedSupportTask.Outcome);
         Assert.NotNull(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.Connected, updatedData.Outcome);
 
@@ -540,7 +540,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserRecordMatchingData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.Connected), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserRecordMatching_Connected, updatedSupportTask.Outcome);
         Assert.NotNull(updatedData.PersonId);
         Assert.Equal(OneLoginUserRecordMatchingOutcome.Connected, updatedData.Outcome);
 
@@ -594,7 +594,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var updatedSupportTask =
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.NotConnecting), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserRecordMatching_NotConnecting, updatedSupportTask.Outcome);
 
         // Because the linked TRN request was Pending, it's resolved to the matched person
         var updatedTrnRequest = await ReloadTrnRequestAsync(supportTask);
@@ -626,7 +626,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var updatedSupportTask =
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.NoMatches), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserRecordMatching_NoMatches, updatedSupportTask.Outcome);
 
         // Because the linked TRN request was Pending and had no match, it's resolved with a newly-created record
         var updatedTrnRequest = await ReloadTrnRequestAsync(supportTask);
@@ -662,7 +662,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var updatedSupportTask =
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.NoMatches), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserRecordMatching_NoMatches, updatedSupportTask.Outcome);
 
         // The TRN request wasn't Pending, so it's untouched
         var updatedTrnRequest =

@@ -46,7 +46,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 new UpdateSupportTaskOptions
                 {
                     SupportTaskReference = supportTask.SupportTaskReference,
-                    Status = SupportTaskStatus.InProgress
+                    Status = SupportTaskStatus.InProgress,
+                    Outcome = null
                 },
                 updateAction: null,
                 processContext);
@@ -215,9 +216,14 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 }
 
                 var oldData = supportTask.Data;
-                supportTask.Data = options.UpdateData(supportTask.GetData<TData>());
+                var oldOutcome = supportTask.Outcome;
 
-                return changes | (!supportTask.GetData<TData>().Equals(oldData) ? SupportTaskUpdatedEventChanges.Data : 0);
+                supportTask.Data = options.UpdateData(supportTask.GetData<TData>());
+                supportTask.Outcome = options.Outcome;
+
+                return changes |
+                    (!supportTask.GetData<TData>().Equals(oldData) ? SupportTaskUpdatedEventChanges.Data : 0) |
+                    (supportTask.Outcome != oldOutcome ? SupportTaskUpdatedEventChanges.Outcome : 0);
             },
             processContext);
     }
@@ -229,6 +235,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             {
                 SupportTaskReference = options.SupportTaskReference,
                 Status = SupportTaskStatus.InProgress,
+                Outcome = null,
                 SavedJourneyState = Option.Some(options.SavedJourneyState)!
             },
             updateAction: null,
@@ -272,13 +279,22 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         // Derived from Data, so this must run after updateAction has applied any changes to it.
         if (options.Status is SupportTaskStatus.Closed)
         {
-            supportTask.OutcomeLabel = supportTask.Data.GetOutcomeLabel();
+            if (supportTask.Outcome is null)
+            {
+                throw new InvalidOperationException($"Closed support tasks must have {nameof(SupportTask.Outcome)} set.");
+            }
+
             supportTask.CompletedOn = processContext.Now;
             supportTask.CompletedByUserId = processContext.Process.UserId;
         }
         else
         {
-            supportTask.OutcomeLabel = null;
+            if (supportTask.Outcome is not null)
+            {
+                throw new InvalidOperationException($"Only closed support tasks can have {nameof(SupportTask.Outcome)} set.");
+            }
+
+            supportTask.Outcome = null;
             supportTask.CompletedOn = null;
             supportTask.CompletedByUserId = null;
         }

@@ -90,7 +90,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserIdVerificationData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserIdVerificationOutcome.NotVerified), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserIdVerification_NotVerified, updatedSupportTask.Outcome);
         Assert.False(updatedData.Verified);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserIdVerificationOutcome.NotVerified, updatedData.Outcome);
@@ -241,7 +241,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserIdVerificationData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserIdVerificationOutcome.VerifiedOnlyWithMatches), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithMatches, updatedSupportTask.Outcome);
         Assert.True(updatedData.Verified);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedOnlyWithMatches, updatedData.Outcome);
@@ -399,7 +399,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserIdVerificationData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithoutMatches, updatedSupportTask.Outcome);
         Assert.True(updatedData.Verified);
         Assert.Null(updatedData.PersonId);
         Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches, updatedData.Outcome);
@@ -497,7 +497,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             await WithDbContextAsync(dbContext => dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         var updatedData = updatedSupportTask.GetData<OneLoginUserIdVerificationData>();
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
-        Assert.Equal(nameof(OneLoginUserIdVerificationOutcome.VerifiedAndConnected), updatedSupportTask.OutcomeLabel);
+        Assert.Equal(SupportTaskOutcome.OneLoginUserIdVerification_VerifiedAndConnected, updatedSupportTask.Outcome);
         Assert.True(updatedData.Verified);
         Assert.NotNull(updatedData.PersonId);
         Assert.Equal(OneLoginUserIdVerificationOutcome.VerifiedAndConnected, updatedData.Outcome);

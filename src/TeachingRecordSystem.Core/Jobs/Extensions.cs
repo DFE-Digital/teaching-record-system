@@ -253,15 +253,8 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<BackfillSupportTaskColumnsJob>(
-                $"{nameof(BackfillSupportTaskColumnsJob)} (dry-run)",
-                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<BackfillSupportTaskColumnsJob>(
-                nameof(BackfillSupportTaskColumnsJob),
-                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillSupportTaskColumnsJob (dry-run)");
+            recurringJobManager.RemoveIfExists("BackfillSupportTaskColumnsJob");
 
             recurringJobManager.AddOrUpdate<BackfillResolvedAttributesJob>(
                 $"{nameof(BackfillResolvedAttributesJob)} (dry-run)",
@@ -270,6 +263,16 @@ public static class Extensions
 
             recurringJobManager.AddOrUpdate<BackfillResolvedAttributesJob>(
                 nameof(BackfillResolvedAttributesJob),
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillSupportTaskOutcomeJob>(
+                $"{nameof(BackfillSupportTaskOutcomeJob)} (dry-run)",
+                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillSupportTaskOutcomeJob>(
+                nameof(BackfillSupportTaskOutcomeJob),
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
