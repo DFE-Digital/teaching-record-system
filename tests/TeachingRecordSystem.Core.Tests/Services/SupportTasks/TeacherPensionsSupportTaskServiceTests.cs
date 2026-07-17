@@ -59,27 +59,16 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
             integrationTransactionId: 42);
         Debug.Assert(supportTask.Status is SupportTaskStatus.Open);
 
-        var existingPerson = await TestData.CreatePersonAsync();
+        var existingPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
-        var resolvedAttributes = new TeacherPensionsPotentialDuplicateAttributes
+        // Every attribute keeps the existing record's value, so the record itself doesn't change.
+        var attributeSources = new PersonAttributeSources
         {
-            FirstName = "Resolved",
-            MiddleName = "Resolved Middle",
-            LastName = "Resolved Last",
-            DateOfBirth = new DateOnly(1990, 1, 1),
-            NationalInsuranceNumber = "AB123456C",
-            Gender = null,
-            Trn = "1000000"
-        };
-        var selectedPersonAttributes = new TeacherPensionsPotentialDuplicateAttributes
-        {
-            FirstName = "Selected",
-            MiddleName = "Selected Middle",
-            LastName = "Selected Last",
-            DateOfBirth = new DateOnly(1991, 2, 2),
-            NationalInsuranceNumber = "CD654321B",
-            Gender = null,
-            Trn = "2000000"
+            FirstName = PersonAttributeSource.ExistingRecord,
+            LastName = PersonAttributeSource.ExistingRecord,
+            DateOfBirth = PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumber = PersonAttributeSource.ExistingRecord,
+            Gender = PersonAttributeSource.ExistingRecord
         };
         var comments = Faker.Lorem.Paragraph();
 
@@ -92,8 +81,7 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
                 {
                     SupportTaskReference = supportTask.SupportTaskReference,
                     ExistingPersonId = existingPerson.PersonId,
-                    ResolvedAttributes = resolvedAttributes,
-                    SelectedPersonAttributes = selectedPersonAttributes,
+                    AttributeSources = attributeSources,
                     Comments = comments
                 },
                 processContext));
@@ -104,8 +92,20 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
             var dbTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, dbTask.Status);
             var data = Assert.IsType<TeacherPensionsPotentialDuplicateData>(dbTask.Data);
-            Assert.Equal(resolvedAttributes, data.ResolvedAttributes);
-            Assert.Equal(selectedPersonAttributes, data.SelectedPersonAttributes);
+
+            var expectedAttributes = new TeacherPensionsPotentialDuplicateAttributes
+            {
+                FirstName = existingPerson.FirstName,
+                MiddleName = existingPerson.MiddleName,
+                LastName = existingPerson.LastName,
+                DateOfBirth = existingPerson.DateOfBirth,
+                NationalInsuranceNumber = existingPerson.NationalInsuranceNumber,
+                Gender = existingPerson.Gender,
+                Trn = existingPerson.Trn!
+            };
+            Assert.Equal(expectedAttributes, data.SelectedPersonAttributes);
+            Assert.Equal(expectedAttributes, data.ResolvedAttributes);
+
             // The rest of the data is preserved by the update.
             Assert.Equal("duplicates.csv", data.FileName);
             Assert.Equal(42, data.IntegrationTransactionId);
@@ -143,6 +143,64 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
     }
 
     [Fact]
+    public async Task ResolveWithMergeAsync_AttributeSourcedFromRequest_UpdatesRecordAndSnapshotsItAsItWasBeforehand()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync();
+        var existingPerson = await TestData.CreatePersonAsync();
+
+        var trnRequest = await WithDbContextAsync(dbContext =>
+            dbContext.TrnRequestMetadata.SingleAsync(r => r.RequestId == supportTask.TrnRequestId));
+
+        // Take the first name from the request; everything else keeps the existing record's value.
+        var attributeSources = new PersonAttributeSources
+        {
+            FirstName = PersonAttributeSource.TrnRequest,
+            LastName = PersonAttributeSource.ExistingRecord,
+            DateOfBirth = PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumber = PersonAttributeSource.ExistingRecord,
+            Gender = PersonAttributeSource.ExistingRecord
+        };
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync<TeacherPensionsSupportTaskService>(
+            service => service.ResolveWithMergeAsync(
+                new ResolveTeacherPensionsPotentialDuplicateWithMergeOptions
+                {
+                    SupportTaskReference = supportTask.SupportTaskReference,
+                    ExistingPersonId = existingPerson.PersonId,
+                    AttributeSources = attributeSources
+                },
+                processContext));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == existingPerson.PersonId);
+            Assert.Equal(trnRequest.FirstName, updatedPerson.FirstName);
+            Assert.Equal(existingPerson.LastName, updatedPerson.LastName);
+
+            var dbTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            var data = Assert.IsType<TeacherPensionsPotentialDuplicateData>(dbTask.Data);
+
+            // The snapshot is the record as it was before the merge, not after.
+            Assert.Equal(existingPerson.FirstName, data.SelectedPersonAttributes!.FirstName);
+
+            // The resolved attributes are the record as it is after the merge.
+            Assert.Equal(trnRequest.FirstName, data.ResolvedAttributes!.FirstName);
+            Assert.Equal(existingPerson.LastName, data.ResolvedAttributes.LastName);
+
+            // The middle name has no choice on this journey, so the existing record's is kept.
+            Assert.Equal(existingPerson.MiddleName, data.ResolvedAttributes.MiddleName);
+
+            // The TRN is never resolvable; the surviving record keeps its own.
+            Assert.Equal(existingPerson.Trn, data.ResolvedAttributes.Trn);
+        });
+    }
+
+    [Fact]
     public async Task ResolveWithMergeAsync_TaskIsAlreadyClosed_ThrowsInvalidOperationException()
     {
         // Arrange
@@ -163,9 +221,7 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
                 new ResolveTeacherPensionsPotentialDuplicateWithMergeOptions
                 {
                     SupportTaskReference = supportTask.SupportTaskReference,
-                    ExistingPersonId = existingPerson.PersonId,
-                    ResolvedAttributes = null,
-                    SelectedPersonAttributes = null
+                    ExistingPersonId = existingPerson.PersonId
                 },
                 processContext)));
 

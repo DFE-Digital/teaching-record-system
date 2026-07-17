@@ -347,17 +347,31 @@ public class TrnRequestService(
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(options.ApplicationUserId, options.RequestId);
+
+        TrnRequestDataPersonAttributes? selectedPersonAttributes = null;
+        TrnRequestDataPersonAttributes resolvedAttributes;
+
         if (options.PersonId is Guid personId)
         {
+            var person = await dbContext.Persons.FindOrThrowAsync(personId);
+
+            // Snapshot the record before resolving, which updates it.
+            selectedPersonAttributes = GetPersonAttributes(person);
+            resolvedAttributes = GetResolvedAttributes(options.AttributeSources, selectedPersonAttributes, trnRequest);
+
             await ResolveTrnRequestWithMatchedPersonAsync(
                 options.ApplicationUserId,
                 options.RequestId,
                 personId,
-                options.AttributesToUpdate,
+                options.AttributeSources.GetAttributesToUpdate(),
                 processContext);
         }
         else
         {
+            // A new record takes every value from the request.
+            resolvedAttributes = GetRequestAttributes(trnRequest);
+
             await ResolveTrnRequestWithNewRecordAsync(options.ApplicationUserId, options.RequestId, processContext);
         }
 
@@ -365,15 +379,60 @@ public class TrnRequestService(
             new ResolveTrnRequestSupportTaskOptions
             {
                 SupportTaskReference = options.SupportTaskReference,
-                ResolvedAttributes = options.ResolvedAttributes,
-                SelectedPersonAttributes = options.SelectedPersonAttributes,
+                ResolvedAttributes = resolvedAttributes,
+                SelectedPersonAttributes = selectedPersonAttributes,
                 Comments = options.Comments
             },
             processContext);
 
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(options.ApplicationUserId, options.RequestId);
+        // Resolving tracked the request's resolved record on the same entity.
         Debug.Assert(trnRequest.ResolvedPersonId is not null);
         return trnRequest.ResolvedPersonId.Value;
+    }
+
+    private static TrnRequestDataPersonAttributes GetPersonAttributes(Person person) =>
+        new()
+        {
+            FirstName = person.FirstName,
+            MiddleName = person.MiddleName,
+            LastName = person.LastName,
+            DateOfBirth = person.DateOfBirth,
+            EmailAddress = person.EmailAddress,
+            NationalInsuranceNumber = person.NationalInsuranceNumber,
+            Gender = person.Gender
+        };
+
+    private static TrnRequestDataPersonAttributes GetRequestAttributes(TrnRequestMetadata trnRequest) =>
+        new()
+        {
+            FirstName = trnRequest.FirstName!,
+            MiddleName = trnRequest.MiddleName ?? string.Empty,
+            LastName = trnRequest.LastName!,
+            DateOfBirth = trnRequest.DateOfBirth,
+            EmailAddress = trnRequest.EmailAddress,
+            NationalInsuranceNumber = trnRequest.NationalInsuranceNumber,
+            Gender = trnRequest.Gender
+        };
+
+    /// The attributes the record ends up with: only a TrnRequest source changes a value, so anything else
+    /// keeps the existing one.
+    private static TrnRequestDataPersonAttributes GetResolvedAttributes(
+        PersonAttributeSources sources,
+        TrnRequestDataPersonAttributes existingAttributes,
+        TrnRequestMetadata trnRequest)
+    {
+        var requestAttributes = GetRequestAttributes(trnRequest);
+
+        return new TrnRequestDataPersonAttributes()
+        {
+            FirstName = sources.FirstName is PersonAttributeSource.TrnRequest ? requestAttributes.FirstName : existingAttributes.FirstName,
+            MiddleName = sources.MiddleName is PersonAttributeSource.TrnRequest ? requestAttributes.MiddleName : existingAttributes.MiddleName,
+            LastName = sources.LastName is PersonAttributeSource.TrnRequest ? requestAttributes.LastName : existingAttributes.LastName,
+            DateOfBirth = sources.DateOfBirth is PersonAttributeSource.TrnRequest ? requestAttributes.DateOfBirth : existingAttributes.DateOfBirth,
+            EmailAddress = sources.EmailAddress is PersonAttributeSource.TrnRequest ? requestAttributes.EmailAddress : existingAttributes.EmailAddress,
+            NationalInsuranceNumber = sources.NationalInsuranceNumber is PersonAttributeSource.TrnRequest ? requestAttributes.NationalInsuranceNumber : existingAttributes.NationalInsuranceNumber,
+            Gender = sources.Gender is PersonAttributeSource.TrnRequest ? requestAttributes.Gender : existingAttributes.Gender
+        };
     }
 
     public async Task CompleteManualChecksNeededTrnRequestAsync(
