@@ -10,8 +10,8 @@ using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpda
 namespace TeachingRecordSystem.Core.Jobs;
 
 /// <summary>
-/// Corrects <c>ResolvedAttributes</c> on closed TRN request and Teachers' Pensions potential duplicate tasks
-/// that were resolved by merging into an existing record.
+/// Corrects <c>ResolvedAttributes</c> on closed TRN request, NPQ TRN request and Teachers' Pensions potential
+/// duplicate tasks that were resolved by merging into an existing record.
 ///
 /// The resolve journeys recorded the TRN request's value for any attribute whose source was left unset, even
 /// though an unset source means the person was never updated and kept its existing value — so the task's
@@ -19,13 +19,16 @@ namespace TeachingRecordSystem.Core.Jobs;
 ///
 /// A source was only ever left unset where the merge page didn't offer a choice, and it offered one exactly
 /// when the two values differed. So wherever the request and the pre-merge snapshot agree, the resolved value
-/// should be the snapshot's. The Teachers' Pensions journey additionally never offered a middle name choice at
-/// all, so its middle name is always taken from the snapshot regardless.
+/// should be the snapshot's. Two journeys go further and never offered a choice for some attributes at all, so
+/// those always come from the snapshot: Teachers' Pensions for the middle name, and NPQ for all three names.
 ///
 /// <c>SelectedPersonAttributes</c> is that pre-merge snapshot, which makes the correct value recoverable.
 /// Tasks resolved by creating a new record have no snapshot and are left alone.
 ///
 /// The closing event's payload embeds the same task data, so it's corrected alongside the task itself.
+///
+/// The NPQ journey's UI was removed in #3434, so those tasks are historical only — they're covered because the
+/// data it left behind has the same defect, not because anything still writes it.
 /// </summary>
 public class BackfillResolvedAttributesJob(TrsDbContext dbContext)
 {
@@ -34,7 +37,7 @@ public class BackfillResolvedAttributesJob(TrsDbContext dbContext)
         [.. LegacyEventBase.GetEventNamesForBaseType(typeof(LegacySupportTaskUpdatedEvent))];
 
     private static readonly SupportTaskType[] _supportTaskTypes =
-        [SupportTaskType.TrnRequest, SupportTaskType.TeacherPensionsPotentialDuplicate];
+        [SupportTaskType.TrnRequest, SupportTaskType.NpqTrnRequest, SupportTaskType.TeacherPensionsPotentialDuplicate];
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
@@ -89,10 +92,35 @@ public class BackfillResolvedAttributesJob(TrsDbContext dbContext)
         return supportTask.SupportTaskType switch
         {
             SupportTaskType.TrnRequest => GetCorrectedTrnRequestData(supportTask.GetData<TrnRequestData>(), requestData),
+            SupportTaskType.NpqTrnRequest => GetCorrectedNpqTrnRequestData(supportTask.GetData<NpqTrnRequestData>(), requestData),
             SupportTaskType.TeacherPensionsPotentialDuplicate =>
                 GetCorrectedTeacherPensionsData(supportTask.GetData<TeacherPensionsPotentialDuplicateData>(), requestData),
             _ => null
         };
+    }
+
+    private static ISupportTaskData? GetCorrectedNpqTrnRequestData(NpqTrnRequestData data, TrnRequestMetadata requestData)
+    {
+        // No snapshot means the request was resolved with a newly created record (or the task was rejected),
+        // neither of which resolves attributes against an existing record.
+        if (data is not { ResolvedAttributes: { } resolved, SelectedPersonAttributes: { } selected })
+        {
+            return null;
+        }
+
+        var corrected = resolved with
+        {
+            // This journey offered no name choices at all, so the existing record's names were always kept.
+            FirstName = selected.FirstName,
+            MiddleName = selected.MiddleName,
+            LastName = selected.LastName,
+            DateOfBirth = selected.DateOfBirth != requestData.DateOfBirth ? resolved.DateOfBirth : selected.DateOfBirth,
+            EmailAddress = DifferAllowingNullOrEmpty(selected.EmailAddress, requestData.EmailAddress) ? resolved.EmailAddress : selected.EmailAddress,
+            NationalInsuranceNumber = DifferAllowingNullOrEmpty(selected.NationalInsuranceNumber, requestData.NationalInsuranceNumber) ? resolved.NationalInsuranceNumber : selected.NationalInsuranceNumber,
+            Gender = selected.Gender != requestData.Gender ? resolved.Gender : selected.Gender
+        };
+
+        return corrected != resolved ? data with { ResolvedAttributes = corrected } : null;
     }
 
     private static ISupportTaskData? GetCorrectedTrnRequestData(TrnRequestData data, TrnRequestMetadata requestData)
@@ -209,6 +237,7 @@ public class BackfillResolvedAttributesJob(TrsDbContext dbContext)
     private static object? GetResolvedAttributes(ISupportTaskData data) => data switch
     {
         TrnRequestData d => d.ResolvedAttributes,
+        NpqTrnRequestData d => d.ResolvedAttributes,
         TeacherPensionsPotentialDuplicateData d => d.ResolvedAttributes,
         _ => null
     };

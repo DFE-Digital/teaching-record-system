@@ -156,6 +156,101 @@ public class BackfillResolvedAttributesJobTests(JobFixture fixture) : JobTestBas
         });
     }
 
+    // The NPQ journey's UI is gone, but the data it left behind has the same defect. It offered no name
+    // choices, so a differing email address with no source selected is the equivalent case.
+    [Fact]
+    public async Task ExecuteAsync_NpqTaskWithEmailAddressTakenFromRequest_CorrectsResolvedEmailToSelectedPerson()
+    {
+        // Arrange
+        // The request holds an empty email address and the record holds none, which the merge page treated as
+        // not different, so no source was selected and the request's value was recorded regardless.
+        var supportTask = await CreateResolvedNpqTaskAsync(
+            requestEmailAddress: string.Empty,
+            configureSelected: a => a with { EmailAddress = null },
+            configureResolved: a => a with { EmailAddress = string.Empty });
+
+        // Act
+        await WithDbContextAsync(dbContext =>
+            new BackfillResolvedAttributesJob(dbContext).ExecuteAsync(dryRun: false, CancellationToken.None));
+
+        // Assert
+        var data = await WithDbContextAsync(async dbContext =>
+        {
+            var dbSupportTask = await dbContext.SupportTasks
+                .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            return dbSupportTask.GetData<NpqTrnRequestData>();
+        });
+
+        Assert.Null(data.ResolvedAttributes!.EmailAddress);
+    }
+
+    private async Task<SupportTask> CreateResolvedNpqTaskAsync(
+        string? requestEmailAddress,
+        Func<NpqTrnRequestDataPersonAttributes, NpqTrnRequestDataPersonAttributes> configureSelected,
+        Func<NpqTrnRequestDataPersonAttributes, NpqTrnRequestDataPersonAttributes> configureResolved)
+    {
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var person = await TestData.CreatePersonAsync();
+
+        var metadata = new TrnRequestMetadata
+        {
+            ApplicationUserId = applicationUser.UserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = TimeProvider.UtcNow,
+            IdentityVerified = null,
+            OneLoginUserSubject = null,
+            Name = [person.FirstName, person.LastName],
+            FirstName = person.FirstName,
+            MiddleName = person.MiddleName,
+            LastName = person.LastName,
+            DateOfBirth = person.DateOfBirth,
+            EmailAddress = requestEmailAddress,
+            NationalInsuranceNumber = person.NationalInsuranceNumber,
+            Gender = person.Gender,
+            PotentialDuplicate = false
+        };
+
+        var baseline = new NpqTrnRequestDataPersonAttributes
+        {
+            FirstName = person.FirstName,
+            MiddleName = person.MiddleName,
+            LastName = person.LastName,
+            DateOfBirth = person.DateOfBirth,
+            EmailAddress = person.EmailAddress,
+            NationalInsuranceNumber = person.NationalInsuranceNumber,
+            Gender = person.Gender
+        };
+
+        var subject = SupportTask.Subject.FromTrnRequest(metadata);
+
+        var supportTask = new SupportTask
+        {
+            CreatedOn = TimeProvider.UtcNow,
+            UpdatedOn = TimeProvider.UtcNow,
+            SupportTaskType = SupportTaskType.NpqTrnRequest,
+            Status = SupportTaskStatus.Closed,
+            Data = new NpqTrnRequestData
+            {
+                SupportRequestOutcome = SupportRequestOutcome.Approved,
+                SelectedPersonAttributes = configureSelected(baseline),
+                ResolvedAttributes = configureResolved(baseline)
+            },
+            PersonId = person.PersonId,
+            TrnRequestApplicationUserId = applicationUser.UserId,
+            TrnRequestId = metadata.RequestId,
+            SubjectName = subject.Name,
+            SubjectEmailAddress = subject.EmailAddress
+        };
+
+        return await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.TrnRequestMetadata.Add(metadata);
+            dbContext.SupportTasks.Add(supportTask);
+            await dbContext.SaveChangesAsync();
+            return supportTask;
+        });
+    }
+
     private async Task<SupportTask> CreateResolvedTeacherPensionsTaskAsync(
         string? requestMiddleName,
         Func<TeacherPensionsPotentialDuplicateAttributes, TeacherPensionsPotentialDuplicateAttributes> configureSelected,
