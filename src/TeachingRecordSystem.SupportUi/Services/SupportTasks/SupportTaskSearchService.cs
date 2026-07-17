@@ -41,6 +41,11 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.TrnRequest.EmailAddress != null &&
                 EF.Functions.Collate(t.TrnRequest.EmailAddress, Collations.CaseInsensitive) == email);
         }
+        else if (SearchTextHelper.IsSupportTaskReference(search))
+        {
+            tasks = tasks.Where(t =>
+                EF.Functions.Collate(t.Task.SupportTaskReference, Collations.CaseInsensitive) == search);
+        }
         else if (SearchTextIsName(search, out var nameParts))
         {
             tasks = tasks.Where(t =>
@@ -117,7 +122,12 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         tasks = tasks.Where(t => changeRequestTypes.Contains(t.SupportTaskType));
 
-        if (SearchTextIsName(search, out var nameParts))
+        if (SearchTextHelper.IsSupportTaskReference(search))
+        {
+            tasks = tasks.Where(t =>
+                EF.Functions.Collate(t.SupportTaskReference, Collations.CaseInsensitive) == search);
+        }
+        else if (SearchTextIsName(search, out var nameParts))
         {
             tasks = tasks.Where(t =>
                 nameParts.All(n => EF.Property<string[]>(t.Person!, "names").Contains(n)));
@@ -187,7 +197,12 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         tasks = tasks.Where(t => sources.Contains(t.Task.TrnRequestMetadata!.ApplicationUserId));
 
-        if (SearchTextIsName(search, out var nameParts))
+        if (SearchTextHelper.IsSupportTaskReference(search))
+        {
+            tasks = tasks.Where(t =>
+                EF.Functions.Collate(t.Task.SupportTaskReference, Collations.CaseInsensitive) == search);
+        }
+        else if (SearchTextIsName(search, out var nameParts))
         {
             tasks = tasks.Where(t =>
                 nameParts.All(n => t.Task.TrnRequestMetadata!.Name.Select(m => EF.Functions.Collate(m, Collations.CaseInsensitive)).Contains(n)));
@@ -261,11 +276,18 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         {
             unorderedResults = unorderedResults.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
         }
+        else if (SearchTextHelper.IsSupportTaskReference(search))
+        {
+            unorderedResults = unorderedResults.Where(t =>
+                string.Equals(t.SupportTaskReference, search, StringComparison.OrdinalIgnoreCase));
+        }
         else if (SearchTextIsName(search, out var name))
         {
             unorderedResults = unorderedResults.Where(t =>
                 name.All(n => t.NameParts!.Any(m => string.Equals(m, n, StringComparison.OrdinalIgnoreCase))));
         }
+
+        var totalFilteredTaskCount = unorderedResults.Count();
 
         var searchResults = (sortBy switch
         {
@@ -277,7 +299,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 .OrderBy(r => r.IntegrationTransactionId, sortDirection),
             _ => unorderedResults
                 .OrderBy(r => r.CreatedOn, sortDirection),
-        }).GetPage(paginationOptions.PageNumber, paginationOptions.PageSize, tasks.Count);
+        }).GetPage(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
 
         return new()
         {

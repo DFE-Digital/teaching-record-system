@@ -208,6 +208,40 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
     }
 
+    [Fact]
+    public async Task SearchTrnRequestsAsync_SearchTextIsSupportTaskReference_ReturnsTaskWithMatchingReference()
+    {
+        // Arrange
+        var tasks = SupportTaskLookup.Create(new()
+        {
+            ["ST1"] = await TestData.CreateTrnRequestSupportTaskAsync(),
+            ["ST2"] = await TestData.CreateTrnRequestSupportTaskAsync()
+        });
+
+        // Act
+        var result = await SearchTrnRequestsAsync(new(Search: tasks["ST2"].SupportTaskReference.ToLowerInvariant(), SourceApplicationUserIds: []), new());
+
+        // Assert
+        Assert.Equal(2, result.TotalTaskCount);
+        Assert.Equal(1, result.SearchResults.TotalItemCount);
+        Assert.Equal(["ST2"], tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Fact]
+    public async Task SearchTrnRequestsAsync_SearchTextIsUnusedSupportTaskReference_ReturnsNoTasks()
+    {
+        // Arrange
+        await TestData.CreateTrnRequestSupportTaskAsync();
+
+        // Act
+        var result = await SearchTrnRequestsAsync(new(Search: "TRS-0", SourceApplicationUserIds: []), new());
+
+        // Assert
+        Assert.Equal(1, result.TotalTaskCount);
+        Assert.Equal(0, result.SearchResults.TotalItemCount);
+        Assert.Empty(result.SearchResults);
+    }
+
     [Theory]
     [InlineData(SortDirection.Ascending)]
     [InlineData(SortDirection.Descending)]

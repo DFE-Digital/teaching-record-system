@@ -138,6 +138,40 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
     }
 
+    [Fact]
+    public async Task SearchChangeRequestsAsync_SearchTextIsSupportTaskReference_ReturnsTaskWithMatchingReference()
+    {
+        // Arrange
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(),
+            ["ST2"] = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync()
+        };
+
+        // Act
+        var result = await SearchChangeRequestsAsync(new(Search: tasks["ST2"].SupportTaskReference.ToLowerInvariant()), new());
+
+        // Assert
+        Assert.Equal(2, result.TotalRequestCount);
+        Assert.Equal(1, result.SearchResults.TotalItemCount);
+        Assert.Equal(["ST2"], tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Fact]
+    public async Task SearchChangeRequestsAsync_SearchTextIsUnusedSupportTaskReference_ReturnsNoTasks()
+    {
+        // Arrange
+        await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync();
+
+        // Act
+        var result = await SearchChangeRequestsAsync(new(Search: "TRS-0"), new());
+
+        // Assert
+        Assert.Equal(1, result.TotalRequestCount);
+        Assert.Equal(0, result.SearchResults.TotalItemCount);
+        Assert.Empty(result.SearchResults);
+    }
+
     [Theory]
     [InlineData(new[] { SupportTaskType.ChangeNameRequest }, new[] { "ST1" })]
     [InlineData(new[] { SupportTaskType.ChangeDateOfBirthRequest }, new[] { "ST2" })]

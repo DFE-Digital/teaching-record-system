@@ -137,6 +137,40 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(expectedTaskKeys, tasks.GetKeysFor(result.SearchResults));
     }
 
+    [Fact]
+    public async Task SearchTrnRequestManualChecksAsync_SearchTextIsSupportTaskReference_ReturnsTaskWithMatchingReference()
+    {
+        // Arrange
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 20)),
+            ["ST2"] = await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 21))
+        };
+
+        // Act
+        var result = await SearchTrnRequestManualChecksAsync(new(Search: tasks["ST2"].SupportTaskReference.ToLowerInvariant()), new());
+
+        // Assert
+        Assert.Equal(2, result.TotalTaskCount);
+        Assert.Equal(1, result.SearchResults.TotalItemCount);
+        Assert.Equal(["ST2"], tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Fact]
+    public async Task SearchTrnRequestManualChecksAsync_SearchTextIsUnusedSupportTaskReference_ReturnsNoTasks()
+    {
+        // Arrange
+        await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(createdOn: new DateTime(2025, 1, 20));
+
+        // Act
+        var result = await SearchTrnRequestManualChecksAsync(new(Search: "TRS-0"), new());
+
+        // Assert
+        Assert.Equal(1, result.TotalTaskCount);
+        Assert.Equal(0, result.SearchResults.TotalItemCount);
+        Assert.Empty(result.SearchResults);
+    }
+
     [Theory]
     [InlineData(new[] { "A application" }, new[] { "ST1", "ST3" })]
     [InlineData(new[] { "B application" }, new[] { "ST2", "ST4" })]
