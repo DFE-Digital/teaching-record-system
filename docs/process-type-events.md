@@ -73,6 +73,7 @@ Support UI *Merge person*.
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `PersonCreatedEvent` | Sometimes | The imported TPS record does not already exist in TRS, so a new person is created. |
+| `SupportTaskCreatedEvent` | Sometimes | The newly created person potentially matches an existing record (a `TeacherPensionsPotentialDuplicate` task). |
 
 ---
 

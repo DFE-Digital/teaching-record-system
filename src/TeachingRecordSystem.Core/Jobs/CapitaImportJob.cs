@@ -11,6 +11,7 @@ using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -22,6 +23,7 @@ public class CapitaImportJob(
     TimeProvider timeProvider,
     TrnRequestService trnRequestService,
     PersonService personService,
+    TeacherPensionsSupportTaskService teacherPensionsSupportTaskService,
     IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 4 * * *";
@@ -195,35 +197,15 @@ public class CapitaImportJob(
                         {
                             potentialDuplicate = true;
 
-                            var subject = SupportTask.Subject.FromTrnRequest(trnRequestMetadata);
-
-                            var supportTask = new SupportTask()
-                            {
-                                SupportTaskType = SupportTaskType.TeacherPensionsPotentialDuplicate,
-                                Data = new Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
+                            await teacherPensionsSupportTaskService.CreatePotentialDuplicateAsync(
+                                new CreateTeacherPensionsPotentialDuplicateOptions
                                 {
+                                    PersonId = personId.Value,
+                                    TrnRequest = trnRequestMetadata,
                                     FileName = fileName,
                                     IntegrationTransactionId = integrationJob.IntegrationTransactionId
                                 },
-                                PersonId = personId.Value,
-                                TrnRequestApplicationUserId = capitaUser.Value.CapitaTpsUserId,
-                                TrnRequestId = trnRequestMetadata.RequestId,
-                                SubjectName = subject.Name,
-                                SubjectEmailAddress = subject.EmailAddress,
-                                CreatedOn = now,
-                                UpdatedOn = now
-                            };
-
-                            var supportTaskCreatedEvent = new LegacyEvents.SupportTaskCreatedEvent
-                            {
-                                SupportTask = EventModels.SupportTask.FromModel(supportTask),
-                                EventId = Guid.NewGuid(),
-                                CreatedUtc = now,
-                                RaisedBy = capitaUser.Value.CapitaTpsUserId
-                            };
-
-                            dbContext.SupportTasks.Add(supportTask);
-                            dbContext.AddEventWithoutBroadcast(supportTaskCreatedEvent);
+                                processContext);
 
                             duplicateRowCount++;
                         }

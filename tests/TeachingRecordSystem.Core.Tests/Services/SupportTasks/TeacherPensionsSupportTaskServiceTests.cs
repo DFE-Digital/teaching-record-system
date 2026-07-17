@@ -8,6 +8,49 @@ namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks;
 public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
+    public async Task CreatePotentialDuplicateAsync_CreatesTaskAndPublishesEvent()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var trnRequest = await TestData.CreateDormantTrnRequestAsync(applicationUser.UserId);
+        var person = await TestData.CreatePersonAsync();
+
+        var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var result = await WithServiceAsync<TeacherPensionsSupportTaskService, SupportTask>(
+            service => service.CreatePotentialDuplicateAsync(
+                new CreateTeacherPensionsPotentialDuplicateOptions
+                {
+                    PersonId = person.PersonId,
+                    TrnRequest = trnRequest,
+                    FileName = "duplicates.csv",
+                    IntegrationTransactionId = 42
+                },
+                processContext));
+
+        // Assert
+        Assert.Equal(SupportTaskType.TeacherPensionsPotentialDuplicate, result.SupportTaskType);
+        Assert.Equal(SupportTaskStatus.Open, result.Status);
+        Assert.Equal(person.PersonId, result.PersonId);
+        Assert.Equal(trnRequest.ApplicationUserId, result.TrnRequestApplicationUserId);
+        Assert.Equal(trnRequest.RequestId, result.TrnRequestId);
+
+        var data = Assert.IsType<TeacherPensionsPotentialDuplicateData>(result.Data);
+        Assert.Equal("duplicates.csv", data.FileName);
+        Assert.Equal(42, data.IntegrationTransactionId);
+        Assert.Null(data.ResolvedAttributes);
+        Assert.Null(data.SelectedPersonAttributes);
+
+        Events.AssertEventsPublished(e =>
+        {
+            var createdEvent = Assert.IsType<SupportTaskCreatedEvent>(e);
+            Assert.Equal(result.SupportTaskReference, createdEvent.SupportTask.SupportTaskReference);
+            Assert.Equal(SupportTaskType.TeacherPensionsPotentialDuplicate, createdEvent.SupportTask.SupportTaskType);
+        });
+    }
+
+    [Fact]
     public async Task ResolveWithMergeAsync_ClosesTaskWithAttributesAndPublishesEvent()
     {
         // Arrange
