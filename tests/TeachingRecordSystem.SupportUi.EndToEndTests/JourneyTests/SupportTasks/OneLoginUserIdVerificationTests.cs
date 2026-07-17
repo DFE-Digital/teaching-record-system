@@ -33,7 +33,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
-        await page.ClickRadioByLabelAsync("Connect it to Record A");
+        await page.ClickRadioByLabelAsync("Connect it to Record A", exact: false);
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-connect");
@@ -170,7 +170,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
-        await page.ClickRadioByLabelAsync("Connect it to Record A");
+        await page.ClickRadioByLabelAsync("Connect it to Record A", exact: false);
         await page.ClickButtonAsync("Save and come back later");
 
 

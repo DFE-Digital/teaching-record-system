@@ -166,14 +166,13 @@ public static class PageExtensions
             .Locator("xpath=following-sibling::label")
             .ClickAsync();
 
-    public static async Task ClickRadioByLabelAsync(this IPage page, string labelText)
-    {
-        var label = page.Locator($"label:has-text('{labelText}')");
-        var forAttr = await label.GetAttributeAsync("for");
-
-        var radio = page.Locator($"input[id='{forAttr}']");
-        await radio.CheckAsync();
-    }
+    /// <param name="exact">
+    /// Match the whole label. Pass false only for a label that is deliberately identified by a
+    /// prefix; a substring match resolves to every label containing <paramref name="labelText"/>,
+    /// which is ambiguous when the label is a data value that may appear inside another label.
+    /// </param>
+    public static Task ClickRadioByLabelAsync(this IPage page, string labelText, bool exact = true) =>
+        page.GetByLabel(labelText, new() { Exact = exact }).CheckAsync();
 
     public static Task ClickChangeLinkAsync(this IPage page) =>
         page.GetByTestId("change-link").ClickAsync();
