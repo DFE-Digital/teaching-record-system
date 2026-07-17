@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DfeAnalytics.EFCore" />
     <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="NSign.Client" />
     <PackageReference Include="NSign.SignatureProviders" />
