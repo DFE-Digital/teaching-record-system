@@ -597,8 +597,9 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.NotConnecting), updatedSupportTask.OutcomeLabel);
 
         // Because the linked TRN request was Pending, it's resolved to the matched person
-        Assert.Equal(matchedPerson.PersonId, supportTask.TrnRequestMetadata!.ResolvedPersonId);
-        Assert.Equal(TrnRequestStatus.Completed, supportTask.TrnRequestMetadata.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(supportTask);
+        Assert.Equal(matchedPerson.PersonId, updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
     }
 
     [Fact]
@@ -628,12 +629,13 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.Equal(nameof(OneLoginUserRecordMatchingOutcome.NoMatches), updatedSupportTask.OutcomeLabel);
 
         // Because the linked TRN request was Pending and had no match, it's resolved with a newly-created record
-        Assert.NotNull(supportTask.TrnRequestMetadata!.ResolvedPersonId);
-        Assert.Equal(TrnRequestStatus.Completed, supportTask.TrnRequestMetadata.Status);
+        var updatedTrnRequest = await ReloadTrnRequestAsync(supportTask);
+        Assert.NotNull(updatedTrnRequest.ResolvedPersonId);
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequest.Status);
 
         await WithDbContextAsync(async dbContext =>
         {
-            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == supportTask.TrnRequestMetadata.ResolvedPersonId);
+            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == updatedTrnRequest.ResolvedPersonId);
             Assert.NotNull(person);
         });
     }
@@ -668,6 +670,12 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.Null(updatedTrnRequest.ResolvedPersonId);
         Assert.Equal(TrnRequestStatus.Dormant, updatedTrnRequest.Status);
     }
+
+    // The service resolves the TRN request via its own TrsDbContext, so re-read it rather than asserting on the
+    // supportTask's stale TrnRequestMetadata
+    private Task<TrnRequestMetadata> ReloadTrnRequestAsync(SupportTask supportTask) =>
+        WithDbContextAsync(dbContext =>
+            dbContext.TrnRequestMetadata.SingleAsync(m => m.RequestId == supportTask.TrnRequestId));
 
     private async Task SetTrnRequestToPendingAsync(SupportTask supportTask)
     {

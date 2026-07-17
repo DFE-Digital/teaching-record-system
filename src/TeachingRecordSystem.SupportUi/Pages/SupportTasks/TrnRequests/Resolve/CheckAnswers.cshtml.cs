@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve.ResolveTrnRequestState;
@@ -14,7 +13,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 public class CheckAnswers(
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
-    TrnRequestSupportTaskService trnRequestSupportTaskService,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider,
     PersonChangeableAttributesService changedService) :
@@ -71,41 +69,31 @@ public class CheckAnswers(
         var trnRequest = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
 
-        TrnRequestDataPersonAttributes? selectedPersonAttributes;
-
         var processContext = new ProcessContext(ProcessType.TrnRequestResolving, timeProvider.UtcNow, User.GetUserId());
 
-        if (CreatingNewRecord)
-        {
-            await trnRequestService.ResolveTrnRequestWithNewRecordAsync(trnRequest, processContext);
+        Guid? existingPersonId = null;
+        TrnRequestDataPersonAttributes? selectedPersonAttributes = null;
+        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate = [];
 
-            selectedPersonAttributes = null;
-        }
-        else
+        if (!CreatingNewRecord)
         {
             Debug.Assert(state.PersonId is not null);
-            var existingPersonId = state.PersonId!.Value;
+            existingPersonId = state.PersonId!.Value;
             var selectedPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
 
             selectedPersonAttributes = GetPersonAttributes(selectedPerson);
-            var attributesToUpdate = GetAttributesToUpdate();
-
-            await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
-                trnRequest,
-                selectedPerson,
-                attributesToUpdate,
-                processContext);
+            attributesToUpdate = GetAttributesToUpdate();
         }
 
-        Debug.Assert(trnRequest.ResolvedPersonId is not null);
-
-        var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
-
-        await trnRequestSupportTaskService.ResolveTrnRequestSupportTaskAsync(
-            new()
+        var resolvedPersonId = await trnRequestService.ResolveTrnRequestAsync(
+            new ResolveTrnRequestOptions
             {
+                ApplicationUserId = trnRequest.ApplicationUserId,
+                RequestId = trnRequest.RequestId,
                 SupportTaskReference = supportTask.SupportTaskReference,
-                ResolvedAttributes = resolvedPersonAttributes,
+                PersonId = existingPersonId,
+                AttributesToUpdate = attributesToUpdate,
+                ResolvedAttributes = GetResolvedPersonAttributes(selectedPersonAttributes),
                 SelectedPersonAttributes = selectedPersonAttributes,
                 Comments = state.Comments
             },
@@ -113,7 +101,7 @@ public class CheckAnswers(
 
         TempData.SetFlashNotificationBanner(
             $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {string.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(trnRequest.ResolvedPersonId!.Value)));
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(resolvedPersonId)));
 
         return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
     }

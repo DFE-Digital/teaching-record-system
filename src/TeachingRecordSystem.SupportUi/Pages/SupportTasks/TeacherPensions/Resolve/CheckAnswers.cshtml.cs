@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
@@ -16,8 +14,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
-    TrnRequestService trnRequestService,
-    PersonService personService,
     TeacherPensionsSupportTaskService teacherPensionsSupportTaskService,
     EvidenceUploadManager evidenceController,
     TimeProvider timeProvider,
@@ -128,34 +124,19 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var trnRequest = supportTask.TrnRequestMetadata!;
-
         var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, timeProvider.UtcNow, User.GetUserId());
 
         var existingPersonId = JourneyInstance!.State.PersonId!.Value;
-        var teacherPensionPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == supportTask.PersonId);
-        var existingPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
 
-        var attributesToUpdate = GetAttributesToUpdate();
         var selectedPersonAttributes = await GetPersonAttributesAsync(existingPersonId);
-        var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
-
-        await personService.DeactivatePersonViaMergeAsync(
-            new DeactivatePersonViaMergeOptions(teacherPensionPerson.PersonId, existingPersonId),
-            processContext);
-
-        await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
-            trnRequest,
-            existingPerson,
-            attributesToUpdate,
-            processContext);
 
         await teacherPensionsSupportTaskService.ResolveWithMergeAsync(
             new()
             {
                 SupportTaskReference = SupportTaskReference,
-                ResolvedAttributes = resolvedPersonAttributes,
+                ExistingPersonId = existingPersonId,
+                AttributesToUpdate = GetAttributesToUpdate(),
+                ResolvedAttributes = GetResolvedPersonAttributes(selectedPersonAttributes),
                 SelectedPersonAttributes = selectedPersonAttributes,
                 Comments = MergeComments
             },
@@ -167,7 +148,7 @@ public class CheckAnswersModel(
             {
                 var link = new TagBuilder("a");
                 link.AddCssClass("govuk-link");
-                link.MergeAttribute("href", linkGenerator.Persons.PersonDetail.Index(trnRequest.ResolvedPersonId!.Value));
+                link.MergeAttribute("href", linkGenerator.Persons.PersonDetail.Index(existingPersonId));
                 link.InnerHtml.Append($"View record.");
                 var span = new TagBuilder("span");
                 span.InnerHtml.Append($"Record updated for {FirstName} {LastName}. ");

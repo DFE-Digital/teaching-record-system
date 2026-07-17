@@ -180,6 +180,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
                 Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation, email.TemplateId);
+                AssertEmailPersonalisation(email, createPersonResult.FirstName);
             }
             else
             {
@@ -191,6 +192,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
                 Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation, email.TemplateId);
+                AssertEmailPersonalisation(email, createPersonResult.FirstName);
             }
         });
 
@@ -298,5 +300,14 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "The request has been cancelled");
+    }
+
+    // These tests reject with RequestAndProofDontMatch
+    private static void AssertEmailPersonalisation(Email email, string expectedFirstName)
+    {
+        Assert.Equal(expectedFirstName, email.Personalization[ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey]);
+        Assert.Equal(
+            "This is because the proof you provided did not match your request.",
+            email.Personalization[ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey]);
     }
 }

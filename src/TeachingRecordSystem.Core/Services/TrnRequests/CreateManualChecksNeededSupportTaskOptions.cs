@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-namespace TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
+namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
 public record CreateManualChecksNeededSupportTaskOptions
 {

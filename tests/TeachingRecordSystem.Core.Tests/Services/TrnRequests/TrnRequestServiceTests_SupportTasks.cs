@@ -1,11 +1,11 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
-namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks;
+namespace TeachingRecordSystem.Core.Tests.Services.TrnRequests;
 
-public class TrnRequestSupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
+public partial class TrnRequestServiceTests
 {
     [Fact]
     public async Task CreateTrnRequestSupportTaskAsync_CreatesTaskAndPublishesEvent()
@@ -17,7 +17,7 @@ public class TrnRequestSupportTaskServiceTests(ServiceFixture fixture) : Service
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<TrnRequestSupportTaskService, SupportTask>(
+        var result = await WithServiceAsync(
             service => service.CreateTrnRequestSupportTaskAsync(
                 new CreateTrnRequestSupportTaskOptions { TrnRequest = trnRequest },
                 processContext));
@@ -49,7 +49,7 @@ public class TrnRequestSupportTaskServiceTests(ServiceFixture fixture) : Service
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var result = await WithServiceAsync<TrnRequestSupportTaskService, SupportTask>(
+        var result = await WithServiceAsync(
             service => service.CreateManualChecksNeededSupportTaskAsync(
                 new CreateManualChecksNeededSupportTaskOptions
                 {
@@ -108,7 +108,7 @@ public class TrnRequestSupportTaskServiceTests(ServiceFixture fixture) : Service
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync<TrnRequestSupportTaskService>(
+        await WithServiceAsync(
             service => service.ResolveTrnRequestSupportTaskAsync(
                 new ResolveTrnRequestSupportTaskOptions
                 {
@@ -151,7 +151,7 @@ public class TrnRequestSupportTaskServiceTests(ServiceFixture fixture) : Service
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync<TrnRequestSupportTaskService>(
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(
             service => service.ResolveTrnRequestSupportTaskAsync(
                 new ResolveTrnRequestSupportTaskOptions
                 {
@@ -176,7 +176,7 @@ public class TrnRequestSupportTaskServiceTests(ServiceFixture fixture) : Service
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        await WithServiceAsync<TrnRequestSupportTaskService>(
+        await WithServiceAsync(
             service => service.CompleteManualChecksNeededSupportTaskAsync(
                 new CompleteManualChecksNeededSupportTaskOptions
                 {

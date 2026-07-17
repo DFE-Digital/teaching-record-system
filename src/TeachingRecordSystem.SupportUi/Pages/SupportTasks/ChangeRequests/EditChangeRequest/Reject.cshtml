@@ -1,5 +1,5 @@
 @page "/support-tasks/change-requests/{supportTaskReference}/reject"
-@using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest.RejectModel;
+@using TeachingRecordSystem.Core.Models.SupportTasks;
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest.RejectModel
 @{
     ViewBag.Title = "Reject the change";
@@ -20,17 +20,17 @@
                     <govuk-radios-fieldset-legend>
                         <h3 class="govuk-heading-m">Reason for rejecting</h3>
                     </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@CaseRejectionReasonOption.RequestAndProofDontMatch">
-                        @CaseRejectionReasonOption.RequestAndProofDontMatch.GetDisplayName()
+                    <govuk-radios-item value="@ChangeRequestRejectReason.RequestAndProofDontMatch">
+                        @ChangeRequestRejectReason.RequestAndProofDontMatch.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@CaseRejectionReasonOption.WrongTypeOfDocument">
-                        @CaseRejectionReasonOption.WrongTypeOfDocument.GetDisplayName()
+                    <govuk-radios-item value="@ChangeRequestRejectReason.WrongTypeOfDocument">
+                        @ChangeRequestRejectReason.WrongTypeOfDocument.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@CaseRejectionReasonOption.ImageQuality">
-                        @CaseRejectionReasonOption.ImageQuality.GetDisplayName()
+                    <govuk-radios-item value="@ChangeRequestRejectReason.ImageQuality">
+                        @ChangeRequestRejectReason.ImageQuality.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@CaseRejectionReasonOption.ChangeNoLongerRequired">
-                        @CaseRejectionReasonOption.ChangeNoLongerRequired.GetDisplayName()
+                    <govuk-radios-item value="@ChangeRequestRejectReason.ChangeNoLongerRequired">
+                        @ChangeRequestRejectReason.ChangeNoLongerRequired.GetDisplayName()
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>

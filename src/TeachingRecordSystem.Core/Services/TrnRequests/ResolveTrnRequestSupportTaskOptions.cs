@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
-namespace TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
+namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
 public record ResolveTrnRequestSupportTaskOptions
 {

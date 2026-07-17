@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -17,7 +15,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditC
 public class RejectModel(
     TrsDbContext dbContext,
     ChangeRequestSupportTaskService changeRequestSupportTaskService,
-    IBackgroundJobScheduler backgroundJobScheduler,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider) : PageModel
 {
@@ -40,7 +37,7 @@ public class RejectModel(
 
     [BindProperty]
     [Display(Name = " ")]
-    public CaseRejectionReasonOption? RejectionReasonChoice { get; set; }
+    public ChangeRequestRejectReason? RejectionReasonChoice { get; set; }
 
     public async Task<IActionResult> OnPostAsync()
     {
@@ -49,7 +46,7 @@ public class RejectModel(
         string requestStatus;
         string flashMessage;
 
-        if (RejectionReasonChoice!.Value == CaseRejectionReasonOption.ChangeNoLongerRequired)
+        if (RejectionReasonChoice!.Value == ChangeRequestRejectReason.ChangeNoLongerRequired)
         {
             requestStatus = "cancelled";
             flashMessage = "The user’s record has not been changed and they have not been notified.";
@@ -81,39 +78,9 @@ public class RejectModel(
                 new RejectChangeRequestSupportTaskOptions
                 {
                     SupportTask = SupportTask!,
-                    RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!
+                    RejectionReason = RejectionReasonChoice.Value
                 },
                 processContext);
-
-            var (requestEmailAddress, emailTemplateId) = ChangeType switch
-            {
-                SupportTaskType.ChangeNameRequest =>
-                    (((ChangeNameRequestData)SupportTask!.Data).EmailAddress, EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation),
-                SupportTaskType.ChangeDateOfBirthRequest =>
-                    (((ChangeDateOfBirthRequestData)SupportTask!.Data).EmailAddress, EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation),
-                _ => throw new InvalidOperationException($"Unexpected change type: '{ChangeType}'.")
-            };
-
-            var emailAddress = string.IsNullOrEmpty(requestEmailAddress) ? Person!.EmailAddress : requestEmailAddress;
-
-            if (!string.IsNullOrEmpty(emailAddress))
-            {
-                var email = new Email
-                {
-                    EmailId = Guid.NewGuid(),
-                    TemplateId = emailTemplateId,
-                    EmailAddress = emailAddress,
-                    Personalization = new Dictionary<string, string>
-                    {
-                        [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = Person!.FirstName,
-                        [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = RejectionReasonChoice.Value.EmailReason()
-                    }
-                };
-
-                dbContext.Emails.Add(email);
-                await dbContext.SaveChangesAsync();
-                await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
-            }
         }
 
         TempData.SetFlashNotificationBanner(
@@ -146,17 +113,5 @@ public class RejectModel(
         Person = person;
 
         await base.OnPageHandlerExecutionAsync(context, next);
-    }
-
-    public enum CaseRejectionReasonOption
-    {
-        [Display(Name = "Request and proof don’t match")]
-        RequestAndProofDontMatch,
-        [Display(Name = "Wrong type of document")]
-        WrongTypeOfDocument,
-        [Display(Name = "Image quality")]
-        ImageQuality,
-        [Display(Name = "Change no longer required")]
-        ChangeNoLongerRequired
     }
 }

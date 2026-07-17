@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
-using TeachingRecordSystem.Core.Services.SupportTasks.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
@@ -11,8 +10,6 @@ public static class Extensions
     public static IServiceCollection AddSupportTaskService(this IServiceCollection services)
     {
         services.AddTransient<SupportTaskService>();
-        // TrnRequestService depends on this, so it must be registered wherever SupportTaskService is.
-        services.AddTransient<TrnRequestSupportTaskService>();
 
         return services;
     }

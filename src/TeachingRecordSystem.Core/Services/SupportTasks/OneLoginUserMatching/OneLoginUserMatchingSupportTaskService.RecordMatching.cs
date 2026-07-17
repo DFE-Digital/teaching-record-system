@@ -73,7 +73,10 @@ public partial class OneLoginUserMatchingSupportTaskService
 
             if (supportTask.TrnRequestMetadata.Status is TrnRequestStatus.Pending)
             {
-                await trnRequestService.TryResolveAsync(supportTask.TrnRequestMetadata, processContext);
+                await trnRequestService.TryResolveAsync(
+                    supportTask.TrnRequestApplicationUserId!.Value,
+                    supportTask.TrnRequestId,
+                    processContext);
             }
         }
 
@@ -126,7 +129,10 @@ public partial class OneLoginUserMatchingSupportTaskService
 
             if (supportTask.TrnRequestMetadata.Status is TrnRequestStatus.Pending)
             {
-                await trnRequestService.TryResolveAsync(supportTask.TrnRequestMetadata, processContext);
+                await trnRequestService.TryResolveAsync(
+                    supportTask.TrnRequestApplicationUserId!.Value,
+                    supportTask.TrnRequestId,
+                    processContext);
             }
         }
 

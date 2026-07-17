@@ -3,13 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Optional;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks.ChangeRequests;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
@@ -17,10 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditC
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public class AcceptModel(
-    TrsDbContext dbContext,
-    PersonService personService,
     ChangeRequestSupportTaskService changeRequestSupportTaskService,
-    IBackgroundJobScheduler backgroundJobScheduler,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider) : PageModel
 {
@@ -39,96 +31,14 @@ public class AcceptModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var changeNameRequestData =
-            ChangeType is SupportTaskType.ChangeNameRequest ? _supportTask!.GetData<ChangeNameRequestData>() : null;
-        var changeDateOfBirthRequestData =
-            ChangeType is SupportTaskType.ChangeDateOfBirthRequest ? _supportTask!.GetData<ChangeDateOfBirthRequestData>() : null;
-
         var processContext = new ProcessContext(
             ChangeType is SupportTaskType.ChangeNameRequest ? ProcessType.ChangeOfNameRequestApproving : ProcessType.ChangeOfDateOfBirthRequestApproving,
             timeProvider.UtcNow,
             User.GetUserId());
 
-        string? emailAddress = _supportTask!.Person!.EmailAddress;
-        string emailTemplateId;
-
-        if (ChangeType is SupportTaskType.ChangeNameRequest)
-        {
-            await personService.UpdatePersonDetailsAsync(
-                new()
-                {
-                    PersonId = _supportTask!.Person!.PersonId,
-                    FirstName = Option.Some(changeNameRequestData!.FirstName),
-                    MiddleName = Option.Some(changeNameRequestData.MiddleName ?? string.Empty),
-                    LastName = Option.Some(changeNameRequestData.LastName),
-                    DateOfBirth = default,
-                    CreatePreviousName = true,
-                    EmailAddress = default,
-                    NationalInsuranceNumber = default,
-                    Gender = default
-                },
-                processContext);
-
-            await changeRequestSupportTaskService.ApproveChangeRequestAsync(
-                new ApproveChangeRequestSupportTaskOptions { SupportTask = _supportTask },
-                processContext);
-
-            if (!string.IsNullOrEmpty(changeNameRequestData.EmailAddress))
-            {
-                emailAddress = changeNameRequestData.EmailAddress;
-            }
-
-            emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation;
-        }
-        else
-        {
-            Debug.Assert(ChangeType is SupportTaskType.ChangeDateOfBirthRequest);
-
-            await personService.UpdatePersonDetailsAsync(
-                new()
-                {
-                    PersonId = _supportTask!.Person!.PersonId,
-                    FirstName = default,
-                    MiddleName = default,
-                    LastName = default,
-                    DateOfBirth = Option.Some<DateOnly?>(changeDateOfBirthRequestData!.DateOfBirth),
-                    CreatePreviousName = false,
-                    EmailAddress = default,
-                    NationalInsuranceNumber = default,
-                    Gender = default
-                },
-                processContext);
-
-            await changeRequestSupportTaskService.ApproveChangeRequestAsync(
-                new ApproveChangeRequestSupportTaskOptions { SupportTask = _supportTask },
-                processContext);
-
-            if (!string.IsNullOrEmpty(changeDateOfBirthRequestData.EmailAddress))
-            {
-                emailAddress = changeDateOfBirthRequestData.EmailAddress;
-            }
-
-            emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation;
-        }
-
-        if (!string.IsNullOrEmpty(emailAddress))
-        {
-            var email = new Email
-            {
-                EmailId = Guid.NewGuid(),
-                TemplateId = emailTemplateId,
-                EmailAddress = emailAddress,
-                Personalization = new Dictionary<string, string>
-                {
-                    { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, _supportTask.Person.FirstName }
-                }
-            };
-
-            dbContext.Emails.Add(email);
-            await dbContext.SaveChangesAsync();
-
-            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
-        }
+        await changeRequestSupportTaskService.ApproveChangeRequestAsync(
+            new ApproveChangeRequestSupportTaskOptions { SupportTask = _supportTask! },
+            processContext);
 
         TempData.SetFlashNotificationBanner(
             "The request has been accepted",
