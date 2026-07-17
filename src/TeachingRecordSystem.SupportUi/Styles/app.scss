@@ -534,3 +534,7 @@
         }
     }
 }
+
+tr:has([data-selects-row]):has(:checked) {
+  background-color: #f0f4f9;
+}

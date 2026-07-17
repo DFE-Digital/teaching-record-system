@@ -167,6 +167,7 @@ else
                                    value="@result.SupportTaskReference"
                                    name="SupportTaskReference"
                                    form="assign-tasks-form"
+                                   data-selects-row
                                    hx-get
                                    hx-page-handler="SelectionBanner"
                                    hx-include="[form='assign-tasks-form']"
@@ -178,7 +179,7 @@ else
                         </div>
                     </td>
                     <td class="govuk-table__cell" data-testid="task-name-and-id">
-                        <a href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(result.SupportTaskReference)" class="govuk-link trs-task-link">
+                        <a href="@LinkGenerator.SupportTaskResolve(result.SupportTaskReference, result.SupportTaskType)" class="govuk-link trs-task-link">
                             <span class="trs-task-link__name" data-testid="task-name">@result.Subject</span>
                             <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
                         </a>
