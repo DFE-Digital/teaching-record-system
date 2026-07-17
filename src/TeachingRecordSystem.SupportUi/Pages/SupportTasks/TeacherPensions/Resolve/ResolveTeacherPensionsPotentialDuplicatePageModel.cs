@@ -146,14 +146,16 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
         {
             Debug.Assert(selectedPersonAttributes is not null);
 
+            // Only a TrnRequest source updates the person (see GetAttributesToUpdate), so anything else —
+            // including MiddleName, which this journey never offers a choice for — keeps the existing value.
             return new TeacherPensionsPotentialDuplicateAttributes()
             {
-                FirstName = state.FirstNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.FirstName : trnRequestPersonAttributes.FirstName,
-                MiddleName = state.MiddleNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.MiddleName : trnRequestPersonAttributes.MiddleName,
-                LastName = state.LastNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.LastName : trnRequestPersonAttributes.LastName,
-                DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.DateOfBirth : trnRequestPersonAttributes.DateOfBirth,
-                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.NationalInsuranceNumber : trnRequestPersonAttributes.NationalInsuranceNumber,
-                Gender = state.GenderSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.Gender : trnRequestPersonAttributes.Gender,
+                FirstName = state.FirstNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.FirstName : selectedPersonAttributes.FirstName,
+                MiddleName = state.MiddleNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.MiddleName : selectedPersonAttributes.MiddleName,
+                LastName = state.LastNameSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.LastName : selectedPersonAttributes.LastName,
+                DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.DateOfBirth : selectedPersonAttributes.DateOfBirth,
+                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.NationalInsuranceNumber : selectedPersonAttributes.NationalInsuranceNumber,
+                Gender = state.GenderSource is PersonAttributeSource.TrnRequest ? trnRequestPersonAttributes.Gender : selectedPersonAttributes.Gender,
                 Trn = selectedPersonAttributes.Trn
             };
         }

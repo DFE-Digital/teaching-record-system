@@ -1,5 +1,6 @@
 using Optional;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 using TeachingRecordSystem.SupportUi.Services;
@@ -470,6 +471,79 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+    }
+
+    // This journey's merge page offers no middle name choice, so MiddleNameSource is always unset. An unset
+    // source must resolve to the existing record's value, matching the fact that the person isn't updated.
+    [Fact]
+    public async Task Post_MiddleNameSourceNotSet_ResolvesMiddleNameToExistingRecordAndLeavesPersonUnchanged()
+    {
+        // Arrange
+        var existingMiddleName = "Existing";
+        var requestMiddleName = "Different";
+
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender(Gender.Male));
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x =>
+            x.WithMiddleName(existingMiddleName).WithNationalInsuranceNumber().WithGender(Gender.Female));
+        var user = await TestData.CreateUserAsync();
+
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            user.UserId,
+            s =>
+            {
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
+                s.WithFirstName(person.FirstName);
+                s.WithMiddleName(requestMiddleName);
+                s.WithLastName(person.LastName);
+                s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
+                s.WithGender(person.Gender);
+                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithSupportTaskData("test.txt", 1);
+                s.WithCreatedOn(TimeProvider.UtcNow);
+                s.WithStatus(SupportTaskStatus.Open);
+            });
+
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            TeachersPensionPersonId = person.PersonId,
+            FirstNameSource = PersonAttributeSource.ExistingRecord,
+            MiddleNameSource = null,
+            LastNameSource = PersonAttributeSource.ExistingRecord,
+            DateOfBirthSource = PersonAttributeSource.ExistingRecord,
+            GenderSource = PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
+            PersonId = duplicatePerson1.PersonId,
+            PersonAttributeSourcesSet = true,
+            Evidence = new() { UploadEvidence = false }
+        };
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updatedPersonRecord = await dbContext.Persons.SingleAsync(x => x.PersonId == duplicatePerson1.PersonId);
+            Assert.Equal(existingMiddleName, updatedPersonRecord.MiddleName);
+
+            var updatedSupportTask = await dbContext.SupportTasks
+                .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            var supportTaskData = updatedSupportTask.GetData<TeacherPensionsPotentialDuplicateData>();
+
+            Assert.NotNull(supportTaskData.ResolvedAttributes);
+            Assert.Equal(existingMiddleName, supportTaskData.ResolvedAttributes.MiddleName);
+            Assert.NotNull(supportTaskData.SelectedPersonAttributes);
+            Assert.Equal(existingMiddleName, supportTaskData.SelectedPersonAttributes.MiddleName);
+        });
     }
 
     private Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(

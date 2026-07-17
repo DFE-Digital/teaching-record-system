@@ -861,6 +861,56 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Contains(expectedPersonId.ToString(), viewRecordLink.GetAttribute("href"));
     }
 
+    // An attribute with no source selected isn't written to the person, so the resolved attributes must
+    // record the existing record's value rather than the request's.
+    [Fact]
+    public async Task Post_UpdatingExistingRecordWithNoSourceSelected_ResolvesAttributeToExistingRecord()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
+            applicationUser.UserId,
+            PersonMatchedAttribute.MiddleName);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveTrnRequestState
+            {
+                MatchedPersons = [new MatchPersonsResultPerson(
+                    matchedPerson.PersonId,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.DateOfBirth,
+                        PersonMatchedAttribute.EmailAddress,
+                        PersonMatchedAttribute.NationalInsuranceNumber,
+                        PersonMatchedAttribute.Gender
+                    ])],
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = true,
+                MiddleNameSource = null
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == matchedPerson.PersonId));
+        Assert.Equal(matchedPerson.Person.MiddleName, person.MiddleName);
+
+        var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
+            .SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
+        var supportTaskData = updatedSupportTask.GetData<TrnRequestData>();
+        AssertPersonAttributesMatchPerson(supportTaskData.ResolvedAttributes, person);
+    }
+
     private void AssertPersonAttributesMatchPerson(
         TrnRequestDataPersonAttributes? personAttributes,
         Person person)
