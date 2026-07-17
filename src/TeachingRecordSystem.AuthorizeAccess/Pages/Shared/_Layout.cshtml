@@ -1,3 +1,5 @@
+@using Microsoft.AspNetCore.Diagnostics
+@using Microsoft.AspNetCore.Http.Features
 @inject Joonasw.AspNetCore.SecurityHeaders.Csp.ICspNonceService NonceService
 @inject IJourneyInstanceProvider JourneyInstanceProvider
 @inject AuthorizeAccessLinkGenerator LinkGenerator
@@ -5,7 +7,13 @@
 @{
     Layout = "_GovUkPageTemplate";
 
-    var coordinator = JourneyInstanceProvider.GetJourneyInstance(Context) as SignInJourneyCoordinator;
+    // Don't resolve journey chrome (service header, back link) when this shared layout is
+    // rendered for an error page re-execution. The request path is then '/error', which isn't
+    // a step in any journey, so GetBackLink() would throw "Current step not found in journey
+    // path." and mask the real error that triggered the error page in the first place.
+    var coordinator = IsErrorReExecute()
+        ? null
+        : JourneyInstanceProvider.GetJourneyInstance(Context) as SignInJourneyCoordinator;
 
     if (coordinator is not null)
     {
@@ -54,7 +62,8 @@
     {
         @await RenderSectionAsync("BeforeContent")
     }
-    else if (JourneyInstanceProvider.GetJourneyInstance(Context) is SignInJourneyCoordinator signInJourneyCoordinator &&
+    else if (!IsErrorReExecute() &&
+        JourneyInstanceProvider.GetJourneyInstance(Context) is SignInJourneyCoordinator signInJourneyCoordinator &&
         signInJourneyCoordinator.GetBackLink() is string backLink)
     {
         <govuk-back-link href="@backLink" />
@@ -68,12 +77,9 @@
         <govuk-footer-meta>
             <govuk-footer-meta-items>
                 <govuk-footer-meta-item href="https://accessibility-statements.education.gov.uk/s/78">Accessibility</govuk-footer-meta-item>
-                @{
-                    var journeyInstance = JourneyInstanceProvider.GetJourneyInstance(Context);
-                    if (journeyInstance is not null)
-                    {
-                        <govuk-footer-meta-item href="@LinkGenerator.Cookies(journeyInstance.InstanceId)">Cookies</govuk-footer-meta-item>
-                    }
+                @if (coordinator is not null)
+                {
+                    <govuk-footer-meta-item href="@LinkGenerator.Cookies(coordinator.InstanceId)">Cookies</govuk-footer-meta-item>
                 }
                 <govuk-footer-meta-item href="https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers">Privacy</govuk-footer-meta-item>
             </govuk-footer-meta-items>
@@ -87,4 +93,12 @@
     @Html.GovUkFrontendScriptImports(cspNonce: NonceService.GetNonce())
     <script src="~/one-login-service-header.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+}
+
+@functions {
+    // True when the pipeline is re-executing to render the error page (via UseExceptionHandler
+    // or UseStatusCodePagesWithReExecute). In that case the current request path is '/error'.
+    private bool IsErrorReExecute() =>
+        Context.Features.Get<IExceptionHandlerPathFeature>() is not null ||
+        Context.Features.Get<IStatusCodeReExecuteFeature>() is not null;
 }
