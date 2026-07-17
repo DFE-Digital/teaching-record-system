@@ -27,7 +27,7 @@
         {
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__cell">
-                    <a href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(task.SupportTaskReference)" class="govuk-link trs-task-link">
+                    <a href="@LinkGenerator.SupportTaskResolve(task.SupportTaskReference, task.Type)" class="govuk-link trs-task-link">
                         <span class="trs-task-link__name" data-testid="task-name">@task.Subject</span>
                         <span class="trs-task-link__reference" data-testid="task-reference">@task.SupportTaskReference</span>
                     </a>
