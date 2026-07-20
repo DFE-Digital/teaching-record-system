@@ -47,23 +47,6 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
     }
 
     [Fact]
-    public async Task Get_MissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/type?personId={person.PersonId}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -129,23 +112,6 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Post_WithMissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/type?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

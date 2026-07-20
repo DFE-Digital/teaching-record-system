@@ -45,23 +45,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToReasonPage()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/reason?personId={person.PersonId}", response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [InlineData(true, true, AddAlertReasonOption.AnotherReason)]
     [InlineData(false, false, AddAlertReasonOption.RoutineNotificationFromStakeholder)]

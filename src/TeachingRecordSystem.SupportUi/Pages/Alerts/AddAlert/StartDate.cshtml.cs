@@ -64,12 +64,6 @@ public class StartDateModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (journey.State.AddLink is null)
-        {
-            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Link(journey.InstanceId));
-            return;
-        }
-
         BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();

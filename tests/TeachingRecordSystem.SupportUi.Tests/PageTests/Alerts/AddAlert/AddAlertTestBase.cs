@@ -118,8 +118,8 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
             _ => Task.FromResult<object>(state),
             pathUrls: []);
 
-        // Seed the whole journey path so that any page under test is reachable; the pages' own guards
-        // handle redirecting when prerequisite state is missing (mirroring the previous FormFlow behaviour).
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
         foreach (var url in new[]
         {
             $"/alerts/add/type?personId={personId}",

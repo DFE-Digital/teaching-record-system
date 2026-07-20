@@ -63,12 +63,6 @@ public class DetailsModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (journey.State.AlertTypeId is null)
-        {
-            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Type(journey.InstanceId));
-            return;
-        }
-
         BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();

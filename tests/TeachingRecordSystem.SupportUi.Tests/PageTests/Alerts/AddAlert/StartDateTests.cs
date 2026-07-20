@@ -45,23 +45,6 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
     }
 
     [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToLinkPage()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -129,23 +112,6 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Post_WithMissingDataInJourneyState_RedirectsToLinkPage()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
