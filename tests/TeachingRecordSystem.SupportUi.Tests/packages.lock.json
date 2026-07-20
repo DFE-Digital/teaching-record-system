@@ -2,6 +2,15 @@
   "version": 2,
   "dependencies": {
     "net10.0": {
+      "GovUk.Questions.AspNetCore.Testing": {
+        "type": "Direct",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "lyvgsfV3M7XgtQurwRSf09GQTGCtl4Ahzh9dSk6PhreYujhvpJddqFnp4kuyhXQoHCCGdzjSgmEH6qScvuGhJA==",
+        "dependencies": {
+          "GovUk.Questions.AspNetCore": "1.0.0"
+        }
+      },
       "JetBrains.Annotations": {
         "type": "Direct",
         "requested": "[2026.2.0, )",

@@ -1,3 +1,6 @@
+using GovUk.Questions.AspNetCore;
+using GovUk.Questions.AspNetCore.State;
+using GovUk.Questions.AspNetCore.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
@@ -5,10 +8,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<AddAlertState>> CreateEmptyJourneyInstanceAsync(Guid personId) =>
+    protected Task<AddAlertJourneyCoordinator> CreateEmptyJourneyInstanceAsync(Guid personId) =>
         CreateJourneyInstanceAsync(personId, new());
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Guid personId, bool populateOptional = true, bool provideAdditionalInformation = false, AddAlertReasonOption addReasonOption = AddAlertReasonOption.AnotherReason)
+    protected async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceForAllStepsCompletedAsync(Guid personId, bool populateOptional = true, bool provideAdditionalInformation = false, AddAlertReasonOption addReasonOption = AddAlertReasonOption.AnotherReason)
     {
         var alertType = await GetKnownAlertTypeAsync();
 
@@ -37,21 +40,21 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
         });
     }
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, bool populateOptional = true)
+    protected async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, bool populateOptional = true)
     {
         var alertType = await GetKnownAlertTypeAsync();
 
         return await CreateJourneyInstanceForCompletedStepAsync(step, personId, alertType, populateOptional);
     }
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, Guid alertTypeId, bool populateOptional = true)
+    protected async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, Guid alertTypeId, bool populateOptional = true)
     {
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertTypeId);
 
         return await CreateJourneyInstanceForCompletedStepAsync(step, personId, alertType, populateOptional);
     }
 
-    protected Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, AlertType alertType, bool populateOptional = true)
+    protected Task<AddAlertJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, AlertType alertType, bool populateOptional = true)
     {
         return
             (step switch
@@ -99,11 +102,46 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
     protected Task<AlertType> GetKnownAlertTypeAsync(bool isDbsAlertType = false) =>
         isDbsAlertType ? TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("") : TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("T4");
 
-    private Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceAsync(Guid personId, AddAlertState state) =>
-        CreateJourneyInstance(
+    protected AddAlertState? GetJourneyInstanceState(AddAlertJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (AddAlertState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
+
+    private async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, AddAlertState state)
+    {
+        var journeyHelper = HostFixture.Services.GetRequiredService<JourneyHelper>();
+
+        var coordinator = await journeyHelper.CreateInstanceAsync<AddAlertJourneyCoordinator>(
             JourneyNames.AddAlert,
-            state ?? new AddAlertState(),
-            new KeyValuePair<string, object>("personId", personId));
+            new RouteValueDictionary { ["personId"] = personId },
+            _ => Task.FromResult<object>(state),
+            pathUrls: []);
+
+        // Seed the whole journey path so that any page under test is reachable; the pages' own guards
+        // handle redirecting when prerequisite state is missing (mirroring the previous FormFlow behaviour).
+        foreach (var url in new[]
+        {
+            $"/alerts/add/type?personId={personId}",
+            $"/alerts/add/details?personId={personId}",
+            $"/alerts/add/link?personId={personId}",
+            $"/alerts/add/start-date?personId={personId}",
+            $"/alerts/add/reason?personId={personId}",
+            $"/alerts/add/check-answers?personId={personId}",
+        })
+        {
+            AddUrlToPath(coordinator, url);
+        }
+
+        return coordinator;
+    }
+
+    private static void AddUrlToPath(JourneyCoordinator coordinator, string url)
+    {
+        var newStep = coordinator.CreateStepFromUrl(url);
+        var newPath = new JourneyPath(coordinator.Path.Steps.Append(newStep));
+        coordinator.UnsafeSetPath(newPath);
+    }
 
     public static class JourneySteps
     {

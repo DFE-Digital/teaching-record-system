@@ -6,8 +6,12 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddAlert), RequireJourneyInstance]
-public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager, TimeProvider timeProvider) : PageModel
+[Journey(JourneyNames.AddAlert)]
+public class StartDateModel(
+    AddAlertJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager,
+    TimeProvider timeProvider) : PageModel
 {
     private readonly InlineValidator<StartDateModel> _validator = new()
     {
@@ -17,13 +21,15 @@ public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUpload
             dateInFutureMessage: "Start date cannot be in the future")
     };
 
-    public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -32,37 +38,39 @@ public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUpload
 
     public void OnGet()
     {
-        StartDate = JourneyInstance!.State.StartDate;
+        StartDate = journey.State.StartDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.StartDate = StartDate!.Value;
-        });
-
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.AddAlert.Reason(PersonId, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.AddAlert.Reason(journey.InstanceId),
+            state => state.StartDate = StartDate!.Value);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.AddLink is null)
+        if (journey.State.AddLink is null)
         {
-            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Link(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Link(journey.InstanceId));
             return;
         }
+
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 

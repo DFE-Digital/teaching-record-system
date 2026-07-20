@@ -4,14 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-public class AddAlertState : IRegisterJourney
+public class AddAlertState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.AddAlert,
-        typeof(AddAlertState),
-        requestDataKeys: ["personId"],
-        appendUniqueKey: true);
-
     public Guid? AlertTypeId { get; set; }
 
     public string? AlertTypeName { get; set; }

@@ -6,8 +6,11 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddAlert), RequireJourneyInstance]
-public class DetailsModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+[Journey(JourneyNames.AddAlert)]
+public class DetailsModel(
+    AddAlertJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<DetailsModel> _validator = new()
     {
@@ -15,13 +18,15 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMa
             maxLengthMessage: maxLength => $"Details must be {maxLength} characters or less")
     };
 
-    public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -32,41 +37,43 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMa
 
     public void OnGet()
     {
-        Details = JourneyInstance!.State.Details;
+        Details = journey.State.Details;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.Details = Details;
-        });
-
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.AddAlert.Link(PersonId, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.AddAlert.Link(journey.InstanceId),
+            state => state.Details = Details);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.AlertTypeId is null)
+        if (journey.State.AlertTypeId is null)
         {
-            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Type(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Type(journey.InstanceId));
             return;
         }
+
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        AlertTypeName = JourneyInstance.State.AlertTypeName;
+        AlertTypeName = journey.State.AlertTypeName;
     }
 }

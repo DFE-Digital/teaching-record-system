@@ -378,7 +378,6 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/check-answers?personId={person.PersonId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.AddReason);
         Assert.Equal(provideAdditionalInformation, journeyInstance.State.ProvideAdditionalInformation);
         Assert.Equal(reasonDetail, journeyInstance.State.AddReasonDetail);
@@ -416,7 +415,6 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/check-answers?personId={person.PersonId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.AddReason);
         Assert.False(journeyInstance.State.ProvideAdditionalInformation);
         Assert.Null(journeyInstance.State.AddReasonDetail);
@@ -431,7 +429,10 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -439,8 +440,7 @@ public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

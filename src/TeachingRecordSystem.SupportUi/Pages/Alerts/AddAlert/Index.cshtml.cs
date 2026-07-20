@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddAlert), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.AddAlert), StartsJourney]
+public class IndexModel(AddAlertJourneyCoordinator journey, SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
-
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    public IActionResult OnGet() => Redirect(linkGenerator.Alerts.AddAlert.Type(PersonId, JourneyInstance!.InstanceId));
+    public IActionResult OnGet() =>
+        journey.AdvanceTo(
+            linkGenerator.Alerts.AddAlert.Type(journey.InstanceId),
+            new PushStepOptions { SetAsFirstStep = true });
 }

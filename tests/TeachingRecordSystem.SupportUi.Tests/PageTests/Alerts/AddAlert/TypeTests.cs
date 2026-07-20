@@ -213,7 +213,6 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(alertType.AlertTypeId, journeyInstance.State.AlertTypeId);
     }
 
@@ -224,7 +223,10 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -232,8 +234,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
