@@ -56,6 +56,8 @@ public class ZendeskTickets(
         TicketUrls ??= [];
         TicketUrls.Add(string.Empty);
 
+        ModelState.Clear();
+
         return Page();
     }
 
@@ -66,6 +68,13 @@ public class ZendeskTickets(
         if (removeIndex >= 0 && removeIndex < TicketUrls.Count)
         {
             TicketUrls.RemoveAt(removeIndex);
+        }
+
+        foreach (var key in ModelState.Keys
+                     .Where(k => k.StartsWith(nameof(TicketUrls) + "["))
+                     .ToList())
+        {
+            ModelState.Remove(key);
         }
 
         return Page();
