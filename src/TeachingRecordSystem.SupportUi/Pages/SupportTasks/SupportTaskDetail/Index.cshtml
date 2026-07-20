@@ -1,12 +1,15 @@
 @page "/support-tasks/{supportTaskReference}"
 @using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail.Index
 @{
     ViewBag.Title = $"{Model.Subject} {Model.SupportTaskReference}";
+
+    var returnUrl = Request.GetEncodedPathAndQuery();
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.Status is not SupportTaskStatus.Closed ? LinkGenerator.SupportTasks.Active() : "#TODO")" />
+    <govuk-back-link href="@Model.BackLink" />
 }
 
 <div class="govuk-grid-row">
@@ -30,7 +33,7 @@
                 </capture-content>
             }
 
-            @if (Model.Subject is not null)
+            @if (Model.SubjectLink is not null)
             {
                 if (linksBuilder.Count > 0)
                 {
@@ -78,10 +81,7 @@
 
                 <div class="govuk-button-group">
                     <govuk-button type="submit">Update details</govuk-button>
-                    <govuk-button-link href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(Model.SupportTaskReference)"
-                                       class="govuk-button--secondary">
-                        Cancel
-                    </govuk-button-link>
+                    <govuk-button-link href="@Model.BackLink" class="govuk-button--secondary">Cancel</govuk-button-link>
                 </div>
             </form>
         </div>
@@ -105,7 +105,7 @@
                 </govuk-details-text>
             </govuk-details>
 
-            <govuk-button-link href="@LinkGenerator.SupportTasks.SupportTaskDetail.AddNote(Model.SupportTaskReference)"
+            <govuk-button-link href="@LinkGenerator.SupportTasks.SupportTaskDetail.AddNote(Model.SupportTaskReference, returnUrl: returnUrl)"
                                class="govuk-button--secondary">
                 Add a note
             </govuk-button-link>

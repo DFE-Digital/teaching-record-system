@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -39,6 +40,8 @@ public class Index(
     public string? CompletedByUserName { get; set; }
 
     public IReadOnlyCollection<Note>? Notes { get; set; }
+
+    public string? BackLink { get; set; }
 
     [BindProperty]
     public Guid? AssignedToUserId { get; set; }
@@ -87,7 +90,7 @@ public class Index(
             TempData.SetFlashNotificationBanner("Task updated");
         }
 
-        return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(SupportTaskReference));
+        return Redirect(Request.GetEncodedPathAndQuery());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -114,6 +117,9 @@ public class Index(
             .ToArrayAsync();
 
         AssignToOptions = await supportTaskService.GetAssignableUsersAsync();
+
+        BackLink = this.GetReturnUrlOrDefault(
+            IsOutstanding ? linkGenerator.SupportTasks.Active() : linkGenerator.SupportTasks.Completed());
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

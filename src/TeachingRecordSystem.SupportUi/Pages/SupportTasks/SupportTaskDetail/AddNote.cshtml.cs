@@ -30,6 +30,8 @@ public class AddNote(
     [BindProperty]
     public new string? Content { get; set; }
 
+    public string? BackLink { get; set; }
+
     public void OnGet()
     {
     }
@@ -60,5 +62,7 @@ public class AddNote(
 
         SupportTaskType = supportTask.SupportTaskType;
         SupportTaskTypeTitle = supportTask.SupportTaskType.GetTitle();
+
+        BackLink = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.SupportTaskDetail.Index(SupportTaskReference));
     }
 }
