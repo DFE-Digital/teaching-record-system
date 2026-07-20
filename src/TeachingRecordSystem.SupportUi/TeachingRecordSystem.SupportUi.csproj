@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
+    <PackageReference Include="GovUk.Questions.AspNetCore" />
     <PackageReference Include="Htmx" />
     <PackageReference Include="Htmx.TagHelpers" />
     <PackageReference Include="Humanizer.Core" />
@@ -29,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="GovUk.Questions.AspNetCore" />
     <Using Include="TeachingRecordSystem.WebCommon" />
   </ItemGroup>
 
