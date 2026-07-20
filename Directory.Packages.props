@@ -27,8 +27,8 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.4.3" />
-    <PackageVersion Include="GovUk.Questions.AspNetCore" Version="0.1.0-alpha.0.94" />
-    <PackageVersion Include="GovUk.Questions.AspNetCore.Testing" Version="0.1.0-alpha.0.94" />
+    <PackageVersion Include="GovUk.Questions.AspNetCore" Version="1.0.0" />
+    <PackageVersion Include="GovUk.Questions.AspNetCore.Testing" Version="1.0.0" />
     <PackageVersion Include="GovukNotify" Version="8.1.0" />
     <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="4.2.1" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.23" />
