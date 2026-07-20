@@ -37,9 +37,9 @@
       },
       "GovUk.Questions.AspNetCore": {
         "type": "Direct",
-        "requested": "[1.0.0, )",
-        "resolved": "1.0.0",
-        "contentHash": "DkD/gZn4j9y7+39SC1bmg8zHd88+vYVnAuyYE+ERPUbPFf+kkc90u7s5+HvKcymPgqH2SRTq9EXy0cEku6QQcw==",
+        "requested": "[1.0.1, )",
+        "resolved": "1.0.1",
+        "contentHash": "KcVexLKlM5aXx6TxMGEXwCzEPXEnyUskssp6w404NbByVSVvuR28nfav7S81oyHnfM+l+TeIuU8Hqw9RTD+oUw==",
         "dependencies": {
           "UUID": "1.1.1"
         }

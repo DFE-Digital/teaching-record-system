@@ -1,4 +1,3 @@
-using GovUk.Questions.AspNetCore;
 using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
@@ -107,40 +106,22 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
         return (AddAlertState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
     }
 
-    private async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, AddAlertState state)
-    {
-        var coordinator = await JourneyHelper.CreateInstanceAsync<AddAlertJourneyCoordinator>(
+    private Task<AddAlertJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, AddAlertState state) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<AddAlertJourneyCoordinator>(
             JourneyNames.AddAlert,
             new RouteValueDictionary { ["personId"] = personId },
             _ => Task.FromResult<object>(state),
-            pathUrls: []);
-
-        // Seed the whole journey path so that any page under test is reachable (the real journey builds
-        // this path up as the user advances). The steps are added via CreateStepFromUrl rather than
-        // CreateInstanceAsync's pathUrls so their StepIds omit the _jid query parameter, matching how the
-        // framework identifies the current step from the request URL.
-        foreach (var url in new[]
-        {
-            $"/alerts/add/type?personId={personId}",
-            $"/alerts/add/details?personId={personId}",
-            $"/alerts/add/link?personId={personId}",
-            $"/alerts/add/start-date?personId={personId}",
-            $"/alerts/add/reason?personId={personId}",
-            $"/alerts/add/check-answers?personId={personId}",
-        })
-        {
-            AddUrlToPath(coordinator, url);
-        }
-
-        return coordinator;
-    }
-
-    private static void AddUrlToPath(JourneyCoordinator coordinator, string url)
-    {
-        var newStep = coordinator.CreateStepFromUrl(url);
-        var newPath = new JourneyPath(coordinator.Path.Steps.Append(newStep));
-        coordinator.UnsafeSetPath(newPath);
-    }
+            pathUrls:
+            [
+                $"/alerts/add/type?personId={personId}",
+                $"/alerts/add/details?personId={personId}",
+                $"/alerts/add/link?personId={personId}",
+                $"/alerts/add/start-date?personId={personId}",
+                $"/alerts/add/reason?personId={personId}",
+                $"/alerts/add/check-answers?personId={personId}",
+            ]);
 
     public static class JourneySteps
     {
