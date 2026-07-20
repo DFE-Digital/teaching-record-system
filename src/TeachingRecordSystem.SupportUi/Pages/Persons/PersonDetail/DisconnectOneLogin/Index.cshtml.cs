@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLogin;
 
-[Journey(JourneyNames.DisconnectOneLogin), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DisconnectOneLogin), ActivatesJourney, RequireJourneyInstance]
 public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
 {
     private readonly InlineValidator<Index> _validator = new()

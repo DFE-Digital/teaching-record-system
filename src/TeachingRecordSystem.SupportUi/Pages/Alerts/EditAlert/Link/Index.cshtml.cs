@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
-[Journey(JourneyNames.EditAlertLink), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertLink), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
     public JourneyInstance<EditAlertLinkState>? JourneyInstance { get; set; }

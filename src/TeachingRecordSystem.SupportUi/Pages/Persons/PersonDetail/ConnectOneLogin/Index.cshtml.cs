@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
-[Journey(JourneyNames.ConnectOneLogin)]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectOneLogin)]
 [ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(
     TrsDbContext dbContext,

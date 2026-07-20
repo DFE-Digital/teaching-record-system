@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-[Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StatusModel(
     SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,

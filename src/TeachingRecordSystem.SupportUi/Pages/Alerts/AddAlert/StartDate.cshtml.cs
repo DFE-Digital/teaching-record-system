@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-[Journey(JourneyNames.AddAlert), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager, TimeProvider timeProvider) : PageModel
 {
     private readonly InlineValidator<StartDateModel> _validator = new()

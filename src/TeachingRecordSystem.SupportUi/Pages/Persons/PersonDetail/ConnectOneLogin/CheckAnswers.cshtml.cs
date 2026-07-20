@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
-[Journey(JourneyNames.ConnectOneLogin), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectOneLogin), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     OneLoginService oneLoginService,

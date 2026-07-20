@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
-[Journey(JourneyNames.AddPerson), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddPerson), ActivatesJourney, RequireJourneyInstance]
 public class PersonalDetailsModel(
     TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator,

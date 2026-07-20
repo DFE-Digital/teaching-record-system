@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLogin;
 
-[Journey(JourneyNames.DisconnectOneLogin), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DisconnectOneLogin), RequireJourneyInstance]
 public class CheckAnswers(
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider,

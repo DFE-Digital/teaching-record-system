@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
-[Journey(JourneyNames.ConnectOneLogin)]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectOneLogin)]
 [RequireJourneyInstance]
 public class MatchModel(
     TrsDbContext dbContext,

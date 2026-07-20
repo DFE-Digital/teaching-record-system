@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
-[Journey(JourneyNames.SetStatus), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.SetStatus), ActivatesJourney, RequireJourneyInstance]
 [AllowDeactivatedPerson]
 public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {

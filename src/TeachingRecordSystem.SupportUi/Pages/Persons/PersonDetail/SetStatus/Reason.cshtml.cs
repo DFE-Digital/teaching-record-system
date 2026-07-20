@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
-[Journey(JourneyNames.SetStatus), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.SetStatus), RequireJourneyInstance]
 [AllowDeactivatedPerson]
 public class ReasonModel(
     SupportUiLinkGenerator linkGenerator,

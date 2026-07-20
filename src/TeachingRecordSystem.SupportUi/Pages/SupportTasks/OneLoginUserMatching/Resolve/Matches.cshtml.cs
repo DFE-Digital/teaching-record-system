@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
 public class Matches(
     TrsDbContext dbContext,
     SupportTaskService supportTaskService,

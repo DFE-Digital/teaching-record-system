@@ -30,11 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="GovUk.Questions.AspNetCore" />
-    <Using Include="TeachingRecordSystem.WebCommon" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Remove="sasscompiler.json" />
     <None Include="sasscompiler.json" />
   </ItemGroup>

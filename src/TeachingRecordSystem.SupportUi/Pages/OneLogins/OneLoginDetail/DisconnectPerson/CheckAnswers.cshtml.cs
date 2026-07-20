@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.DisconnectPerson;
 
-[Journey(JourneyNames.DisconnectPerson), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DisconnectPerson), RequireJourneyInstance]
 [TypeFilter(typeof(CheckOneLoginUserExistsFilterFactory))]
 public class CheckAnswers(
     SupportUiLinkGenerator linkGenerator,

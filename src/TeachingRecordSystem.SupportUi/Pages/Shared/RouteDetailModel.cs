@@ -24,7 +24,7 @@ public class RouteDetailModel()
     public string? TrainingProvider { get; set; }
     public string? TrainingCountry { get; set; }
     public string[]? TrainingSubjects { get; set; }
-    public JourneyInstanceId JourneyInstanceId { get; set; }
+    public TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId JourneyInstanceId { get; set; }
 
     public FieldRequirement StartDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingStartDateRequired, Status.GetStartDateRequirement());
     public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingEndDateRequired, Status.GetEndDateRequirement());
