@@ -4,6 +4,18 @@ namespace TeachingRecordSystem.SupportUi;
 
 public static class PageModelExtensions
 {
+    public static string GetReturnUrlOrDefault(this PageModel pageModel, string defaultReturnUrl)
+    {
+        var returnUrl = pageModel.Request.Query["returnUrl"].ToString();
+
+        if (!string.IsNullOrEmpty(returnUrl) && pageModel.Url.IsLocalUrl(returnUrl))
+        {
+            return returnUrl;
+        }
+
+        return defaultReturnUrl;
+    }
+
     public static PageResult PageWithErrors(this PageModel pageModel) => new PageResult() { StatusCode = StatusCodes.Status400BadRequest };
 
     public static SavedJourneyState CreateSavedJourneyState<T>(

@@ -19,16 +19,23 @@ public class SupportTasksLinkGenerator(LinkGenerator linkGenerator)
     public TrnRequestManualChecksNeededLinkGenerator TrnRequestManualChecksNeeded { get; } = new(linkGenerator);
     public SupportTaskDetailLinkGenerator SupportTaskDetail { get; } = new(linkGenerator);
 
+    public string Active() => linkGenerator.GetRequiredPathByPage("/SupportTasks/Active");
+
     public string Active(
-        SupportTaskType? type = null,
-        Guid? assignedToUserId = null,
-        IEnumerable<SupportTaskStatus>? statuses = null,
-        SupportTasksSortByOption? sortBy = null,
-        SortDirection? sortDirection = null,
+        SupportTaskType? type,
+        Guid? assignedToUserId,
+        IEnumerable<SupportTaskStatus>? statuses,
+        SupportTasksSortByOption? sortBy,
+        SortDirection? sortDirection,
         int? pageNumber = null) =>
         linkGenerator.GetRequiredPathByPage(
             "/SupportTasks/Active",
             routeValues: new { type, assignedToUserId, status = statuses, sortBy, sortDirection, pageNumber });
 
-    public string Assign() => linkGenerator.GetRequiredPathByPage("/SupportTasks/Assign");
+    public string Completed() => "";  // TODO
+
+    public string Assign(string? returnUrl = null) =>
+        linkGenerator.GetRequiredPathByPage(
+            "/SupportTasks/Assign",
+            routeValues: new { returnUrl });
 }

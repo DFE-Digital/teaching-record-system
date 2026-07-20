@@ -1,8 +1,11 @@
 @page "/support-tasks/active/{handler?}"
+@using Microsoft.AspNetCore.Http.Extensions
 @using TeachingRecordSystem.SupportUi.Services.SupportTasks
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Active
 @{
     ViewBag.Title = "Active tasks";
+
+    var returnUrl = Request.GetEncodedPathAndQuery();
 }
 
 @section BeforeContent {
@@ -219,6 +222,7 @@ else
 </div>
 
 <form id="assign-tasks-form" action="@LinkGenerator.SupportTasks.Assign()" method="get" asp-antiforgery="false">
+    <input name="returnUrl" type="hidden" value="@returnUrl">
     <noscript>
         <govuk-button type="submit">Assign tasks</govuk-button>
     </noscript>

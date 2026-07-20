@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.SupportTasks.Active()" />
+    <govuk-back-link href="@Model.BackLink" />
 }
 
 <span class="govuk-caption-m">Bulk assignment</span>
@@ -55,6 +55,6 @@
 
     <div class="govuk-button-group">
         <govuk-button type="submit">Assign tasks</govuk-button>
-        <govuk-button-link href="@LinkGenerator.SupportTasks.Active()" class="govuk-button--secondary">Cancel</govuk-button-link>
+        <govuk-button-link href="@Model.BackLink" class="govuk-button--secondary">Cancel</govuk-button-link>
     </div>
 </form>

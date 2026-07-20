@@ -31,6 +31,8 @@ public class Assign(
     [BindProperty]
     public Guid? AssignToUserId { get; set; }
 
+    public string? BackLink { get; set; }
+
     public void OnGet()
     {
     }
@@ -85,6 +87,8 @@ public class Assign(
         }
 
         AssignToOptions = await supportTaskService.GetAssignableUsersAsync();
+
+        BackLink = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.Active());
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
