@@ -1,6 +1,5 @@
 using GovUk.Questions.AspNetCore;
 using GovUk.Questions.AspNetCore.State;
-using GovUk.Questions.AspNetCore.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
@@ -110,16 +109,16 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
 
     private async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, AddAlertState state)
     {
-        var journeyHelper = HostFixture.Services.GetRequiredService<JourneyHelper>();
-
-        var coordinator = await journeyHelper.CreateInstanceAsync<AddAlertJourneyCoordinator>(
+        var coordinator = await JourneyHelper.CreateInstanceAsync<AddAlertJourneyCoordinator>(
             JourneyNames.AddAlert,
             new RouteValueDictionary { ["personId"] = personId },
             _ => Task.FromResult<object>(state),
             pathUrls: []);
 
         // Seed the whole journey path so that any page under test is reachable (the real journey builds
-        // this path up as the user advances through the steps).
+        // this path up as the user advances). The steps are added via CreateStepFromUrl rather than
+        // CreateInstanceAsync's pathUrls so their StepIds omit the _jid query parameter, matching how the
+        // framework identifies the current step from the request URL.
         foreach (var url in new[]
         {
             $"/alerts/add/type?personId={personId}",
