@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
-[Journey(JourneyNames.EditAlertEndDate), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertEndDate), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController, TimeProvider timeProvider) : PageModel
 {
     public JourneyInstance<EditAlertEndDateState>? JourneyInstance { get; set; }

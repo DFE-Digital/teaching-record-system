@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
-[Journey(JourneyNames.DeleteMq), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DeleteMq), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()

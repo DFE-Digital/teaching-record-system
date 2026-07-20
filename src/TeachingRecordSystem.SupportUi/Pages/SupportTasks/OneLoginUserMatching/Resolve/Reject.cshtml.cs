@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
 public class Reject(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<Reject> _validator = new()

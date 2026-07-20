@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-[Journey(JourneyNames.EditDetails), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditDetails), RequireJourneyInstance]
 public class NameChangeReasonModel(
     SupportUiLinkGenerator linkGenerator,
     PersonService personService,

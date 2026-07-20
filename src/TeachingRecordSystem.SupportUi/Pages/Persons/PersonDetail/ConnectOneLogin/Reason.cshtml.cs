@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
-[Journey(JourneyNames.ConnectOneLogin), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectOneLogin), RequireJourneyInstance]
 public class ReasonModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()

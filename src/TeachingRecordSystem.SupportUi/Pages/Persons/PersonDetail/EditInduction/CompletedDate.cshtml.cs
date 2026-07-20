@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-[Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class CompletedDateModel(
     SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,

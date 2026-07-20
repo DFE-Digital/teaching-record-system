@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-[Journey(JourneyNames.EditInduction), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class ReasonModel(
     SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,

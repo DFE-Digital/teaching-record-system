@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
-[Journey(JourneyNames.ResolveTrnRequest), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTrnRequest), RequireJourneyInstance]
 public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveTrnRequestPageModel(dbContext)
 {
     private readonly InlineValidator<Matches> _validator = new()

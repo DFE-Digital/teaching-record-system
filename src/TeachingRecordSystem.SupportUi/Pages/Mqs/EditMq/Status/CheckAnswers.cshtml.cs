@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-[Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,

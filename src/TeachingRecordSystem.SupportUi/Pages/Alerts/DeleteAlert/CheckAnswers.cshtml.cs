@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
-[Journey(JourneyNames.DeleteAlert), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DeleteAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,

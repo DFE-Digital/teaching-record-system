@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-[Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
 public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()

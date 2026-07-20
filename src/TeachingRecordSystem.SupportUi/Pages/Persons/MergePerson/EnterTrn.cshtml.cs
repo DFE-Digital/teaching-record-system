@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-[Journey(JourneyNames.MergePerson), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class EnterTrnModel(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,

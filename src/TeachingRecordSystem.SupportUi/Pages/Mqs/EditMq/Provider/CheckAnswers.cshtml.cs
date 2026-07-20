@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
-[Journey(JourneyNames.EditMqProvider), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqProvider), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,

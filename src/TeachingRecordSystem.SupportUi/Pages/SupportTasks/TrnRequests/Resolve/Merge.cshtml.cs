@@ -6,7 +6,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resol
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
-[Journey(JourneyNames.ResolveTrnRequest), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTrnRequest), RequireJourneyInstance]
 public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveTrnRequestPageModel(dbContext)
 {
     [FromRoute]

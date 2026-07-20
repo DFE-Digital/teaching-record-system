@@ -5,33 +5,33 @@ public class ResolveTeacherPensionsPotentialDuplicateLinkGenerator(LinkGenerator
     public string Index(string supportTaskReference) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Index", routeValues: new { supportTaskReference });
 
-    public string Matches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+    public string Matches(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Matches", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string MatchesCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+    public string MatchesCancel(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Matches", handler: "Cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string Merge(string supportTaskReference, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+    public string Merge(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Merge", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string MergeCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+    public string MergeCancel(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Merge", handler: "Cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string KeepRecordSeparate(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+    public string KeepRecordSeparate(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/KeepRecordSeparate", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string KeepRecordSeparateCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+    public string KeepRecordSeparateCancel(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/KeepRecordSeparate", handler: "Cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string ConfirmKeepRecordSeparateReason(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+    public string ConfirmKeepRecordSeparateReason(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/ConfirmKeepRecordSeparateReason", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string ConfirmKeepRecordSeparateReasonCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+    public string ConfirmKeepRecordSeparateReasonCancel(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/ConfirmKeepRecordSeparateReason", handler: "Cancel", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string CheckAnswers(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool keepRecordSeparate = false) =>
+    public string CheckAnswers(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null, bool keepRecordSeparate = false) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/CheckAnswers", routeValues: new { supportTaskReference, keepRecordSeparate }, journeyInstanceId: journeyInstanceId);
 
-    public string CheckAnswersCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool keepRecordSeparate = false) =>
+    public string CheckAnswersCancel(string supportTaskReference, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null, bool keepRecordSeparate = false) =>
         linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/CheckAnswers", handler: "Cancel", routeValues: new { supportTaskReference, keepRecordSeparate }, journeyInstanceId: journeyInstanceId);
 }

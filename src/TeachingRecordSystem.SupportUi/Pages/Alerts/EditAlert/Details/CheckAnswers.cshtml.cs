@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
-[Journey(JourneyNames.EditAlertDetails), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertDetails), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,

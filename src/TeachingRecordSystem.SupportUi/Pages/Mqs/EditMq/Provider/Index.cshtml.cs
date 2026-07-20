@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
-[Journey(JourneyNames.EditMqProvider), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqProvider), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()

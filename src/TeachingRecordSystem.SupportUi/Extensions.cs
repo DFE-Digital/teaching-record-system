@@ -53,6 +53,14 @@ public static class Extensions
 
         services.AddCsp(nonceByteAmount: 32);
 
+        services.AddSession(options =>
+        {
+            options.Cookie.Name = "sess";
+            options.Cookie.IsEssential = true;
+        });
+
+        services.AddGovUkQuestions();
+
         services
             .AddRazorPages()
             .AddMvcOptions(options =>

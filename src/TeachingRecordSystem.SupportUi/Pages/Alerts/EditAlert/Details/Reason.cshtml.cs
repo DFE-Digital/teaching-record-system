@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
-[Journey(JourneyNames.EditAlertDetails), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertDetails), RequireJourneyInstance]
 public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()

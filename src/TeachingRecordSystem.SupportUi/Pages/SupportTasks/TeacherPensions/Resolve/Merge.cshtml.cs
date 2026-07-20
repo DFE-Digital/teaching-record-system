@@ -7,7 +7,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.R
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-[Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     private readonly InlineValidator<MergeModel> _validator = new()

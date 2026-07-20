@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
 public class VerifyModel(ISafeFileService safeFileService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<VerifyModel> _validator = new()

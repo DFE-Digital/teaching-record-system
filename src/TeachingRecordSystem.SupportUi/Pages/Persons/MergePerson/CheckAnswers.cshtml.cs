@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-[Journey(JourneyNames.MergePerson), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     PersonService personService,

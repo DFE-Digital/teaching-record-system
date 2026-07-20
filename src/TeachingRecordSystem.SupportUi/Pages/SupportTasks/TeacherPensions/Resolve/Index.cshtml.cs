@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-[Journey(JourneyNames.ResolveTpsPotentialDuplicate), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTpsPotentialDuplicate), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>? JourneyInstance { get; set; }

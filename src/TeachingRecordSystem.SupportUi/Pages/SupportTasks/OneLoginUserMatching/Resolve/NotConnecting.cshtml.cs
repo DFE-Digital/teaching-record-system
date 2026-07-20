@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
 public class NotConnecting(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private InlineValidator<NotConnecting> _validator = new()

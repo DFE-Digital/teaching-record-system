@@ -985,6 +985,11 @@
           "SharpZipLib": "1.4.2"
         }
       },
+      "UUID": {
+        "type": "Transitive",
+        "resolved": "1.1.1",
+        "contentHash": "K/eeCvoeofNIg2SKG04/XbrjBmAYfWEOAJ12XkwPx3dxBSAiUh5CeutPbFgiiRzyWPJqDb3m0DRrtntgIiP2wQ=="
+      },
       "xunit.v3.common": {
         "type": "Transitive",
         "resolved": "3.2.2",
@@ -1083,6 +1088,7 @@
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.99.0, )",
           "GovUk.Frontend.AspNetCore": "[4.2.1, )",
+          "GovUk.Questions.AspNetCore": "[1.0.0, )",
           "Htmx": "[1.12.0, )",
           "Htmx.TagHelpers": "[1.12.0, )",
           "Humanizer.Core": "[3.0.10, )",
@@ -1308,6 +1314,15 @@
         "contentHash": "pWuRZhx7AwjYY/CTllRiKrjcOPXEFWzBOJRzeAqrMj0OsEklnZcssVOlPVFm6XJ2ldaGRJi6xPmoTzVZrIcyGA==",
         "dependencies": {
           "Microsoft.Extensions.FileProviders.Embedded": "10.0.9"
+        }
+      },
+      "GovUk.Questions.AspNetCore": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "DkD/gZn4j9y7+39SC1bmg8zHd88+vYVnAuyYE+ERPUbPFf+kkc90u7s5+HvKcymPgqH2SRTq9EXy0cEku6QQcw==",
+        "dependencies": {
+          "UUID": "1.1.1"
         }
       },
       "GovukNotify": {

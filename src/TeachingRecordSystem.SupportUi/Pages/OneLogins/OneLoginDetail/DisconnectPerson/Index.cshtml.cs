@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.DisconnectPerson;
 
-[Journey(JourneyNames.DisconnectPerson), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DisconnectPerson), ActivatesJourney, RequireJourneyInstance]
 [TypeFilter(typeof(CheckOneLoginUserExistsFilterFactory))]
 public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
 {

@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-[Journey(JourneyNames.EditDetails), ActivatesJourney, RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditDetails), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(
     PersonService personService,
     TimeProvider timeProvider,

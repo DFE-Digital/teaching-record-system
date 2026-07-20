@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerson;
 
-[Journey(JourneyNames.ConnectPerson)]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectPerson)]
 [RequireJourneyInstance]
 [TypeFilter(typeof(CheckOneLoginUserExistsFilterFactory))]
 public class MatchModel(

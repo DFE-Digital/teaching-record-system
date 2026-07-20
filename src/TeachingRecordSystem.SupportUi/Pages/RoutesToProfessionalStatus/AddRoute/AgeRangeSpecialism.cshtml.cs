@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class AgeRangeSpecialismModel(
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,

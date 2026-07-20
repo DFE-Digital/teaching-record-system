@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
-[Journey(JourneyNames.AddMq), RequireJourneyInstance]
+[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddMq), RequireJourneyInstance]
 public class StatusModel(
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
