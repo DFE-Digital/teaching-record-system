@@ -7,17 +7,23 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DeleteAlert), RequireJourneyInstance]
+[Journey(JourneyNames.DeleteAlert)]
 public class CheckAnswersModel(
+    DeleteAlertJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     AlertService alertService,
     TimeProvider timeProvider) : PageModel
 {
-    public JourneyInstance<DeleteAlertState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -45,11 +51,7 @@ public class CheckAnswersModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.Alerts.DeleteAlert.Index(AlertId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
@@ -62,14 +64,19 @@ public class CheckAnswersModel(
         LinkUri = TrsUriHelper.TryCreateWebsiteUri(Link, out var linkUri) ? linkUri : null;
         StartDate = alertInfo.Alert.StartDate;
         EndDate = alertInfo.Alert.EndDate;
-        DeleteReason = JourneyInstance.State.DeleteReason!.Value;
-        DeleteReasonDetail = JourneyInstance.State.DeleteReasonDetail;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
+        DeleteReason = journey.State.DeleteReason!.Value;
+        DeleteReasonDetail = journey.State.DeleteReasonDetail;
+        EvidenceFile = journey.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = journey.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         var alert = HttpContext.GetCurrentAlertFeature().Alert;
         var processContext = new ProcessContext(
             ProcessType.AlertDeleting,
@@ -90,16 +97,16 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
         TempData.SetFlashNotificationBanner("Alert deleted");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(EndDate is null ? linkGenerator.Persons.PersonDetail.Alerts(PersonId) : linkGenerator.Alerts.AlertDetail(AlertId));
     }
 }

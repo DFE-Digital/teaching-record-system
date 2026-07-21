@@ -46,25 +46,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage(bool isOpenAlert)
-    {
-        // Arrange
-        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/delete", response.Headers.Location?.OriginalString);
-    }
-
-    [Theory]
     [InlineData(true, true, true, DeleteAlertReasonOption.AnotherReason)]
     [InlineData(true, false, false, DeleteAlertReasonOption.AnotherReason)]
     [InlineData(false, true, false, DeleteAlertReasonOption.AddedInError)]
@@ -134,25 +115,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task GPost_MissingDataInJourneyState_RedirectsToIndexPage(bool isOpenAlert)
-    {
-        // Arrange
-        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/delete", response.Headers.Location?.OriginalString);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
     public async Task Post_Confirm_DeletesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool isOpenAlert)
     {
         // Arrange
@@ -160,6 +122,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         EventObserver.Clear();
+
+        var state = journeyInstance.State;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -185,13 +149,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
             p.AssertProcessHasEvents<AlertDeletedEvent>();
 
             var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
-            Assert.Equal(journeyInstance.State.DeleteReason!.GetDisplayName(), changeReason.Reason);
-            Assert.Equal(journeyInstance.State.DeleteReasonDetail, changeReason.Details);
-            Assert.Equal(journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel(), changeReason.EvidenceFile);
+            Assert.Equal(state.DeleteReason!.GetDisplayName(), changeReason.Reason);
+            Assert.Equal(state.DeleteReasonDetail, changeReason.Details);
+            Assert.Equal(state.Evidence.UploadedEvidenceFile?.ToEventModel(), changeReason.EvidenceFile);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -203,7 +166,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -219,8 +185,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
             Assert.Equal($"/alerts/{alert.AlertId}", response.Headers.Location!.OriginalString);
         }
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

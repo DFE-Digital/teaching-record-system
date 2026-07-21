@@ -283,7 +283,6 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(provideAdditionalInformation, journeyInstance.State.ProvideAdditionalInformation);
         Assert.Equal(additionalInformation, journeyInstance.State.AdditionalInformation);
         Assert.Null(journeyInstance.State.DeleteReasonDetail);
@@ -319,7 +318,6 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.False(journeyInstance.State.ProvideAdditionalInformation);
         Assert.Null(journeyInstance.State.DeleteReasonDetail);
         Assert.Null(journeyInstance.State.AdditionalInformation);
@@ -336,7 +334,10 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder { { "Cancel", bool.TrueString } }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -352,8 +353,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
             Assert.Equal($"/alerts/{alert.AlertId}", response.Headers.Location!.OriginalString);
         }
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

@@ -2,15 +2,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 public class DeleteAlertLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(Guid alertId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/DeleteAlert/Index", routeValues: new { alertId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string Index(Guid alertId) =>
+        linkGenerator.GetRequiredPathByPage("/Alerts/DeleteAlert/Index", routeValues: new { alertId });
 
-    public string Cancel(Guid alertId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/DeleteAlert/Index", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+    public string Index(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Alerts/DeleteAlert/Index", journeyInstanceId, returnUrl);
 
-    public string CheckAnswers(Guid alertId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/DeleteAlert/CheckAnswers", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswersCancel(Guid alertId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/DeleteAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Alerts/DeleteAlert/CheckAnswers", journeyInstanceId);
 }
