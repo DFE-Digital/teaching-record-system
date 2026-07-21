@@ -1,11 +1,16 @@
-@page "/alerts/{alertId}/start-date/check-answers/{handler?}"
+@page "/alerts/{alertId}/start-date/check-answers"
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate.CheckAnswersModel
 @{
     ViewBag.Title = "Check details before editing alert";
+    var returnUrl = Request.GetEncodedPathAndQuery();
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    @if (Model.BackLink is not null)
+    {
+        <govuk-back-link href="@Model.BackLink">Back</govuk-back-link>
+    }
 }
 
 <div class="govuk-grid-row">
@@ -19,7 +24,7 @@
                     <key>New start date</key>
                     <value>@Model.NewStartDate.ToString(WebConstants.DateDisplayFormat)</value>
                     <row-actions>
-                        <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</action>
+                        <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Index(Model.InstanceId, returnUrl: returnUrl)" visually-hidden-text="new start date">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -35,7 +40,7 @@
                     <key>Reason</key>
                     <value>@Model.ChangeReason.GetDisplayName()</value>
                     <row-actions>
-                        <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</action>
+                        <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.InstanceId, returnUrl: returnUrl)" visually-hidden-text="reason for change">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -44,7 +49,7 @@
                         @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
                     </value>
                     <row-actions>
-                        <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</action>
+                        <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.InstanceId, returnUrl: returnUrl)" visually-hidden-text="reason details">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -53,14 +58,14 @@
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                     </value>
                     <row-actions>
-                        <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</action>
+                        <action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.InstanceId, returnUrl: returnUrl)" visually-hidden-text="evidence">Change</action>
                     </row-actions>
                 </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm and update alert</govuk-button>
-                <govuk-button formaction="@LinkGenerator.Alerts.EditAlert.StartDate.CheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
