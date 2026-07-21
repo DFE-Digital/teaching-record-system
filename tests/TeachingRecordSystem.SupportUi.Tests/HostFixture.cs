@@ -1,3 +1,4 @@
+using GovUk.Questions.AspNetCore.Testing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -99,7 +100,8 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()
                     .AddStartupTask<AddTestRouteTypesStartupTask>()
                     .AddOneLoginService()
-                    .AddSupportTaskServices();
+                    .AddSupportTaskServices()
+                    .AddGovUkQuestionsTestingServices();
 
                 TestScopedServices.ConfigureServices(services);
             });

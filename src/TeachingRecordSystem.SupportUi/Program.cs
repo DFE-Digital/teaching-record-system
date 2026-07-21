@@ -75,6 +75,8 @@ public class Program
         app.UseRouting();
         app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/_hangfire"), a => a.UseTransactions());
 
+        app.UseSession();
+
         app.UseAuthentication();
         app.UseAuthorization();
 

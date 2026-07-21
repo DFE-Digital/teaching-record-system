@@ -109,7 +109,7 @@
 
     @if (Model.CanAddAlert)
     {
-        <govuk-button-link href="@LinkGenerator.Alerts.AddAlert.Index(person.PersonId, journeyInstanceId: null)" class="govuk-!-margin-bottom-0" data-testid="AddAnAlertBtn">Add an alert</govuk-button-link>
+        <govuk-button-link href="@LinkGenerator.Alerts.AddAlert.Index(person.PersonId)" class="govuk-!-margin-bottom-0" data-testid="AddAnAlertBtn">Add an alert</govuk-button-link>
     }
 </div>
 

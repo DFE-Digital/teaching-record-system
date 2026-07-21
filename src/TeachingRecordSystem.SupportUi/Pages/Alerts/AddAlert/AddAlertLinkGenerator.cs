@@ -2,42 +2,24 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 public class AddAlertLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string Index(Guid personId) =>
+        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Index", routeValues: new { personId });
 
-    public string Type(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Type", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string Type(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Alerts/AddAlert/Type", journeyInstanceId, returnUrl);
 
-    public string TypeCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Type", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string Details(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Alerts/AddAlert/Details", journeyInstanceId, returnUrl);
 
-    public string Details(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Details", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string Link(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Alerts/AddAlert/Link", journeyInstanceId, returnUrl);
 
-    public string DetailsCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Details", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string StartDate(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Alerts/AddAlert/StartDate", journeyInstanceId, returnUrl);
 
-    public string Link(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Link", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string Reason(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Alerts/AddAlert/Reason", journeyInstanceId, returnUrl);
 
-    public string LinkCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Link", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string StartDate(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/StartDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string StartDateCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/StartDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string Reason(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Reason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string ReasonCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/Reason", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswers(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswersCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Alerts/AddAlert/CheckAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Alerts/AddAlert/CheckAnswers", journeyInstanceId);
 }

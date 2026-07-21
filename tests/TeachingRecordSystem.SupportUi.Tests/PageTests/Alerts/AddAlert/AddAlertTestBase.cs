@@ -1,3 +1,4 @@
+using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
@@ -5,10 +6,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<AddAlertState>> CreateEmptyJourneyInstanceAsync(Guid personId) =>
+    protected Task<AddAlertJourneyCoordinator> CreateEmptyJourneyInstanceAsync(Guid personId) =>
         CreateJourneyInstanceAsync(personId, new());
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Guid personId, bool populateOptional = true, bool provideAdditionalInformation = false, AddAlertReasonOption addReasonOption = AddAlertReasonOption.AnotherReason)
+    protected async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceForAllStepsCompletedAsync(Guid personId, bool populateOptional = true, bool provideAdditionalInformation = false, AddAlertReasonOption addReasonOption = AddAlertReasonOption.AnotherReason)
     {
         var alertType = await GetKnownAlertTypeAsync();
 
@@ -37,21 +38,21 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
         });
     }
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, bool populateOptional = true)
+    protected async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, bool populateOptional = true)
     {
         var alertType = await GetKnownAlertTypeAsync();
 
         return await CreateJourneyInstanceForCompletedStepAsync(step, personId, alertType, populateOptional);
     }
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, Guid alertTypeId, bool populateOptional = true)
+    protected async Task<AddAlertJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, Guid alertTypeId, bool populateOptional = true)
     {
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertTypeId);
 
         return await CreateJourneyInstanceForCompletedStepAsync(step, personId, alertType, populateOptional);
     }
 
-    protected Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, AlertType alertType, bool populateOptional = true)
+    protected Task<AddAlertJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, AlertType alertType, bool populateOptional = true)
     {
         return
             (step switch
@@ -99,11 +100,28 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
     protected Task<AlertType> GetKnownAlertTypeAsync(bool isDbsAlertType = false) =>
         isDbsAlertType ? TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("") : TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("T4");
 
-    private Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceAsync(Guid personId, AddAlertState state) =>
-        CreateJourneyInstance(
+    protected AddAlertState? GetJourneyInstanceState(AddAlertJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (AddAlertState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
+
+    private Task<AddAlertJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, AddAlertState state) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<AddAlertJourneyCoordinator>(
             JourneyNames.AddAlert,
-            state ?? new AddAlertState(),
-            new KeyValuePair<string, object>("personId", personId));
+            new RouteValueDictionary { ["personId"] = personId },
+            _ => Task.FromResult<object>(state),
+            pathUrls:
+            [
+                $"/alerts/add/type?personId={personId}",
+                $"/alerts/add/details?personId={personId}",
+                $"/alerts/add/link?personId={personId}",
+                $"/alerts/add/start-date?personId={personId}",
+                $"/alerts/add/reason?personId={personId}",
+                $"/alerts/add/check-answers?personId={personId}",
+            ]);
 
     public static class JourneySteps
     {

@@ -45,23 +45,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToReasonPage()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/reason?personId={person.PersonId}", response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [InlineData(true, true, AddAlertReasonOption.AnotherReason)]
     [InlineData(false, false, AddAlertReasonOption.RoutineNotificationFromStakeholder)]
@@ -142,6 +125,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
 
         EventObserver.Clear();
 
+        var state = journeyInstance.State;
+
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -160,14 +145,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
             p.AssertProcessHasEvents<AlertCreatedEvent>();
 
             var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
-            Assert.Equal(journeyInstance.State.AddReason!.GetDisplayName(), changeReason.Reason);
-            Assert.Equal(addAlertReasonOption == AddAlertReasonOption.AnotherReason ? journeyInstance.State.AddReasonDetail : null, changeReason.Details);
-            Assert.Equal(provideAdditionalInformation == true ? journeyInstance.State.AdditionalInformation : null, changeReason.AdditionalInformation);
-            Assert.Equal(populateOptional ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel() : null, changeReason.EvidenceFile);
+            Assert.Equal(state.AddReason!.GetDisplayName(), changeReason.Reason);
+            Assert.Equal(addAlertReasonOption == AddAlertReasonOption.AnotherReason ? state.AddReasonDetail : null, changeReason.Details);
+            Assert.Equal(provideAdditionalInformation == true ? state.AdditionalInformation : null, changeReason.AdditionalInformation);
+            Assert.Equal(populateOptional ? state.Evidence.UploadedEvidenceFile?.ToEventModel() : null, changeReason.EvidenceFile);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -177,7 +161,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional: true);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -185,8 +172,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

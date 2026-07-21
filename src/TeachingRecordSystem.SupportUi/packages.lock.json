@@ -19,9 +19,9 @@
       },
       "GovUk.Questions.AspNetCore": {
         "type": "Direct",
-        "requested": "[1.0.0, )",
-        "resolved": "1.0.0",
-        "contentHash": "DkD/gZn4j9y7+39SC1bmg8zHd88+vYVnAuyYE+ERPUbPFf+kkc90u7s5+HvKcymPgqH2SRTq9EXy0cEku6QQcw==",
+        "requested": "[1.0.1, )",
+        "resolved": "1.0.1",
+        "contentHash": "KcVexLKlM5aXx6TxMGEXwCzEPXEnyUskssp6w404NbByVSVvuR28nfav7S81oyHnfM+l+TeIuU8Hqw9RTD+oUw==",
         "dependencies": {
           "UUID": "1.1.1"
         }
@@ -217,8 +217,7 @@
         "resolved": "11.11.0",
         "contentHash": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
         "dependencies": {
-          "FluentValidation": "11.11.0",
-          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
+          "FluentValidation": "11.11.0"
         }
       },
       "Google.Api.Gax": {
@@ -412,11 +411,6 @@
         "type": "Transitive",
         "resolved": "10.0.10",
         "contentHash": "2gLDordUCGf3aNOOuqtTbP5mxhiP9nk6TnvGiE3RnqT891O+Zf/qKu1PIREubs1M16A0SImr4vULBfU5BTDs1Q=="
-      },
-      "Microsoft.Extensions.DependencyInjection.Abstractions": {
-        "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ=="
       },
       "Microsoft.Extensions.DependencyModel": {
         "type": "Transitive",

@@ -7,20 +7,23 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddAlert), RequireJourneyInstance]
+[Journey(JourneyNames.AddAlert)]
 public class CheckAnswersModel(
+    AddAlertJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     AlertService alertService,
     TimeProvider timeProvider) : PageModel
 {
-    public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -47,29 +50,30 @@ public class CheckAnswersModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Reason(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        AlertTypeId = JourneyInstance.State.AlertTypeId!.Value;
-        AlertTypeName = JourneyInstance.State.AlertTypeName;
-        Details = JourneyInstance.State.Details;
-        Link = JourneyInstance.State.Link;
+        AlertTypeId = journey.State.AlertTypeId!.Value;
+        AlertTypeName = journey.State.AlertTypeName;
+        Details = journey.State.Details;
+        Link = journey.State.Link;
         LinkUri = TrsUriHelper.TryCreateWebsiteUri(Link, out var linkUri) ? linkUri : null;
-        StartDate = JourneyInstance.State.StartDate!.Value;
-        AddReason = JourneyInstance.State.AddReason!.Value;
-        AddReasonDetail = JourneyInstance.State.AddReasonDetail;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
+        StartDate = journey.State.StartDate!.Value;
+        AddReason = journey.State.AddReason!.Value;
+        AddReasonDetail = journey.State.AddReasonDetail;
+        EvidenceFile = journey.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = journey.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         var processContext = new ProcessContext(
             ProcessType.AlertCreating,
             timeProvider.UtcNow,
@@ -94,16 +98,16 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
         TempData.SetFlashNotificationBanner("Alert added");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 }

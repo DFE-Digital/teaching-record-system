@@ -146,7 +146,6 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.False(journeyInstance.State.AddLink);
         Assert.Null(journeyInstance.State.Link);
     }
@@ -209,7 +208,6 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.AddLink);
         Assert.Equal(link, journeyInstance.State.Link);
     }
@@ -233,7 +231,6 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.False(journeyInstance.State.AddLink);
         Assert.Null(journeyInstance.State.Link);
     }
@@ -245,7 +242,10 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -253,8 +253,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

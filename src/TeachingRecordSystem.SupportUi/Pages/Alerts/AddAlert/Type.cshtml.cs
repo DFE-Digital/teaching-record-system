@@ -9,8 +9,9 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddAlert), RequireJourneyInstance]
+[Journey(JourneyNames.AddAlert)]
 public class TypeModel(
+    AddAlertJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager,
@@ -21,13 +22,15 @@ public class TypeModel(
         v => v.RuleFor(m => m.AlertTypeId).AlertType(requiredMessage: "Select an alert type")
     };
 
-    public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -40,36 +43,40 @@ public class TypeModel(
 
     public void OnGet()
     {
-        AlertTypeId = JourneyInstance!.State.AlertTypeId;
+        AlertTypeId = journey.State.AlertTypeId;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
         var selectedType = AlertTypes!.Single(t => t.AlertTypeId == AlertTypeId);
 
-        await JourneyInstance!.UpdateStateAsync(
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.AddAlert.Details(journey.InstanceId),
             state =>
             {
                 state.AlertTypeId = AlertTypeId;
                 state.AlertTypeName = selectedType.Name;
             });
-
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.AddAlert.Details(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        BackLink = journey.GetBackLink();
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;

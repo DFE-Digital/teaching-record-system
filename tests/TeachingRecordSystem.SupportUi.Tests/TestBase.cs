@@ -1,3 +1,4 @@
+using GovUk.Questions.AspNetCore.Testing;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Extensions.Time.Testing;
@@ -48,6 +49,8 @@ public abstract class TestBase
     protected HttpClient HttpClient { get; }
 
     protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    protected JourneyHelper JourneyHelper => HostFixture.Services.GetRequiredService<JourneyHelper>();
 
     protected TestableFeatureProvider FeatureProvider => TestScopedServices.GetCurrent().FeatureProvider;
 
