@@ -79,8 +79,12 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
 }
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-public class CheckAlertExistsFilterFactory(Permissions.Alerts requiredPermission) : Attribute, IFilterFactory
+public class CheckAlertExistsFilterFactory(Permissions.Alerts requiredPermission) : Attribute, IFilterFactory, IOrderedFilter
 {
+    // Run before the filter that creates journey instances so that the CurrentAlertFeature is available
+    // to a journey's starting state.
+    public int Order => -200;
+
     public bool IsReusable => false;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>

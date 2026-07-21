@@ -5,25 +5,32 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertDetails), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
+[Journey(JourneyNames.EditAlertDetails), StartsJourney]
+public class IndexModel(
+    EditAlertDetailsJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController) : PageModel
 {
     public const int DetailsMaxLength = 4000;
 
     private readonly InlineValidator<IndexModel> _validator = new()
     {
         v => v.RuleFor(m => m.Details)
+            .Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage("Enter details")
             .MaximumLength(DetailsMaxLength).WithMessage("Details must be 4000 characters or less")
+            .Must((m, details) => details != m.CurrentDetails).WithMessage("Enter changed details")
     };
 
-    public JourneyInstance<EditAlertDetailsState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -36,37 +43,27 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public void OnGet()
     {
-        Details = JourneyInstance!.State.Details;
+        Details = journey.State.Details;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Details == CurrentDetails)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(Details), "Enter changed details");
+            return await CancelAsync();
         }
 
-        _validator.ValidateAndThrow(this);
+        await _validator.ValidateAndThrowAsync(this);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.Details = Details;
-        });
-
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.EditAlert.Details.CheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.EditAlert.Details.Reason(AlertId, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.EditAlert.Details.Reason(journey.InstanceId),
+            state => state.Details = Details);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
@@ -75,10 +72,10 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        JourneyInstance!.State.EnsureInitialized(alertInfo);
-
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         CurrentDetails = alertInfo.Alert.Details;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Alerts.AlertDetail(AlertId);
     }
 }

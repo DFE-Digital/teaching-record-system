@@ -6,8 +6,11 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertDetails), RequireJourneyInstance]
-public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+[Journey(JourneyNames.EditAlertDetails)]
+public class ReasonModel(
+    EditAlertDetailsJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
@@ -25,16 +28,17 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
         v => v.RuleFor(m => m.ChangeReasonDetail)
             .NotEmpty().WithMessage("Enter a reason")
             .When(m => m.ChangeReason == AlertChangeDetailsReasonOption.AnotherReason),
-
     };
 
-    public JourneyInstance<EditAlertDetailsState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -58,11 +62,13 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.Details is null)
+        if (journey.State.Details is null)
         {
-            context.Result = Redirect(linkGenerator.Alerts.EditAlert.Details.Index(AlertId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Alerts.EditAlert.Details.Index(journey.InstanceId));
             return;
         }
+
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
@@ -72,39 +78,42 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 
     public void OnGet()
     {
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        Evidence = JourneyInstance.State.Evidence;
+        ChangeReason = journey.State.ChangeReason;
+        ProvideAdditionalInformation = journey.State.ProvideAdditionalInformation;
+        AdditionalInformation = journey.State.AdditionalInformation;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail;
+        Evidence = journey.State.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
+        if (Cancel)
         {
-            return this.PageWithErrors();
+            return await CancelAsync();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.ChangeReason = ChangeReason;
-            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
-            state.ChangeReasonDetail = ChangeReason == AlertChangeDetailsReasonOption.AnotherReason ? ChangeReasonDetail : null;
-            state.AdditionalInformation = ProvideAdditionalInformation!.Value ? AdditionalInformation : null;
-            state.Evidence = Evidence;
-        });
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.UploadAsync(Evidence);
 
-        return Redirect(linkGenerator.Alerts.EditAlert.Details.CheckAnswers(AlertId, JourneyInstance.InstanceId));
+        await _validator.ValidateAndThrowAsync(this);
+
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.EditAlert.Details.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.ChangeReason = ChangeReason;
+                state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+                state.ChangeReasonDetail = ChangeReason == AlertChangeDetailsReasonOption.AnotherReason ? ChangeReasonDetail : null;
+                state.AdditionalInformation = ProvideAdditionalInformation!.Value ? AdditionalInformation : null;
+                state.Evidence = Evidence;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 }
