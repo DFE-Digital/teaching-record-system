@@ -5,19 +5,31 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertStartDate), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.EditAlertStartDate), StartsJourney]
 public class IndexModel(
+    EditAlertStartDateJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     TimeProvider timeProvider) : PageModel
 {
-    public JourneyInstance<EditAlertStartDateState>? JourneyInstance { get; set; }
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.StartDate)
+            .Cascade(CascadeMode.Stop)
+            .NotNull().WithMessage("Enter a start date")
+            .LessThanOrEqualTo(timeProvider.Today).WithMessage("Start date cannot be in the future")
+            .Must((m, startDate) => startDate != m.PreviousStartDate).WithMessage("Enter a different start date")
+    };
+
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -30,40 +42,27 @@ public class IndexModel(
 
     public void OnGet()
     {
-        StartDate = JourneyInstance!.State.StartDate;
+        StartDate = journey.State.StartDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (StartDate is null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(StartDate), "Enter a start date");
-        }
-        else if (StartDate > timeProvider.Today)
-        {
-            ModelState.AddModelError(nameof(StartDate), "Start date cannot be in the future");
-        }
-        else if (StartDate == PreviousStartDate)
-        {
-            ModelState.AddModelError(nameof(StartDate), "Enter a different start date");
+            return await CancelAsync();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state => state.StartDate = StartDate);
-
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.EditAlert.StartDate.CheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.EditAlert.StartDate.Reason(AlertId, JourneyInstance!.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.EditAlert.StartDate.Reason(journey.InstanceId),
+            state => state.StartDate = StartDate);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
@@ -72,10 +71,10 @@ public class IndexModel(
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        JourneyInstance!.State.EnsureInitialized(alertInfo);
-
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         PreviousStartDate = alertInfo.Alert.StartDate;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Alerts(PersonId);
     }
 }
