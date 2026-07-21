@@ -1,7 +1,7 @@
 using GovUk.Questions.AspNetCore;
 using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
+namespace TeachingRecordSystem.SupportUi.Tests;
 
 public static class JourneyCoordinatorExtensions
 {
