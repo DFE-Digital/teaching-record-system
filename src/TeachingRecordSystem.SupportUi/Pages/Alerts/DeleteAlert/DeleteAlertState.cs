@@ -4,14 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
-public class DeleteAlertState : IRegisterJourney
+public class DeleteAlertState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.DeleteAlert,
-        typeof(DeleteAlertState),
-        requestDataKeys: ["alertId"],
-        appendUniqueKey: true);
-
     public DeleteAlertReasonOption? DeleteReason { get; set; }
 
     public bool? ProvideAdditionalInformation { get; set; }

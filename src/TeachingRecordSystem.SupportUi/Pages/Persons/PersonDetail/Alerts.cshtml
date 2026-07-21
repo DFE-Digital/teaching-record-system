@@ -40,7 +40,7 @@
                 @if (canWrite)
                 {
                     <card-actions>
-                        <action href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="alert">Delete</action>
+                        <action href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId)" visually-hidden-text="alert">Delete</action>
                     </card-actions>
                 }
                 <govuk-summary-list>
@@ -143,7 +143,7 @@
                         <td class="govuk-table__cell">
                             @if (canWrite)
                             {
-                                <a href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a>
+                                <a href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a>
                             }
                         </td>
                     </tr>

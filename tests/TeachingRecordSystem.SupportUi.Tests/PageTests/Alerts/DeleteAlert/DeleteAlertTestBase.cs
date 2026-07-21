@@ -1,3 +1,4 @@
+using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
@@ -5,10 +6,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
 public class DeleteAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<DeleteAlertState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+    protected Task<DeleteAlertJourneyCoordinator> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
         CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true, DeleteAlertReasonOption deleteReason = DeleteAlertReasonOption.AnotherReason, bool provideAdditionalInformation = false) =>
+    protected Task<DeleteAlertJourneyCoordinator> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true, DeleteAlertReasonOption deleteReason = DeleteAlertReasonOption.AnotherReason, bool provideAdditionalInformation = false) =>
         CreateJourneyInstanceAsync(alert.AlertId, new DeleteAlertState
         {
             DeleteReason = deleteReason,
@@ -27,7 +28,7 @@ public class DeleteAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture
             AdditionalInformation = provideAdditionalInformation == true ? "Some additional information" : null
         });
 
-    protected Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
+    protected Task<DeleteAlertJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
@@ -37,11 +38,24 @@ public class DeleteAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceAsync(Guid alertId, DeleteAlertState state) =>
-        CreateJourneyInstance(
+    protected DeleteAlertState? GetJourneyInstanceState(DeleteAlertJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (DeleteAlertState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
+
+    private Task<DeleteAlertJourneyCoordinator> CreateJourneyInstanceAsync(Guid alertId, DeleteAlertState state) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<DeleteAlertJourneyCoordinator>(
             JourneyNames.DeleteAlert,
-            state,
-            new KeyValuePair<string, object>("alertId", alertId));
+            new RouteValueDictionary { ["alertId"] = alertId },
+            _ => Task.FromResult<object>(state),
+            pathUrls:
+            [
+                $"/alerts/{alertId}/delete",
+                $"/alerts/{alertId}/delete/check-answers",
+            ]);
 
     public static class JourneySteps
     {
