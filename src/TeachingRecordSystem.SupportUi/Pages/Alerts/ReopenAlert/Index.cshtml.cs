@@ -64,8 +64,7 @@ public class IndexModel(
     {
         if (Cancel)
         {
-            journey.DeleteInstance();
-            return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
+            return await CancelAsync();
         }
 
         // Upload the evidence file before validating so that it's retained if the form is re-rendered
@@ -83,6 +82,13 @@ public class IndexModel(
                 state.ChangeReasonDetail = ChangeReasonDetail;
                 state.Evidence = Evidence;
             });
+    }
+
+    private async Task<IActionResult> CancelAsync()
+    {
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
+        return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

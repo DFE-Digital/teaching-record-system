@@ -367,6 +367,28 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
+    [Fact]
+    public async Task Post_Cancel_WithUploadedEvidenceFile_DeletesTheUploadedFile()
+    {
+        // Arrange
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true);
+        var evidenceFileId = journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId;
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder { { "Cancel", bool.TrueString } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+        FileServiceMock.Verify(s => s.DeleteFileAsync(evidenceFileId), Times.Once());
+    }
+
     [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
