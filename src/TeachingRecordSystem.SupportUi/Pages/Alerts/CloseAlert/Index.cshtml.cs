@@ -5,19 +5,31 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.CloseAlert), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.CloseAlert), StartsJourney]
 public class IndexModel(
+    CloseAlertJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     TimeProvider timeProvider) : PageModel
 {
-    public JourneyInstance<CloseAlertState>? JourneyInstance { get; set; }
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.EndDate)
+            .Cascade(CascadeMode.Stop)
+            .NotNull().WithMessage("Enter an end date")
+            .LessThanOrEqualTo(timeProvider.Today).WithMessage("End date cannot be in the future")
+            .GreaterThan(m => m.StartDate).WithMessage("End date must be after the start date")
+    };
+
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -30,40 +42,27 @@ public class IndexModel(
 
     public void OnGet()
     {
-        EndDate = JourneyInstance!.State.EndDate;
+        EndDate = journey.State.EndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (EndDate is null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(EndDate), "Enter an end date");
-        }
-        else if (EndDate > timeProvider.Today)
-        {
-            ModelState.AddModelError(nameof(EndDate), "End date cannot be in the future");
-        }
-        else if (EndDate <= StartDate)
-        {
-            ModelState.AddModelError(nameof(EndDate), "End date must be after the start date");
+            return await CancelAsync();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state => state.EndDate = EndDate);
-
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.CloseAlert.CheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.CloseAlert.Reason(AlertId, JourneyInstance!.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.CloseAlert.Reason(journey.InstanceId),
+            state => state.EndDate = EndDate);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
@@ -75,6 +74,7 @@ public class IndexModel(
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         StartDate = alertInfo.Alert.StartDate;
-    }
 
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Alerts(PersonId);
+    }
 }
