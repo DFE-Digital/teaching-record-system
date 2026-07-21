@@ -51,12 +51,6 @@ public class CheckAnswersModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!journey.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.Alerts.DeleteAlert.Index(journey.InstanceId));
-            return;
-        }
-
         BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();

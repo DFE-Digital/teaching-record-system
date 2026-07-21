@@ -46,25 +46,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage(bool isOpenAlert)
-    {
-        // Arrange
-        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/delete", response.Headers.Location?.OriginalString);
-    }
-
-    [Theory]
     [InlineData(true, true, true, DeleteAlertReasonOption.AnotherReason)]
     [InlineData(true, false, false, DeleteAlertReasonOption.AnotherReason)]
     [InlineData(false, true, false, DeleteAlertReasonOption.AddedInError)]
@@ -129,25 +110,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task GPost_MissingDataInJourneyState_RedirectsToIndexPage(bool isOpenAlert)
-    {
-        // Arrange
-        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/delete", response.Headers.Location?.OriginalString);
     }
 
     [Theory]

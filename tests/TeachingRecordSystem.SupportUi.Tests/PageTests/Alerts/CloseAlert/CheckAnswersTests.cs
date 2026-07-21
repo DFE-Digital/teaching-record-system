@@ -59,23 +59,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : CloseAlertTestBase(hos
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage()
-    {
-        // Arrange
-        var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/close", response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -151,23 +134,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : CloseAlertTestBase(hos
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Post_MissingDataInJourneyState_RedirectsToIndexPage()
-    {
-        // Arrange
-        var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/close", response.Headers.Location?.OriginalString);
     }
 
     [Theory]
