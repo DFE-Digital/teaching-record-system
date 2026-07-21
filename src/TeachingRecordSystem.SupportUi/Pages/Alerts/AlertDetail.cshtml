@@ -47,7 +47,7 @@
         @if (Model.CanEdit)
         {
             <row-actions>
-                <action href="@LinkGenerator.Alerts.ReopenAlert.Index(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Remove</action>
+                <action href="@LinkGenerator.Alerts.ReopenAlert.Index(Model.Alert.AlertId)" visually-hidden-text="end date">Remove</action>
                 <action href="@LinkGenerator.Alerts.EditAlert.EndDate.Index(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Change</action>
             </row-actions>
         }

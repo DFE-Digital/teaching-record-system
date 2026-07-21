@@ -5,8 +5,11 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ReopenAlert), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+[Journey(JourneyNames.ReopenAlert), StartsJourney]
+public class IndexModel(
+    ReopenAlertJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
@@ -23,13 +26,15 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
-    public JourneyInstance<ReopenAlertState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -49,37 +54,35 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public void OnGet()
     {
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        HasAdditionalReasonDetail = JourneyInstance.State.HasAdditionalReasonDetail;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        Evidence = JourneyInstance.State.Evidence;
+        ChangeReason = journey.State.ChangeReason;
+        HasAdditionalReasonDetail = journey.State.HasAdditionalReasonDetail;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail;
+        Evidence = journey.State.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await evidenceUploadManager.ValidateAndUploadAsync<IndexModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
+        if (Cancel)
         {
-            return this.PageWithErrors();
+            journey.DeleteInstance();
+            return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.ChangeReason = ChangeReason;
-            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.ChangeReasonDetail = ChangeReasonDetail;
-            state.Evidence = Evidence;
-        });
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.UploadAsync(Evidence);
 
-        return Redirect(linkGenerator.Alerts.ReopenAlert.CheckAnswers(AlertId, JourneyInstance!.InstanceId));
-    }
+        await _validator.ValidateAndThrowAsync(this);
 
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.ReopenAlert.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.ChangeReason = ChangeReason;
+                state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
+                state.ChangeReasonDetail = ChangeReasonDetail;
+                state.Evidence = Evidence;
+            });
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -88,5 +91,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Alerts.AlertDetail(AlertId);
     }
 }

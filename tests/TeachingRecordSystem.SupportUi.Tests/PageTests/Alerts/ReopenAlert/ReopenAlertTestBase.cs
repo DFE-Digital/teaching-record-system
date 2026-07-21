@@ -1,3 +1,4 @@
+using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 
@@ -5,10 +6,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.ReopenAlert;
 
 public abstract class ReopenAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<ReopenAlertState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+    protected Task<ReopenAlertJourneyCoordinator> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
         CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+    protected Task<ReopenAlertJourneyCoordinator> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
         CreateJourneyInstanceAsync(alert.AlertId, new ReopenAlertState
         {
             ChangeReason = ReopenAlertReasonOption.ClosedInError,
@@ -26,7 +27,7 @@ public abstract class ReopenAlertTestBase(HostFixture hostFixture) : TestBase(ho
             }
         });
 
-    protected Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
+    protected Task<ReopenAlertJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
@@ -36,11 +37,24 @@ public abstract class ReopenAlertTestBase(HostFixture hostFixture) : TestBase(ho
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceAsync(Guid alertId, ReopenAlertState state) =>
-        CreateJourneyInstance(
+    protected ReopenAlertState? GetJourneyInstanceState(ReopenAlertJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (ReopenAlertState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
+
+    private Task<ReopenAlertJourneyCoordinator> CreateJourneyInstanceAsync(Guid alertId, ReopenAlertState state) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<ReopenAlertJourneyCoordinator>(
             JourneyNames.ReopenAlert,
-            state,
-            new KeyValuePair<string, object>("alertId", alertId));
+            new RouteValueDictionary { ["alertId"] = alertId },
+            _ => Task.FromResult<object>(state),
+            pathUrls:
+            [
+                $"/alerts/{alertId}/reopen",
+                $"/alerts/{alertId}/reopen/check-answers",
+            ]);
 
     public static class JourneySteps
     {
