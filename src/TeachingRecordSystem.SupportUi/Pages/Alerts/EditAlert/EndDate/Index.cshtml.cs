@@ -67,7 +67,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Alerts.EditAlert.Details.Index(AlertId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

@@ -341,7 +341,6 @@ public class ReasonTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.True(journeyInstance.State.ProvideAdditionalInformation);
         Assert.Equal(additionalInformation, journeyInstance.State.AdditionalInformation);
@@ -379,7 +378,6 @@ public class ReasonTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.False(journeyInstance.State.ProvideAdditionalInformation);
         Assert.Equal(changeReasonDetail, journeyInstance.State.ChangeReasonDetail);
@@ -395,7 +393,10 @@ public class ReasonTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder { { "Cancel", bool.TrueString } }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -404,8 +405,7 @@ public class ReasonTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/persons/{person.PersonId}/alerts", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
