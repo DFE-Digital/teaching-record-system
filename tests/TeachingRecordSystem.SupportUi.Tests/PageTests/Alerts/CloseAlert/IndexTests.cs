@@ -106,7 +106,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.New, alert);
         var endDate = alert.StartDate!.Value.AddDays(5);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(endDate)
         };
@@ -214,7 +214,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
         var newEndDate = alert.StartDate!.Value.AddDays(2);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(newEndDate)
         };
@@ -226,7 +226,6 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/close/reason", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(newEndDate, journeyInstance.State.EndDate);
     }
 
@@ -237,7 +236,10 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -246,8 +248,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/persons/{person.PersonId}/alerts", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -264,7 +265,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         });
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
-        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/close?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

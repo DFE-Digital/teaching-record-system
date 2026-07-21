@@ -4,14 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
-public class CloseAlertState : IRegisterJourney
+public class CloseAlertState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.CloseAlert,
-        typeof(CloseAlertState),
-        requestDataKeys: ["alertId"],
-        appendUniqueKey: true);
-
     public DateOnly? EndDate { get; set; }
 
     public CloseAlertReasonOption? ChangeReason { get; set; }

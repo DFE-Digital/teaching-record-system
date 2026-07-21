@@ -1,11 +1,14 @@
-@page "/alerts/{alertId}/close/reason/{handler?}"
+@page "/alerts/{alertId}/close/reason"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.ReasonModel
 @{
     ViewBag.Title = "Why are you adding an end date?";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.CloseAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.CloseAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    @if (Model.BackLink is not null)
+    {
+        <govuk-back-link href="@Model.BackLink">Back</govuk-back-link>
+    }
 }
 
 <div class="govuk-grid-row">
@@ -52,7 +55,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.Alerts.CloseAlert.ReasonCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
