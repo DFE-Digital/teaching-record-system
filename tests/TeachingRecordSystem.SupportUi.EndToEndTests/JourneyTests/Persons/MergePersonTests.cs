@@ -49,10 +49,12 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_PersonsDifferOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alice").WithMiddleName("Amelia").WithLastName("Anderson")
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Bob").WithMiddleName("Brian").WithLastName("Baker")
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
@@ -102,10 +104,12 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_NavigateBack()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alice").WithMiddleName("Amelia").WithLastName("Anderson")
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Bob").WithMiddleName("Brian").WithLastName("Baker")
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
@@ -168,10 +172,12 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_CYA_ClickChangeLink_RedirectsToMergePage(string testIdSelector)
     {
         var person1 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alice").WithMiddleName("Amelia").WithLastName("Anderson")
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()).WithGender(Gender.Male));
 
         var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Bob").WithMiddleName("Brian").WithLastName("Baker")
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()).WithGender(Gender.Female));
 
@@ -224,10 +230,12 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_CYA_ChangeDetails_ContinuesToCYA(string changeLink)
     {
         var person1 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alice").WithMiddleName("Amelia").WithLastName("Anderson")
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Bob").WithMiddleName("Brian").WithLastName("Baker")
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
