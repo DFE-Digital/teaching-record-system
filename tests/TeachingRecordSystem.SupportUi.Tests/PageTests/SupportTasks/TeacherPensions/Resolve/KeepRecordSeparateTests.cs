@@ -4,16 +4,16 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions.Resolve;
 
-public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class KeepRecordSeparateTests(HostFixture hostFixture) : ResolveTeacherPensionsPotentialDuplicateTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
         var taskReference = "1234567";
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersons = [] };
-        var journeyInstance = await CreateJourneyInstance(taskReference, state);
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersons = [], PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel };
+        var journeyInstance = await CreateJourneyInstanceAsync(taskReference, state);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/resolve/keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -53,9 +53,10 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])]
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel
         };
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
 
         // Act
         var request = new HttpRequestMessage(
@@ -71,9 +72,9 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(reason, journeyInstance.State.KeepSeparateReason);
-        Assert.Equal(additionalComments, journeyInstance.State.Reason);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(reason, journeyState!.KeepSeparateReason);
+        Assert.Equal(additionalComments, journeyState!.Reason);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/confirm-keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
@@ -107,9 +108,10 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])]
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel
         };
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
 
         // Act
         var request = new HttpRequestMessage(
@@ -125,9 +127,9 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance.State.KeepSeparateReason);
-        Assert.Null(journeyInstance.State.Reason);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Null(journeyState!.KeepSeparateReason);
+        Assert.Null(journeyState!.Reason);
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         await AssertEx.HtmlResponseHasErrorAsync(response, "Reason", "Enter Reason");
     }
@@ -161,28 +163,35 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
-            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])]
+            MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel
         };
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/keep-record-separate/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
+        var pageUrl = $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        // Submit the Cancel button exactly as the rendered page defines it, rather than a URL of our
+        // own choosing — this button used to post to the check answers page, which threw.
+        var doc = await AssertEx.HtmlResponseAsync(await HttpClient.GetAsync(pageUrl));
+        var cancelButton = doc.GetElementsByTagName("button").Single(b => b.TextContent.Trim() == "Cancel");
+        Assert.Null(cancelButton.GetAttribute("formaction"));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { cancelButton.GetAttribute("name")!, cancelButton.GetAttribute("value")! }
+            }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
+        Assert.Equal("/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
-    private Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
-        string supportTaskReference,
-        ResolveTeacherPensionsPotentialDuplicateState state) =>
-        CreateJourneyInstance(
-            JourneyNames.ResolveTpsPotentialDuplicate,
-            state,
-            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 
 }

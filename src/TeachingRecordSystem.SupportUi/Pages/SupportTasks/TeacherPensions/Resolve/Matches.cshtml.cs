@@ -6,9 +6,16 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+[Journey(JourneyNames.ResolveTpsPotentialDuplicate)]
+public class MatchesModel(
+    ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
+    TrsDbContext dbContext,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(journey, dbContext)
 {
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     private readonly InlineValidator<MatchesModel> _validator = new()
     {
         v => v.RuleFor(m => m.PersonId)
@@ -34,13 +41,18 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
     public void OnGet()
     {
-        PersonId = JourneyInstance!.State.PersonId;
+        PersonId = Journey.State.PersonId;
         OneLoginEmails = DbContext.OneLoginUsers.Where(x => x.PersonId == SupportTask!.PersonId).Select(x => x.EmailAddress!)
             .ToArray();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         // Verify the submitted ID is legit
         if (PersonId is Guid personId && PersonId != Guid.Empty &&
             (!PotentialDuplicates!.Any(d => d.PersonId == personId)))
@@ -50,7 +62,11 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
 
         _validator.ValidateAndThrow(this);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
+        var nextStepUrl = PersonId == ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel ?
+            linkGenerator.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(Journey.InstanceId) :
+            linkGenerator.SupportTasks.TeacherPensions.Resolve.Merge(Journey.InstanceId);
+
+        return Journey.AdvanceTo(nextStepUrl, state =>
         {
             var oldPersonId = state.PersonId;
             state.PersonId = PersonId;
@@ -67,17 +83,12 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
                 state.TeachersPensionPersonId = SupportTask!.PersonId!;
             }
         });
-
-        return Redirect(
-            PersonId == Guid.Empty ?
-                linkGenerator.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(SupportTaskReference!, JourneyInstance!.InstanceId) :
-                linkGenerator.SupportTasks.TeacherPensions.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+        Journey.DeleteInstance();
 
         return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
@@ -87,16 +98,18 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
         SupportTask = GetSupportTask();
         RequestData = SupportTask!.TrnRequestMetadata!;
 
+        BackLink = Journey.GetBackLink() ?? linkGenerator.SupportTasks.TeacherPensions.Index();
+
         var person = await DbContext.Persons.Include(x => x.OneLoginUsers).SingleOrDefaultAsync(x => x.PersonId == SupportTask!.PersonId);
         if (person != null)
         {
             Trn = person.Trn;
         }
 
-        var matchedAttributesLookup = JourneyInstance!.State.MatchedPersons.ToDictionary(
+        var matchedAttributesLookup = Journey.State.MatchedPersons.ToDictionary(
                 mp => mp.PersonId,
                 mp => mp.MatchedAttributes);
-        var matchedPersonIds = JourneyInstance!.State.MatchedPersons.Select(p => p.PersonId).ToArray();
+        var matchedPersonIds = Journey.State.MatchedPersons.Select(p => p.PersonId).ToArray();
 
         PotentialDuplicates = (await DbContext.Persons.Include(x => x.OneLoginUsers)
             .Where(p => matchedPersonIds.Contains(p.PersonId))

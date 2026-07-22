@@ -4,24 +4,38 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class KeepRecordSeparateModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+[Journey(JourneyNames.ResolveTpsPotentialDuplicate)]
+public class KeepRecordSeparateModel(
+    ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
+    TrsDbContext dbContext,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(journey, dbContext)
 {
     [BindProperty]
     public string? Reason { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public KeepingRecordSeparateReason? KeepSeparateReason { get; set; }
 
     public void OnGet()
     {
-        KeepSeparateReason = JourneyInstance!.State.KeepSeparateReason;
+        KeepSeparateReason = Journey.State.KeepSeparateReason;
+        Reason = Journey.State.Reason;
     }
-
-    public bool? FromCheckDetails { get; set; }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+            Journey.DeleteInstance();
+
+            return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+        }
+
         if (KeepSeparateReason == KeepingRecordSeparateReason.AnotherReason && string.IsNullOrEmpty(Reason))
         {
             ModelState.AddModelError($"{nameof(Reason)}.{Reason}", "Enter Reason");
@@ -32,20 +46,17 @@ public class KeepRecordSeparateModel(TrsDbContext dbContext, SupportUiLinkGenera
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.Reason = Reason;
-            state.KeepSeparateReason = KeepSeparateReason;
-        });
-
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReason(SupportTaskReference!, JourneyInstance!.InstanceId));
+        return Journey.AdvanceTo(
+            linkGenerator.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReason(Journey.InstanceId),
+            state =>
+            {
+                state.Reason = Reason;
+                state.KeepSeparateReason = KeepSeparateReason;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override void OnPageHandlerExecuting(Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext context)
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
-
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+        BackLink = Journey.GetBackLink() ?? linkGenerator.SupportTasks.TeacherPensions.Index();
     }
 }

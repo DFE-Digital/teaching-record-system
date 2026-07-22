@@ -7,15 +7,15 @@ using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpda
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions.Resolve;
 
-public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : ResolveTeacherPensionsPotentialDuplicateTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
         var taskReference = "1234567";
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersons = [] };
-        var journeyInstance = await CreateJourneyInstance(taskReference, state);
+        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersons = [], PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel };
+        var journeyInstance = await CreateJourneyInstanceAsync(taskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/resolve/keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -55,10 +55,11 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel,
             Reason = "THIS IS A DIFFERENT RECORD",
             KeepSeparateReason = KeepingRecordSeparateReason.AnotherReason
         };
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/confirm-keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -99,10 +100,11 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel,
             KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch,
             Reason = null
         };
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/confirm-keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -143,9 +145,10 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel,
             KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch
         };
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
         EventObserver.Clear();
 
         // Act
@@ -194,8 +197,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
             "Teachers’ Pensions duplicate task completed",
             $"The records were not merged.");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -229,10 +231,11 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
+            PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel,
             KeepSeparateReason = KeepingRecordSeparateReason.AnotherReason,
             Reason = keepReason
         };
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
         EventObserver.Clear();
 
         // Act
@@ -281,16 +284,8 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
             "Teachers’ Pensions duplicate task completed",
             $"The records were not merged.");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
-    private Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
-        string supportTaskReference,
-        ResolveTeacherPensionsPotentialDuplicateState state) =>
-            CreateJourneyInstance(
-                JourneyNames.ResolveTpsPotentialDuplicate,
-                state,
-                new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 
 }

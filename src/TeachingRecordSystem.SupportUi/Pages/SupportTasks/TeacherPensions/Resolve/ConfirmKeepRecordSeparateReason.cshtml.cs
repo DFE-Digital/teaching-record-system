@@ -6,36 +6,46 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveTpsPotentialDuplicate)]
 public class ConfirmKeepRecordSeparateReasonModel(
+    ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
     TrsDbContext dbContext,
     TeacherPensionsSupportTaskService teacherPensionsSupportTaskService,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
-    TimeProvider timeProvider) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+    TimeProvider timeProvider) : ResolveTeacherPensionsPotentialDuplicatePageModel(journey, dbContext)
 {
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     public string? Reason { get; set; }
 
     public KeepingRecordSeparateReason? KeepSeparateReason { get; set; }
 
     public void OnGet()
     {
-        Reason = JourneyInstance!.State.Reason;
-        KeepSeparateReason = JourneyInstance!.State.KeepSeparateReason;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+            Journey.DeleteInstance();
+
+            return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+        }
+
         // Conditionally override the value in Reason.
         // if KeepSeparateReason is AnotherReason - the event will contain the reason provided from the user
         // if RecordDoesNotMatch, override reason using the display name from the enum
-        if (JourneyInstance!.State.KeepSeparateReason == KeepingRecordSeparateReason.RecordDoesNotMatch)
+        if (Journey.State.KeepSeparateReason == KeepingRecordSeparateReason.RecordDoesNotMatch)
         {
-            Reason = JourneyInstance!.State.KeepSeparateReason.GetDisplayName()!;
+            Reason = Journey.State.KeepSeparateReason.GetDisplayName()!;
         }
-        else if (JourneyInstance!.State.KeepSeparateReason == KeepingRecordSeparateReason.AnotherReason)
+        else if (Journey.State.KeepSeparateReason == KeepingRecordSeparateReason.AnotherReason)
         {
-            Reason = JourneyInstance!.State.Reason;
+            Reason = Journey.State.Reason;
         }
 
         var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, timeProvider.UtcNow, User.GetUserId());
@@ -52,7 +62,8 @@ public class ConfirmKeepRecordSeparateReasonModel(
             "Teachers’ Pensions duplicate task completed",
             "The records were not merged.");
 
-        await JourneyInstance!.CompleteAsync();
+        Journey.DeleteInstance();
+
         return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 
@@ -69,22 +80,11 @@ public class ConfirmKeepRecordSeparateReasonModel(
         return string.Empty;
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        BackLink = Journey.GetBackLink();
 
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        if (JourneyInstance!.State.KeepSeparateReason is null ||
-            JourneyInstance!.State.KeepSeparateReason == KeepingRecordSeparateReason.AnotherReason && string.IsNullOrEmpty(JourneyInstance!.State.Reason))
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
-            return;
-        }
-        await base.OnPageHandlerExecutionAsync(context, next);
+        Reason = Journey.State.Reason;
+        KeepSeparateReason = Journey.State.KeepSeparateReason;
     }
 }

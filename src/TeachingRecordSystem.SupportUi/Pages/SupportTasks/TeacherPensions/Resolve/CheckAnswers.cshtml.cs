@@ -7,19 +7,22 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveTpsPotentialDuplicate)]
 public class CheckAnswersModel(
+    ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     TeacherPensionsSupportTaskService teacherPensionsSupportTaskService,
     EvidenceUploadManager evidenceController,
     TimeProvider timeProvider,
-    PersonChangeableAttributesService changedService) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+    PersonChangeableAttributesService changedService) : ResolveTeacherPensionsPotentialDuplicatePageModel(journey, dbContext)
 {
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     public string? SourceApplicationUserName { get; set; }
 
     public bool MergingRecord { get; set; }
@@ -64,19 +67,10 @@ public class CheckAnswersModel(
     {
         var supportTask = GetSupportTask();
         var requestData = supportTask.TrnRequestMetadata!;
-        var state = JourneyInstance!.State;
+        var state = Journey.State;
 
-        if (state.PersonId is not Guid personId)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
+        BackLink = Journey.GetBackLink();
 
-        if (personId != CreateNewRecordPersonIdSentinel && !state.PersonAttributeSourcesSet)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
         Debug.Assert(state.PersonId is not null);
 
         var selectedPerson = await DbContext.Persons
@@ -105,7 +99,7 @@ public class CheckAnswersModel(
 
         MergeComments = state.MergeComments;
         PotentialDuplicate = requestData.PotentialDuplicate;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        EvidenceFile = Journey.State.Evidence.UploadedEvidenceFile;
 
         ResolvableAttributes = changedService.GetResolvableAttributes(
         [
@@ -126,9 +120,17 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+            Journey.DeleteInstance();
+
+            return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+        }
+
         var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, timeProvider.UtcNow, User.GetUserId());
 
-        var existingPersonId = JourneyInstance!.State.PersonId!.Value;
+        var existingPersonId = Journey.State.PersonId!.Value;
 
         await teacherPensionsSupportTaskService.ResolveWithMergeAsync(
             new()
@@ -154,14 +156,7 @@ public class CheckAnswersModel(
                 b.AppendHtml(span);
             });
 
-        await JourneyInstance!.CompleteAsync();
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        Journey.DeleteInstance();
 
         return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
