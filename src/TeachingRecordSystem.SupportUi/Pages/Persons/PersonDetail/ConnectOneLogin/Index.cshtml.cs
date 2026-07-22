@@ -6,9 +6,9 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectOneLogin)]
-[ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.ConnectOneLogin), StartsJourney]
 public class IndexModel(
+    ConnectOneLoginJourneyCoordinator journey,
     TrsDbContext dbContext,
     OneLoginService oneLoginService,
     SupportUiLinkGenerator linkGenerator) : PageModel
@@ -21,23 +21,32 @@ public class IndexModel(
             .EmailAddress()
     };
 
-    public JourneyInstance<ConnectOneLoginState>? JourneyInstance { get; set; }
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
     [BindProperty]
     public string? EmailAddress { get; set; }
 
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public string? BackLink { get; set; }
+
     public string? Trn { get; set; }
 
     public void OnGet()
     {
-        EmailAddress = JourneyInstance?.State.OneLoginEmailAddress;
+        EmailAddress = journey.State.OneLoginEmailAddress;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            journey.DeleteInstance();
+            return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
         var oneLoginUser = await dbContext.OneLoginUsers
@@ -69,25 +78,21 @@ public class IndexModel(
                 EmailAddress = oneLoginUser.EmailAddress
             });
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.Subject = oneLoginUser.Subject;
-            state.OneLoginEmailAddress = oneLoginUser.EmailAddress;
-            state.MatchedAttributes = matchedAttributes;
-        });
-
-        return Redirect(linkGenerator.Persons.PersonDetail.ConnectOneLogin.Match(PersonId, JourneyInstance.InstanceId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
+        return journey.AdvanceTo(
+            linkGenerator.Persons.PersonDetail.ConnectOneLogin.Match(journey.InstanceId),
+            state =>
+            {
+                state.Subject = oneLoginUser.Subject;
+                state.OneLoginEmailAddress = oneLoginUser.EmailAddress;
+                state.MatchedAttributes = matchedAttributes;
+            });
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         Trn = context.HttpContext.GetCurrentPersonFeature().Trn;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Index(PersonId);
 
         await next();
     }

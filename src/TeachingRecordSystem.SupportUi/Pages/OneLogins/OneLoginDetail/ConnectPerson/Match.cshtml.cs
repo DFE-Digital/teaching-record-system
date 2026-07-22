@@ -6,14 +6,17 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectPerson)]
-[RequireJourneyInstance]
+[Journey(JourneyNames.ConnectPerson)]
 [TypeFilter(typeof(CheckOneLoginUserExistsFilterFactory))]
 public class MatchModel(
+    ConnectPersonJourneyCoordinator journey,
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<ConnectPersonState>? JourneyInstance { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public string OneLoginUserSubject { get; set; } = null!;
@@ -22,6 +25,7 @@ public class MatchModel(
     public string[][]? OneLoginUserVerifiedNames { get; set; }
     public DateOnly[]? OneLoginUserVerifiedDatesOfBirth { get; set; }
 
+    public Guid PersonId { get; set; }
     public string? PersonFirstName { get; set; }
     public string? PersonMiddleName { get; set; }
     public string? PersonLastName { get; set; }
@@ -33,22 +37,18 @@ public class MatchModel(
 
     public IActionResult OnPost()
     {
-        return Redirect(linkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Reason(OneLoginUserSubject, JourneyInstance!.InstanceId));
-    }
+        if (Cancel)
+        {
+            journey.DeleteInstance();
+            return Redirect(linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject));
+        }
 
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject));
+        return journey.AdvanceTo(linkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Reason(journey.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (!JourneyInstance!.State.PersonId.HasValue)
-        {
-            context.Result = NotFound();
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var oneLoginUserFeature = context.HttpContext.GetCurrentOneLoginUserFeature();
         OneLoginUserEmailAddress = oneLoginUserFeature.EmailAddress;
@@ -57,9 +57,10 @@ public class MatchModel(
 
         var person = await dbContext.Persons
             .AsNoTracking()
-            .Where(p => p.PersonId == JourneyInstance.State.PersonId)
+            .Where(p => p.PersonId == journey.State.PersonId)
             .SingleAsync();
 
+        PersonId = person.PersonId;
         PersonFirstName = person.FirstName;
         PersonMiddleName = person.MiddleName;
         PersonLastName = person.LastName;

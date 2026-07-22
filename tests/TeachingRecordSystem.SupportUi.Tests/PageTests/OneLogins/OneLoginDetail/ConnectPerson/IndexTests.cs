@@ -2,7 +2,7 @@ using TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerso
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.OneLogins.OneLoginDetail.ConnectPerson;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithValidOneLoginUserSubject_RedirectsWithJourneyInstanceId()
@@ -16,7 +16,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/one-logins/{oneLoginUser.Subject}/connect-person?{Constants.UniqueKeyQueryParameterName}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/one-logins/{oneLoginUser.Subject}/connect-person?_jid", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -25,10 +25,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -47,10 +46,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oneLoginUserSubject = "invalid-subject";
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUserSubject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUserSubject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUserSubject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -67,10 +65,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -93,10 +90,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -119,10 +115,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -146,10 +141,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
         var trn = "1234567";
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -173,10 +167,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -200,10 +193,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -220,9 +212,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(person.PersonId, journeyInstance.State.PersonId);
-        Assert.Equal(person.Trn, journeyInstance.State.PersonTrn);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(person.PersonId, journeyState!.PersonId);
+        Assert.Equal(person.Trn, journeyState!.PersonTrn);
     }
 
     [Fact]
@@ -233,10 +225,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var otherPerson = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(otherPerson);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -253,9 +244,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(person.PersonId, journeyInstance.State.PersonId);
-        Assert.Equal(person.Trn, journeyInstance.State.PersonTrn);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(person.PersonId, journeyState!.PersonId);
+        Assert.Equal(person.Trn, journeyState!.PersonTrn);
     }
 
     [Fact]
@@ -264,14 +255,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
+            new ConnectPersonState());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?handler=Cancel&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
         };
 
         // Act
@@ -281,7 +271,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/one-logins/{oneLoginUser.Subject}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 }

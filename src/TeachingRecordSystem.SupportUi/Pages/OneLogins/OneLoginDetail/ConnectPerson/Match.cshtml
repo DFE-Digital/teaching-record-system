@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Index(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    <govuk-back-link href="@Model.BackLink">Back</govuk-back-link>
 }
 
 <form method="post">
@@ -69,7 +69,7 @@
             <govuk-summary-card data-testid="record">
                 <title>Record details</title>
                 <card-actions>
-                    <action href="@LinkGenerator.Persons.PersonDetail.Index(Model.JourneyInstance!.State.PersonId!.Value)" visually-hidden-text="view record">View record (opens in a new tab)</action>
+                    <action href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId)" visually-hidden-text="view record">View record (opens in a new tab)</action>
                 </card-actions>
                 <govuk-summary-list>
                     @if (Model.PersonConnectedOneLoginEmailAddresses is not null && Model.PersonConnectedOneLoginEmailAddresses.Length > 0)
@@ -143,7 +143,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Connect record to GOV.UK One Login</govuk-button>
-                <govuk-button formaction="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.MatchCancel(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+                <govuk-button name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
             </div>
         </div>
     </div>

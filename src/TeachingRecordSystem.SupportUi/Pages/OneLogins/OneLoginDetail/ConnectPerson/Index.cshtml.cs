@@ -6,10 +6,10 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectPerson)]
-[ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.ConnectPerson), StartsJourney]
 [TypeFilter(typeof(CheckOneLoginUserExistsFilterFactory))]
 public class IndexModel(
+    ConnectPersonJourneyCoordinator journey,
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
@@ -25,21 +25,29 @@ public class IndexModel(
             .When(m => !string.IsNullOrEmpty(m.Trn))
     };
 
-    public JourneyInstance<ConnectPersonState>? JourneyInstance { get; set; }
-
     [FromRoute]
     public string OneLoginUserSubject { get; set; } = null!;
 
     [BindProperty]
     public string? Trn { get; set; }
 
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public string? BackLink { get; set; }
+
     public void OnGet()
     {
-        Trn = JourneyInstance?.State.PersonTrn;
+        Trn = journey.State.PersonTrn;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return CancelJourney();
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
         var person = await dbContext.Persons
@@ -60,18 +68,23 @@ public class IndexModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.PersonId = person.PersonId;
-            state.PersonTrn = person.Trn;
-        });
-
-        return Redirect(linkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Match(OneLoginUserSubject, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Match(journey.InstanceId),
+            state =>
+            {
+                state.PersonId = person.PersonId;
+                state.PersonTrn = person.Trn;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private IActionResult CancelJourney()
     {
-        await JourneyInstance!.DeleteAsync();
+        journey.DeleteInstance();
         return Redirect(linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject));
+    }
+
+    public override void OnPageHandlerExecuting(Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext context)
+    {
+        BackLink = journey.GetBackLink() ?? linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject);
     }
 }

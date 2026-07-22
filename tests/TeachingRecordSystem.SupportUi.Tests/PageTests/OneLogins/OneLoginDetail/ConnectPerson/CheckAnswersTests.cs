@@ -6,10 +6,10 @@ using TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerso
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.OneLogins.OneLoginDetail.ConnectPerson;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithoutJourneyInstance_ReturnsNotFound()
+    public async Task Get_WithoutJourneyInstance_ReturnsBadRequest()
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
@@ -19,36 +19,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_WithoutReason_RedirectsToReasonPage()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(
-            personId: null,
-            email: Option.Some<string?>("test@example.com"),
-            verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
-
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState
-            {
-                PersonId = person.PersonId,
-                PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/one-logins/{oneLoginUser.Subject}/connect-person/reason", response.Headers.Location?.OriginalString);
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
     [Theory]
@@ -68,15 +39,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 email: Option.Some<string?>("test@example.com"),
                 verifiedInfo: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn,
                 ConnectReason = ConnectPersonReason.DataLossOrIncompleteInformation
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -92,7 +62,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(person.Trn, summaryList.GetSummaryListValueByKey("TRN"));
         Assert.Equal("Data loss or incomplete information", summaryList.GetSummaryListValueByKey("Reason"));
 
-        var expectedChangeLink = $"/one-logins/{oneLoginUser.Subject}/connect-person/reason?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
+        var checkAnswersUrl = $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/one-logins/{oneLoginUser.Subject}/connect-person/reason?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}";
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-reason-link")?.GetAttribute("href"));
 
         var checkbox = doc.QuerySelector<IHtmlInputElement>("input[name='IdentityConfirmed'][type='checkbox']");
@@ -116,16 +87,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn,
                 ConnectReason = ConnectPersonReason.AnotherReason,
                 ReasonDetail = "Custom connection reason"
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -150,15 +120,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn,
                 ConnectReason = ConnectPersonReason.DataLossOrIncompleteInformation
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -185,15 +154,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn,
                 ConnectReason = ConnectPersonReason.DataLossOrIncompleteInformation
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -243,9 +211,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedFlashMessage = $"Record connected to {string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
         AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, expectedFlashMessage);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.NotNull(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -258,15 +224,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn,
                 ConnectReason = ConnectPersonReason.DataLossOrIncompleteInformation
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -304,9 +269,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedFlashMessage = $"Record connected to {string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
         AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, expectedFlashMessage);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.NotNull(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -319,16 +282,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn,
                 ConnectReason = ConnectPersonReason.AnotherReason,
                 ReasonDetail = "Custom connection reason details"
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -351,8 +313,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal("Custom connection reason details", changeReason.Details);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.NotNull(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 }

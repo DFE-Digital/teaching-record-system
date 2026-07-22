@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.ConnectOneLogin;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithValidPersonId_RedirectsWithJourneyInstanceId()
@@ -17,7 +17,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/persons/{person.PersonId}/connect-one-login?{Constants.UniqueKeyQueryParameterName}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/persons/{person.PersonId}/connect-one-login?_jid", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -26,10 +26,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new ConnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -63,10 +62,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new ConnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -89,10 +87,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new ConnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -116,10 +113,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var emailAddress = Faker.Internet.Email();
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new ConnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -144,10 +140,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var emailAddress = Faker.Internet.Email();
         await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(emailAddress));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new ConnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -173,10 +168,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var emailAddress = Faker.Internet.Email();
         await TestData.CreateOneLoginUserAsync(otherPerson, email: Option.Some<string?>(emailAddress));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new ConnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -204,10 +198,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>(emailAddress),
             verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new ConnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -231,14 +224,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new ConnectOneLoginState());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?handler=Cancel&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
         };
 
         // Act
@@ -248,7 +240,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 }

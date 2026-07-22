@@ -6,11 +6,8 @@
 
 @section BeforeContent {
     @{
-        var backLink = Model.FromCheckAnswers
-            ? LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.CheckAnswers(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)
-            : LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.Match(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId);
     }
-    <govuk-back-link href="@backLink">Back</govuk-back-link>
+    <govuk-back-link href="@Model.BackLink">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
@@ -47,7 +44,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.OneLogins.OneLoginDetail.ConnectPerson.ReasonCancel(Model.OneLoginUserSubject, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+                <govuk-button name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
             </div>
         </form>
     </div>
