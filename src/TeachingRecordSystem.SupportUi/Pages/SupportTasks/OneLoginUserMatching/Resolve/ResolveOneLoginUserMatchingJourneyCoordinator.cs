@@ -18,6 +18,26 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
     }
 
     /// <summary>
+    /// Gets the URL of the journey's first question, which depends on the type of support task being
+    /// resolved and whether any matching records were found.
+    /// </summary>
+    public string GetFirstStepUrl()
+    {
+        var resolveLinkGenerator = linkGenerator.SupportTasks.OneLoginUserMatching.Resolve;
+
+        // Record matching tasks have already had the person's identity verified, so they skip
+        // straight to picking a record.
+        if (HttpContext.GetCurrentSupportTaskFeature().SupportTask.SupportTaskType is not SupportTaskType.OneLoginUserRecordMatching)
+        {
+            return resolveLinkGenerator.Verify(InstanceId);
+        }
+
+        return State.MatchedPersons.Count > 0 ?
+            resolveLinkGenerator.Matches(InstanceId) :
+            resolveLinkGenerator.NoMatches(InstanceId);
+    }
+
+    /// <summary>
     /// Gets the URL of the support task list page that this journey was started from.
     /// </summary>
     public string GetListPageUrl() =>
