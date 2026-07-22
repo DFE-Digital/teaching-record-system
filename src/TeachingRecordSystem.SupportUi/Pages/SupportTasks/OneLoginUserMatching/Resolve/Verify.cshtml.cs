@@ -7,8 +7,11 @@ using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
-public class VerifyModel(ISafeFileService safeFileService, SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.ResolveOneLoginUserMatching)]
+public class VerifyModel(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
+    ISafeFileService safeFileService,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<VerifyModel> _validator = new()
     {
@@ -16,13 +19,16 @@ public class VerifyModel(ISafeFileService safeFileService, SupportUiLinkGenerato
             .NotNull().WithMessage("Select yes if you can verify this person’s identity")
     };
 
-    public JourneyInstance<ResolveOneLoginUserMatchingState>? JourneyInstance { get; set; }
-
     [FromRoute]
-    public required string? SupportTaskReference { get; set; }
+    public required string SupportTaskReference { get; set; }
 
     [BindProperty]
     public bool? Verified { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public string? BackLink { get; set; }
 
     public string? Name { get; set; }
     public string? EmailAddress { get; set; }
@@ -33,47 +39,36 @@ public class VerifyModel(ISafeFileService safeFileService, SupportUiLinkGenerato
 
     public void OnGet()
     {
-        Verified = JourneyInstance?.State.Verified;
+        Verified = journey.State.Verified;
     }
 
-    public async Task<IActionResult> OnPostAsync(bool cancel)
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (cancel)
+        if (Cancel)
         {
-            await JourneyInstance!.DeleteAsync();
+            journey.DeleteInstance();
 
             return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
         }
 
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state => state.Verified = Verified);
+        var resolveLinkGenerator = linkGenerator.SupportTasks.OneLoginUserMatching.Resolve;
 
-        return Redirect(Verified is false ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Reject(SupportTaskReference!, JourneyInstance!.InstanceId) :
-            string.IsNullOrWhiteSpace(Trn) ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NoMatches(SupportTaskReference!, JourneyInstance!.InstanceId) :
-            JourneyInstance.State.MatchedPersons.Count > 0 ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId) :
-            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NoMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
-    }
+        var nextStepUrl = Verified is false ?
+            resolveLinkGenerator.Reject(journey.InstanceId) :
+            string.IsNullOrWhiteSpace(Trn) || journey.State.MatchedPersons.Count == 0 ?
+            resolveLinkGenerator.NoMatches(journey.InstanceId) :
+            resolveLinkGenerator.Matches(journey.InstanceId);
 
-    public async Task<IActionResult> OnGetEvidenceAsync()
-    {
-        var stream = await safeFileService.OpenReadStreamAsync(Evidence!.FileId);
-        return File(stream, Evidence.MimeType);
+        return journey.AdvanceTo(nextStepUrl, state => state.Verified = Verified);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        if (supportTask.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching)
-        {
-            // Belt and braces to stop this page being used for the record matching only support task type
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink() ?? linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification();
 
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var oneLoginUser = supportTask.OneLoginUser!;
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
         Name = data.StatedFirstName + " " + data.StatedLastName;

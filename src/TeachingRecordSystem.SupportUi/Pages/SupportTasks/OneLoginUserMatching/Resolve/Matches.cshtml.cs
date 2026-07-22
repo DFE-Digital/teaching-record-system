@@ -9,8 +9,9 @@ using TeachingRecordSystem.SupportUi;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveOneLoginUserMatching)]
 public class Matches(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
     TrsDbContext dbContext,
     SupportTaskService supportTaskService,
     TimeProvider timeProvider,
@@ -31,13 +32,13 @@ public class Matches(
 
     private SupportTask? _supportTask;
 
-    public JourneyInstance<ResolveOneLoginUserMatchingState> JourneyInstance { get; set; } = null!;
-
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
     [BindProperty]
     public Guid? MatchedPersonId { get; set; }
+
+    public string? BackLink { get; set; }
 
     public string? Name { get; set; }
     public string? EmailAddress { get; set; }
@@ -45,20 +46,20 @@ public class Matches(
     public string? NationalInsuranceNumber { get; set; }
     public string? Trn { get; set; }
 
-    public bool? IsRecordMatchingOnly { get; set; }
-
     public IReadOnlyCollection<SuggestedMatchViewModel>? SuggestedMatches { get; set; }
 
     public void OnGet()
     {
-        JourneyInstance.State.ApplySavedModelStateValues(nameof(Matches), ModelState);
+        journey.State.ApplySavedModelStateValues(nameof(Matches), ModelState);
     }
 
     public async Task<IActionResult> OnPostAsync(string? action)
     {
         if (action is Actions.Cancel)
         {
-            return await HandleCancelAsync();
+            journey.DeleteInstance();
+
+            return Redirect(journey.GetListPageUrl());
         }
 
         if (action is Actions.SaveAndComeBackLater)
@@ -68,22 +69,24 @@ public class Matches(
 
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance.UpdateStateAsync(state =>
-        {
-            state.MatchedPersonId = MatchedPersonId;
-            state.ClearSavedModelStateValues(nameof(Matches));
-        });
+        var nextStepUrl = MatchedPersonId != ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmConnect(journey.InstanceId) :
+            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NotConnecting(journey.InstanceId);
 
-        return MatchedPersonId != ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel ?
-            Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmConnect(SupportTaskReference, JourneyInstance.InstanceId)) :
-            Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NotConnecting(SupportTaskReference, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            nextStepUrl,
+            state =>
+            {
+                state.MatchedPersonId = MatchedPersonId;
+                state.ClearSavedModelStateValues(nameof(Matches));
+            });
     }
 
     private async Task<IActionResult> HandleSaveAndReturnAsync()
     {
         var savedJourneyState = this.CreateSavedJourneyState(
             nameof(Matches),
-            JourneyInstance.State,
+            journey.State,
             excludeKeys: ["Action", nameof(SupportTaskReference)]);
 
         var processType = _supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
@@ -100,44 +103,17 @@ public class Matches(
             },
             processContext);
 
-        await JourneyInstance.DeleteAsync();
+        journey.DeleteInstance();
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-        {
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-        }
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
-    }
-
-    private async Task<IActionResult> HandleCancelAsync()
-    {
-        await JourneyInstance.DeleteAsync();
-
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-        {
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-        }
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+        return Redirect(journey.GetListPageUrl());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (JourneyInstance.State.Verified is not true)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
-        if (JourneyInstance.State.MatchedPersons.Count == 0)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NoMatches(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        IsRecordMatchingOnly = _supportTask.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching;
+
+        BackLink = journey.GetBackLink() ?? journey.GetListPageUrl();
+
         var oneLoginUser = _supportTask.OneLoginUser!;
         var data = _supportTask.GetData<IOneLoginUserMatchingData>();
 
@@ -149,7 +125,7 @@ public class Matches(
         Trn = TrnHelper.NormalizeTrn(data.StatedTrn);
         EmailAddress = oneLoginUser.EmailAddress;
 
-        var matchedPersonIds = JourneyInstance.State.MatchedPersons.Select(m => m.PersonId).ToArray();
+        var matchedPersonIds = journey.State.MatchedPersons.Select(m => m.PersonId).ToArray();
         SuggestedMatches = (await dbContext.Persons
             .Include(p => p.PreviousNames)
             .Where(p => matchedPersonIds.Contains(p.PersonId))
@@ -182,7 +158,7 @@ public class Matches(
                     .OrderBy(n => n.CreatedOn)
                     .Select(n => $"{n.FirstName} {n.MiddleName} {n.LastName}")
                     .ToArray(),
-                MatchedAttributeTypes = JourneyInstance.State.MatchedPersons.Single(m => m.PersonId == match.PersonId)
+                MatchedAttributeTypes = journey.State.MatchedPersons.Single(m => m.PersonId == match.PersonId)
                     .MatchedAttributes
                     .Select(kvp => kvp.Key)
                     .ToArray()

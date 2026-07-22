@@ -7,15 +7,21 @@ using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
-public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskService, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.ResolveOneLoginUserMatching)]
+public class ConfirmReject(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
+    OneLoginUserMatchingSupportTaskService supportTaskService,
+    TimeProvider timeProvider,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
 
-    [FromRoute]
-    public string SupportTaskReference { get; set; } = null!;
+    [BindProperty]
+    public bool Cancel { get; set; }
 
-    public JourneyInstance<ResolveOneLoginUserMatchingState> JourneyInstance { get; set; } = null!;
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     public string? EmailAddress { get; set; }
 
@@ -29,11 +35,11 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
     {
     }
 
-    public async Task<IActionResult> OnPostAsync(bool cancel)
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (cancel)
+        if (Cancel)
         {
-            await JourneyInstance.DeleteAsync();
+            journey.DeleteInstance();
 
             return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
         }
@@ -44,12 +50,12 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
             new NotVerifiedOutcomeOptions
             {
                 SupportTask = _supportTask!,
-                RejectReason = JourneyInstance.State.RejectReason!.Value,
-                RejectionAdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails
+                RejectReason = journey.State.RejectReason!.Value,
+                RejectionAdditionalDetails = journey.State.RejectionAdditionalDetails
             },
             processContext);
 
-        await JourneyInstance.DeleteAsync();
+        journey.DeleteInstance();
 
         var data = _supportTask!.GetData<OneLoginUserIdVerificationData>();
         TempData.SetFlashNotificationBanner(
@@ -62,24 +68,14 @@ public class ConfirmReject(OneLoginUserMatchingSupportTaskService supportTaskSer
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance.State.Verified is not false)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
-        if (JourneyInstance.State.RejectReason is null)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Reject(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var data = _supportTask.GetData<OneLoginUserIdVerificationData>();
 
         EmailAddress = _supportTask.OneLoginUser!.EmailAddress!;
         Name = $"{data.StatedFirstName} {data.StatedLastName}";
-        Reason = JourneyInstance.State.RejectReason!.Value;
-        AdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails;
+        Reason = journey.State.RejectReason!.Value;
+        AdditionalDetails = journey.State.RejectionAdditionalDetails;
     }
 }
