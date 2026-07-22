@@ -9,17 +9,20 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resol
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTrnRequest), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveTrnRequest)]
 public class CheckAnswers(
+    ResolveTrnRequestJourneyCoordinator journey,
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider,
     PersonChangeableAttributesService changedService) :
-    ResolveTrnRequestPageModel(dbContext)
+    ResolveTrnRequestPageModel(journey, dbContext)
 {
-    [FromRoute]
-    public string? SupportTaskReference { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public JourneyInstanceId InstanceId => Journey.InstanceId;
 
     public string? SourceApplicationUserName { get; set; }
 
@@ -65,9 +68,16 @@ public class CheckAnswers(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            Journey.DeleteInstance();
+
+            return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
+        }
+
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var trnRequest = supportTask.TrnRequestMetadata!;
-        var state = JourneyInstance!.State;
+        var state = Journey.State;
 
         var processContext = new ProcessContext(ProcessType.TrnRequestResolving, timeProvider.UtcNow, User.GetUserId());
 
@@ -100,12 +110,7 @@ public class CheckAnswers(
             $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {string.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
             buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(resolvedPersonId)));
 
-        return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
+        Journey.DeleteInstance();
 
         return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
     }
@@ -113,19 +118,9 @@ public class CheckAnswers(
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var requestData = GetRequestData();
-        var state = JourneyInstance!.State;
+        var state = Journey.State;
 
-        if (state.PersonId is not Guid personId)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TrnRequests.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
-
-        if (personId != CreateNewRecordPersonIdSentinel && !state.PersonAttributeSourcesSet)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TrnRequests.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
+        BackLink = Journey.GetBackLink();
 
         if (state.PersonId == CreateNewRecordPersonIdSentinel)
         {

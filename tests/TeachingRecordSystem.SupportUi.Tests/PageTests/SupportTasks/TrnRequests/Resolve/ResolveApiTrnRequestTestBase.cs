@@ -1,9 +1,51 @@
+using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequests.Resolve;
 
 public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    protected async Task<ResolveTrnRequestState> CreateStateAsync(SupportTask supportTask)
+    {
+        // Resolve TrnRequestService from its own scope so that it doesn't share a DbContext with the
+        // test's other operations.
+        await using var scope = HostFixture.Services.CreateAsyncScope();
+        var trnRequestService = scope.ServiceProvider.GetRequiredService<TrnRequestService>();
+
+        return await ResolveTrnRequestJourneyCoordinator.CreateStateAsync(trnRequestService, supportTask);
+    }
+
+    protected Task<ResolveTrnRequestJourneyCoordinator> CreateJourneyInstanceAsync(
+        string supportTaskReference,
+        ResolveTrnRequestState state)
+    {
+        var basePath = $"/support-tasks/trn-requests/{supportTaskReference}/resolve";
+
+        // Seed the path the real journey would have built up by this point, so that every page is
+        // reachable and back links match production. Creating a new record skips the Merge step —
+        // there are no attribute sources to choose — so it must not appear in the path.
+        string[] pathUrls = state.PersonId == ResolveTrnRequestState.CreateNewRecordPersonIdSentinel
+            ? [$"{basePath}/matches", $"{basePath}/check-answers"]
+            : [$"{basePath}/matches", $"{basePath}/merge", $"{basePath}/check-answers"];
+
+        return JourneyHelper.CreateInstanceAsync<ResolveTrnRequestJourneyCoordinator>(
+            JourneyNames.ResolveTrnRequest,
+            new RouteValueDictionary { ["supportTaskReference"] = supportTaskReference },
+            _ => Task.FromResult<object>(state),
+            pathUrls: pathUrls,
+            // JourneyHelper activates coordinators with Activator.CreateInstance, which can't supply
+            // this one's constructor dependencies.
+            coordinatorFactory: () => ActivatorUtilities.CreateInstance<ResolveTrnRequestJourneyCoordinator>(HostFixture.Services));
+    }
+
+    protected ResolveTrnRequestState? GetJourneyInstanceState(ResolveTrnRequestJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (ResolveTrnRequestState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
+
     protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());

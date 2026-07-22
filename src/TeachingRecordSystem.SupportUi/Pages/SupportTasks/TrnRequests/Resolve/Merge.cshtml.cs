@@ -2,18 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve.ResolveTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTrnRequest), RequireJourneyInstance]
-public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveTrnRequestPageModel(dbContext)
+[Journey(JourneyNames.ResolveTrnRequest)]
+public class Merge(
+    ResolveTrnRequestJourneyCoordinator journey,
+    TrsDbContext dbContext,
+    SupportUiLinkGenerator linkGenerator) : ResolveTrnRequestPageModel(journey, dbContext)
 {
-    [FromRoute]
-    public string? SupportTaskReference { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? SourceApplicationUserName { get; set; }
 
@@ -57,18 +56,25 @@ public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 
     public void OnGet()
     {
-        FirstNameSource = JourneyInstance!.State.FirstNameSource;
-        MiddleNameSource = JourneyInstance!.State.MiddleNameSource;
-        LastNameSource = JourneyInstance!.State.LastNameSource;
-        DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
-        EmailAddressSource = JourneyInstance!.State.EmailAddressSource;
-        NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
-        GenderSource = JourneyInstance!.State.GenderSource;
-        Comments = JourneyInstance!.State.Comments;
+        FirstNameSource = Journey.State.FirstNameSource;
+        MiddleNameSource = Journey.State.MiddleNameSource;
+        LastNameSource = Journey.State.LastNameSource;
+        DateOfBirthSource = Journey.State.DateOfBirthSource;
+        EmailAddressSource = Journey.State.EmailAddressSource;
+        NationalInsuranceNumberSource = Journey.State.NationalInsuranceNumberSource;
+        GenderSource = Journey.State.GenderSource;
+        Comments = Journey.State.Comments;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public IActionResult OnPost()
     {
+        if (Cancel)
+        {
+            Journey.DeleteInstance();
+
+            return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
+        }
+
         if (FirstName!.Different && FirstNameSource is null)
         {
             ModelState.AddModelError(nameof(FirstNameSource), "Select a first name");
@@ -109,48 +115,32 @@ public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.FirstNameSource = FirstNameSource;
-            state.MiddleNameSource = MiddleNameSource;
-            state.LastNameSource = LastNameSource;
-            state.DateOfBirthSource = DateOfBirthSource;
-            state.EmailAddressSource = EmailAddressSource;
-            state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
-            state.GenderSource = GenderSource;
-            state.PersonAttributeSourcesSet = true;
-            state.Comments = Comments;
-        });
-
-        return Redirect(linkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-
-        return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
+        return Journey.AdvanceTo(
+            linkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(Journey.InstanceId),
+            state =>
+            {
+                state.FirstNameSource = FirstNameSource;
+                state.MiddleNameSource = MiddleNameSource;
+                state.LastNameSource = LastNameSource;
+                state.DateOfBirthSource = DateOfBirthSource;
+                state.EmailAddressSource = EmailAddressSource;
+                state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
+                state.GenderSource = GenderSource;
+                state.PersonAttributeSourcesSet = true;
+                state.Comments = Comments;
+            });
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var requestData = GetRequestData();
-        var state = JourneyInstance!.State;
+        var state = Journey.State;
+        var personId = state.PersonId!.Value;
 
-        if (state.PersonId is not Guid personId)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TrnRequests.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
-
-        if (state.PersonId == CreateNewRecordPersonIdSentinel)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
+        BackLink = Journey.GetBackLink();
 
         var personAttributes = await GetPersonAttributesAsync(personId);
-        var attributeMatches = JourneyInstance!.State.MatchedPersons
+        var attributeMatches = state.MatchedPersons
             .Single(m => m.PersonId == personId)
             .MatchedAttributes;
 

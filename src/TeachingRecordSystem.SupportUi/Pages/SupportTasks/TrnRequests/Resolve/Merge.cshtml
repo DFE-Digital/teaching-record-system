@@ -1,4 +1,4 @@
-@page "/support-tasks/trn-requests/{supportTaskReference}/resolve/merge/{handler?}"
+@page "/support-tasks/trn-requests/{supportTaskReference}/resolve/merge"
 @using TeachingRecordSystem.SupportUi.Pages.Shared
 @using TeachingRecordSystem.Core.Models.SupportTasks
 @using TeachingRecordSystem.SupportUi.Services
@@ -9,9 +9,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers ?
-                         LinkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
-                         LinkGenerator.SupportTasks.TrnRequests.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId))" />
+    <govuk-back-link href="@Model.BackLink" />
 }
 
 @functions {
@@ -142,7 +140,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TrnRequests.Resolve.MergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>
