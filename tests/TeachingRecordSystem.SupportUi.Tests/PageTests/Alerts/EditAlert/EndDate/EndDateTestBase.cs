@@ -1,3 +1,4 @@
+using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
@@ -5,13 +6,12 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDat
 
 public abstract class EndDateTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<EditAlertEndDateState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+    protected Task<EditAlertEndDateJourneyCoordinator> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
         CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+    protected Task<EditAlertEndDateJourneyCoordinator> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
         CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState
         {
-            Initialized = true,
             CurrentEndDate = alert.EndDate,
             EndDate = alert.EndDate!.Value.AddDays(-5),
             ChangeReason = AlertChangeEndDateReasonOption.AnotherReason,
@@ -29,19 +29,17 @@ public abstract class EndDateTestBase(HostFixture hostFixture) : TestBase(hostFi
             }
         });
 
-    protected Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
+    protected Task<EditAlertEndDateJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
                 CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState
                 {
-                    Initialized = true,
                     CurrentEndDate = alert.EndDate
                 }),
             JourneySteps.Index =>
                 CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState
                 {
-                    Initialized = true,
                     CurrentEndDate = alert.EndDate,
                     EndDate = alert.EndDate!.Value.AddDays(-5)
                 }),
@@ -50,11 +48,25 @@ public abstract class EndDateTestBase(HostFixture hostFixture) : TestBase(hostFi
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceAsync(Guid alertId, EditAlertEndDateState state) =>
-        CreateJourneyInstance(
+    protected EditAlertEndDateState? GetJourneyInstanceState(EditAlertEndDateJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (EditAlertEndDateState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
+
+    private Task<EditAlertEndDateJourneyCoordinator> CreateJourneyInstanceAsync(Guid alertId, EditAlertEndDateState state) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<EditAlertEndDateJourneyCoordinator>(
             JourneyNames.EditAlertEndDate,
-            state,
-            new KeyValuePair<string, object>("alertId", alertId));
+            new RouteValueDictionary { ["alertId"] = alertId },
+            _ => Task.FromResult<object>(state),
+            pathUrls:
+            [
+                $"/alerts/{alertId}/end-date",
+                $"/alerts/{alertId}/end-date/reason",
+                $"/alerts/{alertId}/end-date/check-answers",
+            ]);
 
     public static class JourneySteps
     {
