@@ -990,8 +990,8 @@
           "AngleSharp": "[1.5.2, )",
           "Azure.Storage.Blobs": "[12.26.0, )",
           "Azure.Storage.Files.DataLake": "[12.24.0, )",
-          "CloudNative.CloudEvents": "[2.8.0, )",
-          "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
+          "CloudNative.CloudEvents": "[2.9.0, )",
+          "CloudNative.CloudEvents.SystemTextJson": "[2.9.0, )",
           "CsvHelper": "[33.1.0, )",
           "DfeAnalytics.EFCore": "[0.5.2, )",
           "EFCore.BulkExtensions.PostgreSql": "[10.0.1, )",
@@ -1142,17 +1142,17 @@
       },
       "CloudNative.CloudEvents": {
         "type": "CentralTransitive",
-        "requested": "[2.8.0, )",
-        "resolved": "2.8.0",
-        "contentHash": "RvabvAQV7u3FZcZL5UlRmFz3/T5nMl86GpChpRvHKRHbO+/I4LBcZ0xRqYnNfAh30gM+h/JkSBHEnbhl0zmGtA=="
+        "requested": "[2.9.0, )",
+        "resolved": "2.9.0",
+        "contentHash": "Qh8/MS3YBI78Q5+AVXN/hNQZkhFW5OyDHdn4Wi05ZzlylKOsTypBiQQ1u0U8iOZ24HMe8Hc0VH2CIwnY4YTGEA=="
       },
       "CloudNative.CloudEvents.SystemTextJson": {
         "type": "CentralTransitive",
-        "requested": "[2.8.0, )",
-        "resolved": "2.8.0",
-        "contentHash": "En3Bvf7tTbGyB/AWJIPGw8ksh1OgiSI3cBXmNvuH9+PMR4l0vVRlp9YsTu+gY7S/0VFyJDHP66P3uZHzgsRQ7w==",
+        "requested": "[2.9.0, )",
+        "resolved": "2.9.0",
+        "contentHash": "gkf4+RRR8W4VmB7hZr0Wie5VYz+oRKJnuj5CLtyKANa+Yq+eynMqVBnmnjWf8hvgCVDAzyvM2iq6THZageO8jA==",
         "dependencies": {
-          "CloudNative.CloudEvents": "2.8.0"
+          "CloudNative.CloudEvents": "2.9.0"
         }
       },
       "CsvHelper": {
