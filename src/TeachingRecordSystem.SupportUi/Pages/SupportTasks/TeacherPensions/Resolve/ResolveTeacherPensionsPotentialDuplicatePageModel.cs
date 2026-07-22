@@ -6,15 +6,18 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbContext dbContext) : PageModel
+public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(
+    ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
+    TrsDbContext dbContext) : PageModel
 {
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    public string? BackLink { get; set; }
 
-    public JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    protected ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator Journey => journey;
 
     protected TrsDbContext DbContext => dbContext!;
 
@@ -28,7 +31,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
     /// middle name is kept.
     protected PersonAttributeSources GetPersonAttributeSources()
     {
-        var state = JourneyInstance!.State;
+        var state = journey.State;
 
         if (!state.PersonAttributeSourcesSet)
         {

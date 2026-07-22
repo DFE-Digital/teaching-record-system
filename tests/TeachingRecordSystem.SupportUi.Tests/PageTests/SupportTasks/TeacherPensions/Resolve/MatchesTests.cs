@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions.Resolve;
 
-public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPotentialDuplicateTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
@@ -539,8 +539,8 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(duplicatePerson1.PersonId, journeyInstance.State.PersonId);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(duplicatePerson1.PersonId, journeyState!.PersonId);
     }
 
     [Fact]
@@ -593,8 +593,8 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(Guid.Empty, journeyInstance.State.PersonId);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(Guid.Empty, journeyState!.PersonId);
     }
 
     private void AssertMatchRowHasExpectedHighlight(IElement matchDetails, string summaryListKey, bool expectHighlight)
@@ -613,26 +613,19 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    private async Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
+    private async Task<ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator> CreateJourneyInstance(
         SupportTask supportTask,
         MatchPersonsResultPerson[] matchedPersons,
         bool useFactory = true)
     {
         var state = useFactory
-            ? await CreateJourneyStateWithFactory<ResolveTeacherPensionsPotentialDuplicateStateFactory, ResolveTeacherPensionsPotentialDuplicateState>(factory => factory.CreateAsync(supportTask))
+            ? await CreateStateAsync(supportTask)
             : new ResolveTeacherPensionsPotentialDuplicateState
             {
                 MatchedPersons = matchedPersons
             };
 
-        return await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        return await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
     }
 
-    private Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
-            string supportTaskReference,
-            ResolveTeacherPensionsPotentialDuplicateState state) =>
-        CreateJourneyInstance(
-            JourneyNames.ResolveTpsPotentialDuplicate,
-            state,
-            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 }

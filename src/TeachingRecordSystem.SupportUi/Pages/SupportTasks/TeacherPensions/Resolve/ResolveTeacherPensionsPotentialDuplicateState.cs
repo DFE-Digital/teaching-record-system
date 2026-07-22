@@ -1,20 +1,15 @@
-using System.Diagnostics;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-public class ResolveTeacherPensionsPotentialDuplicateState : IRegisterJourney
+public class ResolveTeacherPensionsPotentialDuplicateState
 {
-    public static Guid CreateNewRecordPersonIdSentinel => Guid.Empty;
-
-    public static JourneyDescriptor Journey { get; } = new(
-        JourneyNames.ResolveTpsPotentialDuplicate,
-        typeof(ResolveTeacherPensionsPotentialDuplicateState),
-        ["supportTaskReference"],
-        appendUniqueKey: true);
+    /// <summary>
+    /// The value the Matches page submits for "keep the records separate" rather than picking a record.
+    /// </summary>
+    public static Guid KeepRecordSeparatePersonIdSentinel => Guid.Empty;
 
     public required IReadOnlyCollection<MatchPersonsResultPerson> MatchedPersons { get; init; }
     public Guid? PersonId { get; set; }
@@ -31,33 +26,4 @@ public class ResolveTeacherPensionsPotentialDuplicateState : IRegisterJourney
     public KeepingRecordSeparateReason? KeepSeparateReason { get; set; }
     public Guid? TeachersPensionPersonId { get; set; }
     public EvidenceUploadModel Evidence { get; set; } = new();
-}
-
-public class ResolveTeacherPensionsPotentialDuplicateStateFactory(TrnRequestService trnRequestService) : IJourneyStateFactory<ResolveTeacherPensionsPotentialDuplicateState>
-{
-    public Task<ResolveTeacherPensionsPotentialDuplicateState> CreateAsync(CreateJourneyStateContext context)
-    {
-        var supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        return CreateAsync(supportTask);
-    }
-
-    public async Task<ResolveTeacherPensionsPotentialDuplicateState> CreateAsync(SupportTask supportTask)
-    {
-        Debug.Assert(supportTask.SupportTaskType is SupportTaskType.TeacherPensionsPotentialDuplicate);
-        var requestData = supportTask.TrnRequestMetadata!;
-
-        var matchResult = await trnRequestService.MatchPersonsAsync(requestData, excludePersonIds: supportTask.PersonId!.Value);
-
-        var state = new ResolveTeacherPensionsPotentialDuplicateState
-        {
-            MatchedPersons = matchResult.Outcome switch
-            {
-                MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonsResultPerson(matchResult.PersonId, matchResult.MatchedAttributes)],
-                MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.ToArray(),
-                _ => []
-            }
-        };
-
-        return state;
-    }
 }
