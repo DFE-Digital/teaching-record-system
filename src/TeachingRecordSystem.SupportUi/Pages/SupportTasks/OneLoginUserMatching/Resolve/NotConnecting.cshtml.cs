@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
@@ -20,8 +19,6 @@ public class NotConnecting(
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount).WithMessage($"Additional detail must be {UiDefaults.ReasonDetailsMaxCharacterCount} characters or less")
             .When(x => x.Reason is OneLoginUserNotConnectingReason.AnotherReason)
     };
-
-    private SupportTask? _supportTask;
 
     [BindProperty]
     public OneLoginUserNotConnectingReason? Reason { get; set; }
@@ -46,7 +43,7 @@ public class NotConnecting(
         {
             journey.DeleteInstance();
 
-            return Redirect(GetListPageUrl());
+            return Redirect(journey.GetListPageUrl());
         }
 
         await _validator.ValidateAndThrowAsync(this);
@@ -60,15 +57,8 @@ public class NotConnecting(
             });
     }
 
-    private string GetListPageUrl() =>
-        _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
-
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-
         BackLink = journey.GetBackLink();
     }
 }

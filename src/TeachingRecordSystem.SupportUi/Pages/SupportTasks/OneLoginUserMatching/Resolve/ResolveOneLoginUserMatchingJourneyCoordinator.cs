@@ -6,7 +6,9 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
 [JourneyCoordinator(JourneyNames.ResolveOneLoginUserMatching, routeValueKeys: ["supportTaskReference"])]
-public class ResolveOneLoginUserMatchingJourneyCoordinator(OneLoginService oneLoginService) :
+public class ResolveOneLoginUserMatchingJourneyCoordinator(
+    OneLoginService oneLoginService,
+    SupportUiLinkGenerator linkGenerator) :
     JourneyCoordinator<ResolveOneLoginUserMatchingState>
 {
     public override Task<ResolveOneLoginUserMatchingState> GetStartingStateAsync()
@@ -14,6 +16,14 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(OneLoginService oneLo
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         return CreateStateAsync(oneLoginService, supportTask);
     }
+
+    /// <summary>
+    /// Gets the URL of the support task list page that this journey was started from.
+    /// </summary>
+    public string GetListPageUrl() =>
+        HttpContext.GetCurrentSupportTaskFeature().SupportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public static async Task<ResolveOneLoginUserMatchingState> CreateStateAsync(
         OneLoginService oneLoginService,

@@ -12,8 +12,7 @@ public class ConfirmConnect(
     ResolveOneLoginUserMatchingJourneyCoordinator journey,
     OneLoginUserMatchingSupportTaskService supportTaskService,
     TrsDbContext dbContext,
-    TimeProvider timeProvider,
-    SupportUiLinkGenerator linkGenerator) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -48,7 +47,7 @@ public class ConfirmConnect(
         {
             journey.DeleteInstance();
 
-            return Redirect(GetListPageUrl());
+            return Redirect(journey.GetListPageUrl());
         }
 
         var matchedPerson = journey.State.MatchedPersons
@@ -87,13 +86,8 @@ public class ConfirmConnect(
             $"GOV.UK One Login connected to {MatchedPersonName}’s record",
             $"We’ve sent {MatchedPersonName} an email confirming their GOV.UK One Login has been connected to their teaching record.");
 
-        return Redirect(GetListPageUrl());
+        return Redirect(journey.GetListPageUrl());
     }
-
-    private string GetListPageUrl() =>
-        _supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {

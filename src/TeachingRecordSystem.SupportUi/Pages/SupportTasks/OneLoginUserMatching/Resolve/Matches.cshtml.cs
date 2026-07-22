@@ -103,26 +103,21 @@ public class Matches(
 
         journey.DeleteInstance();
 
-        return Redirect(GetListPageUrl());
+        return Redirect(journey.GetListPageUrl());
     }
 
     private IActionResult HandleCancel()
     {
         journey.DeleteInstance();
 
-        return Redirect(GetListPageUrl());
+        return Redirect(journey.GetListPageUrl());
     }
-
-    private string GetListPageUrl() =>
-        _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
-        BackLink = journey.GetBackLink() ?? GetListPageUrl();
+        BackLink = journey.GetBackLink() ?? journey.GetListPageUrl();
 
         var oneLoginUser = _supportTask.OneLoginUser!;
         var data = _supportTask.GetData<IOneLoginUserMatchingData>();

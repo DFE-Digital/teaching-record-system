@@ -11,8 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 public class ConfirmNotConnecting(
     ResolveOneLoginUserMatchingJourneyCoordinator journey,
     OneLoginUserMatchingSupportTaskService supportTaskService,
-    TimeProvider timeProvider,
-    SupportUiLinkGenerator linkGenerator) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -39,7 +38,7 @@ public class ConfirmNotConnecting(
         {
             journey.DeleteInstance();
 
-            return Redirect(GetListPageUrl());
+            return Redirect(journey.GetListPageUrl());
         }
 
         bool emailSent = false;
@@ -90,13 +89,8 @@ public class ConfirmNotConnecting(
             messageText: emailSent ? emailSentMessage : $"Request closed for {personName}.",
             notificationBannerType: NotificationBannerType.Default);
 
-        return Redirect(GetListPageUrl());
+        return Redirect(journey.GetListPageUrl());
     }
-
-    private string GetListPageUrl() =>
-        _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {

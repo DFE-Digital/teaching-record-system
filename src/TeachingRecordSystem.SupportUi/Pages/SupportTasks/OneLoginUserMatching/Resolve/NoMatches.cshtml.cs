@@ -10,7 +10,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 [Journey(JourneyNames.ResolveOneLoginUserMatching)]
 public class NoMatches(
     ResolveOneLoginUserMatchingJourneyCoordinator journey,
-    SupportUiLinkGenerator linkGenerator,
     OneLoginUserMatchingSupportTaskService supportTaskService,
     TimeProvider timeProvider) : PageModel
 {
@@ -35,7 +34,7 @@ public class NoMatches(
         {
             journey.DeleteInstance();
 
-            return Redirect(GetListPageUrl());
+            return Redirect(journey.GetListPageUrl());
         }
 
         bool emailSent;
@@ -80,19 +79,14 @@ public class NoMatches(
             messageText: emailSent ? emailSentMessage : $"Request closed for {Name}.",
             notificationBannerType: NotificationBannerType.Default);
 
-        return Redirect(GetListPageUrl());
+        return Redirect(journey.GetListPageUrl());
     }
-
-    private string GetListPageUrl() =>
-        _supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
-        BackLink = journey.GetBackLink() ?? GetListPageUrl();
+        BackLink = journey.GetBackLink() ?? journey.GetListPageUrl();
 
         var data = _supportTask.GetData<IOneLoginUserMatchingData>();
 
