@@ -171,8 +171,8 @@
       },
       "EntityFrameworkCore.Projectables.Abstractions": {
         "type": "Transitive",
-        "resolved": "6.0.4",
-        "contentHash": "pkXXJTR5v3RlKxaUx+MbGxt0r7T/8KAXxtYIhI5sY0800kT136FEU/tENxaO3sKJ5+hF6hmcyiHQD8yvgH/+xA=="
+        "resolved": "6.0.6",
+        "contentHash": "iG8qvidAzVn3J8I90inFyZi+Z1KXvKYRlfe2Df8xC6EPa1jc7lX33+O258LYkNmbCFt6E5Pa1OdXHLyYiyarlA=="
       },
       "Google.Api.Gax": {
         "type": "Transitive",
@@ -995,7 +995,7 @@
           "DfeAnalytics.EFCore": "[0.5.2, )",
           "EFCore.BulkExtensions.PostgreSql": "[10.0.1, )",
           "EFCore.NamingConventions": "[10.0.0, )",
-          "EntityFrameworkCore.Projectables": "[6.0.4, )",
+          "EntityFrameworkCore.Projectables": "[6.0.6, )",
           "FluentValidation": "[12.1.1, )",
           "GovukNotify": "[8.1.0, )",
           "Hangfire.Core": "[1.8.24, )",
@@ -1162,11 +1162,11 @@
       },
       "EntityFrameworkCore.Projectables": {
         "type": "CentralTransitive",
-        "requested": "[6.0.4, )",
-        "resolved": "6.0.4",
-        "contentHash": "9V3INByDW4et9KQZPr4vXqQ1TMiC0vcrmxr5w//PC1WGvRfsdnLCmHra3C8NUPIqEuDic+3hHMVXMwewfelSYA==",
+        "requested": "[6.0.6, )",
+        "resolved": "6.0.6",
+        "contentHash": "cTTQHm5cmIt26gkRA/xn1y22BaVyZxAOGSd/Cu15TJ5/9RfMkOPEI3x0un5PmxGaiZwx2YwGUZYdQ52pAzIPaA==",
         "dependencies": {
-          "EntityFrameworkCore.Projectables.Abstractions": "6.0.4",
+          "EntityFrameworkCore.Projectables.Abstractions": "6.0.6",
           "Microsoft.EntityFrameworkCore": "10.0.0"
         }
       },
