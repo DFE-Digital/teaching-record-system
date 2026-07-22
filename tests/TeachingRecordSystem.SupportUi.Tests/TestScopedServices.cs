@@ -29,6 +29,9 @@ public class TestScopedServices
         BlobStorageFileServiceMock
             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
             .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
+        BlobStorageFileServiceMock
+            .Setup(s => s.TryGetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+            .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
         BlobStorageSafeFileServiceMock = new();
         BlobStorageSafeFileServiceMock
             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))

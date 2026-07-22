@@ -51,6 +51,17 @@ public class BlobStorageFileService : IFileService
         return blobClient.GenerateSasUri(sasBuilder).ToString();
     }
 
+    public async Task<string?> TryGetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
+    {
+        var blobClient = await GetBlobClientAsync(fileId);
+        if (!await blobClient.ExistsAsync())
+        {
+            return null;
+        }
+
+        return await GetFileUrlAsync(fileId, expiresAfter);
+    }
+
     public async Task<Stream> OpenReadStreamAsync(Guid fileId)
     {
         var blobClient = await GetBlobClientAsync(fileId);

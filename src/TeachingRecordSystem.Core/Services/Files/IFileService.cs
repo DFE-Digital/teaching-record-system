@@ -8,6 +8,8 @@ public interface IFileService
 
     Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter);
 
+    Task<string?> TryGetFileUrlAsync(Guid fileId, TimeSpan expiresAfter);
+
     Task<Stream> OpenReadStreamAsync(Guid fileId);
 
     Task<bool> DeleteFileAsync(Guid fileId);

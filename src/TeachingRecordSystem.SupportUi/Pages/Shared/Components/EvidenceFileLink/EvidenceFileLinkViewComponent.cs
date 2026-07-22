@@ -12,8 +12,15 @@ public class EvidenceFileLinkViewComponent(
     {
         if (evidenceFile is UploadedEvidenceFile file)
         {
-            var fileUrl = await fileService.GetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry);
-            file.PreviewUrl = linkGenerator.Files.File(file.FileName, fileUrl);
+            var fileUrl = await fileService.TryGetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry);
+            if (fileUrl is not null)
+            {
+                file.PreviewUrl = linkGenerator.Files.File(file.FileName, fileUrl);
+            }
+            else
+            {
+                file.IsDeleted = true;
+            }
         }
 
         return View(evidenceFile);

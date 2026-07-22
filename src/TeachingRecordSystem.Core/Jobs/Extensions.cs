@@ -41,6 +41,11 @@ public static class Extensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<DeleteOldEvidenceFilesJobOptions>()
+            .Bind(configuration.GetSection("DeleteOldEvidenceFilesJob"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         string GetRecurringJobSchedule(string cronExpression) =>
             configuration.GetValue<bool>("RecurringJobsEnabled") && environment.IsProduction() ? cronExpression : Cron.Never();
 
@@ -290,6 +295,12 @@ public static class Extensions
                 nameof(BackfillAuthzRegistrationTokenJob),
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(BackfillAuthzRegistrationTokenJob.JobSchedule));
+
+            var deleteOldEvidenceFilesJobOptions = sp.GetRequiredService<IOptions<DeleteOldEvidenceFilesJobOptions>>().Value;
+            recurringJobManager.AddOrUpdate<DeleteOldEvidenceFilesJob>(
+                nameof(DeleteOldEvidenceFilesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                GetRecurringJobSchedule(deleteOldEvidenceFilesJobOptions.JobSchedule));
 
             recurringJobManager.RemoveIfExists("BackfillAlertProcessesJob (dry-run)");
             recurringJobManager.RemoveIfExists("BackfillAlertProcessesJob");
