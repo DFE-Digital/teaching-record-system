@@ -7,19 +7,19 @@ using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveOneLoginUserMatching)]
 public class ConfirmConnect(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
     OneLoginUserMatchingSupportTaskService supportTaskService,
     TrsDbContext dbContext,
-    TimeProvider timeProvider,
-    SupportUiLinkGenerator linkGenerator) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     private SupportTask? _supportTask;
 
-    [FromRoute]
-    public string SupportTaskReference { get; set; } = null!;
+    [BindProperty]
+    public bool Cancel { get; set; }
 
-    public JourneyInstance<ResolveOneLoginUserMatchingState> JourneyInstance { get; set; } = null!;
+    public string? BackLink { get; set; }
 
     public Guid MatchedPersonId { get; set; }
 
@@ -41,21 +41,16 @@ public class ConfirmConnect(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync(bool cancel)
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (cancel)
+        if (Cancel)
         {
-            await JourneyInstance.DeleteAsync();
+            journey.DeleteInstance();
 
-            if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-            {
-                return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-            }
-
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+            return Redirect(journey.GetListPageUrl());
         }
 
-        var matchedPerson = JourneyInstance.State.MatchedPersons
+        var matchedPerson = journey.State.MatchedPersons
             .Single(m => m.PersonId == MatchedPersonId);
 
         if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
@@ -85,38 +80,26 @@ public class ConfirmConnect(
                 processContext);
         }
 
-        await JourneyInstance.DeleteAsync();
+        journey.DeleteInstance();
 
         TempData.SetFlashNotificationBanner(
             $"GOV.UK One Login connected to {MatchedPersonName}’s record",
             $"We’ve sent {MatchedPersonName} an email confirming their GOV.UK One Login has been connected to their teaching record.");
 
-        return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+        return Redirect(journey.GetListPageUrl());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (JourneyInstance.State.Verified is not true)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
-        if (JourneyInstance.State.MatchedPersonId is null)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Matches(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+
+        BackLink = journey.GetBackLink();
 
         OneLoginUserEmailAddress = _supportTask.OneLoginUser!.EmailAddress;
 
         var matchedPerson = await dbContext.Persons
             .Include(p => p.PreviousNames)
-            .SingleAsync(p => p.PersonId == JourneyInstance.State.MatchedPersonId);
+            .SingleAsync(p => p.PersonId == journey.State.MatchedPersonId);
 
         MatchedPersonId = matchedPerson.PersonId;
         MatchedPersonName = $"{matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}";

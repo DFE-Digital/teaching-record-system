@@ -4,62 +4,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUs
 
 public class ConfirmRejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTestBase(hostFixture)
 {
-    [Theory]
-    [InlineData(true)]
-    [InlineData(null)]
-    public async Task Get_UserIsNotUnverified_RedirectsToIndex(bool? verified)
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s => s.Verified = verified);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-reject?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
-    public async Task Get_ReasonNotChosen_RedirectsToRejectPage()
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s =>
-            {
-                s.Verified = false;
-                s.RejectReason = null;
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-reject?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/reject?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
     [Fact]
     public async Task Get_ShowsExpectedData()
     {
@@ -181,7 +125,6 @@ public class ConfirmRejectTests(HostFixture hostFixture) : ResolveOneLoginUserMa
             "/support-tasks/one-login-user-matching/id-verification",
             response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 }

@@ -5,9 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.IsRecordMatchingOnly is true ?
-        LinkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching() :
-        LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Verify(Model.SupportTaskReference, Model.JourneyInstance.InstanceId))" />
+    <govuk-back-link href="@Model.BackLink" />
 }
 
 <form method="post">

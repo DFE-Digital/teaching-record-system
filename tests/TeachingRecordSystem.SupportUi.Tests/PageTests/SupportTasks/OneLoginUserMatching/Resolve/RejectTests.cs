@@ -4,33 +4,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUs
 
 public class RejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTestBase(hostFixture)
 {
-    [Theory]
-    [InlineData(true)]
-    [InlineData(null)]
-    public async Task Get_UserIsNotUnverified_RedirectsToIndex(bool? verified)
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s => s.Verified = verified);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/reject?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
     [Fact]
     public async Task Get_ValidRequest_ReturnsOk()
     {
@@ -163,8 +136,8 @@ public class RejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
             $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-reject?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest, journeyInstance.State.RejectReason);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest, journeyState!.RejectReason);
     }
 
     [Fact]
@@ -199,9 +172,9 @@ public class RejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
             $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-reject?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(OneLoginIdVerificationRejectReason.AnotherReason, journeyInstance.State.RejectReason);
-        Assert.Equal(additionalDetails, journeyInstance.State.RejectionAdditionalDetails);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(OneLoginIdVerificationRejectReason.AnotherReason, journeyState!.RejectReason);
+        Assert.Equal(additionalDetails, journeyState!.RejectionAdditionalDetails);
     }
 
     [Fact]
@@ -235,7 +208,6 @@ public class RejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
             "/support-tasks/one-login-user-matching/id-verification",
             response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 }

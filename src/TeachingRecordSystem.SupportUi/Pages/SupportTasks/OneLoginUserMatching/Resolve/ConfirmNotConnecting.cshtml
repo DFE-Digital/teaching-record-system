@@ -1,14 +1,16 @@
 @page "/support-tasks/one-login-user-matching/{supportTaskReference}/resolve/confirm-not-connecting"
+@using Microsoft.AspNetCore.Http.Extensions
 @using TeachingRecordSystem.Core.Models.SupportTasks
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve.ConfirmNotConnecting
 @{
     ViewBag.Title = "Confirm you’re not connecting the GOV.UK One Login";
 
     var resolveLinkGenerator = LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve;
+    var returnUrl = Request.GetEncodedPathAndQuery();
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NotConnecting(Model.SupportTaskReference, Model.JourneyInstance.InstanceId)" />
+    <govuk-back-link href="@Model.BackLink" />
 }
 
 <form method="post">
@@ -26,7 +28,7 @@
                     <key>Reason</key>
                     <value>@Model.Reason.GetDisplayName()</value>
                     <row-actions>
-                        <action href="@resolveLinkGenerator.NotConnecting(Model.SupportTaskReference, Model.JourneyInstance.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason">Change</action>
+                        <action href="@resolveLinkGenerator.NotConnecting(Model.InstanceId, returnUrl: returnUrl)" visually-hidden-text="reason">Change</action>
                     </row-actions>
                 </row>
                 @if (Model.Reason is OneLoginUserNotConnectingReason.AnotherReason)
@@ -35,7 +37,7 @@
                         <key>Additional details</key>
                         <value>@Model.AdditionalDetails</value>
                         <row-actions>
-                            <action href="@resolveLinkGenerator.NotConnecting(Model.SupportTaskReference, Model.JourneyInstance.InstanceId, fromCheckAnswers: true)" visually-hidden-text="additional details">Change</action>
+                            <action href="@resolveLinkGenerator.NotConnecting(Model.InstanceId, returnUrl: returnUrl)" visually-hidden-text="additional details">Change</action>
                         </row-actions>
                     </row>
                 }

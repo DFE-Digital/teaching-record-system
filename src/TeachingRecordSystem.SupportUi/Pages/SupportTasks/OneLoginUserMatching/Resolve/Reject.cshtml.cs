@@ -5,8 +5,10 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
-public class Reject(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.ResolveOneLoginUserMatching)]
+public class Reject(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<Reject> _validator = new()
     {
@@ -18,51 +20,45 @@ public class Reject(SupportUiLinkGenerator linkGenerator) : PageModel
             .When(m => m.Reason is OneLoginIdVerificationRejectReason.AnotherReason)
     };
 
-    [FromRoute]
-    public string SupportTaskReference { get; set; } = null!;
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    public JourneyInstance<ResolveOneLoginUserMatchingState> JourneyInstance { get; set; } = null!;
-
     [BindProperty]
     public OneLoginIdVerificationRejectReason? Reason { get; set; }
 
     [BindProperty]
     public string? AdditionalDetails { get; set; }
 
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public string? BackLink { get; set; }
+
     public void OnGet()
     {
-        Reason = JourneyInstance.State.RejectReason;
-        AdditionalDetails = JourneyInstance.State.RejectionAdditionalDetails;
+        Reason = journey.State.RejectReason;
+        AdditionalDetails = journey.State.RejectionAdditionalDetails;
     }
 
-    public async Task<IActionResult> OnPostAsync(bool cancel)
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (cancel)
+        if (Cancel)
         {
-            await JourneyInstance.DeleteAsync();
+            journey.DeleteInstance();
 
             return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
         }
 
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance.UpdateStateAsync(state =>
-        {
-            state.RejectReason = Reason;
-            state.RejectionAdditionalDetails = Reason is OneLoginIdVerificationRejectReason.AnotherReason ? AdditionalDetails : null;
-        });
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmReject(SupportTaskReference, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmReject(journey.InstanceId),
+            state =>
+            {
+                state.RejectReason = Reason;
+                state.RejectionAdditionalDetails = Reason is OneLoginIdVerificationRejectReason.AnotherReason ? AdditionalDetails : null;
+            });
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance.State.Verified is not false)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(SupportTaskReference, JourneyInstance.InstanceId));
-        }
+        BackLink = journey.GetBackLink();
     }
 }

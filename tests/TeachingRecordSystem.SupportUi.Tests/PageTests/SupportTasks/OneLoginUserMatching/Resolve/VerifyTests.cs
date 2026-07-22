@@ -158,8 +158,8 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/reject?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.False(journeyInstance.State.Verified);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.False(journeyState!.Verified);
     }
 
     [Fact]
@@ -186,8 +186,8 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.Verified);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.True(journeyState!.Verified);
     }
 
     [Fact]
@@ -218,9 +218,9 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.Verified);
-        Assert.Empty(journeyInstance.State.MatchedPersons);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.True(journeyState!.Verified);
+        Assert.Empty(journeyState!.MatchedPersons);
     }
 
     [Fact]
@@ -268,8 +268,8 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.Verified);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.True(journeyState!.Verified);
     }
 
     [Fact]
@@ -296,7 +296,6 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/support-tasks/one-login-user-matching/id-verification", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 }

@@ -47,31 +47,20 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s =>
-            {
-                s.Verified = true;
-                s.MatchedPersonId = Guid.NewGuid();
-            });
-
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClient.SendAsync(request);  // Initializes journey
+        response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        if (isRecordMatchingOnlySupportTask)
-        {
-            Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-        }
-        else
-        {
-            Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-        }
+        var expectedPage = isRecordMatchingOnlySupportTask ? "no-matches" : "verify";
+        Assert.StartsWith(
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/{expectedPage}?",
+            response.Headers.Location?.OriginalString);
     }
 
     [Fact]
