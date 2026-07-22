@@ -97,11 +97,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var tasks = SupportTaskLookup.Create(new()
         {
             ["ST1"] = await TestData.CreateTrnRequestSupportTaskAsync(
-                configure: t => t.WithFirstName("Jim").WithLastName("Smith")
+                configure: t => t.WithFirstName("Jim").WithMiddleName("Alan").WithLastName("Smith")
                     .WithCreatedOn(new DateTime(2025, 1, 1))),
 
             ["ST2"] = await TestData.CreateTrnRequestSupportTaskAsync(
-                configure: t => t.WithEmailAddress("bob.jones@email.com")
+                configure: t => t.WithFirstName("Bob").WithMiddleName("Robert").WithLastName("Jones")
+                .WithEmailAddress("bob.jones@email.com")
                 .WithCreatedOn(new DateTime(2023, 10, 10))),
         });
 
