@@ -57,7 +57,9 @@ public class Matches(
     {
         if (action is Actions.Cancel)
         {
-            return HandleCancel();
+            journey.DeleteInstance();
+
+            return Redirect(journey.GetListPageUrl());
         }
 
         if (action is Actions.SaveAndComeBackLater)
@@ -101,13 +103,6 @@ public class Matches(
             },
             processContext);
 
-        journey.DeleteInstance();
-
-        return Redirect(journey.GetListPageUrl());
-    }
-
-    private IActionResult HandleCancel()
-    {
         journey.DeleteInstance();
 
         return Redirect(journey.GetListPageUrl());
