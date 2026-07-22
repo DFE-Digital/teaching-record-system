@@ -59,23 +59,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage()
-    {
-        // Arrange
-        var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/end-date", response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -150,24 +133,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Post_MissingDataInJourneyState_RedirectsToIndexPage()
-    {
-        // Arrange
-        var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
-
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/end-date", response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -178,6 +143,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
         EventObserver.Clear();
+
+        var state = journeyInstance.State;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -194,7 +161,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         await WithDbContextAsync(async dbContext =>
         {
             var updatedAlert = await dbContext.Alerts.FirstOrDefaultAsync(a => a.AlertId == alert.AlertId);
-            Assert.Equal(journeyInstance.State.EndDate, updatedAlert!.EndDate);
+            Assert.Equal(state.EndDate, updatedAlert!.EndDate);
         });
 
         Events.AssertProcessesCreated(p =>
@@ -203,13 +170,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
             p.AssertProcessHasEvents<AlertUpdatedEvent>();
 
             var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
-            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), changeReason.Reason);
-            Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : null, changeReason.Details);
-            Assert.Equal(populateOptional ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel() : null, changeReason.EvidenceFile);
+            Assert.Equal(state.ChangeReason!.GetDisplayName(), changeReason.Reason);
+            Assert.Equal(populateOptional ? state.ChangeReasonDetail : null, changeReason.Details);
+            Assert.Equal(populateOptional ? state.Evidence.UploadedEvidenceFile?.ToEventModel() : null, changeReason.EvidenceFile);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -219,7 +185,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, true);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -228,8 +197,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

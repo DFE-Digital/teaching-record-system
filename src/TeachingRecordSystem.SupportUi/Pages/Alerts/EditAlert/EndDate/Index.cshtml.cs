@@ -5,16 +5,32 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertEndDate), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController, TimeProvider timeProvider) : PageModel
+[Journey(JourneyNames.EditAlertEndDate), StartsJourney]
+public class IndexModel(
+    EditAlertEndDateJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController,
+    TimeProvider timeProvider) : PageModel
 {
-    public JourneyInstance<EditAlertEndDateState>? JourneyInstance { get; set; }
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.EndDate)
+            .Cascade(CascadeMode.Stop)
+            .NotNull().WithMessage("Enter an end date")
+            .LessThanOrEqualTo(timeProvider.Today).WithMessage("End date cannot be in the future")
+            .GreaterThan(m => m.StartDate).WithMessage("End date must be after the start date")
+            .Must((m, endDate) => endDate != m.PreviousEndDate).WithMessage("Enter a different end date")
+    };
+
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -29,44 +45,27 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public void OnGet()
     {
-        EndDate = JourneyInstance!.State.EndDate;
+        EndDate = journey.State.EndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (EndDate is null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(EndDate), "Enter an end date");
-        }
-        else if (EndDate > timeProvider.Today)
-        {
-            ModelState.AddModelError(nameof(EndDate), "End date cannot be in the future");
-        }
-        else if (EndDate <= StartDate)
-        {
-            ModelState.AddModelError(nameof(EndDate), "End date must be after the start date");
-        }
-        else if (EndDate == PreviousEndDate)
-        {
-            ModelState.AddModelError(nameof(EndDate), "Enter a different end date");
+            return await CancelAsync();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state => state.EndDate = EndDate);
-
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.EditAlert.EndDate.CheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.EditAlert.EndDate.Reason(AlertId, JourneyInstance!.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.EditAlert.EndDate.Reason(journey.InstanceId),
+            state => state.EndDate = EndDate);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
     }
 
@@ -75,11 +74,11 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        JourneyInstance!.State.EnsureInitialized(alertInfo);
-
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         PreviousEndDate = alertInfo.Alert.EndDate;
         StartDate = alertInfo.Alert.StartDate;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Alerts.AlertDetail(AlertId);
     }
 }

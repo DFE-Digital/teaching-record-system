@@ -301,7 +301,6 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.True(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Equal(reasonDetail, journeyInstance.State.ChangeReasonDetail);
@@ -335,7 +334,6 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Null(journeyInstance.State.ChangeReasonDetail);
@@ -350,7 +348,10 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder { { "Cancel", bool.TrueString } }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -359,8 +360,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -377,7 +377,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         });
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/end-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/end-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
