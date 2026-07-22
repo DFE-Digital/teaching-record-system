@@ -8,103 +8,6 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
 {
     [Theory]
     [InlineData(false)]
-    [InlineData(null)]
-    public async Task Get_UserIsNotVerified_RedirectsToIndex(bool? verified)
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s => s.Verified = verified);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder { { "Reason", nameof(OneLoginUserNotConnectingReason.NoMatchingRecord) } }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Get_MatchedPersonIsNotSentinel_RedirectsToMatches(bool isRecordMatchingOnlySupportTask)
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
-        var supportTask = isRecordMatchingOnlySupportTask ?
-            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject) :
-            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s =>
-            {
-                s.Verified = true;
-                s.MatchedPersonId = Guid.NewGuid();
-                s.NotConnectingReason = OneLoginUserNotConnectingReason.NoMatchingRecord;
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Get_ReasonNotChosen_RedirectsToNotConnectingPage(bool isRecordMatchingOnlySupportTask)
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
-        var supportTask = isRecordMatchingOnlySupportTask ?
-            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject) :
-            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s =>
-            {
-                s.Verified = true;
-                s.MatchedPersonId = ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel;
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Theory]
-    [InlineData(false)]
     [InlineData(true)]
     public async Task Get_ShowsExpectedData(bool isRecordMatchingOnlySupportTask)
     {
@@ -139,103 +42,6 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
         Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal(notConnectingReason.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
         Assert.Equal(additionalDetails, doc.GetSummaryListValueByKey("Additional details"));
-    }
-
-    [Theory]
-    [InlineData(false)]
-    [InlineData(null)]
-    public async Task Post_UserIsNotVerified_RedirectsToIndex(bool? verified)
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s => s.Verified = verified);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder { { "Reason", nameof(OneLoginUserNotConnectingReason.NoMatchingRecord) } }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Post_MatchedPersonIsNotSentinel_RedirectsToMatches(bool isRecordMatchingOnlySupportTask)
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
-        var supportTask = isRecordMatchingOnlySupportTask ?
-            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject) :
-            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s =>
-            {
-                s.Verified = true;
-                s.MatchedPersonId = Guid.NewGuid();
-                s.NotConnectingReason = OneLoginUserNotConnectingReason.NoMatchingRecord;
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Post_ReasonNotChosen_RedirectsToNotConnectingPage(bool isRecordMatchingOnlySupportTask)
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
-        var supportTask = isRecordMatchingOnlySupportTask ?
-            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject) :
-            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask,
-            s =>
-            {
-                s.Verified = true;
-                s.MatchedPersonId = ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel;
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/not-connecting?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -429,8 +235,7 @@ public class ConfirmNotConnectingTests(HostFixture hostFixture) : ResolveOneLogi
                 response.Headers.Location?.OriginalString);
         }
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

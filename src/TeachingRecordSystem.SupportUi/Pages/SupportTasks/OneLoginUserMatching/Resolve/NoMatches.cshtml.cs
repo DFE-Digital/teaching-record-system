@@ -7,22 +7,21 @@ using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveOneLoginUserMatching)]
 public class NoMatches(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     OneLoginUserMatchingSupportTaskService supportTaskService,
     TimeProvider timeProvider) : PageModel
 {
     private SupportTask? _supportTask;
 
-    [FromRoute]
-    public string SupportTaskReference { get; set; } = null!;
+    [BindProperty]
+    public bool Cancel { get; set; }
 
-    public JourneyInstance<ResolveOneLoginUserMatchingState> JourneyInstance { get; set; } = null!;
+    public string? BackLink { get; set; }
 
     public string? Name { get; set; }
-
-    public bool? IsRecordMatchingOnly { get; set; }
 
     public string? NoMatchesPageContent { get; set; }
 
@@ -30,15 +29,13 @@ public class NoMatches(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync(bool cancel)
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (cancel)
+        if (Cancel)
         {
-            await JourneyInstance.DeleteAsync();
+            journey.DeleteInstance();
 
-            return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
-                linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-                linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+            return Redirect(GetListPageUrl());
         }
 
         bool emailSent;
@@ -70,7 +67,7 @@ public class NoMatches(
             emailSent = resolveResult.EmailSent;
         }
 
-        await JourneyInstance.DeleteAsync();
+        journey.DeleteInstance();
 
         var appContent = await supportTaskService.GetAppContentAsync(_supportTask);
 
@@ -83,27 +80,20 @@ public class NoMatches(
             messageText: emailSent ? emailSentMessage : $"Request closed for {Name}.",
             notificationBannerType: NotificationBannerType.Default);
 
-        return Redirect(_supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+        return Redirect(GetListPageUrl());
     }
+
+    private string GetListPageUrl() =>
+        _supportTask!.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (JourneyInstance.State.Verified is not true)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
-        if (JourneyInstance.State.MatchedPersons.Count > 0)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Matches(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        IsRecordMatchingOnly = _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching;
+
+        BackLink = journey.GetBackLink() ?? GetListPageUrl();
+
         var data = _supportTask.GetData<IOneLoginUserMatchingData>();
 
         // For the time being only display first verified name and dob if there are multiples (but still match on both)

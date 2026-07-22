@@ -7,18 +7,21 @@ using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveOneLoginUserMatching)]
 public class ConfirmNotConnecting(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
     OneLoginUserMatchingSupportTaskService supportTaskService,
     TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
 
-    [FromRoute]
-    public string SupportTaskReference { get; set; } = null!;
+    [BindProperty]
+    public bool Cancel { get; set; }
 
-    public JourneyInstance<ResolveOneLoginUserMatchingState> JourneyInstance { get; set; } = null!;
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     public string? EmailAddress { get; set; }
 
@@ -30,18 +33,13 @@ public class ConfirmNotConnecting(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync(bool cancel)
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (cancel)
+        if (Cancel)
         {
-            await JourneyInstance.DeleteAsync();
+            journey.DeleteInstance();
 
-            if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-            {
-                return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-            }
-
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+            return Redirect(GetListPageUrl());
         }
 
         bool emailSent = false;
@@ -54,8 +52,8 @@ public class ConfirmNotConnecting(
                 new VerifiedOnlyWithMatchesOutcomeOptions
                 {
                     SupportTask = _supportTask!,
-                    NotConnectingReason = JourneyInstance.State.NotConnectingReason!.Value,
-                    NotConnectingAdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails
+                    NotConnectingReason = journey.State.NotConnectingReason!.Value,
+                    NotConnectingAdditionalDetails = journey.State.NotConnectingAdditionalDetails
                 },
                 processContext);
         }
@@ -67,15 +65,15 @@ public class ConfirmNotConnecting(
                 new NotConnectingOutcomeOptions
                 {
                     SupportTask = _supportTask!,
-                    NotConnectingReason = JourneyInstance.State.NotConnectingReason!.Value,
-                    NotConnectingAdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails
+                    NotConnectingReason = journey.State.NotConnectingReason!.Value,
+                    NotConnectingAdditionalDetails = journey.State.NotConnectingAdditionalDetails
                 },
                 processContext);
 
             emailSent = resolveResult.EmailSent;
         }
 
-        await JourneyInstance.DeleteAsync();
+        journey.DeleteInstance();
 
         var data = _supportTask!.GetData<IOneLoginUserMatchingData>();
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
@@ -92,38 +90,22 @@ public class ConfirmNotConnecting(
             messageText: emailSent ? emailSentMessage : $"Request closed for {personName}.",
             notificationBannerType: NotificationBannerType.Default);
 
-        if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-        {
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-        }
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+        return Redirect(GetListPageUrl());
     }
+
+    private string GetListPageUrl() =>
+        _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance.State.Verified is not true)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
-        if (JourneyInstance.State.MatchedPersonId != ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Matches(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
-        if (JourneyInstance.State.NotConnectingReason is null)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NotConnecting(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
+        BackLink = journey.GetBackLink();
+
         EmailAddress = _supportTask.OneLoginUser!.EmailAddress!;
-        Reason = JourneyInstance.State.NotConnectingReason!.Value;
-        AdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails;
+        Reason = journey.State.NotConnectingReason!.Value;
+        AdditionalDetails = journey.State.NotConnectingAdditionalDetails;
     }
 }

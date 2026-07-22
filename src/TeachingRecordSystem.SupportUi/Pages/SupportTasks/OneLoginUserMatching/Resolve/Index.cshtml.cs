@@ -1,33 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.ResolveOneLoginUserMatching), StartsJourney]
+public class IndexModel(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<ResolveOneLoginUserMatchingState>? JourneyInstance { get; set; }
-
-    [FromRoute]
-    public required string? SupportTaskReference { get; set; }
-
-    public void OnGet()
-    {
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    public IActionResult OnGet()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        if (supportTask.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching)
-        {
-            context.Result = Redirect(JourneyInstance!.State.MatchedPersons.Count > 0 ?
-                linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId) :
-                linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NoMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
-        }
-        else
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Verify(SupportTaskReference!, JourneyInstance!.InstanceId));
-        }
+
+        var firstStepUrl = supportTask.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching ?
+            journey.State.MatchedPersons.Count > 0 ?
+                linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Matches(journey.InstanceId) :
+                linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.NoMatches(journey.InstanceId) :
+            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Verify(journey.InstanceId);
+
+        return journey.AdvanceTo(firstStepUrl, new PushStepOptions { SetAsFirstStep = true });
     }
 }

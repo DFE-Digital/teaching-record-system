@@ -6,8 +6,10 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveOneLoginUserMatching), RequireJourneyInstance]
-public class NotConnecting(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.ResolveOneLoginUserMatching)]
+public class NotConnecting(
+    ResolveOneLoginUserMatchingJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private InlineValidator<NotConnecting> _validator = new()
     {
@@ -21,62 +23,52 @@ public class NotConnecting(SupportUiLinkGenerator linkGenerator) : PageModel
 
     private SupportTask? _supportTask;
 
-    [FromRoute]
-    public string SupportTaskReference { get; set; } = null!;
-
-    public JourneyInstance<ResolveOneLoginUserMatchingState> JourneyInstance { get; set; } = null!;
-
     [BindProperty]
     public OneLoginUserNotConnectingReason? Reason { get; set; }
 
     [BindProperty]
     public string? AdditionalDetails { get; set; }
 
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public string? BackLink { get; set; }
+
     public void OnGet()
     {
-        Reason = JourneyInstance.State.NotConnectingReason;
-        AdditionalDetails = JourneyInstance.State.NotConnectingAdditionalDetails;
+        Reason = journey.State.NotConnectingReason;
+        AdditionalDetails = journey.State.NotConnectingAdditionalDetails;
     }
 
-    public async Task<IActionResult> OnPostAsync(bool cancel)
+    public async Task<IActionResult> OnPostAsync()
     {
-        if (cancel)
+        if (Cancel)
         {
-            await JourneyInstance.DeleteAsync();
+            journey.DeleteInstance();
 
-            if (_supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
-            {
-                return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
-            }
-
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+            return Redirect(GetListPageUrl());
         }
 
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance.UpdateStateAsync(state =>
-        {
-            state.NotConnectingReason = Reason;
-            state.NotConnectingAdditionalDetails = Reason is OneLoginUserNotConnectingReason.AnotherReason ? AdditionalDetails : null;
-        });
-
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmNotConnecting(SupportTaskReference, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmNotConnecting(journey.InstanceId),
+            state =>
+            {
+                state.NotConnectingReason = Reason;
+                state.NotConnectingAdditionalDetails = Reason is OneLoginUserNotConnectingReason.AnotherReason ? AdditionalDetails : null;
+            });
     }
+
+    private string GetListPageUrl() =>
+        _supportTask!.SupportTaskType == SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance.State.Verified is not true)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Index(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
-        if (JourneyInstance.State.MatchedPersonId != ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Matches(SupportTaskReference, JourneyInstance.InstanceId));
-            return;
-        }
-
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+
+        BackLink = journey.GetBackLink();
     }
 }
