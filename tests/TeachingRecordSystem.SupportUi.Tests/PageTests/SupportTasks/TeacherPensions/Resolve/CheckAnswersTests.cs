@@ -8,7 +8,7 @@ using SupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.SupportTaskUpda
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions.Resolve;
 
-public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPotentialDuplicateTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
@@ -19,7 +19,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         {
             MatchedPersons = []
         };
-        var journeyInstance = await CreateJourneyInstance(taskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(taskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -82,8 +82,8 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             MergeComments = mergeComments
         };
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -153,8 +153,11 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             PersonAttributeSourcesSet = true
         };
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -162,8 +165,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -217,7 +219,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             MergeComments = mergeComments
         };
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
         EventObserver.Clear();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -256,8 +258,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -313,7 +314,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             MergeComments = mergeComments
         };
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
         EventObserver.Clear();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -355,8 +356,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -405,7 +405,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             MergeComments = mergeComments
         };
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
         EventObserver.Clear();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -468,8 +468,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(viewRecordLink);
         Assert.Contains(duplicatePerson1.PersonId.ToString(), viewRecordLink.GetAttribute("href"));
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     // This journey's merge page offers no middle name choice, so MiddleNameSource is always unset. An unset
@@ -518,7 +517,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             Evidence = new() { UploadEvidence = false }
         };
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(
             HttpMethod.Post,
             $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -545,11 +544,4 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    private Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
-        string supportTaskReference,
-        ResolveTeacherPensionsPotentialDuplicateState state) =>
-        CreateJourneyInstance(
-            JourneyNames.ResolveTpsPotentialDuplicate,
-            state,
-            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 }

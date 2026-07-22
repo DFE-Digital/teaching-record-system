@@ -3,17 +3,23 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+[Journey(JourneyNames.ResolveTpsPotentialDuplicate)]
+public class MergeModel(
+    ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
+    TrsDbContext dbContext,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : ResolveTeacherPensionsPotentialDuplicatePageModel(journey, dbContext)
 {
     private readonly InlineValidator<MergeModel> _validator = new()
     {
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -60,22 +66,14 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     {
         var supportTask = GetSupportTask();
         var requestData = supportTask.TrnRequestMetadata!;
-        var state = JourneyInstance!.State;
+        var state = Journey.State;
         var person = DbContext!.Persons.Single(x => x.PersonId == supportTask.PersonId);
+        var personId = state.PersonId!.Value;
 
-        if (state.PersonId is not Guid personId)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
+        BackLink = Journey.GetBackLink();
 
-        if (state.PersonId == CreateNewRecordPersonIdSentinel)
-        {
-            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
         var personAttributes = await GetPersonAttributesAsync(personId);
-        var attributeMatches = JourneyInstance!.State.MatchedPersons
+        var attributeMatches = state.MatchedPersons
             .Single(m => m.PersonId == personId)
             .MatchedAttributes;
 
@@ -122,18 +120,23 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public void OnGet()
     {
-        DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
-        NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
-        GenderSource = JourneyInstance!.State.GenderSource;
-        MergeComments = JourneyInstance!.State.MergeComments;
-        FirstNameSource = JourneyInstance!.State.FirstNameSource;
-        LastNameSource = JourneyInstance!.State.LastNameSource;
-        TRNSource = JourneyInstance!.State.TRNSource;
-        Evidence = JourneyInstance!.State.Evidence;
+        DateOfBirthSource = Journey.State.DateOfBirthSource;
+        NationalInsuranceNumberSource = Journey.State.NationalInsuranceNumberSource;
+        GenderSource = Journey.State.GenderSource;
+        MergeComments = Journey.State.MergeComments;
+        FirstNameSource = Journey.State.FirstNameSource;
+        LastNameSource = Journey.State.LastNameSource;
+        TRNSource = Journey.State.TRNSource;
+        Evidence = Journey.State.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         await evidenceUploadManager.ValidateAndUploadAsync<MergeModel>(m => m.Evidence, ViewData);
 
         if (DateOfBirth!.Different && DateOfBirthSource is null)
@@ -168,25 +171,26 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.DateOfBirthSource = DateOfBirthSource;
-            state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
-            state.GenderSource = GenderSource;
-            state.PersonAttributeSourcesSet = true;
-            state.MergeComments = MergeComments;
-            state.FirstNameSource = FirstNameSource;
-            state.LastNameSource = LastNameSource;
-            state.Evidence = Evidence;
-        });
-
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+        return Journey.AdvanceTo(
+            linkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Journey.InstanceId),
+            state =>
+            {
+                state.DateOfBirthSource = DateOfBirthSource;
+                state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
+                state.GenderSource = GenderSource;
+                state.PersonAttributeSourcesSet = true;
+                state.MergeComments = MergeComments;
+                state.FirstNameSource = FirstNameSource;
+                state.LastNameSource = LastNameSource;
+                state.Evidence = Evidence;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+        Journey.DeleteInstance();
+
         return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 

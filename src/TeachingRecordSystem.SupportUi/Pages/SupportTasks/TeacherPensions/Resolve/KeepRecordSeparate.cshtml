@@ -1,12 +1,11 @@
-@page "/support-tasks/teacher-pensions/{supportTaskReference}/resolve/keep-record-separate/{handler?}"
+@page "/support-tasks/teacher-pensions/{supportTaskReference}/resolve/keep-record-separate"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparateModel
 @{
     ViewBag.Title = "Why are you keeping the records separate?";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
-        LinkGenerator.SupportTasks.TeacherPensions.Index())" />
+    <govuk-back-link href="@Model.BackLink" />
 }
 
 <div class="govuk-grid-row">
@@ -31,7 +30,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, true)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </form>
     </div>

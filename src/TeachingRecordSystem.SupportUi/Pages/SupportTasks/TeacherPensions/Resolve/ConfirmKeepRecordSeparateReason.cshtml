@@ -1,4 +1,5 @@
-@page "/support-tasks/teacher-pensions/{supportTaskReference}/resolve/confirm-keep-record-separate/{handler?}"
+@page "/support-tasks/teacher-pensions/{supportTaskReference}/resolve/confirm-keep-record-separate"
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReasonModel
 @{
     ViewBag.Title = "Check details";
@@ -18,7 +19,7 @@
                     <key>Reason</key>
                     <value>@Model.GetReason()</value>
                     <row-actions>
-                        <action href="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)"
+                        <action href="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(Model.InstanceId, returnUrl: Request.GetEncodedPathAndQuery())"
                             visually-hidden-text="reason">Change</action>
                     </row-actions>
                 </row>
@@ -32,7 +33,7 @@
         <div class="govuk-grid-column-two-thirds">
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReasonCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>
