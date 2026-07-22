@@ -4,64 +4,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve.ResolveTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequests.Resolve;
 
 public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
 {
-    [Fact]
-    public async Task Get_NoPersonIdSelected_RedirectsToMatches()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, _, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
-
-        var journeyInstance = await CreateJourneyInstance(
-            supportTask,
-            personId: null);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
-    public async Task Get_CreateNewRecordSelected_RedirectsToCheckAnswers()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, _, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
-
-        var journeyInstance = await CreateJourneyInstance(
-            supportTask,
-            personId: CreateNewRecordPersonIdSentinel);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [MemberData(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsNotDifferent_RendersDisabledAndUnselectedRadioButtons(
@@ -144,7 +91,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -184,7 +131,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -223,7 +170,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var comments = "Some comments";
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -253,60 +200,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         // Assert
         var doc = await response.GetDocumentAsync();
         Assert.Equal(comments, doc.GetElementsByName("Comments").Single().TrimmedText());
-    }
-
-    [Fact]
-    public async Task Post_NoPersonIdSelected_RedirectsToMatches()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, _, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
-
-        var journeyInstance = await CreateJourneyInstance(supportTask, personId: null);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
-    public async Task Post_CreateNewRecordSelected_RedirectsToCheckAnswers()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, _, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
-
-        var journeyInstance = await CreateJourneyInstance(supportTask, personId: CreateNewRecordPersonIdSentinel);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
     }
 
     [Theory]
@@ -378,7 +271,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         // Deliberately create a support task with all differences to test setting all fields (even though it would not actually be a match!)
         var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -419,14 +312,14 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(firstNameSelection, journeyInstance.State.FirstNameSource);
-        Assert.Equal(middleNameSelection, journeyInstance.State.MiddleNameSource);
-        Assert.Equal(lastNameSelection, journeyInstance.State.LastNameSource);
-        Assert.Equal(dateOfBirthSelection, journeyInstance.State.DateOfBirthSource);
-        Assert.Equal(emailAddressSelection, journeyInstance.State.EmailAddressSource);
-        Assert.Equal(nationalInsuranceNumberSelection, journeyInstance.State.NationalInsuranceNumberSource);
-        Assert.Equal(genderSelection, journeyInstance.State.GenderSource);
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(firstNameSelection, journeyState!.FirstNameSource);
+        Assert.Equal(middleNameSelection, journeyState!.MiddleNameSource);
+        Assert.Equal(lastNameSelection, journeyState!.LastNameSource);
+        Assert.Equal(dateOfBirthSelection, journeyState!.DateOfBirthSource);
+        Assert.Equal(emailAddressSelection, journeyState!.EmailAddressSource);
+        Assert.Equal(nationalInsuranceNumberSelection, journeyState!.NationalInsuranceNumberSource);
+        Assert.Equal(genderSelection, journeyState!.GenderSource);
     }
 
     public static (PersonMatchedAttribute Attribute, string SourceFieldName)[] GetAttributesAndFieldsData() =>
@@ -440,22 +333,46 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         (PersonMatchedAttribute.Gender, "GenderSource")
     ];
 
-    private async Task<JourneyInstance<ResolveTrnRequestState>> CreateJourneyInstance(
+    private async Task<ResolveTrnRequestJourneyCoordinator> CreateJourneyInstance(
         SupportTask supportTask,
         Guid? personId)
     {
-        var state = await CreateJourneyStateWithFactory<ResolveApiTrnRequestStateFactory, ResolveTrnRequestState>(
-            factory => factory.CreateAsync(supportTask));
+        var state = await CreateStateAsync(supportTask);
         state.PersonId = personId;
 
-        return await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        return await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
     }
 
-    private Task<JourneyInstance<ResolveTrnRequestState>> CreateJourneyInstance(
-            string supportTaskReference,
-            ResolveTrnRequestState state) =>
-        CreateJourneyInstance(
-            JourneyNames.ResolveTrnRequest,
-            state,
-            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToListPage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            new ResolveTrnRequestState
+            {
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = true
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal("/support-tasks/trn-requests", response.Headers.Location?.OriginalString);
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
 }

@@ -5,9 +5,13 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
-public abstract class ResolveTrnRequestPageModel(TrsDbContext dbContext) : PageModel
+public abstract class ResolveTrnRequestPageModel(
+    ResolveTrnRequestJourneyCoordinator journey,
+    TrsDbContext dbContext) : PageModel
 {
-    public JourneyInstance<ResolveTrnRequestState>? JourneyInstance { get; set; }
+    public string? BackLink { get; set; }
+
+    protected ResolveTrnRequestJourneyCoordinator Journey => journey;
 
     protected TrsDbContext DbContext => dbContext;
 
@@ -19,7 +23,7 @@ public abstract class ResolveTrnRequestPageModel(TrsDbContext dbContext) : PageM
 
     protected PersonAttributeSources GetPersonAttributeSources()
     {
-        var state = JourneyInstance!.State;
+        var state = journey.State;
 
         if (!state.PersonAttributeSourcesSet)
         {

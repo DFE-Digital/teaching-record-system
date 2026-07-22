@@ -6,8 +6,11 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTrnRequest), RequireJourneyInstance]
-public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveTrnRequestPageModel(dbContext)
+[Journey(JourneyNames.ResolveTrnRequest)]
+public class Matches(
+    ResolveTrnRequestJourneyCoordinator journey,
+    TrsDbContext dbContext,
+    SupportUiLinkGenerator linkGenerator) : ResolveTrnRequestPageModel(journey, dbContext)
 {
     private readonly InlineValidator<Matches> _validator = new()
     {
@@ -15,11 +18,8 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
             .NotNull().WithMessage("Select a record")
     };
 
-    [FromRoute]
-    public string? SupportTaskReference { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public TrnRequestMetadata? RequestData { get; set; }
 
@@ -38,11 +38,18 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
 
     public void OnGet()
     {
-        PersonId = JourneyInstance!.State.PersonId;
+        PersonId = Journey.State.PersonId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public IActionResult OnPost()
     {
+        if (Cancel)
+        {
+            Journey.DeleteInstance();
+
+            return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
+        }
+
         // Verify the submitted ID is legit
         if (PersonId is Guid personId &&
             (!PotentialDuplicates!.Any(d => d.PersonId == personId) && personId != ResolveTrnRequestState.CreateNewRecordPersonIdSentinel))
@@ -52,7 +59,11 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
 
         _validator.ValidateAndThrow(this);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
+        var nextStepUrl = PersonId == ResolveTrnRequestState.CreateNewRecordPersonIdSentinel ?
+            linkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(Journey.InstanceId) :
+            linkGenerator.SupportTasks.TrnRequests.Resolve.Merge(Journey.InstanceId);
+
+        return Journey.AdvanceTo(nextStepUrl, state =>
         {
             var oldPersonId = state.PersonId;
             state.PersonId = PersonId;
@@ -69,29 +80,19 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 state.PersonAttributeSourcesSet = false;
             }
         });
-
-        return Redirect(
-            PersonId == ResolveTrnRequestState.CreateNewRecordPersonIdSentinel ?
-                linkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
-                linkGenerator.SupportTasks.TrnRequests.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-
-        return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         RequestData = GetRequestData();
 
-        var matchedAttributesLookup = JourneyInstance!.State.MatchedPersons.ToDictionary(
+        BackLink = Journey.GetBackLink() ?? linkGenerator.SupportTasks.TrnRequests.Index();
+
+        var matchedAttributesLookup = Journey.State.MatchedPersons.ToDictionary(
                 mp => mp.PersonId,
                 mp => mp.MatchedAttributes);
-        var matchedPersonIds = JourneyInstance!.State.MatchedPersons.Select(p => p.PersonId).ToArray();
-        MatchOutcome = JourneyInstance.State.MatchOutcome;
+        var matchedPersonIds = Journey.State.MatchedPersons.Select(p => p.PersonId).ToArray();
+        MatchOutcome = Journey.State.MatchOutcome;
 
         PotentialDuplicates = (await DbContext.Persons
             .Where(p => matchedPersonIds.Contains(p.PersonId))
