@@ -1,3 +1,4 @@
+using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
@@ -5,13 +6,12 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
 
 public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<EditAlertLinkState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+    protected Task<EditAlertLinkJourneyCoordinator> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
         CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+    protected Task<EditAlertLinkJourneyCoordinator> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
         CreateJourneyInstanceAsync(alert.AlertId, new EditAlertLinkState
         {
-            Initialized = true,
             CurrentLink = populateOptional ? null : alert.ExternalLink,
             AddLink = populateOptional,
             Link = populateOptional ? "https://www.example.com" : null,
@@ -30,7 +30,7 @@ public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixtu
             }
         });
 
-    protected Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert, bool populateOptional = true) =>
+    protected Task<EditAlertLinkJourneyCoordinator> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert, bool populateOptional = true) =>
         step switch
         {
             JourneySteps.New =>
@@ -38,7 +38,6 @@ public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixtu
             JourneySteps.Index =>
                 CreateJourneyInstanceAsync(alert.AlertId, new EditAlertLinkState
                 {
-                    Initialized = true,
                     CurrentLink = populateOptional ? null : alert.ExternalLink,
                     AddLink = populateOptional,
                     Link = populateOptional ? "https://www.example.com" : null
@@ -48,11 +47,25 @@ public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixtu
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceAsync(Guid alertId, EditAlertLinkState state) =>
-        CreateJourneyInstance(
+    protected EditAlertLinkState? GetJourneyInstanceState(EditAlertLinkJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (EditAlertLinkState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
+
+    private Task<EditAlertLinkJourneyCoordinator> CreateJourneyInstanceAsync(Guid alertId, EditAlertLinkState state) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<EditAlertLinkJourneyCoordinator>(
             JourneyNames.EditAlertLink,
-            state,
-            new KeyValuePair<string, object>("alertId", alertId));
+            new RouteValueDictionary { ["alertId"] = alertId },
+            _ => Task.FromResult<object>(state),
+            pathUrls:
+            [
+                $"/alerts/{alertId}/link",
+                $"/alerts/{alertId}/link/reason",
+                $"/alerts/{alertId}/link/check-answers",
+            ]);
 
     public static class JourneySteps
     {

@@ -342,7 +342,6 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture), I
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.True(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Equal(reasonDetail, journeyInstance.State.ChangeReasonDetail);
@@ -376,7 +375,6 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture), I
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Null(journeyInstance.State.ChangeReasonDetail);
@@ -391,7 +389,10 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture), I
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link/reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder { { "Cancel", bool.TrueString } }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -400,8 +401,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture), I
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/persons/{person.PersonId}/alerts", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

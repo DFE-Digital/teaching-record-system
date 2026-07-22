@@ -61,16 +61,16 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
+    public async Task Get_NewJourneyInstance_PopulatesModelFromDatabase()
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/link");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClient.SendAsync(request);  // Starts the journey
+        response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
@@ -240,8 +240,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/persons/{person.PersonId}/alerts", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -264,7 +263,6 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/link/reason", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.AddLink);
         Assert.Equal(newLink, journeyInstance.State.Link);
     }
@@ -288,7 +286,6 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alert.AlertId}/link/reason", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.False(journeyInstance.State.AddLink);
         Assert.Null(journeyInstance.State.Link);
     }
@@ -300,7 +297,10 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         var (person, alert) = await CreatePersonWithOpenAlert(populateOptional: true);
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -309,8 +309,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/persons/{person.PersonId}/alerts", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]

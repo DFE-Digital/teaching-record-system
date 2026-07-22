@@ -5,16 +5,35 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditAlertLink), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
+[Journey(JourneyNames.EditAlertLink), StartsJourney]
+public class IndexModel(
+    EditAlertLinkJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController) : PageModel
 {
-    public JourneyInstance<EditAlertLinkState>? JourneyInstance { get; set; }
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.AddLink)
+            .NotNull()
+            .WithMessage(m => string.IsNullOrEmpty(m.PreviousLink)
+                ? "Select yes if you want to add a link to a panel outcome"
+                : "Select change link if you want to change the link to the panel outcome"),
+        v => v.RuleFor(m => m.Link)
+            .Cascade(CascadeMode.Stop)
+            .Must(link => TrsUriHelper.TryCreateWebsiteUri(link, out _)).WithMessage("Enter a valid URL")
+            .Must((m, link) => link != m.PreviousLink).WithMessage("Enter a different link")
+            .When(m => m.AddLink == true)
+    };
+
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -30,60 +49,39 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public void OnGet()
     {
-        AddLink = JourneyInstance!.State.AddLink;
-        Link = JourneyInstance!.State.Link;
+        AddLink = journey.State.AddLink;
+        Link = journey.State.Link;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (AddLink is null)
+        if (Cancel)
         {
-            if (string.IsNullOrEmpty(PreviousLink))
-            {
-                ModelState.AddModelError(nameof(AddLink), "Select yes if you want to add a link to a panel outcome");
-            }
-            else
-            {
-                ModelState.AddModelError(nameof(AddLink), "Select change link if you want to change the link to the panel outcome");
-            }
-        }
-        else if (AddLink == true)
-        {
-            if (!TrsUriHelper.TryCreateWebsiteUri(Link, out _))
-            {
-                ModelState.AddModelError(nameof(Link), "Enter a valid URL");
-            }
-            else if (Link == PreviousLink)
-            {
-                ModelState.AddModelError(nameof(Link), "Enter a different link");
-            }
+            return await CancelAsync();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.AddLink = AddLink;
-            state.Link = AddLink == true ? Link : null;
-        });
-
+        // There was no link to begin with and the user doesn't want to add one, so there's nothing to
+        // change; abandon the journey and return to the record.
         if (string.IsNullOrEmpty(PreviousLink) && AddLink == false)
         {
-            return await OnPostCancelAsync();
+            return await CancelAsync();
         }
 
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.Alerts.EditAlert.Link.CheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.Alerts.EditAlert.Link.Reason(AlertId, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Alerts.EditAlert.Link.Reason(journey.InstanceId),
+            state =>
+            {
+                state.AddLink = AddLink;
+                state.Link = AddLink == true ? Link : null;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
@@ -92,10 +90,10 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        JourneyInstance!.State.EnsureInitialized(alertInfo);
-
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         PreviousLink = alertInfo.Alert.ExternalLink;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Alerts(PersonId);
     }
 }
