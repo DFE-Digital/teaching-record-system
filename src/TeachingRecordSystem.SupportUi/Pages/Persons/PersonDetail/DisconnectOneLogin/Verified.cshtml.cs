@@ -5,8 +5,8 @@ using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLogin;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DisconnectOneLogin), RequireJourneyInstance]
-public class Verified(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.DisconnectOneLogin)]
+public class Verified(DisconnectOneLoginJourneyCoordinator journey, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<Verified> _validator = new()
     {
@@ -21,52 +21,36 @@ public class Verified(SupportUiLinkGenerator linkGenerator) : PageModel
 
     [BindProperty] public DisconnectOneLoginStayVerified? StayVerified { get; set; }
 
-    public JourneyInstance<DisconnectOneLoginState>? JourneyInstance { get; set; }
 
-    [FromQuery] public bool? FromCheckAnswers { get; set; }
 
-    public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers(PersonId, OneLoginSubject!,
-            JourneyInstance!.InstanceId)
-        : linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(PersonId,
-            OneLoginSubject!, JourneyInstance!.InstanceId);
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public void OnGet()
     {
-        StayVerified = JourneyInstance?.State.StayVerified;
+        StayVerified = journey.State.StayVerified;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            journey.DeleteInstance();
+            return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.StayVerified = StayVerified;
-        });
-
-        return Redirect(
-            linkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers(
-                PersonId,
-                OneLoginSubject,
-                JourneyInstance.InstanceId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
+        return journey.AdvanceTo(
+            linkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers(journey.InstanceId),
+            state => state.StayVerified = StayVerified);
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.DisconnectReason.HasValue)
-        {
-            context.Result = Redirect(
-                linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(
-                    PersonId,
-                    OneLoginSubject,
-                    JourneyInstance.InstanceId));
-        }
+        BackLink = journey.GetBackLink();
     }
+
 }

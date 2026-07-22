@@ -3,34 +3,8 @@ using TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.DisconnectPe
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.OneLogins.OneLoginDetail.DisconnectPerson;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : DisconnectPersonTestBase(hostFixture)
 {
-    [Theory]
-    [InlineData(null, null)]
-    [InlineData(DisconnectPersonStayVerified.Yes, null)]
-    [InlineData(null, DisconnectPersonReason.NewInformation)]
-    public async Task Get_WithMissingOptions_ReturnsToIndex(DisconnectPersonStayVerified? stayVerified,
-        DisconnectPersonReason? reason)
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var oneLogin = await TestData.CreateOneLoginUserAsync(person);
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            oneLogin.Subject,
-            new DisconnectPersonState() { DisconnectReason = reason, StayVerified = stayVerified });
-
-        var request = new HttpRequestMessage(HttpMethod.Get,
-            $"/one-logins/{oneLogin.Subject}/disconnect-person/{person.PersonId}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Contains($"/one-logins/{oneLogin.Subject}/disconnect-person/{person.PersonId}",
-            response.Headers.Location?.OriginalString);
-    }
-
     [Fact]
     public async Task Post_RemovingVerification_RemovesPersonAndVerification()
     {
@@ -39,6 +13,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             oneLogin.Subject,
+            person.PersonId,
             new DisconnectPersonState() { DisconnectReason = DisconnectPersonReason.NewInformation, StayVerified = DisconnectPersonStayVerified.No });
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLogin.Subject}/disconnect-person/{person.PersonId}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -77,6 +52,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             oneLogin.Subject,
+            person.PersonId,
             new DisconnectPersonState() { DisconnectReason = DisconnectPersonReason.NewInformation, StayVerified = DisconnectPersonStayVerified.Yes });
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLogin.Subject}/disconnect-person/{person.PersonId}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -111,6 +87,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             oneLogin.Subject,
+            person.PersonId,
             new DisconnectPersonState() { DisconnectReason = DisconnectPersonReason.NewInformation, StayVerified = DisconnectPersonStayVerified.Yes });
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLogin.Subject}/disconnect-person/{person.PersonId}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -139,6 +116,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             oneLogin.Subject,
+            person.PersonId,
             new DisconnectPersonState() { DisconnectReason = reason, StayVerified = stayVerified, Detail = details });
 
         var request = new HttpRequestMessage(HttpMethod.Get,
@@ -163,6 +141,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             oneLogin.Subject,
+            person.PersonId,
             new DisconnectPersonState() { DisconnectReason = reason, StayVerified = stayVerified, Detail = details });
 
         var request = new HttpRequestMessage(HttpMethod.Get,
@@ -176,9 +155,30 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.GetElementByTestId("disconnect-reason-detail");
     }
 
-    private Task<JourneyInstance<DisconnectPersonState>> CreateJourneyInstanceAsync(string oneLoginUserSubject, DisconnectPersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.DisconnectPerson,
-            state ?? new DisconnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUserSubject));
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToOneLoginDetail()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLogin = await TestData.CreateOneLoginUserAsync(person);
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLogin.Subject,
+            person.PersonId,
+            new DisconnectPersonState
+            {
+                DisconnectReason = DisconnectPersonReason.NewInformation,
+                StayVerified = DisconnectPersonStayVerified.Yes
+            });
+
+        var pageUrl = $"/one-logins/{oneLogin.Subject}/disconnect-person/{person.PersonId}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        // Act
+        var response = await PostCancelAsync(pageUrl);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/one-logins/{oneLogin.Subject}", response.Headers.Location?.OriginalString);
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
 }

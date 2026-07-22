@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLog
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.DisconnectOneLogin;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : DisconnectOneLoginTestBase(hostFixture)
 {
     [Fact]
     public async Task Post_WithoutReason_ReturnsError()
@@ -13,6 +13,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
+            oneLogin.Subject,
             new DisconnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -38,6 +39,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
+            oneLogin.Subject,
             new DisconnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -64,6 +66,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
+            oneLogin.Subject,
             new DisconnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -93,6 +96,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
+            oneLogin.Subject,
             new DisconnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -112,9 +116,30 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains($"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}/verified", response.Headers.Location?.OriginalString);
     }
 
-    private Task<JourneyInstance<DisconnectOneLoginState>> CreateJourneyInstanceAsync(Guid personId, DisconnectOneLoginState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.DisconnectOneLogin,
-            state ?? new DisconnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", personId));
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetail()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLogin = await TestData.CreateOneLoginUserAsync(person);
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            oneLogin.Subject,
+            new DisconnectOneLoginState
+            {
+                DisconnectReason = DisconnectOneLoginReason.NewInformation,
+                StayVerified = DisconnectOneLoginStayVerified.Yes
+            });
+
+        var pageUrl = $"/persons/{person.PersonId}/disconnect-one-login/{oneLogin.Subject}?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        // Act
+        var response = await PostCancelAsync(pageUrl);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
 }
