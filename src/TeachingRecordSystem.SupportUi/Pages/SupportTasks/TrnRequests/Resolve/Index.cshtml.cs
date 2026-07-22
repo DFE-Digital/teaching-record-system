@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ResolveTrnRequest), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.ResolveTrnRequest), StartsJourney]
+public class IndexModel(
+    ResolveTrnRequestJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<ResolveTrnRequestState>? JourneyInstance { get; set; }
-
-    [FromRoute]
-    public required string SupportTaskReference { get; init; }
-
-    public IActionResult OnGet() => Redirect(linkGenerator.SupportTasks.TrnRequests.Resolve.Matches(SupportTaskReference, JourneyInstance!.InstanceId));
+    public IActionResult OnGet() =>
+        journey.AdvanceTo(
+            linkGenerator.SupportTasks.TrnRequests.Resolve.Matches(journey.InstanceId),
+            new PushStepOptions { SetAsFirstStep = true });
 }

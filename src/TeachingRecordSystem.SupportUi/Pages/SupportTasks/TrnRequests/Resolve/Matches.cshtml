@@ -1,4 +1,4 @@
-@page "/support-tasks/trn-requests/{supportTaskReference}/resolve/matches/{handler?}"
+@page "/support-tasks/trn-requests/{supportTaskReference}/resolve/matches"
 @using TeachingRecordSystem.Core.Services.TrnRequests
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve.Matches
 @{
@@ -7,9 +7,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers ?
-        LinkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
-        LinkGenerator.SupportTasks.TrnRequests.Index())"/>
+    <govuk-back-link href="@Model.BackLink" />
 }
 
 <form method="post">
@@ -225,7 +223,7 @@
                 {
                     <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
                 }
-                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TrnRequests.Resolve.MatchesCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>

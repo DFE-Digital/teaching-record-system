@@ -13,89 +13,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequest
 
 public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
 {
-    [Fact]
-    public async Task Get_NoPersonIdSelected_RedirectsToMatches()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
-
-        var journeyInstance = await CreateJourneyInstance(
-            supportTask.SupportTaskReference,
-            new ResolveTrnRequestState
-            {
-                MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonsResultPerson(
-                        p,
-                        [
-                            PersonMatchedAttribute.FirstName,
-                            PersonMatchedAttribute.MiddleName,
-                            PersonMatchedAttribute.LastName,
-                            PersonMatchedAttribute.DateOfBirth,
-                            PersonMatchedAttribute.EmailAddress,
-                            PersonMatchedAttribute.Gender
-                        ]
-                    )).ToArray(),
-                PersonId = null
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
-    public async Task Get_NoAttributesSourcesSet_RedirectsToMerge()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
-
-        var journeyInstance = await CreateJourneyInstance(
-            supportTask.SupportTaskReference,
-            new ResolveTrnRequestState
-            {
-                MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonsResultPerson(
-                        p,
-                        [
-                            PersonMatchedAttribute.FirstName,
-                            PersonMatchedAttribute.MiddleName,
-                            PersonMatchedAttribute.LastName,
-                            PersonMatchedAttribute.DateOfBirth,
-                            PersonMatchedAttribute.EmailAddress,
-                            PersonMatchedAttribute.Gender
-                        ]
-                    )).ToArray(),
-                PersonId = matchedPersonIds[0],
-                PersonAttributeSourcesSet = false
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [MemberData(nameof(GetPersonAttributeInfosData))]
     public async Task Get_AttributeSourceIsTrnRequest_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromRequestDataAttribute)
@@ -130,7 +47,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         };
         SetPersonAttributeSourceToTrnRequest(state, sourcedFromRequestDataAttribute.Attribute);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -185,7 +102,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -224,7 +141,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -263,7 +180,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -303,7 +220,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -345,7 +262,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var comments = Faker.Lorem.Paragraph();
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -386,7 +303,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -405,12 +322,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
+        var checkAnswersUrl = $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
         var expectedBackLink = $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
-        var expectedChangeLink = $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}";
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, checkAnswersUrl);
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -432,7 +348,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -456,12 +372,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
                 GenderSource = PersonAttributeSource.TrnRequest
             });
 
+        var checkAnswersUrl = $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
         var expectedBackLink = $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
-        var expectedChangeLink = $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}";
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, checkAnswersUrl);
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -473,89 +388,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("ni-change-link")?.GetAttribute("href"));
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("dob-change-link")?.GetAttribute("href"));
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("gender-change-link")?.GetAttribute("href"));
-    }
-
-    [Fact]
-    public async Task Post_NoPersonIdSelected_RedirectsToMatches()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
-
-        var journeyInstance = await CreateJourneyInstance(
-            supportTask.SupportTaskReference,
-            new ResolveTrnRequestState
-            {
-                MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonsResultPerson(
-                        p,
-                        [
-                            PersonMatchedAttribute.FirstName,
-                            PersonMatchedAttribute.MiddleName,
-                            PersonMatchedAttribute.LastName,
-                            PersonMatchedAttribute.DateOfBirth,
-                            PersonMatchedAttribute.EmailAddress,
-                            PersonMatchedAttribute.Gender
-                        ]
-                    )).ToArray(),
-                PersonId = null
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
-    public async Task Post_NoAttributesSourcesSet_RedirectsToMerge()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
-
-        var journeyInstance = await CreateJourneyInstance(
-            supportTask.SupportTaskReference,
-            new ResolveTrnRequestState
-            {
-                MatchedPersons = matchedPersonIds.Select(
-                    p => new MatchPersonsResultPerson(
-                        p,
-                        [
-                            PersonMatchedAttribute.FirstName,
-                            PersonMatchedAttribute.MiddleName,
-                            PersonMatchedAttribute.LastName,
-                            PersonMatchedAttribute.DateOfBirth,
-                            PersonMatchedAttribute.EmailAddress,
-                            PersonMatchedAttribute.Gender
-                        ]
-                    )).ToArray(),
-                PersonId = matchedPersonIds[0],
-                PersonAttributeSourcesSet = false
-            });
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal(
-            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
-            response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -572,7 +404,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -658,7 +490,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -741,7 +573,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -795,7 +627,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         TimeProvider.Advance(TimeSpan.FromDays(1));
 
         var comments = Faker.Lorem.Paragraph();
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -833,13 +665,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.NotEmpty(furtherChecksRequiredTasks);
     }
 
-    private Task<JourneyInstance<ResolveTrnRequestState>> CreateJourneyInstance(
-        string supportTaskReference,
-        ResolveTrnRequestState state) =>
-        CreateJourneyInstance(
-            JourneyNames.ResolveTrnRequest,
-            state,
-            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 
     private static void SetPersonAttributeSourceToTrnRequest(ResolveTrnRequestState state, PersonMatchedAttribute attribute)
     {
@@ -872,7 +697,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             applicationUser.UserId,
             PersonMatchedAttribute.MiddleName);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
@@ -1013,4 +838,37 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Func<TrnRequestMetadata, object?> GetValueFromRequestData,
         Func<TestData.CreatePersonResult, object?> GetValueFromPerson,
         Func<object?, object?>? MapValueToSummaryListRowValue = null);
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToListPage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            new ResolveTrnRequestState
+            {
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = true
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal("/support-tasks/trn-requests", response.Headers.Location?.OriginalString);
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
 }
