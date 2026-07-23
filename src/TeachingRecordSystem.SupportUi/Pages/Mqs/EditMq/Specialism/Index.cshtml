@@ -1,11 +1,14 @@
-@page "/mqs/{qualificationId}/specialism/{handler?}"
+@page "/mqs/{qualificationId}/specialism"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism.IndexModel
 @{
     ViewBag.Title = "Specialism";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Qualifications(Model.PersonId)">Back</govuk-back-link>
+    @if (Model.BackLink is not null)
+    {
+        <govuk-back-link href="@Model.BackLink">Back</govuk-back-link>
+    }
 }
 
 <div class="govuk-grid-row">
@@ -27,7 +30,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.Mqs.EditMq.Specialism.Cancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
