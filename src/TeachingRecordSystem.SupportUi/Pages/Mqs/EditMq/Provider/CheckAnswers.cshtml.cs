@@ -9,17 +9,23 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqProvider), RequireJourneyInstance]
+[Journey(JourneyNames.EditMqProvider)]
 public class CheckAnswersModel(
+    EditMqProviderJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
     TimeProvider timeProvider,
     MandatoryQualificationService mandatoryQualificationService) : PageModel
 {
-    public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -43,11 +49,7 @@ public class CheckAnswersModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.Mqs.EditMq.Provider.Index(QualificationId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
@@ -55,16 +57,21 @@ public class CheckAnswersModel(
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         CurrentProviderName = qualificationInfo.MandatoryQualification.Provider?.Name;
-        ProviderId = JourneyInstance.State.ProviderId!.Value;
+        ProviderId = journey.State.ProviderId!.Value;
         ProviderName = MandatoryQualificationProvider.GetById(ProviderId).Name;
-        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
+        ChangeReason = journey.State.ChangeReason!.Value;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail;
+        EvidenceFile = journey.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = journey.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
         var processContext = new ProcessContext(
@@ -87,16 +94,16 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
         TempData.SetFlashNotificationBanner("Mandatory qualification changed");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }
