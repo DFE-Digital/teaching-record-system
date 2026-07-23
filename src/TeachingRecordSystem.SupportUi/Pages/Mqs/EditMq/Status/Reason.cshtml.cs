@@ -24,6 +24,9 @@ public class ReasonModel(
         v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
+        v => v.RuleFor(m => m.AdditionalInformation)
+            .NotEmpty().WithMessage("Enter additional detail")
+            .When(m => m.ProvideAdditionalInformation == true),
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
@@ -81,6 +84,8 @@ public class ReasonModel(
         EndDateChangeReason = journey.State.EndDateChangeReason;
         ChangeReasonDetail = journey.State.ChangeReasonDetail;
         Evidence = journey.State.Evidence;
+        ProvideAdditionalInformation = journey.State.ProvideAdditionalInformation;
+        AdditionalInformation = ProvideAdditionalInformation == true ? journey.State.AdditionalInformation : null;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -104,6 +109,8 @@ public class ReasonModel(
                 state.EndDateChangeReason = EndDateChangeReason;
                 state.ChangeReasonDetail = ChangeReasonDetail;
                 state.Evidence = Evidence;
+                state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+                state.AdditionalInformation = ProvideAdditionalInformation == true ? AdditionalInformation : null;
             });
     }
 

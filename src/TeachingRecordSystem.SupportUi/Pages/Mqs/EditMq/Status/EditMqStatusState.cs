@@ -27,5 +27,7 @@ public class EditMqStatusState
     [JsonIgnore]
     public bool IsStatusChange => Status != CurrentStatus;
 
+    public bool? ProvideAdditionalInformation { get; set; }
+
     public string? AdditionalInformation { get; set; }
 }

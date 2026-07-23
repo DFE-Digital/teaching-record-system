@@ -313,6 +313,80 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/mqs/{qualificationId}/status/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        Assert.True(journeyInstance.State.ProvideAdditionalInformation);
+        Assert.Equal("Some more details", journeyInstance.State.AdditionalInformation);
+    }
+
+    [Fact]
+    public async Task Post_WhenProvideAdditionalInformationIsYesAndNoDetailIsEntered_ReturnsError()
+    {
+        // Arrange
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
+        var newEndDate = new DateOnly(2021, 12, 5);
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqStatusState
+            {
+                CurrentStatus = oldStatus,
+                Status = newStatus,
+                EndDate = newEndDate
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "StatusChangeReason", MqChangeStatusReasonOption.ChangeOfStatus.ToString() },
+                { "ProvideAdditionalInformation", "True" },
+                { "AdditionalInformation", "" },
+                { "Evidence.UploadEvidence", "False" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter additional detail");
+    }
+
+    [Fact]
+    public async Task Get_AdditionalInformationInJourneyState_PopulatesModelFromJourneyState()
+    {
+        // Arrange
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
+        var newEndDate = new DateOnly(2021, 12, 5);
+        var additionalInformation = "Some more details";
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqStatusState
+            {
+                CurrentStatus = oldStatus,
+                Status = newStatus,
+                EndDate = newEndDate,
+                ProvideAdditionalInformation = true,
+                AdditionalInformation = additionalInformation
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var provideAdditionalInformationRadioButtons = doc.GetElementByTestId("has-additional-reason_detail-options")!.GetElementsByTagName("input");
+        var selectedOption = provideAdditionalInformationRadioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
+        Assert.NotNull(selectedOption);
+        Assert.Equal("True", selectedOption.GetAttribute("value"));
+        Assert.Equal(additionalInformation, doc.GetElementById("AdditionalInformation")?.TrimmedText());
     }
 
     [Fact]

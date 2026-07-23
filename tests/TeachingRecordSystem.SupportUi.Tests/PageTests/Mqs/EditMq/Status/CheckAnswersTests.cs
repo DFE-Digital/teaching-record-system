@@ -192,6 +192,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStatusTestBase(h
 
         Guid evidenceFileId = Guid.NewGuid();
         string evidenceFileName = "test.pdf";
+        var additionalInformation = "Some more details";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
@@ -213,7 +214,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStatusTestBase(h
                         FileName = evidenceFileName,
                         FileSizeDescription = "1MB"
                     } : null
-                }
+                },
+                ProvideAdditionalInformation = true,
+                AdditionalInformation = additionalInformation
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -257,7 +260,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStatusTestBase(h
             var changeReasonInfo = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal(changeReason, changeReasonInfo.Reason);
             Assert.Equal(changeReasonDetail, changeReasonInfo.Details);
-            Assert.Null(changeReasonInfo.AdditionalInformation);
+            Assert.Equal(additionalInformation, changeReasonInfo.AdditionalInformation);
             Assert.Equal(
                 uploadEvidence ? new EventModels.File { FileId = evidenceFileId, Name = evidenceFileName } : null,
                 changeReasonInfo.EvidenceFile);
