@@ -95,14 +95,42 @@ public partial class OneLoginServiceTests
         var firstName = TestData.GenerateFirstName();
         var lastName = TestData.GenerateLastName();
         var dateOfBirth = TestData.GenerateDateOfBirth();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
 
-        var person1 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-        var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(nationalInsuranceNumber).WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(nationalInsuranceNumber).WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
         string[][] names = [[firstName, lastName]];
         DateOnly[] datesOfBirth = [dateOfBirth];
-        var nationalInsuranceNumber = person1.NationalInsuranceNumber!;
-        var trn = person2.Trn;
+        string? trn = null;
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.MatchPersonAsync(new(names, datesOfBirth, EmailAddress: null, nationalInsuranceNumber, trn, TrnTokenTrnHint: null)));
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task MatchPersonAsync_WithTrnSpecifiedThatDoesNotMatchOtherwiseMatchingPerson_ReturnsNull()
+    {
+        // Arrange
+        var firstName = TestData.GenerateFirstName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+
+        // Person who matches on name, DOB and NINO but whose TRN is not the one specified
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+
+        // Person whose TRN is specified but who matches on nothing else
+        var otherPerson = await TestData.CreatePersonAsync();
+
+        string[][] names = [[firstName, lastName]];
+        DateOnly[] datesOfBirth = [dateOfBirth];
+        var nationalInsuranceNumber = person.NationalInsuranceNumber!;
+        var trn = otherPerson.Trn;
 
         // Act
         var result = await WithServiceAsync(
@@ -469,16 +497,6 @@ public partial class OneLoginServiceTests
             _matchNameDobAndNinoAttributes
         },
 
-        // Single name, single DOB, person NINO match but TRN doesn't match
-        {
-            OneLogin.NameArgumentOption.MatchesPersonName,
-            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
-            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
-            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
-            /*expectMatch: */ true,
-            _matchNameDobAndNinoAttributes
-        },
-
         // Single name, single DOB, TRN match but no NINO
         {
             OneLogin.NameArgumentOption.MatchesPersonName,
@@ -519,16 +537,6 @@ public partial class OneLoginServiceTests
             _matchNameDobAndNinoAttributes
         },
 
-        // Single name, single DOB, employment NINO match but TRN doesn't match
-        {
-            OneLogin.NameArgumentOption.MatchesPersonName,
-            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
-            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino,
-            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
-            /*expectMatch: */ true,
-            _matchNameDobAndNinoAttributes
-        },
-
         // Single name with alias, single DOB, person NINO and TRN all match
         {
             OneLogin.NameArgumentOption.MatchesAlias,
@@ -545,16 +553,6 @@ public partial class OneLoginServiceTests
             OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
             OneLogin.TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ true,
-            _matchNameDobAndNinoAttributes
-        },
-
-        // Single name with alias, single DOB, person NINO match but TRN doesn't match
-        {
-            OneLogin.NameArgumentOption.MatchesAlias,
-            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
-            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
-            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
             /*expectMatch: */ true,
             _matchNameDobAndNinoAttributes
         },
@@ -599,16 +597,6 @@ public partial class OneLoginServiceTests
             _matchNameDobAndNinoAttributes
         },
 
-        // Single name with alias, single DOB, employment NINO match but TRN doesn't match
-        {
-            OneLogin.NameArgumentOption.MatchesAlias,
-            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
-            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino,
-            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
-            /*expectMatch: */ true,
-            _matchNameDobAndNinoAttributes
-        },
-
         // Multiple names with one match, single DOB, person NINO and TRN all match
         {
             OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName,
@@ -625,16 +613,6 @@ public partial class OneLoginServiceTests
             OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
             OneLogin.TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ true,
-            _matchNameDobAndNinoAttributes
-        },
-
-        // Multiple names with one match, single DOB, person NINO match but TRN doesn't match
-        {
-            OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName,
-            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
-            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
-            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
             /*expectMatch: */ true,
             _matchNameDobAndNinoAttributes
         },
@@ -675,16 +653,6 @@ public partial class OneLoginServiceTests
             OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino,
             OneLogin.TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ true,
-            _matchNameDobAndNinoAttributes
-        },
-
-        // Multiple names with one match, single DOB, employment NINO match but TRN doesn't match
-        {
-            OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName,
-            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
-            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino,
-            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
             /*expectMatch: */ true,
             _matchNameDobAndNinoAttributes
         },
@@ -787,6 +755,66 @@ public partial class OneLoginServiceTests
             OneLogin.NameArgumentOption.MatchesPersonName,
             OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             OneLogin.NationalInsuranceNumberArgumentOption.NotSpecified,
+            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
+            /*expectMatch: */ false,
+            null
+        },
+
+        // Single name, single DOB, person NINO match but TRN doesn't match
+        {
+            OneLogin.NameArgumentOption.MatchesPersonName,
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
+            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
+            /*expectMatch: */ false,
+            null
+        },
+
+        // Single name, single DOB, employment NINO match but TRN doesn't match
+        {
+            OneLogin.NameArgumentOption.MatchesPersonName,
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino,
+            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
+            /*expectMatch: */ false,
+            null
+        },
+
+        // Single name with alias, single DOB, person NINO match but TRN doesn't match
+        {
+            OneLogin.NameArgumentOption.MatchesAlias,
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
+            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
+            /*expectMatch: */ false,
+            null
+        },
+
+        // Single name with alias, single DOB, employment NINO match but TRN doesn't match
+        {
+            OneLogin.NameArgumentOption.MatchesAlias,
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino,
+            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
+            /*expectMatch: */ false,
+            null
+        },
+
+        // Multiple names with one match, single DOB, person NINO match but TRN doesn't match
+        {
+            OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName,
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesPersonNino,
+            OneLogin.TrnArgumentOption.SpecifiedButDifferent,
+            /*expectMatch: */ false,
+            null
+        },
+
+        // Multiple names with one match, single DOB, employment NINO match but TRN doesn't match
+        {
+            OneLogin.NameArgumentOption.MultipleSpecifiedAndOneMatchesPersonName,
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
+            OneLogin.NationalInsuranceNumberArgumentOption.SpecifiedAndMatchesEmploymentNino,
             OneLogin.TrnArgumentOption.SpecifiedButDifferent,
             /*expectMatch: */ false,
             null
