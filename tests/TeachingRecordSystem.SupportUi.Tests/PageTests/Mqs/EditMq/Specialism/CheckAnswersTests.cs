@@ -4,31 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Specialism;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : EditMqSpecialismTestBase(hostFixture)
 {
-    [Fact]
-    public async Task Get_MissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            new EditMqSpecialismState
-            {
-                Initialized = true
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [InlineData(MqChangeSpecialismReasonOption.ChangeOfSpecialism, null, false)]
     [InlineData(MqChangeSpecialismReasonOption.AnotherReason, "Some reason", true)]
@@ -46,7 +23,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = newMqSpecialism,
                 CurrentSpecialism = oldMqSpecialism,
                 ChangeReason = changeReason,
@@ -91,32 +67,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_MissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            new EditMqSpecialismState
-            {
-                Initialized = true
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
     public async Task Post_Confirm_UpdatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -136,7 +86,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = newMqSpecialism,
                 CurrentSpecialism = oldMqSpecialism,
                 ChangeReason = changeReason,
@@ -163,8 +112,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification changed");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -205,7 +153,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = newMqSpecialism,
                 ChangeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism,
                 ChangeReasonDetail = null,
@@ -216,9 +163,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 }
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -227,8 +174,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -256,7 +202,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = newMqSpecialism,
                 ChangeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism,
                 ChangeReasonDetail = "Some reason",
@@ -276,9 +221,4 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    private async Task<JourneyInstance<EditMqSpecialismState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqSpecialismState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditMqSpecialism,
-            state ?? new EditMqSpecialismState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }
