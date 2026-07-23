@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class NameChangeReasonTests(HostFixture hostFixture) : EditDetailsTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
@@ -21,10 +21,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("A", "New", "Name")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "A";
+                s.MiddleName = "New";
+                s.LastName = "Name";
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -48,10 +50,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -86,12 +90,23 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .WithNameChangeReasonChoice(reasonChoice)
-                .WithNameChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+                s.NameChangeReason = reasonChoice;
+                s.NameChangeEvidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = "evidence.jpg",
+                        FileSizeDescription = "1.2 KB"
+                    }
+                };
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -131,10 +146,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -172,10 +189,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -202,10 +221,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -233,10 +254,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -265,10 +288,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -309,10 +334,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -354,10 +381,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -389,10 +418,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -423,10 +454,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -442,7 +475,6 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.NameChangeEvidence.UploadEvidence);
         Assert.Equal("evidence.pdf", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile!.FileName);
         Assert.Equal("1.2 KB", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
@@ -459,10 +491,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -492,10 +526,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -513,18 +549,12 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         FileServiceMock.AssertFileWasNotUploaded();
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(PersonNameChangeReason.CorrectingAnError, journeyInstance.State.NameChangeReason);
         Assert.False(journeyInstance.State.NameChangeEvidence.UploadEvidence);
         Assert.Null(journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance) =>
+    private string GetRequestPath(TestData.CreatePersonResult person, EditDetailsJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/edit-details/name-change-reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<EditDetailsState>> CreateJourneyInstanceAsync(Guid personId, EditDetailsState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.EditDetails,
-            state ?? new EditDetailsState(),
-            new KeyValuePair<string, object>("personId", personId));
 }
