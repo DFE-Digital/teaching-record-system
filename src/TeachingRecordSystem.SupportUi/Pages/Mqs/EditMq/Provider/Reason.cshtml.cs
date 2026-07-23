@@ -5,8 +5,11 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqProvider), RequireJourneyInstance]
-public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+[Journey(JourneyNames.EditMqProvider)]
+public class ReasonModel(
+    EditMqProviderJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
@@ -26,10 +29,15 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
-    public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -52,11 +60,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.ProviderId.HasValue)
-        {
-            context.Result = Redirect(linkGenerator.Mqs.EditMq.Provider.Index(QualificationId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
@@ -66,39 +70,42 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 
     public void OnGet()
     {
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ChangeReasonDetail = ChangeReason == MqChangeProviderReasonOption.AnotherReason ? JourneyInstance.State.ChangeReasonDetail : null;
-        Evidence = JourneyInstance.State.Evidence;
-        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
-        AdditionalInformation = ProvideAdditionalInformation == true ? JourneyInstance.State.AdditionalInformation : null;
+        ChangeReason = journey.State.ChangeReason;
+        ChangeReasonDetail = ChangeReason == MqChangeProviderReasonOption.AnotherReason ? journey.State.ChangeReasonDetail : null;
+        Evidence = journey.State.Evidence;
+        ProvideAdditionalInformation = journey.State.ProvideAdditionalInformation;
+        AdditionalInformation = ProvideAdditionalInformation == true ? journey.State.AdditionalInformation : null;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
+        if (Cancel)
         {
-            return this.PageWithErrors();
+            return await CancelAsync();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.ChangeReason = ChangeReason;
-            state.ChangeReasonDetail = ChangeReason == MqChangeProviderReasonOption.AnotherReason ? ChangeReasonDetail : null;
-            state.Evidence = Evidence;
-            state.AdditionalInformation = ProvideAdditionalInformation == true ? AdditionalInformation : null;
-            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
-        });
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.UploadAsync(Evidence);
 
-        return Redirect(linkGenerator.Mqs.EditMq.Provider.CheckAnswers(QualificationId, JourneyInstance!.InstanceId));
+        await _validator.ValidateAndThrowAsync(this);
+
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.EditMq.Provider.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.ChangeReason = ChangeReason;
+                state.ChangeReasonDetail = ChangeReason == MqChangeProviderReasonOption.AnotherReason ? ChangeReasonDetail : null;
+                state.Evidence = Evidence;
+                state.AdditionalInformation = ProvideAdditionalInformation == true ? AdditionalInformation : null;
+                state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

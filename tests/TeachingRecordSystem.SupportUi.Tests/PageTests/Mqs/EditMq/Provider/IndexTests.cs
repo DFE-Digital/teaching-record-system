@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
@@ -23,18 +23,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
+    public async Task Get_NewJourneyInstance_PopulatesModelFromDatabase()
     {
         // Arrange
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClient.SendAsync(request);  // Starts the journey
+        response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
@@ -44,7 +44,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
+    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
@@ -55,7 +55,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqProviderState
             {
-                Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
             });
 
@@ -126,7 +125,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqProviderState
             {
-                Initialized = true,
                 ProviderId = oldProvider.MandatoryQualificationProviderId
             });
 
@@ -157,12 +155,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqProviderState
             {
-                Initialized = true,
                 ProviderId = provider.MandatoryQualificationProviderId
             });
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -171,8 +168,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -193,7 +189,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqProviderState
             {
-                Initialized = true,
                 ProviderId = provider.MandatoryQualificationProviderId
             });
         var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -205,9 +200,4 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    private async Task<JourneyInstance<EditMqProviderState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqProviderState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditMqProvider,
-            state ?? new EditMqProviderState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }
