@@ -32,7 +32,18 @@ public class SupportTasksLinkGenerator(LinkGenerator linkGenerator)
             "/SupportTasks/Active",
             routeValues: new { type, assignedToUserId, status = statuses, sortBy, sortDirection, pageNumber });
 
-    public string Completed() => "";  // TODO
+    public string Completed() => linkGenerator.GetRequiredPathByPage("/SupportTasks/Completed");
+
+    public string Completed(
+        string? search,
+        SupportTaskType? type,
+        Guid? completedByUserId,
+        CompletedTasksSortByOption? sortBy,
+        SortDirection? sortDirection,
+        int? pageNumber = null) =>
+        linkGenerator.GetRequiredPathByPage(
+            "/SupportTasks/Completed",
+            routeValues: new { search, type, completedByUserId, sortBy, sortDirection, pageNumber });
 
     public string Assign(string? returnUrl = null) =>
         linkGenerator.GetRequiredPathByPage(

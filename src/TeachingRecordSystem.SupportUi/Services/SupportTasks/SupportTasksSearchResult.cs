@@ -14,3 +14,18 @@ public record SupportTasksSearchResultItem(
     Guid? AssignedToUserId,
     string? AssignedToName,
     DateTime CreatedOn) : ISupportTaskSearchResult;
+
+public record CompletedTasksSearchResult
+{
+    public required int TotalTaskCount { get; init; }
+    public required ResultPage<CompletedTasksSearchResultItem> SearchResults { get; init; }
+}
+
+public record CompletedTasksSearchResultItem(
+    string SupportTaskReference,
+    string Subject,
+    SupportTaskType SupportTaskType,
+    DateTime CompletedOn,
+    SupportTaskOutcome? Outcome,
+    Guid? CompletedByUserId,
+    string? CompletedByName) : ISupportTaskSearchResult;

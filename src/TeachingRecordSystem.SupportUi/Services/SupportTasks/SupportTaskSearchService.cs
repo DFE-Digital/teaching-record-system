@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Linq.Expressions;
+using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -583,6 +584,130 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             .ToArray();
 
         return nameParts.Length > 0;
+    }
+
+    public async Task<CompletedTasksSearchResult> SearchCompletedTasksAsync(CompletedTasksSearchOptions searchOptions, PaginationOptions paginationOptions)
+    {
+        var search = searchOptions.Search?.Trim() ?? string.Empty;
+        var sortBy = searchOptions.SortBy ?? CompletedTasksSortByOption.CompletedOn;
+        var sortDirection = searchOptions.SortDirection ?? SortDirection.Descending;
+
+        IQueryable<SupportTask> tasks;
+
+        // Apply search filters
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            if (SearchTextIsDate(search, out var minDate, out var maxDate))
+            {
+                tasks = dbContext.SupportTasks
+                    .Where(t => t.Status == SupportTaskStatus.Closed)
+                    .Where(t => t.CompletedOn >= minDate && t.CompletedOn < maxDate);
+            }
+            else if (SearchTextHelper.IsEmailAddress(search, out var email))
+            {
+                tasks = dbContext.SupportTasks
+                    .Where(t => t.Status == SupportTaskStatus.Closed)
+                    .Where(t => t.SubjectEmailAddress == email);
+            }
+            else if (SearchTextHelper.IsSupportTaskReference(search))
+            {
+                tasks = dbContext.SupportTasks
+                    .Where(t => t.Status == SupportTaskStatus.Closed)
+                    .Where(t => t.SupportTaskReference == search);
+            }
+            else if (SearchTextIsName(search, out var nameParts))
+            {
+                tasks = dbContext.SupportTasks
+                    .FromSqlRaw(
+                        """
+                        SELECT * FROM support_tasks
+                        WHERE status = {0}
+                        AND fn_split_names(ARRAY[:names]::varchar[]) COLLATE "case_insensitive" <@ subject_names
+                        """,
+                        (int)SupportTaskStatus.Closed,
+                        new NpgsqlParameter("names", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = search });
+            }
+            else
+            {
+                tasks = dbContext.SupportTasks
+                    .Where(t => t.Status == SupportTaskStatus.Closed);
+            }
+        }
+        else
+        {
+            tasks = dbContext.SupportTasks
+                .Where(t => t.Status == SupportTaskStatus.Closed);
+        }
+
+        if (searchOptions.SupportTaskType is { } supportTaskType)
+        {
+            tasks = tasks.Where(t => t.SupportTaskType == supportTaskType);
+        }
+
+        if (searchOptions.CompletedByUserId is { } completedByUserId)
+        {
+            tasks = tasks.Where(t => t.CompletedByUserId == completedByUserId);
+        }
+
+        var totalFilteredTaskCount = await tasks.CountAsync();
+
+        tasks = sortBy switch
+        {
+            CompletedTasksSortByOption.Subject => tasks
+                .OrderBy(t => t.SubjectName ?? t.SubjectEmailAddress, sortDirection),
+            CompletedTasksSortByOption.TaskType => tasks
+                .OrderBy(GetOrderByTypeExpression(), sortDirection),
+            CompletedTasksSortByOption.Outcome => tasks
+                .OrderBy(t => t.Outcome, sortDirection),
+            CompletedTasksSortByOption.CompletedBy => tasks
+                .OrderBy(t => t.CompletedBy!.Name, sortDirection),
+            CompletedTasksSortByOption.CompletedOn => tasks
+                .OrderBy(t => t.CompletedOn, sortDirection),
+            _ => tasks
+                .OrderBy(t => t.CompletedOn, sortDirection)
+        };
+
+        var searchResults = await tasks
+            .Select(t => new CompletedTasksSearchResultItem(
+                t.SupportTaskReference,
+                (t.SubjectName ?? t.SubjectEmailAddress)!,
+                t.SupportTaskType,
+                t.CompletedOn!.Value,
+                t.Outcome,
+                t.CompletedByUserId,
+                t.CompletedBy != null ? t.CompletedBy.Name : null))
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
+
+        return new()
+        {
+            TotalTaskCount = totalFilteredTaskCount,
+            SearchResults = searchResults
+        };
+
+        Expression<Func<SupportTask, int>> GetOrderByTypeExpression()
+        {
+            var typesOrderedByTitle = SupportTaskTypeRegistry.GetAll()
+                .OrderBy(t => t.Title)
+                .Select(t => (int)t.SupportTaskType)
+                .ToArray();
+
+            var parameter = Expression.Parameter(typeof(SupportTask), "t");
+            var typeAsInt = Expression.Convert(
+                Expression.Property(parameter, nameof(SupportTask.SupportTaskType)),
+                typeof(int));
+
+            // Build a CASE expression that maps each task type to its position in typesOrderedByTitle.
+            Expression body = Expression.Constant(typesOrderedByTitle.Length);
+            for (var i = typesOrderedByTitle.Length - 1; i >= 0; i--)
+            {
+                body = Expression.Condition(
+                    Expression.Equal(typeAsInt, Expression.Constant(typesOrderedByTitle[i])),
+                    Expression.Constant(i),
+                    body);
+            }
+
+            return Expression.Lambda<Func<SupportTask, int>>(body, parameter);
+        }
     }
 }
 

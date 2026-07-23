@@ -1,0 +1,145 @@
+@page "/support-tasks/completed/{handler?}"
+@using Microsoft.AspNetCore.Http.Extensions
+@using TeachingRecordSystem.SupportUi.Services.SupportTasks
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Completed
+@{
+    ViewBag.Title = "Completed tasks";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Index()" />
+}
+
+<span class="govuk-caption-m">Tasks overview</span>
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="trs-vertical-filters">
+    <form method="get" asp-antiforgery="false">
+        <h2 class="govuk-heading-m trs-vertical-filters__heading">Search completed tasks</h2>
+
+        <govuk-input for="Search" class="govuk-!-margin-bottom-3" input-class="govuk-!-width-two-thirds">
+            <govuk-input-label class="govuk-label--s">Search</govuk-input-label>
+            <govuk-input-hint>Enter a name, task ID, email address or completion date, for example 31 3 2025</govuk-input-hint>
+        </govuk-input>
+
+        <div class="trs-display-flex trs-column-gap-1 govuk-!-margin-bottom-3">
+            <govuk-select for="Type"
+                          class="govuk-!-width-one-half govuk-!-margin-bottom-0"
+                          select-class="govuk-!-width-full">
+                <govuk-select-label class="govuk-label--s">Task type</govuk-select-label>
+                <govuk-select-item value="">All types</govuk-select-item>
+                @foreach (var type in SupportTaskTypeRegistry.GetAllTypes(includeLegacy: false).OrderBy(t => t.GetTitle()))
+                {
+                    <govuk-select-item value="@type">@type.GetTitle()</govuk-select-item>
+                }
+            </govuk-select>
+
+            <govuk-select for="CompletedByUserId"
+                          class="govuk-!-width-one-half govuk-!-margin-bottom-0"
+                          select-class="govuk-!-width-full">
+                <govuk-select-label class="govuk-label--s">Completed by</govuk-select-label>
+                <govuk-select-item value="">All users</govuk-select-item>
+                @foreach (var user in Model.CompletedByOptions!)
+                {
+                    <govuk-select-item value="@user.UserId">
+                        @user.UserName
+                    </govuk-select-item>
+                }
+            </govuk-select>
+        </div>
+
+        <input type="hidden" name="SortBy" value="@Model.SortBy" />
+        <input type="hidden" name="SortDirection" value="@Model.SortDirection" />
+
+        <div class="trs-vertical-filters__actions">
+            <div class="govuk-button-group govuk-!-margin-bottom-0">
+                <govuk-button type="submit">Apply filters</govuk-button>
+                <a href="@LinkGenerator.SupportTasks.Completed()"
+                   class="govuk-link">
+                    Clear all
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (Model.Results!.Count == 0)
+{
+    <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-3" data-testid="no-results-message">
+        No matching tasks found
+    </p>
+    <p class="govuk-body-m">Try searching again with different details.</p>
+}
+else
+{
+    <table class="govuk-table trs-table-layout-fixed" sortable>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header"
+                    sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Subject ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Subject, direction))">
+                    Name and Task ID
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-150"
+                    sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedOn ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedOn, direction))">
+                    Completed on
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-180"
+                    sort-direction="@(Model.SortBy == CompletedTasksSortByOption.TaskType ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.TaskType, direction))">
+                    Type
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-180"
+                    sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Outcome ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Outcome, direction))">
+                    Outcome
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-130"
+                    sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedBy ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedBy, direction))">
+                    Completed by
+                </th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body" data-testid="results">
+            @foreach (var result in Model.Results!)
+            {
+                <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                    <td class="govuk-table__cell" data-testid="task-name-and-id">
+                        <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference)" class="govuk-link trs-task-link">
+                            <span class="trs-task-link__name" data-testid="task-name">@result.Subject</span>
+                            <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
+                        </a>
+                    </td>
+                    <td class="govuk-table__cell" data-testid="completed-on">@result.CompletedOn.ToString(WebConstants.DateDisplayFormat)</td>
+                    <td class="govuk-table__cell">@result.SupportTaskType.GetTitle()</td>
+                    <td class="govuk-table__cell" data-testid="outcome" use-empty-fallback="Not set">
+                        @result.Outcome?.GetDisplayName()
+                    </td>
+                    <td class="govuk-table__cell" data-testid="completed-by" use-empty-fallback="Not set">
+                        @result.CompletedByName
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden">
+    @if (Model.Results!.Count == 0)
+    {
+        <text>No matching tasks found.</text>
+    }
+    else
+    {
+        <text>
+            Showing @Model.Results!.Count of @Model.TotalTaskCount matching tasks
+            sorted by @Model.OrderedByLabel (@Model.OrderDirectionLabel).
+        </text>
+    }
+</div>
+
+<div id="pagination-container">
+    <partial name="_Pagination" model="@Model.Pagination" />
+</div>
