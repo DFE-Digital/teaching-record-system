@@ -5,13 +5,16 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectOneLogin)]
-[RequireJourneyInstance]
+[Journey(JourneyNames.ConnectOneLogin)]
 public class MatchModel(
+    ConnectOneLoginJourneyCoordinator journey,
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<ConnectOneLoginState>? JourneyInstance { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -30,24 +33,20 @@ public class MatchModel(
 
     public IReadOnlyCollection<PersonMatchedAttribute>? MatchedAttributeTypes { get; set; }
 
-    public async Task<IActionResult> OnPostAsync()
+    public IActionResult OnPost()
     {
-        return Redirect(linkGenerator.Persons.PersonDetail.ConnectOneLogin.Reason(PersonId, JourneyInstance!.InstanceId));
-    }
+        if (Cancel)
+        {
+            journey.DeleteInstance();
+            return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
+        }
 
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
+        return journey.AdvanceTo(linkGenerator.Persons.PersonDetail.ConnectOneLogin.Reason(journey.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (JourneyInstance!.State.MatchedAttributes is null)
-        {
-            context.Result = NotFound();
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personFeature = context.HttpContext.GetCurrentPersonFeature();
 
@@ -61,14 +60,15 @@ public class MatchModel(
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .AsNoTracking()
-            .Where(u => u.Subject == JourneyInstance!.State.Subject)
+            .Where(u => u.Subject == journey.State.Subject)
             .SingleAsync();
 
         OneLoginUserEmailAddress = oneLoginUser.EmailAddress;
         OneLoginUserVerifiedNames = oneLoginUser.VerifiedNames;
         OneLoginUserVerifiedDatesOfBirth = oneLoginUser.VerifiedDatesOfBirth;
 
-        MatchedAttributeTypes = JourneyInstance.State.MatchedAttributes
+        // Set by the Index page, which is the only step this one can be reached from
+        MatchedAttributeTypes = journey.State.MatchedAttributes!
             .Select(a => a.Key)
             .ToArray();
 

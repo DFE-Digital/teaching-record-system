@@ -2,32 +2,18 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLo
 
 public class ConnectOneLoginLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string Index(Guid personId) =>
+        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/Index", routeValues: new { personId });
 
-    public string IndexCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/Index", handler: "Cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string Index(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/ConnectOneLogin/Index", journeyInstanceId);
 
-    public string Match(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/Match", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string Match(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/ConnectOneLogin/Match", journeyInstanceId);
 
-    public string MatchCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/Match", handler: "Cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string Reason(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/ConnectOneLogin/Reason", journeyInstanceId, returnUrl);
 
-    public string Reason(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/Reason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string ReasonCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/Reason", handler: "Cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswers(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswersCancel(Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/ConnectOneLogin/CheckAnswers", handler: "Cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/ConnectOneLogin/CheckAnswers", journeyInstanceId);
 }
-
-
-
-
-

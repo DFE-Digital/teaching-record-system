@@ -4,53 +4,17 @@ using TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ConnectPerso
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.OneLogins.OneLoginDetail.ConnectPerson;
 
-public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFixture)
 {
-    [Fact]
-    public async Task Get_WithoutMatchedPerson_ReturnsNotFound()
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_WithoutJourneyInstance_ReturnsNotFound()
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
     [Fact]
     public async Task Get_WithInvalidOneLoginUserSubject_ReturnsNotFound()
     {
         // Arrange
         var oneLoginUserSubject = "invalid-subject";
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
-            new ConnectPersonState(),
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUserSubject));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUserSubject,
+            new ConnectPersonState());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUserSubject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -78,14 +42,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -138,14 +101,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ["Johnny", "Smith"]
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -189,14 +151,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         new DateOnly(1992, 12, 25)
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -228,14 +189,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: null);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -268,14 +228,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -306,14 +265,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -342,14 +300,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -378,14 +335,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("onelogin@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -426,14 +382,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ["Johnny", "Bloggs"]
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -472,14 +427,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ["Jim", "Brown"]
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -517,14 +471,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         new DateOnly(1992, 12, 25)
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -562,14 +515,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         new DateOnly(1992, 12, 25)
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -597,14 +549,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("new@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -629,14 +580,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -660,16 +610,18 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectPerson,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            oneLoginUser.Subject,
             new ConnectPersonState
             {
                 PersonId = person.PersonId,
                 PersonTrn = person.Trn
-            },
-            new KeyValuePair<string, object>("oneLoginUserSubject", oneLoginUser.Subject));
+            });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?handler=Cancel&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/one-logins/{oneLoginUser.Subject}/connect-person/match?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -678,8 +630,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/one-logins/{oneLoginUser.Subject}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     private void AssertPersonRowIsHighlighted(IElement recordCard, string summaryListKey)

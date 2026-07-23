@@ -7,8 +7,9 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.ConnectOneLogin), RequireJourneyInstance]
+[Journey(JourneyNames.ConnectOneLogin)]
 public class CheckAnswersModel(
+    ConnectOneLoginJourneyCoordinator journey,
     TrsDbContext dbContext,
     OneLoginService oneLoginService,
     TimeProvider timeProvider,
@@ -22,10 +23,15 @@ public class CheckAnswersModel(
             .When(m => !m.IsOneLoginUserVerified)
     };
 
-    public JourneyInstance<ConnectOneLoginState>? JourneyInstance { get; set; }
-
     [FromRoute]
     public Guid PersonId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     public string? OneLoginEmailAddress { get; set; }
 
@@ -40,31 +46,32 @@ public class CheckAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (!JourneyInstance!.State.ConnectReason.HasValue)
-        {
-            context.Result = Redirect(linkGenerator.Persons.PersonDetail.ConnectOneLogin.Reason(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var oneLoginUser = await dbContext.OneLoginUsers
-            .Where(u => u.Subject == JourneyInstance.State.Subject)
+            .Where(u => u.Subject == journey.State.Subject)
             .Select(u => new { u.VerifiedOn, u.VerifiedNames, u.VerifiedDatesOfBirth })
             .SingleAsync();
 
         IsOneLoginUserVerified = oneLoginUser.VerifiedOn is not null;
-        OneLoginEmailAddress = JourneyInstance.State.OneLoginEmailAddress;
-        ConnectReason = JourneyInstance.State.ConnectReason;
-        ReasonDetail = JourneyInstance.State.ReasonDetail;
+        OneLoginEmailAddress = journey.State.OneLoginEmailAddress;
+        ConnectReason = journey.State.ConnectReason;
+        ReasonDetail = journey.State.ReasonDetail;
 
         await next();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return CancelJourney();
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
         var oneLoginUser = await dbContext.OneLoginUsers
-            .Where(u => u.Subject == JourneyInstance!.State.Subject)
+            .Where(u => u.Subject == journey.State.Subject)
             .SingleAsync();
 
         var person = await dbContext.Persons
@@ -73,9 +80,9 @@ public class CheckAnswersModel(
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence()
         {
-            Reason = JourneyInstance!.State.ConnectReason?.GetDisplayName(),
-            Details = JourneyInstance.State.ConnectReason == ConnectOneLoginReason.AnotherReason
-                ? JourneyInstance.State.ReasonDetail
+            Reason = journey.State.ConnectReason?.GetDisplayName(),
+            Details = journey.State.ConnectReason == ConnectOneLoginReason.AnotherReason
+                ? journey.State.ReasonDetail
                 : null,
             EvidenceFile = null,
             AdditionalInformation = null
@@ -83,7 +90,7 @@ public class CheckAnswersModel(
 
         var processContext = new ProcessContext(ProcessType.PersonOneLoginUserConnecting, timeProvider.UtcNow, User.GetUserId(), changeReason: changeReason);
 
-        var matchedAttributes = JourneyInstance!.State.MatchedAttributes!;
+        var matchedAttributes = journey.State.MatchedAttributes!;
 
         if (oneLoginUser.VerifiedOn is null)
         {
@@ -94,7 +101,7 @@ public class CheckAnswersModel(
             await oneLoginService.SetUserVerifiedAndMatchedAsync(
                 new SetUserVerifiedAndMatchedOptions
                 {
-                    OneLoginUserSubject = JourneyInstance.State.Subject!,
+                    OneLoginUserSubject = journey.State.Subject!,
                     VerificationRoute = OneLoginUserVerificationRoute.Support,
                     VerifiedNames = [verifiedNames],
                     VerifiedDatesOfBirth = person.DateOfBirth.HasValue ? [person.DateOfBirth.Value] : [],
@@ -110,7 +117,7 @@ public class CheckAnswersModel(
             await oneLoginService.SetUserMatchedAsync(
                 new SetUserMatchedOptions
                 {
-                    OneLoginUserSubject = JourneyInstance.State.Subject!,
+                    OneLoginUserSubject = journey.State.Subject!,
                     MatchedPersonId = PersonId,
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
                     MatchedAttributes = matchedAttributes
@@ -121,13 +128,14 @@ public class CheckAnswersModel(
         var personName = string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);
         TempData.SetFlashNotificationBanner($"Record connected to {personName}’s GOV.UK One Login");
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
+
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private IActionResult CancelJourney()
     {
-        await JourneyInstance!.DeleteAsync();
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 }

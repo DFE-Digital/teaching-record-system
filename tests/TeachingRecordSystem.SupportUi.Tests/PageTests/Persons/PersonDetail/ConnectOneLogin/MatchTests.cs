@@ -4,53 +4,17 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ConnectOneLogin;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.ConnectOneLogin;
 
-public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostFixture)
 {
-    [Fact]
-    public async Task Get_WithoutMatchedOneLogin_ReturnsNotFound()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", person.PersonId));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_WithoutJourneyInstance_ReturnsNotFound()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
     [Fact]
     public async Task Get_WithInvalidPersonId_ReturnsNotFound()
     {
         // Arrange
         var personId = Guid.NewGuid();
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
-            new ConnectOneLoginState(),
-            new KeyValuePair<string, object>("personId", personId));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personId,
+            new ConnectOneLoginState());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -77,8 +41,8 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
@@ -87,8 +51,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
                     KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -137,8 +100,8 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ["Johnny", "Smith"]
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
@@ -146,8 +109,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName)
                 ]
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -192,16 +154,15 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         new DateOnly(1992, 12, 25)
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = [
                     KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -231,14 +192,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verified: false);
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = []
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -269,8 +229,8 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
@@ -280,8 +240,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                     KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.EmailAddress, person.EmailAddress!)
                 ]
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -310,14 +269,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["Jane", "Doe"], new DateOnly(1990, 1, 15)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = []
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -343,14 +301,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: (["John", "Doe"], new DateOnly(1985, 5, 20)));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = []
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -389,8 +346,8 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ["Johnny", "Bloggs"]
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
@@ -398,8 +355,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName)
                 ]  // Name matches (one of the multiple names)
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -438,14 +394,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         ["Jim", "Brown"]
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = []  // No matched attributes - none of the names match
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -483,16 +438,15 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         new DateOnly(1992, 12, 25)
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = [
                     KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]  // DOB matches (one of the multiple DOBs)
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -530,14 +484,13 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                         new DateOnly(1992, 12, 25)
                     ])));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = []
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -562,8 +515,8 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
@@ -572,8 +525,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
                     KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -598,8 +550,8 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
             email: Option.Some<string?>("test@example.com"),
             verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
-        var journeyInstance = await CreateJourneyInstance(
-            JourneyNames.ConnectOneLogin,
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
             new ConnectOneLoginState
             {
                 Subject = oneLoginUser.Subject,
@@ -608,10 +560,12 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
                     KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]
-            },
-            new KeyValuePair<string, object>("personId", person.PersonId));
+            });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/match?handler=Cancel&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/connect-one-login/match?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -620,8 +574,7 @@ public class MatchTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     private void AssertOneLoginRowIsHighlighted(IElement oneLoginCard, string summaryListKey)
