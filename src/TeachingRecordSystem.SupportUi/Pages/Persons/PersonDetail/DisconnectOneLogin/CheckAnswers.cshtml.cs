@@ -8,8 +8,9 @@ using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOneLogin;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DisconnectOneLogin), RequireJourneyInstance]
+[Journey(JourneyNames.DisconnectOneLogin)]
 public class CheckAnswers(
+    DisconnectOneLoginJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider,
     OneLoginService oneLoginService,
@@ -20,7 +21,13 @@ public class CheckAnswers(
 
     [FromRoute] public required string OneLoginSubject { get; set; }
 
-    public JourneyInstance<DisconnectOneLoginState>? JourneyInstance { get; set; }
+
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? EmailAddress { get; set; }
 
@@ -34,25 +41,31 @@ public class CheckAnswers(
     {
         var oneLogin = await dbContext.OneLoginUsers.SingleAsync(x => x.Subject == OneLoginSubject);
         EmailAddress = oneLogin.EmailAddress;
-        Reason = JourneyInstance!.State.DisconnectReason;
-        Detail = JourneyInstance!.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason ? JourneyInstance.State.Detail : null;
-        StayVerified = JourneyInstance!.State.StayVerified;
+        Reason = journey.State.DisconnectReason;
+        Detail = journey.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason ? journey.State.Detail : null;
+        StayVerified = journey.State.StayVerified;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            journey.DeleteInstance();
+            return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
+        }
+
         var changeReason = new ChangeReasonWithDetailsAndEvidence()
         {
             Reason = Reason?.GetDisplayName(),
-            Details = JourneyInstance!.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason
-                ? JourneyInstance.State.Detail
+            Details = journey.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason
+                ? journey.State.Detail
                 : null,
             EvidenceFile = null,
             AdditionalInformation = null
         };
         var processContext = new ProcessContext(ProcessType.PersonOneLoginUserDisconnecting, timeProvider.UtcNow, User.GetUserId(), changeReason: changeReason);
         var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
-        if (JourneyInstance!.State.StayVerified == DisconnectOneLoginStayVerified.Yes)
+        if (journey.State.StayVerified == DisconnectOneLoginStayVerified.Yes)
         {
             await oneLoginService.SetUserUnmatchedAsync(OneLoginSubject, processContext);
         }
@@ -64,21 +77,13 @@ public class CheckAnswers(
 
         var personName = $"{person.FirstName} {person.LastName}";
         TempData.SetFlashNotificationBanner($"GOV.UK One Login disconnected from {personName}’s record");
-        return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
-    }
 
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.DisconnectReason.HasValue || !JourneyInstance.State.StayVerified.HasValue)
-        {
-            context.Result = Redirect(linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Index(PersonId, OneLoginSubject, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
     }
 }

@@ -6,9 +6,9 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.DisconnectPerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DisconnectPerson), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.DisconnectPerson), StartsJourney]
 [TypeFilter(typeof(CheckOneLoginUserExistsFilterFactory))]
-public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
+public class Index(DisconnectPersonJourneyCoordinator journey, SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
 {
     private readonly InlineValidator<Index> _validator = new()
     {
@@ -36,50 +36,42 @@ public class Index(SupportUiLinkGenerator linkGenerator, TrsDbContext dbContext)
 
     [FromRoute] public required Guid PersonId { get; set; }
 
-    public JourneyInstance<DisconnectPersonState>? JourneyInstance { get; set; }
 
-    [FromQuery] public bool? FromCheckAnswers { get; set; }
 
-    public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.CheckAnswers(OneLoginUserSubject, PersonId,
-            JourneyInstance!.InstanceId)
-        : linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject);
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public async Task OnGetAsync()
     {
         var person = await dbContext.Persons.SingleAsync(p => p.PersonId == PersonId);
-        ReasonDetail = JourneyInstance!.State.Detail;
-        Reason = JourneyInstance.State.DisconnectReason;
+        ReasonDetail = journey.State.Detail;
+        Reason = journey.State.DisconnectReason;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            journey.DeleteInstance();
+            return Redirect(linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject));
+        }
+
         await _validator.ValidateAndThrowAsync(this);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.DisconnectReason = Reason;
-            state.Detail = Reason == DisconnectPersonReason.AnotherReason ? ReasonDetail : null;
-        });
-
-        if (FromCheckAnswers == true)
-        {
-            return Redirect(linkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.CheckAnswers(OneLoginUserSubject, PersonId,
-                JourneyInstance.InstanceId));
-        }
-
-        return Redirect(linkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Verified(OneLoginUserSubject, PersonId,
-            JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Verified(journey.InstanceId),
+            state =>
+            {
+                state.DisconnectReason = Reason;
+                state.Detail = Reason == DisconnectPersonReason.AnotherReason ? ReasonDetail : null;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override void OnPageHandlerExecuting(Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject));
+        BackLink = journey.GetBackLink() ?? linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject);
     }
+
 }

@@ -1,4 +1,5 @@
 @page "/one-logins/{oneLoginUserSubject}/disconnect-person/{personId}/check-answers"
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.DisconnectPerson.CheckAnswers
 @{
     Layout = "_Layout";
@@ -6,10 +7,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link data-testid="back-link"
-                     href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Verified(Model.OneLoginUserSubject, Model.PersonId, Model!.JourneyInstance!.InstanceId)">
-        Back
-    </govuk-back-link>
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
@@ -36,7 +34,7 @@
                     </value>
                     <row-actions>
                         <action
-                            href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Index(Model.OneLoginUserSubject, Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                            href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Index(Model.InstanceId, returnUrl: Request.GetEncodedPathAndQuery())"
                             visually-hidden-text="disconnect reason">Change
                         </action>
                     </row-actions>
@@ -48,7 +46,7 @@
                     </value>
                     <row-actions>
                         <action
-                            href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Verified(Model.OneLoginUserSubject, Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                            href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Verified(Model.InstanceId, returnUrl: Request.GetEncodedPathAndQuery())"
                             visually-hidden-text="stay verified">Change
                         </action>
                     </row-actions>
@@ -58,10 +56,8 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Confirm and disconnect</govuk-button>
-                <govuk-button data-testid="cancel-button"
-                              formaction="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.CheckAnswersCancel(Model.OneLoginUserSubject!, Model.PersonId, Model.JourneyInstance!.InstanceId)"
-                              class="govuk-button--secondary" type="submit">Cancel
-                </govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true"
+                              class="govuk-button--secondary" type="submit">Cancel</govuk-button>
             </div>
         </form>
     </div>

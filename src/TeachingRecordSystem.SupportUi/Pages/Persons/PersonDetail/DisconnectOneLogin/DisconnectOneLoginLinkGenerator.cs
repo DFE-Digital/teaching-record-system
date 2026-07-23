@@ -2,28 +2,16 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.DisconnectOn
 
 public class DisconnectOneLoginLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(Guid personId, string oneLoginSubject, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId,
-        bool? fromCheckAnswers = null) =>
+    public string Index(Guid personId, string oneLoginSubject) =>
         linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/DisconnectOneLogin/Index",
-            routeValues: new { personId, oneLoginSubject, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+            routeValues: new { personId, oneLoginSubject });
 
-    public string Cancel(Guid personId, string oneLoginSubject, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/DisconnectOneLogin/Index", "cancel",
-            routeValues: new { personId, oneLoginSubject }, journeyInstanceId: journeyInstanceId);
+    public string Index(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/DisconnectOneLogin/Index", journeyInstanceId, returnUrl);
 
-    public string Verified(Guid personId, string oneLoginSubject, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/DisconnectOneLogin/Verified",
-            routeValues: new { personId, oneLoginSubject, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string Verified(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/DisconnectOneLogin/Verified", journeyInstanceId, returnUrl);
 
-    public string VerifiedCancel(Guid personId, string oneLoginSubject, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/DisconnectOneLogin/Verified", "cancel",
-            routeValues: new { personId, oneLoginSubject }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswers(Guid personId, string oneLoginSubject, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/DisconnectOneLogin/CheckAnswers",
-            routeValues: new { personId, oneLoginSubject }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswersCancel(Guid personId, string oneLoginSubject, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/DisconnectOneLogin/CheckAnswers", "cancel",
-            routeValues: new { personId, oneLoginSubject }, journeyInstanceId: journeyInstanceId);
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/DisconnectOneLogin/CheckAnswers", journeyInstanceId);
 }
