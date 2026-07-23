@@ -367,6 +367,7 @@
   }
 }
 
+
 .trs-tile__count {
   @include govuk-font($size: 36, $weight: bold);
   display: block;
@@ -381,6 +382,32 @@
     text-decoration-thickness: $govuk-link-hover-underline-thickness;
   }
 }
+
+.trs-task-tile-layout {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  column-gap: 30px;
+}
+
+.trs-task-tile-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 15px;
+}
+
+.trs-task-tile__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding-bottom: 16px;
+}
+
+.trs-task-tile__count {
+  @include govuk-font($size: 36, $weight: bold);
+  line-height: 1;
+}
+
 
 .trs-blue-panel {
   background-color: $govuk-brand-colour;

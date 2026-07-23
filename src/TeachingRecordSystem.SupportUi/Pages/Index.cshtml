@@ -53,7 +53,51 @@
             </govuk-tabs-item>
         </govuk-tabs>
     </div>
+    @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
+    {
+        <div class="govuk-grid-column-full">
+            <div class="trs-task-tile-section">
+                <div class="trs-task-tile-layout">
+                    <div class="trs-task-panel">
+                        <h3 class="govuk-heading-m">My tasks</h3>
+                        <div class="trs-task-tile">
+                            <div class="trs-task-tile__header">
+                                <span class="trs-task-tile__count" data-testid="my-tasks-count">@Model.MyTasksCount</span>
+                            </div>
+                            <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: User.GetUserId(), statuses: new[] { SupportTaskStatus.Open, SupportTaskStatus.InProgress }, sortBy: null, sortDirection: null)">Tasks assigned to me</a>
+                        </div>
+                    </div>
+                    <div class="trs-task-panel">
+                        <h3 class="govuk-heading-m">Tasks overview</h3>
+                        <div class="trs-task-tile-row">
+                            <div class="trs-task-tile">
+                                <div class="trs-task-tile__header">
+                                    <span class="trs-task-tile__count" data-testid="unassigned-task-count">@Model.UnassignedCount</span>
 
+                                    <tag color="TagColor.Yellow">Unassigned</tag>
+                                </div>
+                                <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: null, statuses: new[] { SupportTaskStatus.Open, SupportTaskStatus.InProgress }, sortBy: null, sortDirection: null)">Manage unassigned tasks</a>
+                            </div>
+                            <div class="trs-task-tile">
+                                <div class="trs-task-tile__header">
+                                    <span class="trs-task-tile__count" data-testid="in-progress-tasks-count">@Model.InProgressCount</span>
+
+                                    <tag color="TagColor.LightBlue">In progress</tag>
+                                </div>
+                                <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: null, statuses: new[] { SupportTaskStatus.InProgress }, sortBy: null, sortDirection: null)">Manage tasks in progress</a>
+                            </div>
+                            <div class="trs-task-tile">
+                                <div class="trs-task-tile__header">
+                                    <span class="govuk-heading-s">Completed tasks</span>
+                                </div>
+                                <a class="govuk-link" href="@LinkGenerator.SupportTasks.Completed()">View completed tasks</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     <div class="govuk-grid-column-full">
         <div class="trs-tiles govuk-!-margin-top-5">
             @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
