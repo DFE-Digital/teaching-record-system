@@ -205,7 +205,7 @@ else
                     <row-actions>
                         @if (Model.CanEdit)
                         {
-                            <action href="@LinkGenerator.Mqs.EditMq.StartDate.Index(mq.QualificationId, null)" class="govuk-link" visually-hidden-text="start date" data-testid="start-date-change-link-@mq.QualificationId">Change</action>
+                            <action href="@LinkGenerator.Mqs.EditMq.StartDate.Index(mq.QualificationId)" class="govuk-link" visually-hidden-text="start date" data-testid="start-date-change-link-@mq.QualificationId">Change</action>
                         }
                     </row-actions>
                 </row>

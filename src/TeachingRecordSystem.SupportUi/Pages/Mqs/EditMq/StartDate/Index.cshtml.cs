@@ -5,13 +5,29 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqStartDate), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+[Journey(JourneyNames.EditMqStartDate), StartsJourney]
+public class IndexModel(
+    EditMqStartDateJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
-    public JourneyInstance<EditMqStartDateState>? JourneyInstance { get; set; }
+    private readonly InlineValidator<IndexModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.StartDate)
+            .Cascade(CascadeMode.Stop)
+            .NotNull().WithMessage("Enter a start date")
+            .Must((m, startDate) => !(startDate >= m.EndDate)).WithMessage("Start date must be after end date")
+    };
+
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -24,34 +40,27 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public void OnGet()
     {
-        StartDate = JourneyInstance!.State.StartDate;
+        StartDate = journey.State.StartDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (StartDate is null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(StartDate), "Enter a start date");
-        }
-        else if (StartDate >= EndDate)
-        {
-            ModelState.AddModelError(nameof(StartDate), "Start date must be after end date");
+            return await CancelAsync();
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
-        await JourneyInstance!.UpdateStateAsync(state => state.StartDate = StartDate);
-
-        return Redirect(linkGenerator.Mqs.EditMq.StartDate.Reason(QualificationId, JourneyInstance!.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.EditMq.StartDate.Reason(journey.InstanceId),
+            state => state.StartDate = StartDate);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
@@ -60,10 +69,10 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        JourneyInstance!.State.EnsureInitialized(qualificationInfo);
-
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         EndDate = qualificationInfo.MandatoryQualification.EndDate;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
     }
 }

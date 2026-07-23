@@ -2,7 +2,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.StartDate;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : EditMqStartDateTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
@@ -21,18 +21,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
+    public async Task Get_NewJourneyInstance_PopulatesModelFromDatabase()
     {
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(databaseStartDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClient.SendAsync(request);  // Starts the journey
+        response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
@@ -42,7 +42,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
+    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
@@ -53,7 +53,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStartDateState
             {
-                Initialized = true,
                 StartDate = journeyStartDate
             });
 
@@ -179,9 +178,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -190,8 +189,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -219,9 +217,4 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    private async Task<JourneyInstance<EditMqStartDateState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqStartDateState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditMqStartDate,
-            state ?? new EditMqStartDateState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }
