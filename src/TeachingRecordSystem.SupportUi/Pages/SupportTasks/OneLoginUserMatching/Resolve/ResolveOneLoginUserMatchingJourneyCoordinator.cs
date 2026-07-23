@@ -61,15 +61,17 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
         }
         else
         {
-            suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(new(
+            var matchOptions = new GetSuggestedPersonMatchesOptions(
                 Names: requestData.VerifiedOrStatedNames!,
                 DatesOfBirth: requestData.VerifiedOrStatedDatesOfBirth!,
                 NationalInsuranceNumber: requestData.StatedNationalInsuranceNumber,
                 EmailAddress: emailAddress,
                 Trn: requestData.StatedTrn,
-                TrnTokenTrnHint: requestData.TrnTokenTrn));
+                TrnTokenTrnHint: requestData.TrnTokenTrn);
 
-            var matchResult = oneLoginService.MatchPerson(suggestedMatches);
+            suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(matchOptions);
+
+            var matchResult = oneLoginService.MatchPerson(matchOptions, suggestedMatches);
             if (matchResult is not null)
             {
                 suggestedMatches = [matchResult];

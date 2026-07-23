@@ -318,25 +318,29 @@ public class OneLoginService(
             ["reason"] = reason
         };
 
-    public virtual async Task<MatchPersonResult?> MatchPersonAsync(MatchPersonOptions options)
+    public virtual async Task<MatchPersonResult?> MatchPersonAsync(GetSuggestedPersonMatchesOptions matchOptions)
     {
         var suggestedMatches = await GetSuggestedPersonMatchesAsync(
             new GetSuggestedPersonMatchesOptions(
-                options.Names,
-                options.DatesOfBirth,
-                options.EmailAddress,
-                options.NationalInsuranceNumber,
-                options.Trn,
-                options.TrnTokenTrnHint));
+                matchOptions.Names,
+                matchOptions.DatesOfBirth,
+                matchOptions.EmailAddress,
+                matchOptions.NationalInsuranceNumber,
+                matchOptions.Trn,
+                matchOptions.TrnTokenTrnHint));
 
-        return MatchPerson(suggestedMatches);
+        return MatchPerson(matchOptions, suggestedMatches);
     }
 
-    public virtual MatchPersonResult? MatchPerson(IReadOnlyCollection<MatchPersonResult> suggestedMatches)
+    public virtual MatchPersonResult? MatchPerson(
+        GetSuggestedPersonMatchesOptions matchOptions,
+        IReadOnlyCollection<MatchPersonResult> suggestedMatches)
     {
         // A One Login is matched if there is exactly one Person with a matching
         // first name, last name, DOB AND either NINO or TRN *OR*
         // first name, DOB, NINO and TRN.
+        //
+        // If TRN was specified but does not match, don't return that record.
 
         var candidates = new List<MatchPersonResult>();
 
@@ -351,8 +355,11 @@ public class OneLoginService(
             var nationalInsuranceNumberMatched = matchedAttributeTypes.Contains(PersonMatchedAttribute.NationalInsuranceNumber);
             var trnMatched = matchedAttributeTypes.Contains(PersonMatchedAttribute.Trn);
 
-            if ((firstNameMatched && lastNameMatched && dateOfBirthMatched && (nationalInsuranceNumberMatched || trnMatched)) ||
-                (firstNameMatched && dateOfBirthMatched && nationalInsuranceNumberMatched && trnMatched))
+            var trnSpecified = !string.IsNullOrEmpty(matchOptions.Trn);
+
+            if ((trnMatched || !trnSpecified) && (
+                (firstNameMatched && lastNameMatched && dateOfBirthMatched && (nationalInsuranceNumberMatched || trnMatched)) ||
+                (firstNameMatched && dateOfBirthMatched && nationalInsuranceNumberMatched && trnMatched)))
             {
                 candidates.Add(new MatchPersonResult(
                     match.PersonId,
