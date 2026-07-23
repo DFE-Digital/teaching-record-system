@@ -161,9 +161,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var emailAddress = "Test.User@Example.Com";
+        // The address has to be unique per run, otherwise every previous run's person matches the
+        // search too and this run's person gets pushed off the first page of results.
+        var emailAddress = $"Test.User{Guid.NewGuid():N}@Example.Com";
         await TestData.CreateOneLoginUserAsync(person, email: Option.Some<string?>(emailAddress));
-        var search = "test.user@example.com";
+        var search = emailAddress.ToLowerInvariant();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
 
