@@ -1,5 +1,6 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
@@ -14,10 +15,13 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980")
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Post,
             $"/persons/add/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -42,15 +46,22 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
         var emailAddress = "some@email-address.com";
         var nationalInsuranceNumber = "AB123456D";
 
-        var state = new AddPersonStateBuilder()
-                        .WithName(firstName, middleName, lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmail(emailAddress)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-            .WithUploadEvidenceChoice(false);
+        var state = new AddPersonState
+        {
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue(emailAddress),
+            NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(nationalInsuranceNumber),
+            Reason = PersonCreateReason.MandatoryQualification,
+            Evidence = new()
+            {
+                UploadEvidence = false
+            }
+        };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/add{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -78,15 +89,22 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
         var mobileNumber = "07891234567";
         var nationalInsuranceNumber = "AB123456D";
 
-        var state = new AddPersonStateBuilder()
-                        .WithName(firstName, middleName, lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmail(emailAddress)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-            .WithUploadEvidenceChoice(false);
+        var state = new AddPersonState
+        {
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue(emailAddress),
+            NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(nationalInsuranceNumber),
+            Reason = PersonCreateReason.MandatoryQualification,
+            Evidence = new()
+            {
+                UploadEvidence = false
+            }
+        };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/add{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new AddPersonPostRequestContentBuilder()
@@ -121,12 +139,18 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-                .WithUploadEvidenceChoice(false)
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
 
         var pageUrl = $"/persons/add/{page}?{journeyInstance.GetUniqueIdQueryParameter()}";
         var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
@@ -166,12 +190,24 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-                .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = "evidence.jpg",
+                        FileSizeDescription = "1.2 KB"
+                    }
+                }
+            });
 
         var pageUrl = $"/persons/add/{page}?{journeyInstance.GetUniqueIdQueryParameter()}";
         var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
@@ -207,15 +243,22 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
         var emailAddress = "some@email-address.com";
         var nationalInsuranceNumber = "AB123456D";
 
-        var state = new AddPersonStateBuilder()
-                        .WithName(firstName, middleName, lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmail(emailAddress)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-            .WithUploadEvidenceChoice(false);
+        var state = new AddPersonState
+        {
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue(emailAddress),
+            NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(nationalInsuranceNumber),
+            Reason = PersonCreateReason.MandatoryQualification,
+            Evidence = new()
+            {
+                UploadEvidence = false
+            }
+        };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
         var checkAnswersUrl = $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/add/{page}?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -243,15 +286,22 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
         var mobileNumber = "07891234567";
         var nationalInsuranceNumber = "AB123456D";
 
-        var state = new AddPersonStateBuilder()
-                        .WithName(firstName, middleName, lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmail(emailAddress)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber)
-            .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-            .WithUploadEvidenceChoice(false);
+        var state = new AddPersonState
+        {
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue(emailAddress),
+            NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(nationalInsuranceNumber),
+            Reason = PersonCreateReason.MandatoryQualification,
+            Evidence = new()
+            {
+                UploadEvidence = false
+            }
+        };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
         var checkAnswersUrl = $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/add/{page}?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {

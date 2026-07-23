@@ -17,7 +17,9 @@ public abstract class AddPersonTestBase(HostFixture hostFixture) : TestBase(host
                 "/persons/add/personal-details",
                 "/persons/add/reason",
                 "/persons/add/check-answers",
-            ]);
+            ],
+            // The coordinator has constructor dependencies, so it can't be Activator-created.
+            coordinatorFactory: () => ActivatorUtilities.CreateInstance<AddPersonJourneyCoordinator>(HostFixture.Services));
 
     protected AddPersonState? GetJourneyInstanceState(AddPersonJourneyCoordinator coordinator)
     {

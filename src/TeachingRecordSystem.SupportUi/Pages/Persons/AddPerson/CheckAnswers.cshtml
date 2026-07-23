@@ -24,35 +24,35 @@
                     <key>Full name</key>
                     <value>@Model.Name</value>
                     <row-actions>
-                        <action data-testid="change-details-link" href=@Model.ChangePersonalDetailsLink(returnUrl) visually-hidden-text="name">Change</action>
+                        <action data-testid="change-details-link" href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="name">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Date of birth</key>
                     <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
                     <row-actions>
-                        <action href=@Model.ChangePersonalDetailsLink(returnUrl) visually-hidden-text="date of birth">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="date of birth">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Email address</key>
                     <value use-empty-fallback>@Model.EmailAddress?.ToDisplayString()</value>
                     <row-actions>
-                        <action href=@Model.ChangePersonalDetailsLink(returnUrl) visually-hidden-text="email address">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="email address">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>National Insurance number</key>
                     <value use-empty-fallback>@Model.NationalInsuranceNumber?.ToDisplayString()</value>
                     <row-actions>
-                        <action href=@Model.ChangePersonalDetailsLink(returnUrl) visually-hidden-text="National Insurance number">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="National Insurance number">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Gender</key>
                     <value use-empty-fallback>@Model.Gender?.GetDisplayName()</value>
                     <row-actions>
-                        <action href=@Model.ChangePersonalDetailsLink(returnUrl) visually-hidden-text="gender">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="gender">Change</action>
                     </row-actions>
                 </row>
 
@@ -64,7 +64,7 @@
                     <key>Reason</key>
                     <value>@Model.Reason?.GetDisplayName()</value>
                     <row-actions>
-                        <action data-testid="change-create-reason-link" href=@Model.ChangeReasonLink(returnUrl) visually-hidden-text="reason">Change</action>
+                        <action data-testid="change-create-reason-link" href=@LinkGenerator.Persons.AddPerson.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -80,7 +80,7 @@
                         }
                     </value>
                     <row-actions>
-                        <action href=@Model.ChangeReasonLink(returnUrl) visually-hidden-text="reason details">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason details">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -96,7 +96,7 @@
                         }
                     </value>
                     <row-actions>
-                        <action href=@Model.ChangeReasonLink(returnUrl) visually-hidden-text="reason details">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason details">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -105,7 +105,7 @@
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                     </value>
                     <row-actions>
-                        <action href=@Model.ChangeReasonLink(returnUrl) visually-hidden-text="evidence">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="evidence">Change</action>
                     </row-actions>
                 </row>
             </govuk-summary-list>

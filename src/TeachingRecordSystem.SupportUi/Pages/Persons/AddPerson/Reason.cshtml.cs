@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -10,8 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 public class ReasonModel(
     AddPersonJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(journey, linkGenerator, evidenceUploadManager)
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
@@ -35,6 +35,9 @@ public class ReasonModel(
     public string? BackLink { get; set; }
 
     [BindProperty]
+    public bool Cancel { get; set; }
+
+    [BindProperty]
     public PersonCreateReason? Reason { get; set; }
 
     [BindProperty]
@@ -51,33 +54,33 @@ public class ReasonModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        BackLink = Journey.GetBackLink();
+        BackLink = journey.GetBackLink();
     }
 
     public void OnGet()
     {
-        Reason = Journey.State.Reason;
-        ReasonDetail = Journey.State.ReasonDetail;
-        Evidence = Journey.State.Evidence;
-        ProvideAdditionalInformation = Journey.State.ProvideAdditionalInformation;
-        AdditionalInformation = Journey.State.AdditionalInformation;
+        Reason = journey.State.Reason;
+        ReasonDetail = journey.State.ReasonDetail;
+        Evidence = journey.State.Evidence;
+        ProvideAdditionalInformation = journey.State.ProvideAdditionalInformation;
+        AdditionalInformation = journey.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return Redirect(await journey.CancelAsync());
         }
 
         // Upload the evidence file before validating so that it's retained if the form is re-rendered
         // with errors.
-        await EvidenceUploadManager.UploadAsync(Evidence);
+        await evidenceUploadManager.UploadAsync(Evidence);
 
         await _validator.ValidateAndThrowAsync(this);
 
-        return Journey.AdvanceTo(
-            GetPageLink(AddPersonJourneyPage.CheckAnswers),
+        return journey.AdvanceTo(
+            linkGenerator.Persons.AddPerson.CheckAnswers(journey.InstanceId),
             state =>
             {
                 state.Reason = Reason;

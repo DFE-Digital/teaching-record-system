@@ -16,12 +16,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithUploadEvidenceChoice(false)
-                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -44,15 +50,21 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         // Arrange
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithEmail("test@test.com")
-                .WithNationalInsuranceNumber("AB 12 34 56 C")
-                .WithGender(Gender.Other)
-                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-                .WithUploadEvidenceChoice(false)
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("test@test.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB 12 34 56 C"),
+                Gender = Gender.Other,
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -74,12 +86,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", null, "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-                .WithUploadEvidenceChoice(false)
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -102,11 +120,22 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var evidenceFileId = Guid.NewGuid();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(PersonCreateReason.AnotherReason, ChangeReasonDetails)
-                .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
-                .Build());
+            new AddPersonState
+            {
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                Reason = PersonCreateReason.AnotherReason,
+                ReasonDetail = ChangeReasonDetails,
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = "evidence.pdf",
+                        FileSizeDescription = "1.2 MB"
+                    }
+                }
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -136,11 +165,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var evidenceFileId = Guid.NewGuid();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-                .WithUploadEvidenceChoice(false)
-                .Build());
+            new AddPersonState
+            {
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -170,15 +203,28 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var otherEvidenceFileId = Guid.NewGuid();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName(firstName, middleName, lastName)
-                .WithDateOfBirth(dateOfBirth)
-                .WithEmail(emailAddress)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber)
-                .WithGender(gender)
-                .WithAddPersonReasonChoice(PersonCreateReason.AnotherReason, ChangeReasonDetails)
-                .WithUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue(emailAddress),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(nationalInsuranceNumber),
+                Gender = gender,
+                Reason = PersonCreateReason.AnotherReason,
+                ReasonDetail = ChangeReasonDetails,
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = otherEvidenceFileId,
+                        FileName = "other-evidence.png",
+                        FileSizeDescription = "5MB"
+                    }
+                }
+            });
 
         EventObserver.Clear();
 

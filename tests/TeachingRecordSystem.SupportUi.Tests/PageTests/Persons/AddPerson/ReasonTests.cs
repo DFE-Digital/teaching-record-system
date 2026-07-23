@@ -16,10 +16,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -49,13 +52,27 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
         var additionalInfo = "this is additional info";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAddPersonReasonChoice(reasonChoice, reasonDetail)
-                .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, additionalInfo)
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                Reason = reasonChoice,
+                ReasonDetail = reasonDetail,
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = additionalInfo,
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = "evidence.jpg",
+                        FileSizeDescription = "1.2 KB"
+                    }
+                }
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -97,10 +114,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
         var expectedChoices = Enum.GetValues<PersonCreateReason>().Select(s => s.ToString());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -143,11 +163,15 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
         var changeReasonDetails = "A description about why the change typed into the box";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = "Some more information",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -171,10 +195,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -194,10 +221,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -218,10 +248,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -243,11 +276,15 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAdditionalInformation(ProvideMoreInformationOption.No, "")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                ProvideAdditionalInformation = ProvideMoreInformationOption.No,
+                AdditionalInformation = ""
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -269,10 +306,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -294,10 +334,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -320,10 +363,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -359,10 +405,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -399,10 +448,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -429,10 +481,13 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -458,11 +513,15 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = "Some more information"
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -489,11 +548,15 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = "Some more information"
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -519,11 +582,15 @@ public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixtur
         var evidenceFileId = Guid.NewGuid();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "this is additional info that should be discarded")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = "this is additional info that should be discarded"
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {

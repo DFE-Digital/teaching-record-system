@@ -1,16 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 [Journey(JourneyNames.AddPerson)]
 public class PersonalDetailsModel(
-    TimeProvider timeProvider,
     AddPersonJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(journey, linkGenerator, evidenceUploadManager)
+    TimeProvider timeProvider) : PageModel
 {
     private readonly InlineValidator<PersonalDetailsModel> _validator = new()
     {
@@ -38,6 +36,9 @@ public class PersonalDetailsModel(
     public string? BackLink { get; set; }
 
     [BindProperty]
+    public bool Cancel { get; set; }
+
+    [BindProperty]
     public string? FirstName { get; set; }
 
     [BindProperty]
@@ -59,7 +60,7 @@ public class PersonalDetailsModel(
     [BindProperty]
     public Gender? Gender { get; set; }
 
-    // Exposed so the validation rules can use them; also reused when the answers are written to state.
+    // Exposed so the validation rules can use them; the parsed values are reused when writing state.
     public DateOnly Today => timeProvider.Today;
 
     public NationalInsuranceNumber? ParsedNationalInsuranceNumber =>
@@ -70,15 +71,15 @@ public class PersonalDetailsModel(
 
     public IActionResult OnGet()
     {
-        BackLink = Journey.GetBackLink() ?? LinkGenerator.Index();
+        BackLink = GetBackLink();
 
-        FirstName = Journey.State.FirstName;
-        MiddleName = Journey.State.MiddleName;
-        LastName = Journey.State.LastName;
-        DateOfBirth = Journey.State.DateOfBirth;
-        EmailAddress = Journey.State.EmailAddress.Parsed?.ToDisplayString() ?? Journey.State.EmailAddress.Raw;
-        NationalInsuranceNumber = Journey.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? Journey.State.NationalInsuranceNumber.Raw;
-        Gender = Journey.State.Gender;
+        FirstName = journey.State.FirstName;
+        MiddleName = journey.State.MiddleName;
+        LastName = journey.State.LastName;
+        DateOfBirth = journey.State.DateOfBirth;
+        EmailAddress = journey.State.EmailAddress.Parsed?.ToDisplayString() ?? journey.State.EmailAddress.Raw;
+        NationalInsuranceNumber = journey.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? journey.State.NationalInsuranceNumber.Raw;
+        Gender = journey.State.Gender;
 
         return Page();
     }
@@ -87,10 +88,10 @@ public class PersonalDetailsModel(
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return Redirect(await journey.CancelAsync());
         }
 
-        BackLink = Journey.GetBackLink() ?? LinkGenerator.Index();
+        BackLink = GetBackLink();
 
         // NotAvailable is not a value the user is allowed to select in the UI.
         if (Gender == Core.Models.Gender.NotAvailable)
@@ -100,8 +101,8 @@ public class PersonalDetailsModel(
 
         await _validator.ValidateAndThrowAsync(this);
 
-        return Journey.AdvanceTo(
-            GetPageLink(AddPersonJourneyPage.Reason),
+        return journey.AdvanceTo(
+            linkGenerator.Persons.AddPerson.Reason(journey.InstanceId),
             state =>
             {
                 state.FirstName = FirstName ?? "";
@@ -113,4 +114,6 @@ public class PersonalDetailsModel(
                 state.Gender = Gender;
             });
     }
+
+    private string GetBackLink() => journey.GetBackLink() ?? linkGenerator.Index();
 }
