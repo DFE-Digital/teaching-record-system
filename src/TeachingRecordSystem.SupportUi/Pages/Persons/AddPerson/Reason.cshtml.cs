@@ -6,11 +6,12 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddPerson), RequireJourneyInstance]
+[Journey(JourneyNames.AddPerson)]
 public class ReasonModel(
+    AddPersonJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(linkGenerator, evidenceUploadManager)
+    : CommonJourneyPage(journey, linkGenerator, evidenceUploadManager)
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
@@ -31,6 +32,8 @@ public class ReasonModel(
             .When(x => x.ProvideAdditionalInformation == ProvideMoreInformationOption.Yes)
     };
 
+    public string? BackLink { get; set; }
+
     [BindProperty]
     public PersonCreateReason? Reason { get; set; }
 
@@ -46,52 +49,42 @@ public class ReasonModel(
     [BindProperty]
     public string? AdditionalInformation { get; set; }
 
-    public string BackLink => GetPageLink(
-        FromCheckAnswers
-            ? AddPersonJourneyPage.CheckAnswers
-            : AddPersonJourneyPage.PersonalDetails);
-
-    public string NextPage => GetPageLink(
-        AddPersonJourneyPage.CheckAnswers,
-        FromCheckAnswers is true ? true : null);
-
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < AddPersonJourneyPage.Reason)
-        {
-            context.Result = Redirect(GetPageLink(NextIncompletePage));
-            return;
-        }
+        BackLink = Journey.GetBackLink();
     }
 
     public void OnGet()
     {
-        Reason = JourneyInstance!.State.Reason;
-        ReasonDetail = JourneyInstance.State.ReasonDetail;
-        Evidence = JourneyInstance.State.Evidence;
-        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
+        Reason = Journey.State.Reason;
+        ReasonDetail = Journey.State.ReasonDetail;
+        Evidence = Journey.State.Evidence;
+        ProvideAdditionalInformation = Journey.State.ProvideAdditionalInformation;
+        AdditionalInformation = Journey.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
+        if (Cancel)
         {
-            return this.PageWithErrors();
+            return await CancelAsync();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.Reason = Reason;
-            state.ReasonDetail = Reason is PersonCreateReason.AnotherReason ? ReasonDetail : null;
-            state.Evidence = Evidence;
-            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
-            state.AdditionalInformation = ProvideAdditionalInformation == ProvideMoreInformationOption.Yes ? AdditionalInformation : null;
-        });
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await EvidenceUploadManager.UploadAsync(Evidence);
 
-        return Redirect(NextPage);
+        await _validator.ValidateAndThrowAsync(this);
+
+        return Journey.AdvanceTo(
+            GetPageLink(AddPersonJourneyPage.CheckAnswers),
+            state =>
+            {
+                state.Reason = Reason;
+                state.ReasonDetail = Reason is PersonCreateReason.AnotherReason ? ReasonDetail : null;
+                state.Evidence = Evidence;
+                state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+                state.AdditionalInformation = ProvideAdditionalInformation == ProvideMoreInformationOption.Yes ? AdditionalInformation : null;
+            });
     }
 }

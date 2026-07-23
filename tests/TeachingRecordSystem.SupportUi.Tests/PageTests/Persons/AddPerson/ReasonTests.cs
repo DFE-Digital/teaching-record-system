@@ -9,7 +9,7 @@ using ReasonModel = TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson.Reaso
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
@@ -17,8 +17,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -51,8 +50,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .WithAddPersonReasonChoice(reasonChoice, reasonDetail)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
@@ -100,8 +98,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -147,8 +144,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
@@ -166,7 +162,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.Reason!.GetDisplayName());
         Assert.Equal(changeReasonDetails, journeyInstance.State.ReasonDetail);
     }
@@ -177,8 +172,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -201,8 +195,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -226,8 +219,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -252,8 +244,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .WithAdditionalInformation(ProvideMoreInformationOption.No, "")
                 .Build());
@@ -279,8 +270,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -305,8 +295,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -332,8 +321,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -372,8 +360,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -413,8 +400,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -444,8 +430,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
@@ -474,8 +459,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .Build());
@@ -495,7 +479,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.Evidence.UploadEvidence);
         Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
         Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile.FileSizeDescription);
@@ -507,8 +490,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
                 .Build());
@@ -538,8 +520,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "this is additional info that should be discarded")
                 .Build());
@@ -561,7 +542,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         FileServiceMock.AssertFileWasNotUploaded();
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(PersonCreateReason.MandatoryQualification, journeyInstance.State.Reason);
         Assert.Null(journeyInstance.State.ReasonDetail);
         Assert.False(journeyInstance.State.Evidence.UploadEvidence);
@@ -569,11 +549,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance.State.AdditionalInformation);
     }
 
-    private string GetRequestPath(JourneyInstance<AddPersonState> journeyInstance) =>
+    private string GetRequestPath(AddPersonJourneyCoordinator journeyInstance) =>
         $"/persons/add/reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<AddPersonState>> CreateJourneyInstanceAsync(AddPersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.AddPerson,
-            state ?? new AddPersonState());
 }

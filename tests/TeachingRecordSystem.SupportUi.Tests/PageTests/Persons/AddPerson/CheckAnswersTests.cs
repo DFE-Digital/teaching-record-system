@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(hostFixture)
 {
     private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
@@ -17,8 +17,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithUploadEvidenceChoice(false)
                 .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
@@ -46,8 +45,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
@@ -77,8 +75,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", null, "Great")
+                                .WithName("Alfred", null, "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(false)
@@ -106,8 +103,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithAddPersonReasonChoice(PersonCreateReason.AnotherReason, ChangeReasonDetails)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
@@ -141,8 +137,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -176,8 +171,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName(firstName, middleName, lastName)
+                                .WithName(firstName, middleName, lastName)
                 .WithDateOfBirth(dateOfBirth)
                 .WithEmail(emailAddress)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
@@ -249,15 +243,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal("other-evidence.png", changeReasonInfo?.EvidenceFile?.Name);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
-    private string GetRequestPath(JourneyInstance<AddPersonState> journeyInstance) =>
+    private string GetRequestPath(AddPersonJourneyCoordinator journeyInstance) =>
         $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<AddPersonState>> CreateJourneyInstanceAsync(AddPersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.AddPerson,
-            state ?? new AddPersonState());
 }

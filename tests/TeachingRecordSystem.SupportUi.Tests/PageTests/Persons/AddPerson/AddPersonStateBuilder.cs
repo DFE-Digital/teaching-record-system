@@ -23,15 +23,6 @@ public class AddPersonStateBuilder
     public bool? UploadEvidence { get; set; }
     public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
-    private bool Initialized { get; set; }
-
-    public AddPersonStateBuilder WithInitializedState()
-    {
-        Initialized = true;
-
-        return this;
-    }
-
     public AddPersonStateBuilder WithName(string? firstName, string? middleName, string? lastName)
     {
         FirstName = firstName ?? "";
@@ -111,7 +102,6 @@ public class AddPersonStateBuilder
                 UploadEvidence = UploadEvidence,
                 UploadedEvidenceFile = UploadedEvidenceFile,
             },
-            Initialized = Initialized,
             ProvideAdditionalInformation = ProvideAdditionalInformation,
             AdditionalInformation = AdditionalInformation,
         };

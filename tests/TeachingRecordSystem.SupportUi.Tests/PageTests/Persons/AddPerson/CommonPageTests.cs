@@ -1,11 +1,10 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
-public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFixture)
 {
     [Theory]
     [MemberData(nameof(GetPagesForUserWithoutPersonDataEditPermissionData))]
@@ -16,8 +15,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .Build());
 
@@ -29,52 +27,6 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData("reason", false, false, "personal-details")]
-    [InlineData("check-answers", false, false, "personal-details")]
-    [InlineData("check-answers", true, false, "reason")]
-    public async Task Get_InvalidState_RedirectsToAppropriatePage(string attemptedPage, bool hasPersonalDetails, bool hasCreateReason, string expectedPage)
-    {
-        // Arrange
-        var firstName = "Alfred";
-        var middleName = "The";
-        var lastName = "Great";
-        var dateOfBirth = DateOnly.Parse("1 Feb 1980");
-        var emailAddress = "some@email-address.com";
-        var nationalInsuranceNumber = "AB123456D";
-
-        var state = new AddPersonStateBuilder()
-            .WithInitializedState();
-
-        if (hasPersonalDetails)
-        {
-            state = state
-                .WithName(firstName, middleName, lastName)
-                .WithDateOfBirth(dateOfBirth)
-                .WithEmail(emailAddress)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber);
-        }
-
-        if (hasCreateReason)
-        {
-            state = state
-                .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
-                .WithUploadEvidenceChoice(false);
-        }
-
-        var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/add/{attemptedPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var location = response.Headers.Location?.OriginalString;
-        var expectedUrl = $"/persons/add/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
-        Assert.Equal(expectedUrl, location);
     }
 
     [Theory]
@@ -91,8 +43,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new AddPersonStateBuilder()
-            .WithInitializedState()
-            .WithName(firstName, middleName, lastName)
+                        .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
@@ -128,8 +79,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new AddPersonStateBuilder()
-            .WithInitializedState()
-            .WithName(firstName, middleName, lastName)
+                        .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
@@ -172,14 +122,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(false)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/add/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var pageUrl = $"/persons/add/{page}?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -187,18 +137,22 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+        Assert.NotNull(cancelButton);
+        Assert.Equal("Cancel", cancelButton.Name);
 
         // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+        var cancelRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var cancelResponse = await HttpClient.SendAsync(cancelRequest);
 
         // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal(StatusCodes.Status302Found, (int)cancelResponse.StatusCode);
+        var location = cancelResponse.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/add", location);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -213,36 +167,37 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithAddPersonReasonChoice(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/add/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var pageUrl = $"/persons/add/{page}?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
 
         // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+        var cancelRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var cancelResponse = await HttpClient.SendAsync(cancelRequest);
 
         // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        Assert.Equal(StatusCodes.Status302Found, (int)cancelResponse.StatusCode);
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Theory]
     [InlineData("personal-details")]
     [InlineData("reason")]
-    public async Task Get_WhenLinkedToFromFromCheckAnswersPage_BacklinkLinksToCheckAnswersPage(string page)
+    public async Task Get_WithReturnUrlToCheckAnswersPage_BacklinkLinksToCheckAnswersPage(string page)
     {
         // Arrange
         var firstName = "Alfred";
@@ -253,8 +208,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new AddPersonStateBuilder()
-            .WithInitializedState()
-            .WithName(firstName, middleName, lastName)
+                        .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
@@ -262,7 +216,8 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithUploadEvidenceChoice(false);
 
         var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/add/{page}?FromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var checkAnswersUrl = $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/add/{page}?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -277,7 +232,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Theory]
     [InlineData("personal-details")]
     [InlineData("reason")]
-    public async Task Post_WhenLinkedToFromCheckAnswersPage_AndMoreChangesMade_RedirectsToCheckAnswersPage(string page)
+    public async Task Post_WithReturnUrlToCheckAnswersPage_RedirectsToCheckAnswersPage(string page)
     {
         // Arrange
         var firstName = "Alfred";
@@ -289,8 +244,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new AddPersonStateBuilder()
-            .WithInitializedState()
-            .WithName(firstName, middleName, lastName)
+                        .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
@@ -298,7 +252,8 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithUploadEvidenceChoice(false);
 
         var journeyInstance = await CreateJourneyInstanceAsync(state.Build());
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/add/{page}?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var checkAnswersUrl = $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/add/{page}?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new AddPersonPostRequestContentBuilder()
                 .WithFirstName(firstName)
@@ -345,8 +300,4 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         return data;
     }
 
-    private Task<JourneyInstance<AddPersonState>> CreateJourneyInstanceAsync(AddPersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.AddPerson,
-            state ?? new AddPersonState());
 }

@@ -6,13 +6,14 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddPerson), RequireJourneyInstance]
+[Journey(JourneyNames.AddPerson)]
 public class CheckAnswersModel(
+    AddPersonJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     PersonService personService,
     TimeProvider timeProvider)
-    : CommonJourneyPage(linkGenerator, evidenceUploadManager)
+    : CommonJourneyPage(journey, linkGenerator, evidenceUploadManager)
 {
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
@@ -28,33 +29,29 @@ public class CheckAnswersModel(
 
     public string Name => string.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
-    public string? ChangePersonalDetailsLink =>
-        GetPageLink(AddPersonJourneyPage.PersonalDetails, true);
+    public string? BackLink { get; set; }
 
-    public string? ChangeReasonLink =>
-        GetPageLink(AddPersonJourneyPage.Reason, true);
+    public string ChangePersonalDetailsLink(string returnUrl) =>
+        GetPageLink(AddPersonJourneyPage.PersonalDetails, returnUrl);
 
-    public string BackLink => GetPageLink(AddPersonJourneyPage.Reason);
+    public string ChangeReasonLink(string returnUrl) =>
+        GetPageLink(AddPersonJourneyPage.Reason, returnUrl);
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < AddPersonJourneyPage.CheckAnswers)
-        {
-            context.Result = Redirect(GetPageLink(NextIncompletePage));
-            return;
-        }
+        BackLink = Journey.GetBackLink();
 
-        FirstName = JourneyInstance!.State.FirstName;
-        MiddleName = JourneyInstance.State.MiddleName;
-        LastName = JourneyInstance.State.LastName;
-        DateOfBirth = JourneyInstance.State.DateOfBirth;
-        EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
-        NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
-        Gender = JourneyInstance.State.Gender;
-        Reason = JourneyInstance.State.Reason;
-        ReasonDetail = JourneyInstance.State.ReasonDetail;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
+        FirstName = Journey.State.FirstName;
+        MiddleName = Journey.State.MiddleName;
+        LastName = Journey.State.LastName;
+        DateOfBirth = Journey.State.DateOfBirth;
+        EmailAddress = Journey.State.EmailAddress.Parsed;
+        NationalInsuranceNumber = Journey.State.NationalInsuranceNumber.Parsed;
+        Gender = Journey.State.Gender;
+        Reason = Journey.State.Reason;
+        ReasonDetail = Journey.State.ReasonDetail;
+        EvidenceFile = Journey.State.Evidence.UploadedEvidenceFile;
+        AdditionalInformation = Journey.State.AdditionalInformation;
     }
 
     public void OnGet()
@@ -63,6 +60,11 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         var processContext = new ProcessContext(
             ProcessType.PersonCreating,
             timeProvider.UtcNow,
@@ -89,7 +91,7 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        await JourneyInstance!.CompleteAsync();
+        Journey.DeleteInstance();
 
         TempData.SetFlashNotificationBanner($"Record created for {Name}");
 

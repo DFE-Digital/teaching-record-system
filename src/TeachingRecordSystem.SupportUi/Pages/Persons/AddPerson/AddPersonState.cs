@@ -1,18 +1,11 @@
-using System.Text.Json.Serialization;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
-public class AddPersonState : IRegisterJourney
+public class AddPersonState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.AddPerson,
-        typeof(AddPersonState),
-        requestDataKeys: [],
-        appendUniqueKey: true);
-
     public string FirstName { get; set; } = "";
     public string MiddleName { get; set; } = "";
     public string LastName { get; set; } = "";
@@ -28,33 +21,4 @@ public class AddPersonState : IRegisterJourney
     public ProvideMoreInformationOption? ProvideAdditionalInformation { get; set; }
 
     public string? AdditionalInformation { get; set; }
-
-    public bool Initialized { get; set; }
-
-    [JsonIgnore]
-    public bool IsComplete =>
-        IsPersonalDetailsComplete &&
-        IsCreateReasonComplete;
-
-    [JsonIgnore]
-    public bool IsPersonalDetailsComplete =>
-        FirstName is not null &&
-        LastName is not null &&
-        DateOfBirth.HasValue;
-
-    [JsonIgnore]
-    public bool IsCreateReasonComplete =>
-        Reason.HasValue &&
-        (Reason is not PersonCreateReason.AnotherReason || ReasonDetail is not null) &&
-        Evidence.IsComplete;
-
-    public void EnsureInitialized()
-    {
-        if (Initialized)
-        {
-            return;
-        }
-
-        Initialized = true;
-    }
 }

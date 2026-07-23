@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
-public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class PersonalDetailsTests(HostFixture hostFixture) : AddPersonTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
@@ -11,8 +11,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -35,8 +34,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
+                                .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
@@ -77,8 +75,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -99,8 +96,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -125,8 +121,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -151,8 +146,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -177,8 +171,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -203,8 +196,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -229,8 +221,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -255,8 +246,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -281,8 +271,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -307,8 +296,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -333,8 +321,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -371,8 +358,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -450,8 +436,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -493,8 +478,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -527,8 +511,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -554,8 +537,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -574,7 +556,6 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance.State.Gender);
     }
 
@@ -584,8 +565,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
-                .WithInitializedState()
-                .Build());
+                                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -605,7 +585,6 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal("Jimmy", journeyInstance.State.FirstName);
         Assert.Equal("A", journeyInstance.State.MiddleName);
         Assert.Equal("Person", journeyInstance.State.LastName);
@@ -618,11 +597,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
     private string GetRequestPath() =>
         $"/persons/add/personal-details";
 
-    private string GetRequestPath(JourneyInstance<AddPersonState> journeyInstance) =>
+    private string GetRequestPath(AddPersonJourneyCoordinator journeyInstance) =>
         $"/persons/add/personal-details?{journeyInstance.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<AddPersonState>> CreateJourneyInstanceAsync(AddPersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.AddPerson,
-            state ?? new AddPersonState());
 }
