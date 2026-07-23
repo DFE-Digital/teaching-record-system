@@ -2,15 +2,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 public class DeleteMqLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/DeleteMq/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string Index(Guid qualificationId) =>
+        linkGenerator.GetRequiredPathByPage("/Mqs/DeleteMq/Index", routeValues: new { qualificationId });
 
-    public string Cancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/DeleteMq/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string Index(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Mqs/DeleteMq/Index", journeyInstanceId, returnUrl);
 
-    public string CheckAnswers(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/DeleteMq/CheckAnswers", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswersCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/DeleteMq/CheckAnswers", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Mqs/DeleteMq/CheckAnswers", journeyInstanceId);
 }

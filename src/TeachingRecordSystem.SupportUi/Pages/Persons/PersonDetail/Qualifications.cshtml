@@ -175,7 +175,7 @@ else
             <card-actions>
                 @if (Model.CanEdit)
                 {
-                    <action href="@LinkGenerator.Mqs.DeleteMq.Index(mq.QualificationId, null)" data-testid="delete-link-@mq.QualificationId">Delete qualification</action>
+                    <action href="@LinkGenerator.Mqs.DeleteMq.Index(mq.QualificationId)" data-testid="delete-link-@mq.QualificationId">Delete qualification</action>
                 }
             </card-actions>
             <govuk-summary-list>

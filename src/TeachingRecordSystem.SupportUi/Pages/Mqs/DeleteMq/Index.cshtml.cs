@@ -5,8 +5,11 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DeleteMq), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+[Journey(JourneyNames.DeleteMq), StartsJourney]
+public class IndexModel(
+    DeleteMqJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
@@ -26,10 +29,15 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
-    public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -60,43 +68,48 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         Specialism = qualificationInfo.MandatoryQualification.Specialism;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
     }
 
     public void OnGet()
     {
-        DeletionReason = JourneyInstance!.State.DeletionReason;
-        DeletionReasonDetail = DeletionReason == MqDeletionReasonOption.AnotherReason ? JourneyInstance.State.DeletionReasonDetail : null;
-        Evidence = JourneyInstance.State.Evidence;
-        AdditionalInformation = ProvideAdditionalInformation == true ? JourneyInstance.State.AdditionalInformation : null;
-        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
+        DeletionReason = journey.State.DeletionReason;
+        DeletionReasonDetail = DeletionReason == MqDeletionReasonOption.AnotherReason ? journey.State.DeletionReasonDetail : null;
+        Evidence = journey.State.Evidence;
+        AdditionalInformation = ProvideAdditionalInformation == true ? journey.State.AdditionalInformation : null;
+        ProvideAdditionalInformation = journey.State.ProvideAdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await evidenceUploadManager.ValidateAndUploadAsync<IndexModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
+        if (Cancel)
         {
-            return this.PageWithErrors();
+            return await CancelAsync();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.DeletionReason = DeletionReason;
-            state.DeletionReasonDetail = DeletionReasonDetail;
-            state.Evidence = Evidence;
-            state.AdditionalInformation = AdditionalInformation;
-            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
-        });
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.UploadAsync(Evidence);
 
-        return Redirect(linkGenerator.Mqs.DeleteMq.CheckAnswers(QualificationId, JourneyInstance!.InstanceId));
+        await _validator.ValidateAndThrowAsync(this);
+
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.DeleteMq.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.DeletionReason = DeletionReason;
+                state.DeletionReasonDetail = DeletionReasonDetail;
+                state.Evidence = Evidence;
+                state.AdditionalInformation = AdditionalInformation;
+                state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }
