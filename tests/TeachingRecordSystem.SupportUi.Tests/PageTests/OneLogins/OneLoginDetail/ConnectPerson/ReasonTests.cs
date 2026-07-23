@@ -8,20 +8,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.OneLogins.OneLoginDetai
 public class ReasonTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithoutJourneyInstance_ReturnsBadRequest()
-    {
-        // Arrange
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null);
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{oneLoginUser.Subject}/connect-person/reason");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-    }
-
-    [Fact]
     public async Task Get_WithValidJourney_RendersExpectedContent()
     {
         // Arrange

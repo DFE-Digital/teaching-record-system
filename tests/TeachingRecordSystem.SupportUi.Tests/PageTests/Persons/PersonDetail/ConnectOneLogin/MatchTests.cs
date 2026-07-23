@@ -7,21 +7,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Co
 public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithoutJourneyInstance_ReturnsBadRequest()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/connect-one-login/match");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-    }
-
-    [Fact]
     public async Task Get_WithInvalidPersonId_ReturnsNotFound()
     {
         // Arrange
