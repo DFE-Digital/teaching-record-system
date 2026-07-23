@@ -596,7 +596,6 @@ public class PersonalDetailsTests(HostFixture hostFixture) : AddPersonTestBase(h
                 .WithLastName("Person")
                 .WithDateOfBirth(DateOnly.Parse("2 Mar 1981"))
                 .WithEmailAddress("new@email.com")
-                .WithMobileNumber("07987 654321")
                 .WithNationalInsuranceNumber("AB 65 43 21 D")
                 .WithGender(Gender.Other)
                 .BuildFormUrlEncoded()

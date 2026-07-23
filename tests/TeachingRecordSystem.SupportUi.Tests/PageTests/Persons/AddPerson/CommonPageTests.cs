@@ -86,7 +86,6 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
         var lastName = "Great";
         var dateOfBirth = DateOnly.Parse("1 Feb 1980");
         var emailAddress = "some@email-address.com";
-        var mobileNumber = "07891234567";
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new AddPersonState
@@ -113,7 +112,6 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
                 .WithLastName(lastName)
                 .WithDateOfBirth(dateOfBirth)
                 .WithEmailAddress(emailAddress)
-                .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(false)
@@ -283,7 +281,6 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
         var lastName = "Great";
         var dateOfBirth = DateOnly.Parse("1 Feb 1980");
         var emailAddress = "some@email-address.com";
-        var mobileNumber = "07891234567";
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new AddPersonState
@@ -311,7 +308,6 @@ public class CommonPageTests(HostFixture hostFixture) : AddPersonTestBase(hostFi
                 .WithLastName(lastName)
                 .WithDateOfBirth(dateOfBirth)
                 .WithEmailAddress(emailAddress)
-                .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithReason(PersonCreateReason.MandatoryQualification)
                 .WithUploadEvidence(false)
