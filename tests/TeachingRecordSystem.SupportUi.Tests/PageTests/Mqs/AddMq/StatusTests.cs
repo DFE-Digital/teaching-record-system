@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
-public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class StatusTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
@@ -19,26 +19,6 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_StartDateMissingFromState_RedirectsToStartDate()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            state => state.StartDate = null);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -117,35 +97,6 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Post_StartDateMissingFromState_RedirectsToStartDate()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var status = MandatoryQualificationStatus.Passed;
-        var endDate = new DateOnly(2021, 11, 5);
-
-        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state => state.StartDate = null);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder
-            {
-                { "Status", status.ToString() },
-                { "EndDate.Day", $"{endDate:%d}" },
-                { "EndDate.Month", $"{endDate:%M}" },
-                { "EndDate.Year", $"{endDate:yyyy}" }
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -291,7 +242,10 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -300,11 +254,10 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}/qualifications", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
-    private Task<JourneyInstance<AddMqState>> CreateJourneyInstanceAsync(Guid personId, Action<AddMqState>? configureState = null)
+    private Task<AddMqJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, Action<AddMqState>? configureState = null)
     {
         var state = new AddMqState
         {
@@ -314,9 +267,6 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
         configureState?.Invoke(state);
 
-        return CreateJourneyInstance(
-            JourneyNames.AddMq,
-            state,
-            new KeyValuePair<string, object>("personId", personId));
+        return CreateJourneyInstanceForStateAsync(personId, state);
     }
 }

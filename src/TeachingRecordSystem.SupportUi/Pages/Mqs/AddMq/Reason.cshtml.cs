@@ -5,8 +5,9 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddMq), RequireJourneyInstance]
+[Journey(JourneyNames.AddMq)]
 public class ReasonModel(
+    AddMqJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
@@ -28,13 +29,15 @@ public class ReasonModel(
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
-    public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -55,49 +58,48 @@ public class ReasonModel(
 
     public void OnGet()
     {
-        AddReason = JourneyInstance!.State.AddReason;
-        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
-        AddReasonDetail = JourneyInstance.State.AddReasonDetail;
-        Evidence = JourneyInstance.State.Evidence;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
+        AddReason = journey.State.AddReason;
+        ProvideAdditionalInformation = journey.State.ProvideAdditionalInformation;
+        AddReasonDetail = journey.State.AddReasonDetail;
+        Evidence = journey.State.Evidence;
+        AdditionalInformation = journey.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
+        if (Cancel)
         {
-            return this.PageWithErrors();
+            return await CancelAsync();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.AddReason = AddReason;
-            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
-            state.AddReasonDetail = AddReason == AddMqReasonOption.AnotherReason ? AddReasonDetail : null;
-            state.Evidence = Evidence;
-            state.AdditionalInformation = ProvideAdditionalInformation == true ? AdditionalInformation : null;
-        });
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.UploadAsync(Evidence);
 
-        return Redirect(linkGenerator.Mqs.AddMq.CheckAnswers(PersonId, JourneyInstance.InstanceId));
+        await _validator.ValidateAndThrowAsync(this);
+
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.AddMq.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.AddReason = AddReason;
+                state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+                state.AddReasonDetail = AddReason == AddMqReasonOption.AnotherReason ? AddReasonDetail : null;
+                state.Evidence = Evidence;
+                state.AdditionalInformation = ProvideAdditionalInformation == true ? AdditionalInformation : null;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.Status is null)
-        {
-            context.Result = Redirect(linkGenerator.Mqs.AddMq.Status(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;

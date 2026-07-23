@@ -1,17 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
-public class AddMqState : IRegisterJourney
+public class AddMqState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.AddMq,
-        typeof(AddMqState),
-        requestDataKeys: ["personId"],
-        appendUniqueKey: true);
-
     public Guid? ProviderId { get; set; }
 
     public MandatoryQualificationSpecialism? Specialism { get; set; }
@@ -31,21 +23,4 @@ public class AddMqState : IRegisterJourney
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     public string? AdditionalInformation { get; set; }
-
-    [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(ProviderId), nameof(Specialism), nameof(StartDate), nameof(Status))]
-    public bool IsComplete =>
-        ProviderId.HasValue &&
-        Specialism.HasValue &&
-        StartDate.HasValue &&
-        Status.HasValue &&
-        (Status != MandatoryQualificationStatus.Passed ||
-         (Status == MandatoryQualificationStatus.Passed && EndDate.HasValue)) &&
-        AddReason.HasValue &&
-        (AddReason == AddMqReasonOption.AnotherReason && !string.IsNullOrEmpty(AddReasonDetail) ||
-         AddReason != AddMqReasonOption.AnotherReason && string.IsNullOrEmpty(AddReasonDetail)) &&
-         ProvideAdditionalInformation is bool proveAdditionalInfo &&
-         (proveAdditionalInfo == true && !string.IsNullOrEmpty(AdditionalInformation) ||
-          proveAdditionalInfo == false && string.IsNullOrEmpty(AdditionalInformation)) &&
-         Evidence.IsComplete;
 }
