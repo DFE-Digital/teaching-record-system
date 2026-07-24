@@ -1,4 +1,6 @@
+using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
@@ -186,5 +188,45 @@ public class MergePersonTestBase(HostFixture hostFixture)
         });
 
         return (personA, personB);
+    }
+
+    /// <summary>
+    /// Builds the state the coordinator starts the journey with — the record being merged from —
+    /// optionally applying the answers a test is interested in.
+    /// </summary>
+    protected static MergePersonState CreateState(Person personA, Action<MergePersonState>? configure = null)
+    {
+        var state = new MergePersonState
+        {
+            PersonAId = personA.PersonId,
+            PersonATrn = personA.Trn
+        };
+
+        configure?.Invoke(state);
+
+        return state;
+    }
+
+    protected Task<MergePersonJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, MergePersonState state) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<MergePersonJourneyCoordinator>(
+            JourneyNames.MergePerson,
+            new RouteValueDictionary { ["personId"] = personId },
+            _ => Task.FromResult<object>(state),
+            pathUrls:
+            [
+                $"/persons/{personId}/merge/enter-trn",
+                $"/persons/{personId}/merge/matches",
+                $"/persons/{personId}/merge/merge",
+                $"/persons/{personId}/merge/check-answers",
+            ],
+            // The coordinator has constructor dependencies, so it can't be Activator-created.
+            coordinatorFactory: () => ActivatorUtilities.CreateInstance<MergePersonJourneyCoordinator>(HostFixture.Services));
+
+    protected MergePersonState? GetJourneyInstanceState(MergePersonJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (MergePersonState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
     }
 }

@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.MergePerson), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.MergePerson), StartsJourney]
+public class IndexModel(MergePersonJourneyCoordinator journey, SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<MergePersonState>? JourneyInstance { get; set; }
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
-    public IActionResult OnGet() => Redirect(linkGenerator.Persons.MergePerson.EnterTrn(PersonId, JourneyInstance!.InstanceId));
+    public IActionResult OnGet() =>
+        journey.AdvanceTo(
+            linkGenerator.Persons.MergePerson.EnterTrn(journey.InstanceId),
+            new PushStepOptions { SetAsFirstStep = true });
 }

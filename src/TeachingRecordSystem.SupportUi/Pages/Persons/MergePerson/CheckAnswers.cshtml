@@ -1,7 +1,9 @@
 @page "/persons/{personId}/merge/check-answers"
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson.CheckAnswersModel
 @{
     Layout = "_Layout";
+    var returnUrl = Request.GetEncodedPathAndQuery();
     ViewBag.Title = "Check details before updating the primary record";
 }
 
@@ -21,7 +23,7 @@
                     @if (Model.IsFirstNameChangeable)
                     {
                         <row-actions>
-                            <action data-testid="change-firstname-link" href=@Model.ChangeDetailsLink visually-hidden-text="first name">Change</action>
+                            <action data-testid="change-firstname-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="first name">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -31,7 +33,7 @@
                     @if (Model.IsMiddleNameChangeable)
                     {
                         <row-actions>
-                            <action data-testid="change-middlename-link" href=@Model.ChangeDetailsLink visually-hidden-text="middle name">Change</action>
+                            <action data-testid="change-middlename-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="middle name">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -41,7 +43,7 @@
                     @if (Model.IsLastNameChangeable)
                     {
                         <row-actions>
-                            <action data-testid="change-lastname-link" href=@Model.ChangeDetailsLink visually-hidden-text="last name">Change</action>
+                            <action data-testid="change-lastname-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="last name">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -51,7 +53,7 @@
                     @if (Model.IsDateOfBirthChangeable)
                     {
                         <row-actions>
-                            <action data-testid="change-dob-link" href=@Model.ChangeDetailsLink visually-hidden-text="date of birth">Change</action>
+                            <action data-testid="change-dob-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="date of birth">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -61,7 +63,7 @@
                     @if (Model.IsEmailAddressChangeable)
                     {
                         <row-actions>
-                            <action data-testid="change-email-link" href=@Model.ChangeDetailsLink visually-hidden-text="email address">Change</action>
+                            <action data-testid="change-email-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="email address">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -71,7 +73,7 @@
                     @if (Model.IsNationalInsuranceNumberChangeable)
                     {
                         <row-actions>
-                            <action data-testid="change-ni-link" href=@Model.ChangeDetailsLink visually-hidden-text="national insurance number">Change</action>
+                            <action data-testid="change-ni-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="national insurance number">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -81,7 +83,7 @@
                     @if (Model.IsGenderChangeable)
                     {
                         <row-actions>
-                            <action data-testid="change-gender-link" href=@Model.ChangeDetailsLink visually-hidden-text="gender">Change</action>
+                            <action data-testid="change-gender-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="gender">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -91,14 +93,14 @@
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                     </value>
                     <row-actions>
-                        <action data-testid="change-evidence-link" href=@Model.ChangeDetailsLink visually-hidden-text="evidence">Change</action>
+                        <action data-testid="change-evidence-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="evidence">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Comments</key>
                     <value use-empty-fallback>@Model.Comments</value>
                     <row-actions>
-                        <action data-testid="change-comments-link" href=@Model.ChangeDetailsLink visually-hidden-text="comments">Change</action>
+                        <action data-testid="change-comments-link" href=@LinkGenerator.Persons.MergePerson.Merge(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="comments">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -110,7 +112,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Confirm and update primary record</govuk-button>
-                <govuk-button type="submit" formaction="@Model.CancelLink" class="govuk-button--secondary" data-testid="cancel-button">Cancel and return to record</govuk-button>
+                <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary" data-testid="cancel-button">Cancel and return to record</govuk-button>
             </div>
         </div>
     </div>

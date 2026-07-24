@@ -13,9 +13,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -38,10 +36,11 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -64,9 +63,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -92,9 +89,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -120,9 +115,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -146,9 +139,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -174,9 +165,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -208,9 +197,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -243,9 +230,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -272,9 +257,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -307,9 +290,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         // Act
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -335,9 +316,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -353,20 +332,14 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         AssertEx.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(personA.PersonId, journeyInstance.State.PersonAId);
         Assert.Equal(personA.Trn, journeyInstance.State.PersonATrn);
         Assert.Equal(personB.PersonId, journeyInstance.State.PersonBId);
         Assert.Equal(personB.Trn, journeyInstance.State.PersonBTrn);
     }
 
-    private string GetRequestPath(Person person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
+    private string GetRequestPath(Person person, MergePersonJourneyCoordinator? journeyInstance = null) =>
         $"/persons/{person.PersonId}/merge/enter-trn?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<MergePersonState>> CreateJourneyInstanceAsync(Guid personId, MergePersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.MergePerson,
-            state ?? new MergePersonState(),
-            new KeyValuePair<string, object>("personId", personId));
 
 }
