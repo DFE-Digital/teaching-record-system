@@ -9,18 +9,20 @@ using ReasonModel = TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson.Reaso
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : AddPersonTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -50,14 +52,27 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var additionalInfo = "this is additional info";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAddPersonReasonChoice(reasonChoice, reasonDetail)
-                .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, additionalInfo)
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                Reason = reasonChoice,
+                ReasonDetail = reasonDetail,
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = additionalInfo,
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = "evidence.jpg",
+                        FileSizeDescription = "1.2 KB"
+                    }
+                }
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -99,11 +114,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedChoices = Enum.GetValues<PersonCreateReason>().Select(s => s.ToString());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
 
@@ -146,12 +163,15 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReasonDetails = "A description about why the change typed into the box";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = "Some more information",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -166,7 +186,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.Reason!.GetDisplayName());
         Assert.Equal(changeReasonDetails, journeyInstance.State.ReasonDetail);
     }
@@ -176,11 +195,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -200,11 +221,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -225,11 +248,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -251,12 +276,15 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAdditionalInformation(ProvideMoreInformationOption.No, "")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                ProvideAdditionalInformation = ProvideMoreInformationOption.No,
+                AdditionalInformation = ""
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -278,11 +306,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -304,11 +334,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -331,11 +363,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -371,11 +405,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -412,11 +448,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -443,11 +481,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999")
+            });
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -473,12 +513,15 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = "Some more information"
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -495,7 +538,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.Evidence.UploadEvidence);
         Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
         Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile.FileSizeDescription);
@@ -506,12 +548,15 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = "Some more information"
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -537,12 +582,15 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var evidenceFileId = Guid.NewGuid();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            new AddPersonStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
-                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "this is additional info that should be discarded")
-                .Build());
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("5 Jun 1999"),
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = "this is additional info that should be discarded"
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
@@ -561,7 +609,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         FileServiceMock.AssertFileWasNotUploaded();
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(PersonCreateReason.MandatoryQualification, journeyInstance.State.Reason);
         Assert.Null(journeyInstance.State.ReasonDetail);
         Assert.False(journeyInstance.State.Evidence.UploadEvidence);
@@ -569,11 +616,298 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance.State.AdditionalInformation);
     }
 
-    private string GetRequestPath(JourneyInstance<AddPersonState> journeyInstance) =>
+    private string GetRequestPath(AddPersonJourneyCoordinator journeyInstance) =>
         $"/persons/add/reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<AddPersonState>> CreateJourneyInstanceAsync(AddPersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.AddPerson,
-            state ?? new AddPersonState());
+    [Theory]
+    [InlineData(UserRoles.Viewer)]
+    [InlineData(null)]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
+    {
+        // Arrange
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task Get_BacklinkLinksToPersonalDetailsPage()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.NotNull(backlink);
+        Assert.Contains("/persons/add/personal-details", backlink.Href);
+    }
+
+
+    [Fact]
+    public async Task Post_ValidRequest_RedirectsToCheckAnswersPage()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
+        {
+            Content =
+            new AddPersonPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("some@email-address.com")
+                .WithNationalInsuranceNumber("AB123456D")
+                .WithReason(PersonCreateReason.MandatoryQualification)
+                .WithUploadEvidence(false)
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+    }
+
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToAddPersonIndexPage()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var pageUrl = GetRequestPath(journeyInstance);
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+        Assert.NotNull(cancelButton);
+        Assert.Equal("Cancel", cancelButton.Name);
+
+        // Act
+        var cancelRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var cancelResponse = await HttpClient.SendAsync(cancelRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)cancelResponse.StatusCode);
+        Assert.Equal("/persons/add", cancelResponse.Headers.Location?.OriginalString);
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
+    [Fact]
+    public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile()
+    {
+        // Arrange
+        var evidenceFileId = Guid.NewGuid();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = "evidence.jpg",
+                        FileSizeDescription = "1.2 KB"
+                    }
+                }
+            });
+
+        var pageUrl = GetRequestPath(journeyInstance);
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        // Act
+        var cancelRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var cancelResponse = await HttpClient.SendAsync(cancelRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)cancelResponse.StatusCode);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
+    }
+
+
+    [Fact]
+    public async Task Get_WithReturnUrlToCheckAnswersPage_BacklinkLinksToCheckAnswersPage()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var checkAnswersUrl = $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/persons/add/reason?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.NotNull(backlink);
+        Assert.Contains("/persons/add/check-answers", backlink.Href);
+    }
+
+    [Fact]
+    public async Task Post_WithReturnUrlToCheckAnswersPage_RedirectsToCheckAnswersPage()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var checkAnswersUrl = $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/persons/add/reason?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content =
+            new AddPersonPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("some@email-address.com")
+                .WithNationalInsuranceNumber("AB123456D")
+                .WithReason(PersonCreateReason.MandatoryQualification)
+                .WithUploadEvidence(false)
+                .WithAdditionalInformation(ProvideMoreInformationOption.Yes, "Some more information")
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(checkAnswersUrl, response.Headers.Location?.OriginalString);
+    }
 }

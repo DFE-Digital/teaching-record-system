@@ -1,8 +1,10 @@
 @page "/persons/add/check-answers"
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson.CheckAnswersModel
 @{
     Layout = "_Layout";
     ViewBag.Title = "Check details before creating record";
+    var returnUrl = Request.GetEncodedPathAndQuery();
 }
 
 @section BeforeContent {
@@ -22,35 +24,35 @@
                     <key>Full name</key>
                     <value>@Model.Name</value>
                     <row-actions>
-                        <action data-testid="change-details-link" href=@Model.ChangePersonalDetailsLink visually-hidden-text="name">Change</action>
+                        <action data-testid="change-details-link" href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="name">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Date of birth</key>
                     <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
                     <row-actions>
-                        <action href=@Model.ChangePersonalDetailsLink visually-hidden-text="date of birth">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="date of birth">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Email address</key>
                     <value use-empty-fallback>@Model.EmailAddress?.ToDisplayString()</value>
                     <row-actions>
-                        <action href=@Model.ChangePersonalDetailsLink visually-hidden-text="email address">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="email address">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>National Insurance number</key>
                     <value use-empty-fallback>@Model.NationalInsuranceNumber?.ToDisplayString()</value>
                     <row-actions>
-                        <action href=@Model.ChangePersonalDetailsLink visually-hidden-text="National Insurance number">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="National Insurance number">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Gender</key>
                     <value use-empty-fallback>@Model.Gender?.GetDisplayName()</value>
                     <row-actions>
-                        <action href=@Model.ChangePersonalDetailsLink visually-hidden-text="gender">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.PersonalDetails(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="gender">Change</action>
                     </row-actions>
                 </row>
 
@@ -62,7 +64,7 @@
                     <key>Reason</key>
                     <value>@Model.Reason?.GetDisplayName()</value>
                     <row-actions>
-                        <action data-testid="change-create-reason-link" href=@Model.ChangeReasonLink visually-hidden-text="reason">Change</action>
+                        <action data-testid="change-create-reason-link" href=@LinkGenerator.Persons.AddPerson.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -78,7 +80,7 @@
                         }
                     </value>
                     <row-actions>
-                        <action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason details">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -94,7 +96,7 @@
                         }
                     </value>
                     <row-actions>
-                        <action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason details">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -103,7 +105,7 @@
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                     </value>
                     <row-actions>
-                        <action href=@Model.ChangeReasonLink visually-hidden-text="evidence">Change</action>
+                        <action href=@LinkGenerator.Persons.AddPerson.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="evidence">Change</action>
                     </row-actions>
                 </row>
             </govuk-summary-list>
@@ -111,7 +113,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="confirm-button">Confirm and create record</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.Persons.AddPerson.CheckAnswersCancel(Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
+                <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
             </div>
         </form>
     </div>
