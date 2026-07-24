@@ -15,8 +15,10 @@ using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-public abstract class TestBase
+public abstract class TestBase : IDisposable
 {
+    private readonly List<IDisposable> _disposables = new();
+
     protected TestBase(HostFixture hostFixture)
     {
         HostFixture = hostFixture;
@@ -59,6 +61,19 @@ public abstract class TestBase
     protected Mock<IFileService> FileServiceMock => TestScopedServices.GetCurrent().BlobStorageFileServiceMock;
 
     protected TrnRequestOptions TrnRequestOptions => TestScopedServices.GetCurrent().TrnRequestOptions;
+
+    public virtual void Dispose()
+    {
+        _disposables.ForEach(x => x.Dispose());
+        _disposables.Clear();
+    }
+
+    protected T CreateJourneyCoordinator<T>()
+    {
+        var scope = HostFixture.Services.CreateScope();
+        _disposables.Add(scope);
+        return ActivatorUtilities.CreateInstance<T>(scope.ServiceProvider);
+    }
 
     protected Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
         string journeyName,
