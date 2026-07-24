@@ -19,13 +19,15 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
         builder.HasOne(t => t.Person).WithMany().HasForeignKey(p => p.PersonId).HasConstraintName("fk_support_tasks_person");
         builder.HasIndex(t => t.OneLoginUserSubject);
         builder.HasIndex(t => t.PersonId);
+        builder.Property(t => t.PersonId).ConfigureAnalyticsSync(hidden: true);
+        builder.Property(t => t.OneLoginUserSubject).ConfigureAnalyticsSync(hidden: true);
         builder.Property(t => t.Data)
             .HasColumnType("jsonb")
             .IsRequired()
             .HasConversion(
                 v => JsonSerializer.Serialize(v, ISupportTaskData.SerializerOptions),
                 v => JsonSerializer.Deserialize<ISupportTaskData>(v, ISupportTaskData.SerializerOptions)!)
-            .ConfigureAnalyticsSync(hidden: true);
+            .ConfigureAnalyticsSync(policyTag: PolicyTagNames.SensitiveHidden);
         builder.HasOne(t => t.TrnRequestMetadata).WithMany().HasForeignKey(p => new { p.TrnRequestApplicationUserId, p.TrnRequestId });
         builder.HasOne<SupportTaskTypeInfo>().WithMany().HasForeignKey(t => t.SupportTaskType);
         builder.Property(t => t.ResolveJourneySavedState)

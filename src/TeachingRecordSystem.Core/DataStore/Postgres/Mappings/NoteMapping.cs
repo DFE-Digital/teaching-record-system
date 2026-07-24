@@ -12,9 +12,9 @@ public class NoteMapping : IEntityTypeConfiguration<Note>
         builder.ToTable("notes");
         builder.HasKey(x => x.NoteId);
         builder.Property(x => x.NoteId);
-        builder.Property(x => x.PersonId).IsRequired();
-        builder.Property(x => x.Content).ConfigureAnalyticsSync(hidden: true);
-        builder.Property(x => x.ContentHtml).IsRequired(false).ConfigureAnalyticsSync(hidden: true);
+        builder.Property(x => x.PersonId).IsRequired().ConfigureAnalyticsSync(hidden: true);
+        builder.Property(x => x.Content).ConfigureAnalyticsSync(policyTag: PolicyTagNames.SensitiveHidden);
+        builder.Property(x => x.ContentHtml).IsRequired(false).ConfigureAnalyticsSync(policyTag: PolicyTagNames.SensitiveHidden);
         builder.Property(x => x.OriginalFileName).ConfigureAnalyticsSync(included: false);
         builder.Property(x => x.CreatedByDqtUserId).IsRequired(false).ConfigureAnalyticsSync(included: false);
         builder.Property(x => x.CreatedByDqtUserName).IsRequired(false).ConfigureAnalyticsSync(included: false);
