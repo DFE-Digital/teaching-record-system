@@ -56,8 +56,7 @@ public abstract class EditDetailsTestBase(HostFixture hostFixture) : TestBase(ho
                 .. state.OtherDetailsChanged ? new[] { $"/persons/{personId}/edit-details/other-details-change-reason" } : [],
                 $"/persons/{personId}/edit-details/check-answers",
             ],
-            // The coordinator has constructor dependencies, so it can't be Activator-created.
-            coordinatorFactory: () => ActivatorUtilities.CreateInstance<EditDetailsJourneyCoordinator>(HostFixture.Services));
+            coordinatorFactory: CreateJourneyCoordinator<EditDetailsJourneyCoordinator>);
 
     protected EditDetailsState? GetJourneyInstanceState(EditDetailsJourneyCoordinator coordinator)
     {
