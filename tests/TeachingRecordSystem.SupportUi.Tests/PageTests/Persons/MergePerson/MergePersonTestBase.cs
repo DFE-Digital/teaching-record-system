@@ -220,8 +220,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
                 $"/persons/{personId}/merge/merge",
                 $"/persons/{personId}/merge/check-answers",
             ],
-            // The coordinator has constructor dependencies, so it can't be Activator-created.
-            coordinatorFactory: () => ActivatorUtilities.CreateInstance<MergePersonJourneyCoordinator>(HostFixture.Services));
+            coordinatorFactory: CreateJourneyCoordinator<MergePersonJourneyCoordinator>);
 
     protected MergePersonState? GetJourneyInstanceState(MergePersonJourneyCoordinator coordinator)
     {
