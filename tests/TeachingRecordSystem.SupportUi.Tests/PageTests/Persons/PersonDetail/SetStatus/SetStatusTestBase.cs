@@ -59,8 +59,7 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
                 $"/persons/{personId}/set-status/{targetStatus}/reason",
                 $"/persons/{personId}/set-status/{targetStatus}/check-answers",
             ],
-            // The coordinator has constructor dependencies, so it can't be Activator-created.
-            coordinatorFactory: () => ActivatorUtilities.CreateInstance<SetStatusJourneyCoordinator>(HostFixture.Services));
+            coordinatorFactory: CreateJourneyCoordinator<SetStatusJourneyCoordinator>);
 
     protected SetStatusState? GetJourneyInstanceState(SetStatusJourneyCoordinator coordinator)
     {
