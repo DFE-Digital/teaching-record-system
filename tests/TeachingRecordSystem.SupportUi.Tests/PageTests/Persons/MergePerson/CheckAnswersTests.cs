@@ -19,14 +19,24 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var evidenceFileName = "evidence.jpg";
         var comments = Faker.Lorem.Paragraph();
 
-        var state = new MergePersonStateBuilder()
-            .WithInitializedState(personA)
-            .WithPersonB(personB)
-            .WithPrimaryPerson(personA)
-            .WithAttributeSourcesSet()
-            .WithComments(comments)
-            .WithUploadEvidenceChoice(true, evidenceFileId, evidenceFileName)
-            .Build();
+        var state = CreateState(personA, s =>
+                    {
+                        s.PersonBId = personB.PersonId;
+                        s.PersonBTrn = personB.Trn;
+                        s.PrimaryPersonId = personA.PersonId;
+                        s.PersonAttributeSourcesSet = true;
+                        s.Comments = comments;
+                        s.Evidence = new()
+                        {
+                            UploadEvidence = true,
+                            UploadedEvidenceFile = new()
+                            {
+                                FileId = evidenceFileId,
+                                FileName = evidenceFileName,
+                                FileSizeDescription = "5MB"
+                            }
+                        };
+                    });
 
         var journeyInstance = await CreateJourneyInstanceAsync(personA.PersonId, state);
 
@@ -62,13 +72,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             sourcedFromSecondaryPersonAttribute.Attribute,
             useNullValues: useNullValues);
 
-        var state = new MergePersonStateBuilder()
-            .WithInitializedState(personA)
-            .WithPersonB(personB)
-            .WithPrimaryPerson(personA)
-            .WithAttributeSourcesSet()
-            .WithUploadEvidenceChoice(false)
-            .Build();
+        var state = CreateState(personA, s =>
+                    {
+                        s.PersonBId = personB.PersonId;
+                        s.PersonBTrn = personB.Trn;
+                        s.PrimaryPersonId = personA.PersonId;
+                        s.PersonAttributeSourcesSet = true;
+                        s.Evidence = new()
+                        {
+                            UploadEvidence = false
+                        };
+                    });
         SetPersonAttributeSourceToSecondaryPerson(state, sourcedFromSecondaryPersonAttribute.Attribute);
 
         var journeyInstance = await CreateJourneyInstanceAsync(personA.PersonId, state);
@@ -132,14 +146,24 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var evidenceFileName = "evidence.jpg";
         var comments = Faker.Lorem.Paragraph();
 
-        var state = new MergePersonStateBuilder()
-            .WithInitializedState(personA)
-            .WithPersonB(personB)
-            .WithPrimaryPerson(personA)
-            .WithAttributeSourcesSet()
-            .WithComments(comments)
-            .WithUploadEvidenceChoice(true, evidenceFileId, evidenceFileName)
-            .Build();
+        var state = CreateState(personA, s =>
+                    {
+                        s.PersonBId = personB.PersonId;
+                        s.PersonBTrn = personB.Trn;
+                        s.PrimaryPersonId = personA.PersonId;
+                        s.PersonAttributeSourcesSet = true;
+                        s.Comments = comments;
+                        s.Evidence = new()
+                        {
+                            UploadEvidence = true,
+                            UploadedEvidenceFile = new()
+                            {
+                                FileId = evidenceFileId,
+                                FileName = evidenceFileName,
+                                FileSizeDescription = "5MB"
+                            }
+                        };
+                    });
         SetPersonAttributeSourceToSecondaryPerson(state, sourcedFromSecondaryPersonAttribute.Attribute);
 
         var journeyInstance = await CreateJourneyInstanceAsync(personA.PersonId, state);
@@ -254,8 +278,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             nextPageDoc,
             $"Records merged for {primaryPerson.FirstName} {primaryPerson.MiddleName} {primaryPerson.LastName}");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     private static void SetPersonAttributeSourceToSecondaryPerson(MergePersonState state, PersonMatchedAttribute attribute)
@@ -342,12 +365,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         Func<PersonDetails, object?> GetValueFromPersonAttributes,
         Func<object?, object?>? MapValueToSummaryListRowValue = null);
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
+    private string GetRequestPath(TestData.CreatePersonResult person, MergePersonJourneyCoordinator? journeyInstance = null) =>
         $"/persons/{person.PersonId}/merge/check-answers?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<MergePersonState>> CreateJourneyInstanceAsync(Guid personId, MergePersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.MergePerson,
-            state ?? new MergePersonState(),
-            new KeyValuePair<string, object>("personId", personId));
 }

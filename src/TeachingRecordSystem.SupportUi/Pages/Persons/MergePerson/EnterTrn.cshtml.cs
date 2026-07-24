@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.MergePerson), RequireJourneyInstance]
+[Journey(JourneyNames.MergePerson)]
 public class EnterTrnModel(
+    MergePersonJourneyCoordinator journey,
     TrsDbContext dbContext,
-    SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<EnterTrnModel> _validator = new()
     {
@@ -25,30 +24,41 @@ public class EnterTrnModel(
             .When(m => !string.IsNullOrEmpty(m.OtherTrn))
     };
 
+    public string? BackLink { get; set; }
+
+    [FromRoute]
+    public Guid PersonId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     public string? ThisTrn { get; set; }
 
     [BindProperty]
     public string? OtherTrn { get; set; }
 
-    public string BackLink => GetPageLink(FromCheckAnswers ? MergePersonJourneyPage.CheckAnswers : null);
-
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Index(PersonId);
 
-        ThisTrn = JourneyInstance!.State.PersonATrn;
+        ThisTrn = journey.State.PersonATrn;
     }
 
     public IActionResult OnGet()
     {
-        OtherTrn = JourneyInstance!.State.PersonBTrn;
+        OtherTrn = journey.State.PersonBTrn;
 
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var potentialDuplicates = await GetPotentialDuplicatesAsync(JourneyInstance!.State.PersonAId!.Value);
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
+        var potentialDuplicates = await journey.GetPotentialDuplicatesAsync(journey.State.PersonAId!.Value);
 
         if (potentialDuplicates.Any(p => p.IsInvalid))
         {
@@ -62,7 +72,7 @@ public class EnterTrnModel(
             ModelState.AddModelError(nameof(OtherTrn), "TRN must be for a different record");
         }
 
-        var otherPerson = await DbContext.Persons
+        var otherPerson = await dbContext.Persons
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(p => p.Trn == OtherTrn);
 
@@ -79,15 +89,13 @@ public class EnterTrnModel(
         {
             return this.PageWithErrors();
         }
-        else
-        {
-            await JourneyInstance!.UpdateStateAsync(state =>
+
+        return journey.AdvanceTo(
+            linkGenerator.Persons.MergePerson.Matches(journey.InstanceId),
+            state =>
             {
                 state.PersonBId = otherPerson.PersonId;
                 state.PersonBTrn = otherPerson.Trn;
             });
-
-            return Redirect(GetPageLink(FromCheckAnswers ? MergePersonJourneyPage.CheckAnswers : MergePersonJourneyPage.Matches));
-        }
     }
 }

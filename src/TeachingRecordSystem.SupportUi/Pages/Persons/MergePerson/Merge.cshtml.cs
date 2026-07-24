@@ -1,22 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.MergePerson), RequireJourneyInstance]
+[Journey(JourneyNames.MergePerson)]
 public class MergeModel(
-    TrsDbContext dbContext,
+    MergePersonJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<MergeModel> _validator = new()
     {
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
-    public string BackLink => GetPageLink(FromCheckAnswers ? MergePersonJourneyPage.CheckAnswers : MergePersonJourneyPage.Matches);
+    public string? BackLink { get; set; }
+
+    [FromRoute]
+    public Guid PersonId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public PersonAttribute<string>? Trn { get; set; }
     public PersonAttribute<string>? FirstName { get; set; }
@@ -56,30 +61,22 @@ public class MergeModel(
 
     private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
 
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        BackLink = journey.GetBackLink();
 
-        if (JourneyInstance!.State.PersonAId is not Guid personAId || JourneyInstance!.State.PersonBId is not Guid personBId)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.EnterTrn));
-            return;
-        }
+        var personAId = journey.State.PersonAId!.Value;
+        var personBId = journey.State.PersonBId!.Value;
+        var primaryPersonId = journey.State.PrimaryPersonId!.Value;
 
-        if (JourneyInstance!.State.PrimaryPersonId is not Guid primaryPersonId)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.Matches));
-            return;
-        }
-
-        _potentialDuplicates = await GetPotentialDuplicatesAsync(personAId, personBId);
+        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync(personAId, personBId);
 
         var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
 
         var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
         var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
 
-        var attributeMatches = GetPersonAttributeMatches(
+        var attributeMatches = journey.GetPersonAttributeMatches(
             primaryPerson.Attributes,
             secondaryPerson.Attributes.FirstName,
             secondaryPerson.Attributes.MiddleName,
@@ -128,23 +125,30 @@ public class MergeModel(
             primaryPerson.Attributes.Gender,
             secondaryPerson.Attributes.Gender,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public void OnGet()
     {
-        FirstNameSource = JourneyInstance!.State.FirstNameSource;
-        MiddleNameSource = JourneyInstance!.State.MiddleNameSource;
-        LastNameSource = JourneyInstance!.State.LastNameSource;
-        DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
-        EmailAddressSource = JourneyInstance!.State.EmailAddressSource;
-        NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
-        GenderSource = JourneyInstance!.State.GenderSource;
-        Comments = JourneyInstance!.State.Comments;
-        Evidence = JourneyInstance!.State.Evidence;
+        FirstNameSource = journey.State.FirstNameSource;
+        MiddleNameSource = journey.State.MiddleNameSource;
+        LastNameSource = journey.State.LastNameSource;
+        DateOfBirthSource = journey.State.DateOfBirthSource;
+        EmailAddressSource = journey.State.EmailAddressSource;
+        NationalInsuranceNumberSource = journey.State.NationalInsuranceNumberSource;
+        GenderSource = journey.State.GenderSource;
+        Comments = journey.State.Comments;
+        Evidence = journey.State.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         if (_potentialDuplicates!.Any(p => p.IsInvalid))
         {
             return BadRequest();
@@ -185,28 +189,31 @@ public class MergeModel(
             ModelState.AddModelError(nameof(GenderSource), "Select a gender");
         }
 
-        await EvidenceUploadManager.ValidateAndUploadAsync<MergeModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.UploadAsync(Evidence);
 
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.FirstNameSource = FirstNameSource;
-            state.MiddleNameSource = MiddleNameSource;
-            state.LastNameSource = LastNameSource;
-            state.DateOfBirthSource = DateOfBirthSource;
-            state.EmailAddressSource = EmailAddressSource;
-            state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
-            state.GenderSource = GenderSource;
-            state.PersonAttributeSourcesSet = true;
-            state.Evidence = Evidence;
-            state.Comments = Comments;
-        });
+        await _validator.ValidateAndThrowAsync(this);
 
-        return Redirect(GetPageLink(MergePersonJourneyPage.CheckAnswers));
+        return journey.AdvanceTo(
+            linkGenerator.Persons.MergePerson.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.FirstNameSource = FirstNameSource;
+                state.MiddleNameSource = MiddleNameSource;
+                state.LastNameSource = LastNameSource;
+                state.DateOfBirthSource = DateOfBirthSource;
+                state.EmailAddressSource = EmailAddressSource;
+                state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
+                state.GenderSource = GenderSource;
+                state.PersonAttributeSourcesSet = true;
+                state.Evidence = Evidence;
+                state.Comments = Comments;
+            });
     }
 }
