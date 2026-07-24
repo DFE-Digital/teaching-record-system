@@ -5,24 +5,29 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddMq), RequireJourneyInstance]
+[Journey(JourneyNames.AddMq)]
 public class SpecialismModel(
+    AddMqJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<SpecialismModel> _validator = new()
     {
         v => v.RuleFor(m => m.Specialism)
+            .Cascade(CascadeMode.Stop)
             .NotNull().WithMessage("Select a specialism")
+            .Must((m, specialism) => m.Specialisms!.Any(s => s.Value == specialism)).WithMessage("Select a valid specialism")
     };
 
-    public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -33,44 +38,33 @@ public class SpecialismModel(
 
     public void OnGet()
     {
-        Specialism = JourneyInstance!.State.Specialism;
+        Specialism = journey.State.Specialism;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Specialism is MandatoryQualificationSpecialism specialism && !Specialisms!.Any(s => s.Value == specialism))
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(Specialism), "Select a valid specialism");
+            return await CancelAsync();
         }
 
-        _validator.ValidateAndThrow(this);
+        await _validator.ValidateAndThrowAsync(this);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        await JourneyInstance!.UpdateStateAsync(state => state.Specialism = Specialism);
-
-        return Redirect(FromCheckAnswers ?
-            linkGenerator.Mqs.AddMq.CheckAnswers(PersonId, JourneyInstance.InstanceId) :
-            linkGenerator.Mqs.AddMq.StartDate(PersonId, JourneyInstance.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.AddMq.StartDate(journey.InstanceId),
+            state => state.Specialism = Specialism);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.ProviderId is null)
-        {
-            context.Result = Redirect(linkGenerator.Mqs.AddMq.Provider(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 

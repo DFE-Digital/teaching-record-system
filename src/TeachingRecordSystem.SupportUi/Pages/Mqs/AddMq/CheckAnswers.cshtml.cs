@@ -8,17 +8,23 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddMq), RequireJourneyInstance]
+[Journey(JourneyNames.AddMq)]
 public class CheckAnswersModel(
+    AddMqJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     TimeProvider timeProvider,
     EvidenceUploadManager evidenceUploadManager,
     MandatoryQualificationService mandatoryQualificationService) : PageModel
 {
-    public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromQuery]
     public Guid PersonId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -45,6 +51,11 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         var processContext = new ProcessContext(
             ProcessType.MandatoryQualificationCreating,
             timeProvider.UtcNow,
@@ -69,40 +80,35 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
         TempData.SetFlashNotificationBanner("Mandatory qualification added");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.Mqs.AddMq.Provider(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        ProviderId = JourneyInstance.State.ProviderId.Value;
+        ProviderId = journey.State.ProviderId!.Value;
         ProviderName = MandatoryQualificationProvider.GetById(ProviderId).Name;
-        Specialism = JourneyInstance.State.Specialism.Value;
-        StartDate = JourneyInstance.State.StartDate.Value;
-        Status = JourneyInstance.State.Status.Value;
-        EndDate = JourneyInstance.State.EndDate;
-        AddReason = JourneyInstance.State.AddReason!.Value;
-        AddReasonDetail = JourneyInstance.State.AddReasonDetail;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-        await next();
+        Specialism = journey.State.Specialism!.Value;
+        StartDate = journey.State.StartDate!.Value;
+        Status = journey.State.Status!.Value;
+        EndDate = journey.State.EndDate;
+        AddReason = journey.State.AddReason!.Value;
+        AddReasonDetail = journey.State.AddReasonDetail;
+        AdditionalInformation = journey.State.AdditionalInformation;
+        EvidenceFile = journey.State.Evidence.UploadedEvidenceFile;
     }
 }
