@@ -1,3 +1,5 @@
+using GovUk.Questions.AspNetCore.State;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
@@ -44,4 +46,25 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 
     public static TheoryData<PersonStatus> GetAllStatuses() =>
         new(PersonStatus.Active, PersonStatus.Deactivated);
+
+    protected Task<SetStatusJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, PersonStatus targetStatus, SetStatusState? state = null) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<SetStatusJourneyCoordinator>(
+            JourneyNames.SetStatus,
+            new RouteValueDictionary { ["personId"] = personId, ["targetStatus"] = targetStatus },
+            _ => Task.FromResult<object>(state ?? new SetStatusState()),
+            pathUrls:
+            [
+                $"/persons/{personId}/set-status/{targetStatus}/reason",
+                $"/persons/{personId}/set-status/{targetStatus}/check-answers",
+            ],
+            // The coordinator has constructor dependencies, so it can't be Activator-created.
+            coordinatorFactory: () => ActivatorUtilities.CreateInstance<SetStatusJourneyCoordinator>(HostFixture.Services));
+
+    protected SetStatusState? GetJourneyInstanceState(SetStatusJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (SetStatusState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
 }

@@ -1,7 +1,9 @@
 @page "/persons/{PersonId}/set-status/{TargetStatus}/check-answers"
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus.CheckAnswersModel
 @{
     Layout = "_Layout";
+    var returnUrl = Request.GetEncodedPathAndQuery();
     ViewBag.Title = Model.TargetStatus == PersonStatus.Deactivated
         ? "Check details before deactivating record"
         : "Check details before reactivating record";
@@ -73,7 +75,7 @@
                         <value>@Model.DeactivateReason?.GetDisplayName()</value>
                         <row-actions>
                             <action data-testid="change-deactivate-reason-link"
-                                    href=@Model.ChangeReasonLink visually-hidden-text="reason">
+                                    href=@LinkGenerator.Persons.PersonDetail.SetStatus.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason">
                                 Change
                             </action>
                         </row-actions>
@@ -91,7 +93,7 @@
                             }
                         </value>
                         <row-actions>
-                            <action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</action>
+                            <action href=@LinkGenerator.Persons.PersonDetail.SetStatus.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason details">Change</action>
                         </row-actions>
                     </row>
                     <row>
@@ -107,7 +109,7 @@
                             }
                         </value>
                         <row-actions>
-                            <action href=@Model.ChangeReasonLink
+                            <action href=@LinkGenerator.Persons.PersonDetail.SetStatus.Reason(Model.InstanceId, returnUrl: returnUrl)
                                                            visually-hidden-text="reason details">Change
                             </action>
                         </row-actions>
@@ -120,7 +122,7 @@
                         <value>@Model.ReactivateReason?.GetDisplayName()</value>
                         <row-actions>
                             <action data-testid="change-reactivate-reason-link"
-                                    href=@Model.ChangeReasonLink visually-hidden-text="reason">
+                                    href=@LinkGenerator.Persons.PersonDetail.SetStatus.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason">
                                 Change
                             </action>
                         </row-actions>
@@ -138,7 +140,7 @@
                             }
                         </value>
                         <row-actions>
-                            <action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</action>
+                            <action href=@LinkGenerator.Persons.PersonDetail.SetStatus.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="reason details">Change</action>
                         </row-actions>
                     </row>
                     <row>
@@ -154,7 +156,7 @@
                             }
                         </value>
                         <row-actions>
-                            <action href=@Model.ChangeReasonLink
+                            <action href=@LinkGenerator.Persons.PersonDetail.SetStatus.Reason(Model.InstanceId, returnUrl: returnUrl)
                                                            visually-hidden-text="reason details">Change
                             </action>
                         </row-actions>
@@ -166,7 +168,7 @@
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile"/>
                     </value>
                     <row-actions>
-                        <action href=@Model.ChangeReasonLink visually-hidden-text="evidence">
+                        <action href=@LinkGenerator.Persons.PersonDetail.SetStatus.Reason(Model.InstanceId, returnUrl: returnUrl) visually-hidden-text="evidence">
                             Change
                         </action>
                     </row-actions>
@@ -176,7 +178,7 @@
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="confirm-button">@confirmButtonText</govuk-button>
                 <govuk-button type="submit"
-                              formaction="@LinkGenerator.Persons.PersonDetail.SetStatus.CheckAnswersCancel(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)"
+                              name="Cancel" value="true"
                               class="govuk-button--secondary" data-testid="cancel-button">Cancel
                 </govuk-button>
             </div>
