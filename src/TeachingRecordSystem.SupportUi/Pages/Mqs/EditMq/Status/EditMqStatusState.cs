@@ -3,16 +3,8 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-public class EditMqStatusState : IRegisterJourney
+public class EditMqStatusState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.EditMqStatus,
-        typeof(EditMqStatusState),
-        requestDataKeys: ["qualificationId"],
-        appendUniqueKey: true);
-
-    public bool Initialized { get; set; }
-
     public MandatoryQualificationStatus? CurrentStatus { get; set; }
 
     public MandatoryQualificationStatus? Status { get; set; }
@@ -35,23 +27,7 @@ public class EditMqStatusState : IRegisterJourney
     [JsonIgnore]
     public bool IsStatusChange => Status != CurrentStatus;
 
+    public bool? ProvideAdditionalInformation { get; set; }
+
     public string? AdditionalInformation { get; set; }
-
-    [JsonIgnore]
-    public bool IsComplete => Status.HasValue &&
-        (Status != MandatoryQualificationStatus.Passed || Status == MandatoryQualificationStatus.Passed && EndDate.HasValue) &&
-        (StatusChangeReason.HasValue || EndDateChangeReason.HasValue) &&
-        Evidence.IsComplete;
-
-    public void EnsureInitialized(CurrentMandatoryQualificationFeature qualificationInfo)
-    {
-        if (Initialized)
-        {
-            return;
-        }
-
-        Status = CurrentStatus = qualificationInfo.MandatoryQualification.Status;
-        EndDate = CurrentEndDate = qualificationInfo.MandatoryQualification.EndDate;
-        Initialized = true;
-    }
 }

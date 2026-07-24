@@ -215,7 +215,7 @@ else
                     <row-actions>
                         @if (Model.CanEdit)
                         {
-                            <action href="@LinkGenerator.Mqs.EditMq.Status.Index(mq.QualificationId, null)" visually-hidden-text="status" data-testid="status-change-link-@mq.QualificationId">Change</action>
+                            <action href="@LinkGenerator.Mqs.EditMq.Status.Index(mq.QualificationId)" visually-hidden-text="status" data-testid="status-change-link-@mq.QualificationId">Change</action>
                         }
                     </row-actions>
                 </row>
@@ -225,7 +225,7 @@ else
                     <row-actions>
                         @if (Model.CanEdit)
                         {
-                            <action href="@LinkGenerator.Mqs.EditMq.Status.Index(mq.QualificationId, null)" visually-hidden-text="end date" data-testid="end-date-change-link-@mq.QualificationId">Change</action>
+                            <action href="@LinkGenerator.Mqs.EditMq.Status.Index(mq.QualificationId)" visually-hidden-text="end date" data-testid="end-date-change-link-@mq.QualificationId">Change</action>
                         }
                     </row-actions>
                 </row>

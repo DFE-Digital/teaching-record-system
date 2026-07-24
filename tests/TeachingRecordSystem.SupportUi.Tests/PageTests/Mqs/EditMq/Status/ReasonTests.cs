@@ -2,7 +2,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
@@ -21,29 +21,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_MissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            new EditMqStatusState
-            {
-                Initialized = true
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsOK()
     {
         // Arrange
@@ -56,7 +33,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStatusState
             {
-                Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus
@@ -136,7 +112,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStatusState
             {
-                Initialized = true,
                 CurrentStatus = oldStatus,
                 Status = newStatus,
                 CurrentEndDate = oldEndDate,
@@ -171,7 +146,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStatusState
             {
-                Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus
@@ -206,7 +180,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStatusState
             {
-                Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus
@@ -241,7 +214,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStatusState
             {
-                Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus
@@ -317,7 +289,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStatusState
             {
-                Initialized = true,
                 CurrentStatus = oldStatus,
                 Status = newStatus,
                 CurrentEndDate = oldEndDate,
@@ -342,6 +313,80 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/mqs/{qualificationId}/status/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        Assert.True(journeyInstance.State.ProvideAdditionalInformation);
+        Assert.Equal("Some more details", journeyInstance.State.AdditionalInformation);
+    }
+
+    [Fact]
+    public async Task Post_WhenProvideAdditionalInformationIsYesAndNoDetailIsEntered_ReturnsError()
+    {
+        // Arrange
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
+        var newEndDate = new DateOnly(2021, 12, 5);
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqStatusState
+            {
+                CurrentStatus = oldStatus,
+                Status = newStatus,
+                EndDate = newEndDate
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "StatusChangeReason", MqChangeStatusReasonOption.ChangeOfStatus.ToString() },
+                { "ProvideAdditionalInformation", "True" },
+                { "AdditionalInformation", "" },
+                { "Evidence.UploadEvidence", "False" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter additional detail");
+    }
+
+    [Fact]
+    public async Task Get_AdditionalInformationInJourneyState_PopulatesModelFromJourneyState()
+    {
+        // Arrange
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
+        var newEndDate = new DateOnly(2021, 12, 5);
+        var additionalInformation = "Some more details";
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqStatusState
+            {
+                CurrentStatus = oldStatus,
+                Status = newStatus,
+                EndDate = newEndDate,
+                ProvideAdditionalInformation = true,
+                AdditionalInformation = additionalInformation
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var provideAdditionalInformationRadioButtons = doc.GetElementByTestId("has-additional-reason_detail-options")!.GetElementsByTagName("input");
+        var selectedOption = provideAdditionalInformationRadioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
+        Assert.NotNull(selectedOption);
+        Assert.Equal("True", selectedOption.GetAttribute("value"));
+        Assert.Equal(additionalInformation, doc.GetElementById("AdditionalInformation")?.TrimmedText());
     }
 
     [Fact]
@@ -357,15 +402,14 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStatusState
             {
-                Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -374,8 +418,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -398,7 +441,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqStatusState
             {
-                Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus
@@ -426,9 +468,4 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         return multipartContent;
     }
 
-    private async Task<JourneyInstance<EditMqStatusState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqStatusState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditMqStatus,
-            state ?? new EditMqStatusState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }
