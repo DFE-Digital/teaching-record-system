@@ -68,8 +68,6 @@ public abstract class ResolveOneLoginUserMatchingTestBase(HostFixture hostFixtur
                 $"{basePath}/confirm-not-connecting",
                 $"{basePath}/confirm-connect"
             ],
-            // JourneyHelper activates coordinators with Activator.CreateInstance, which can't supply
-            // this one's constructor dependencies.
-            coordinatorFactory: () => ActivatorUtilities.CreateInstance<ResolveOneLoginUserMatchingJourneyCoordinator>(HostFixture.Services));
+            coordinatorFactory: CreateJourneyCoordinator<ResolveOneLoginUserMatchingJourneyCoordinator>);
     }
 }

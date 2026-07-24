@@ -35,9 +35,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
             new RouteValueDictionary { ["supportTaskReference"] = supportTaskReference },
             _ => Task.FromResult<object>(state),
             pathUrls: pathUrls,
-            // JourneyHelper activates coordinators with Activator.CreateInstance, which can't supply
-            // this one's constructor dependencies.
-            coordinatorFactory: () => ActivatorUtilities.CreateInstance<ResolveTrnRequestJourneyCoordinator>(HostFixture.Services));
+            coordinatorFactory: CreateJourneyCoordinator<ResolveTrnRequestJourneyCoordinator>);
     }
 
     protected ResolveTrnRequestState? GetJourneyInstanceState(ResolveTrnRequestJourneyCoordinator coordinator)

@@ -35,9 +35,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicateTestBase(HostFixtu
             new RouteValueDictionary { ["supportTaskReference"] = supportTaskReference },
             _ => Task.FromResult<object>(state),
             pathUrls: pathUrls,
-            // JourneyHelper activates coordinators with Activator.CreateInstance, which can't supply
-            // this one's constructor dependencies.
-            coordinatorFactory: () => ActivatorUtilities.CreateInstance<ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator>(HostFixture.Services));
+            coordinatorFactory: CreateJourneyCoordinator<ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator>);
     }
 
     protected ResolveTeacherPensionsPotentialDuplicateState? GetJourneyInstanceState(
