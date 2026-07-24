@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Optional;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -9,19 +9,23 @@ using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.MergePerson), RequireJourneyInstance]
+[Journey(JourneyNames.MergePerson)]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
+    MergePersonJourneyCoordinator journey,
     PersonService personService,
     SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager,
     TimeProvider timeProvider,
-    PersonChangeableAttributesService changedService)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    PersonChangeableAttributesService changedService) : PageModel
 {
-    public string BackLink => GetPageLink(MergePersonJourneyPage.Merge);
-    public string ChangePrimaryPersonLink => GetPageLink(MergePersonJourneyPage.Matches, fromCheckAnswers: true);
-    public string ChangeDetailsLink => GetPageLink(MergePersonJourneyPage.Merge, fromCheckAnswers: true);
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
+
+    [FromRoute]
+    public Guid PersonId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
@@ -52,32 +56,16 @@ public class CheckAnswersModel(
 
     public bool IsEmailAddressChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.EmailAddress) == true;
 
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        BackLink = journey.GetBackLink();
 
-        var state = JourneyInstance!.State;
+        var state = journey.State;
+        var personAId = state.PersonAId!.Value;
+        var personBId = state.PersonBId!.Value;
+        var primaryPersonId = state.PrimaryPersonId!.Value;
 
-        if (state.PersonAId is not Guid personAId || state.PersonBId is not Guid personBId)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.EnterTrn));
-            return;
-        }
-
-        if (state.PrimaryPersonId is not Guid primaryPersonId)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.Matches));
-            return;
-        }
-
-        if (state.PersonAttributeSourcesSet is false ||
-            !state.Evidence.IsComplete)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.Merge));
-            return;
-        }
-
-        _potentialDuplicates = await GetPotentialDuplicatesAsync(personAId, personBId);
+        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync(personAId, personBId);
 
         ResolvableAttributes = changedService.GetResolvableMergedAttributes(
              new List<ResolvedMergedAttribute>
@@ -104,8 +92,10 @@ public class CheckAnswersModel(
         NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.NationalInsuranceNumber : secondaryPerson.NationalInsuranceNumber;
         Gender = state.GenderSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.Gender : secondaryPerson.Gender;
         Trn = primaryPerson.Trn;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        EvidenceFile = state.Evidence.UploadedEvidenceFile;
         Comments = state.Comments;
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public IActionResult OnGet()
@@ -115,12 +105,17 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         if (_potentialDuplicates!.Any(p => p.IsInvalid))
         {
             return BadRequest();
         }
 
-        var state = JourneyInstance!.State;
+        var state = journey.State;
         var primaryPersonId = state.PrimaryPersonId!.Value;
         var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId!.Value;
 
@@ -153,10 +148,10 @@ public class CheckAnswersModel(
 
         TempData.SetFlashNotificationBanner(
             $"Records merged for {string.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId)));
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(primaryPersonId)));
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
 
-        return Redirect(GetPageLink(null));
+        return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 }

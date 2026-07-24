@@ -1,76 +1,43 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Models;
-using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-public abstract class CommonJourneyPage(
+[JourneyCoordinator(JourneyNames.MergePerson, routeValueKeys: ["personId"])]
+public class MergePersonJourneyCoordinator(
     TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager) : PageModel
+    EvidenceUploadManager evidenceUploadManager) : JourneyCoordinator<MergePersonState>
 {
-    public JourneyInstance<MergePersonState>? JourneyInstance { get; set; }
+    // This folder doesn't set up the CurrentPersonFeature, so take the person from the journey's
+    // own route values.
+    private Guid PersonId => Guid.Parse(InstanceId.RouteValues["personId"]!.ToString()!);
 
-    protected TrsDbContext DbContext { get; } = dbContext;
-    protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
-    protected EvidenceUploadManager EvidenceUploadManager { get; } = evidenceUploadManager;
-
-    [FromRoute]
-    public Guid PersonId { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    public string CancelLink => LinkGenerator.Persons.MergePerson.EnterTrnCancel(PersonId, JourneyInstance!.InstanceId);
-
-    public string GetPageLink(MergePersonJourneyPage? pageName, bool? fromCheckAnswers = null)
+    public override async Task<MergePersonState> GetStartingStateAsync()
     {
-        fromCheckAnswers ??= FromCheckAnswers ? true : null;
-        return pageName switch
+        var personId = PersonId;
+        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == personId);
+
+        return new MergePersonState
         {
-            MergePersonJourneyPage.EnterTrn => LinkGenerator.Persons.MergePerson.EnterTrn(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            MergePersonJourneyPage.Matches => LinkGenerator.Persons.MergePerson.Matches(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            MergePersonJourneyPage.Merge => LinkGenerator.Persons.MergePerson.Merge(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            MergePersonJourneyPage.CheckAnswers => LinkGenerator.Persons.MergePerson.CheckAnswers(PersonId, JourneyInstance!.InstanceId),
-            _ => LinkGenerator.Persons.PersonDetail.Index(PersonId)
+            PersonAId = personId,
+            PersonATrn = person.Trn
         };
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    /// <summary>
+    /// Discards the journey along with any evidence file uploaded during it and returns the URL to
+    /// send the user back to.
+    /// </summary>
+    public async Task<string> CancelAsync()
     {
-        ArgumentNullException.ThrowIfNull(context);
-        ArgumentNullException.ThrowIfNull(next);
-
-        OnPageHandlerExecuting(context);
-        await OnPageHandlerExecutingAsync(context);
-        if (context.Result == null)
-        {
-            var executedContext = await next();
-            OnPageHandlerExecuted(executedContext);
-            await OnPageHandlerExecutedAsync(executedContext);
-        }
+        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile);
+        DeleteInstance();
+        return linkGenerator.Persons.PersonDetail.Index(PersonId);
     }
 
-    protected virtual async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
-    {
-        await JourneyInstance!.State.EnsureInitializedAsync(PersonId, async () => (await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId)).Trn);
-    }
-
-    protected virtual Task OnPageHandlerExecutedAsync(PageHandlerExecutedContext context)
-        => Task.CompletedTask;
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await EvidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(GetPageLink(null));
-    }
-
-    protected IReadOnlyCollection<PersonMatchedAttribute> GetPersonAttributeMatches(
+    public IReadOnlyCollection<PersonMatchedAttribute> GetPersonAttributeMatches(
         PersonDetails recordToMatchAgainst,
         string firstName,
         string middleName,
@@ -121,9 +88,9 @@ public abstract class CommonJourneyPage(
         }
     }
 
-    protected async Task<IReadOnlyList<PotentialDuplicate>> GetPotentialDuplicatesAsync(params Guid[] personIds)
+    public async Task<IReadOnlyList<PotentialDuplicate>> GetPotentialDuplicatesAsync(params Guid[] personIds)
     {
-        var potentialDuplicates = (await DbContext.Persons
+        var potentialDuplicates = (await dbContext.Persons
             .IgnoreQueryFilters()
             .Where(p => personIds.Contains(p.PersonId))
             .Select(p => new PotentialDuplicate

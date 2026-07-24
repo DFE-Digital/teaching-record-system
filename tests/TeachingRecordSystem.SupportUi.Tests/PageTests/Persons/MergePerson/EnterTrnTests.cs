@@ -12,9 +12,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -37,10 +35,11 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -63,9 +62,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -91,9 +88,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -119,9 +114,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -145,9 +138,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -173,9 +164,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -207,9 +196,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -242,9 +229,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -271,9 +256,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -306,9 +289,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         // Act
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -334,9 +315,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
+            CreateState(personA));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -352,20 +331,255 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         AssertEx.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(personA.PersonId, journeyInstance.State.PersonAId);
         Assert.Equal(personA.Trn, journeyInstance.State.PersonATrn);
         Assert.Equal(personB.PersonId, journeyInstance.State.PersonBId);
         Assert.Equal(personB.Trn, journeyInstance.State.PersonBTrn);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
+    private string GetRequestPath(TestData.CreatePersonResult person, MergePersonJourneyCoordinator? journeyInstance = null) =>
         $"/persons/{person.PersonId}/merge/enter-trn?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<MergePersonState>> CreateJourneyInstanceAsync(Guid personId, MergePersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.MergePerson,
-            state ?? new MergePersonState(),
-            new KeyValuePair<string, object>("personId", personId));
+    [Theory]
+    [InlineData(null)]
+    public async Task Get_BacklinkLinksToExpected(string? expectedPage)
+    {
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
 
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+                s.PrimaryPersonId = personA.PersonId;
+                s.PersonAttributeSourcesSet = true;
+                s.Evidence = new()
+                {
+                    UploadEvidence = false
+                };
+            }));
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.NotNull(backlink);
+        var expectedBackLink = $"/persons/{personA.PersonId}";
+        if (expectedPage is not null)
+        {
+            expectedBackLink += "/merge/" + expectedPage;
+        }
+        Assert.Contains(expectedBackLink, backlink.Href);
+    }
+
+    [Theory]
+    [InlineData("check-answers")]
+    public async Task Get_WithReturnUrlToCheckAnswersPage_BacklinkLinksToExpected(string? expectedPage)
+    {
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+                s.PrimaryPersonId = personA.PersonId;
+                s.PersonAttributeSourcesSet = true;
+                s.Evidence = new()
+                {
+                    UploadEvidence = false
+                };
+            }));
+
+        var checkAnswersUrl = $"/persons/{personA.PersonId}/merge/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{GetRequestPath(personA, journeyInstance)}&returnUrl={Uri.EscapeDataString(checkAnswersUrl)}");
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.NotNull(backlink);
+        var expectedBackLink = $"/persons/{personA.PersonId}";
+        if (expectedPage is not null)
+        {
+            expectedBackLink += "/merge/" + expectedPage;
+        }
+        Assert.Contains(expectedBackLink, backlink.Href);
+    }
+
+    [Theory]
+    [InlineData("Continue", "Cancel and return to record")]
+    public async Task Get_ContinueAndCancelButtons_ExistOnPage(string continueButtonText, string cancelButtonText)
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+                s.PrimaryPersonId = personA.PersonId;
+                s.PersonAttributeSourcesSet = true;
+                s.Evidence = new()
+                {
+                    UploadEvidence = false
+                };
+            }));
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
+        Assert.NotNull(form);
+        var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
+        Assert.Collection(buttons,
+            b => Assert.Equal(continueButtonText, b.TrimmedText()),
+            b => Assert.Equal(cancelButtonText, b.TrimmedText()));
+    }
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetailPage()
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+                s.PrimaryPersonId = personA.PersonId;
+                s.PersonAttributeSourcesSet = true;
+                s.Evidence = new()
+                {
+                    UploadEvidence = false
+                };
+            }));
+
+        var pageUrl = GetRequestPath(personA, journeyInstance);
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+        Assert.NotNull(cancelButton);
+        Assert.Equal("Cancel", cancelButton.Name);
+
+        // Act
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        AssertEx.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
+    [Theory]
+    [InlineData("matches")]
+    public async Task Post_RedirectsToExpected(string? expectedPage)
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+                s.PrimaryPersonId = personA.PersonId;
+                s.PersonAttributeSourcesSet = true;
+                s.Evidence = new()
+                {
+                    UploadEvidence = false
+                };
+            }));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePersonPostRequestContentBuilder()
+                .WithOtherTrn(personB.Trn)
+                .WithPrimaryPersonId(personB.PersonId)
+                .WithUploadEvidence(false)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var expectedRedirect = $"/persons/{personA.PersonId}";
+        if (expectedPage is not null)
+        {
+            expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
+        }
+
+        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+    }
+
+    [Theory]
+    [InlineData("check-answers")]
+    public async Task Post_WithReturnUrlToCheckAnswersPage_RedirectsToCheckAnswersPage(string? expectedPage)
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+                s.PrimaryPersonId = personA.PersonId;
+                s.PersonAttributeSourcesSet = true;
+                s.Evidence = new()
+                {
+                    UploadEvidence = false
+                };
+            }));
+
+        var checkAnswersUrl = $"/persons/{personA.PersonId}/merge/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(personA, journeyInstance)}&returnUrl={Uri.EscapeDataString(checkAnswersUrl)}")
+        {
+            Content = new MergePersonPostRequestContentBuilder()
+                .WithOtherTrn(personB.Trn)
+                .WithPrimaryPersonId(personB.PersonId)
+                .WithUploadEvidence(false)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var expectedRedirect = $"/persons/{personA.PersonId}";
+        if (expectedPage is not null)
+        {
+            expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
+        }
+
+        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+    }
 }
