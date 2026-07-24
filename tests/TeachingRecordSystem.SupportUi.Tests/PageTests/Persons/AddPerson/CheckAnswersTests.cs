@@ -295,4 +295,164 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
     private string GetRequestPath(AddPersonJourneyCoordinator journeyInstance) =>
         $"/persons/add/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
 
+    [Theory]
+    [InlineData(UserRoles.Viewer)]
+    [InlineData(null)]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
+    {
+        // Arrange
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task Get_BacklinkLinksToReasonPage()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.NotNull(backlink);
+        Assert.Contains("/persons/add/reason", backlink.Href);
+    }
+
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToAddPersonIndexPage()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                EmailAddress = AddPersonFieldState<EmailAddress>.FromRawValue("some@email-address.com"),
+                NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue("AB123456D"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
+            });
+
+        var pageUrl = GetRequestPath(journeyInstance);
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+        Assert.NotNull(cancelButton);
+        Assert.Equal("Cancel", cancelButton.Name);
+
+        // Act
+        var cancelRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var cancelResponse = await HttpClient.SendAsync(cancelRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)cancelResponse.StatusCode);
+        Assert.Equal("/persons/add", cancelResponse.Headers.Location?.OriginalString);
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
+    [Fact]
+    public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile()
+    {
+        // Arrange
+        var evidenceFileId = Guid.NewGuid();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new AddPersonState
+            {
+                FirstName = "Alfred",
+                MiddleName = "The",
+                LastName = "Great",
+                DateOfBirth = DateOnly.Parse("1 Feb 1980"),
+                Reason = PersonCreateReason.MandatoryQualification,
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = "evidence.jpg",
+                        FileSizeDescription = "1.2 KB"
+                    }
+                }
+            });
+
+        var pageUrl = GetRequestPath(journeyInstance);
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        // Act
+        var cancelRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var cancelResponse = await HttpClient.SendAsync(cancelRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)cancelResponse.StatusCode);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
+    }
 }
