@@ -6,14 +6,14 @@
 
 <form method="post">
     <govuk-panel class="govuk-panel--interruption">
-        <govuk-panel-title>@ViewBag.Title</govuk-panel-title>
+        <panel-title>@ViewBag.Title</panel-title>
 
-        <govuk-panel-body class="govuk-panel__body">
+        <panel-body>
             <p class="govuk-body govuk-!-margin-bottom-0">
                 We could not match your details to a teaching record.
             </p>
 
-            <h2 class="govuk-heading-l">What you can do next</h2>
+            <h2 class="govuk-heading-m">What you can do next</h2>
 
             <p class="govuk-body">
                 Check your answers. If they are correct, you can send a support request to help us find your teaching record.
@@ -22,8 +22,9 @@
             <p class="govuk-body">
                 We’ll review your details and contact you if we need more information.
             </p>
-
-            <govuk-button class="govuk-!-margin-bottom-0">Check your answers</govuk-button>
-        </govuk-panel-body>
+        </panel-body>
+        <panel-actions>
+            <action-button type="submit">Check your answers</action-button>
+        </panel-actions>
     </govuk-panel>
 </form>

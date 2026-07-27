@@ -5,10 +5,10 @@
 }
 
 <form method="post">
-    <div class="govuk-panel govuk-panel--interruption">
-        <h1 class="govuk-panel__title">@ViewBag.Title</h1>
+    <govuk-panel class="govuk-panel--interruption">
+        <panel-title>@ViewBag.Title</panel-title>
 
-        <div class="govuk-panel__body">
+        <panel-body>
             <p class="govuk-body">
                 You’ve signed in to GOV.UK One Login and verified your identity.
             </p>
@@ -20,8 +20,9 @@
             <p class="govuk-body">
                 You won’t need to do this again.
             </p>
-
-            <govuk-button class="govuk-!-margin-bottom-0">Find your teaching record</govuk-button>
-        </div>
-    </div>
+        </panel-body>
+        <panel-actions>
+            <action-button type="submit">Find your teaching record</action-button>
+        </panel-actions>
+    </govuk-panel>
 </form>

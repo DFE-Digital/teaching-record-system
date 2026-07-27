@@ -45,6 +45,9 @@ public static class PageExtensions
     public static Task ClickGovUkButtonAsync(this IPage page, string text) =>
         page.ClickAsync($".govuk-button{TextIsSelector(text)}");
 
+    public static Task ClickGovUkStartButtonAsync(this IPage page) =>
+        page.ClickAsync(".govuk-button--start");
+
     public static Task ClickBackLinkAsync(this IPage page) =>
         page.ClickAsync(".govuk-back-link");
 

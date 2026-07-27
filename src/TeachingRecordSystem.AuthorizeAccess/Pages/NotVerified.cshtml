@@ -5,15 +5,15 @@
 }
 
 <form method="post">
-    <div class="govuk-panel govuk-panel--interruption">
-        <h1 class="govuk-panel__title">@ViewBag.Title</h1>
+    <govuk-panel class="govuk-panel--interruption">
+        <panel-title>@ViewBag.Title</panel-title>
 
-        <div class="govuk-panel__body">
+        <panel-body>
             <p class="govuk-body">
                 You can try to verify your identity again using GOV.UK One Login.
             </p>
 
-            <govuk-button name="TryAgain" value="true">Verify with GOV.UK One Login</govuk-button>
+            <govuk-button name="TryAgain" value="true" class="govuk-button--inverse">Verify with GOV.UK One Login</govuk-button>
 
             <p class="govuk-body">
                 Alternatively, we will try to confirm your identity and match you to a teaching record using your personal details.
@@ -31,8 +31,9 @@
                 <li>your teacher reference number (TRN)</li>
                 <li>proof of your identity, such as a passport or driving licence</li>
             </ul>
-
-            <button class="trs-panel--interruption__link-button govuk-!-margin-bottom-0">Verify using my personal details</button>
-        </div>
-    </div>
+        </panel-body>
+        <panel-actions>
+            <action-button type="submit" class="trs-panel--interruption__link-button">Verify using my personal details</action-button>
+        </panel-actions>
+    </govuk-panel>
 </form>

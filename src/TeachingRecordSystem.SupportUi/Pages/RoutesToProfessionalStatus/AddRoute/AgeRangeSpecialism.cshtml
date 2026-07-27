@@ -15,25 +15,23 @@
         <form method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-radios for="@Model.TrainingAgeSpecialism.AgeRangeType">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
-                        @ViewBag.Title
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.FoundationStage">@TrainingAgeSpecialismType.FoundationStage.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage1">@TrainingAgeSpecialismType.KeyStage1.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage2">@TrainingAgeSpecialismType.KeyStage2.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage3">@TrainingAgeSpecialismType.KeyStage3.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage4">@TrainingAgeSpecialismType.KeyStage4.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.FurtherEducation">@TrainingAgeSpecialismType.FurtherEducation.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-divider>or</govuk-radios-divider>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.Range">
-                        Enter an age range
-                        <govuk-radios-item-conditional>
-                            <govuk-input for="TrainingAgeSpecialism.AgeRangeFrom" input-class="govuk-input--width-2" />
-                            <govuk-input for="TrainingAgeSpecialism.AgeRangeTo" input-class="govuk-input--width-2"  />
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
+                    @ViewBag.Title
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@TrainingAgeSpecialismType.FoundationStage">@TrainingAgeSpecialismType.FoundationStage.GetDisplayName()</govuk-radios-item>
+                <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage1">@TrainingAgeSpecialismType.KeyStage1.GetDisplayName()</govuk-radios-item>
+                <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage2">@TrainingAgeSpecialismType.KeyStage2.GetDisplayName()</govuk-radios-item>
+                <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage3">@TrainingAgeSpecialismType.KeyStage3.GetDisplayName()</govuk-radios-item>
+                <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage4">@TrainingAgeSpecialismType.KeyStage4.GetDisplayName()</govuk-radios-item>
+                <govuk-radios-item value="@TrainingAgeSpecialismType.FurtherEducation">@TrainingAgeSpecialismType.FurtherEducation.GetDisplayName()</govuk-radios-item>
+                <govuk-radios-divider>or</govuk-radios-divider>
+                <govuk-radios-item value="@TrainingAgeSpecialismType.Range">
+                    Enter an age range
+                    <govuk-radios-item-conditional>
+                        <govuk-input for="TrainingAgeSpecialism.AgeRangeFrom" input-class="govuk-input--width-2" />
+                        <govuk-input for="TrainingAgeSpecialism.AgeRangeTo" input-class="govuk-input--width-2"  />
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
             </govuk-radios>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>

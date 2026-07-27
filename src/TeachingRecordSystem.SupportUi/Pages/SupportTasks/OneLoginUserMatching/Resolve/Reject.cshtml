@@ -15,29 +15,27 @@
             <span class="govuk-caption-l">Record management</span>
 
             <govuk-radios for="Reason">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend>
-                        <h1 class="govuk-fieldset__legend--l govuk-!-margin-top-0">@ViewBag.Title</h1>
-                        <div class="govuk-hint">We’ll email the person with the reason you select</div>
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest">
-                        @OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofIsUnclear">
-                        @OneLoginIdVerificationRejectReason.ProofIsUnclear.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofIsWrongType">
-                        @OneLoginIdVerificationRejectReason.ProofIsWrongType.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@OneLoginIdVerificationRejectReason.AnotherReason">
-                        @OneLoginIdVerificationRejectReason.AnotherReason.GetDisplayName()
-                        <govuk-radios-item-conditional>
-                            <govuk-character-count for="AdditionalDetails" max-length="@UiDefaults.ReasonDetailsMaxCharacterCount">
-                                <govuk-character-count-label>Enter details</govuk-character-count-label>
-                            </govuk-character-count>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend>
+                    <h1 class="govuk-fieldset__legend--l govuk-!-margin-top-0">@ViewBag.Title</h1>
+                    <div class="govuk-hint">We’ll email the person with the reason you select</div>
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest">
+                    @OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofIsUnclear">
+                    @OneLoginIdVerificationRejectReason.ProofIsUnclear.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofIsWrongType">
+                    @OneLoginIdVerificationRejectReason.ProofIsWrongType.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@OneLoginIdVerificationRejectReason.AnotherReason">
+                    @OneLoginIdVerificationRejectReason.AnotherReason.GetDisplayName()
+                    <govuk-radios-item-conditional>
+                        <govuk-character-count for="AdditionalDetails" max-length="@UiDefaults.ReasonDetailsMaxCharacterCount">
+                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                        </govuk-character-count>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

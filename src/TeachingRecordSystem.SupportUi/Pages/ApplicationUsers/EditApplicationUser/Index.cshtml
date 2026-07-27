@@ -24,13 +24,11 @@
             </govuk-input>
 
             <govuk-checkboxes for="ApiRoles">
-                <govuk-checkboxes-fieldset>
-                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m">API roles</govuk-checkboxes-fieldset-legend>
-                    @foreach (var role in ApiRoles.All.OrderBy(r => r))
-                    {
-                        <govuk-checkboxes-item value="@role">@role</govuk-checkboxes-item>
-                    }
-                </govuk-checkboxes-fieldset>
+                <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m">API roles</govuk-checkboxes-fieldset-legend>
+                @foreach (var role in ApiRoles.All.OrderBy(r => r))
+                {
+                    <govuk-checkboxes-item value="@role">@role</govuk-checkboxes-item>
+                }
             </govuk-checkboxes>
 
             <h2 class="govuk-heading-m">API keys</h2>
@@ -115,21 +113,19 @@
                         </govuk-input>
 
                         <govuk-radios for="UseSharedOneLoginSigningKeys">
-                            <govuk-radios-fieldset>
-                                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
-                                    Use shared One Login signing keys (<span class="trs-monospace">/one-login-jwks</span>)
-                                </govuk-radios-fieldset-legend>
-                                <govuk-radios-item value="@true">Yes</govuk-radios-item>
-                                <govuk-radios-item value="@false">
-                                    No
-                                    <govuk-radios-item-conditional>
-                                        <govuk-textarea for="OneLoginPrivateKeyPem" textarea-class="trs-monospace trs-nowrap" spellcheck="false">
-                                            <govuk-textarea-label class="govuk-label--s">One Login private key</govuk-textarea-label>
-                                            <govuk-textarea-hint>Enter a key in the PEM format</govuk-textarea-hint>
-                                        </govuk-textarea>
-                                    </govuk-radios-item-conditional>
-                                </govuk-radios-item>
-                            </govuk-radios-fieldset>
+                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
+                                Use shared One Login signing keys (<span class="trs-monospace">/one-login-jwks</span>)
+                            </govuk-radios-fieldset-legend>
+                            <govuk-radios-item value="@true">Yes</govuk-radios-item>
+                            <govuk-radios-item value="@false">
+                                No
+                                <govuk-radios-item-conditional>
+                                    <govuk-textarea for="OneLoginPrivateKeyPem" textarea-class="trs-monospace trs-nowrap" spellcheck="false">
+                                        <govuk-textarea-label class="govuk-label--s">One Login private key</govuk-textarea-label>
+                                        <govuk-textarea-hint>Enter a key in the PEM format</govuk-textarea-hint>
+                                    </govuk-textarea>
+                                </govuk-radios-item-conditional>
+                            </govuk-radios-item>
                         </govuk-radios>
 
                         <govuk-input for="OneLoginRedirectUriPath" input-class="trs-monospace" spellcheck="false">
@@ -141,19 +137,17 @@
                         </govuk-input>
 
                         <govuk-radios for="RecordMatchingPolicy">
-                            <govuk-radios-fieldset>
-                                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
-                                    Record matching policy
-                                </govuk-radios-fieldset-legend>
-                                <govuk-radios-item value="@RecordMatchingPolicy.Required">
-                                    Required
-                                    <govuk-radios-item-hint>Users must be matched to a teaching record to sign in</govuk-radios-item-hint>
-                                </govuk-radios-item>
-                                <govuk-radios-item value="@RecordMatchingPolicy.Deferred">
-                                    Deferred
-                                    <govuk-radios-item-hint>Users can sign in without a teaching record and be allocated one later</govuk-radios-item-hint>
-                                </govuk-radios-item>
-                            </govuk-radios-fieldset>
+                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
+                                Record matching policy
+                            </govuk-radios-fieldset-legend>
+                            <govuk-radios-item value="@RecordMatchingPolicy.Required">
+                                Required
+                                <govuk-radios-item-hint>Users must be matched to a teaching record to sign in</govuk-radios-item-hint>
+                            </govuk-radios-item>
+                            <govuk-radios-item value="@RecordMatchingPolicy.Deferred">
+                                Deferred
+                                <govuk-radios-item-hint>Users can sign in without a teaching record and be allocated one later</govuk-radios-item-hint>
+                            </govuk-radios-item>
                         </govuk-radios>
 
                         <h3 class="govuk-heading-s">App content</h3>

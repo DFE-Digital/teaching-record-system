@@ -423,8 +423,8 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "10.0.9",
-        "contentHash": "UpRgjjSUmF7KYZTIv1Zd2Y0Wv2oK9jE+Jmyp4UMynTowjvJGG1yrRe2JodYyVgcDgZF2auGwYEl+U0J1+YhBRw=="
+        "resolved": "10.0.10",
+        "contentHash": "TZQQIZ1wFmQX7WdRAyhaDlv3splUPOYheTP3aZtoLpxMlVnLOFRjiLaDB0PZX/d27N52+FLbiNkwL02x4hZgjg=="
       },
       "Microsoft.Graph.Beta": {
         "type": "Transitive",
@@ -1087,7 +1087,7 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.99.0, )",
-          "GovUk.Frontend.AspNetCore": "[4.2.1, )",
+          "GovUk.Frontend.AspNetCore": "[4.4.0, )",
           "GovUk.Questions.AspNetCore": "[1.0.1, )",
           "Htmx": "[1.12.0, )",
           "Htmx.TagHelpers": "[1.12.0, )",
@@ -1309,11 +1309,11 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[4.2.1, )",
-        "resolved": "4.2.1",
-        "contentHash": "pWuRZhx7AwjYY/CTllRiKrjcOPXEFWzBOJRzeAqrMj0OsEklnZcssVOlPVFm6XJ2ldaGRJi6xPmoTzVZrIcyGA==",
+        "requested": "[4.4.0, )",
+        "resolved": "4.4.0",
+        "contentHash": "KJ/dnGQ04bna1DyXNz9z3U3uPUfMjHuAfnDRTgsZN4rsU4W22rfMh7Kydb17gOKjoUxArj585pOqhrVna7FraQ==",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "10.0.9"
+          "Microsoft.Extensions.FileProviders.Embedded": "10.0.10"
         }
       },
       "GovUk.Questions.AspNetCore": {

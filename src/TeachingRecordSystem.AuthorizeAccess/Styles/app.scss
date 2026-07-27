@@ -6,7 +6,6 @@
 );
 
 @import '../lib/govuk-one-login/service-header/dist/styles/service-header-no-imports';
-@import './Components/interruption-card.scss';
 
 .trs-panel--left {
   text-align: left;
@@ -16,16 +15,48 @@
   color: govuk-colour("black", $variant: "tint-25");
 }
 
+// A <button> that looks like a govuk-link--inverse. The extend picks up the link
+// typography, decoration and the button-group layout; the rest strips the chrome
+// that the govuk-button and govuk-button--inverse classes bring with them.
 .trs-panel--interruption__link-button {
   @extend .govuk-link;
-  @extend .govuk-link--inverse;
+  @include govuk-font($size: 19);
   background: none;
   border: 0;
+  box-shadow: none;
   cursor: pointer;
   padding: 0;
-  @include govuk-font($size: 19);
+  // Neutralises .govuk-button:active, which nudges the button down by 2px.
+  position: static;
+  width: auto;
+
+  // The button's extended hit area.
+  &::before {
+    display: none;
+  }
+
+  // govuk-link--inverse colours its states through :link and :visited, neither
+  // of which matches a <button>, so set them here. The decoration is restated
+  // because .govuk-button:hover and :active drop the underline.
+  &,
+  &:active {
+    color: govuk-functional-colour(inverse-text);
+    @include govuk-link-decoration;
+  }
 
   &:hover {
+    // .govuk-button--inverse:hover tints the background.
+    background: none;
     color: govuk-colour("black", $variant: "tint-95");
+    @include govuk-link-decoration;
+    @include govuk-link-hover-decoration;
+  }
+
+  // .govuk-button:focus:not(:active):not(:hover) outranks .govuk-link:focus, so
+  // match its specificity to keep the link focus state.
+  &:focus,
+  &:focus:not(:active):not(:hover) {
+    @include govuk-focused-text;
+    border-color: transparent;
   }
 }

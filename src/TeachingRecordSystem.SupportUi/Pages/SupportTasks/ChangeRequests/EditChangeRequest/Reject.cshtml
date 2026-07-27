@@ -16,23 +16,21 @@
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
             <govuk-radios for="RejectionReasonChoice">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend>
-                        <h3 class="govuk-heading-m">Reason for rejecting</h3>
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@ChangeRequestRejectReason.RequestAndProofDontMatch">
-                        @ChangeRequestRejectReason.RequestAndProofDontMatch.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@ChangeRequestRejectReason.WrongTypeOfDocument">
-                        @ChangeRequestRejectReason.WrongTypeOfDocument.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@ChangeRequestRejectReason.ImageQuality">
-                        @ChangeRequestRejectReason.ImageQuality.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@ChangeRequestRejectReason.ChangeNoLongerRequired">
-                        @ChangeRequestRejectReason.ChangeNoLongerRequired.GetDisplayName()
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend>
+                    <h3 class="govuk-heading-m">Reason for rejecting</h3>
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@ChangeRequestRejectReason.RequestAndProofDontMatch">
+                    @ChangeRequestRejectReason.RequestAndProofDontMatch.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@ChangeRequestRejectReason.WrongTypeOfDocument">
+                    @ChangeRequestRejectReason.WrongTypeOfDocument.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@ChangeRequestRejectReason.ImageQuality">
+                    @ChangeRequestRejectReason.ImageQuality.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@ChangeRequestRejectReason.ChangeNoLongerRequired">
+                    @ChangeRequestRejectReason.ChangeNoLongerRequired.GetDisplayName()
+                </govuk-radios-item>
             </govuk-radios>
 
             <govuk-button type="submit">Reject</govuk-button>

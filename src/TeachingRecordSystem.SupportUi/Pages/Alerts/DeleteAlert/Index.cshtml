@@ -33,22 +33,20 @@
             </govuk-radios>
 
             <govuk-radios for="ProvideAdditionalInformation">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                        Do you want to provide more information?
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@true">
-                        Yes
-                        <govuk-radios-item-conditional>
-                            <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>Enter details</govuk-character-count-label>
-                            </govuk-character-count>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@false">
-                        No
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                    Do you want to provide more information?
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@true">
+                    Yes
+                    <govuk-radios-item-conditional>
+                        <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                        </govuk-character-count>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
+                <govuk-radios-item value="@false">
+                    No
+                </govuk-radios-item>
             </govuk-radios>
 
             @Html.EditorFor(m => m.Evidence)

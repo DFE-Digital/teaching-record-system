@@ -49,12 +49,10 @@
             </govuk-input>
 
             <govuk-date-input for="DateOfBirth" data-testid="edit-details-date-of-birth">
-                <govuk-date-input-fieldset>
-                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--s">
-                        Date of birth
-                    </govuk-date-input-fieldset-legend>
-                    <govuk-date-input-hint>For example, 31 3 1980</govuk-date-input-hint>
-                </govuk-date-input-fieldset>
+                <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--s">
+                    Date of birth
+                </govuk-date-input-fieldset-legend>
+                <govuk-date-input-hint>For example, 31 3 1980</govuk-date-input-hint>
             </govuk-date-input>
 
             <govuk-input for="EmailAddress" type="email" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-email-address">
@@ -67,30 +65,28 @@
             </govuk-input>
 
             <govuk-radios for="Gender" data-testid="edit-details-gender-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" data-testid="edit-details-gender-options-legend">
-                        Gender (optional)
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@Gender.Male">
-                        @Gender.Male.GetDisplayName()
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" data-testid="edit-details-gender-options-legend">
+                    Gender (optional)
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@Gender.Male">
+                    @Gender.Male.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@Gender.Female">
+                    @Gender.Female.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@Gender.Other">
+                    @Gender.Other.GetDisplayName()
+                </govuk-radios-item>
+                @* We only allow NotAvailable if it's a pre-existing value on the Person record *@
+                @if (Model.Gender == Gender.NotAvailable)
+                {
+                    <govuk-radios-item value="@Gender.NotAvailable">
+                        @Gender.NotAvailable.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@Gender.Female">
-                        @Gender.Female.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@Gender.Other">
-                        @Gender.Other.GetDisplayName()
-                    </govuk-radios-item>
-                    @* We only allow NotAvailable if it's a pre-existing value on the Person record *@
-                    @if (Model.Gender == Gender.NotAvailable)
-                    {
-                        <govuk-radios-item value="@Gender.NotAvailable">
-                            @Gender.NotAvailable.GetDisplayName()
-                        </govuk-radios-item>
-                    }
-                    <govuk-radios-item value="">
-                        Not provided
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                }
+                <govuk-radios-item value="">
+                    Not provided
+                </govuk-radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">
