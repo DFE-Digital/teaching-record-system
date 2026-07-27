@@ -16,3 +16,19 @@ public enum SupportTasksSortByOption
     AssignedTo,
     RequestedOn
 }
+
+public record CompletedTasksSearchOptions(
+    string? Search,
+    SupportTaskType? SupportTaskType,
+    Guid? CompletedByUserId,
+    CompletedTasksSortByOption? SortBy,
+    SortDirection? SortDirection);
+
+public enum CompletedTasksSortByOption
+{
+    Subject,
+    CompletedOn,
+    TaskType,
+    Outcome,
+    CompletedBy
+}

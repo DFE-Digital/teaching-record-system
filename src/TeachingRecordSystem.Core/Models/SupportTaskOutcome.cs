@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace TeachingRecordSystem.Core.Models;
 
@@ -68,4 +69,26 @@ public enum SupportTaskOutcome
 
     [Display(Name = "Rejected")]
     NpqTrnRequest_Rejected = 21,
+}
+
+public static class SupportTaskOutcomeRegistry
+{
+    private static readonly IReadOnlyDictionary<SupportTaskOutcome, string> _displayNames =
+        Enum.GetValues<SupportTaskOutcome>().ToDictionary(o => o, GetDisplayNameInternal);
+
+    public static string GetDisplayName(this SupportTaskOutcome outcome) =>
+        _displayNames.TryGetValue(outcome, out var name) ? name : outcome.ToString();
+
+    private static string GetDisplayNameInternal(SupportTaskOutcome outcome)
+    {
+        var attr = outcome.GetType()
+            .GetMember(outcome.ToString())
+            .Single()
+            .GetCustomAttribute<DisplayAttribute>();
+
+        return attr?.Name ?? outcome.ToString();
+    }
+
+    public static IReadOnlyCollection<SupportTaskOutcome> GetAll() =>
+        Enum.GetValues<SupportTaskOutcome>().OrderBy(o => GetDisplayNameInternal(o)).ToArray();
 }
