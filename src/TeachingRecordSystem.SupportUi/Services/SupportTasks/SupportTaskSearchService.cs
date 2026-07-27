@@ -11,6 +11,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 {
     private static readonly SupportTaskType[] _allChangeRequestTypes = [SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest];
 
+    public static Guid UnassignedUserId => Guid.Empty;
+
     public async Task<TrnRequestsSearchResult> SearchTrnRequestsAsync(TrnRequestsSearchOptions options, PaginationOptions paginationOptions)
     {
         var search = options.Search?.Trim() ?? string.Empty;
@@ -493,7 +495,9 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         if (searchOptions.AssignedToUserId is { } assignedToUserId)
         {
-            tasks = tasks.Where(t => t.AssignedToUserId == assignedToUserId);
+            tasks = assignedToUserId == UnassignedUserId ?
+                tasks.Where(t => t.AssignedToUserId == null) :
+                tasks.Where(t => t.AssignedToUserId == assignedToUserId);
         }
 
         if (searchOptions.Statuses is { Count: not 0 } statuses)

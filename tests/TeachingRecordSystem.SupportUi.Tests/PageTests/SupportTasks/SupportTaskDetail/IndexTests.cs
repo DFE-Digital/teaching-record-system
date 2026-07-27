@@ -1,5 +1,6 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.SupportTaskDetail;
 
@@ -68,12 +69,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_AssignToOptions_OnlyIncludesAccessManagerAndRecordManagerUsers()
+    public async Task Get_AssignToOptions_OnlyIncludesAccessManagerRecordManagerAndAdministratorUsers()
     {
         // Arrange
         var recordManager = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         var accessManager = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
         var administrator = await TestData.CreateUserAsync(role: UserRoles.Administrator);
+        var viewer = await TestData.CreateUserAsync(role: UserRoles.Viewer);
 
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
 
@@ -92,7 +94,41 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.Contains(recordManager.UserId.ToString(), optionValues);
         Assert.Contains(accessManager.UserId.ToString(), optionValues);
-        Assert.DoesNotContain(administrator.UserId.ToString(), optionValues);
+        Assert.Contains(administrator.UserId.ToString(), optionValues);
+        Assert.DoesNotContain(viewer.UserId.ToString(), optionValues);
+    }
+
+    [Fact]
+    public async Task Get_AssignToOptions_StartWithUnassignedAndMyselfAndExcludeCurrentUserFromUserList()
+    {
+        // Arrange
+        var currentUser = await TestData.CreateUserAsync(name: "Current User", role: UserRoles.RecordManager);
+        SetCurrentUser(currentUser);
+        var otherUser = await TestData.CreateUserAsync(name: "Other User", role: UserRoles.RecordManager);
+
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var options = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
+            .Options
+            .Select(o => (o.Value, Text: o.TrimmedText()))
+            .ToArray();
+
+        Assert.Equal(
+            [
+                (SupportTaskSearchService.UnassignedUserId.ToString(), "Unassigned"),
+                (currentUser.UserId.ToString(), "Myself")
+            ],
+            options.Take(2));
+        Assert.Contains((otherUser.UserId.ToString(), "Other User"), options);
+        Assert.DoesNotContain(options, o => o.Value == currentUser.UserId.ToString() && o.Text != "Myself");
     }
 
     [Fact]
@@ -236,6 +272,83 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "Task updated");
+    }
+
+    [Fact]
+    public async Task Post_AssignedToCurrentUser_AssignsTaskToCurrentUser()
+    {
+        // Arrange
+        var currentUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
+        SetCurrentUser(currentUser);
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/{supportTask.SupportTaskReference}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "AssignedToUserId", currentUser.UserId.ToString() },
+                { "Status", SupportTaskStatus.InProgress.ToString() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(currentUser.UserId, dbTask.AssignedToUserId);
+        });
+    }
+
+    [Fact]
+    public async Task Post_UnassignedUserId_RemovesTheAssignment()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            dbTask.AssignedToUserId = user.UserId;
+            dbTask.Status = SupportTaskStatus.InProgress;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/{supportTask.SupportTaskReference}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "AssignedToUserId", SupportTaskSearchService.UnassignedUserId.ToString() },
+                { "Status", SupportTaskStatus.InProgress.ToString() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Null(dbTask.AssignedToUserId);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Collection(p.Events, e =>
+            {
+                var updatedEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+                Assert.Equal(supportTask.SupportTaskReference, updatedEvent.SupportTaskReference);
+                Assert.Null(updatedEvent.SupportTask.AssignedToUserId);
+                Assert.Equal(SupportTaskUpdatedEventChanges.AssignedToUserId, updatedEvent.Changes);
+            });
+        });
     }
 
     [Fact]

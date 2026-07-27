@@ -809,12 +809,13 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
     }
 
     [Fact]
-    public async Task GetAssignableUsersAsync_ReturnsAccessManagersAndRecordManagersOrderedByNameAndExcludesOtherRoles()
+    public async Task GetAssignableUsersAsync_ReturnsAccessManagersRecordManagersAndAdministratorsOrderedByNameAndExcludesOtherRoles()
     {
         // Arrange
         var accessManager = await TestData.CreateUserAsync(name: "ZZZ Assignable AccessManager", role: UserRoles.AccessManager);
         var recordManager = await TestData.CreateUserAsync(name: "AAA Assignable RecordManager", role: UserRoles.RecordManager);
-        var viewer = await TestData.CreateUserAsync(name: "MMM Assignable Viewer", role: UserRoles.Viewer);
+        var administrator = await TestData.CreateUserAsync(name: "MMM Assignable Administrator", role: UserRoles.Administrator);
+        var viewer = await TestData.CreateUserAsync(name: "NNN Assignable Viewer", role: UserRoles.Viewer);
 
         // Act
         var result = await WithServiceAsync<SupportTaskService, IReadOnlyCollection<AssignableUserInfo>>(
@@ -823,13 +824,14 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         // Assert
         Assert.Contains(result, u => u.UserId == accessManager.UserId && u.UserName == accessManager.Name);
         Assert.Contains(result, u => u.UserId == recordManager.UserId && u.UserName == recordManager.Name);
+        Assert.Contains(result, u => u.UserId == administrator.UserId && u.UserName == administrator.Name);
         Assert.DoesNotContain(result, u => u.UserId == viewer.UserId);
 
         var createdUsersInResult = result
-            .Where(u => u.UserId == accessManager.UserId || u.UserId == recordManager.UserId)
+            .Where(u => u.UserId == accessManager.UserId || u.UserId == recordManager.UserId || u.UserId == administrator.UserId)
             .Select(u => u.UserId)
             .ToArray();
-        Assert.Equal(new[] { recordManager.UserId, accessManager.UserId }, createdUsersInResult);
+        Assert.Equal(new[] { recordManager.UserId, administrator.UserId, accessManager.UserId }, createdUsersInResult);
     }
 
     private record DummyJourneyState;

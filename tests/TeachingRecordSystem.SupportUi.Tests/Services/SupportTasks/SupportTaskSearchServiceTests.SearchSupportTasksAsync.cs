@@ -125,6 +125,28 @@ public partial class SupportTaskSearchServiceTests
         Assert.Equal(["ST1", "ST3"], tasks.GetKeysFor(result.SearchResults));
     }
 
+    [Fact]
+    public async Task SearchSupportTasksAsync_FilterByUnassignedUserId_ReturnsOnlyTasksThatAreNotAssigned()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(name: "User A");
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20))),
+            ["ST2"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 21))),
+            ["ST3"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 22))),
+        };
+        await AssignToUserAsync(tasks["ST2"], user.UserId);
+
+        // Act
+        var result = await SearchSupportTasksAsync(assignedToUserId: SupportTaskSearchService.UnassignedUserId);
+
+        // Assert
+        Assert.Equal(2, result.TotalTaskCount);
+        Assert.Equal(2, result.SearchResults.TotalItemCount);
+        Assert.Equal(["ST1", "ST3"], tasks.GetKeysFor(result.SearchResults));
+    }
+
     [Theory]
     [InlineData(new[] { SupportTaskStatus.Open }, new[] { "ST1" })]
     [InlineData(new[] { SupportTaskStatus.InProgress }, new[] { "ST2" })]

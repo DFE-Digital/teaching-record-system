@@ -39,6 +39,10 @@ public class Active(SupportTaskSearchService searchService, SupportTaskService s
 
     public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
+    public Guid UnassignedUserId => SupportTaskSearchService.UnassignedUserId;
+
+    public Guid CurrentUserId => User.GetUserId();
+
     public string? OrderedByLabel { get; set; }
 
     public string? OrderDirectionLabel { get; set; }
@@ -60,7 +64,9 @@ public class Active(SupportTaskSearchService searchService, SupportTaskService s
             Results,
             pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber));
 
-        AssignToOptions = await supportTaskService.GetAssignableUsersAsync();
+        AssignToOptions = (await supportTaskService.GetAssignableUsersAsync())
+            .Where(u => u.UserId != CurrentUserId)
+            .AsReadOnly();
 
         OrderedByLabel = sortBy switch
         {

@@ -48,6 +48,8 @@
                           select-class="govuk-!-width-full">
                 <govuk-select-label class="govuk-label--s">Assigned to</govuk-select-label>
                 <govuk-select-item value="">All owners</govuk-select-item>
+                <govuk-select-item value="@Model.UnassignedUserId">Unassigned</govuk-select-item>
+                <govuk-select-item value="@Model.CurrentUserId">Myself</govuk-select-item>
                 @foreach (var user in Model.AssignToOptions!)
                 {
                     <govuk-select-item value="@user.UserId">
@@ -107,7 +109,7 @@ else
     <table class="govuk-table trs-table-layout-fixed" sortable data-module="moj-multi-select" data-id-prefix="AssignSupportTask-">
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header trs-!-width-25"></th>
+                <th scope="col" class="govuk-table__header trs-!-width-35"></th>
                 <th scope="col" class="govuk-table__header"
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.Subject ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Subject, direction))"
@@ -163,7 +165,7 @@ else
             {
                 <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                     <td class="govuk-table__cell">
-                        <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
+                        <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox trs-select-row">
                             <input type="checkbox"
                                    class="govuk-checkboxes__input"
                                    id="AssignSupportTask-@(result.SupportTaskReference)"
@@ -192,8 +194,8 @@ else
                     <td class="govuk-table__cell" data-testid="status">
                         <support-task-status-tag status="@result.Status"/>
                     </td>
-                    <td class="govuk-table__cell" data-testid="assigned-to" use-empty-fallback="Not assigned">
-                        @result.AssignedToName
+                    <td class="govuk-table__cell" data-testid="assigned-to" use-empty-fallback="Unassigned">
+                        @(result.AssignedToUserId == Model.CurrentUserId ? "Myself" : result.AssignedToName)
                     </td>
                     <td class="govuk-table__cell">
                         <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference)"
@@ -219,7 +221,7 @@ else
 <div id="selected-tasks-banner" aria-live="polite" aria-atomic="true"></div>
 
 @section ContainerEnd {
-    <div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden" hx-preserve hx-swap-oob="innerHTML">
+    <div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden" hx-swap-oob="innerHTML">
         @if (Model.Results!.Count == 0)
         {
             <text>No matching tasks found.</text>

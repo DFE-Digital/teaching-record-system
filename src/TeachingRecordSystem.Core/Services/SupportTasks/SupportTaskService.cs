@@ -10,7 +10,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
     public async Task<IReadOnlyCollection<AssignableUserInfo>> GetAssignableUsersAsync()
     {
         return await dbContext.Users
-            .Where(u => u.Role == UserRoles.AccessManager || u.Role == UserRoles.RecordManager)
+            .Where(u => u.Role == UserRoles.AccessManager || u.Role == UserRoles.RecordManager || u.Role == UserRoles.Administrator)
             .OrderBy(u => u.Name)
             .Select(u => new AssignableUserInfo(u.UserId, u.Name))
             .ToArrayAsync();
