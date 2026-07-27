@@ -76,7 +76,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_UnassignedTask_ShowsNotAssigned()
+    public async Task Get_UnassignedTask_ShowsUnassigned()
     {
         // Arrange
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
@@ -91,7 +91,106 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var row = doc.GetElementByTestId($"task:{supportTask.SupportTaskReference}");
         Assert.NotNull(row);
-        Assert.Equal("Not assigned", row.GetElementByTestId("assigned-to")!.TrimmedText());
+        Assert.Equal("Unassigned", row.GetElementByTestId("assigned-to")!.TrimmedText());
+    }
+
+    [Fact]
+    public async Task Get_TaskAssignedToCurrentUser_ShowsMyself()
+    {
+        // Arrange
+        var currentUser = await CreateAndSetCurrentUserAsync();
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AssignToUserAsync(supportTask, currentUser.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var row = doc.GetElementByTestId($"task:{supportTask.SupportTaskReference}");
+        Assert.NotNull(row);
+        Assert.Equal("Myself", row.GetElementByTestId("assigned-to")!.TrimmedText());
+    }
+
+    [Fact]
+    public async Task Get_AssignedToFilterOptions_IncludeUnassignedAndMyselfAndExcludeCurrentUserFromUserList()
+    {
+        // Arrange
+        var currentUser = await CreateAndSetCurrentUserAsync(name: "Current User");
+        var otherUser = await TestData.CreateUserAsync(name: "Other User", role: UserRoles.RecordManager);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var options = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
+            .Options
+            .Select(o => (o.Value, Text: o.TrimmedText()))
+            .ToArray();
+
+        Assert.Equal(
+            [
+                ("", "All owners"),
+                (SupportTaskSearchService.UnassignedUserId.ToString(), "Unassigned"),
+                (currentUser.UserId.ToString(), "Myself"),
+                (otherUser.UserId.ToString(), "Other User")
+            ],
+            options);
+    }
+
+    [Fact]
+    public async Task Get_FilterByUnassignedUserId_ShowsOnlyTasksThatAreNotAssigned()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(name: "User A");
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20))),
+            ["ST2"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 21))),
+            ["ST3"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 22))),
+        };
+        await AssignToUserAsync(tasks["ST2"], user.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/active?assignedToUserId={SupportTaskSearchService.UnassignedUserId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(["ST1", "ST3"], GetResultTaskKeys(doc, tasks));
+    }
+
+    [Fact]
+    public async Task Get_FilterByCurrentUserId_ShowsOnlyTasksAssignedToCurrentUser()
+    {
+        // Arrange
+        var currentUser = await CreateAndSetCurrentUserAsync();
+        var otherUser = await TestData.CreateUserAsync(name: "Other User");
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20))),
+            ["ST2"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 21))),
+        };
+        await AssignToUserAsync(tasks["ST1"], currentUser.UserId);
+        await AssignToUserAsync(tasks["ST2"], otherUser.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/active?assignedToUserId={currentUser.UserId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(["ST1"], GetResultTaskKeys(doc, tasks));
     }
 
     [Fact]
@@ -301,6 +400,15 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Single(GetResultTaskReferences(doc));
+    }
+
+    private async Task<User> CreateAndSetCurrentUserAsync(string? name = null)
+    {
+        // The current user from HostFixture isn't in the database once it's been cleared,
+        // so create a user we can assign tasks to and sign in as them
+        var user = await TestData.CreateUserAsync(name: name, role: UserRoles.RecordManager);
+        SetCurrentUser(user);
+        return user;
     }
 
     private Task AssignToUserAsync(SupportTask task, Guid userId) =>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
 
@@ -54,6 +55,10 @@ public class Index(
 
     public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
+    public Guid UnassignedUserId => SupportTaskSearchService.UnassignedUserId;
+
+    public Guid CurrentUserId => User.GetUserId();
+
     public void OnGet()
     {
         AssignedToUserId = _supportTask!.AssignedToUserId;
@@ -68,8 +73,9 @@ public class Index(
         }
 
         // Belt & braces check that status and user assignments are valid
-        if (Status is not SupportTaskStatus.InProgress and not SupportTaskStatus.Open ||
-            AssignedToUserId is not null && !AssignToOptions!.Any(o => o.UserId == AssignedToUserId))
+        var validAssignmentIds = AssignToOptions!.Select(u => u.UserId).Concat([CurrentUserId, UnassignedUserId]);
+        if ((Status is not SupportTaskStatus.InProgress and not SupportTaskStatus.Open) ||
+            (AssignedToUserId is not null && !validAssignmentIds.Contains(AssignedToUserId.Value)))
         {
             return BadRequest();
         }
@@ -81,7 +87,7 @@ public class Index(
             {
                 SupportTaskReference = SupportTaskReference,
                 Status = Status,
-                AssignToUserId = AssignedToUserId
+                AssignToUserId = AssignedToUserId == UnassignedUserId ? null : AssignedToUserId
             },
             processContext);
 
@@ -116,7 +122,9 @@ public class Index(
             .Select(t => new Note(t.Content, t.CreatedOn, t.CreatedBy!.Name))
             .ToArrayAsync();
 
-        AssignToOptions = await supportTaskService.GetAssignableUsersAsync();
+        AssignToOptions = (await supportTaskService.GetAssignableUsersAsync())
+            .Where(u => u.UserId != CurrentUserId)
+            .AsReadOnly();
 
         BackLink = this.GetReturnUrlOrDefault(
             IsOutstanding ? linkGenerator.SupportTasks.Active() : linkGenerator.SupportTasks.Completed());
