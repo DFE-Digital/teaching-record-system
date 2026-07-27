@@ -1,11 +1,14 @@
-@page "/mqs/{qualificationId}/delete/check-answers/{handler?}"
+@page "/mqs/{qualificationId}/delete/check-answers"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.CheckAnswersModel
 @{
     ViewBag.Title = "Check details before deleting mandatory qualification";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Mqs.DeleteMq.Index(Model.QualificationId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    @if (Model.BackLink is not null)
+    {
+        <govuk-back-link href="@Model.BackLink">Back</govuk-back-link>
+    }
 }
 
 <div class="govuk-grid-row">
@@ -64,7 +67,7 @@
             <h2 class="govuk-heading-m">Are you sure you want to delete this mandatory qualification?</h2>
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit">Confirm and delete qualification</govuk-button>
-                <govuk-button formaction="@LinkGenerator.Mqs.DeleteMq.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

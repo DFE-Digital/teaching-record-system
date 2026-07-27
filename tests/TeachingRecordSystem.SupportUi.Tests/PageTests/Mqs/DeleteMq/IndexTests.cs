@@ -2,7 +2,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
@@ -228,9 +228,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualification = person.MandatoryQualifications.Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -239,8 +239,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -266,12 +265,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
-
-    private async Task<JourneyInstance<DeleteMqState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteMqState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.DeleteMq,
-            state ?? new DeleteMqState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 
     private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
     {

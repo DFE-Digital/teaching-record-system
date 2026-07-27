@@ -4,31 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
 {
-    [Fact]
-    public async Task Get_MissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            new DeleteMqState
-            {
-                Initialized = true
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.AnotherReason, "Some details about the deletion reason", true, "additional info", true)]
     [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null, false, "additional info", true)]
@@ -61,7 +38,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualification.QualificationId,
             new DeleteMqState
             {
-                Initialized = true,
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = deletionReasonDetail,
                 Evidence = new()
@@ -110,32 +86,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_MissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            new DeleteMqState
-            {
-                Initialized = true
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
     public async Task Post_Confirm_DeletesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -164,7 +114,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new DeleteMqState
             {
-                Initialized = true,
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = deletionReasonDetail,
                 Evidence = new()
@@ -218,8 +167,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(new EventModels.File { FileId = evidenceFileId, Name = evidenceFileName }, changeReason.EvidenceFile);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
@@ -232,7 +180,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new DeleteMqState
             {
-                Initialized = true,
                 DeletionReason = MqDeletionReasonOption.AnotherReason,
                 DeletionReasonDetail = "Some details about the deletion reason",
                 Evidence = new()
@@ -243,9 +190,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 AdditionalInformation = null
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -254,8 +201,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -290,7 +236,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new DeleteMqState
             {
-                Initialized = true,
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = null,
                 Evidence = new()
@@ -316,9 +261,4 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    private async Task<JourneyInstance<DeleteMqState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteMqState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.DeleteMq,
-            state ?? new DeleteMqState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }
