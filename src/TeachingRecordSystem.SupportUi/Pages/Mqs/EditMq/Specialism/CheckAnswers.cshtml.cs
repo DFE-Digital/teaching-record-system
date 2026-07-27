@@ -8,17 +8,23 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqSpecialism), RequireJourneyInstance]
+[Journey(JourneyNames.EditMqSpecialism)]
 public class CheckAnswersModel(
+    EditMqSpecialismJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
     TimeProvider timeProvider,
     MandatoryQualificationService mandatoryQualificationService) : PageModel
 {
-    public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -38,26 +44,27 @@ public class CheckAnswersModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.Mqs.EditMq.Specialism.Index(QualificationId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        CurrentSpecialism = JourneyInstance.State.CurrentSpecialism;
-        NewSpecialism = JourneyInstance.State.Specialism;
-        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        CurrentSpecialism = journey.State.CurrentSpecialism;
+        NewSpecialism = journey.State.Specialism;
+        ChangeReason = journey.State.ChangeReason!.Value;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail;
+        AdditionalInformation = journey.State.AdditionalInformation;
+        EvidenceFile = journey.State.Evidence.UploadedEvidenceFile;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
         var processContext = new ProcessContext(
@@ -80,16 +87,16 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
         TempData.SetFlashNotificationBanner("Mandatory qualification changed");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

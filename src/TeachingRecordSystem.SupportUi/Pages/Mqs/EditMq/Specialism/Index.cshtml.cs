@@ -5,19 +5,29 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqSpecialism), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
+[Journey(JourneyNames.EditMqSpecialism), StartsJourney]
+public class IndexModel(
+    EditMqSpecialismJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
         v => v.RuleFor(m => m.Specialism)
+            .Cascade(CascadeMode.Stop)
             .NotNull().WithMessage("Select a specialism")
+            .Must((m, specialism) => m.Specialisms!.Any(s => s.Value == specialism)).WithMessage("Select a valid specialism")
     };
 
-    public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -30,32 +40,27 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public void OnGet()
     {
-        Specialism = JourneyInstance!.State.Specialism;
+        Specialism = journey.State.Specialism;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Specialism is MandatoryQualificationSpecialism specialism && !Specialisms!.Any(s => s.Value == specialism))
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(Specialism), "Select a valid specialism");
+            return await CancelAsync();
         }
 
-        _validator.ValidateAndThrow(this);
+        await _validator.ValidateAndThrowAsync(this);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        await JourneyInstance!.UpdateStateAsync(state => state.Specialism = Specialism);
-
-        return Redirect(linkGenerator.Mqs.EditMq.Specialism.Reason(QualificationId, JourneyInstance!.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.EditMq.Specialism.Reason(journey.InstanceId),
+            state => state.Specialism = Specialism);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
@@ -64,8 +69,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        JourneyInstance!.State.EnsureInitialized(qualificationInfo);
-
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
 
@@ -73,6 +76,8 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
             MandatoryQualificationSpecialismRegistry.GetByDqtValue(dqtSpecialismValue).IsLegacy();
 
         Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: migratedFromDqtWithLegacySpecialism);
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
 
         await next();
     }

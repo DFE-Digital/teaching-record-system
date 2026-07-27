@@ -2,21 +2,15 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 public class EditMqSpecialismLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/EditMq/Specialism/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string Index(Guid qualificationId) =>
+        linkGenerator.GetRequiredPathByPage("/Mqs/EditMq/Specialism/Index", routeValues: new { qualificationId });
 
-    public string Cancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/EditMq/Specialism/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string Index(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Mqs/EditMq/Specialism/Index", journeyInstanceId, returnUrl);
 
-    public string Reason(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/EditMq/Specialism/Reason", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string Reason(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Mqs/EditMq/Specialism/Reason", journeyInstanceId, returnUrl);
 
-    public string ReasonCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/EditMq/Specialism/Reason", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswers(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/EditMq/Specialism/CheckAnswers", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswersCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Mqs/EditMq/Specialism/CheckAnswers", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Mqs/EditMq/Specialism/CheckAnswers", journeyInstanceId);
 }

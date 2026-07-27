@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Specialism;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
@@ -22,18 +22,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
+    public async Task Get_NewJourneyInstance_PopulatesModelFromDatabase()
     {
         // Arrange
         var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClient.SendAsync(request);  // Starts the journey
+        response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
@@ -45,7 +45,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
+    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
         var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
@@ -56,7 +56,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = journeySpecialism
             });
 
@@ -88,7 +87,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = specialism
             });
 
@@ -121,7 +119,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = specialism
             });
 
@@ -196,7 +193,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = oldSpecialism
             });
 
@@ -227,13 +223,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = specialism
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -242,8 +237,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -264,7 +258,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqSpecialismState
             {
-                Initialized = true,
                 Specialism = specialism
             });
 
@@ -277,9 +270,4 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    private async Task<JourneyInstance<EditMqSpecialismState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqSpecialismState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditMqSpecialism,
-            state ?? new EditMqSpecialismState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }
