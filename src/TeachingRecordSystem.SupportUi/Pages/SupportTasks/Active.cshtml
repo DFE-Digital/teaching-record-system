@@ -25,6 +25,7 @@
                           select-hx-trigger="change"
                           select-hx-select="main"
                           select-hx-target="main"
+                          select-hx-swap="outerHTML"
                           select-hx-push-url="true"
                           class="govuk-!-width-one-half govuk-!-margin-bottom-0"
                           select-class="govuk-!-width-full">
@@ -41,6 +42,7 @@
                           select-hx-trigger="change"
                           select-hx-select="main"
                           select-hx-target="main"
+                          select-hx-swap="outerHTML"
                           select-hx-push-url="true"
                           class="govuk-!-width-one-half govuk-!-margin-bottom-0"
                           select-class="govuk-!-width-full">
@@ -205,20 +207,6 @@ else
     </table>
 }
 
-<div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden" hx-preserve hx-swap-oob="innerHTML">
-    @if (Model.Results!.Count == 0)
-    {
-        <text>No matching tasks found.</text>
-    }
-    else
-    {
-        <text>
-            Showing @Model.Results!.Count of @Model.TotalTaskCount matching tasks
-            sorted by @Model.OrderedByLabel (@Model.OrderDirectionLabel).
-        </text>
-    }
-</div>
-
 <form id="assign-tasks-form" action="@LinkGenerator.SupportTasks.Assign()" method="get" asp-antiforgery="false">
     <input name="returnUrl" type="hidden" value="@returnUrl">
     <noscript>
@@ -226,8 +214,22 @@ else
     </noscript>
 </form>
 
-<div id="pagination-container">
-    <partial name="_Pagination" model="@Model.Pagination" />
-</div>
+<partial name="_Pagination" model="@Model.Pagination" />
 
 <div id="selected-tasks-banner" aria-live="polite" aria-atomic="true"></div>
+
+@section ContainerEnd {
+    <div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden" hx-preserve hx-swap-oob="innerHTML">
+        @if (Model.Results!.Count == 0)
+        {
+            <text>No matching tasks found.</text>
+        }
+        else
+        {
+            <text>
+                Showing @Model.Results!.Count of @Model.TotalTaskCount matching tasks
+                sorted by @Model.OrderedByLabel (@Model.OrderDirectionLabel).
+            </text>
+        }
+    </div>
+}
