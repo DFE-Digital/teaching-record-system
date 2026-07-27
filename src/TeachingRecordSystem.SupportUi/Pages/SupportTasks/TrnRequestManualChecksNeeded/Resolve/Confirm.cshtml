@@ -5,19 +5,18 @@
 }
 
 <form method="post">
-    <govuk-panel class="trs-blue-panel">
-        <govuk-panel-title>@ViewBag.Title</govuk-panel-title>
-        <govuk-panel-body>
+    <govuk-panel class="govuk-panel--interruption">
+        <panel-title>@ViewBag.Title</panel-title>
+        <panel-body>
             <p class="govuk-body">
                 By continuing, you confirm that all checks needed outside this service are complete.
             </p>
-
-            <div class="govuk-button-group govuk-!-margin-bottom-0">
-                <govuk-button type="submit" class="govuk-button--inverse">Continue</govuk-button>
-                <a href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(Model.SupportTaskReference!)" class="trs-button--link">
-                    Go back to the TRN request
-                </a>
-            </div>
-        </govuk-panel-body>
+        </panel-body>
+        <panel-actions>
+            <action-button type="submit">Continue</action-button>
+            <action-link href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(Model.SupportTaskReference!)">
+                Go back to the TRN request
+            </action-link>
+        </panel-actions>
     </govuk-panel>
 </form>

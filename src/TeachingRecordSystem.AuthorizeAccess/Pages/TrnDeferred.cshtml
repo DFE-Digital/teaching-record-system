@@ -5,15 +5,16 @@
 }
 
 <form method="post">
-    <div class="govuk-panel govuk-panel--interruption">
-        <h1 class="govuk-panel__title">@ViewBag.Title</h1>
+    <govuk-panel class="govuk-panel--interruption">
+        <panel-title>@ViewBag.Title</panel-title>
 
-        <div class="govuk-panel__body">
+        <panel-body>
             <p class="govuk-body">
                 You’ll be given a teacher reference number (TRN) once you’ve been accepted on a course.
             </p>
-
-            <govuk-button class="govuk-!-margin-bottom-0">Continue</govuk-button>
-        </div>
-    </div>
+        </panel-body>
+        <panel-actions>
+            <action-button type="submit">Continue</action-button>
+        </panel-actions>
+    </govuk-panel>
 </form>

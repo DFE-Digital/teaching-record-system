@@ -17,40 +17,36 @@
             <span class="govuk-caption-l">Edit mandatory qualification - @Model.PersonName</span>
 
             <govuk-radios for="ChangeReason" page data-testid="change-reason-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">Why are you changing the training provider?</govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@MqChangeProviderReasonOption.IncorrectTrainingProvider">
-                        @MqChangeProviderReasonOption.IncorrectTrainingProvider.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MqChangeProviderReasonOption.ChangeOfTrainingProvider">
-                        @MqChangeProviderReasonOption.ChangeOfTrainingProvider.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MqChangeProviderReasonOption.AnotherReason">
-                        @MqChangeProviderReasonOption.AnotherReason.GetDisplayName()
-                        <govuk-radios-item-conditional data-testid="provider-reason-detail">
-                            <govuk-input data-testid="reason-detail" for="ChangeReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
-                                <govuk-input-label>Enter a reason</govuk-input-label>
-                            </govuk-input>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">Why are you changing the training provider?</govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@MqChangeProviderReasonOption.IncorrectTrainingProvider">
+                    @MqChangeProviderReasonOption.IncorrectTrainingProvider.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@MqChangeProviderReasonOption.ChangeOfTrainingProvider">
+                    @MqChangeProviderReasonOption.ChangeOfTrainingProvider.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@MqChangeProviderReasonOption.AnotherReason">
+                    @MqChangeProviderReasonOption.AnotherReason.GetDisplayName()
+                    <govuk-radios-item-conditional data-testid="provider-reason-detail">
+                        <govuk-input data-testid="reason-detail" for="ChangeReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
+                            <govuk-input-label>Enter a reason</govuk-input-label>
+                        </govuk-input>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
             </govuk-radios>
 
             <govuk-radios for="ProvideAdditionalInformation" data-testid="has-additional-reason_detail-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2></govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@true">
-                        Yes
-                        <govuk-radios-item-conditional data-testid="additional-detail">
-                            <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>Enter details</govuk-character-count-label>
-                            </govuk-character-count>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@false">
-                        No
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend><h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2></govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@true">
+                    Yes
+                    <govuk-radios-item-conditional data-testid="additional-detail">
+                        <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                        </govuk-character-count>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
+                <govuk-radios-item value="@false">
+                    No
+                </govuk-radios-item>
             </govuk-radios>
 
             @Html.EditorFor(m => m.Evidence)

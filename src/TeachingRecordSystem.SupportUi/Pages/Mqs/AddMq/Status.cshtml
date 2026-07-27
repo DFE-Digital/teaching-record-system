@@ -17,35 +17,31 @@
             <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
 
             <govuk-radios for="Status" data-testid="status-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l">Select the status</govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="status-deferred">
-                        @MandatoryQualificationStatus.Deferred.GetTitle()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MandatoryQualificationStatus.Extended" data-testid="status-extended">
-                        @MandatoryQualificationStatus.Extended.GetTitle()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MandatoryQualificationStatus.Failed" data-testid="status-failed">
-                        @MandatoryQualificationStatus.Failed.GetTitle()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MandatoryQualificationStatus.InProgress" data-testid="status-in-progress">
-                        @MandatoryQualificationStatus.InProgress.GetTitle()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="status-passed">
-                        @MandatoryQualificationStatus.Passed.GetTitle()
-                        <govuk-radios-item-conditional>
-                            <govuk-date-input for="EndDate">
-                                <govuk-date-input-fieldset>
-                                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend" />
-                                    <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
-                                </govuk-date-input-fieldset>
-                            </govuk-date-input>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MandatoryQualificationStatus.Withdrawn">
-                        Withdrawn
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l">Select the status</govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="status-deferred">
+                    @MandatoryQualificationStatus.Deferred.GetTitle()
+                </govuk-radios-item>
+                <govuk-radios-item value="@MandatoryQualificationStatus.Extended" data-testid="status-extended">
+                    @MandatoryQualificationStatus.Extended.GetTitle()
+                </govuk-radios-item>
+                <govuk-radios-item value="@MandatoryQualificationStatus.Failed" data-testid="status-failed">
+                    @MandatoryQualificationStatus.Failed.GetTitle()
+                </govuk-radios-item>
+                <govuk-radios-item value="@MandatoryQualificationStatus.InProgress" data-testid="status-in-progress">
+                    @MandatoryQualificationStatus.InProgress.GetTitle()
+                </govuk-radios-item>
+                <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="status-passed">
+                    @MandatoryQualificationStatus.Passed.GetTitle()
+                    <govuk-radios-item-conditional>
+                        <govuk-date-input for="EndDate">
+                            <govuk-date-input-fieldset-legend class="govuk-fieldset__legend" />
+                            <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
+                        </govuk-date-input>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
+                <govuk-radios-item value="@MandatoryQualificationStatus.Withdrawn">
+                    Withdrawn
+                </govuk-radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

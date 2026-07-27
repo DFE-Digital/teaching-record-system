@@ -21,7 +21,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Act
         await page.GotoAsync($"{AuthorizeAccessBaseUrl}/oidc-test");
-        await page.ClickButtonAsync("Start");
+        await page.ClickGovUkStartButtonAsync();
         await page.WaitForUrlPathAsync("/oidc-test/signed-in");
 
         // Assert
@@ -58,7 +58,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = await context.NewPageAsync();
 
         await page.GotoAsync($"{AuthorizeAccessBaseUrl}/oidc-test");
-        await page.ClickGovUkButtonAsync("Start");
+        await page.ClickGovUkStartButtonAsync();
         await page.WaitForUrlPathAsync("/oidc-test/signed-in");
 
         var initialAccessToken = await page.GetByLabel("Access token").InputValueAsync();

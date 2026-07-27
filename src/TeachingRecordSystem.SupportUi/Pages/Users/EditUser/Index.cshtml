@@ -32,57 +32,55 @@
             </govuk-input>
 
             <govuk-radios for="@Model.Role" radios-class="trs-user-roles">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                        Role
-                    </govuk-radios-fieldset-legend>
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                    Role
+                </govuk-radios-fieldset-legend>
 
-                    @foreach (var role in Model.RoleOptions)
-                    {
-                        <govuk-radios-item value="@role.Name" disabled="@(!Model.IsActiveUser)">@role.DisplayName</govuk-radios-item>
-                        <govuk-radios-divider>
-                            <table class="govuk-table">
-                                <caption class="govuk-table__caption govuk-table__caption--s">Permissions</caption>
+                @foreach (var role in Model.RoleOptions)
+                {
+                    <govuk-radios-item value="@role.Name" disabled="@(!Model.IsActiveUser)">@role.DisplayName</govuk-radios-item>
+                    <govuk-radios-divider>
+                        <table class="govuk-table">
+                            <caption class="govuk-table__caption govuk-table__caption--s">Permissions</caption>
 
-                                <thead class="govuk-table__head">
-                                    <tr class="govuk-table__row">
-                                        @foreach (var permission in role.Permissions)
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    @foreach (var permission in role.Permissions)
+                                    {
+                                        <th scope="col" class="govuk-table__header">@permission.Type</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                <tr class="govuk-table__row">
+                                    @foreach (var permission in role.Permissions)
+                                    {
+                                        switch (permission.Level)
                                         {
-                                            <th scope="col" class="govuk-table__header">@permission.Type</th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody class="govuk-table__body">
-                                    <tr class="govuk-table__row">
-                                        @foreach (var permission in role.Permissions)
-                                        {
-                                            switch (permission.Level)
-                                            {
-                                                case UserPermissionLevel.Edit:
-                                                    <td class="govuk-table__cell">
-                                                        <tag color="TagColor.Green">Edit</tag>
-                                                    </td>
-                                                    break;
+                                            case UserPermissionLevel.Edit:
+                                                <td class="govuk-table__cell">
+                                                    <tag color="TagColor.Green">Edit</tag>
+                                                </td>
+                                                break;
 
-                                                case UserPermissionLevel.View:
-                                                    <td class="govuk-table__cell">
-                                                        <tag color="TagColor.LightBlue">View</tag>
-                                                    </td>
-                                                    break;
+                                            case UserPermissionLevel.View:
+                                                <td class="govuk-table__cell">
+                                                    <tag color="TagColor.LightBlue">View</tag>
+                                                </td>
+                                                break;
 
-                                                default:
-                                                    <td class="govuk-table__cell">
-                                                        <tag color="TagColor.Grey">No</tag>
-                                                    </td>
-                                                    break;
-                                            }
+                                            default:
+                                                <td class="govuk-table__cell">
+                                                    <tag color="TagColor.Grey">No</tag>
+                                                </td>
+                                                break;
                                         }
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </govuk-radios-divider>
-                    }
-                </govuk-radios-fieldset>
+                                    }
+                                </tr>
+                            </tbody>
+                        </table>
+                    </govuk-radios-divider>
+                }
             </govuk-radios>
 
             @if (Model.IsActiveUser)

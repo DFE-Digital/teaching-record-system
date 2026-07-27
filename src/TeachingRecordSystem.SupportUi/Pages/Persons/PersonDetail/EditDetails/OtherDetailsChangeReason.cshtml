@@ -15,35 +15,33 @@
         <form method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="change-reason-caption">Change personal details - @Model.PersonName</span>
             <govuk-radios for="Reason" data-testid="change-reason-options">
-                <govuk-radios-fieldset>
-                    @if (Model.IsAlsoChangingName)
-                    {
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
-                            Why are you changing the other personal details on this record?
-                        </govuk-radios-fieldset-legend>
-                    }
-                    else
-                    {
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
-                            Why are you changing this record?
-                        </govuk-radios-fieldset-legend>
-                    }
-                    <govuk-radios-item value="@PersonDetailsChangeReason.IncompleteDetails">
-                        @PersonDetailsChangeReason.IncompleteDetails.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@PersonDetailsChangeReason.NewInformation">
-                        @PersonDetailsChangeReason.NewInformation.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@PersonDetailsChangeReason.AnotherReason">
-                        @PersonDetailsChangeReason.AnotherReason.GetDisplayName()
+                @if (Model.IsAlsoChangingName)
+                {
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
+                        Why are you changing the other personal details on this record?
+                    </govuk-radios-fieldset-legend>
+                }
+                else
+                {
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
+                        Why are you changing this record?
+                    </govuk-radios-fieldset-legend>
+                }
+                <govuk-radios-item value="@PersonDetailsChangeReason.IncompleteDetails">
+                    @PersonDetailsChangeReason.IncompleteDetails.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@PersonDetailsChangeReason.NewInformation">
+                    @PersonDetailsChangeReason.NewInformation.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@PersonDetailsChangeReason.AnotherReason">
+                    @PersonDetailsChangeReason.AnotherReason.GetDisplayName()
 
-                        <govuk-radios-item-conditional data-testid="change-reason-detail">
-                            <govuk-character-count for="ReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>Enter details</govuk-character-count-label>
-                            </govuk-character-count>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                    <govuk-radios-item-conditional data-testid="change-reason-detail">
+                        <govuk-character-count for="ReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                        </govuk-character-count>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
             </govuk-radios>
 
             @Html.EditorFor(m => m.Evidence)

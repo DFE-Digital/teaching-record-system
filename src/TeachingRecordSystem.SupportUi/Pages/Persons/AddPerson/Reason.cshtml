@@ -16,48 +16,44 @@
         <form method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="create-reason-caption">Create a record</span>
             <govuk-radios for="Reason" data-testid="create-reason-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="create-reason-options-legend">
-                        Why are you creating this record?
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@PersonCreateReason.MandatoryQualification">
-                        @PersonCreateReason.MandatoryQualification.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@PersonCreateReason.AlertReceived">
-                        @PersonCreateReason.AlertReceived.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@PersonCreateReason.UniversityLateStarter">
-                        @PersonCreateReason.UniversityLateStarter.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@PersonCreateReason.AnotherReason">
-                        @PersonCreateReason.AnotherReason.GetDisplayName()
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="create-reason-options-legend">
+                    Why are you creating this record?
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@PersonCreateReason.MandatoryQualification">
+                    @PersonCreateReason.MandatoryQualification.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@PersonCreateReason.AlertReceived">
+                    @PersonCreateReason.AlertReceived.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@PersonCreateReason.UniversityLateStarter">
+                    @PersonCreateReason.UniversityLateStarter.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@PersonCreateReason.AnotherReason">
+                    @PersonCreateReason.AnotherReason.GetDisplayName()
 
-                        <govuk-radios-item-conditional data-testid="create-reason-detail">
-                            <govuk-input data-testid="reason-detail" for="ReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
-                                <govuk-input-label>Enter a reason</govuk-input-label>
-                           </govuk-input>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                    <govuk-radios-item-conditional data-testid="create-reason-detail">
+                        <govuk-input data-testid="reason-detail" for="ReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
+                            <govuk-input-label>Enter a reason</govuk-input-label>
+                       </govuk-input>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
             </govuk-radios>
 
             <govuk-radios for="ProvideAdditionalInformation" data-testid="provide-more-information-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="create-provide-additional-information-legend">
-                        <h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2>
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
-                        @ProvideMoreInformationOption.Yes.GetDisplayName()
-                        <govuk-radios-item-conditional>
-                            <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>Enter details</govuk-character-count-label>
-                            </govuk-character-count>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@ProvideMoreInformationOption.No">
-                        @ProvideMoreInformationOption.No.GetDisplayName()
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="create-provide-additional-information-legend">
+                    <h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2>
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
+                    @ProvideMoreInformationOption.Yes.GetDisplayName()
+                    <govuk-radios-item-conditional>
+                        <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                        </govuk-character-count>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
+                <govuk-radios-item value="@ProvideMoreInformationOption.No">
+                    @ProvideMoreInformationOption.No.GetDisplayName()
+                </govuk-radios-item>
             </govuk-radios>
             
             @Html.EditorFor(m => m.Evidence)

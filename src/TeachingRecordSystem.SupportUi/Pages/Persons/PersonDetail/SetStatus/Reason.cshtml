@@ -23,84 +23,76 @@
             @if (Model.TargetStatus == PersonStatus.Deactivated)
             {
                 <govuk-radios for="DeactivateReason" data-testid="deactivate-reason-options">
-                    <govuk-radios-fieldset>
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="deactivate-reason-options-legend">
-                            Why are you deactivating this record?
-                        </govuk-radios-fieldset-legend>
-                        <govuk-radios-item value="@PersonDeactivateReason.RecordHolderDied">
-                            @PersonDeactivateReason.RecordHolderDied.GetDisplayName()
-                        </govuk-radios-item>
-                        <govuk-radios-item value="@PersonDeactivateReason.ProblemWithTheRecord">
-                            @PersonDeactivateReason.ProblemWithTheRecord.GetDisplayName()
-                        </govuk-radios-item>
-                        <govuk-radios-item value="@PersonDeactivateReason.AnotherReason">
-                            @PersonDeactivateReason.AnotherReason.GetDisplayName()
-                            <govuk-radios-item-conditional data-testid="deactivate-reason-detail">
-                                <govuk-input data-testid="deactivate-reason-detail" for="DeactivateReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
-                                    <govuk-input-label>Enter a reason</govuk-input-label>
-                                </govuk-input>
-                            </govuk-radios-item-conditional>
-                        </govuk-radios-item>
-                    </govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="deactivate-reason-options-legend">
+                        Why are you deactivating this record?
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@PersonDeactivateReason.RecordHolderDied">
+                        @PersonDeactivateReason.RecordHolderDied.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@PersonDeactivateReason.ProblemWithTheRecord">
+                        @PersonDeactivateReason.ProblemWithTheRecord.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@PersonDeactivateReason.AnotherReason">
+                        @PersonDeactivateReason.AnotherReason.GetDisplayName()
+                        <govuk-radios-item-conditional data-testid="deactivate-reason-detail">
+                            <govuk-input data-testid="deactivate-reason-detail" for="DeactivateReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
+                                <govuk-input-label>Enter a reason</govuk-input-label>
+                            </govuk-input>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
                 </govuk-radios>
 
                 <govuk-radios for="ProvideMoreInformation"  name="ProvideMoreInformation" data-testid="provide-more-information-options">
-                    <govuk-radios-fieldset>
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="provide-more-information-options-legend">
-                            Do you want to provide more information?
-                        </govuk-radios-fieldset-legend>
-                        <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
-                            @ProvideMoreInformationOption.Yes.GetDisplayName()
-                            <govuk-radios-item-conditional>
-                                <govuk-character-count for="DeactivateAdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                    <govuk-character-count-label>Enter details</govuk-character-count-label>
-                                </govuk-character-count>
-                            </govuk-radios-item-conditional>
-                        </govuk-radios-item>
-                        <govuk-radios-item value="@ProvideMoreInformationOption.No">
-                            @ProvideMoreInformationOption.No.GetDisplayName()
-                        </govuk-radios-item>
-                    </govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="provide-more-information-options-legend">
+                        Do you want to provide more information?
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
+                        @ProvideMoreInformationOption.Yes.GetDisplayName()
+                        <govuk-radios-item-conditional>
+                            <govuk-character-count for="DeactivateAdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@ProvideMoreInformationOption.No">
+                        @ProvideMoreInformationOption.No.GetDisplayName()
+                    </govuk-radios-item>
                 </govuk-radios>
             }
             else
             {
                 <govuk-radios for="ReactivateReason" data-testid="reactivate-reason-options">
-                    <govuk-radios-fieldset>
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="reactivate-reason-options-legend">
-                            Why are you reactivating this record?
-                        </govuk-radios-fieldset-legend>
-                        <govuk-radios-item value="@PersonReactivateReason.DeactivatedByMistake">
-                            @PersonReactivateReason.DeactivatedByMistake.GetDisplayName()
-                        </govuk-radios-item>
-                        <govuk-radios-item value="@PersonReactivateReason.AnotherReason">
-                            @PersonReactivateReason.AnotherReason.GetDisplayName()
-                            <govuk-radios-item-conditional>
-                                <govuk-input data-testid="reactivate-reason-detail" for="ReactivateReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
-                                    <govuk-input-label>Enter a reason</govuk-input-label>
-                                </govuk-input>
-                            </govuk-radios-item-conditional>
-                        </govuk-radios-item>
-                    </govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="reactivate-reason-options-legend">
+                        Why are you reactivating this record?
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@PersonReactivateReason.DeactivatedByMistake">
+                        @PersonReactivateReason.DeactivatedByMistake.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@PersonReactivateReason.AnotherReason">
+                        @PersonReactivateReason.AnotherReason.GetDisplayName()
+                        <govuk-radios-item-conditional>
+                            <govuk-input data-testid="reactivate-reason-detail" for="ReactivateReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
+                                <govuk-input-label>Enter a reason</govuk-input-label>
+                            </govuk-input>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
                 </govuk-radios>
 
                 <govuk-radios for="ProvideMoreInformation"  name="ProvideMoreInformation" data-testid="provide-more-information-options">
-                    <govuk-radios-fieldset>
-                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="provide-more-information-options-legend">
-                            Do you want to provide more information?
-                        </govuk-radios-fieldset-legend>
-                        <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
-                            @ProvideMoreInformationOption.Yes.GetDisplayName()
-                            <govuk-radios-item-conditional>
-                                <govuk-character-count for="ReactivateAdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                                    <govuk-character-count-label>Enter details</govuk-character-count-label>
-                                </govuk-character-count>
-                            </govuk-radios-item-conditional>
-                        </govuk-radios-item>
-                        <govuk-radios-item value="@ProvideMoreInformationOption.No">
-                            @ProvideMoreInformationOption.No.GetDisplayName()
-                        </govuk-radios-item>
-                    </govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="provide-more-information-options-legend">
+                        Do you want to provide more information?
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@ProvideMoreInformationOption.Yes">
+                        @ProvideMoreInformationOption.Yes.GetDisplayName()
+                        <govuk-radios-item-conditional>
+                            <govuk-character-count for="ReactivateAdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@ProvideMoreInformationOption.No">
+                        @ProvideMoreInformationOption.No.GetDisplayName()
+                    </govuk-radios-item>
                 </govuk-radios>
             }
 

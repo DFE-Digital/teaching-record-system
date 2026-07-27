@@ -137,24 +137,22 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <govuk-radios for="PersonId">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                        What do you want to do with the Teachers&rsquo; Pensions record?
-                    </govuk-radios-fieldset-legend>
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                    What do you want to do with the Teachers&rsquo; Pensions record?
+                </govuk-radios-fieldset-legend>
 
-                    @foreach (var match in Model.PotentialDuplicates)
-                    {
-                        <govuk-radios-item value="@match.PersonId">
-                            Merge it with Record @match.Identifier
-                        </govuk-radios-item>
-                    }
-
-                    <govuk-radios-divider>or</govuk-radios-divider>
-
-                    <govuk-radios-item value="@Guid.Empty">
-                        Keep it as a separate record
+                @foreach (var match in Model.PotentialDuplicates)
+                {
+                    <govuk-radios-item value="@match.PersonId">
+                        Merge it with Record @match.Identifier
                     </govuk-radios-item>
-                </govuk-radios-fieldset>
+                }
+
+                <govuk-radios-divider>or</govuk-radios-divider>
+
+                <govuk-radios-item value="@Guid.Empty">
+                    Keep it as a separate record
+                </govuk-radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

@@ -14,17 +14,15 @@
         <form method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-radios for=@Model.IsExemptFromInduction data-testid="induction-exemption">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend data-testid="induction-exemption-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
-                        @ViewBag.Title
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@true">
-                        Yes
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@false">
-                        No
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend data-testid="induction-exemption-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
+                    @ViewBag.Title
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@true">
+                    Yes
+                </govuk-radios-item>
+                <govuk-radios-item value="@false">
+                    No
+                </govuk-radios-item>
             </govuk-radios>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>

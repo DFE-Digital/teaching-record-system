@@ -12,20 +12,18 @@
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
             <govuk-radios for="KeepSeparateReason">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
-                        @ViewBag.Title
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@KeepingRecordSeparateReason.RecordDoesNotMatch">
-                        The records do not match
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@KeepingRecordSeparateReason.AnotherReason">
-                        Another reason
-                        <govuk-radios-item-conditional>
-                            <govuk-input for="Reason" />
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
+                    @ViewBag.Title
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@KeepingRecordSeparateReason.RecordDoesNotMatch">
+                    The records do not match
+                </govuk-radios-item>
+                <govuk-radios-item value="@KeepingRecordSeparateReason.AnotherReason">
+                    Another reason
+                    <govuk-radios-item-conditional>
+                        <govuk-input for="Reason" />
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

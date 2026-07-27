@@ -15,55 +15,51 @@
 
         <form method="post">
             <govuk-radios for="HasAdditionalReason">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-visually-hidden">
-                        Reason for deactivating user
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@false">
-                        They no longer need access
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@true">
-                        Another reason
+                <govuk-radios-fieldset-legend class="govuk-visually-hidden">
+                    Reason for deactivating user
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@false">
+                    They no longer need access
+                </govuk-radios-item>
+                <govuk-radios-item value="@true">
+                    Another reason
 
-                        <govuk-radios-item-conditional>
-                            <govuk-character-count for="AdditionalReasonDetail"
-                                                   textarea-class="govuk-!-width-one-half"
-                                                   max-length="UiDefaults.ReasonDetailsMaxCharacterCount"
-                                                   rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>
-                                    Enter a reason for deactivating this user
-                                </govuk-character-count-label>
-                            </govuk-character-count>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                    <govuk-radios-item-conditional>
+                        <govuk-character-count for="AdditionalReasonDetail"
+                                               textarea-class="govuk-!-width-one-half"
+                                               max-length="UiDefaults.ReasonDetailsMaxCharacterCount"
+                                               rows="UiDefaults.ReasonDetailsRows">
+                            <govuk-character-count-label>
+                                Enter a reason for deactivating this user
+                            </govuk-character-count-label>
+                        </govuk-character-count>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
             </govuk-radios>
 
             <h2 class="govuk-heading-m">Do you want to provide more details?</h2>
 
             <govuk-radios for="HasMoreInformation">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-visually-hidden">
-                        Do you have more information?
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@true">
-                        Yes
+                <govuk-radios-fieldset-legend class="govuk-visually-hidden">
+                    Do you have more information?
+                </govuk-radios-fieldset-legend>
+                <govuk-radios-item value="@true">
+                    Yes
 
-                        <govuk-radios-item-conditional>
-                            <govuk-character-count for="MoreInformationDetail"
-                                                   textarea-class="govuk-!-width-one-half"
-                                                   max-length="UiDefaults.ReasonDetailsMaxCharacterCount"
-                                                   rows="UiDefaults.ReasonDetailsRows">
-                                <govuk-character-count-label>
-                                    Enter details
-                                </govuk-character-count-label>
-                            </govuk-character-count>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@false">
-                        No
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                    <govuk-radios-item-conditional>
+                        <govuk-character-count for="MoreInformationDetail"
+                                               textarea-class="govuk-!-width-one-half"
+                                               max-length="UiDefaults.ReasonDetailsMaxCharacterCount"
+                                               rows="UiDefaults.ReasonDetailsRows">
+                            <govuk-character-count-label>
+                                Enter details
+                            </govuk-character-count-label>
+                        </govuk-character-count>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
+                <govuk-radios-item value="@false">
+                    No
+                </govuk-radios-item>
             </govuk-radios>
 
             @Html.EditorFor(m => m.Evidence)
