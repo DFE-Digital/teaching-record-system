@@ -8,17 +8,23 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
+[Journey(JourneyNames.EditMqStatus)]
 public class CheckAnswersModel(
+    EditMqStatusJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     TimeProvider timeProvider,
     MandatoryQualificationService mandatoryQualificationService) : PageModel
 {
-    public JourneyInstance<EditMqStatusState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -48,31 +54,32 @@ public class CheckAnswersModel(
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.Mqs.EditMq.Status.Index(QualificationId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        CurrentStatus = JourneyInstance.State.CurrentStatus;
-        NewStatus ??= JourneyInstance.State.Status;
-        CurrentEndDate = JourneyInstance.State.CurrentEndDate;
-        NewEndDate ??= JourneyInstance.State.EndDate;
-        StatusChangeReason = JourneyInstance.State.StatusChangeReason;
-        EndDateChangeReason = JourneyInstance.State.EndDateChangeReason;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-        IsEndDateChange = JourneyInstance.State.IsEndDateChange;
-        IsStatusChange = JourneyInstance.State.IsStatusChange;
-        AdditionalInformation = JourneyInstance.State.AdditionalInformation;
+        CurrentStatus = journey.State.CurrentStatus;
+        NewStatus = journey.State.Status;
+        CurrentEndDate = journey.State.CurrentEndDate;
+        NewEndDate = journey.State.EndDate;
+        StatusChangeReason = journey.State.StatusChangeReason;
+        EndDateChangeReason = journey.State.EndDateChangeReason;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail;
+        EvidenceFile = journey.State.Evidence.UploadedEvidenceFile;
+        IsEndDateChange = journey.State.IsEndDateChange;
+        IsStatusChange = journey.State.IsStatusChange;
+        AdditionalInformation = journey.State.AdditionalInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
+
         var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
         var processContext = new ProcessContext(
@@ -96,16 +103,16 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
         TempData.SetFlashNotificationBanner("Mandatory qualification changed");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

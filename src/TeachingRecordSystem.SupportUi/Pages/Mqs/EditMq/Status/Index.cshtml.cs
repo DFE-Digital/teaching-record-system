@@ -5,19 +5,32 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqStatus), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+[Journey(JourneyNames.EditMqStatus), StartsJourney]
+public class IndexModel(
+    EditMqStatusJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
+        v => v.RuleFor(m => m.EndDate)
+            .Cascade(CascadeMode.Stop)
+            .NotNull().WithMessage("Enter an end date")
+            .Must((m, endDate) => !(endDate <= m.StartDate)).WithMessage("End date must be after start date")
+            .When(m => m.Status == MandatoryQualificationStatus.Passed),
         v => v.RuleFor(m => m.Status)
             .NotNull().WithMessage("Select a status")
     };
 
-    public JourneyInstance<EditMqStatusState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -33,45 +46,32 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public void OnGet()
     {
-        Status = JourneyInstance!.State.Status;
-        EndDate = JourneyInstance!.State.EndDate;
+        Status = journey.State.Status;
+        EndDate = journey.State.EndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Status == MandatoryQualificationStatus.Passed)
+        if (Cancel)
         {
-            if (EndDate is null)
-            {
-                ModelState.AddModelError(nameof(EndDate), "Enter an end date");
-            }
-            else if (EndDate <= StartDate)
-            {
-                ModelState.AddModelError(nameof(EndDate), "End date must be after start date");
-            }
+            return await CancelAsync();
         }
 
-        _validator.ValidateAndThrow(this);
+        await _validator.ValidateAndThrowAsync(this);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        await JourneyInstance!.UpdateStateAsync(
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.EditMq.Status.Reason(journey.InstanceId),
             state =>
             {
                 state.Status = Status;
                 state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
-
-        return Redirect(linkGenerator.Mqs.EditMq.Status.Reason(QualificationId, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
@@ -80,10 +80,10 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        JourneyInstance!.State.EnsureInitialized(qualificationInfo);
-
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         StartDate = qualificationInfo.MandatoryQualification.StartDate;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
     }
 }
