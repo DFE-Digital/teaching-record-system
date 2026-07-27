@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
@@ -212,8 +212,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification added");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
 
         Guid qualificationId = default;
         await WithDbContextAsync(async dbContext =>
@@ -291,9 +290,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Evidence = evidence
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/check-answers/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -302,8 +301,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -350,9 +348,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    private async Task<JourneyInstance<AddMqState>> CreateJourneyInstanceAsync(Guid personId, AddMqState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.AddMq,
-            state ?? new AddMqState(),
-            new KeyValuePair<string, object>("personId", personId));
+    private Task<AddMqJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, AddMqState? state = null) =>
+        CreateJourneyInstanceForStateAsync(personId, state ?? new AddMqState());
 }

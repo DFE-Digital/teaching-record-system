@@ -6,24 +6,32 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddMq), RequireJourneyInstance]
+[Journey(JourneyNames.AddMq)]
 public class StatusModel(
+    AddMqJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<StatusModel> _validator = new()
     {
+        v => v.RuleFor(m => m.EndDate)
+            .Cascade(CascadeMode.Stop)
+            .NotNull().WithMessage("Enter an end date")
+            .Must((m, endDate) => !(endDate <= m.StartDate)).WithMessage("End date must be after start date")
+            .When(m => m.Status == MandatoryQualificationStatus.Passed),
         v => v.RuleFor(m => m.Status)
             .NotNull().WithMessage("Select a status")
     };
 
-    public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromQuery]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -38,59 +46,42 @@ public class StatusModel(
 
     public void OnGet()
     {
-        Status = JourneyInstance!.State.Status;
-        EndDate = JourneyInstance!.State.EndDate;
+        Status = journey.State.Status;
+        EndDate = journey.State.EndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (Status == MandatoryQualificationStatus.Passed)
+        if (Cancel)
         {
-            if (EndDate is null)
-            {
-                ModelState.AddModelError(nameof(EndDate), "Enter an end date");
-            }
-            else if (EndDate <= StartDate)
-            {
-                ModelState.AddModelError(nameof(EndDate), "End date must be after start date");
-            }
+            return await CancelAsync();
         }
 
-        _validator.ValidateAndThrow(this);
+        await _validator.ValidateAndThrowAsync(this);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        await JourneyInstance!.UpdateStateAsync(
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.AddMq.Reason(journey.InstanceId),
             state =>
             {
                 state.Status = Status;
                 state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
-
-        return Redirect(linkGenerator.Mqs.AddMq.Reason(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.StartDate is null)
-        {
-            context.Result = Redirect(linkGenerator.Mqs.AddMq.StartDate(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        StartDate = JourneyInstance!.State.StartDate;
+        StartDate = journey.State.StartDate;
     }
 }

@@ -1,11 +1,14 @@
-@page "/mqs/add/reason/{handler?}"
+@page "/mqs/add/reason"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.ReasonModel
 @{
     ViewBag.Title = "Why are you adding this mandatory qualification?";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers? LinkGenerator.Mqs.AddMq.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Mqs.AddMq.Status(Model.PersonId, Model.JourneyInstance!.InstanceId))" />
+    @if (Model.BackLink is not null)
+    {
+        <govuk-back-link href="@Model.BackLink" />
+    }
 }
 
 <div class="govuk-grid-row">
@@ -54,7 +57,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.Mqs.AddMq.ReasonCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
-public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class SpecialismTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
@@ -20,24 +20,6 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_ProviderMissingFromState_RedirectsToProvider()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state => state.ProviderId = null);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -85,31 +67,6 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Post_ProviderMissingFromState_RedirectsToProvider()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var specialism = MandatoryQualificationSpecialism.Hearing;
-
-        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state => state.ProviderId = null);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder
-            {
-                { "Specialism", specialism }
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -189,7 +146,10 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -198,11 +158,10 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}/qualifications", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
-    private Task<JourneyInstance<AddMqState>> CreateJourneyInstanceAsync(Guid personId, Action<AddMqState>? configureState = null)
+    private Task<AddMqJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, Action<AddMqState>? configureState = null)
     {
         var state = new AddMqState
         {
@@ -210,9 +169,6 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
         configureState?.Invoke(state);
 
-        return CreateJourneyInstance(
-            JourneyNames.AddMq,
-            state,
-            new KeyValuePair<string, object>("personId", personId));
+        return CreateJourneyInstanceForStateAsync(personId, state);
     }
 }
