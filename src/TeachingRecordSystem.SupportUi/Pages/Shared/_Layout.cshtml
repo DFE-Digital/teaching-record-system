@@ -99,6 +99,10 @@
 
 @RenderBody()
 
+@section ContainerEnd {
+    @await RenderSectionAsync("ContainerEnd", required: false)
+}
+
 @section GovUkFooter {
     <govuk-footer>
         <govuk-footer-meta>
@@ -143,5 +147,4 @@
             MOJFrontend.initAll(el);
         });
     </script>
-
 }
