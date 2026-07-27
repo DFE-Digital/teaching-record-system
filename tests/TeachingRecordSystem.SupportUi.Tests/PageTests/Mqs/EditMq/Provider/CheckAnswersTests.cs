@@ -4,31 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFixture)
 {
-    [Fact]
-    public async Task Get_MissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            new EditMqProviderState
-            {
-                Initialized = true
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
     [Theory]
     [InlineData(MqChangeProviderReasonOption.ChangeOfTrainingProvider, null, false, true, "Additional info")]
     [InlineData(MqChangeProviderReasonOption.AnotherReason, "Some reason", true, false, null)]
@@ -48,7 +25,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqProviderState
             {
-                Initialized = true,
                 ProviderId = newProvider.MandatoryQualificationProviderId,
                 CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = changeReason,
@@ -96,32 +72,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_MissingDataInJourneyState_Redirects()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            new EditMqProviderState
-            {
-                Initialized = true
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
     public async Task Post_Confirm_UpdatesMqCreatesEventAndCompletesJourneyRedirectsWithFlashMessage()
     {
         // Arrange
@@ -137,7 +87,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqProviderState
             {
-                Initialized = true,
                 ProviderId = newProvider.MandatoryQualificationProviderId,
                 CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = MqChangeProviderReasonOption.AnotherReason,
@@ -165,8 +114,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification changed");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -207,7 +155,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqProviderState
             {
-                Initialized = true,
                 ProviderId = newProvider.MandatoryQualificationProviderId,
                 CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
@@ -220,9 +167,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 AdditionalInformation = null,
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
         };
 
         // Act
@@ -231,8 +178,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -260,7 +206,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             new EditMqProviderState
             {
-                Initialized = true,
                 ProviderId = newProvider.MandatoryQualificationProviderId,
                 CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
@@ -280,9 +225,4 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    private async Task<JourneyInstance<EditMqProviderState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqProviderState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditMqProvider,
-            state ?? new EditMqProviderState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }

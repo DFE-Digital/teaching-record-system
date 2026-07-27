@@ -6,8 +6,11 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditMqProvider), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
+[Journey(JourneyNames.EditMqProvider), StartsJourney]
+public class IndexModel(
+    EditMqProviderJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
@@ -15,10 +18,15 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
             .NotNull().WithMessage("Select a training provider")
     };
 
-    public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public Guid PersonId { get; set; }
 
@@ -31,35 +39,39 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     public void OnGet()
     {
-        ProviderId = JourneyInstance!.State.ProviderId;
+        ProviderId = journey.State.ProviderId;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        if (Cancel)
+        {
+            return await CancelAsync();
+        }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.ProviderId = ProviderId);
+        await _validator.ValidateAndThrowAsync(this);
 
-        return Redirect(linkGenerator.Mqs.EditMq.Provider.Reason(QualificationId, JourneyInstance!.InstanceId));
+        return journey.AdvanceTo(
+            linkGenerator.Mqs.EditMq.Provider.Reason(journey.InstanceId),
+            state => state.ProviderId = ProviderId);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    private async Task<IActionResult> CancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
-
-        JourneyInstance!.State.EnsureInitialized(qualificationInfo);
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         Providers = MandatoryQualificationProvider.All.Select(p => new ProviderInfo(p.MandatoryQualificationProviderId, p.Name)).ToArray();
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
     }
 
     public record ProviderInfo(Guid MandatoryQualificationProviderId, string Name);
