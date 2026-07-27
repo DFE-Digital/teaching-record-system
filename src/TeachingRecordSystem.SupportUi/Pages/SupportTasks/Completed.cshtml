@@ -40,6 +40,12 @@
 
                 <div class="trs-display-flex trs-column-gap-1 govuk-!-margin-bottom-3">
                     <govuk-select for="Type"
+                                  select-hx-get="@LinkGenerator.SupportTasks.Completed(Model.Search, type: null, Model.CompletedByUserId, Model.SortBy, Model.SortDirection)"
+                                  select-hx-trigger="change"
+                                  select-hx-select="main"
+                                  select-hx-target="main"
+                                  select-hx-swap="outerHTML"
+                                  select-hx-push-url="true"
                                   class="govuk-!-width-one-half govuk-!-margin-bottom-0"
                                   select-class="govuk-!-width-full">
                         <govuk-select-label class="govuk-label--s">Task type</govuk-select-label>
@@ -51,6 +57,12 @@
                     </govuk-select>
 
                     <govuk-select for="CompletedByUserId"
+                                  select-hx-get="@LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, completedByUserId: null, Model.SortBy, Model.SortDirection)"
+                                  select-hx-trigger="change"
+                                  select-hx-select="main"
+                                  select-hx-target="main"
+                                  select-hx-swap="outerHTML"
+                                  select-hx-push-url="true"
                                   class="govuk-!-width-one-half govuk-!-margin-bottom-0"
                                   select-class="govuk-!-width-full">
                         <govuk-select-label class="govuk-label--s">Completed by</govuk-select-label>
@@ -66,8 +78,15 @@
 
                 <div class="trs-vertical-filters__actions">
                     <div class="govuk-button-group govuk-!-margin-bottom-0">
-                        <govuk-button type="submit">Apply filters</govuk-button>
+                        <noscript class="trs-display-flex">
+                            <govuk-button type="submit">Apply filters</govuk-button>
+                        </noscript>
                         <a href="@LinkGenerator.SupportTasks.Completed()"
+                           hx-get="@LinkGenerator.SupportTasks.Completed()"
+                           hx-select="main"
+                           hx-target="main"
+                           hx-swap="outerHTML"
+                           hx-push-url="true"
                            class="govuk-link">
                             Clear all
                         </a>
@@ -94,27 +113,47 @@
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header"
                             sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Subject ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Subject, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Subject, direction))"
+                            use-htmx="true"
+                            hx-select="main"
+                            hx-target="main"
+                            hx-push-url="true">
                             Task
                         </th>
                         <th scope="col" class="govuk-table__header trs-!-width-150"
                             sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedOn ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedOn, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedOn, direction))"
+                            use-htmx="true"
+                            hx-select="main"
+                            hx-target="main"
+                            hx-push-url="true">
                             Completed on
                         </th>
                         <th scope="col" class="govuk-table__header trs-!-width-180"
                             sort-direction="@(Model.SortBy == CompletedTasksSortByOption.TaskType ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.TaskType, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.TaskType, direction))"
+                            use-htmx="true"
+                            hx-select="main"
+                            hx-target="main"
+                            hx-push-url="true">
                             Type
                         </th>
                         <th scope="col" class="govuk-table__header trs-!-width-180"
                             sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Outcome ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Outcome, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Outcome, direction))"
+                            use-htmx="true"
+                            hx-select="main"
+                            hx-target="main"
+                            hx-push-url="true">
                             Outcome
                         </th>
                         <th scope="col" class="govuk-table__header trs-!-width-130"
                             sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedBy ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedBy, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedBy, direction))"
+                            use-htmx="true"
+                            hx-select="main"
+                            hx-target="main"
+                            hx-push-url="true">
                             Completed by
                         </th>
                     </tr>
@@ -143,23 +182,23 @@
             </table>
         }
 
-        <div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden">
-            @if (Model.Results!.Count == 0)
-            {
-                <text>No matching tasks found.</text>
-            }
-            else
-            {
-                <text>
-                    Showing @Model.Results!.Count of @Model.TotalTaskCount matching tasks
-                    sorted by @Model.OrderedByLabel (@Model.OrderDirectionLabel).
-                </text>
-            }
-        </div>
-
-        <div id="pagination-container">
-            <partial name="_Pagination" model="@Model.Pagination" />
-        </div>
+        <partial name="_Pagination" model="@Model.Pagination" />
 
     </div>
 </div>
+
+@section ContainerEnd {
+    <div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden" hx-swap-oob="innerHTML">
+        @if (Model.Results!.Count == 0)
+        {
+            <text>No matching tasks found.</text>
+        }
+        else
+        {
+            <text>
+                Showing @Model.Results!.Count of @Model.TotalTaskCount matching tasks
+                sorted by @Model.OrderedByLabel (@Model.OrderDirectionLabel).
+            </text>
+        }
+    </div>
+}
