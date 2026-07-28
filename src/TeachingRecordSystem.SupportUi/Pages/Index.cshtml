@@ -53,7 +53,7 @@
             </govuk-tabs-item>
         </govuk-tabs>
     </div>
-    @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
+    @if (FeatureProvider.IsEnabled("SupportTaskDashboard") && (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
     {
         <div class="govuk-grid-column-full">
             <div class="trs-task-tile-section">
