@@ -105,7 +105,7 @@ public class Matches(
             processContext);
 
         journey.DeleteInstance();
-        
+
         if (featureProvider.IsEnabled("SupportTaskDashboard"))
         {
             return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(_supportTask.SupportTaskReference));
