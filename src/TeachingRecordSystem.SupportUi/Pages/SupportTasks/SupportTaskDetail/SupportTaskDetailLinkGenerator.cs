@@ -16,4 +16,9 @@ public class SupportTaskDetailLinkGenerator(LinkGenerator linkGenerator)
         linkGenerator.GetRequiredPathByPage(
             "/SupportTasks/SupportTaskDetail/AddNote",
             routeValues: new { supportTaskReference, returnUrl });
+
+    public string ZendeskTickets(string supportTaskReference, string? returnUrl = null) =>
+        linkGenerator.GetRequiredPathByPage(
+            "/SupportTasks/SupportTaskDetail/ZendeskTickets",
+            routeValues: new { supportTaskReference, returnUrl });
 }

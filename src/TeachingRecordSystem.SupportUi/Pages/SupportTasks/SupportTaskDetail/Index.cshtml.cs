@@ -42,6 +42,8 @@ public class Index(
 
     public IReadOnlyCollection<Note>? Notes { get; set; }
 
+    public IReadOnlyCollection<string>? ZendeskTickets { get; set; }
+
     public string? BackLink { get; set; }
 
     [BindProperty]
@@ -122,6 +124,8 @@ public class Index(
             .Select(t => new Note(t.Content, t.CreatedOn, t.CreatedBy!.Name))
             .ToArrayAsync();
 
+        ZendeskTickets = _supportTask.ZendeskTickets;
+
         AssignToOptions = (await supportTaskService.GetAssignableUsersAsync())
             .Where(u => u.UserId != CurrentUserId)
             .AsReadOnly();
@@ -130,6 +134,18 @@ public class Index(
             IsOutstanding ? linkGenerator.SupportTasks.Active() : linkGenerator.SupportTasks.Completed());
 
         await base.OnPageHandlerExecutionAsync(context, next);
+    }
+
+    public static string GetZendeskTicketDisplayText(string url)
+    {
+        const string zendeskPrefix = "https://becomingateacher.zendesk.com/";
+
+        if (url.StartsWith(zendeskPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            return url.Substring(zendeskPrefix.Length);
+        }
+
+        return url;
     }
 
     public record Note(string Content, DateTime CreatedOn, string CreatedBy);
