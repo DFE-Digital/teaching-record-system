@@ -47,7 +47,7 @@ public class ConfirmConnect(
         {
             journey.DeleteInstance();
 
-            return Redirect(journey.GetListPageUrl());
+            return Redirect(journey.State.CompletionUrl);
         }
 
         var matchedPerson = journey.State.MatchedPersons
@@ -86,7 +86,7 @@ public class ConfirmConnect(
             $"GOV.UK One Login connected to {MatchedPersonName}’s record",
             $"We’ve sent {MatchedPersonName} an email confirming their GOV.UK One Login has been connected to their teaching record.");
 
-        return Redirect(journey.GetListPageUrl());
+        return Redirect(journey.State.CompletionUrl);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

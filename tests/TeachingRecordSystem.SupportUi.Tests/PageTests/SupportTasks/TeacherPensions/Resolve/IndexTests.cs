@@ -62,6 +62,62 @@ public class IndexTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
             response.Headers.Location?.OriginalString);
     }
 
+    [Fact]
+    public async Task Get_WithReturnUrl_JourneyCompletesToReturnUrl()
+    {
+        // Arrange
+        var returnUrl = "/support-tasks/active?keyword=test";
+        var matchesUrl = await StartJourneyAsync(returnUrl);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, matchesUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(returnUrl, response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Get_WithNonLocalReturnUrl_JourneyCompletesToListPage()
+    {
+        // Arrange
+        var matchesUrl = await StartJourneyAsync("https://evil.example.com/");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, matchesUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(DefaultCompletionUrl, response.Headers.Location?.OriginalString);
+    }
+
+    /// <summary>
+    /// Starts the journey the way the "View task" link does and returns the URL of its first page.
+    /// </summary>
+    private async Task<string> StartJourneyAsync(string returnUrl)
+    {
+        var supportTask = await CreateSupportTaskAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve?returnUrl={Uri.EscapeDataString(returnUrl)}");
+
+        var response = await HttpClient.SendAsync(request);  // Initializes journey
+        response = await response.FollowRedirectAsync(HttpClient);
+
+        return response.Headers.Location!.OriginalString;
+    }
+
     private async Task<SupportTask> CreateSupportTaskAsync()
     {
         var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());

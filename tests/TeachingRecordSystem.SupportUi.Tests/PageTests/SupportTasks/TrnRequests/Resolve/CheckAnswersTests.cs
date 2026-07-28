@@ -27,6 +27,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var state = new ResolveTrnRequestState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(
                 matchedPerson.PersonId,
                     new[]
@@ -106,6 +107,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -145,6 +147,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -184,6 +187,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -224,6 +228,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -266,6 +271,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -307,6 +313,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -352,6 +359,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -408,6 +416,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
@@ -494,6 +503,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
@@ -577,6 +587,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
@@ -631,6 +642,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
@@ -701,6 +713,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(
                     matchedPerson.PersonId,
                     [
@@ -850,6 +863,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true

@@ -12,6 +12,13 @@ public class ResolveTeacherPensionsPotentialDuplicateState
     public static Guid KeepRecordSeparatePersonIdSentinel => Guid.Empty;
 
     public required IReadOnlyCollection<MatchPersonsResultPerson> MatchedPersons { get; init; }
+
+    /// <summary>
+    /// Where the user is sent when the journey finishes or is cancelled; the page the journey was
+    /// started from, or the Teachers' Pensions list when it was started without one.
+    /// </summary>
+    public required string CompletionUrl { get; init; }
+
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }

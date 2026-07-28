@@ -38,7 +38,7 @@ public class ConfirmNotConnecting(
         {
             journey.DeleteInstance();
 
-            return Redirect(journey.GetListPageUrl());
+            return Redirect(journey.State.CompletionUrl);
         }
 
         bool emailSent = false;
@@ -89,7 +89,7 @@ public class ConfirmNotConnecting(
             messageText: emailSent ? emailSentMessage : $"Request closed for {personName}.",
             notificationBannerType: NotificationBannerType.Default);
 
-        return Redirect(journey.GetListPageUrl());
+        return Redirect(journey.State.CompletionUrl);
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

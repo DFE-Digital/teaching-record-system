@@ -43,7 +43,7 @@ public class NotConnecting(
         {
             journey.DeleteInstance();
 
-            return Redirect(journey.GetListPageUrl());
+            return Redirect(journey.State.CompletionUrl);
         }
 
         await _validator.ValidateAndThrowAsync(this);

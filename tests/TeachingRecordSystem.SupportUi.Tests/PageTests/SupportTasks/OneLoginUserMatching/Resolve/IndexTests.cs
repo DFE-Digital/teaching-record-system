@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserMatching.Resolve;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
@@ -64,6 +66,45 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
     }
 
     [Fact]
+    public async Task Get_WithReturnUrl_JourneyCompletesToReturnUrl()
+    {
+        // Arrange
+        var returnUrl = "/support-tasks/active?keyword=test";
+        var (_, firstStepUrl) = await StartJourneyAsync(returnUrl);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, firstStepUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder { { "cancel", "true" } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(returnUrl, response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Get_WithNonLocalReturnUrl_JourneyCompletesToListPage()
+    {
+        // Arrange
+        var (supportTask, firstStepUrl) = await StartJourneyAsync("https://evil.example.com/");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, firstStepUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder { { "cancel", "true" } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(GetDefaultCompletionUrl(supportTask), response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
     public async Task Post_SupportTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -101,5 +142,23 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    /// <summary>
+    /// Starts the journey the way the "View task" link does and returns the URL of its first page.
+    /// </summary>
+    private async Task<(SupportTask SupportTask, string FirstStepUrl)> StartJourneyAsync(string returnUrl)
+    {
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve?returnUrl={Uri.EscapeDataString(returnUrl)}");
+
+        var response = await HttpClient.SendAsync(request);  // Initializes journey
+        response = await response.FollowRedirectAsync(HttpClient);
+
+        return (supportTask, response.Headers.Location!.OriginalString);
     }
 }

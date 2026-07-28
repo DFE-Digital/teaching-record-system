@@ -5,18 +5,24 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
 [JourneyCoordinator(JourneyNames.ResolveTrnRequest, routeValueKeys: ["supportTaskReference"])]
-public class ResolveTrnRequestJourneyCoordinator(TrnRequestService trnRequestService) :
+public class ResolveTrnRequestJourneyCoordinator(
+    TrnRequestService trnRequestService,
+    SupportUiLinkGenerator linkGenerator) :
     JourneyCoordinator<ResolveTrnRequestState>
 {
     public override Task<ResolveTrnRequestState> GetStartingStateAsync()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        return CreateStateAsync(trnRequestService, supportTask);
+
+        var completionUrl = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.TrnRequests.Index());
+
+        return CreateStateAsync(trnRequestService, supportTask, completionUrl);
     }
 
     public static async Task<ResolveTrnRequestState> CreateStateAsync(
         TrnRequestService trnRequestService,
-        SupportTask supportTask)
+        SupportTask supportTask,
+        string completionUrl)
     {
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.TrnRequest);
         var requestData = supportTask.TrnRequestMetadata!;
@@ -25,6 +31,7 @@ public class ResolveTrnRequestJourneyCoordinator(TrnRequestService trnRequestSer
 
         return new ResolveTrnRequestState
         {
+            CompletionUrl = completionUrl,
             MatchOutcome = matchResult.Outcome,
             MatchedPersons = matchResult.Outcome switch
             {

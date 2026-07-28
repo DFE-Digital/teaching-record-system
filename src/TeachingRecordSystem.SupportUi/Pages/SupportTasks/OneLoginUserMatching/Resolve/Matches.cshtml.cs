@@ -59,7 +59,7 @@ public class Matches(
         {
             journey.DeleteInstance();
 
-            return Redirect(journey.GetListPageUrl());
+            return Redirect(journey.State.CompletionUrl);
         }
 
         if (action is Actions.SaveAndComeBackLater)
@@ -105,14 +105,14 @@ public class Matches(
 
         journey.DeleteInstance();
 
-        return Redirect(journey.GetListPageUrl());
+        return Redirect(journey.State.CompletionUrl);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
-        BackLink = journey.GetBackLink() ?? journey.GetListPageUrl();
+        BackLink = journey.GetBackLink() ?? journey.State.CompletionUrl;
 
         var oneLoginUser = _supportTask.OneLoginUser!;
         var data = _supportTask.GetData<IOneLoginUserMatchingData>();

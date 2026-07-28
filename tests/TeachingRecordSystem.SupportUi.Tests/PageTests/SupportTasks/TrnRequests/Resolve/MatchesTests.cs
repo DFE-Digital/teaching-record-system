@@ -321,6 +321,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -363,6 +364,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -1010,6 +1012,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -1068,6 +1071,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -1138,6 +1142,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             ? await CreateStateAsync(supportTask)
             : new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersons
             };
 
@@ -1155,6 +1160,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true

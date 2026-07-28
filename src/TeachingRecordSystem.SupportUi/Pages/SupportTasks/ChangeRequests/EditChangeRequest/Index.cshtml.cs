@@ -13,7 +13,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditC
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public class IndexModel(
     TrsDbContext dbContext,
-    IFileService fileService) : PageModel
+    IFileService fileService,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public SupportTaskType? ChangeType { get; set; }
 
@@ -33,6 +34,11 @@ public class IndexModel(
 
     [FromRoute]
     public string? SupportTaskReference { get; set; }
+
+    [FromQuery]
+    public string? ReturnUrl { get; set; }
+
+    public string? BackLink { get; set; }
 
     public void OnGet()
     {
@@ -65,6 +71,7 @@ public class IndexModel(
         Trn = person.Trn;
         PersonId = person.PersonId;
         ChangeType = supportTask.SupportTaskType;
+        BackLink = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.ChangeRequests.Index());
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
         if (supportTask.SupportTaskType == SupportTaskType.ChangeNameRequest)
         {

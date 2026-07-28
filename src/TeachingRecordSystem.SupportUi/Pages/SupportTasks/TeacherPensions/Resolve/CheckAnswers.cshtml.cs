@@ -125,7 +125,7 @@ public class CheckAnswersModel(
             await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
             Journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+            return Redirect(Journey.State.CompletionUrl);
         }
 
         var processContext = new ProcessContext(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, timeProvider.UtcNow, User.GetUserId());
@@ -158,6 +158,6 @@ public class CheckAnswersModel(
 
         Journey.DeleteInstance();
 
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+        return Redirect(Journey.State.CompletionUrl);
     }
 }

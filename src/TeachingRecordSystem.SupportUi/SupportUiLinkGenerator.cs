@@ -27,16 +27,16 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
     public string SignedOut() =>
         linkGenerator.GetRequiredPathByPage("/SignedOut");
 
-    public string SupportTaskResolve(string supportTaskReference, SupportTaskType supportTaskType) =>
+    public string SupportTaskResolve(string supportTaskReference, SupportTaskType supportTaskType, string? returnUrl = null) =>
         supportTaskType switch
         {
-            SupportTaskType.OneLoginUserRecordMatching => SupportTasks.OneLoginUserMatching.Resolve.Index(supportTaskReference),
-            SupportTaskType.TrnRequest => SupportTasks.TrnRequests.Resolve.Index(supportTaskReference),
-            SupportTaskType.TrnRequestManualChecksNeeded => SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(supportTaskReference),
-            SupportTaskType.ChangeDateOfBirthRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference),
-            SupportTaskType.ChangeNameRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference),
-            SupportTaskType.TeacherPensionsPotentialDuplicate => SupportTasks.TeacherPensions.Resolve.Index(supportTaskReference),
-            SupportTaskType.OneLoginUserIdVerification => SupportTasks.OneLoginUserMatching.Resolve.Index(supportTaskReference),
+            SupportTaskType.OneLoginUserRecordMatching => SupportTasks.OneLoginUserMatching.Resolve.Index(supportTaskReference, returnUrl),
+            SupportTaskType.TrnRequest => SupportTasks.TrnRequests.Resolve.Index(supportTaskReference, returnUrl),
+            SupportTaskType.TrnRequestManualChecksNeeded => SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(supportTaskReference, returnUrl),
+            SupportTaskType.ChangeDateOfBirthRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference, returnUrl),
+            SupportTaskType.ChangeNameRequest => SupportTasks.ChangeRequests.EditChangeRequest.Index(supportTaskReference, returnUrl),
+            SupportTaskType.TeacherPensionsPotentialDuplicate => SupportTasks.TeacherPensions.Resolve.Index(supportTaskReference, returnUrl),
+            SupportTaskType.OneLoginUserIdVerification => SupportTasks.OneLoginUserMatching.Resolve.Index(supportTaskReference, returnUrl),
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 

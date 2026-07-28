@@ -116,6 +116,7 @@ else
                     use-htmx="true"
                     hx-select="main"
                     hx-target="main"
+                    hx-swap="outerHTML"
                     hx-push-url="true">
                     Task
                 </th>
@@ -125,6 +126,7 @@ else
                     use-htmx="true"
                     hx-select="main"
                     hx-target="main"
+                    hx-swap="outerHTML"
                     hx-push-url="true">
                     Requested on
                 </th>
@@ -134,6 +136,7 @@ else
                     use-htmx="true"
                     hx-select="main"
                     hx-target="main"
+                    hx-swap="outerHTML"
                     hx-push-url="true">
                     Type
                 </th>
@@ -143,6 +146,7 @@ else
                     use-htmx="true"
                     hx-select="main"
                     hx-target="main"
+                    hx-swap="outerHTML"
                     hx-push-url="true">
                     Status
                 </th>
@@ -152,6 +156,7 @@ else
                     use-htmx="true"
                     hx-select="main"
                     hx-target="main"
+                    hx-swap="outerHTML"
                     hx-push-url="true">
                     Assigned to
                 </th>
@@ -184,7 +189,7 @@ else
                         </div>
                     </td>
                     <td class="govuk-table__cell" data-testid="task-name-and-id">
-                        <a href="@LinkGenerator.SupportTaskResolve(result.SupportTaskReference, result.SupportTaskType)" class="govuk-link trs-task-link">
+                        <a href="@LinkGenerator.SupportTaskResolve(result.SupportTaskReference, result.SupportTaskType, returnUrl)" class="govuk-link trs-task-link">
                             <span class="trs-task-link__name" data-testid="task-name">@result.Subject</span>
                             <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
                         </a>
@@ -198,7 +203,7 @@ else
                         @(result.AssignedToUserId == Model.CurrentUserId ? "Myself" : result.AssignedToName)
                     </td>
                     <td class="govuk-table__cell">
-                        <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference)"
+                        <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference, returnUrl: returnUrl)"
                            class="govuk-link">
                             Manage
                         </a>

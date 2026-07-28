@@ -1,7 +1,10 @@
 @page "/support-tasks/assign"
+@using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Assign
 @{
     ViewBag.Title = "Assign tasks";
+
+    var returnUrl = HttpContext.Request.GetEncodedPathAndQuery();
 }
 
 @section BeforeContent {
@@ -27,7 +30,7 @@
         {
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__cell">
-                    <a href="@LinkGenerator.SupportTaskResolve(task.SupportTaskReference, task.Type)" class="govuk-link trs-task-link">
+                    <a href="@LinkGenerator.SupportTaskResolve(task.SupportTaskReference, task.Type, returnUrl: returnUrl)" class="govuk-link trs-task-link">
                         <span class="trs-task-link__name" data-testid="task-name">@task.Subject</span>
                         <span class="trs-task-link__reference" data-testid="task-reference">@task.SupportTaskReference</span>
                     </a>

@@ -169,7 +169,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
-        var journeyInstance = await CreateJourneyInstanceAsync(supportTask, state => state.MatchedPersons = []);
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(supportTask);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -236,20 +236,18 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
                 .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
                 .WithStatedTrn(matchedPerson.Trn!));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
             supportTask,
-            state => state.MatchedPersons =
-            [
-                new MatchPersonResult(
-                    matchedPerson.PersonId,
-                    matchedPerson.Trn,
-                    [
-                        KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
-                        KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                        KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
-                        KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
-                    ])
-            ]);
+            configureState: null,
+            new MatchPersonResult(
+                matchedPerson.PersonId,
+                matchedPerson.Trn,
+                [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
+                ]));
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,

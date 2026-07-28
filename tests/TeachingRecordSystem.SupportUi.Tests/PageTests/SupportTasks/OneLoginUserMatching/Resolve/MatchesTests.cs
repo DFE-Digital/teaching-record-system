@@ -31,8 +31,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         var supportTaskData = supportTask.GetData<IOneLoginUserMatchingData>();
         var firstVerifiedOrStatedName = supportTaskData.VerifiedOrStatedNames!.First();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,
@@ -89,8 +89,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                     .WithStatedTrn(nonNormalizedTrn)
                     .WithStatedNationalInsuranceNumber(nonNormalizedNino));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,
@@ -147,8 +147,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             .WithPreviousNames((TestData.GenerateChangedFirstName(firstVerifiedOrStatedName.First()), TestData.GenerateMiddleName(), firstVerifiedOrStatedName.Last(), TimeProvider.UtcNow))
             .WithDateOfBirth(firstVerifiedOrStatedDateOfBirth));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson1.PersonId,
@@ -230,8 +230,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             .WithLastName(firstVerifiedOrStatedName.Last())
             .WithDateOfBirth(firstVerifiedOrStatedDateOfBirth));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,
@@ -281,8 +281,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         // Person who matches on NINO
         var matchedPerson2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(supportTaskData.StatedNationalInsuranceNumber!));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson1.PersonId,
@@ -335,8 +335,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                     .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
                     .WithStatedTrn(matchedPerson.Trn!));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,
@@ -380,8 +380,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                     .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
                     .WithStatedTrn(matchedPerson.Trn!));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,
@@ -434,8 +434,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                     .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
                     .WithStatedTrn(matchedPerson.Trn!));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,
@@ -488,8 +488,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                     .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
                     .WithStatedTrn(matchedPerson.Trn!));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,
@@ -578,8 +578,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                     .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
                     .WithStatedTrn(matchedPerson.Trn!));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,

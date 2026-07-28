@@ -16,6 +16,9 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
+    [FromQuery]
+    public string? ReturnUrl { get; set; }
+
     [BindProperty]
     public bool? ChecksCompleted { get; set; }
 
@@ -43,6 +46,8 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 
     public Guid PersonId { get; set; }
 
+    public string? BackLink { get; set; }
+
     public string Name => string.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
     public void OnGet() { }
@@ -53,10 +58,10 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 
         if (ChecksCompleted == false)
         {
-            return Redirect(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index());
+            return Redirect(BackLink!);
         }
 
-        return Redirect(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Confirm(SupportTaskReference!));
+        return Redirect(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Confirm(SupportTaskReference!, ReturnUrl));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -90,6 +95,8 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
         HasQts = person.HasQts;
         HasEyts = person.HasEyts;
         FlagCount = new[] { HasOpenAlerts, HasQts, HasEyts }.Count(f => f);
+
+        BackLink = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index());
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

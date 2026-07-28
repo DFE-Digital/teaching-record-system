@@ -2,8 +2,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 
 public class ResolveOneLoginUserMatchingLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(string supportTaskReference) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/Resolve/Index", routeValues: new { supportTaskReference });
+    public string Index(string supportTaskReference, string? returnUrl = null) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/OneLoginUserMatching/Resolve/Index", routeValues: new { supportTaskReference, returnUrl });
 
     public string Verify(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
         linkGenerator.GetJourneyPage("/SupportTasks/OneLoginUserMatching/Resolve/Verify", journeyInstanceId, returnUrl);
@@ -17,11 +17,11 @@ public class ResolveOneLoginUserMatchingLinkGenerator(LinkGenerator linkGenerato
     public string ConfirmReject(JourneyInstanceId journeyInstanceId) =>
         linkGenerator.GetJourneyPage("/SupportTasks/OneLoginUserMatching/Resolve/ConfirmReject", journeyInstanceId);
 
-    public string Matches(JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetJourneyPage("/SupportTasks/OneLoginUserMatching/Resolve/Matches", journeyInstanceId);
+    public string Matches(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/SupportTasks/OneLoginUserMatching/Resolve/Matches", journeyInstanceId, returnUrl);
 
-    public string NoMatches(JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetJourneyPage("/SupportTasks/OneLoginUserMatching/Resolve/NoMatches", journeyInstanceId);
+    public string NoMatches(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/SupportTasks/OneLoginUserMatching/Resolve/NoMatches", journeyInstanceId, returnUrl);
 
     public string NotConnecting(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
         linkGenerator.GetJourneyPage("/SupportTasks/OneLoginUserMatching/Resolve/NotConnecting", journeyInstanceId, returnUrl);

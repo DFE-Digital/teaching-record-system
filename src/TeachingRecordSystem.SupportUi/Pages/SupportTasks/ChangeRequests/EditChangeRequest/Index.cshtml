@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.SupportTasks.ChangeRequests.Index()" />
+    <govuk-back-link href="@Model.BackLink" />
 }
 
 <span class="govuk-caption-l" data-testid="heading-caption">Record management</span>
@@ -119,6 +119,6 @@
 </div>
 
 <div class="govuk-button-group">
-    <govuk-button-link href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Accept(Model.SupportTaskReference!)" class="govuk-button">Accept change</govuk-button-link>
-    <govuk-button-link href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Reject(Model.SupportTaskReference!)" class="govuk-button govuk-button--warning">Reject change</govuk-button-link>
+    <govuk-button-link href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Accept(Model.SupportTaskReference!, Model.ReturnUrl)" class="govuk-button">Accept change</govuk-button-link>
+    <govuk-button-link href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Reject(Model.SupportTaskReference!, Model.ReturnUrl)" class="govuk-button govuk-button--warning">Reject change</govuk-button-link>
 </div>
