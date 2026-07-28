@@ -9,6 +9,9 @@ public class Confirm(TrnRequestService trnRequestService, TimeProvider timeProvi
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
+    [FromQuery]
+    public string? ReturnUrl { get; set; }
+
     public void OnGet()
     {
     }
@@ -28,6 +31,6 @@ public class Confirm(TrnRequestService trnRequestService, TimeProvider timeProvi
 
         TempData.SetFlashNotificationBanner($"TRN request for {trnRequest.FirstName} {trnRequest.MiddleName} {trnRequest.LastName} completed");
 
-        return Redirect(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index());
+        return Redirect(this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index()));
     }
 }

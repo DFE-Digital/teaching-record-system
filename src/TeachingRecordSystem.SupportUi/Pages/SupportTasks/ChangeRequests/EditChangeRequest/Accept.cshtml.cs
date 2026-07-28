@@ -21,6 +21,9 @@ public class AcceptModel(
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
+    [FromQuery]
+    public string? ReturnUrl { get; set; }
+
     public SupportTaskType ChangeType { get; set; }
 
     public string? PersonName { get; set; }
@@ -44,7 +47,7 @@ public class AcceptModel(
             "The request has been accepted",
             "The user’s record has been changed and they have been notified.");
 
-        return Redirect(linkGenerator.SupportTasks.ChangeRequests.Index());
+        return Redirect(this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.ChangeRequests.Index()));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

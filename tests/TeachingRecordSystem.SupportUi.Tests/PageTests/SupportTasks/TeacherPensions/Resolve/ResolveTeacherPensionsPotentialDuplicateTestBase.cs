@@ -7,6 +7,12 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public abstract class ResolveTeacherPensionsPotentialDuplicateTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    /// <summary>
+    /// The URL the journey completes to when it's started without a <c>returnUrl</c>.
+    /// </summary>
+    protected string DefaultCompletionUrl =>
+        HostFixture.Services.GetRequiredService<SupportUiLinkGenerator>().SupportTasks.TeacherPensions.Index();
+
     protected async Task<ResolveTeacherPensionsPotentialDuplicateState> CreateStateAsync(SupportTask supportTask)
     {
         // Resolve TrnRequestService from its own scope so that it doesn't share a DbContext with the
@@ -14,7 +20,10 @@ public abstract class ResolveTeacherPensionsPotentialDuplicateTestBase(HostFixtu
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var trnRequestService = scope.ServiceProvider.GetRequiredService<TrnRequestService>();
 
-        return await ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator.CreateStateAsync(trnRequestService, supportTask);
+        return await ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator.CreateStateAsync(
+            trnRequestService,
+            supportTask,
+            DefaultCompletionUrl);
     }
 
     protected Task<ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator> CreateJourneyInstanceAsync(

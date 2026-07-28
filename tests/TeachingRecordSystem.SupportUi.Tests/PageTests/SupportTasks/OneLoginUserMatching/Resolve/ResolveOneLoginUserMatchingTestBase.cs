@@ -19,23 +19,45 @@ public abstract class ResolveOneLoginUserMatchingTestBase(HostFixture hostFixtur
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var oneLoginService = scope.ServiceProvider.GetRequiredService<OneLoginService>();
 
-        var state = await ResolveOneLoginUserMatchingJourneyCoordinator.CreateStateAsync(oneLoginService, supportTask);
+        var state = await ResolveOneLoginUserMatchingJourneyCoordinator.CreateStateAsync(
+            oneLoginService,
+            supportTask,
+            GetDefaultCompletionUrl(supportTask));
 
         configureState?.Invoke(state);
 
         return await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
     }
 
-    protected Task<ResolveOneLoginUserMatchingJourneyCoordinator> CreateJourneyInstanceAsync(
-        string supportTaskReference,
+    /// <summary>
+    /// Creates a journey instance with the given matches, instead of the ones the matching service finds.
+    /// </summary>
+    protected Task<ResolveOneLoginUserMatchingJourneyCoordinator> CreateJourneyInstanceWithMatchedPersonsAsync(
+        SupportTask supportTask,
         Action<ResolveOneLoginUserMatchingState>? configureState = null,
         params MatchPersonResult[] matchedPersons)
     {
-        var state = new ResolveOneLoginUserMatchingState { MatchedPersons = matchedPersons };
+        var state = new ResolveOneLoginUserMatchingState
+        {
+            MatchedPersons = matchedPersons,
+            CompletionUrl = GetDefaultCompletionUrl(supportTask)
+        };
 
         configureState?.Invoke(state);
 
-        return CreateJourneyInstanceAsync(supportTaskReference, state);
+        return CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
+    }
+
+    /// <summary>
+    /// The URL the journey completes to when it's started without a <c>returnUrl</c>.
+    /// </summary>
+    protected string GetDefaultCompletionUrl(SupportTask supportTask)
+    {
+        var linkGenerator = HostFixture.Services.GetRequiredService<SupportUiLinkGenerator>();
+
+        return supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
+            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
+            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
     }
 
     protected ResolveOneLoginUserMatchingState? GetJourneyInstanceState(ResolveOneLoginUserMatchingJourneyCoordinator coordinator)

@@ -11,7 +11,6 @@ public class ConfirmKeepRecordSeparateReasonModel(
     ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
     TrsDbContext dbContext,
     TeacherPensionsSupportTaskService teacherPensionsSupportTaskService,
-    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
     TimeProvider timeProvider) : ResolveTeacherPensionsPotentialDuplicatePageModel(journey, dbContext)
 {
@@ -33,7 +32,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
             await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
             Journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+            return Redirect(Journey.State.CompletionUrl);
         }
 
         // Conditionally override the value in Reason.
@@ -64,7 +63,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
 
         Journey.DeleteInstance();
 
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+        return Redirect(Journey.State.CompletionUrl);
     }
 
     public string GetReason()

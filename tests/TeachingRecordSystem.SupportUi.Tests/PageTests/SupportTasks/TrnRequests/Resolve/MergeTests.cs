@@ -95,6 +95,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.TrnRequest,
@@ -135,6 +136,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.ExistingRecord,
@@ -174,6 +176,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersonIds.Select(
                     p => new MatchPersonsResultPerson(
                         p,
@@ -275,6 +278,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId
             });
@@ -354,6 +358,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveTrnRequestState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true

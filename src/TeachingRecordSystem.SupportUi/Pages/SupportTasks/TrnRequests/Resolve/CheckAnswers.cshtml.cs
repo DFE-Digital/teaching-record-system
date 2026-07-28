@@ -72,7 +72,7 @@ public class CheckAnswers(
         {
             Journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
+            return Redirect(Journey.State.CompletionUrl);
         }
 
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
@@ -112,7 +112,7 @@ public class CheckAnswers(
 
         Journey.DeleteInstance();
 
-        return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
+        return Redirect(Journey.State.CompletionUrl);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

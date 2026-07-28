@@ -8,6 +8,13 @@ public class ResolveTrnRequestState
     public static Guid CreateNewRecordPersonIdSentinel => Guid.Empty;
 
     public required IReadOnlyCollection<MatchPersonsResultPerson> MatchedPersons { get; init; } = [];
+
+    /// <summary>
+    /// Where the user is sent when the journey finishes or is cancelled; the page the journey was
+    /// started from, or the TRN requests list when it was started without one.
+    /// </summary>
+    public required string CompletionUrl { get; init; }
+
     public MatchPersonsResultOutcome MatchOutcome { get; set; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }

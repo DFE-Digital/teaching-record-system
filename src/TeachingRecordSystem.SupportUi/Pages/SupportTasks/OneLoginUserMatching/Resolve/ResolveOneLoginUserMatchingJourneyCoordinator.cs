@@ -14,14 +14,20 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
     public override Task<ResolveOneLoginUserMatchingState> GetStartingStateAsync()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        return CreateStateAsync(oneLoginService, supportTask);
+
+        var completionUrl = this.GetReturnUrlOrDefault(
+            supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification
+                ? linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification()
+                : linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching());
+
+        return CreateStateAsync(oneLoginService, supportTask, completionUrl);
     }
 
     /// <summary>
     /// Gets the URL of the journey's first question, which depends on the type of support task being
     /// resolved and whether any matching records were found.
     /// </summary>
-    public string GetFirstStepUrl()
+    public string GetFirstStepUrl(string? returnUrl)
     {
         var resolveLinkGenerator = linkGenerator.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -33,21 +39,14 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
         }
 
         return State.MatchedPersons.Count > 0 ?
-            resolveLinkGenerator.Matches(InstanceId) :
-            resolveLinkGenerator.NoMatches(InstanceId);
+            resolveLinkGenerator.Matches(InstanceId, returnUrl) :
+            resolveLinkGenerator.NoMatches(InstanceId, returnUrl);
     }
-
-    /// <summary>
-    /// Gets the URL of the support task list page that this journey was started from.
-    /// </summary>
-    public string GetListPageUrl() =>
-        HttpContext.GetCurrentSupportTaskFeature().SupportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification ?
-            linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification() :
-            linkGenerator.SupportTasks.OneLoginUserMatching.RecordMatching();
 
     public static async Task<ResolveOneLoginUserMatchingState> CreateStateAsync(
         OneLoginService oneLoginService,
-        SupportTask supportTask)
+        SupportTask supportTask,
+        string completionUrl)
     {
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification or SupportTaskType.OneLoginUserRecordMatching);
         var requestData = supportTask.GetData<IOneLoginUserMatchingData>();
@@ -87,6 +86,7 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
             new ResolveOneLoginUserMatchingState
             {
                 MatchedPersons = suggestedMatches,
+                CompletionUrl = completionUrl,
                 Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching ? true : null
             };
     }

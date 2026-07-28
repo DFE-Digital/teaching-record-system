@@ -2,8 +2,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 
 public class ResolveTeacherPensionsPotentialDuplicateLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(string supportTaskReference) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Index", routeValues: new { supportTaskReference });
+    public string Index(string supportTaskReference, string? returnUrl = null) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Index", routeValues: new { supportTaskReference, returnUrl });
 
     public string Matches(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
         linkGenerator.GetJourneyPage("/SupportTasks/TeacherPensions/Resolve/Matches", journeyInstanceId, returnUrl);

@@ -34,7 +34,7 @@ public class NoMatches(
         {
             journey.DeleteInstance();
 
-            return Redirect(journey.GetListPageUrl());
+            return Redirect(journey.State.CompletionUrl);
         }
 
         bool emailSent;
@@ -79,14 +79,14 @@ public class NoMatches(
             messageText: emailSent ? emailSentMessage : $"Request closed for {Name}.",
             notificationBannerType: NotificationBannerType.Default);
 
-        return Redirect(journey.GetListPageUrl());
+        return Redirect(journey.State.CompletionUrl);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
-        BackLink = journey.GetBackLink() ?? journey.GetListPageUrl();
+        BackLink = journey.GetBackLink() ?? journey.State.CompletionUrl;
 
         var data = _supportTask.GetData<IOneLoginUserMatchingData>();
 

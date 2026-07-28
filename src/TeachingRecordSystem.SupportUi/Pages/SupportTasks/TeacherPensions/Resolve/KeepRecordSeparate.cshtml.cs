@@ -33,7 +33,7 @@ public class KeepRecordSeparateModel(
             await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
             Journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+            return Redirect(Journey.State.CompletionUrl);
         }
 
         if (KeepSeparateReason == KeepingRecordSeparateReason.AnotherReason && string.IsNullOrEmpty(Reason))
@@ -57,6 +57,6 @@ public class KeepRecordSeparateModel(
 
     public override void OnPageHandlerExecuting(Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext context)
     {
-        BackLink = Journey.GetBackLink() ?? linkGenerator.SupportTasks.TeacherPensions.Index();
+        BackLink = Journey.GetBackLink() ?? Journey.State.CompletionUrl;
     }
 }

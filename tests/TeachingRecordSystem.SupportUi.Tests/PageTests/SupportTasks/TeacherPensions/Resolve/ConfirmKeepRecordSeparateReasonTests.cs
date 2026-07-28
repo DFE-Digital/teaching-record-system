@@ -14,7 +14,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
     {
         // Arrange
         var taskReference = "1234567";
-        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersons = [], PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState { CompletionUrl = DefaultCompletionUrl, MatchedPersons = [], PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel };
         var journeyInstance = await CreateJourneyInstanceAsync(taskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/resolve/keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -54,6 +54,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel,
             Reason = "THIS IS A DIFFERENT RECORD",
@@ -99,6 +100,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel,
             KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch,
@@ -144,6 +146,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel,
             KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch
@@ -230,6 +233,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel,
             KeepSeparateReason = KeepingRecordSeparateReason.AnotherReason,

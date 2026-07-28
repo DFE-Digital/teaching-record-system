@@ -47,7 +47,7 @@ public class Matches(
         {
             Journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
+            return Redirect(Journey.State.CompletionUrl);
         }
 
         // Verify the submitted ID is legit
@@ -86,7 +86,7 @@ public class Matches(
     {
         RequestData = GetRequestData();
 
-        BackLink = Journey.GetBackLink() ?? linkGenerator.SupportTasks.TrnRequests.Index();
+        BackLink = Journey.GetBackLink() ?? Journey.State.CompletionUrl;
 
         var matchedAttributesLookup = Journey.State.MatchedPersons.ToDictionary(
                 mp => mp.PersonId,

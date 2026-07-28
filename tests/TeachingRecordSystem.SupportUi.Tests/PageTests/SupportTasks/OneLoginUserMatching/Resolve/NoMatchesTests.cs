@@ -12,8 +12,8 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
         var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             matchedPersons: []);
 
@@ -70,8 +70,8 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
                 .WithClientApplicationUserId(applicationUser.UserId));
         var supportTaskData = supportTask.GetData<OneLoginUserRecordMatchingData>();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             matchedPersons: []);
 
@@ -116,8 +116,8 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             matchedPersons: []);
 
@@ -247,8 +247,8 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
             oneLoginUser.Subject, t => t.WithClientApplicationUserId(applicationUser.UserId));
         var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             matchedPersons: []);
 
@@ -276,8 +276,8 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
         var supportTaskData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             matchedPersons: []);
 
@@ -310,8 +310,8 @@ public class NoMatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatchi
             oneLoginUser.Subject, t => t
                 .WithVerifiedNames([firstName, lastName]));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            supportTask.SupportTaskReference,
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
             state => state.Verified = true,
             matchedPersons: []);
 

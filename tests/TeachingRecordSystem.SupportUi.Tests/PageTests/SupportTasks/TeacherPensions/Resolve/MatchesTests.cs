@@ -622,6 +622,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
             ? await CreateStateAsync(supportTask)
             : new ResolveTeacherPensionsPotentialDuplicateState
             {
+                CompletionUrl = DefaultCompletionUrl,
                 MatchedPersons = matchedPersons
             };
 

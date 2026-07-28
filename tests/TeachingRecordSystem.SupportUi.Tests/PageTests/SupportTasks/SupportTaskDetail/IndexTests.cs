@@ -140,26 +140,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var olderContent = "This is the older note";
         var newerContent = "This is the newer note";
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.SupportTaskNotes.Add(new SupportTaskNote
-            {
-                SupportTaskNoteId = Guid.NewGuid(),
-                SupportTaskReference = supportTask.SupportTaskReference,
-                Content = olderContent,
-                CreatedOn = TimeProvider.UtcNow,
-                CreatedByUserId = GetCurrentUserId()
-            });
-            dbContext.SupportTaskNotes.Add(new SupportTaskNote
-            {
-                SupportTaskNoteId = Guid.NewGuid(),
-                SupportTaskReference = supportTask.SupportTaskReference,
-                Content = newerContent,
-                CreatedOn = TimeProvider.UtcNow.AddMinutes(1),
-                CreatedByUserId = GetCurrentUserId()
-            });
-            await dbContext.SaveChangesAsync();
-        });
+        await AddNoteAsync(supportTask.SupportTaskReference, olderContent);
+        await AddNoteAsync(supportTask.SupportTaskReference, newerContent, TimeProvider.UtcNow.AddMinutes(1));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}");
 
@@ -170,15 +152,59 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var bodyText = doc.Body!.TextContent;
 
+        Assert.Null(doc.GetElementByTestId("no-notes"));
+        Assert.NotNull(doc.GetElementByTestId("notes"));
         Assert.Contains(olderContent, bodyText);
         Assert.Contains(newerContent, bodyText);
         Assert.True(bodyText.IndexOf(newerContent, StringComparison.Ordinal) < bodyText.IndexOf(olderContent, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task Get_OutstandingTaskWithNoNotes_DisplaysNoNotesMessageInsteadOfNotes()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var noNotesMessage = doc.GetElementByTestId("no-notes");
+        Assert.NotNull(noNotesMessage);
+        Assert.Equal("There are no notes associated with this task", noNotesMessage.TrimmedText());
+        Assert.Null(doc.GetElementByTestId("notes"));
     }
 
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task Get_ExpandNotesQueryParameter_ControlsWhetherNotesAreExpanded(bool expandNotes)
+    {
+        // Arrange
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AddNoteAsync(supportTask.SupportTaskReference, "This is a note");
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}?ExpandNotes={expandNotes}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var details = doc.GetElementByTestId("notes");
+        Assert.NotNull(details);
+        Assert.Equal(expandNotes, details.HasAttribute("open"));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Get_ExpandNotesQueryParameter_WithNoNotes_DisplaysNoNotesMessage(bool expandNotes)
     {
         // Arrange
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
@@ -191,9 +217,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var details = doc.QuerySelector(".govuk-details");
-        Assert.NotNull(details);
-        Assert.Equal(expandNotes, details.HasAttribute("open"));
+        Assert.NotNull(doc.GetElementByTestId("no-notes"));
+        Assert.Null(doc.GetElementByTestId("notes"));
     }
 
     [Fact]
@@ -444,6 +469,20 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         Events.AssertNoEventsPublished();
     }
+
+    private Task AddNoteAsync(string supportTaskReference, string content, DateTime? createdOn = null) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            dbContext.SupportTaskNotes.Add(new SupportTaskNote
+            {
+                SupportTaskNoteId = Guid.NewGuid(),
+                SupportTaskReference = supportTaskReference,
+                Content = content,
+                CreatedOn = createdOn ?? TimeProvider.UtcNow,
+                CreatedByUserId = GetCurrentUserId()
+            });
+            await dbContext.SaveChangesAsync();
+        });
 
     private async Task<(SupportTask SupportTask, User CompletedByUser)> CreateClosedSupportTaskAsync(
         SupportTaskOutcome outcome = SupportTaskOutcome.ChangeNameRequest_Approved,

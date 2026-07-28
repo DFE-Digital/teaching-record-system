@@ -29,7 +29,7 @@
             @if (Model.IsOutstanding)
             {
                 <capture-content to="linksBuilder">
-                    <a href="@LinkGenerator.SupportTaskResolve(Model.SupportTaskReference, Model.SupportTaskType)" class="govuk-link">View task</a>
+                    <a href="@LinkGenerator.SupportTaskResolve(Model.SupportTaskReference, Model.SupportTaskType, returnUrl)" class="govuk-link">View task</a>
                 </capture-content>
             }
 
@@ -92,19 +92,26 @@
 
             <p class="govuk-body">View and add notes related to this task.</p>
 
-            <govuk-details open="@Model.ExpandNotes">
-                <govuk-details-summary>View notes</govuk-details-summary>
-                <govuk-details-text>
-                    <div class="moj-timeline">
-                        @foreach (var note in Model.Notes!)
-                        {
-                            <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn.ToGmt()">
-                                @note.Content
-                            </timeline-entry>
-                        }
-                    </div>
-                </govuk-details-text>
-            </govuk-details>
+            @if (Model.Notes!.Count == 0)
+            {
+                <p class="govuk-body" data-testid="no-notes">There are no notes associated with this task</p>
+            }
+            else
+            {
+                <govuk-details open="@Model.ExpandNotes" data-testid="notes">
+                    <govuk-details-summary>View notes</govuk-details-summary>
+                    <govuk-details-text>
+                        <div class="moj-timeline">
+                            @foreach (var note in Model.Notes!)
+                            {
+                                <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn.ToGmt()">
+                                    @note.Content
+                                </timeline-entry>
+                            }
+                        </div>
+                    </govuk-details-text>
+                </govuk-details>
+            }
 
             <govuk-button-link href="@LinkGenerator.SupportTasks.SupportTaskDetail.AddNote(Model.SupportTaskReference, returnUrl: returnUrl)"
                                class="govuk-button--secondary">
@@ -147,7 +154,7 @@
                 <row>
                     <key>Outcome</key>
                     <value>
-                        <govuk-tag class="govuk-tag--green">@Model.Outcome?.GetDisplayName()</govuk-tag>
+                        <govuk-tag class="govuk-tag--green trs-!-max-width-none">@Model.Outcome?.GetDisplayName()</govuk-tag>
                     </value>
                 </row>
                 <row>

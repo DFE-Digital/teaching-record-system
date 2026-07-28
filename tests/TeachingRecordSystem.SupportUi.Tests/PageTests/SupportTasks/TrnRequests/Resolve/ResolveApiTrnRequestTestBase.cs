@@ -7,6 +7,12 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequest
 
 public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    /// <summary>
+    /// The URL the journey completes to when it's started without a <c>returnUrl</c>.
+    /// </summary>
+    protected string DefaultCompletionUrl =>
+        HostFixture.Services.GetRequiredService<SupportUiLinkGenerator>().SupportTasks.TrnRequests.Index();
+
     protected async Task<ResolveTrnRequestState> CreateStateAsync(SupportTask supportTask)
     {
         // Resolve TrnRequestService from its own scope so that it doesn't share a DbContext with the
@@ -14,7 +20,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var trnRequestService = scope.ServiceProvider.GetRequiredService<TrnRequestService>();
 
-        return await ResolveTrnRequestJourneyCoordinator.CreateStateAsync(trnRequestService, supportTask);
+        return await ResolveTrnRequestJourneyCoordinator.CreateStateAsync(trnRequestService, supportTask, DefaultCompletionUrl);
     }
 
     protected Task<ResolveTrnRequestJourneyCoordinator> CreateJourneyInstanceAsync(

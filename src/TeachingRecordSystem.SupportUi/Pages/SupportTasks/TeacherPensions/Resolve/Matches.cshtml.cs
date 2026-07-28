@@ -90,7 +90,7 @@ public class MatchesModel(
         await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
         Journey.DeleteInstance();
 
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+        return Redirect(Journey.State.CompletionUrl);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -98,7 +98,7 @@ public class MatchesModel(
         SupportTask = GetSupportTask();
         RequestData = SupportTask!.TrnRequestMetadata!;
 
-        BackLink = Journey.GetBackLink() ?? linkGenerator.SupportTasks.TeacherPensions.Index();
+        BackLink = Journey.GetBackLink() ?? Journey.State.CompletionUrl;
 
         var person = await DbContext.Persons.Include(x => x.OneLoginUsers).SingleOrDefaultAsync(x => x.PersonId == SupportTask!.PersonId);
         if (person != null)

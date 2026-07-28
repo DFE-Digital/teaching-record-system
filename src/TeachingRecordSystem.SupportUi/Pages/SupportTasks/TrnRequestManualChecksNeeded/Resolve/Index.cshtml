@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index()"/>
+    <govuk-back-link href="@Model.BackLink"/>
 }
 
 <form method="post">
@@ -102,7 +102,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm</govuk-button>
-                <govuk-button-link href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index()" class="govuk-button--secondary">Cancel</govuk-button-link>
+                <govuk-button-link href="@Model.BackLink" class="govuk-button--secondary">Cancel</govuk-button-link>
             </div>
         </div>
     </div>

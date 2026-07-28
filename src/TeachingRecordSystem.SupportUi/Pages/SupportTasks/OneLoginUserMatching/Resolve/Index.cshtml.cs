@@ -6,6 +6,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 [Journey(JourneyNames.ResolveOneLoginUserMatching), StartsJourney]
 public class IndexModel(ResolveOneLoginUserMatchingJourneyCoordinator journey) : PageModel
 {
+    [FromQuery]
+    public string? ReturnUrl { get; set; }
+
     public IActionResult OnGet() =>
-        journey.AdvanceTo(journey.GetFirstStepUrl(), new PushStepOptions { SetAsFirstStep = true });
+        journey.AdvanceTo(journey.GetFirstStepUrl(ReturnUrl), new PushStepOptions { SetAsFirstStep = true });
 }

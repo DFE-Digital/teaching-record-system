@@ -72,7 +72,7 @@ public class Merge(
         {
             Journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.TrnRequests.Index());
+            return Redirect(Journey.State.CompletionUrl);
         }
 
         if (FirstName!.Different && FirstNameSource is null)

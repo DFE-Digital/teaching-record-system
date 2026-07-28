@@ -191,7 +191,7 @@ public class MergeModel(
         await evidenceUploadManager.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
         Journey.DeleteInstance();
 
-        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
+        return Redirect(Journey.State.CompletionUrl);
     }
 
 #pragma warning disable CA1711

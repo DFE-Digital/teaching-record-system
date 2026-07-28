@@ -71,6 +71,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
@@ -166,6 +167,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
@@ -213,6 +215,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
@@ -261,6 +264,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
@@ -308,6 +312,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };
@@ -373,6 +378,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             PersonId = duplicatePerson1.PersonId
         };

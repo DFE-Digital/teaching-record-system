@@ -17,6 +17,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         var taskReference = "1234567";
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = []
         };
         var journeyInstance = await CreateJourneyInstanceAsync(taskReference, state);
@@ -59,6 +60,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.TrnRequest,
@@ -141,6 +143,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             DateOfBirthSource = PersonAttributeSource.ExistingRecord,
@@ -202,6 +205,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.TrnRequest,
@@ -297,6 +301,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.TrnRequest,
@@ -388,6 +393,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.TrnRequest,
@@ -504,6 +510,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState
         {
+            CompletionUrl = DefaultCompletionUrl,
             MatchedPersons = [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [])],
             TeachersPensionPersonId = person.PersonId,
             FirstNameSource = PersonAttributeSource.ExistingRecord,

@@ -27,6 +27,9 @@ public class RejectModel(
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
+    [FromQuery]
+    public string? ReturnUrl { get; set; }
+
     public SupportTaskType? ChangeType { get; set; }
 
     public string? PersonName { get; set; }
@@ -87,7 +90,7 @@ public class RejectModel(
             $"The request has been {requestStatus}",
             flashMessage);
 
-        return Redirect(linkGenerator.SupportTasks.ChangeRequests.Index());
+        return Redirect(this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.ChangeRequests.Index()));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

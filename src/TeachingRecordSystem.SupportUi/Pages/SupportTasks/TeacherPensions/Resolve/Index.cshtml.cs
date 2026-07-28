@@ -8,8 +8,11 @@ public class IndexModel(
     ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    [FromQuery]
+    public string? ReturnUrl { get; set; }
+
     public IActionResult OnGet() =>
         journey.AdvanceTo(
-            linkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(journey.InstanceId),
+            linkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(journey.InstanceId, ReturnUrl),
             new PushStepOptions { SetAsFirstStep = true });
 }
