@@ -468,11 +468,19 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToListPage(bool isRecordMatchingOnlySupportTask)
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToCorrectPage(bool isRecordMatchingOnlySupportTask, bool supportTaskDashboardEnabled)
     {
         // Arrange
+        FeatureProvider.Features.Clear();
+        if (supportTaskDashboardEnabled)
+        {
+            FeatureProvider.Features.Add("SupportTaskDashboard");
+        }
+
         var matchedPerson = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
         var supportTask = isRecordMatchingOnlySupportTask ?
@@ -519,7 +527,12 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        if (isRecordMatchingOnlySupportTask)
+
+        if (supportTaskDashboardEnabled)
+        {
+            Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", response.Headers.Location?.OriginalString);
+        }
+        else if (isRecordMatchingOnlySupportTask)
         {
             Assert.Equal($"/support-tasks/one-login-user-matching/record-matching", response.Headers.Location?.OriginalString);
         }
