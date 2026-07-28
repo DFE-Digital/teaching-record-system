@@ -124,8 +124,11 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
         await page.ClickRadioByLabelAsync("Connect it to Record A", exact: false);
         await page.ClickButtonAsync("Save and come back later");
 
+        // With SupportTaskDashboard feature flag enabled, should redirect to the Manage Task page
+        await page.WaitForUrlPathAsync($"/support-tasks/{supportTask.SupportTaskReference}");
 
-        // Re-start the journey and check the saved values were persisted
+        // Navigate back to the list and re-start the journey to check the saved values were persisted
+        await page.GotoAsync("/support-tasks/one-login-user-matching/record-matching");
 
         await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");

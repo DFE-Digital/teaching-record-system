@@ -15,7 +15,8 @@ public class Matches(
     TrsDbContext dbContext,
     SupportTaskService supportTaskService,
     TimeProvider timeProvider,
-    SupportUiLinkGenerator linkGenerator) :
+    SupportUiLinkGenerator linkGenerator,
+    IFeatureProvider featureProvider) :
     PageModel
 {
     public static class Actions
@@ -104,6 +105,11 @@ public class Matches(
             processContext);
 
         journey.DeleteInstance();
+
+        if (featureProvider.IsEnabled("SupportTaskDashboard"))
+        {
+            return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(_supportTask.SupportTaskReference));
+        }
 
         return Redirect(journey.State.CompletionUrl);
     }
