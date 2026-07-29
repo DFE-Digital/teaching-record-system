@@ -386,20 +386,20 @@
   display: grid;
   grid-template-columns: 1fr 3fr;
 
-  > * {
-    padding: 0 15px;
+  > * + * {
+    border-left: 1px solid var(--govuk-border-colour, #cecece);
   }
+}
 
-  :first-child {
+.trs-task-panel {
+  padding: 0 15px;
+
+  &:first-child {
     padding-left: 0;
   }
 
-  :last-child {
+  &:last-child {
     padding-right: 0;
-  }
-
-  > * + * {
-    border-left: 1px solid var(--govuk-border-colour, #cecece);
   }
 }
 

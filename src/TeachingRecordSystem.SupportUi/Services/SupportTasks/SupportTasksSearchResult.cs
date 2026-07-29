@@ -13,7 +13,8 @@ public record SupportTasksSearchResultItem(
     SupportTaskStatus Status,
     Guid? AssignedToUserId,
     string? AssignedToName,
-    DateTime CreatedOn) : ISupportTaskSearchResult;
+    DateTime CreatedOn,
+    string? SourceApplicationName) : ISupportTaskSearchResult;
 
 public record CompletedTasksSearchResult
 {
@@ -28,4 +29,5 @@ public record CompletedTasksSearchResultItem(
     DateTime CompletedOn,
     SupportTaskOutcome Outcome,
     Guid? CompletedByUserId,
-    string? CompletedByName) : ISupportTaskSearchResult;
+    string? CompletedByName,
+    string? SourceApplicationName) : ISupportTaskSearchResult;

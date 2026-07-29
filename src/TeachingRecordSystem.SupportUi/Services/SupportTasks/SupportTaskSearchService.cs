@@ -531,7 +531,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.Status,
                 t.AssignedToUserId,
                 t.AssignedTo != null ? t.AssignedTo.Name : null,
-                t.CreatedOn))
+                t.CreatedOn,
+                t.SourceApplicationUser != null ? (t.SourceApplicationUser.ShortName ?? t.SourceApplicationUser.Name) : null))
             .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
 
         return new()
@@ -654,7 +655,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.CompletedOn!.Value,
                 t.Outcome!.Value,
                 t.CompletedByUserId,
-                t.CompletedBy != null ? t.CompletedBy.Name : null))
+                t.CompletedBy != null ? t.CompletedBy.Name : null,
+                t.SourceApplicationUser != null ? (t.SourceApplicationUser.ShortName ?? t.SourceApplicationUser.Name) : null))
             .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
 
         return new()

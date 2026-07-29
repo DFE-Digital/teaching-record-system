@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
@@ -47,10 +48,12 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var user = await TestData.CreateUserAsync(name: "Reviewer One");
+        var applicationUser = await TestData.CreateApplicationUserAsync(shortName: "Source App");
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             configure: r => r
                 .WithCreatedOn(new DateTime(2025, 1, 20))
-                .WithStatus(SupportTaskStatus.Closed),
+                .WithStatus(SupportTaskStatus.Closed)
+                .WithSourceApplicationUserId(applicationUser.UserId),
             configurePerson: p => p
                 .WithFirstName("Alice")
                 .WithMiddleName("The")
@@ -71,7 +74,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("Alice The Apple", row.GetElementByTestId("subject")!.TrimmedText());
         Assert.Equal(supportTask.SupportTaskReference, row.GetElementByTestId("task-reference")!.TrimmedText());
         Assert.Equal(new DateTime(2025, 1, 25).ToString(WebConstants.DateDisplayFormat), row.GetElementByTestId("completed-on")!.TrimmedText());
-        Assert.Equal("Change name request", row.GetElementByTestId("task-type")!.TrimmedText());
+        Assert.Equal("Change name request (Source App)", row.GetElementByTestId("task-type")!.GetTextContentWithNormalizedWhitespace());
         Assert.Equal("Approved", row.GetElementByTestId("outcome")!.TrimmedText());
         Assert.Equal("Reviewer One", row.GetElementByTestId("completed-by")!.TrimmedText());
     }
@@ -445,4 +448,13 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         GetResultTaskReferences(document)
             .Select(tasks.GetKeyFor)
             .ToArray();
+}
+
+file static class Extensions
+{
+    public static string GetTextContentWithNormalizedWhitespace(this IElement element)
+    {
+        var textContent = element.TextContent;
+        return Regex.Replace(textContent, @"\s+", " ").Trim();
+    }
 }
