@@ -20,7 +20,7 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
     }
 
     [Fact]
-    public async Task Get_NoZendeskTickets_ShowsNoTicketsAdded()
+    public async Task Get_NoZendeskTickets_ShowsNoTicketRows()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -49,10 +49,8 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         // Assert
         var document = await AssertEx.HtmlResponseAsync(response);
 
-        var noTickets = document.GetElementByTestId("no-tickets");
-
-        Assert.NotNull(noTickets);
-        Assert.Equal("No tickets added", noTickets.TrimmedText());
+        Assert.Null(document.GetElementByTestId("zendesk-ticket-0"));
+        Assert.NotNull(document.GetElementByTestId("zendesk-ticket-new"));
     }
 
     [Fact]
@@ -69,8 +67,8 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "TicketUrls[0]", "" },
-                { "TicketUrls[1]", ticketUrl2 }
+                { "TicketUrls", "" },
+                { "TicketUrls", ticketUrl2 }
             }
         };
 
@@ -106,10 +104,11 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         // Assert
         var document = await AssertEx.HtmlResponseAsync(response);
 
-        var ticketInput = document.QuerySelector(
-            "input[name='TicketUrls[0]']");
+        var ticketInput = document.QuerySelector("input#TicketUrls-0");
 
         Assert.NotNull(ticketInput);
+        Assert.Equal("TicketUrls", ticketInput.GetAttribute("name"));
+        Assert.True(string.IsNullOrEmpty(ticketInput.GetAttribute("value")));
     }
 
     [Fact]
@@ -127,8 +126,8 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "TicketUrls[0]", ticketUrl1 },
-                { "TicketUrls[1]", ticketUrl2 }
+                { "TicketUrls", ticketUrl1 },
+                { "TicketUrls", ticketUrl2 }
             }
         };
 
@@ -190,7 +189,7 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "TicketUrls[0]", updatedTicketUrl }
+                { "TicketUrls", updatedTicketUrl }
             }
         };
 
@@ -256,7 +255,7 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "TicketUrls[0]", "" },
+                { "TicketUrls", "" },
             }
         };
 
@@ -323,8 +322,8 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "TicketUrls[0]", updatedTicketUrl1 },
-                { "TicketUrls[1]", updatedTicketUrl2 }
+                { "TicketUrls", updatedTicketUrl1 },
+                { "TicketUrls", updatedTicketUrl2 }
             }
         };
 
@@ -353,6 +352,182 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
                 Assert.Contains(updatedTicketUrl1, supportTaskZendeskEvent.SupportTask.ZendeskTickets);
                 Assert.Contains(updatedTicketUrl2, supportTaskZendeskEvent.SupportTask.ZendeskTickets);
                 Assert.Contains(existingTicketUrl, supportTaskZendeskEvent.OldSupportTask.ZendeskTickets);
+            });
+        });
+    }
+
+    [Fact]
+    public async Task Post_TicketsAreUnchanged_DoesNotPublishEventOrShowNotification()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(
+            personId: null,
+            email: Option.Some<string?>(TestData.GenerateUniqueEmail()),
+            verifiedInfo: null);
+
+        var existingTicketUrl =
+            "https://example.zendesk.com/agent/tickets/123";
+
+        var supportTask =
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+                oneLoginUser1.Subject,
+                configure => configure
+                    .WithStatedFirstName("Alphie")
+                    .WithStatedLastName("Smith")
+                    .WithCreatedOn(new DateTime(2025, 1, 22, 1, 1, 1))
+                    .WithClientApplicationUserId(applicationUser.UserId)
+                    .WithZendeskTickets(existingTicketUrl));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/{supportTask.SupportTaskReference}/zendesk-tickets")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "TicketUrls", existingTicketUrl }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
+
+        Assert.Empty(redirectDoc.GetElementsByClassName("govuk-notification-banner"));
+
+        var updatedSupportTask = await WithDbContextAsync(dbContext =>
+            dbContext.SupportTasks.SingleAsync(
+                t => t.SupportTaskReference == supportTask.SupportTaskReference));
+
+        Assert.Equal([existingTicketUrl], updatedSupportTask.ZendeskTickets);
+
+        Events.AssertNoEventsPublished();
+    }
+
+    [Fact]
+    public async Task Post_TicketIsAddedToOpenSupportTask_SetsStatusToInProgress()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(
+            personId: null,
+            email: Option.Some<string?>(TestData.GenerateUniqueEmail()),
+            verifiedInfo: null);
+
+        var addedTicketUrl =
+            "https://example.zendesk.com/agent/tickets/123";
+
+        var supportTask =
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+                oneLoginUser1.Subject,
+                configure => configure
+                    .WithStatedFirstName("Alphie")
+                    .WithStatedLastName("Smith")
+                    .WithCreatedOn(new DateTime(2025, 1, 22, 1, 1, 1))
+                    .WithClientApplicationUserId(applicationUser.UserId)
+                    .WithStatus(SupportTaskStatus.Open));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/{supportTask.SupportTaskReference}/zendesk-tickets")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "TicketUrls", addedTicketUrl }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var updatedSupportTask = await WithDbContextAsync(dbContext =>
+            dbContext.SupportTasks.SingleAsync(
+                t => t.SupportTaskReference == supportTask.SupportTaskReference));
+
+        Assert.Equal(SupportTaskStatus.InProgress, updatedSupportTask.Status);
+
+        Events.AssertProcessesCreated(x =>
+        {
+            Assert.Equal(ProcessType.SupportTaskZendeskUrlsUpdating, x.ProcessContext.ProcessType);
+            Assert.Collection(x.Events, e =>
+            {
+                var supportTaskZendeskEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+                Assert.Equal(
+                    SupportTaskUpdatedEventChanges.ZendeskTicketUrls | SupportTaskUpdatedEventChanges.Status,
+                    supportTaskZendeskEvent.Changes);
+                Assert.Equal(SupportTaskStatus.Open, supportTaskZendeskEvent.OldSupportTask.Status);
+                Assert.Equal(SupportTaskStatus.InProgress, supportTaskZendeskEvent.SupportTask.Status);
+            });
+        });
+    }
+
+    [Fact]
+    public async Task Post_TicketIsRemovedFromOpenSupportTask_LeavesStatusUnchanged()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(
+            personId: null,
+            email: Option.Some<string?>(TestData.GenerateUniqueEmail()),
+            verifiedInfo: null);
+
+        var existingTicketUrl1 =
+            "https://example.zendesk.com/agent/tickets/123";
+
+        var existingTicketUrl2 =
+            "https://example.zendesk.com/agent/tickets/456";
+
+        var supportTask =
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+                oneLoginUser1.Subject,
+                configure => configure
+                    .WithStatedFirstName("Alphie")
+                    .WithStatedLastName("Smith")
+                    .WithCreatedOn(new DateTime(2025, 1, 22, 1, 1, 1))
+                    .WithClientApplicationUserId(applicationUser.UserId)
+                    .WithStatus(SupportTaskStatus.Open)
+                    .WithZendeskTickets(existingTicketUrl1, existingTicketUrl2));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/{supportTask.SupportTaskReference}/zendesk-tickets")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "TicketUrls", existingTicketUrl1 }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var updatedSupportTask = await WithDbContextAsync(dbContext =>
+            dbContext.SupportTasks.SingleAsync(
+                t => t.SupportTaskReference == supportTask.SupportTaskReference));
+
+        Assert.Equal([existingTicketUrl1], updatedSupportTask.ZendeskTickets);
+        Assert.Equal(SupportTaskStatus.Open, updatedSupportTask.Status);
+
+        Events.AssertProcessesCreated(x =>
+        {
+            Assert.Equal(ProcessType.SupportTaskZendeskUrlsUpdating, x.ProcessContext.ProcessType);
+            Assert.Collection(x.Events, e =>
+            {
+                var supportTaskZendeskEvent = Assert.IsType<SupportTaskUpdatedEvent>(e);
+                Assert.Equal(SupportTaskUpdatedEventChanges.ZendeskTicketUrls, supportTaskZendeskEvent.Changes);
+                Assert.Equal(SupportTaskStatus.Open, supportTaskZendeskEvent.SupportTask.Status);
             });
         });
     }
@@ -392,9 +567,9 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "TicketUrls[0]", ticketUrl1 },
-                { "TicketUrls[1]", ticketUrl2 },
-                { "TicketUrls[2]", invalidTicketUrl }
+                { "TicketUrls", ticketUrl1 },
+                { "TicketUrls", ticketUrl2 },
+                { "TicketUrls", invalidTicketUrl }
             }
         };
 
@@ -404,7 +579,7 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(
             response,
-            "TicketUrls_2_",
+            "TicketUrls-2",
             "Enter a valid Zendesk URL");
     }
 }

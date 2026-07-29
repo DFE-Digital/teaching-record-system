@@ -553,3 +553,32 @@ tr:has([data-selects-row]):has(:checked) {
 .trs-select-row {
   margin-left: 10px !important;
 }
+
+.trs-zendesk-links-table {
+  height: 1px;  // Hack so that height: 100% works in __actions-container
+
+  &__actions-container {
+    height: 100%;
+    display: flex;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    column-gap: 15px;
+    height: 40px;
+    margin-top: auto;
+
+    .govuk-button {
+      margin: 0;
+    }
+  }
+
+  &__link-input {
+    margin: 0;
+  }
+}
+
+body:not(.js-enabled) .trs-requires-js {
+  @extend .govuk-visually-hidden;
+}

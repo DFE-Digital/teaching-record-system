@@ -94,7 +94,7 @@
 
             @if (Model.Notes!.Count == 0)
             {
-                <p class="govuk-body" data-testid="no-notes">There are no notes associated with this task</p>
+                <p class="govuk-body" data-testid="no-notes">There are no notes associated with this task.</p>
             }
             else
             {
@@ -124,11 +124,15 @@
 
             <p class="govuk-body">View and add Zendesk tickets related to this task.</p>
 
-            <govuk-details>
-                <govuk-details-summary>View tickets</govuk-details-summary>
-                <govuk-details-text>
-                    @if (Model.ZendeskTickets?.Any() == true)
-                    {
+            @if (Model.ZendeskTickets!.Count == 0)
+            {
+                <p class="govuk-body">No Zendesk tickets have been added yet.</p>
+            }
+            else
+            {
+                <govuk-details>
+                    <govuk-details-summary>View tickets</govuk-details-summary>
+                    <govuk-details-text>
                         <ul class="govuk-list">
                             @foreach (var ticket in Model.ZendeskTickets)
                             {
@@ -139,13 +143,9 @@
                                 </li>
                             }
                         </ul>
-                    }
-                    else
-                    {
-                        <p class="govuk-body">No Zendesk tickets have been added yet.</p>
-                    }
-                </govuk-details-text>
-            </govuk-details>
+                    </govuk-details-text>
+                </govuk-details>
+            }
 
             <govuk-button-link href="@LinkGenerator.SupportTasks.SupportTaskDetail.ZendeskTickets(Model.SupportTaskReference, returnUrl: returnUrl)"
                                class="govuk-button--secondary">
