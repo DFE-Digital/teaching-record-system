@@ -40,6 +40,7 @@ module "airbyte" {
   is_rails_application         = false
   is_dotnet_application        = true
   dotnet_application_directory = "/Apps/TrsCli"
+  airbyte_sync_mode            = "incremental_deduped_history"
 }
 
 locals {
