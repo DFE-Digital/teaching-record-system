@@ -2,6 +2,7 @@ using Hangfire;
 using Htmx.TagHelpers;
 using Joonasw.AspNetCore.SecurityHeaders;
 using TeachingRecordSystem.SupportUi.Endpoints;
+using TeachingRecordSystem.SupportUi.Infrastructure.Middleware;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
@@ -78,6 +79,7 @@ public class Program
         app.UseSession();
 
         app.UseAuthentication();
+        app.UseMiddleware<AssignUserToSentryScopeMiddleware>();
         app.UseAuthorization();
 
         app.MapHtmxAntiforgeryScript();
