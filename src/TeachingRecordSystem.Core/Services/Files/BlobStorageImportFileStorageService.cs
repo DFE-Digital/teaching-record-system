@@ -61,7 +61,12 @@ public class BlobStorageImportFileStorageService(BlobServiceClient blobServiceCl
     private async Task<string[]> GetFileNamesAsync(BlobContainerClient containerClient, string prefix, bool includeSubfolders, CancellationToken cancellationToken)
     {
         var fileNames = new List<string>();
-        var resultSegment = containerClient.GetBlobsByHierarchyAsync(prefix: prefix, delimiter: "/", cancellationToken: cancellationToken).AsPages();
+        var resultSegment = containerClient.GetBlobsByHierarchyAsync(
+            BlobTraits.None,
+            BlobStates.None,
+            prefix: prefix,
+            delimiter: "/",
+            cancellationToken: cancellationToken).AsPages();
 
         // Enumerate the blobs returned for each page.
         await foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
