@@ -176,7 +176,14 @@
                                 </a>
                             </td>
                             <td class="govuk-table__cell" data-testid="completed-on">@result.CompletedOn.ToString(WebConstants.DateDisplayFormat)</td>
-                            <td class="govuk-table__cell" data-testid="task-type">@result.SupportTaskType.GetTitle()</td>
+                            <td class="govuk-table__cell" data-testid="task-type">
+                                @result.SupportTaskType.GetTitle()
+
+                                @if (result.SourceApplicationName is not null)
+                                {
+                                    <text>(@result.SourceApplicationName)</text>
+                                }
+                            </td>
                             <td class="govuk-table__cell" data-testid="outcome">
                                 @result.Outcome.GetDisplayName()
                             </td>

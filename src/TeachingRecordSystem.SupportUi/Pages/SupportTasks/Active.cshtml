@@ -195,7 +195,14 @@ else
                         </a>
                     </td>
                     <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateDisplayFormat)</td>
-                    <td class="govuk-table__cell">@result.SupportTaskType.GetTitle()</td>
+                    <td class="govuk-table__cell">
+                        @result.SupportTaskType.GetTitle()
+
+                        @if (result.SourceApplicationName is not null)
+                        {
+                            <text>(@result.SourceApplicationName)</text>
+                        }
+                    </td>
                     <td class="govuk-table__cell" data-testid="status">
                         <support-task-status-tag status="@result.Status"/>
                     </td>
