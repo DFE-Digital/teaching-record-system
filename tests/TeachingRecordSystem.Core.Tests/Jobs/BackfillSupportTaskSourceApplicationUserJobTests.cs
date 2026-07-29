@@ -238,6 +238,181 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
         Assert.Null(await GetSourceApplicationUserIdAsync(result.SupportTask));
     }
 
+    [Fact]
+    public async Task ExecuteAsync_ProcessEventCarryingTask_SetsSourceOnPayload()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var result = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var supportTask = result.SupportTask;
+
+        var eventId = Guid.NewGuid();
+
+        await TestData.CreateProcessAsync(
+            ProcessType.TrnRequestCreating,
+            SystemUser.SystemUserId,
+            changeReason: null,
+            new SupportTaskCreatedEvent
+            {
+                EventId = eventId,
+                SupportTask = EventModels.SupportTask.FromModel(supportTask) with { SourceApplicationUserId = null }
+            });
+
+        await ClearSourceApplicationUserIdAsync(supportTask);
+
+        // Act
+        await ExecuteJobAsync();
+
+        // Assert
+        var payload = await GetProcessEventPayloadAsync<SupportTaskCreatedEvent>(eventId);
+        Assert.Equal(applicationUser.UserId, payload.SupportTask.SourceApplicationUserId);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ProcessEventWithOldAndNewTask_SetsSourceOnBoth()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var result = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var supportTask = result.SupportTask;
+
+        var eventId = Guid.NewGuid();
+        var eventSupportTask = EventModels.SupportTask.FromModel(supportTask) with { SourceApplicationUserId = null };
+
+        await TestData.CreateProcessAsync(
+            ProcessType.TrnRequestCreating,
+            SystemUser.SystemUserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = eventId,
+                SupportTaskReference = supportTask.SupportTaskReference,
+                Changes = SupportTaskUpdatedEventChanges.Status,
+                SupportTask = eventSupportTask with { Status = SupportTaskStatus.Closed },
+                OldSupportTask = eventSupportTask,
+                Comments = null,
+                RejectionReason = null
+            });
+
+        await ClearSourceApplicationUserIdAsync(supportTask);
+
+        // Act
+        await ExecuteJobAsync();
+
+        // Assert
+        var payload = await GetProcessEventPayloadAsync<SupportTaskUpdatedEvent>(eventId);
+        Assert.Equal(applicationUser.UserId, payload.SupportTask.SourceApplicationUserId);
+        Assert.Equal(applicationUser.UserId, payload.OldSupportTask.SourceApplicationUserId);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_LegacyEventCarryingTask_SetsSourceOnPayload()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var person = await TestData.CreatePersonAsync();
+        var eventId = Guid.NewGuid();
+
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
+        await CreateCreatingProcessAsync(supportTask, ProcessType.ChangeOfNameRequestCreating, applicationUser.UserId);
+
+        var eventSupportTask = EventModels.SupportTask.FromModel(supportTask) with { SourceApplicationUserId = null };
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(new LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent
+            {
+                EventId = eventId,
+                CreatedUtc = TimeProvider.UtcNow,
+                RaisedBy = SystemUser.SystemUserId,
+                PersonId = person.PersonId,
+                RequestData = EventModels.ChangeNameRequestData.FromModel(supportTask.GetData<ChangeNameRequestData>()),
+                RejectionReason = null,
+                SupportTask = eventSupportTask with { Status = SupportTaskStatus.Closed },
+                OldSupportTask = eventSupportTask
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        await ClearSourceApplicationUserIdAsync(supportTask);
+
+        // Act
+        await ExecuteJobAsync();
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var @event = await dbContext.Events.SingleAsync(e => e.EventId == eventId);
+            var eventBase = Assert.IsType<LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent>(@event.ToEventBase());
+
+            Assert.Equal(applicationUser.UserId, eventBase.SupportTask.SourceApplicationUserId);
+            Assert.Equal(applicationUser.UserId, eventBase.OldSupportTask.SourceApplicationUserId);
+        });
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_EventForTaskThatAlreadyHadASource_IsStillFixedUp()
+    {
+        // Arrange — the task keeps its column; only the event pre-dates the payload carrying it.
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var result = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var supportTask = result.SupportTask;
+
+        var eventId = Guid.NewGuid();
+
+        await TestData.CreateProcessAsync(
+            ProcessType.TrnRequestCreating,
+            SystemUser.SystemUserId,
+            changeReason: null,
+            new SupportTaskCreatedEvent
+            {
+                EventId = eventId,
+                SupportTask = EventModels.SupportTask.FromModel(supportTask) with { SourceApplicationUserId = null }
+            });
+
+        // Act
+        await ExecuteJobAsync();
+
+        // Assert
+        var payload = await GetProcessEventPayloadAsync<SupportTaskCreatedEvent>(eventId);
+        Assert.Equal(applicationUser.UserId, payload.SupportTask.SourceApplicationUserId);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_EventForUnresolvableTask_IsLeftUnchanged()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var eventId = Guid.NewGuid();
+
+        await TestData.CreateProcessAsync(
+            ProcessType.ChangeOfNameRequestCreating,
+            SystemUser.SystemUserId,
+            changeReason: null,
+            new SupportTaskCreatedEvent
+            {
+                EventId = eventId,
+                SupportTask = EventModels.SupportTask.FromModel(supportTask) with { SourceApplicationUserId = null }
+            });
+
+        await ClearSourceApplicationUserIdAsync(supportTask);
+
+        // Act
+        await ExecuteJobAsync();
+
+        // Assert
+        var payload = await GetProcessEventPayloadAsync<SupportTaskCreatedEvent>(eventId);
+        Assert.Null(payload.SupportTask.SourceApplicationUserId);
+    }
+
+    private Task<T> GetProcessEventPayloadAsync<T>(Guid eventId) where T : IEvent =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(e => e.ProcessEventId == eventId);
+            return Assert.IsType<T>(processEvent.Payload);
+        });
+
     private Task ExecuteJobAsync(bool dryRun = false) =>
         WithDbContextAsync(dbContext => new BackfillSupportTaskSourceApplicationUserJob(
                 dbContext,

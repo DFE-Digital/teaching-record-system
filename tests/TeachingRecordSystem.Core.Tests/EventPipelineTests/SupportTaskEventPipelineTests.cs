@@ -31,6 +31,7 @@ public class SupportTaskEventPipelineTests(EventPipelineFixture fixture) : Event
                     EmailAddress = TestData.GenerateUniqueEmail(),
                     ChangeRequestOutcome = null
                 },
+                SourceApplicationUserId = null,
                 ResolveJourneySavedState = null,
                 AssignedToUserId = null,
                 Outcome = null,

@@ -1,13 +1,17 @@
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using LegacyEventBase = TeachingRecordSystem.Core.Events.Legacy.EventBase;
 using LegacySupportTaskCreatedEvent = TeachingRecordSystem.Core.Events.Legacy.SupportTaskCreatedEvent;
+using LegacySupportTaskUpdatedEvent = TeachingRecordSystem.Core.Events.Legacy.SupportTaskUpdatedEvent;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
 /// <summary>
-/// Back-fills <see cref="SupportTask.SourceApplicationUserId"/> on tasks that pre-date the column.
+/// Back-fills <see cref="SupportTask.SourceApplicationUserId"/> on tasks that pre-date the column, and on the
+/// events that carry a copy of each task.
 ///
 /// Every task type already records the application user it came from somewhere, so the value is recoverable
 /// without guessing:
@@ -26,6 +30,10 @@ namespace TeachingRecordSystem.Core.Jobs;
 /// A task is only updated when the resolved user still exists and is an application user rather than a staff or
 /// system user; anything unresolved is left null and counted in the summary, so a dry run says how much of the
 /// table the job can actually account for.
+///
+/// The source never changes once a task exists, so every event that embeds a copy of the task gets the same
+/// value — including the pre-change state on an update, and the events of tasks that already carried the column
+/// before it reached the event payloads.
 /// </summary>
 public class BackfillSupportTaskSourceApplicationUserJob(
     TrsDbContext dbContext,
@@ -39,6 +47,24 @@ public class BackfillSupportTaskSourceApplicationUserJob(
 
     // Matches the EventName stored in the events table, which is the type's own name rather than the alias.
     private static readonly string _legacySupportTaskCreatedEventName = typeof(LegacySupportTaskCreatedEvent).Name;
+
+    // Every event that embeds a copy of the task, in each pipeline.
+    private static readonly string[] _supportTaskProcessEventNames =
+    [
+        typeof(SupportTaskCreatedEvent).Name,
+        typeof(SupportTaskUpdatedEvent).Name,
+        typeof(SupportTaskDeletedEvent).Name
+    ];
+
+    private static readonly string[] _legacySupportTaskEventNames =
+    [
+        typeof(LegacySupportTaskCreatedEvent).Name,
+        .. LegacyEventBase.GetEventNamesForBaseType(typeof(LegacySupportTaskUpdatedEvent))
+    ];
+
+    // The properties on those events that hold a copy of the task.
+    private static readonly string[] _supportTaskPropertyNames =
+        [nameof(SupportTaskUpdatedEvent.SupportTask), nameof(SupportTaskUpdatedEvent.OldSupportTask)];
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
@@ -61,6 +87,14 @@ public class BackfillSupportTaskSourceApplicationUserJob(
 
         var changeRequestCreators = await GetChangeRequestCreatorsAsync(supportTasks, cancellationToken);
 
+        // Tasks that already carry the column still have events that pre-date it, so they belong in the map too.
+        var sources = (await dbContext.SupportTasks
+                .IgnoreQueryFilters()
+                .Where(t => t.SourceApplicationUserId != null)
+                .Select(t => new { t.SupportTaskReference, SourceApplicationUserId = t.SourceApplicationUserId!.Value })
+                .ToListAsync(cancellationToken))
+            .ToDictionary(t => t.SupportTaskReference, t => t.SourceApplicationUserId);
+
         var updated = 0;
         var unresolved = new Dictionary<SupportTaskType, int>();
 
@@ -76,15 +110,20 @@ public class BackfillSupportTaskSourceApplicationUserJob(
 
             // The property is init-only, so go through the entry rather than the model.
             dbContext.Entry(supportTask).Property(t => t.SourceApplicationUserId).CurrentValue = userId;
+            sources[supportTask.SupportTaskReference] = userId;
             updated++;
         }
+
+        var updatedEvents = await BackfillEventsAsync(sources, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation(
-            "Back-filled the source application user on {UpdatedCount} of {TotalCount} support task(s){DryRunSuffix}.",
+            "Back-filled the source application user on {UpdatedCount} of {TotalCount} support task(s) and " +
+            "{UpdatedEventCount} event(s){DryRunSuffix}.",
             updated,
             supportTasks.Count,
+            updatedEvents,
             dryRun ? " (dry run, rolling back)" : "");
 
         foreach (var (supportTaskType, count) in unresolved.OrderByDescending(u => u.Value))
@@ -129,6 +168,105 @@ public class BackfillSupportTaskSourceApplicationUserJob(
             var supportTaskType => throw new NotSupportedException(
                 $"Cannot derive the source application user for a support task of type '{supportTaskType}'.")
         };
+
+    private async Task<int> BackfillEventsAsync(
+        IReadOnlyDictionary<string, Guid> sources,
+        CancellationToken cancellationToken)
+    {
+        if (sources.Count == 0)
+        {
+            return 0;
+        }
+
+        var updated = 0;
+
+        // New pipeline: the payload round-trips through the typed model.
+        var processEvents = await dbContext.ProcessEvents
+            .Where(e => _supportTaskProcessEventNames.Contains(e.EventName))
+            .ToListAsync(cancellationToken);
+
+        foreach (var processEvent in processEvents)
+        {
+            if (WithSourceApplicationUser(processEvent.Payload, sources) is not { } payload)
+            {
+                continue;
+            }
+
+            dbContext.Entry(processEvent).Property(e => e.Payload).CurrentValue = payload;
+            updated++;
+        }
+
+        // Legacy events are stored as JSON, so edit the payload in place rather than round-tripping it through
+        // the typed model.
+        var legacyEvents = await dbContext.Events
+            .Where(e => _legacySupportTaskEventNames.Contains(e.EventName))
+            .ToListAsync(cancellationToken);
+
+        foreach (var legacyEvent in legacyEvents)
+        {
+            var payload = JsonNode.Parse(legacyEvent.Payload)!;
+            var changed = false;
+
+            foreach (var propertyName in _supportTaskPropertyNames)
+            {
+                if (payload[propertyName] is JsonObject supportTaskNode &&
+                    supportTaskNode["SourceApplicationUserId"] is null &&
+                    supportTaskNode["SupportTaskReference"]?.GetValue<string>() is { } reference &&
+                    sources.TryGetValue(reference, out var userId))
+                {
+                    supportTaskNode["SourceApplicationUserId"] = userId;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                dbContext.Entry(legacyEvent).Property(e => e.Payload).CurrentValue = payload.ToJsonString();
+                updated++;
+            }
+        }
+
+        return updated;
+    }
+
+    private static IEvent? WithSourceApplicationUser(IEvent @event, IReadOnlyDictionary<string, Guid> sources)
+    {
+        switch (@event)
+        {
+            case SupportTaskCreatedEvent created
+                when WithSourceApplicationUser(created.SupportTask, sources) is { } supportTask:
+                return created with { SupportTask = supportTask };
+
+            case SupportTaskDeletedEvent deleted
+                when WithSourceApplicationUser(deleted.SupportTask, sources) is { } supportTask:
+                return deleted with { SupportTask = supportTask };
+
+            case SupportTaskUpdatedEvent updated:
+                {
+                    var supportTask = WithSourceApplicationUser(updated.SupportTask, sources);
+                    var oldSupportTask = WithSourceApplicationUser(updated.OldSupportTask, sources);
+
+                    return supportTask is null && oldSupportTask is null
+                        ? null
+                        : updated with
+                        {
+                            SupportTask = supportTask ?? updated.SupportTask,
+                            OldSupportTask = oldSupportTask ?? updated.OldSupportTask
+                        };
+                }
+
+            default:
+                return null;
+        }
+    }
+
+    private static EventModels.SupportTask? WithSourceApplicationUser(
+        EventModels.SupportTask supportTask,
+        IReadOnlyDictionary<string, Guid> sources) =>
+        supportTask.SourceApplicationUserId is null &&
+        sources.TryGetValue(supportTask.SupportTaskReference, out var userId)
+            ? supportTask with { SourceApplicationUserId = userId }
+            : null;
 
     private async Task<IReadOnlyDictionary<string, Guid>> GetChangeRequestCreatorsAsync(
         IReadOnlyCollection<SupportTask> supportTasks,
