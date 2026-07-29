@@ -9,4 +9,5 @@ public record CreateNameChangeRequestSupportTaskOptions
     public required Guid EvidenceFileId { get; init; }
     public required string EvidenceFileName { get; init; }
     public required string? EmailAddress { get; init; }
+    public required Guid SourceApplicationUserId { get; init; }
 }

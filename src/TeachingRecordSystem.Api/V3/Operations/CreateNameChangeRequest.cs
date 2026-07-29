@@ -87,7 +87,8 @@ public class CreateNameChangeRequestHandler(
                 LastName = command.LastName,
                 EvidenceFileId = evidenceFileId,
                 EvidenceFileName = command.EvidenceFileName,
-                EmailAddress = command.EmailAddress
+                EmailAddress = command.EmailAddress,
+                SourceApplicationUserId = userId
             },
             processContext);
 

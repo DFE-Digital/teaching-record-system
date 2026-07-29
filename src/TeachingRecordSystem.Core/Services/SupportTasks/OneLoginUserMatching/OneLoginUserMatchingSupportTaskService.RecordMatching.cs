@@ -33,7 +33,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 PersonId = null,
                 OneLoginUserSubject = options.OneLoginUserSubject,
                 TrnRequest = trnRequest,
-                Subject = SupportTask.Subject.FromOneLoginUser(options.VerifiedNames!)
+                Subject = SupportTask.Subject.FromOneLoginUser(options.VerifiedNames!),
+                SourceApplicationUserId = options.ClientApplicationUserId
             },
             processContext);
 

@@ -83,7 +83,8 @@ public class CreateDateOfBirthChangeRequestHandler(
                 DateOfBirth = command.DateOfBirth,
                 EvidenceFileId = evidenceFileId,
                 EvidenceFileName = command.EvidenceFileName,
-                EmailAddress = command.EmailAddress
+                EmailAddress = command.EmailAddress,
+                SourceApplicationUserId = userId
             },
             processContext);
 

@@ -239,7 +239,8 @@ public class BackfillResolvedAttributesJobTests(JobFixture fixture) : JobTestBas
             TrnRequestApplicationUserId = applicationUser.UserId,
             TrnRequestId = metadata.RequestId,
             SubjectName = subject.Name,
-            SubjectEmailAddress = subject.EmailAddress
+            SubjectEmailAddress = subject.EmailAddress,
+            SourceApplicationUserId = applicationUser.UserId
         };
 
         return await WithDbContextAsync(async dbContext =>

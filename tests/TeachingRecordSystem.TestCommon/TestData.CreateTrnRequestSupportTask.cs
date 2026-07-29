@@ -276,7 +276,8 @@ public partial class TestData
                 TrnRequestApplicationUserId = applicationUserId,
                 TrnRequestId = trnRequestId,
                 SubjectName = subject.Name,
-                SubjectEmailAddress = subject.EmailAddress
+                SubjectEmailAddress = subject.EmailAddress,
+                SourceApplicationUserId = applicationUserId
             };
 
             return await testData.WithDbContextAsync(async dbContext =>

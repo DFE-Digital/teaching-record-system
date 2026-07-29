@@ -38,7 +38,8 @@ public class ChangeRequestSupportTaskService(
                 PersonId = options.PersonId,
                 OneLoginUserSubject = null,
                 TrnRequest = null,
-                Subject = SupportTask.Subject.FromPerson(person)
+                Subject = SupportTask.Subject.FromPerson(person),
+                SourceApplicationUserId = options.SourceApplicationUserId
             },
             processContext);
     }
@@ -64,7 +65,8 @@ public class ChangeRequestSupportTaskService(
                 PersonId = options.PersonId,
                 OneLoginUserSubject = null,
                 TrnRequest = null,
-                Subject = SupportTask.Subject.FromPerson(person)
+                Subject = SupportTask.Subject.FromPerson(person),
+                SourceApplicationUserId = options.SourceApplicationUserId
             },
             processContext);
     }

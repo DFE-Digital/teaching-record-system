@@ -127,6 +127,7 @@
     <None Remove="Services\DqtReporting\Migrations\0111_SupportTaskColumns.sql" />
     <None Remove="Services\DqtReporting\Migrations\0112_SupportTaskZendeskColumn.sql" />
     <None Remove="Services\DqtReporting\Migrations\0113_SupportTaskOutcome.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0114_SupportTaskSourceApplicationUser.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -293,6 +294,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0111_SupportTaskColumns.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0112_SupportTaskZendeskColumn.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0113_SupportTaskOutcome.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0114_SupportTaskSourceApplicationUser.sql" />
   </ItemGroup>
 
   <ItemGroup>

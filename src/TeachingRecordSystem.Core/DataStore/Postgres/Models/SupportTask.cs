@@ -25,6 +25,8 @@ public class SupportTask
     public TrnRequestMetadata? TrnRequestMetadata { get; }
     public required string? SubjectName { get; init; }
     public required string? SubjectEmailAddress { get; init; }
+    public ApplicationUser? SourceApplicationUser { get; }
+    public required Guid? SourceApplicationUserId { get; init; }
     public required ISupportTaskData Data { get; set; }
     public SavedJourneyState? ResolveJourneySavedState { get; set; }
     public string[] ZendeskTickets { get; set; } = Array.Empty<string>();

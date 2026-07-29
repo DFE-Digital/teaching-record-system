@@ -11,4 +11,5 @@ public record CreateSupportTaskOptions
     public required string? OneLoginUserSubject { get; init; }
     public required (Guid ApplicationUserId, string RequestId)? TrnRequest { get; init; }
     public required SupportTask.Subject Subject { get; init; }
+    public required Guid? SourceApplicationUserId { get; init; }
 }

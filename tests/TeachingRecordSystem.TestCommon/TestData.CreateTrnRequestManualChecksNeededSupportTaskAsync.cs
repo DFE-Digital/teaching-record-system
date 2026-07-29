@@ -63,7 +63,8 @@ public partial class TestData
                 TrnRequestApplicationUserId = trnRequestApplicationUserId,
                 TrnRequestId = trnRequestId,
                 SubjectName = subject.Name,
-                SubjectEmailAddress = subject.EmailAddress
+                SubjectEmailAddress = subject.EmailAddress,
+                SourceApplicationUserId = trnRequestApplicationUserId
             };
 
             dbContext.SupportTasks.Add(task);

@@ -28,7 +28,8 @@ public class TeacherPensionsSupportTaskService(
                 PersonId = options.PersonId,
                 OneLoginUserSubject = null,
                 TrnRequest = (options.TrnRequest.ApplicationUserId, options.TrnRequest.RequestId),
-                Subject = SupportTask.Subject.FromTrnRequest(options.TrnRequest)
+                Subject = SupportTask.Subject.FromTrnRequest(options.TrnRequest),
+                SourceApplicationUserId = options.TrnRequest.ApplicationUserId
             },
             processContext);
 
