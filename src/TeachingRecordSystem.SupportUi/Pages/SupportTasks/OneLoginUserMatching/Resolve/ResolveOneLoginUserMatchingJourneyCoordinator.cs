@@ -81,6 +81,7 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
             existingState with
             {
                 MatchedPersons = suggestedMatches,
+                CompletionUrl = completionUrl,
                 SavedJourneyState = supportTask.ResolveJourneySavedState
             } :
             new ResolveOneLoginUserMatchingState
