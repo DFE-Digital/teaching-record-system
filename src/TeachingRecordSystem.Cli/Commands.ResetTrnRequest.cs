@@ -110,6 +110,7 @@ public partial class Commands
                     TrnRequestId = request.RequestId,
                     SubjectName = subject.Name,
                     SubjectEmailAddress = subject.EmailAddress,
+                    SourceApplicationUserId = request.ApplicationUserId,
                     Data = new TrnRequestData()
                 };
 

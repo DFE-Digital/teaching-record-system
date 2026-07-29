@@ -77,7 +77,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             TrnRequestApplicationUserId = options.TrnRequest?.ApplicationUserId,
             TrnRequestId = options.TrnRequest?.RequestId,
             SubjectName = options.Subject.Name,
-            SubjectEmailAddress = options.Subject.EmailAddress
+            SubjectEmailAddress = options.Subject.EmailAddress,
+            SourceApplicationUserId = options.SourceApplicationUserId
         };
 
         dbContext.SupportTasks.Add(supportTask);

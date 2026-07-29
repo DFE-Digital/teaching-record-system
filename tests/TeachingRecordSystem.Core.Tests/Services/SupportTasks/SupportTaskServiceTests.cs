@@ -29,7 +29,8 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             PersonId = person.PersonId,
             OneLoginUserSubject = null,
             TrnRequest = null,
-            Subject = SupportTask.Subject.FromPerson(person.Person)
+            Subject = SupportTask.Subject.FromPerson(person.Person),
+            SourceApplicationUserId = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -64,7 +65,8 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             PersonId = person.PersonId,
             OneLoginUserSubject = null,
             TrnRequest = null,
-            Subject = SupportTask.Subject.FromPerson(person.Person)
+            Subject = SupportTask.Subject.FromPerson(person.Person),
+            SourceApplicationUserId = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -116,7 +118,8 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             PersonId = person.PersonId,
             OneLoginUserSubject = null,
             TrnRequest = null,
-            Subject = SupportTask.Subject.FromOneLoginUser(emailAddress)
+            Subject = SupportTask.Subject.FromOneLoginUser(emailAddress),
+            SourceApplicationUserId = null
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);

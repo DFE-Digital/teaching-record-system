@@ -1,4 +1,5 @@
 using Optional;
+using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
@@ -38,6 +39,7 @@ public partial class TestData
         private Option<DateTime> _createdOn;
         private bool _hasEmailAddress = true;
         private Option<string[]> _zendeskTickets;
+        private Option<Guid> _sourceApplicationUserId;
 
         public CreateChangeDateOfBirthRequestSupportTaskBuilder WithDateOfBirth(DateOnly dateOfBirth)
         {
@@ -93,45 +95,59 @@ public partial class TestData
             return this;
         }
 
-        public Task<SupportTask> ExecuteAsync(TestData testData) => testData.WithDbContextAsync(async dbContext =>
+        public CreateChangeDateOfBirthRequestSupportTaskBuilder WithSourceApplicationUserId(Guid sourceApplicationUserId)
         {
-            var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
-            var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid);
-            var evidenceFileName = _evidenceFileName.ValueOr("evidence-file.jpg");
-            var emailAddress = _hasEmailAddress ? _emailAddress.ValueOr(testData.GenerateUniqueEmail) : null;
-            var status = _status.ValueOr(SupportTaskStatus.Open);
-            var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow).ToUniversalTime();
-            var zendeskTickets = _zendeskTickets.ValueOr([]);
+            _sourceApplicationUserId = Option.Some(sourceApplicationUserId);
+            return this;
+        }
 
-            var person = await dbContext.Persons.FindAsync(personId) ??
-                throw new InvalidOperationException("Person does not exist.");
+        public async Task<SupportTask> ExecuteAsync(TestData testData)
+        {
+            var sourceApplicationUserId = _sourceApplicationUserId.HasValue ?
+                _sourceApplicationUserId.ValueOrFailure() :
+                (await testData.CreateApplicationUserAsync()).UserId;
 
-            var subject = SupportTask.Subject.FromPerson(person);
-
-            var supportTask = new SupportTask
+            return await testData.WithDbContextAsync(async dbContext =>
             {
-                CreatedOn = createdOn,
-                UpdatedOn = createdOn,
-                SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
-                Status = status,
-                Data = new ChangeDateOfBirthRequestData()
+                var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
+                var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid);
+                var evidenceFileName = _evidenceFileName.ValueOr("evidence-file.jpg");
+                var emailAddress = _hasEmailAddress ? _emailAddress.ValueOr(testData.GenerateUniqueEmail) : null;
+                var status = _status.ValueOr(SupportTaskStatus.Open);
+                var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow).ToUniversalTime();
+                var zendeskTickets = _zendeskTickets.ValueOr([]);
+
+                var person = await dbContext.Persons.FindAsync(personId) ??
+                    throw new InvalidOperationException("Person does not exist.");
+
+                var subject = SupportTask.Subject.FromPerson(person);
+
+                var supportTask = new SupportTask
                 {
-                    DateOfBirth = dateOfBirth,
-                    EvidenceFileId = evidenceFileId,
-                    EvidenceFileName = evidenceFileName,
-                    EmailAddress = emailAddress,
-                    ChangeRequestOutcome = null
-                },
-                PersonId = personId,
-                SubjectName = subject.Name,
-                SubjectEmailAddress = subject.EmailAddress,
-                ZendeskTickets = zendeskTickets
-            };
+                    CreatedOn = createdOn,
+                    UpdatedOn = createdOn,
+                    SupportTaskType = SupportTaskType.ChangeDateOfBirthRequest,
+                    Status = status,
+                    Data = new ChangeDateOfBirthRequestData()
+                    {
+                        DateOfBirth = dateOfBirth,
+                        EvidenceFileId = evidenceFileId,
+                        EvidenceFileName = evidenceFileName,
+                        EmailAddress = emailAddress,
+                        ChangeRequestOutcome = null
+                    },
+                    PersonId = personId,
+                    SubjectName = subject.Name,
+                    SubjectEmailAddress = subject.EmailAddress,
+                    SourceApplicationUserId = sourceApplicationUserId,
+                    ZendeskTickets = zendeskTickets
+                };
 
-            dbContext.SupportTasks.Add(supportTask);
-            await dbContext.SaveChangesAsync();
+                dbContext.SupportTasks.Add(supportTask);
+                await dbContext.SaveChangesAsync();
 
-            return supportTask;
-        });
+                return supportTask;
+            });
+        }
     }
 }

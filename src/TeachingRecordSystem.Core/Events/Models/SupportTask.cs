@@ -10,6 +10,7 @@ public record SupportTask
     public required string? OneLoginUserSubject { get; init; }
     public required Guid? PersonId { get; init; }
     public required ISupportTaskData Data { get; init; }
+    public required Guid? SourceApplicationUserId { get; init; }
     public required SavedJourneyState? ResolveJourneySavedState { get; init; }
     public required Guid? AssignedToUserId { get; init; }
     public required string[] ZendeskTickets { get; init; }
@@ -23,6 +24,7 @@ public record SupportTask
         OneLoginUserSubject = model.OneLoginUserSubject,
         PersonId = model.PersonId,
         Data = model.Data,
+        SourceApplicationUserId = model.SourceApplicationUserId,
         ResolveJourneySavedState = model.ResolveJourneySavedState,
         AssignedToUserId = model.AssignedToUserId,
         ZendeskTickets = model.ZendeskTickets,

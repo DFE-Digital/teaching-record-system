@@ -15,7 +15,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var verifiedDatesOfBirth = new[] { DateOnly.FromDateTime(Faker.Identification.DateOfBirth()) };
         var statedNationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
         var statedTrn = "0000000";
-        var clientApplicationUserId = Guid.NewGuid();
+        var clientApplicationUserId = (await TestData.CreateApplicationUserAsync()).UserId;
         var trnTokenTrn = "0000000";
 
         var options = new CreateOneLoginUserRecordMatchingSupportTaskOptions

@@ -198,6 +198,7 @@ public partial class TestData
                     TrnRequestId = trnRequestId,
                     SubjectName = subject.Name,
                     SubjectEmailAddress = subject.EmailAddress,
+                    SourceApplicationUserId = clientApplicationUserId,
                     ZendeskTickets = zendeskTickets
                 };
 

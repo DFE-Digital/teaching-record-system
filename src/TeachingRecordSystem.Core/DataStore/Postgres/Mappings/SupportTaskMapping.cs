@@ -50,5 +50,7 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
             .Property(x => x.ZendeskTickets)
             .HasColumnType("varchar[]")
             .HasDefaultValueSql("'{}'::varchar[]");
+        builder.HasOne(x => x.SourceApplicationUser).WithMany().HasForeignKey(x => x.SourceApplicationUserId);
+        builder.Property(x => x.SourceApplicationUserId).ConfigureAnalyticsSync(included: true);
     }
 }

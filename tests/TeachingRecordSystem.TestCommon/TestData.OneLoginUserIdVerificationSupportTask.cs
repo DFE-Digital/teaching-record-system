@@ -222,6 +222,7 @@ public partial class TestData
                     OneLoginUserSubject = oneLoginUserSubject,
                     SubjectName = subject.Name,
                     SubjectEmailAddress = subject.EmailAddress,
+                    SourceApplicationUserId = clientApplicationUserId,
                     ZendeskTickets = zendeskTickets
                 };
 

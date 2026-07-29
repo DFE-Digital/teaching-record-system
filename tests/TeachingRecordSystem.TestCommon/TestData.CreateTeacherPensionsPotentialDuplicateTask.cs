@@ -23,10 +23,9 @@ public partial class TestData
 
         var person = await CreatePersonAsync(x => configurePerson(x));
         var duplicatePerson1 = await CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
-        var user = await CreateUserAsync();
         var supportTask = await CreateTeacherPensionsPotentialDuplicateTaskAsync(
             person.PersonId,
-            user.UserId,
+            applicationUserId.Value,
             s =>
             {
                 s.WithMatchedPersons(duplicatePerson1.PersonId);
@@ -186,7 +185,8 @@ public partial class TestData
                 TrnRequestApplicationUserId = userId,
                 TrnRequestId = trnRequestMetadata.RequestId,
                 SubjectName = subject.Name,
-                SubjectEmailAddress = subject.EmailAddress
+                SubjectEmailAddress = subject.EmailAddress,
+                SourceApplicationUserId = userId
             };
 
             return await testData.WithDbContextAsync(async dbContext =>

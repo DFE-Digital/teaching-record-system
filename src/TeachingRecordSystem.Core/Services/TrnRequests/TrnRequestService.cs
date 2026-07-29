@@ -471,7 +471,8 @@ public class TrnRequestService(
                 PersonId = null,
                 OneLoginUserSubject = null,
                 TrnRequest = (options.TrnRequest.ApplicationUserId, options.TrnRequest.RequestId),
-                Subject = SupportTask.Subject.FromTrnRequest(options.TrnRequest)
+                Subject = SupportTask.Subject.FromTrnRequest(options.TrnRequest),
+                SourceApplicationUserId = options.TrnRequest.ApplicationUserId
             },
             processContext);
 
@@ -486,7 +487,8 @@ public class TrnRequestService(
                 PersonId = options.Person.PersonId,
                 OneLoginUserSubject = null,
                 TrnRequest = (options.TrnRequest.ApplicationUserId, options.TrnRequest.RequestId),
-                Subject = SupportTask.Subject.FromPerson(options.Person)
+                Subject = SupportTask.Subject.FromPerson(options.Person),
+                SourceApplicationUserId = options.TrnRequest.ApplicationUserId
             },
             processContext);
 
