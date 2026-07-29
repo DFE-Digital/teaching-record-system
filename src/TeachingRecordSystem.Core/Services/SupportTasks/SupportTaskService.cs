@@ -319,16 +319,31 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         }
     }
 
-    public async Task UpdateZendeskUrlsAsync(string supportTaskReference, string[] zendeskUrls, ProcessContext processContext)
+    public async Task<bool> UpdateZendeskUrlsAsync(UpdateZendeskUrlsOptions options, ProcessContext processContext)
     {
-        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(supportTaskReference);
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
+
+        var zendeskUrls = options.ZendeskUrls.ToArray();
+
+        if (zendeskUrls.SequenceEqual(supportTask.ZendeskTickets))
+        {
+            return false;
+        }
 
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
 
+        var urlsHaveBeenAdded = zendeskUrls.Except(supportTask.ZendeskTickets).Any();
+
         supportTask.UpdatedOn = processContext.Now;
-        supportTask.ZendeskTickets = zendeskUrls
-            .Where(ticket => !string.IsNullOrEmpty(ticket))
-            .ToArray();
+        supportTask.ZendeskTickets = zendeskUrls;
+
+        var changes = SupportTaskUpdatedEventChanges.ZendeskTicketUrls;
+
+        if (urlsHaveBeenAdded && supportTask.Status is SupportTaskStatus.Open)
+        {
+            supportTask.Status = SupportTaskStatus.InProgress;
+            changes |= SupportTaskUpdatedEventChanges.Status;
+        }
 
         await dbContext.SaveChangesAsync();
 
@@ -336,14 +351,16 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             new SupportTaskUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                SupportTaskReference = supportTaskReference,
-                Changes = SupportTaskUpdatedEventChanges.ZendeskTicketUrls,
+                SupportTaskReference = options.SupportTaskReference,
+                Changes = changes,
                 SupportTask = EventModels.SupportTask.FromModel(supportTask),
                 OldSupportTask = oldSupportTaskEventModel,
                 Comments = null,
                 RejectionReason = null
             },
             processContext);
+
+        return true;
     }
 }
 

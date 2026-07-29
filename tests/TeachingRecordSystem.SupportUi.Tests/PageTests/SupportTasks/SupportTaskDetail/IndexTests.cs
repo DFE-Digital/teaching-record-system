@@ -175,7 +175,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var noNotesMessage = doc.GetElementByTestId("no-notes");
         Assert.NotNull(noNotesMessage);
-        Assert.Equal("There are no notes associated with this task", noNotesMessage.TrimmedText());
+        Assert.Equal("There are no notes associated with this task.", noNotesMessage.TrimmedText());
         Assert.Null(doc.GetElementByTestId("notes"));
     }
 
