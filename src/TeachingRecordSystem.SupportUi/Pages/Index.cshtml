@@ -64,7 +64,7 @@
                             <div class="trs-task-tile__header">
                                 <span class="trs-task-tile__count" data-testid="my-tasks-count">@Model.MyTasksCount</span>
                             </div>
-                            <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: User.GetUserId(), statuses: new[] { SupportTaskStatus.Open, SupportTaskStatus.InProgress }, sortBy: null, sortDirection: null)">Tasks assigned to me</a>
+                            <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: User.GetUserId(), statuses: [SupportTaskStatus.Open, SupportTaskStatus.InProgress], sortBy: null, sortDirection: null)">Tasks assigned to me</a>
                         </div>
                     </div>
                     <div class="trs-task-panel">
@@ -73,18 +73,16 @@
                             <div class="trs-task-tile">
                                 <div class="trs-task-tile__header">
                                     <span class="trs-task-tile__count" data-testid="unassigned-task-count">@Model.UnassignedCount</span>
-
                                     <tag color="TagColor.Yellow">Unassigned</tag>
                                 </div>
-                                <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: null, statuses: new[] { SupportTaskStatus.Open, SupportTaskStatus.InProgress }, sortBy: null, sortDirection: null)">Manage unassigned tasks</a>
+                                <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: null, statuses: [SupportTaskStatus.Open, SupportTaskStatus.InProgress], sortBy: null, sortDirection: null)">Manage unassigned tasks</a>
                             </div>
                             <div class="trs-task-tile">
                                 <div class="trs-task-tile__header">
                                     <span class="trs-task-tile__count" data-testid="in-progress-tasks-count">@Model.InProgressCount</span>
-
                                     <tag color="TagColor.LightBlue">In progress</tag>
                                 </div>
-                                <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: null, statuses: new[] { SupportTaskStatus.InProgress }, sortBy: null, sortDirection: null)">Manage tasks in progress</a>
+                                <a class="govuk-link" href="@LinkGenerator.SupportTasks.Active(type: null, assignedToUserId: null, statuses: [SupportTaskStatus.InProgress], sortBy: null, sortDirection: null)">Manage tasks in progress</a>
                             </div>
                             <div class="trs-task-tile">
                                 <div class="trs-task-tile__header">
