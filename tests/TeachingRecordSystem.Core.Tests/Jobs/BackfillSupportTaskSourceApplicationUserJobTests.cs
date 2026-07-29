@@ -108,13 +108,12 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
     }
 
     [Fact]
-    public async Task ExecuteAsync_ChangeNameRequestWithCreatingProcess_SetsSourceFromProcessUser()
+    public async Task ExecuteAsync_ChangeNameRequest_SetsSourceFromAccessYourTeachingQualificationsUser()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var applicationUser = await CreateChangeRequestApplicationUserAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
 
-        await CreateCreatingProcessAsync(supportTask, ProcessType.ChangeOfNameRequestCreating, applicationUser.UserId);
         await ClearSourceApplicationUserIdAsync(supportTask);
 
         // Act
@@ -125,13 +124,12 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
     }
 
     [Fact]
-    public async Task ExecuteAsync_ChangeDateOfBirthRequestWithCreatingProcess_SetsSourceFromProcessUser()
+    public async Task ExecuteAsync_ChangeDateOfBirthRequest_SetsSourceFromAccessYourTeachingQualificationsUser()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var applicationUser = await CreateChangeRequestApplicationUserAsync();
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync();
 
-        await CreateCreatingProcessAsync(supportTask, ProcessType.ChangeOfDateOfBirthRequestCreating, applicationUser.UserId);
         await ClearSourceApplicationUserIdAsync(supportTask);
 
         // Act
@@ -142,38 +140,10 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
     }
 
     [Fact]
-    public async Task ExecuteAsync_ChangeRequestWithOnlyLegacyCreatedEvent_SetsSourceFromEventRaisedBy()
+    public async Task ExecuteAsync_ChangeRequestWithNoAccessYourTeachingQualificationsUser_IsLeftNull()
     {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
-
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(new LegacyEvents.SupportTaskCreatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = applicationUser.UserId,
-                SupportTask = EventModels.SupportTask.FromModel(supportTask)
-            });
-
-            await dbContext.SaveChangesAsync();
-        });
-
-        await ClearSourceApplicationUserIdAsync(supportTask);
-
-        // Act
-        await ExecuteJobAsync();
-
-        // Assert
-        Assert.Equal(applicationUser.UserId, await GetSourceApplicationUserIdAsync(supportTask));
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_ChangeRequestWithNoProcessOrEvent_IsLeftNull()
-    {
-        // Arrange
+        // Arrange — an application user exists, but not the one change requests come from.
+        await TestData.CreateApplicationUserAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
         await ClearSourceApplicationUserIdAsync(supportTask);
 
@@ -185,14 +155,41 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
     }
 
     [Fact]
-    public async Task ExecuteAsync_ChangeRequestCreatedByStaffUser_IsLeftNull()
+    public async Task ExecuteAsync_DuplicateAccessYourTeachingQualificationsUsers_Throws()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync();
-        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await CreateChangeRequestApplicationUserAsync();
+        await CreateChangeRequestApplicationUserAsync();
 
-        await CreateCreatingProcessAsync(supportTask, ProcessType.ChangeOfNameRequestCreating, user.UserId);
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
         await ClearSourceApplicationUserIdAsync(supportTask);
+
+        // Act
+        var exception = await Record.ExceptionAsync(() => ExecuteJobAsync());
+
+        // Assert
+        Assert.NotNull(exception);
+        Assert.IsType<InvalidOperationException>(exception);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_SourceApplicationUserNoLongerExists_IsLeftNull()
+    {
+        // Arrange — the client application user in the task's data has since been removed.
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject,
+            t => t.WithClientApplicationUserId(applicationUser.UserId));
+
+        await ClearSourceApplicationUserIdAsync(supportTask);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Remove(await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == applicationUser.UserId));
+            await dbContext.SaveChangesAsync();
+        });
 
         // Act
         await ExecuteJobAsync();
@@ -309,12 +306,11 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
     public async Task ExecuteAsync_LegacyEventCarryingTask_SetsSourceOnPayload()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var applicationUser = await CreateChangeRequestApplicationUserAsync();
         var person = await TestData.CreatePersonAsync();
         var eventId = Guid.NewGuid();
 
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(person.PersonId);
-        await CreateCreatingProcessAsync(supportTask, ProcessType.ChangeOfNameRequestCreating, applicationUser.UserId);
 
         var eventSupportTask = EventModels.SupportTask.FromModel(supportTask) with { SourceApplicationUserId = null };
 
@@ -445,16 +441,8 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
             return dbSupportTask.SourceApplicationUserId;
         });
 
-    private Task CreateCreatingProcessAsync(SupportTask supportTask, ProcessType processType, Guid userId) =>
-        TestData.CreateProcessAsync(
-            processType,
-            userId,
-            changeReason: null,
-            new SupportTaskCreatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                SupportTask = EventModels.SupportTask.FromModel(supportTask)
-            });
+    private Task<ApplicationUser> CreateChangeRequestApplicationUserAsync() =>
+        TestData.CreateApplicationUserAsync(name: "Access your teaching qualifications");
 
     private async Task<SupportTask> CreateNpqTrnRequestTaskAsync(Guid applicationUserId)
     {

@@ -22,9 +22,9 @@ namespace TeachingRecordSystem.Core.Jobs;
 /// application user is the source.</item>
 /// <item>One Login identity verification and record matching tasks keep the calling client's application user in
 /// their data.</item>
-/// <item>Change of name and date of birth requests come in through the API and don't link to a TRN request, so
-/// the source is the user recorded against the process that created them, falling back to the legacy created
-/// event for tasks that pre-date the process pipeline.</item>
+/// <item>Change of name and date of birth requests don't link to a TRN request and carry no application user of
+/// their own, but they only ever reach the API from Access your teaching qualifications, so they all take that
+/// service's application user.</item>
 /// </list>
 ///
 /// A task is only updated when the resolved user still exists and is an application user rather than a staff or
@@ -39,14 +39,8 @@ public class BackfillSupportTaskSourceApplicationUserJob(
     TrsDbContext dbContext,
     ILogger<BackfillSupportTaskSourceApplicationUserJob> logger)
 {
-    private static readonly SupportTaskType[] _changeRequestTypes =
-        [SupportTaskType.ChangeNameRequest, SupportTaskType.ChangeDateOfBirthRequest];
-
-    private static readonly ProcessType[] _changeRequestCreatingProcessTypes =
-        [ProcessType.ChangeOfNameRequestCreating, ProcessType.ChangeOfDateOfBirthRequestCreating];
-
-    // Matches the EventName stored in the events table, which is the type's own name rather than the alias.
-    private static readonly string _legacySupportTaskCreatedEventName = typeof(LegacySupportTaskCreatedEvent).Name;
+    // The only service that raises change requests, and so the source for every one of them.
+    private const string ChangeRequestApplicationUserName = "Access your teaching qualifications";
 
     // Every event that embeds a copy of the task, in each pipeline.
     private static readonly string[] _supportTaskProcessEventNames =
@@ -85,7 +79,7 @@ public class BackfillSupportTaskSourceApplicationUserJob(
                 .ToArrayAsync(cancellationToken))
             .ToHashSet();
 
-        var changeRequestCreators = await GetChangeRequestCreatorsAsync(supportTasks, cancellationToken);
+        var changeRequestApplicationUserId = await GetChangeRequestApplicationUserIdAsync(cancellationToken);
 
         // Tasks that already carry the column still have events that pre-date it, so they belong in the map too.
         var sources = (await dbContext.SupportTasks
@@ -100,7 +94,7 @@ public class BackfillSupportTaskSourceApplicationUserJob(
 
         foreach (var supportTask in supportTasks)
         {
-            var sourceApplicationUserId = GetSourceApplicationUserId(supportTask, changeRequestCreators);
+            var sourceApplicationUserId = GetSourceApplicationUserId(supportTask, changeRequestApplicationUserId);
 
             if (sourceApplicationUserId is not Guid userId || !applicationUserIds.Contains(userId))
             {
@@ -146,7 +140,7 @@ public class BackfillSupportTaskSourceApplicationUserJob(
 
     private static Guid? GetSourceApplicationUserId(
         SupportTask supportTask,
-        IReadOnlyDictionary<string, Guid> changeRequestCreators) => supportTask.SupportTaskType switch
+        Guid? changeRequestApplicationUserId) => supportTask.SupportTaskType switch
         {
             // All of these are raised off the back of a TRN request, so they inherit its application user.
             // NPQ tasks are historical — the journey's UI was removed in #3434 — but their link is the same.
@@ -162,8 +156,7 @@ public class BackfillSupportTaskSourceApplicationUserJob(
                 supportTask.GetData<OneLoginUserIdVerificationData>().ClientApplicationUserId,
 
             SupportTaskType.ChangeNameRequest or
-            SupportTaskType.ChangeDateOfBirthRequest =>
-                changeRequestCreators.TryGetValue(supportTask.SupportTaskReference, out var userId) ? userId : null,
+            SupportTaskType.ChangeDateOfBirthRequest => changeRequestApplicationUserId,
 
             var supportTaskType => throw new NotSupportedException(
                 $"Cannot derive the source application user for a support task of type '{supportTaskType}'.")
@@ -268,59 +261,30 @@ public class BackfillSupportTaskSourceApplicationUserJob(
             ? supportTask with { SourceApplicationUserId = userId }
             : null;
 
-    private async Task<IReadOnlyDictionary<string, Guid>> GetChangeRequestCreatorsAsync(
-        IReadOnlyCollection<SupportTask> supportTasks,
-        CancellationToken cancellationToken)
+    private async Task<Guid?> GetChangeRequestApplicationUserIdAsync(CancellationToken cancellationToken)
     {
-        var creators = new Dictionary<string, Guid>();
-
-        var references = supportTasks
-            .Where(t => _changeRequestTypes.Contains(t.SupportTaskType))
-            .Select(t => t.SupportTaskReference)
-            .ToHashSet();
-
-        if (references.Count == 0)
-        {
-            return creators;
-        }
-
-        // The API stamps the calling application user on the process that creates the request. There's one
-        // process per change request ever made, so match them up in memory rather than pushing the reference
-        // list into the array containment query.
-        var processes = await dbContext.Processes
-            .Where(p => _changeRequestCreatingProcessTypes.Contains(p.ProcessType))
-            .Where(p => p.UserId != null)
-            .Select(p => new { UserId = p.UserId!.Value, p.SupportTaskReferences })
+        var applicationUsers = await dbContext.ApplicationUsers
+            .IgnoreQueryFilters()
+            .Where(u => u.Name == ChangeRequestApplicationUserName)
+            .Select(u => u.UserId)
             .ToListAsync(cancellationToken);
 
-        foreach (var process in processes)
+        if (applicationUsers.Count > 1)
         {
-            foreach (var reference in process.SupportTaskReferences.Where(references.Contains))
-            {
-                creators.TryAdd(reference, process.UserId);
-            }
+            throw new InvalidOperationException(
+                $"Found {applicationUsers.Count} application users named '{ChangeRequestApplicationUserName}'; " +
+                "cannot tell which one raised the change requests.");
         }
 
-        if (references.All(creators.ContainsKey))
+        if (applicationUsers.Count == 0)
         {
-            return creators;
+            logger.LogWarning(
+                "No application user named '{ApplicationUserName}' exists, so change requests cannot be resolved.",
+                ChangeRequestApplicationUserName);
+
+            return null;
         }
 
-        // Requests made before the process pipeline only left the legacy created event behind, which records
-        // the same user. The events table has no support task column, so the payloads have to be read.
-        var legacyEvents = await dbContext.Events
-            .Where(e => e.EventName == _legacySupportTaskCreatedEventName)
-            .ToListAsync(cancellationToken);
-
-        foreach (var legacyEvent in legacyEvents)
-        {
-            if (legacyEvent.ToEventBase() is LegacySupportTaskCreatedEvent { SupportTask.SupportTaskReference: var reference, RaisedBy.UserId: Guid userId } &&
-                references.Contains(reference))
-            {
-                creators.TryAdd(reference, userId);
-            }
-        }
-
-        return creators;
+        return applicationUsers[0];
     }
 }
