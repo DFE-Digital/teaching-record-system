@@ -63,11 +63,11 @@
       },
       "DfeAnalytics.EFCore": {
         "type": "Direct",
-        "requested": "[0.6.0, )",
-        "resolved": "0.6.0",
-        "contentHash": "VdC29ratOkZHnQ6P90lG7OuUPke3ICcNnsW9FmTssfcsI6v4Zjjzq3eLUV7rTNrSCJDRzQqB6p+OTnUlV/RFrw==",
+        "requested": "[0.6.1, )",
+        "resolved": "0.6.1",
+        "contentHash": "X08WS2UGzxxdcsLdC2C//Em2VdffczXxMyUFflOFNTpOpSP3DmlD4VXa/tUnv+BK6xVdlfueKnymuar3I2TMvw==",
         "dependencies": {
-          "DfeAnalytics.Core": "0.6.0",
+          "DfeAnalytics.Core": "0.6.1",
           "Microsoft.EntityFrameworkCore": "10.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "10.0.0",
           "Microsoft.Extensions.Http": "10.0.9",
@@ -543,8 +543,8 @@
       },
       "DfeAnalytics.Core": {
         "type": "Transitive",
-        "resolved": "0.6.0",
-        "contentHash": "AjEabrPPC+Uo7uEN8LYAmMfNPoVmqkWLYoYi5qT9OQCuzvZUrHFedxvgPGfQj4AUI+fD5hCOTuMuuZVtaS0p5g==",
+        "resolved": "0.6.1",
+        "contentHash": "UCj4+Vfd1Vozjlu2oI1DNjJeFp0DNPYgiXwmTU18gtcb44a0GhYiJI1UPOoPo7vFZrLWFKhv1Fya809Ynh0erA==",
         "dependencies": {
           "Google.Apis.Auth": "1.71.0",
           "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",

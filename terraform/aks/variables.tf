@@ -56,10 +56,6 @@ variable "docker_image" {
   type = string
 }
 
-variable "run_dqt_reporting_service" {
-  type = bool
-}
-
 variable "azure_maintenance_window" { default = null }
 
 variable "api_replicas" {
@@ -164,6 +160,11 @@ variable "airbyte_environment" {
   type        = string
   default     = null
   description = "Overrides the environment name used for Airbyte. If not set, environment_name will be used"
+}
+
+variable "skip_bq_policy_tags" {
+  type    = bool
+  default = false
 }
 
 locals {
