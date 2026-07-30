@@ -56,11 +56,6 @@ variable "docker_image" {
   type = string
 }
 
-variable "deploy_dqt_reporting_server" {
-  type    = bool
-  default = false
-}
-
 variable "run_dqt_reporting_service" {
   type = bool
 }

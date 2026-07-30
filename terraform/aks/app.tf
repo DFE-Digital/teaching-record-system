@@ -174,9 +174,7 @@ module "worker_application_configuration" {
 
   config_variables = merge(local.shared_config, { app = "Worker" })
 
-  secret_variables = merge(local.shared_secrets, {
-    DqtReporting__ReportingDbConnectionString = local.reporting_db_connection_string
-  })
+  secret_variables = merge(local.shared_secrets, { app = "Worker" })
 }
 
 module "worker_application" {
