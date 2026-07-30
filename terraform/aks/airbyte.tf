@@ -28,6 +28,7 @@ module "airbyte" {
   gcp_keyring       = "trs-key-ring"
   gcp_key           = "trs-key"
   gcp_bq_sa         = module.infrastructure_secrets.map.AIRBYTE-BQ-SA
+  skip_policy_tags  = var.skip_bq_policy_tags
 
   gcp_dataset_internal = "airbyte_internal"
 
