@@ -290,6 +290,35 @@ public partial class SupportTaskSearchServiceTests
     }
 
     [Theory]
+    [InlineData(SortDirection.Ascending)]
+    [InlineData(SortDirection.Descending)]
+    public async Task SearchSupportTasksAsync_SortBySource_SortsBySourceApplicationShortNameFallingBackToName(SortDirection sortDirection)
+    {
+        // Arrange
+        // The short name is used in preference to the name, so ST2's source ("Bee application")
+        // sorts before ST1's ("Zebra") even though ST1's application user is named "Ant application".
+        var applicationUserWithShortName = await TestData.CreateApplicationUserAsync(name: "Ant application", shortName: "Zebra");
+        var applicationUserWithoutShortName = await TestData.CreateApplicationUserAsync(name: "Bee application", shortName: null);
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+                .WithCreatedOn(new DateTime(2025, 1, 20))
+                .WithSourceApplicationUserId(applicationUserWithShortName.UserId)),
+            ["ST2"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+                .WithCreatedOn(new DateTime(2025, 1, 21))
+                .WithSourceApplicationUserId(applicationUserWithoutShortName.UserId)),
+        };
+
+        // Act
+        var result = await SearchSupportTasksAsync(sortBy: SupportTasksSortByOption.Source, sortDirection: sortDirection);
+
+        // Assert
+        Assert.Equal(2, result.SearchResults.TotalItemCount);
+        Assert.Equal(sortDirection == SortDirection.Ascending ? ["ST2", "ST1"] : ["ST1", "ST2"],
+            tasks.GetKeysFor(result.SearchResults));
+    }
+
+    [Theory]
     [InlineData(null, new[] { "ST1", "ST2" })]
     [InlineData(0, new[] { "ST1", "ST2" })]
     [InlineData(1, new[] { "ST1", "ST2" })]

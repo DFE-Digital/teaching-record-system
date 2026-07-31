@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi;
 
 public static class PageModelExtensions
 {
-    public static string GetReturnUrlOrDefault(this PageModel pageModel, string defaultReturnUrl)
+    public static string? GetReturnUrl(this PageModel pageModel)
     {
         var returnUrl = pageModel.Request.Query["returnUrl"].ToString();
 
@@ -13,8 +13,11 @@ public static class PageModelExtensions
             return returnUrl;
         }
 
-        return defaultReturnUrl;
+        return null;
     }
+
+    public static string GetReturnUrlOrDefault(this PageModel pageModel, string defaultReturnUrl) =>
+        pageModel.GetReturnUrl() ?? defaultReturnUrl;
 
     public static PageResult PageWithErrors(this PageModel pageModel) => new PageResult() { StatusCode = StatusCodes.Status400BadRequest };
 

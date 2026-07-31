@@ -175,6 +175,39 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_ValidContentWithReturnUrl_RedirectsToDetailWithReturnUrlPreserved()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync();
+        var returnUrl = "/support-tasks/active?sortBy=Source";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/{supportTask.SupportTask.SupportTaskReference}/notes/add?returnUrl={Uri.EscapeDataString(returnUrl)}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Content", Faker.Lorem.Paragraph() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var location = response.Headers.Location?.OriginalString;
+        Assert.NotNull(location);
+        Assert.Contains("xpandNotes=True", location);
+        Assert.Contains($"returnUrl={Uri.EscapeDataString(returnUrl)}", location);
+
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        Assert.Equal(returnUrl, nextPageDoc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+    }
+
+    [Fact]
     public async Task Post_MaxLengthContent_CreatesNoteSuccessfully()
     {
         // Arrange

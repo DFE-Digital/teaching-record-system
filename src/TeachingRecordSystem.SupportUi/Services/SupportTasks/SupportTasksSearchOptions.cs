@@ -14,7 +14,8 @@ public enum SupportTasksSortByOption
     TaskType,
     Status,
     AssignedTo,
-    RequestedOn
+    RequestedOn,
+    Source
 }
 
 public record CompletedTasksSearchOptions(
@@ -30,5 +31,6 @@ public enum CompletedTasksSortByOption
     CompletedOn,
     TaskType,
     Outcome,
-    CompletedBy
+    CompletedBy,
+    Source
 }

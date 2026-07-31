@@ -34,6 +34,9 @@ public class SupportTasksLinkGenerator(LinkGenerator linkGenerator)
 
     public string Completed() => linkGenerator.GetRequiredPathByPage("/SupportTasks/Completed");
 
+    public string Completed(string? search) =>
+        Completed(search, null, null, null, null);
+
     public string Completed(
         string? search,
         SupportTaskType? type,

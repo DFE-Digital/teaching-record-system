@@ -130,7 +130,7 @@ else
                     hx-push-url="true">
                     Requested on
                 </th>
-                <th scope="col" class="govuk-table__header trs-!-width-180"
+                <th scope="col" class="govuk-table__header trs-!-width-150"
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.TaskType ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.TaskType, direction))"
                     use-htmx="true"
@@ -159,6 +159,16 @@ else
                     hx-swap="outerHTML"
                     hx-push-url="true">
                     Assigned to
+                </th>
+                <th scope="col" class="govuk-table__header trs-!-width-90"
+                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.Source ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Source, direction))"
+                    use-htmx="true"
+                    hx-select="main"
+                    hx-target="main"
+                    hx-swap="outerHTML"
+                    hx-push-url="true">
+                    Source
                 </th>
                 <th scope="col" class="govuk-table__header trs-!-width-100">
                     Action
@@ -194,20 +204,23 @@ else
                             <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
                         </a>
                     </td>
-                    <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateDisplayFormat)</td>
-                    <td class="govuk-table__cell">
-                        @result.SupportTaskType.GetTitle()
-
-                        @if (result.SourceApplicationName is not null)
-                        {
-                            <text>(@result.SourceApplicationName)</text>
-                        }
-                    </td>
+                    <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateShortDisplayFormat)</td>
+                    <td class="govuk-table__cell">@result.SupportTaskType.GetTitle()</td>
                     <td class="govuk-table__cell" data-testid="status">
                         <support-task-status-tag status="@result.Status"/>
                     </td>
                     <td class="govuk-table__cell" data-testid="assigned-to" use-empty-fallback="Unassigned">
                         @(result.AssignedToUserId == Model.CurrentUserId ? "Myself" : result.AssignedToName)
+                    </td>
+                    <td class="govuk-table__cell" data-testid="source">
+                        @if (result.SourceApplicationName is not null)
+                        {
+                            <tag>@result.SourceApplicationName</tag>
+                        }
+                        else
+                        {
+                            <span use-empty-fallback="Not applicable"></span>
+                        }
                     </td>
                     <td class="govuk-table__cell">
                         <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference, returnUrl: returnUrl)"

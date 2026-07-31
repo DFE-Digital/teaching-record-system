@@ -68,6 +68,7 @@ public class Completed(SupportTaskSearchService searchService, SupportTaskServic
             CompletedTasksSortByOption.TaskType => "type",
             CompletedTasksSortByOption.Outcome => "outcome",
             CompletedTasksSortByOption.CompletedBy => "completed by",
+            CompletedTasksSortByOption.Source => "source",
             _ => throw new NotSupportedException($"Unknown sortBy value: '{sortBy}'.")
         };
 

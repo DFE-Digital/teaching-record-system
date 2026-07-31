@@ -61,7 +61,10 @@ public class ZendeskTickets(
             TempData.SetFlashNotificationBanner("Zendesk tickets updated");
         }
 
-        return Redirect(BackLink!);
+        return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(
+            SupportTaskReference,
+            expandZendeskTickets: true,
+            returnUrl: this.GetReturnUrl()));
     }
 
     public IActionResult OnPostRemoveTicket(int index)

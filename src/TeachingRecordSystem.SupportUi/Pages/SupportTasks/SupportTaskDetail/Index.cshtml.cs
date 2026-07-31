@@ -55,6 +55,9 @@ public class Index(
     [FromQuery]
     public bool ExpandNotes { get; set; }
 
+    [FromQuery]
+    public bool ExpandZendeskTickets { get; set; }
+
     public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
     public Guid UnassignedUserId => SupportTaskSearchService.UnassignedUserId;
