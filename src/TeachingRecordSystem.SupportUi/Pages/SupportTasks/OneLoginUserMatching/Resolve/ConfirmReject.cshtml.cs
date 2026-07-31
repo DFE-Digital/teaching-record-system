@@ -11,8 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 public class ConfirmReject(
     ResolveOneLoginUserMatchingJourneyCoordinator journey,
     OneLoginUserMatchingSupportTaskService supportTaskService,
-    TimeProvider timeProvider,
-    SupportUiLinkGenerator linkGenerator) : PageModel
+    TimeProvider timeProvider) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -41,7 +40,7 @@ public class ConfirmReject(
         {
             journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
+            return Redirect(journey.State.CompletionUrl);
         }
 
         var processContext = new ProcessContext(ProcessType.OneLoginUserIdVerificationSupportTaskCompleting, timeProvider.UtcNow, User.GetUserId());
@@ -63,7 +62,7 @@ public class ConfirmReject(
             $"Request closed for {data.StatedFirstName} {data.StatedLastName}. We’ve sent them an email confirming we could not verify their identity.",
             notificationBannerType: NotificationBannerType.Default);
 
-        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
+        return Redirect(journey.State.CompletionUrl);
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

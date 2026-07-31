@@ -48,7 +48,7 @@ public class VerifyModel(
         {
             journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
+            return Redirect(journey.State.CompletionUrl);
         }
 
         await _validator.ValidateAndThrowAsync(this);
@@ -66,7 +66,7 @@ public class VerifyModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        BackLink = journey.GetBackLink() ?? linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification();
+        BackLink = journey.GetBackLink() ?? journey.State.CompletionUrl;
 
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var oneLoginUser = supportTask.OneLoginUser!;
