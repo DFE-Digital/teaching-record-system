@@ -76,6 +76,7 @@ public class Active(SupportTaskSearchService searchService, SupportTaskService s
             SupportTasksSortByOption.Status => "status",
             SupportTasksSortByOption.AssignedTo => "assigned to",
             SupportTasksSortByOption.RequestedOn => "requested on",
+            SupportTasksSortByOption.Source => "source",
             _ => throw new NotSupportedException($"Unknown sortBy value: '{sortBy}'.")
         };
 

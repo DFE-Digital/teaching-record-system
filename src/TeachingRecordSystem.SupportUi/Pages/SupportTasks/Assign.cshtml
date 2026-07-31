@@ -23,6 +23,8 @@
             <th scope="col" class="govuk-table__header trs-!-width-180">Type</th>
             <th scope="col" class="govuk-table__header trs-!-width-120">Status</th>
             <th scope="col" class="govuk-table__header trs-!-width-150">Assigned to</th>
+            <th scope="col" class="govuk-table__header trs-!-width-90">Source</th>
+            <th scope="col" class="govuk-table__header trs-!-width-100">Action</th>
         </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -35,12 +37,27 @@
                         <span class="trs-task-link__reference" data-testid="task-reference">@task.SupportTaskReference</span>
                     </a>
                 </th>
-                <td class="govuk-table__cell">@task.CreatedOn.ToGmt().ToString(DateDisplayFormat)</td>
+                <td class="govuk-table__cell">@task.CreatedOn.ToGmt().ToString(DateShortDisplayFormat)</td>
                 <td class="govuk-table__cell">@task.Type.GetTitle()</td>
                 <td class="govuk-table__cell">
                     <support-task-status-tag status="@task.Status"/>
                 </td>
-                <td class="govuk-table__cell" use-empty-fallback="Unassigned">@task.AssignedTo</td>
+                <td class="govuk-table__cell">
+                    @if (task.SourceApplicationName is not null)
+                    {
+                        <tag>@task.SourceApplicationName</tag>
+                    }
+                    else
+                    {
+                        <span use-empty-fallback="Not applicable"></span>
+                    }
+                </td>
+                <td class="govuk-table__cell" use-empty-fallback="Unassigned">@task.AssignedTo</td><td class="govuk-table__cell">
+                    <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(@task.SupportTaskReference, returnUrl: returnUrl)"
+                       class="govuk-link">
+                        Manage
+                    </a>
+                </td>
             </tr>
         }
     </tbody>

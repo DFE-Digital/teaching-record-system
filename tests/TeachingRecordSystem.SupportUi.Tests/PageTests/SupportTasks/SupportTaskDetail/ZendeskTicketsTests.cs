@@ -139,6 +139,10 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         // Assert
         AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Zendesk tickets updated");
 
+        var details = redirectDoc.GetElementByTestId("zendesk-tickets");
+        Assert.NotNull(details);
+        Assert.True(details.HasAttribute("open"));
+
         var updatedSupportTask = await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.SingleAsync(
                 t => t.SupportTaskReference == supportTask.SupportTask.SupportTaskReference));
@@ -159,6 +163,39 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
                 Assert.Contains(ticketUrl2, supportTaskZendeskEvent.SupportTask.ZendeskTickets);
             });
         });
+    }
+
+    [Fact]
+    public async Task Post_ValidTicketsWithReturnUrl_RedirectsToDetailWithReturnUrlPreserved()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateTrnRequestSupportTaskAsync();
+        var returnUrl = "/support-tasks/active?sortBy=Source";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/{supportTask.SupportTask.SupportTaskReference}/zendesk-tickets?returnUrl={Uri.EscapeDataString(returnUrl)}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "TicketUrls", "https://example.zendesk.com/agent/tickets/123" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var location = response.Headers.Location?.OriginalString;
+        Assert.NotNull(location);
+        Assert.Contains("xpandZendeskTickets=True", location);
+        Assert.Contains($"returnUrl={Uri.EscapeDataString(returnUrl)}", location);
+
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
+        Assert.Equal(returnUrl, redirectDoc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 
     [Fact]

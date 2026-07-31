@@ -76,7 +76,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             TrnRequestsSortByOption.Email => tasks
                 .OrderBy(t => t.TrnRequest.EmailAddress, sortDirection),
             TrnRequestsSortByOption.Source => tasks
-                .OrderBy(t => t.TrnRequest.ApplicationUser!.Name, sortDirection),
+                .OrderBy(t => t.ApplicationUser.ShortName ?? t.ApplicationUser.Name, sortDirection),
             _ => tasks
                 .OrderBy(t => t.Task.CreatedOn, sortDirection)
         };
@@ -222,7 +222,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             TrnRequestManualChecksSortByOption.DateOfBirth => tasks
                 .OrderBy(t => t.Task.TrnRequestMetadata!.DateOfBirth, sortDirection),
             TrnRequestManualChecksSortByOption.Source => tasks
-                .OrderBy(t => t.Task.TrnRequestMetadata!.ApplicationUser!.Name, sortDirection),
+                .OrderBy(t => t.Task.TrnRequestMetadata!.ApplicationUser!.ShortName ?? t.Task.TrnRequestMetadata!.ApplicationUser!.Name, sortDirection),
             _ => tasks
                 .OrderBy(t => t.Task.CreatedOn, sortDirection),
         };
@@ -519,6 +519,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 .OrderBy(t => t.AssignedTo!.Name, sortDirection),
             SupportTasksSortByOption.RequestedOn => tasks
                 .OrderBy(t => t.CreatedOn, sortDirection),
+            SupportTasksSortByOption.Source => tasks
+                .OrderBy(t => t.SourceApplicationUser!.ShortName ?? t.SourceApplicationUser!.Name, sortDirection),
             _ => tasks
                 .OrderBy(t => t.SupportTaskReference, sortDirection)
         };
@@ -643,6 +645,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 .OrderBy(t => t.CompletedBy!.Name, sortDirection),
             CompletedTasksSortByOption.CompletedOn => tasks
                 .OrderBy(t => t.CompletedOn, sortDirection),
+            CompletedTasksSortByOption.Source => tasks
+                .OrderBy(t => t.SourceApplicationUser!.ShortName ?? t.SourceApplicationUser!.Name, sortDirection),
             _ => tasks
                 .OrderBy(t => t.CompletedOn, sortDirection)
         };

@@ -86,7 +86,15 @@ public class Assign(
                 $"select * from support_tasks where support_task_reference = any({SupportTaskReferences}) and deleted_on is null for update")
             .Where(t => t.IsOutstanding)  // Exclude any tasks that may have been Completed since the initial selection
             .OrderBy(t => t.CreatedOn)
-            .Select(t => new TaskInfo(t.SupportTaskReference, t.CreatedOn, t.SubjectName, t.SubjectEmailAddress, t.AssignedTo != null ? t.AssignedTo.Name : null, t.SupportTaskType, t.Status))
+            .Select(t => new TaskInfo(
+                t.SupportTaskReference,
+                t.CreatedOn,
+                t.SubjectName,
+                t.SubjectEmailAddress,
+                t.AssignedTo != null ? t.AssignedTo.Name : null,
+                t.SupportTaskType,
+                t.Status,
+                t.SourceApplicationUser!.ShortName ?? t.SourceApplicationUser.Name))
             .ToArrayAsync();
 
         // Re-order so that tasks are in the order they were specified in
@@ -114,7 +122,8 @@ public class Assign(
         string? SubjectEmailAddress,
         string? AssignedTo,
         SupportTaskType Type,
-        SupportTaskStatus Status)
+        SupportTaskStatus Status,
+        string? SourceApplicationName)
     {
         public string Subject => (SubjectName ?? SubjectEmailAddress)!;
     }

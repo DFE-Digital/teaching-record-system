@@ -84,41 +84,39 @@
                         }
                         @if (!HttpContext.Request.IsHtmx())
                         {
-                            <noscript>
-                                <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell">
-                                        <govuk-input
-                                            data-testid="zendesk-ticket-new"
-                                            name="TicketUrls"
-                                            type="url"
-                                            class="trs-zendesk-links-table__link-input"
-                                            input-class="govuk-!-width-full">
-                                            <govuk-input-label class="govuk-label--s govuk-visually-hidden">
-                                                Zendesk URL
-                                            </govuk-input-label>
-                                        </govuk-input>
-                                    </td>
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
+                                    <govuk-input
+                                        data-testid="zendesk-ticket-new"
+                                        name="TicketUrls"
+                                        type="url"
+                                        class="trs-zendesk-links-table__link-input"
+                                        input-class="govuk-!-width-full">
+                                        <govuk-input-label class="govuk-label--s govuk-visually-hidden">
+                                            Zendesk URL
+                                        </govuk-input-label>
+                                    </govuk-input>
+                                </td>
 
-                                    <td class="govuk-table__cell">
-                                        <div class="trs-zendesk-links-table__actions-container">
-                                            <div class="trs-zendesk-links-table__actions">
-                                                <govuk-button
-                                                    type="button"
-                                                    class="govuk-button--secondary trs-requires-js"
-                                                    hx-post
-                                                    hx-page-handler="RemoveTicket"
-                                                    hx-route-index="@Model.TicketUrls.Count"
-                                                    hx-include="closest form"
-                                                    hx-target="main"
-                                                    hx-select="main"
-                                                    hx-swap="outerHTML">
-                                                    Remove
-                                                </govuk-button>
-                                            </div>
+                                <td class="govuk-table__cell">
+                                    <div class="trs-zendesk-links-table__actions-container">
+                                        <div class="trs-zendesk-links-table__actions">
+                                            <govuk-button
+                                                type="button"
+                                                class="govuk-button--secondary trs-requires-js"
+                                                hx-post
+                                                hx-page-handler="RemoveTicket"
+                                                hx-route-index="@Model.TicketUrls.Count"
+                                                hx-include="closest form"
+                                                hx-target="main"
+                                                hx-select="main"
+                                                hx-swap="outerHTML">
+                                                Remove
+                                            </govuk-button>
                                         </div>
-                                    </td>
-                                </tr>
-                            </noscript>
+                                    </div>
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -132,7 +130,7 @@
                         hx-target="#zendesk-tickets-container tbody"
                         hx-select="#zendesk-tickets-container tbody tr:last-child"
                         hx-swap="beforeend">
-                        Add another
+                        Add ticket
                     </govuk-button>
                 </div>
             </div>

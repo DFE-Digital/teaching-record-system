@@ -204,6 +204,28 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
+    public async Task Get_ExpandZendeskTicketsQueryParameter_ControlsWhetherZendeskTicketsAreExpanded(bool expandZendeskTickets)
+    {
+        // Arrange
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+            .WithZendeskTickets("https://becomingateacher.zendesk.com/agent/tickets/123"));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}?ExpandZendeskTickets={expandZendeskTickets}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var details = doc.GetElementByTestId("zendesk-tickets");
+        Assert.NotNull(details);
+        Assert.Equal(expandZendeskTickets, details.HasAttribute("open"));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Get_ExpandNotesQueryParameter_WithNoNotes_DisplaysNoNotesMessage(bool expandNotes)
     {
         // Arrange

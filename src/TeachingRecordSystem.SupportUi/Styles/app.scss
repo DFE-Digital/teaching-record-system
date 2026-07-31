@@ -2,7 +2,8 @@
 @use "govuk-frontend-aspnetcore";
 @use "govuk-frontend" as * with (
   $govuk-font-url-function: meta.get-function("versioned-font-url", $module: "govuk-frontend-aspnetcore"),
-  $govuk-image-url-function: meta.get-function("versioned-image-url", $module: "govuk-frontend-aspnetcore")
+  $govuk-image-url-function: meta.get-function("versioned-image-url", $module: "govuk-frontend-aspnetcore"),
+  $govuk-page-width: 1020px
 );
 
 .autocomplete__option {
@@ -407,6 +408,26 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   column-gap: 15px;
+}
+
+.trs-task-tile {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  @include govuk-typography-common;
+
+  &:focus {
+    @include govuk-focused-text;
+  }
+
+  &__link {
+    color: $govuk-link-colour;
+    @include govuk-link-decoration;
+
+    :hover > & {
+      @include govuk-link-hover-decoration;
+    }
+  }
 }
 
 .trs-task-tile__header {

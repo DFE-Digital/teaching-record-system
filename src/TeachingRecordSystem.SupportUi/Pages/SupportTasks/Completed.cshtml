@@ -18,7 +18,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form method="get" asp-antiforgery="false" data-testid="search-form">
-            <govuk-input for="Search" label-class="govuk-label--m" data-testid="search-input" type="search">
+            <govuk-input for="Search" label-class="govuk-label--m" data-testid="search-input" type="search" input-hx-preserve="true">
                 <govuk-input-label>Search completed tasks</govuk-input-label>
                 <govuk-input-hint>
                     Enter a name, task ID, email address or completion date
@@ -27,6 +27,11 @@
                     <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
                 </govuk-input-after-input>
             </govuk-input>
+
+            <input type="hidden" asp-for="Type" />
+            <input type="hidden" asp-for="CompletedByUserId" />
+            <input type="hidden" asp-for="SortDirection" />
+            <input type="hidden" asp-for="SortBy" />
         </form>
     </div>
 </div>
@@ -83,13 +88,13 @@
                         <noscript class="trs-display-flex">
                             <govuk-button type="submit">Apply filters</govuk-button>
                         </noscript>
-                        <a href="@LinkGenerator.SupportTasks.Completed()"
-                           hx-get="@LinkGenerator.SupportTasks.Completed()"
+                        <a href="@LinkGenerator.SupportTasks.Completed(search: Model.Search)"
+                           hx-get="@LinkGenerator.SupportTasks.Completed(search: Model.Search)"
                            hx-select="main"
                            hx-target="main"
                            hx-swap="outerHTML"
                            hx-push-url="true"
-                           class="govuk-link">
+                           class="govuk-link govuk-link--no-visited-state">
                             Clear all
                         </a>
                     </div>
@@ -143,6 +148,16 @@
                             hx-push-url="true">
                             Type
                         </th>
+                        <th scope="col" class="govuk-table__header trs-!-width-90"
+                            sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Source ? Model.SortDirection : null)"
+                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Source, direction))"
+                            use-htmx="true"
+                            hx-select="main"
+                            hx-target="main"
+                            hx-swap="outerHTML"
+                            hx-push-url="true">
+                            Source
+                        </th>
                         <th scope="col" class="govuk-table__header trs-!-width-180"
                             sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Outcome ? Model.SortDirection : null)"
                             link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Outcome, direction))"
@@ -153,7 +168,7 @@
                             hx-push-url="true">
                             Outcome
                         </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-130"
+                        <th scope="col" class="govuk-table__header trs-!-width-150"
                             sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedBy ? Model.SortDirection : null)"
                             link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedBy, direction))"
                             use-htmx="true"
@@ -176,16 +191,19 @@
                                 </a>
                             </td>
                             <td class="govuk-table__cell" data-testid="completed-on">@result.CompletedOn.ToString(WebConstants.DateDisplayFormat)</td>
-                            <td class="govuk-table__cell" data-testid="task-type">
-                                @result.SupportTaskType.GetTitle()
-
+                            <td class="govuk-table__cell" data-testid="task-type">@result.SupportTaskType.GetTitle()</td>
+                            <td class="govuk-table__cell" data-testid="source">
                                 @if (result.SourceApplicationName is not null)
                                 {
-                                    <text>(@result.SourceApplicationName)</text>
+                                    <tag>@result.SourceApplicationName</tag>
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback="Not applicable"></span>
                                 }
                             </td>
                             <td class="govuk-table__cell" data-testid="outcome">
-                                @result.Outcome.GetDisplayName()
+                                <tag class="trs-!-max-width-none">@result.Outcome.GetDisplayName()</tag>
                             </td>
                             <td class="govuk-table__cell" data-testid="completed-by" use-empty-fallback="Not set">
                                 @result.CompletedByName

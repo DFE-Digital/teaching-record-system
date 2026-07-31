@@ -74,7 +74,8 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("Alice The Apple", row.GetElementByTestId("subject")!.TrimmedText());
         Assert.Equal(supportTask.SupportTaskReference, row.GetElementByTestId("task-reference")!.TrimmedText());
         Assert.Equal(new DateTime(2025, 1, 25).ToString(WebConstants.DateDisplayFormat), row.GetElementByTestId("completed-on")!.TrimmedText());
-        Assert.Equal("Change name request (Source App)", row.GetElementByTestId("task-type")!.GetTextContentWithNormalizedWhitespace());
+        Assert.Equal("Change name request", row.GetElementByTestId("task-type")!.TrimmedText());
+        Assert.Equal("Source App", row.GetElementByTestId("source")!.TrimmedText());
         Assert.Equal("Approved", row.GetElementByTestId("outcome")!.TrimmedText());
         Assert.Equal("Reviewer One", row.GetElementByTestId("completed-by")!.TrimmedText());
     }
@@ -269,6 +270,41 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/completed?sortBy={CompletedTasksSortByOption.Outcome}&sortDirection={sortDirection}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
+    }
+
+    [Theory]
+    [InlineData(SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(SortDirection.Descending, new[] { "ST1", "ST2" })]
+    public async Task Get_SortBySource_ShowsTasksInSourceApplicationShortNameOrder(SortDirection sortDirection, string[] expectedTaskKeys)
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync();
+        var zebraApplicationUser = await TestData.CreateApplicationUserAsync(name: "Ant application", shortName: "Zebra");
+        var antApplicationUser = await TestData.CreateApplicationUserAsync(name: "Zebra application", shortName: "Ant");
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+                .WithCreatedOn(new DateTime(2025, 1, 20))
+                .WithStatus(SupportTaskStatus.Closed)
+                .WithSourceApplicationUserId(zebraApplicationUser.UserId)),
+            ["ST2"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+                .WithCreatedOn(new DateTime(2025, 1, 21))
+                .WithStatus(SupportTaskStatus.Closed)
+                .WithSourceApplicationUserId(antApplicationUser.UserId)),
+        };
+
+        await SetCompletedTaskPropertiesAsync(tasks["ST1"], user.UserId, new DateTime(2025, 1, 25), SupportTaskOutcome.ChangeNameRequest_Approved);
+        await SetCompletedTaskPropertiesAsync(tasks["ST2"], user.UserId, new DateTime(2025, 1, 26), SupportTaskOutcome.ChangeNameRequest_Approved);
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/completed?sortBy={CompletedTasksSortByOption.Source}&sortDirection={sortDirection}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

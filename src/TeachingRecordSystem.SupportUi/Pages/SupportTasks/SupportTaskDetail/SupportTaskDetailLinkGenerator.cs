@@ -2,10 +2,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
 
 public class SupportTaskDetailLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(string supportTaskReference, bool? expandNotes = null, string? returnUrl = null) =>
+    public string Index(string supportTaskReference, bool? expandNotes = null, bool? expandZendeskTickets = null, string? returnUrl = null) =>
         linkGenerator.GetRequiredPathByPage(
             "/SupportTasks/SupportTaskDetail/Index",
-            routeValues: new { supportTaskReference, expandNotes, returnUrl });
+            routeValues: new { supportTaskReference, expandNotes, expandZendeskTickets, returnUrl });
 
     public string Events(string supportTaskReference) =>
         linkGenerator.GetRequiredPathByPage(

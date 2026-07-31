@@ -1,4 +1,5 @@
 @page "/support-tasks/{supportTaskReference}"
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @using Microsoft.AspNetCore.Html
 @using Microsoft.AspNetCore.Http.Extensions
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail.Index
@@ -15,12 +16,24 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
-            <span class="govuk-caption-m">Manage task</span>
+            @if (Model.IsOutstanding)
+            {
+                <span class="govuk-caption-m">Manage task</span>
 
-            <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
-                @Model.Subject<br/>
-                @Model.SupportTaskReference
-            </h1>
+                <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
+                    @Model.Subject<br/>
+                    @Model.SupportTaskReference
+                </h1>
+            }
+            else
+            {
+                <span class="govuk-caption-m">@Model.SupportTaskType.GetTitle()</span>
+                <span class="govuk-caption-m">@Model.SupportTaskReference</span>
+
+                <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
+                    @Model.Subject
+                </h1>
+            }
 
             @{
                 var linksBuilder = new HtmlContentBuilder();
@@ -94,7 +107,7 @@
 
             @if (Model.Notes!.Count == 0)
             {
-                <p class="govuk-body" data-testid="no-notes">There are no notes associated with this task.</p>
+                <p class="govuk-body trs-empty-fallback" data-testid="no-notes">There are no notes associated with this task.</p>
             }
             else
             {
@@ -126,23 +139,50 @@
 
             @if (Model.ZendeskTickets!.Count == 0)
             {
-                <p class="govuk-body">No Zendesk tickets have been added yet.</p>
+                <p class="govuk-body trs-empty-fallback">No Zendesk tickets have been added yet.</p>
             }
             else
             {
-                <govuk-details>
+                <govuk-details open="@Model.ExpandZendeskTickets" data-testid="zendesk-tickets">
                     <govuk-details-summary>View tickets</govuk-details-summary>
                     <govuk-details-text>
-                        <ul class="govuk-list">
-                            @foreach (var ticket in Model.ZendeskTickets)
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th scope="col" class="govuk-table__header govuk-!-width-one-half">
+                                    Link to ticket
+                                </th>
+                                <th scope="col" class="govuk-table__header">
+                                    Action
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                            @foreach (var ticketUrl in Model.ZendeskTickets)
                             {
-                                <li>
-                                    <a href="@ticket" target="_blank" class="govuk-link" rel="noopener noreferrer">
-                                        @Index.GetZendeskTicketDisplayText(ticket)
-                                    </a>
-                                </li>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">@Index.GetZendeskTicketDisplayText(ticketUrl)</td>
+                                    <td class="govuk-table__cell">
+                                        <div class="govuk-button-group govuk-!-margin-bottom-0">
+                                            <govuk-button type="button"
+                                                          class="govuk-button--secondary trs-requires-js govuk-!-margin-bottom-0"
+                                                          data-clipboard-text="@ticketUrl">
+                                                Copy to clipboard
+                                            </govuk-button>
+
+                                            <a
+                                                href="@ticketUrl"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="govuk-link">
+                                                View ticket (opens in new tab)
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
                             }
-                        </ul>
+                            </tbody>
+                        </table>
                     </govuk-details-text>
                 </govuk-details>
             }
@@ -153,16 +193,19 @@
             </govuk-button-link>
         </div>
 
-        <div class="govuk-grid-column-full trs-task-detail__section">
-            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">History</h2>
+        @if (FeatureProvider.IsEnabled("SupportTaskDashboard"))
+        {
+            <div class="govuk-grid-column-full trs-task-detail__section">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-2">History</h2>
 
-            <govuk-details>
-                <govuk-details-summary>View activity</govuk-details-summary>
-                <govuk-details-text>
-                    TODO
-                </govuk-details-text>
-            </govuk-details>
-        </div>
+                <govuk-details>
+                    <govuk-details-summary>View activity</govuk-details-summary>
+                    <govuk-details-text>
+                        TODO
+                    </govuk-details-text>
+                </govuk-details>
+            </div>
+        }
     }
     else
     {
@@ -173,7 +216,7 @@
                 <row>
                     <key>Outcome</key>
                     <value>
-                        <govuk-tag class="govuk-tag--green trs-!-max-width-none">@Model.Outcome?.GetDisplayName()</govuk-tag>
+                        <tag class="trs-!-max-width-none">@Model.Outcome?.GetDisplayName()</tag>
                     </value>
                 </row>
                 <row>
@@ -212,10 +255,44 @@
                 </row>
             </govuk-summary-list>
 
-            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Task history</h2>
+            @if (FeatureProvider.IsEnabled("SupportTaskDashboard"))
+            {
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Task history</h2>
 
-            <div class="moj-timeline">
-            </div>
+                <div class="moj-timeline">
+                </div>
+            }
+            else
+            {
+                @if (Model.Notes!.Count == 0)
+                {
+                    <p class="govuk-body trs-empty-fallback" data-testid="no-notes">There are no notes associated with this task.</p>
+                }
+                else
+                {
+                    <div class="moj-timeline">
+                        @foreach (var note in Model.Notes!)
+                        {
+                            <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn.ToGmt()">
+                                @note.Content
+                            </timeline-entry>
+                        }
+                    </div>
+                }
+            }
         </div>
     }
 </div>
+
+@section Scripts {
+    <script type="text/javascript" asp-add-nonce="true">
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-clipboard-text]').forEach((element) => {
+                element.addEventListener('click', (e) => {
+                    var text = e.target.getAttribute('data-clipboard-text');
+                    navigator.clipboard.writeText(text);
+                })
+            });
+        });
+    </script>
+}

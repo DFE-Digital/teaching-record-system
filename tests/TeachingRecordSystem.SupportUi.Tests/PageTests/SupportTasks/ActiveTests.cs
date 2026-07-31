@@ -48,10 +48,12 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var user = await TestData.CreateUserAsync(name: "Reviewer One");
+        var applicationUser = await TestData.CreateApplicationUserAsync(shortName: "Source App");
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             configure: r => r
                 .WithCreatedOn(new DateTime(2025, 1, 20))
-                .WithStatus(SupportTaskStatus.InProgress),
+                .WithStatus(SupportTaskStatus.InProgress)
+                .WithSourceApplicationUserId(applicationUser.UserId),
             configurePerson: p => p
                 .WithFirstName("Alice")
                 .WithMiddleName("The")
@@ -70,9 +72,10 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(row);
         Assert.Equal("Alice The Apple", row.GetElementByTestId("task-name")!.TrimmedText());
         Assert.Equal(supportTask.SupportTaskReference, row.GetElementByTestId("task-reference")!.TrimmedText());
-        Assert.Equal(new DateTime(2025, 1, 20).ToString(WebConstants.DateDisplayFormat), row.GetElementByTestId("requested-on")!.TrimmedText());
+        Assert.Equal(new DateTime(2025, 1, 20).ToString(WebConstants.DateShortDisplayFormat), row.GetElementByTestId("requested-on")!.TrimmedText());
         Assert.Equal("In progress", row.GetElementByTestId("status")!.TrimmedText());
         Assert.Equal("Reviewer One", row.GetElementByTestId("assigned-to")!.TrimmedText());
+        Assert.Equal("Source App", row.GetElementByTestId("source")!.TrimmedText());
     }
 
     [Fact]
@@ -350,6 +353,35 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Get,
             $"/support-tasks/active?sortBy={SupportTasksSortByOption.Subject}&sortDirection={sortDirection}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
+    }
+
+    [Theory]
+    [InlineData(SortDirection.Ascending, new[] { "ST2", "ST1" })]
+    [InlineData(SortDirection.Descending, new[] { "ST1", "ST2" })]
+    public async Task Get_SortBySource_ShowsTasksInSourceApplicationShortNameOrder(SortDirection sortDirection, string[] expectedTaskKeys)
+    {
+        // Arrange
+        var zebraApplicationUser = await TestData.CreateApplicationUserAsync(name: "Ant application", shortName: "Zebra");
+        var antApplicationUser = await TestData.CreateApplicationUserAsync(name: "Zebra application", shortName: "Ant");
+        var tasks = new SupportTaskLookup
+        {
+            ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+                .WithCreatedOn(new DateTime(2025, 1, 20))
+                .WithSourceApplicationUserId(zebraApplicationUser.UserId)),
+            ["ST2"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+                .WithCreatedOn(new DateTime(2025, 1, 21))
+                .WithSourceApplicationUserId(antApplicationUser.UserId)),
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/support-tasks/active?sortBy={SupportTasksSortByOption.Source}&sortDirection={sortDirection}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
