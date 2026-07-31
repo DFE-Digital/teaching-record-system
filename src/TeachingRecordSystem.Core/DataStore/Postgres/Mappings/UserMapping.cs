@@ -26,7 +26,8 @@ public class UserMapping : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.IncludeInAnalyticsSync(hidden: false);
-        builder.Property(e => e.Email).HasMaxLength(User.EmailMaxLength);
+        builder.Property(e => e.Email).HasMaxLength(User.EmailMaxLength).ConfigureAnalyticsSync(policyTag: PolicyTagNames.SensitiveHidden);
+        builder.Property(e => e.Name).ConfigureAnalyticsSync(policyTag: PolicyTagNames.SensitiveHidden);
         builder.Property(e => e.AzureAdUserId).HasMaxLength(User.AzureAdUserIdMaxLength);
         builder.Property(e => e.Role).HasMaxLength(User.RoleMaxLength);
         builder.Property(e => e.DqtUserId).ConfigureAnalyticsSync(included: false);

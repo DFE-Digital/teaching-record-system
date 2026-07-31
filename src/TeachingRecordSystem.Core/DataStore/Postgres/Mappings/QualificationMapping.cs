@@ -15,6 +15,7 @@ public class QualificationMapping : IEntityTypeConfiguration<Qualification>
         builder.HasDiscriminator(q => q.QualificationType)
             .HasValue<MandatoryQualification>(QualificationType.MandatoryQualification)
             .HasValue<RouteToProfessionalStatus>(QualificationType.RouteToProfessionalStatus);
+        builder.Property(q => q.PersonId).ConfigureAnalyticsSync(hidden: true);
         builder.HasOne(q => q.Person).WithMany(p => p.Qualifications).HasForeignKey(q => q.PersonId).HasConstraintName(Qualification.PersonForeignKeyName);
         builder.HasIndex(q => q.PersonId);
     }

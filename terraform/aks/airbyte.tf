@@ -24,11 +24,14 @@ module "airbyte" {
   cluster           = var.cluster
   namespace         = var.namespace
   gcp_taxonomy_id   = "4953620268226784157"
-  gcp_policy_tag_id = "2818002780538442239"
-  gcp_keyring       = "trs-key-ring"
-  gcp_key           = "trs-key"
-  gcp_bq_sa         = module.infrastructure_secrets.map.AIRBYTE-BQ-SA
-  skip_policy_tags  = var.skip_bq_policy_tags
+  gcp_policy_tag_id = "2792096618541600484"
+  additional_policy_tags = {
+    "sensitive_hidden" : "2818002780538442239"
+  }
+  gcp_keyring      = "trs-key-ring"
+  gcp_key          = "trs-key"
+  gcp_bq_sa        = module.infrastructure_secrets.map.AIRBYTE-BQ-SA
+  skip_policy_tags = var.skip_bq_policy_tags
 
   gcp_dataset_internal = "airbyte_internal"
 

@@ -12,6 +12,8 @@ public class ProcessMapping : IEntityTypeConfiguration<Process>
     {
         builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("processes");
+        builder.Property(p => p.PersonIds).ConfigureAnalyticsSync(hidden: true);
+        builder.Property(p => p.OneLoginUserSubjects).ConfigureAnalyticsSync(policyTag: PolicyTagNames.SensitiveHidden);
         builder.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId);
         builder.HasIndex(p => p.ProcessType);
         builder.HasIndex(p => p.PersonIds).HasMethod("GIN");
@@ -23,5 +25,6 @@ public class ProcessMapping : IEntityTypeConfiguration<Process>
                 v => JsonSerializer.Serialize(v, IChangeReasonInfo.SerializerOptions),
                 v => JsonSerializer.Deserialize<IChangeReasonInfo>(v, IChangeReasonInfo.SerializerOptions)!)
             .ConfigureAnalyticsSync(hidden: true);
+        builder.Property(p => p.DqtUserName).ConfigureAnalyticsSync(policyTag: PolicyTagNames.SensitiveHidden);
     }
 }
