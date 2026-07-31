@@ -65,12 +65,14 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
-    public async Task Get_WithReturnUrl_JourneyCompletesToReturnUrl()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_WithReturnUrl_JourneyCompletesToReturnUrl(bool isRecordMatchingOnlySupportTask)
     {
         // Arrange
         var returnUrl = "/support-tasks/active?keyword=test";
-        var (_, firstStepUrl) = await StartJourneyAsync(returnUrl);
+        var (_, firstStepUrl) = await StartJourneyAsync(returnUrl, isRecordMatchingOnlySupportTask);
 
         var request = new HttpRequestMessage(HttpMethod.Post, firstStepUrl)
         {
@@ -85,11 +87,13 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
         Assert.Equal(returnUrl, response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
-    public async Task Get_WithNonLocalReturnUrl_JourneyCompletesToListPage()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_WithNonLocalReturnUrl_JourneyCompletesToListPage(bool isRecordMatchingOnlySupportTask)
     {
         // Arrange
-        var (supportTask, firstStepUrl) = await StartJourneyAsync("https://evil.example.com/");
+        var (supportTask, firstStepUrl) = await StartJourneyAsync("https://evil.example.com/", isRecordMatchingOnlySupportTask);
 
         var request = new HttpRequestMessage(HttpMethod.Post, firstStepUrl)
         {
@@ -147,10 +151,14 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
     /// <summary>
     /// Starts the journey the way the "View task" link does and returns the URL of its first page.
     /// </summary>
-    private async Task<(SupportTask SupportTask, string FirstStepUrl)> StartJourneyAsync(string returnUrl)
+    private async Task<(SupportTask SupportTask, string FirstStepUrl)> StartJourneyAsync(
+        string returnUrl,
+        bool isRecordMatchingOnlySupportTask = true)
     {
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: isRecordMatchingOnlySupportTask);
+        var supportTask = isRecordMatchingOnlySupportTask ?
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(oneLoginUser.Subject) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

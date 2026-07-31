@@ -296,4 +296,64 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
+
+    [Fact]
+    public async Task Get_JourneyStartedWithReturnUrl_RendersBackLinkToReturnUrl()
+    {
+        // Arrange
+        var returnUrl = "/support-tasks/active?keyword=test";
+        var verifyUrl = await StartJourneyAsync(returnUrl);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, verifyUrl);
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(returnUrl, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Post_Cancel_JourneyStartedWithReturnUrl_RedirectsToReturnUrl()
+    {
+        // Arrange
+        var returnUrl = "/support-tasks/active?keyword=test";
+        var verifyUrl = await StartJourneyAsync(returnUrl);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, verifyUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Cancel", "True" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(returnUrl, response.Headers.Location?.OriginalString);
+    }
+
+    /// <summary>
+    /// Starts the journey the way the "View task" link does and returns the URL of this page.
+    /// </summary>
+    private async Task<string> StartJourneyAsync(string returnUrl)
+    {
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve?returnUrl={Uri.EscapeDataString(returnUrl)}");
+
+        var response = await HttpClient.SendAsync(request);  // Initializes journey
+        response = await response.FollowRedirectAsync(HttpClient);
+
+        return response.Headers.Location!.OriginalString;
+    }
 }

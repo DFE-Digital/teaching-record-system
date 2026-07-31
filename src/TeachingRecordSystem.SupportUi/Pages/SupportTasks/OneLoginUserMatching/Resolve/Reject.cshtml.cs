@@ -43,7 +43,7 @@ public class Reject(
         {
             journey.DeleteInstance();
 
-            return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
+            return Redirect(journey.State.CompletionUrl);
         }
 
         await _validator.ValidateAndThrowAsync(this);
