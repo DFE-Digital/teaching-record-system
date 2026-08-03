@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Tests.Jobs;
@@ -29,6 +30,7 @@ public class JobFixture : ServiceProviderFixture
             .AddWebhookMessageFactory()
             .AddOneLoginService()
             .AddPersonService()
+            .AddRoutesToProfessionalStatusService()
             .AddSupportTaskServices()
             .AddTrnRequestService(configuration)
             .AddSingleton<IBackgroundJobScheduler>(_ => Mock.Of<IBackgroundJobScheduler>())

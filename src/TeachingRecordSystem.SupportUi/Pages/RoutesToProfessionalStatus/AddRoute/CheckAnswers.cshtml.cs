@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
@@ -9,10 +8,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 [TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager,
-    TimeProvider timeProvider)
+    RoutesToProfessionalStatusService routesToProfessionalStatusService)
     : AddRoutePostStatusPageModel(AddRoutePage.CheckAnswers, linkGenerator, referenceDataCache, evidenceUploadManager)
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
@@ -80,42 +78,29 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var person = await dbContext.Persons
-            .Where(p => p.PersonId == PersonId)
-            .Include(p => p.Qualifications)
-            .SingleAsync();
-
-        var allRoutes = await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
-
-        var professionalStatus = RouteToProfessionalStatus.Create(
-            person,
-            allRoutes,
-            RouteType.RouteToProfessionalStatusTypeId,
-            sourceApplicationUserId: null,
-            sourceApplicationReference: null,
-            status: Status,
-            holdsFrom: JourneyInstance!.State.HoldsFrom,
-            trainingStartDate: JourneyInstance.State.TrainingStartDate,
-            trainingEndDate: JourneyInstance.State.TrainingEndDate,
-            trainingSubjectIds: JourneyInstance.State.TrainingSubjectIds,
-            trainingAgeSpecialismType: JourneyInstance.State.TrainingAgeSpecialismType,
-            trainingAgeSpecialismRangeFrom: JourneyInstance.State.TrainingAgeSpecialismRangeFrom,
-            trainingAgeSpecialismRangeTo: JourneyInstance.State.TrainingAgeSpecialismRangeTo,
-            trainingCountryId: JourneyInstance.State.TrainingCountryId,
-            trainingProviderId: JourneyInstance.State.TrainingProviderId,
-            degreeTypeId: JourneyInstance.State.DegreeTypeId,
-            isExemptFromInduction: JourneyInstance.State.IsExemptFromInduction,
-            createdBy: User.GetUserId(),
-            now: timeProvider.UtcNow,
-            changeReason: JourneyInstance.State.ChangeReason?.GetDisplayName(),
-            changeReasonDetail: JourneyInstance.State.ChangeReasonDetail.ChangeReasonDetail,
-            evidenceFile: JourneyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
-            @event: out var @event,
-            additionalInformation: JourneyInstance.State.ChangeReasonDetail.AdditionalInformation);
-
-        dbContext.Qualifications.Add(professionalStatus);
-        dbContext.AddEventWithoutBroadcast(@event);
-        await dbContext.SaveChangesAsync();
+        await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+            new CreateRouteToProfessionalStatusOptions
+            {
+                PersonId = PersonId,
+                RouteToProfessionalStatusTypeId = RouteType.RouteToProfessionalStatusTypeId,
+                Status = Status,
+                CreatedBy = User.GetUserId(),
+                HoldsFrom = JourneyInstance!.State.HoldsFrom,
+                TrainingStartDate = JourneyInstance.State.TrainingStartDate,
+                TrainingEndDate = JourneyInstance.State.TrainingEndDate,
+                TrainingSubjectIds = JourneyInstance.State.TrainingSubjectIds,
+                TrainingAgeSpecialismType = JourneyInstance.State.TrainingAgeSpecialismType,
+                TrainingAgeSpecialismRangeFrom = JourneyInstance.State.TrainingAgeSpecialismRangeFrom,
+                TrainingAgeSpecialismRangeTo = JourneyInstance.State.TrainingAgeSpecialismRangeTo,
+                TrainingCountryId = JourneyInstance.State.TrainingCountryId,
+                TrainingProviderId = JourneyInstance.State.TrainingProviderId,
+                DegreeTypeId = JourneyInstance.State.DegreeTypeId,
+                IsExemptFromInduction = JourneyInstance.State.IsExemptFromInduction,
+                ChangeReason = JourneyInstance.State.ChangeReason?.GetDisplayName(),
+                ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail.ChangeReasonDetail,
+                EvidenceFile = JourneyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
+                AdditionalInformation = JourneyInstance.State.ChangeReasonDetail.AdditionalInformation
+            });
 
         await JourneyInstance!.CompleteAsync();
 

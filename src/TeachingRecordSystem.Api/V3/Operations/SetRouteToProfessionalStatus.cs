@@ -1,6 +1,8 @@
+using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.Api.V3.Operations;
 
@@ -31,7 +33,7 @@ public class SetRouteToProfessionalStatusHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
     ReferenceDataCache referenceDataCache,
-    TimeProvider timeProvider) :
+    RoutesToProfessionalStatusService routesToProfessionalStatusService) :
     ICommandHandler<SetRouteToProfessionalStatusCommand, SetRouteToProfessionalStatusResult>
 {
     private static readonly IReadOnlyCollection<Guid> _permittedRouteTypeIds =
@@ -187,69 +189,49 @@ public class SetRouteToProfessionalStatusHandler(
                     break;
             }
 
-            route.Update(
-                allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(),
-                r =>
+            await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+                new UpdateRouteToProfessionalStatusOptions
                 {
-                    r.RouteToProfessionalStatusTypeId = command.RouteToProfessionalStatusTypeId;
-                    r.Status = command.Status;
-                    r.HoldsFrom = command.HoldsFrom;
-                    r.TrainingStartDate = command.TrainingStartDate;
-                    r.TrainingEndDate = command.TrainingEndDate;
-                    r.TrainingSubjectIds = subjectIds.ToArray();
-                    r.TrainingAgeSpecialismType = command.TrainingAgeSpecialism?.Type;
-                    r.TrainingAgeSpecialismRangeFrom = command.TrainingAgeSpecialism?.From;
-                    r.TrainingAgeSpecialismRangeTo = command.TrainingAgeSpecialism?.To;
-                    r.TrainingProviderId = trainingProviderId;
-                    r.DegreeTypeId = degreeTypeId;
-                    r.ExemptFromInduction = command.IsExemptFromInduction;
-                },
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                currentUserId,
-                timeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
-
-            if (@event is not null)
-            {
-                dbContext.AddEventWithoutBroadcast(@event);
-            }
+                    QualificationId = route.QualificationId,
+                    UpdatedBy = currentUserId,
+                    RouteToProfessionalStatusTypeId = Option.Some(command.RouteToProfessionalStatusTypeId),
+                    Status = Option.Some(command.Status),
+                    HoldsFrom = Option.Some(command.HoldsFrom),
+                    TrainingStartDate = Option.Some(command.TrainingStartDate),
+                    TrainingEndDate = Option.Some(command.TrainingEndDate),
+                    TrainingSubjectIds = Option.Some(subjectIds.ToArray()),
+                    TrainingAgeSpecialismType = Option.Some(command.TrainingAgeSpecialism?.Type),
+                    TrainingAgeSpecialismRangeFrom = Option.Some(command.TrainingAgeSpecialism?.From),
+                    TrainingAgeSpecialismRangeTo = Option.Some(command.TrainingAgeSpecialism?.To),
+                    TrainingProviderId = Option.Some(trainingProviderId),
+                    DegreeTypeId = Option.Some(degreeTypeId),
+                    ExemptFromInduction = Option.Some(command.IsExemptFromInduction)
+                });
         }
         else
         {
-            route = RouteToProfessionalStatus.Create(
-                person,
-                allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(),
-                routeToProfessionalStatusTypeId: command.RouteToProfessionalStatusTypeId,
-                sourceApplicationUserId: currentUserId,
-                sourceApplicationReference: command.SourceApplicationReference,
-                status: command.Status,
-                holdsFrom: command.HoldsFrom,
-                trainingStartDate: command.TrainingStartDate,
-                trainingEndDate: command.TrainingEndDate,
-                trainingSubjectIds: subjectIds.ToArray(),
-                trainingAgeSpecialismType: command.TrainingAgeSpecialism?.Type,
-                trainingAgeSpecialismRangeFrom: command.TrainingAgeSpecialism?.From,
-                trainingAgeSpecialismRangeTo: command.TrainingAgeSpecialism?.To,
-                trainingCountryId: command.TrainingCountryReference,
-                trainingProviderId: trainingProviderId,
-                degreeTypeId: degreeTypeId,
-                isExemptFromInduction: command.IsExemptFromInduction,
-                createdBy: currentUserId,
-                now: timeProvider.UtcNow,
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                additionalInformation: null,
-                @event: out var @event);
-
-            dbContext.RouteToProfessionalStatuses.Add(route);
-            dbContext.AddEventWithoutBroadcast(@event);
+            await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+                new CreateRouteToProfessionalStatusOptions
+                {
+                    PersonId = person.PersonId,
+                    RouteToProfessionalStatusTypeId = command.RouteToProfessionalStatusTypeId,
+                    Status = command.Status,
+                    CreatedBy = currentUserId,
+                    SourceApplicationUserId = currentUserId,
+                    SourceApplicationReference = command.SourceApplicationReference,
+                    HoldsFrom = command.HoldsFrom,
+                    TrainingStartDate = command.TrainingStartDate,
+                    TrainingEndDate = command.TrainingEndDate,
+                    TrainingSubjectIds = subjectIds.ToArray(),
+                    TrainingAgeSpecialismType = command.TrainingAgeSpecialism?.Type,
+                    TrainingAgeSpecialismRangeFrom = command.TrainingAgeSpecialism?.From,
+                    TrainingAgeSpecialismRangeTo = command.TrainingAgeSpecialism?.To,
+                    TrainingCountryId = command.TrainingCountryReference,
+                    TrainingProviderId = trainingProviderId,
+                    DegreeTypeId = degreeTypeId,
+                    IsExemptFromInduction = command.IsExemptFromInduction
+                });
         }
-
-        await dbContext.SaveChangesAsync();
 
         return new SetRouteToProfessionalStatusResult();
     }

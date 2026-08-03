@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -158,22 +159,15 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: TimeProvider.Today)
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.Attach(person.Person);
-            var route = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
-            route.Delete(
-                allRouteTypes: await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(),
-                deletionReason: null,
-                deletionReasonDetail: null,
-                evidenceFile: null,
-                deletedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var deletedEvent);
-            dbContext.AddEventWithoutBroadcast(deletedEvent);
-            await dbContext.SaveChangesAsync();
-        });
+        var route = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+
+        await WithServiceAsync<RoutesToProfessionalStatusService>(routesToProfessionalStatusService =>
+            routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+                new DeleteRouteToProfessionalStatusOptions
+                {
+                    QualificationId = route.QualificationId,
+                    DeletedBy = SystemUser.SystemUserId
+                }));
 
         TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 

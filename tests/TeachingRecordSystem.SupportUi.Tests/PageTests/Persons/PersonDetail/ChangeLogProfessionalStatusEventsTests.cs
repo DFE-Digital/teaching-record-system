@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 using ProfessionalStatusType = TeachingRecordSystem.Core.Models.ProfessionalStatusType;
@@ -194,36 +196,25 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            professionalStatus.Update(
-                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                r =>
-                {
-                    r.HoldsFrom = holdsFrom;
-                    r.TrainingStartDate = startDate;
-                    r.TrainingEndDate = endDate;
-                    r.DegreeTypeId = degreeType.DegreeTypeId;
-                    r.TrainingSubjectIds = [subject.TrainingSubjectId];
-                    r.TrainingProviderId = trainingProvider.TrainingProviderId;
-                    r.TrainingAgeSpecialismType = ageRange;
-                    r.TrainingCountryId = country.CountryId;
-                    r.ExemptFromInduction = exemptFromInduction;
-                },
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                updatedBy: updatedByUser.UserId,
-                TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            Debug.Assert(@event is not null);
+        var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+            new UpdateRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                UpdatedBy = updatedByUser.UserId,
+                HoldsFrom = Option.Some<DateOnly?>(holdsFrom),
+                TrainingStartDate = Option.Some<DateOnly?>(startDate),
+                TrainingEndDate = Option.Some<DateOnly?>(endDate),
+                DegreeTypeId = Option.Some<Guid?>(degreeType.DegreeTypeId),
+                TrainingSubjectIds = Option.Some<Guid[]>([subject.TrainingSubjectId]),
+                TrainingProviderId = Option.Some<Guid?>(trainingProvider.TrainingProviderId),
+                TrainingAgeSpecialismType = Option.Some<TrainingAgeSpecialismType?>(ageRange),
+                TrainingCountryId = Option.Some<string?>(country.CountryId),
+                ExemptFromInduction = Option.Some<bool?>(exemptFromInduction)
+            });
 
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        Debug.Assert(changes is not RouteToProfessionalStatusUpdatedEventChanges.None);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -301,24 +292,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            professionalStatus.Update(
-                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                r => r.Status = status,
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                updatedBy: updatedByUser.UserId,
-                TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
-            Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+            new UpdateRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                UpdatedBy = updatedByUser.UserId,
+                Status = Option.Some(status)
+            });
+        Debug.Assert(changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -385,24 +368,18 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            professionalStatus.Update(
-                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                r => r.Status = status,
-                changeReason: changeReason,
-                changeReasonDetail: changeReasonDetail,
-                evidenceFile: null,
-                updatedBy: updatedByUser.UserId,
-                TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
-            Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+            new UpdateRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                UpdatedBy = updatedByUser.UserId,
+                Status = Option.Some(status),
+                ChangeReason = changeReason,
+                ChangeReasonDetail = changeReasonDetail
+            });
+        Debug.Assert(changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -456,22 +433,14 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            professionalStatus.Delete(
-                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                deletionReason: null,
-                deletionReasonDetail: null,
-                evidenceFile: null,
-                deletedBy: deletedByUser.UserId,
-                TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -512,22 +481,14 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            professionalStatus.Delete(
-                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                deletionReason: null,
-                deletionReasonDetail: null,
-                evidenceFile: null,
-                deletedBy: deletedByUser.UserId,
-                TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -552,22 +513,14 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            professionalStatus.Delete(
-                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                deletionReason: null,
-                deletionReasonDetail: null,
-                evidenceFile: null,
-                deletedBy: deletedByUser.UserId,
-                TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -592,22 +545,14 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            professionalStatus.Delete(
-                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                deletionReason: null,
-                deletionReasonDetail: null,
-                evidenceFile: null,
-                deletedBy: deletedByUser.UserId,
-                TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -632,22 +577,14 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            professionalStatus.Delete(
-                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                deletionReason: null,
-                deletionReasonDetail: null,
-                evidenceFile: null,
-                deletedBy: deletedByUser.UserId,
-                TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 

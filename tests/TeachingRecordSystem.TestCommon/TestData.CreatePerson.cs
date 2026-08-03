@@ -486,9 +486,8 @@ public partial class TestData
 
                     foreach (var builder in _routeToProfessionalStatusBuilders)
                     {
-                        var (routeId, createdEvents) = await builder.ExecuteAsync(this, person, testData, dbContext);
+                        var routeId = await builder.ExecuteAsync(this, person, testData, dbContext);
                         routeIds.Add(routeId);
-                        events.AddRange(createdEvents);
                     }
 
                     return routeIds;

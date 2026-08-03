@@ -6,6 +6,7 @@ using CsvHelper.Configuration.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using File = System.IO.File;
 
 namespace TeachingRecordSystem.Cli;
@@ -46,16 +47,16 @@ public static partial class Commands
 
             var services = new ServiceCollection()
                 .AddTimeProvider()
-                .AddDatabase(connectionString);
+                .AddDatabase(connectionString)
+                .AddSingleton<ReferenceDataCache>()
+                .AddRoutesToProfessionalStatusService();
 
             var serviceProvider = services.BuildServiceProvider();
 
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
-            var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
+            var routesToProfessionalStatusService = scope.ServiceProvider.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            // fetch all routes
-            var allRouteTypes = await dbContext.RouteToProfessionalStatusTypes.ToListAsync();
             var systemUser = SystemUser.SystemUserId;
 
             var results = new List<TrnCorrectionResult>();
@@ -139,23 +140,21 @@ public static partial class Commands
                     var route = matchingRoutes.Single();
                     var prevStart = route.TrainingStartDate;
 
-                    route.Update(
-                        allRouteTypes,
-                        r => r.TrainingStartDate = correctStart,
-                        changeReason: "Bulk correction",
-                        changeReasonDetail: $"Corrected via CLI from {prevStart:yyyy-MM-dd} to {correctStart:yyyy-MM-dd}",
-                        evidenceFile: null,
-                        updatedBy: systemUser,
-                        now: timeProvider.UtcNow,
-                        additionalInformation: null,
-                        out var updateEvent);
+                    var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+                        new UpdateRouteToProfessionalStatusOptions
+                        {
+                            QualificationId = route.QualificationId,
+                            UpdatedBy = systemUser,
+                            TrainingStartDate = Optional.Option.Some(correctStart),
+                            ChangeReason = "Bulk correction",
+                            ChangeReasonDetail = $"Corrected via CLI from {prevStart:yyyy-MM-dd} to {correctStart:yyyy-MM-dd}"
+                        });
 
-                    if (updateEvent is null)
+                    if (changes is LegacyEvents.RouteToProfessionalStatusUpdatedEventChanges.None)
                     {
                         Console.WriteLine($"Skipping TRN {trn}: no effective change");
                         continue;
                     }
-                    dbContext.AddEventWithoutBroadcast(@updateEvent);
 
                     results.Add(new TrnCorrectionResult
                     {
