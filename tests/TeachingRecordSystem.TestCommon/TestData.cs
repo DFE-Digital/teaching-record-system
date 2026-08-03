@@ -6,7 +6,8 @@ namespace TeachingRecordSystem.TestCommon;
 public partial class TestData(
     IDbContextFactory<TrsDbContext> dbContextFactory,
     ReferenceDataCache referenceDataCache,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider,
+    IServiceProvider serviceProvider)
 {
     private static readonly Lock _gate = new();
     private static readonly HashSet<string> _emails = [];
@@ -30,6 +31,8 @@ public partial class TestData(
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; } = dbContextFactory;
 
     public ReferenceDataCache ReferenceDataCache { get; } = referenceDataCache;
+
+    public IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     public static async Task<string> GetBase64EncodedFileContentAsync(Stream file)
     {

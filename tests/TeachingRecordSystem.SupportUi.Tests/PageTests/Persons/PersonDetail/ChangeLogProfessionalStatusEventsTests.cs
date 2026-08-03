@@ -196,31 +196,23 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                ReferenceDataCache,
-                TimeProvider);
+        var changes = await RoutesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+            new UpdateRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                UpdatedBy = updatedByUser.UserId,
+                HoldsFrom = Option.Some<DateOnly?>(holdsFrom),
+                TrainingStartDate = Option.Some<DateOnly?>(startDate),
+                TrainingEndDate = Option.Some<DateOnly?>(endDate),
+                DegreeTypeId = Option.Some<Guid?>(degreeType.DegreeTypeId),
+                TrainingSubjectIds = Option.Some<Guid[]>([subject.TrainingSubjectId]),
+                TrainingProviderId = Option.Some<Guid?>(trainingProvider.TrainingProviderId),
+                TrainingAgeSpecialismType = Option.Some<TrainingAgeSpecialismType?>(ageRange),
+                TrainingCountryId = Option.Some<string?>(country.CountryId),
+                ExemptFromInduction = Option.Some<bool?>(exemptFromInduction)
+            });
 
-            var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
-                new UpdateRouteToProfessionalStatusOptions
-                {
-                    QualificationId = professionalStatus.QualificationId,
-                    UpdatedBy = updatedByUser.UserId,
-                    HoldsFrom = Option.Some<DateOnly?>(holdsFrom),
-                    TrainingStartDate = Option.Some<DateOnly?>(startDate),
-                    TrainingEndDate = Option.Some<DateOnly?>(endDate),
-                    DegreeTypeId = Option.Some<Guid?>(degreeType.DegreeTypeId),
-                    TrainingSubjectIds = Option.Some<Guid[]>([subject.TrainingSubjectId]),
-                    TrainingProviderId = Option.Some<Guid?>(trainingProvider.TrainingProviderId),
-                    TrainingAgeSpecialismType = Option.Some<TrainingAgeSpecialismType?>(ageRange),
-                    TrainingCountryId = Option.Some<string?>(country.CountryId),
-                    ExemptFromInduction = Option.Some<bool?>(exemptFromInduction)
-                });
-
-            Debug.Assert(changes is not RouteToProfessionalStatusUpdatedEventChanges.None);
-        });
+        Debug.Assert(changes is not RouteToProfessionalStatusUpdatedEventChanges.None);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -298,22 +290,14 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                ReferenceDataCache,
-                TimeProvider);
-
-            var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
-                new UpdateRouteToProfessionalStatusOptions
-                {
-                    QualificationId = professionalStatus.QualificationId,
-                    UpdatedBy = updatedByUser.UserId,
-                    Status = Option.Some(status)
-                });
-            Debug.Assert(changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
-        });
+        var changes = await RoutesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+            new UpdateRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                UpdatedBy = updatedByUser.UserId,
+                Status = Option.Some(status)
+            });
+        Debug.Assert(changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -380,24 +364,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                ReferenceDataCache,
-                TimeProvider);
-
-            var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
-                new UpdateRouteToProfessionalStatusOptions
-                {
-                    QualificationId = professionalStatus.QualificationId,
-                    UpdatedBy = updatedByUser.UserId,
-                    Status = Option.Some(status),
-                    ChangeReason = changeReason,
-                    ChangeReasonDetail = changeReasonDetail
-                });
-            Debug.Assert(changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
-        });
+        var changes = await RoutesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+            new UpdateRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                UpdatedBy = updatedByUser.UserId,
+                Status = Option.Some(status),
+                ChangeReason = changeReason,
+                ChangeReasonDetail = changeReasonDetail
+            });
+        Debug.Assert(changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -451,20 +427,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                ReferenceDataCache,
-                TimeProvider);
-
-            await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
-                new DeleteRouteToProfessionalStatusOptions
-                {
-                    QualificationId = professionalStatus.QualificationId,
-                    DeletedBy = deletedByUser.UserId
-                });
-        });
+        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -505,20 +473,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                ReferenceDataCache,
-                TimeProvider);
-
-            await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
-                new DeleteRouteToProfessionalStatusOptions
-                {
-                    QualificationId = professionalStatus.QualificationId,
-                    DeletedBy = deletedByUser.UserId
-                });
-        });
+        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -543,20 +503,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                ReferenceDataCache,
-                TimeProvider);
-
-            await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
-                new DeleteRouteToProfessionalStatusOptions
-                {
-                    QualificationId = professionalStatus.QualificationId,
-                    DeletedBy = deletedByUser.UserId
-                });
-        });
+        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -581,20 +533,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                ReferenceDataCache,
-                TimeProvider);
-
-            await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
-                new DeleteRouteToProfessionalStatusOptions
-                {
-                    QualificationId = professionalStatus.QualificationId,
-                    DeletedBy = deletedByUser.UserId
-                });
-        });
+        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -619,20 +563,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                ReferenceDataCache,
-                TimeProvider);
-
-            await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
-                new DeleteRouteToProfessionalStatusOptions
-                {
-                    QualificationId = professionalStatus.QualificationId,
-                    DeletedBy = deletedByUser.UserId
-                });
-        });
+        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = professionalStatus.QualificationId,
+                DeletedBy = deletedByUser.UserId
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 

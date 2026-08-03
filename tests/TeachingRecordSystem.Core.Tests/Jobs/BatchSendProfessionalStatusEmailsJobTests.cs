@@ -161,20 +161,13 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
 
         var route = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                TestData.ReferenceDataCache,
-                TimeProvider);
-
-            await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+        await WithServiceAsync<RoutesToProfessionalStatusService>(routesToProfessionalStatusService =>
+            routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
                 new DeleteRouteToProfessionalStatusOptions
                 {
                     QualificationId = route.QualificationId,
                     DeletedBy = SystemUser.SystemUserId
-                });
-        });
+                }));
 
         TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 

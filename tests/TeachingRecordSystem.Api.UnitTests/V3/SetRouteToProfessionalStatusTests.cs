@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
@@ -290,25 +291,20 @@ public class SetRouteToProfessionalStatusTests(OperationTestFixture operationTes
     {
         var currentUserId = CurrentUserProvider.GetCurrentApplicationUserId();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                TestData.ReferenceDataCache,
-                TimeProvider);
+        using var scope = Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        var routesToProfessionalStatusService = scope.ServiceProvider.GetRequiredService<RoutesToProfessionalStatusService>();
 
-            await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
-                new CreateRouteToProfessionalStatusOptions
-                {
-                    PersonId = personId,
-                    RouteToProfessionalStatusTypeId = routeTypeId,
-                    Status = status,
-                    CreatedBy = SystemUser.SystemUserId,
-                    SourceApplicationUserId = currentUserId,
-                    SourceApplicationReference = sourceRef,
-                    HoldsFrom = holdsFrom,
-                    TrainingSubjectIds = []
-                });
-        });
+        await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+            new CreateRouteToProfessionalStatusOptions
+            {
+                PersonId = personId,
+                RouteToProfessionalStatusTypeId = routeTypeId,
+                Status = status,
+                CreatedBy = SystemUser.SystemUserId,
+                SourceApplicationUserId = currentUserId,
+                SourceApplicationReference = sourceRef,
+                HoldsFrom = holdsFrom,
+                TrainingSubjectIds = []
+            });
     }
 }

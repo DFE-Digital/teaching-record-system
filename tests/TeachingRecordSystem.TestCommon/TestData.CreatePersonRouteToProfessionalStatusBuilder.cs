@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
@@ -154,10 +155,12 @@ public partial class TestData
 
             _createdByUser ??= SystemUser.SystemUserId;
 
-            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
-                dbContext,
-                testData.ReferenceDataCache,
-                testData.TimeProvider);
+            // The service has to share the DbContext the rest of the builder chain is writing to, otherwise the
+            // person attributes it refreshes (QTS date, induction status etc.) would be overwritten by the stale
+            // copy the outer context saves afterwards.
+            var routesToProfessionalStatusService = ActivatorUtilities.CreateInstance<RoutesToProfessionalStatusService>(
+                testData.ServiceProvider,
+                dbContext);
 
             var professionalStatus = await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
                 new CreateRouteToProfessionalStatusOptions
