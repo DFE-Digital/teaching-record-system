@@ -1,4 +1,5 @@
 using EntityFrameworkCore.Projectables;
+using FluentValidation;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -85,5 +86,46 @@ public class SupportTask
 
         public static Subject FromOneLoginUser(string emailAddress) =>
             new(name: null, emailAddress);
+    }
+}
+
+public static class SupportTaskValidationExtensions
+{
+    public static IRuleBuilderOptions<T, string?> ZendeskUrl<T>(this IRuleBuilder<T, string?> ruleBuilder, string message)
+    {
+        return ruleBuilder
+            .Must(url => IsValidZendeskUrl(url))
+            .WithMessage(message);
+    }
+
+    private static bool IsValidZendeskUrl(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        if (!string.Equals(
+            uri.Scheme,
+            Uri.UriSchemeHttps,
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!uri.Host.EndsWith(
+            "zendesk.com",
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return !string.IsNullOrEmpty(uri.AbsolutePath)
+            && uri.AbsolutePath != "/";
     }
 }

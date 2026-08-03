@@ -139,17 +139,7 @@ public class Index(
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
-    public static string GetZendeskTicketDisplayText(string url)
-    {
-        const string zendeskPrefix = "https://becomingateacher.zendesk.com/";
-
-        if (url.StartsWith(zendeskPrefix, StringComparison.OrdinalIgnoreCase))
-        {
-            return url.Substring(zendeskPrefix.Length);
-        }
-
-        return url;
-    }
+    public static string GetZendeskTicketDisplayText(string url) => new Uri(url).LocalPath;
 
     public record Note(string Content, DateTime CreatedOn, string CreatedBy);
 }

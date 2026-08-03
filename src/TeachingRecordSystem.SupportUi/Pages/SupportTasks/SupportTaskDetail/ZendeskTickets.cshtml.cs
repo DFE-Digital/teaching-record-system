@@ -14,10 +14,8 @@ public class ZendeskTickets(
     private readonly InlineValidator<ZendeskTickets> _validator = new()
     {
         v => v.RuleForEach(m => m.TicketUrls!)
-            .Must(ticket =>
-                string.IsNullOrWhiteSpace(ticket) ||
-                IsValidZendeskUrl(ticket))
-            .WithMessage("Enter a valid Zendesk URL")
+            .Where(ticket => !string.IsNullOrWhiteSpace(ticket))
+            .ZendeskUrl("Enter a valid Zendesk URL")
             .When(m => m.TicketUrls is not null)
     };
 
@@ -96,36 +94,5 @@ public class ZendeskTickets(
         SupportTaskTypeTitle = _supportTask.SupportTaskType.GetTitle();
 
         BackLink = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.SupportTaskDetail.Index(SupportTaskReference));
-    }
-
-    private static bool IsValidZendeskUrl(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri))
-        {
-            return false;
-        }
-
-        if (!string.Equals(
-                uri.Scheme,
-                Uri.UriSchemeHttps,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        if (!uri.Host.EndsWith(
-                "zendesk.com",
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        return !string.IsNullOrEmpty(uri.AbsolutePath)
-               && uri.AbsolutePath != "/";
     }
 }
