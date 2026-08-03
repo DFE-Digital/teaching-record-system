@@ -1,10 +1,12 @@
+using System.Globalization;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEventChanges;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
@@ -17,10 +19,12 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("A", "New", "Name")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "A";
+                s.MiddleName = "New";
+                s.LastName = "Name";
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -40,9 +44,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -79,7 +81,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/persons/{person.PersonId}/edit-details?ffiid=", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/persons/{person.PersonId}/edit-details?_jid=", response.Headers.Location?.OriginalString);
         var redirectRequest = new HttpRequestMessage(HttpMethod.Get, response.Headers.Location!.OriginalString);
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
@@ -122,7 +124,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/persons/{person.PersonId}/edit-details?ffiid=", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/persons/{person.PersonId}/edit-details?_jid=", response.Headers.Location?.OriginalString);
         var redirectRequest = new HttpRequestMessage(HttpMethod.Get, response.Headers.Location!.OriginalString);
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
@@ -144,14 +146,16 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithEmail("test@test.com")
-                .WithNationalInsuranceNumber("AB 12 34 56 C")
-                .WithGender(Gender.Other)
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Alfred";
+                s.MiddleName = "The";
+                s.LastName = "Great";
+                s.DateOfBirth = DateOnly.Parse("1 Feb 1980");
+                s.EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue("test@test.com");
+                s.NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue("AB 12 34 56 C");
+                s.Gender = Gender.Other;
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -193,10 +197,10 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithGender(preExistingGenderValue)
-                .Build());
+            CreateState(person, s =>
+            {
+                s.Gender = preExistingGenderValue;
+            }));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -220,9 +224,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -248,9 +250,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -276,9 +276,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -304,9 +302,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -332,9 +328,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -360,9 +354,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -388,9 +380,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -416,9 +406,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -444,9 +432,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -472,9 +458,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -512,9 +496,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -593,9 +575,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -638,9 +618,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -682,9 +660,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -722,9 +698,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -746,7 +720,6 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(Gender.NotAvailable, journeyInstance.State.Gender);
     }
 
@@ -765,9 +738,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -789,7 +760,6 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance.State.Gender);
     }
 
@@ -808,9 +778,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
+            CreateState(person));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -840,14 +808,16 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithEmail("test@test.com")
-                .WithNationalInsuranceNumber("AB 12 34 56 C")
-                .WithGender(Gender.Male)
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Alfred";
+                s.MiddleName = "The";
+                s.LastName = "Great";
+                s.DateOfBirth = DateOnly.Parse("1 Feb 1980");
+                s.EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue("test@test.com");
+                s.NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue("AB 12 34 56 C");
+                s.Gender = Gender.Male;
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -867,7 +837,6 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal("Jimmy", journeyInstance.State.FirstName);
         Assert.Equal("A", journeyInstance.State.MiddleName);
         Assert.Equal("Person", journeyInstance.State.LastName);
@@ -895,18 +864,39 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
-                .WithEmail("new@email.com")
-                .WithNationalInsuranceNumber("AB654321D")
-                .WithGender(Gender.Other)
-                .WithNameChangeReasonChoice(PersonNameChangeReason.MarriageOrCivilPartnership)
-                .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, "Some reason")
-                .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png", "1.3 KB")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+                s.DateOfBirth = DateOnly.Parse("3 Aug 1999");
+                s.EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue("new@email.com");
+                s.NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue("AB654321D");
+                s.Gender = Gender.Other;
+                s.NameChangeReason = PersonNameChangeReason.MarriageOrCivilPartnership;
+                s.NameChangeEvidence = new()
+                {
+                    UploadEvidence = false,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = nameEvidenceFileId,
+                        FileName = "name-evidence.pdf",
+                        FileSizeDescription = "2.4 MB"
+                    }
+                };
+                s.OtherDetailsChangeReason = PersonDetailsChangeReason.AnotherReason;
+                s.OtherDetailsChangeReasonDetail = "Some reason";
+                s.OtherDetailsChangeEvidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = otherEvidenceFileId,
+                        FileName = "other-evidence.png",
+                        FileSizeDescription = "1.3 KB"
+                    }
+                };
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -924,7 +914,6 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
 
         // Assert
         Assert.Equal("Alfred", journeyInstance.State.FirstName);
@@ -964,18 +953,39 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Megan", "Thee", "Stallion")
-                .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
-                .WithEmail("new@email.com")
-                .WithNationalInsuranceNumber("AB654321D")
-                .WithGender(Gender.Female)
-                .WithNameChangeReasonChoice(PersonNameChangeReason.MarriageOrCivilPartnership)
-                .WithNameChangeUploadEvidenceChoice(true, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(PersonDetailsChangeReason.AnotherReason, "Some reason")
-                .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png", "1.3 KB")
-                .Build());
+            CreateState(person, s =>
+            {
+                s.FirstName = "Megan";
+                s.MiddleName = "Thee";
+                s.LastName = "Stallion";
+                s.DateOfBirth = DateOnly.Parse("3 Aug 1999");
+                s.EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue("new@email.com");
+                s.NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue("AB654321D");
+                s.Gender = Gender.Female;
+                s.NameChangeReason = PersonNameChangeReason.MarriageOrCivilPartnership;
+                s.NameChangeEvidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = nameEvidenceFileId,
+                        FileName = "name-evidence.pdf",
+                        FileSizeDescription = "2.4 MB"
+                    }
+                };
+                s.OtherDetailsChangeReason = PersonDetailsChangeReason.AnotherReason;
+                s.OtherDetailsChangeReasonDetail = "Some reason";
+                s.OtherDetailsChangeEvidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = otherEvidenceFileId,
+                        FileName = "other-evidence.png",
+                        FileSizeDescription = "1.3 KB"
+                    }
+                };
+            }));
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
@@ -993,7 +1003,6 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
 
         // Assert
         Assert.Equal("Megan", journeyInstance.State.FirstName);
@@ -1017,12 +1026,483 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
     private string GetRequestPath(TestData.CreatePersonResult person) =>
         $"/persons/{person.PersonId}/edit-details";
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance) =>
+    private string GetRequestPath(TestData.CreatePersonResult person, EditDetailsJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<EditDetailsState>> CreateJourneyInstanceAsync(Guid personId, EditDetailsState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.EditDetails,
-            state ?? new EditDetailsState(),
-            new KeyValuePair<string, object>("personId", personId));
+    public static TheoryData<string?, HttpMethod> UserDoesNotHavePermission_ReturnsForbiddenData =>
+        new MatrixTheoryData<string?, HttpMethod>(
+            [UserRoles.Viewer, null],
+            TestHttpMethods.GetAndPost.SplitTestMethods().ToArray());
+
+    [Theory]
+    [MemberData(nameof(UserDoesNotHavePermission_ReturnsForbiddenData))]
+    public async Task UserDoesNotHavePermission_ReturnsForbidden(string? role, HttpMethod httpMethod)
+    {
+        // Arrange
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
+
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            CreateState(person, s =>
+            {
+                s.FirstName = "Alfred";
+                s.MiddleName = "The";
+                s.LastName = "Great";
+                s.DateOfBirth = DateOnly.Parse("1 Feb 1980");
+            }));
+
+        var request = new HttpRequestMessage(httpMethod,
+            $"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    [Theory]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            CreateState(person, s =>
+            {
+                s.FirstName = "Alfred";
+                s.MiddleName = "The";
+                s.LastName = "Great";
+                s.DateOfBirth = DateOnly.Parse("1 Feb 1980");
+            }));
+
+        var request = new HttpRequestMessage(httpMethod,
+            $"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange, "")]
+    [InlineData(PersonDetailsUpdatedEventChanges.OtherThanNameChange, "")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "")]
+    public async Task Get_BacklinkContainsExpected(PersonDetailsUpdatedEventChanges changes, string expectedBackPage)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmailAddress("some@email-address.com")
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Gender.Male));
+
+        var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
+        var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
+        var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
+        var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
+        var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
+
+        var state = CreateState(person, s =>
+                    {
+                        s.FirstName = firstName;
+                        s.MiddleName = middleName;
+                        s.LastName = lastName;
+                        s.DateOfBirth = dateOfBirth;
+                        s.EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(emailAddress);
+                        s.NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(nationalInsuranceNumber);
+                    });
+
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+        {
+            state.NameChangeReason = PersonNameChangeReason.CorrectingAnError;
+            state.NameChangeEvidence = new() { UploadEvidence = false };
+        }
+
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
+        {
+            state.OtherDetailsChangeReason = PersonDetailsChangeReason.IncompleteDetails;
+            state.OtherDetailsChangeEvidence = new() { UploadEvidence = false };
+        }
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.NotNull(backlink);
+        Assert.Contains($"/persons/{person.PersonId}{expectedBackPage}", backlink.Href);
+    }
+
+    [Theory]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName, "/edit-details/name-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.MiddleName, "/edit-details/name-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.LastName, "/edit-details/name-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/other-details-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason")]
+    // Edit details (name changes only): redirects to change name reason page
+    // Edit details (other details changes only): redirects to change reason page
+    // Edit details (name and other details changes): redirects to change name reason page
+    // Name change reason (name changes only): redirects to check answers page
+    // Name change reason (name and other details changes): redirects to change reason page
+    // Change reason (other details changes only): redirects to check answers page
+    // Change reason (name and other details changes): redirects to check answers page
+    public async Task Post_RedirectsToExpectedPage(PersonDetailsUpdatedEventChanges changes, string expectedNextPageUrl)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmailAddress("some@email-address.com")
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Gender.Other));
+
+        var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
+        var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
+        var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
+        var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
+        var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
+
+        var state = CreateState(person, s =>
+                    {
+                        s.FirstName = firstName;
+                        s.MiddleName = middleName;
+                        s.LastName = lastName;
+                        s.DateOfBirth = dateOfBirth;
+                        s.EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(emailAddress);
+                        s.NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(nationalInsuranceNumber);
+                        s.Gender = gender;
+                    });
+
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+        {
+            state.NameChangeReason = PersonNameChangeReason.CorrectingAnError;
+            state.NameChangeEvidence = new() { UploadEvidence = false };
+        }
+
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
+        {
+            state.OtherDetailsChangeReason = PersonDetailsChangeReason.IncompleteDetails;
+            state.OtherDetailsChangeEvidence = new() { UploadEvidence = false };
+        }
+
+        var content = new EditDetailsPostRequestContentBuilder()
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmailAddress(emailAddress)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber)
+            .WithGender(gender);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = content.BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+        var expectedUrl = $"/persons/{person.PersonId}{expectedNextPageUrl}?{journeyInstance.GetUniqueIdQueryParameter()}";
+        Assert.Equal(expectedUrl, location);
+    }
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetailsPage()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            CreateState(person, s =>
+            {
+                s.FirstName = "Alfred";
+                s.MiddleName = "The";
+                s.LastName = "Great";
+                s.DateOfBirth = DateOnly.Parse("1 Feb 1980");
+                s.NameChangeReason = PersonNameChangeReason.CorrectingAnError;
+                s.NameChangeEvidence = new()
+                {
+                    UploadEvidence = false
+                };
+                s.OtherDetailsChangeReason = PersonDetailsChangeReason.IncompleteDetails;
+                s.OtherDetailsChangeEvidence = new()
+                {
+                    UploadEvidence = false
+                };
+            }));
+
+        var pageUrl = $"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+        Assert.NotNull(cancelButton);
+        Assert.Equal("Cancel", cancelButton.Name);
+
+        // Act
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal($"/persons/{person.PersonId}", location);
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
+    [Fact]
+    public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile()
+    {
+        // Arrange
+        var evidenceFileId = Guid.NewGuid();
+
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            CreateState(person, s =>
+            {
+                s.FirstName = "Alfred";
+                s.MiddleName = "The";
+                s.LastName = "Great";
+                s.DateOfBirth = DateOnly.Parse("1 Feb 1980");
+                s.NameChangeReason = PersonNameChangeReason.CorrectingAnError;
+                s.NameChangeEvidence = new()
+                {
+                    UploadEvidence = false
+                };
+                s.OtherDetailsChangeReason = PersonDetailsChangeReason.IncompleteDetails;
+                s.OtherDetailsChangeEvidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = "evidence.jpg",
+                        FileSizeDescription = "1.2 KB"
+                    }
+                };
+            }));
+
+        var pageUrl = $"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Get, pageUrl);
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        // Act
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, pageUrl)
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
+    }
+
+    [Theory]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers")]
+    [InlineData(PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    // Every page goes back to check answers page (even if a new reason page was added to the journey on this visit)
+    // Check answers page goes back to the appropriate reason page
+    public async Task Get_WithReturnUrlToCheckAnswersPage_BacklinkLinksToCheckAnswersPage(PersonDetailsUpdatedEventChanges changes, string expectedBackPage)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmailAddress("some@email-address.com")
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Gender.Female));
+
+        var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
+        var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
+        var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
+        var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
+        var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Other : person.Gender;
+
+        var state = CreateState(person, s =>
+                    {
+                        s.FirstName = firstName;
+                        s.MiddleName = middleName;
+                        s.LastName = lastName;
+                        s.DateOfBirth = dateOfBirth;
+                        s.EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(emailAddress);
+                        s.NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(nationalInsuranceNumber);
+                        s.Gender = gender;
+                    });
+
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+        {
+            state.NameChangeReason = PersonNameChangeReason.CorrectingAnError;
+            state.NameChangeEvidence = new() { UploadEvidence = false };
+        }
+
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
+        {
+            state.OtherDetailsChangeReason = PersonDetailsChangeReason.IncompleteDetails;
+            state.OtherDetailsChangeEvidence = new() { UploadEvidence = false };
+        }
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state);
+        var checkAnswersUrl = $"/persons/{person.PersonId}/edit-details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-details?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.Contains($"/persons/{person.PersonId}{expectedBackPage}", backlink!.Href);
+    }
+
+    [Theory]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers?")]
+    [InlineData(PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason?returnUrl={0}&")]
+    [InlineData(PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason?returnUrl={0}&")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason?returnUrl={0}&")]
+    [InlineData(PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason?returnUrl={0}&")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers?")]
+    [InlineData(PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    // No new changes: redirects to check answers page
+    // Switches from name change to other details change (& vice versa): redirects to appropriate reason page
+    // Adds name/other details change: redirects to appropriate reason page
+    // Removes name/other details change: redirects to check answers page
+    // Change name reason (whether original or subsequent name change): redirects to check answers page
+    // Change reason (whether original or subsequent other details change): redirects to check answers page
+    public async Task Post_WithReturnUrlToCheckAnswersPage_AndMoreChangesMade_RedirectsToExpectedPage(PersonDetailsUpdatedEventChanges originalChanges, PersonDetailsUpdatedEventChanges newChanges, string expectedNextPageUrl)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmailAddress("some@email-address.com")
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Gender.Female));
+
+        var originalFirstName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
+        var originalMiddleName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
+        var originalLastName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
+        var originalDateOfBirth = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
+        var originalEmailAddress = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
+        var originalNationalInsuranceNumber = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var originalGender = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Male : person.Gender;
+
+        var newFirstName = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
+        var newMiddleName = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
+        var newLastName = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
+        var newDateOfBirth = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
+        var newEmailAddress = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
+        var newNationalInsuranceNumber = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var newGender = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Male : person.Gender;
+
+        var state = CreateState(person, s =>
+                    {
+                        s.FirstName = originalFirstName;
+                        s.MiddleName = originalMiddleName;
+                        s.LastName = originalLastName;
+                        s.DateOfBirth = originalDateOfBirth;
+                        s.EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(originalEmailAddress);
+                        s.NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(originalNationalInsuranceNumber);
+                        s.Gender = originalGender;
+                    });
+
+        if (originalChanges.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+        {
+            state.NameChangeReason = PersonNameChangeReason.CorrectingAnError;
+            state.NameChangeEvidence = new() { UploadEvidence = false };
+        }
+
+        if (originalChanges.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
+        {
+            state.OtherDetailsChangeReason = PersonDetailsChangeReason.IncompleteDetails;
+            state.OtherDetailsChangeEvidence = new() { UploadEvidence = false };
+        }
+
+        var content = new EditDetailsPostRequestContentBuilder()
+            .WithFirstName(newFirstName)
+            .WithMiddleName(newMiddleName)
+            .WithLastName(newLastName)
+            .WithDateOfBirth(newDateOfBirth)
+            .WithEmailAddress(newEmailAddress)
+            .WithNationalInsuranceNumber(newNationalInsuranceNumber)
+            .WithGender(newGender);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state);
+        var checkAnswersUrl = $"/persons/{person.PersonId}/edit-details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-details?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = content.BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+        var expectedUrl = $"/persons/{person.PersonId}{string.Format(CultureInfo.InvariantCulture, expectedNextPageUrl, Uri.EscapeDataString(checkAnswersUrl))}{journeyInstance.GetUniqueIdQueryParameter()}";
+        Assert.Equal(expectedUrl, location);
+    }
 }

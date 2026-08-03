@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditDetails), RequireJourneyInstance]
+[Journey(JourneyNames.EditDetails)]
 public class OtherDetailsChangeReasonModel(
+    EditDetailsJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    PersonService personService,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<OtherDetailsChangeReasonModel> _validator = new()
     {
@@ -25,6 +25,16 @@ public class OtherDetailsChangeReasonModel(
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
+    public string? BackLink { get; set; }
+
+    [FromRoute]
+    public Guid PersonId { get; set; }
+
+    public string? PersonName { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     [BindProperty]
     public PersonDetailsChangeReason? Reason { get; set; }
 
@@ -34,52 +44,44 @@ public class OtherDetailsChangeReasonModel(
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
-    public bool IsAlsoChangingName => JourneyInstance!.State.NameChangeReason is not null;
-
-    public string BackLink => GetPageLink(
-        FromCheckAnswers
-            ? EditDetailsJourneyPage.CheckAnswers
-            : JourneyInstance!.State.NameChanged
-                ? EditDetailsJourneyPage.NameChangeReason
-                : EditDetailsJourneyPage.PersonalDetails);
-
-    public string NextPage => GetPageLink(
-        EditDetailsJourneyPage.CheckAnswers,
-        FromCheckAnswers is true ? true : null);
+    public bool IsAlsoChangingName => journey.State.NameChangeReason is not null;
 
     public void OnGet()
     {
-        Reason = JourneyInstance!.State.OtherDetailsChangeReason;
-        ReasonDetail = JourneyInstance.State.OtherDetailsChangeReasonDetail;
-        Evidence = JourneyInstance.State.OtherDetailsChangeEvidence;
+        Reason = journey.State.OtherDetailsChangeReason;
+        ReasonDetail = journey.State.OtherDetailsChangeReasonDetail;
+        Evidence = journey.State.OtherDetailsChangeEvidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await EvidenceUploadManager.ValidateAndUploadAsync<OtherDetailsChangeReasonModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
+        if (Cancel)
         {
-            return this.PageWithErrors();
+            return Redirect(await journey.CancelAsync());
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.OtherDetailsChangeReason = Reason;
-            state.OtherDetailsChangeReasonDetail = Reason is PersonDetailsChangeReason.AnotherReason ? ReasonDetail : null;
-            state.OtherDetailsChangeEvidence = Evidence;
-        });
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.UploadAsync(Evidence);
 
-        return Redirect(NextPage);
+        await _validator.ValidateAndThrowAsync(this);
+
+        return journey.AdvanceToNextQuestion(
+            linkGenerator.Persons.PersonDetail.EditDetails.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.OtherDetailsChangeReason = Reason;
+                state.OtherDetailsChangeReasonDetail = Reason is PersonDetailsChangeReason.AnotherReason ? ReasonDetail : null;
+                state.OtherDetailsChangeEvidence = Evidence;
+            });
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < EditDetailsJourneyPage.OtherDetailsChangeReason)
-        {
-            context.Result = Redirect(GetPageLink(NextIncompletePage));
-            return;
-        }
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+
+        BackLink = journey.GetBackLink();
     }
 }

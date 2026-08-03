@@ -1,21 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Optional;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditDetails), RequireJourneyInstance]
+[Journey(JourneyNames.EditDetails)]
 public class CheckAnswersModel(
+    EditDetailsJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     PersonService personService,
-    EvidenceUploadManager evidenceUploadManager,
-    TimeProvider timeProvider)
-    : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
+    TimeProvider timeProvider) : PageModel
 {
-    private Person? _person;
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
+
+    [FromRoute]
+    public Guid PersonId { get; set; }
+
+    public string? PersonName { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
@@ -32,26 +41,17 @@ public class CheckAnswersModel(
 
     public string Name => string.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
-    public string ChangePersonalDetailsLink =>
-        GetPageLink(EditDetailsJourneyPage.PersonalDetails, true);
-
-    public string ChangeNameChangeReasonLink =>
-        GetPageLink(EditDetailsJourneyPage.NameChangeReason, true);
-
-    public string ChangeDetailsChangeReasonLink =>
-        GetPageLink(EditDetailsJourneyPage.OtherDetailsChangeReason, true);
-
-    public string BackLink => GetPageLink(
-        OtherDetailsChangeReason is not null
-            ? EditDetailsJourneyPage.OtherDetailsChangeReason
-            : EditDetailsJourneyPage.NameChangeReason);
-
     public void OnGet()
     {
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         var processContext = new ProcessContext(
             ProcessType.PersonDetailsUpdating,
             timeProvider.UtcNow,
@@ -66,7 +66,7 @@ public class CheckAnswersModel(
                 AdditionalInformation = null
             });
 
-        await PersonService.UpdatePersonDetailsAsync(
+        await personService.UpdatePersonDetailsAsync(
             new UpdatePersonDetailsOptions
             {
                 PersonId = PersonId,
@@ -81,40 +81,39 @@ public class CheckAnswersModel(
             },
             processContext);
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
 
         TempData.SetFlashNotificationBanner("Personal details have been updated");
 
-        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < EditDetailsJourneyPage.CheckAnswers)
+        // Changing details from here can introduce a change whose reason hasn't been given yet.
+        if (journey.GetUnansweredReasonPageUrl() is string unansweredReasonPageUrl)
         {
-            context.Result = Redirect(GetPageLink(NextIncompletePage));
+            context.Result = Redirect(unansweredReasonPageUrl);
             return;
         }
 
-        _person = await PersonService.GetPersonAsync(PersonId);
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
 
-        if (_person is null)
-        {
-            context.Result = NotFound();
-            return;
-        }
+        BackLink = journey.GetBackLink();
 
-        FirstName = JourneyInstance!.State.FirstName;
-        MiddleName = JourneyInstance.State.MiddleName;
-        LastName = JourneyInstance.State.LastName;
-        DateOfBirth = JourneyInstance.State.DateOfBirth;
-        EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
-        NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
-        Gender = JourneyInstance.State.Gender;
-        NameChangeReason = JourneyInstance.State.NameChangeReason;
-        NameChangeEvidenceFile = JourneyInstance.State.NameChangeEvidence.UploadedEvidenceFile;
-        OtherDetailsChangeReason = JourneyInstance.State.OtherDetailsChangeReason;
-        OtherDetailsChangeReasonDetail = JourneyInstance.State.OtherDetailsChangeReasonDetail;
-        OtherDetailsChangeEvidenceFile = JourneyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile;
+        FirstName = journey.State.FirstName;
+        MiddleName = journey.State.MiddleName;
+        LastName = journey.State.LastName;
+        DateOfBirth = journey.State.DateOfBirth;
+        EmailAddress = journey.State.EmailAddress.Parsed;
+        NationalInsuranceNumber = journey.State.NationalInsuranceNumber.Parsed;
+        Gender = journey.State.Gender;
+        NameChangeReason = journey.State.NameChangeReason;
+        NameChangeEvidenceFile = journey.State.NameChangeEvidence.UploadedEvidenceFile;
+        OtherDetailsChangeReason = journey.State.OtherDetailsChangeReason;
+        OtherDetailsChangeReasonDetail = journey.State.OtherDetailsChangeReasonDetail;
+        OtherDetailsChangeEvidenceFile = journey.State.OtherDetailsChangeEvidence.UploadedEvidenceFile;
     }
 }

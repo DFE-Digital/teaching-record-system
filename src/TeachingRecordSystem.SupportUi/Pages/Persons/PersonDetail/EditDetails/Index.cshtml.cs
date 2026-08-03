@@ -1,18 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditDetails), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.EditDetails), StartsJourney]
 public class IndexModel(
+    EditDetailsJourneyCoordinator journey,
     PersonService personService,
     TimeProvider timeProvider,
-    SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager)
-    : CommonJourneyPage(personService, linkGenerator, evidenceUploadManager)
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
@@ -25,12 +24,32 @@ public class IndexModel(
             .NotEmpty().WithMessage("Enter the person’s last name")
             .MaximumLength(Person.FirstNameMaxLength).WithMessage("Person’s last name must be 100 characters or less"),
         v => v.RuleFor(m => m.DateOfBirth)
-            .NotNull().WithMessage("Enter the person’s date of birth"),
+            .NotNull().WithMessage("Enter the person’s date of birth")
+            .Must((m, dateOfBirth) => !(dateOfBirth > m.Today)).WithMessage("Person’s date of birth must be in the past"),
+        v => v.RuleFor(m => m.NationalInsuranceNumber)
+            .Must((m, _) => m.ParsedNationalInsuranceNumber is not null)
+                .WithMessage("Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C")
+            .When(m => m.NationalInsuranceNumber is not null),
         v => v.RuleFor(m => m.EmailAddress)
             .MaximumLength(Person.EmailAddressMaxLength).WithMessage("Person’s email address must be 100 characters or less")
+            .Must((m, _) => m.ParsedEmailAddress is not null).WithMessage("Enter a valid email address")
+            .When(m => m.EmailAddress is not null),
+        v => v.RuleFor(m => m).Must(m => m.NameChanged || m.OtherDetailsChanged)
+            .WithMessage("Please change one or more of the person’s details")
+            .OverridePropertyName("")
     };
 
     private Person? _person;
+
+    public string? BackLink { get; set; }
+
+    [FromRoute]
+    public Guid PersonId { get; set; }
+
+    public string? PersonName { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public string? FirstName { get; set; }
@@ -54,49 +73,46 @@ public class IndexModel(
     [BindProperty]
     public Gender? Gender { get; set; }
 
+    // Exposed so the validation rules can use them; the parsed values are reused when writing state.
+    public DateOnly Today => timeProvider.Today;
+
+    public NationalInsuranceNumber? ParsedNationalInsuranceNumber =>
+        Core.NationalInsuranceNumber.TryParse(NationalInsuranceNumber, out var nationalInsuranceNumber) ? nationalInsuranceNumber : null;
+
+    public EmailAddress? ParsedEmailAddress =>
+        Core.EmailAddress.TryParse(EmailAddress, out var emailAddress) ? emailAddress : null;
+
     public bool NameChanged =>
-        (FirstName ?? "") != JourneyInstance!.State.OriginalFirstName ||
-        (MiddleName ?? "") != JourneyInstance!.State.OriginalMiddleName ||
-        (LastName ?? "") != JourneyInstance!.State.OriginalLastName;
+        (FirstName ?? "") != journey.State.OriginalFirstName ||
+        (MiddleName ?? "") != journey.State.OriginalMiddleName ||
+        (LastName ?? "") != journey.State.OriginalLastName;
 
     public bool OtherDetailsChanged =>
-        DateOfBirth != JourneyInstance!.State.OriginalDateOfBirth ||
-        EditDetailsFieldState<EmailAddress>.FromRawValue(EmailAddress) != JourneyInstance!.State.OriginalEmailAddress ||
-        EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber) != JourneyInstance!.State.OriginalNationalInsuranceNumber ||
-        Gender != JourneyInstance!.State.OriginalGender;
-
-    public string BackLink => GetPageLink(
-        FromCheckAnswers
-            ? EditDetailsJourneyPage.CheckAnswers
-            : null);
-
-    public string NextPage => GetPageLink(
-        FromCheckAnswers
-            ? !JourneyInstance!.State.NameChanged && NameChanged
-                ? EditDetailsJourneyPage.NameChangeReason
-                : !JourneyInstance!.State.OtherDetailsChanged && OtherDetailsChanged
-                    ? EditDetailsJourneyPage.OtherDetailsChangeReason
-                    : EditDetailsJourneyPage.CheckAnswers
-            : NameChanged
-                ? EditDetailsJourneyPage.NameChangeReason
-                : EditDetailsJourneyPage.OtherDetailsChangeReason,
-        FromCheckAnswers is true ? true : null);
+        DateOfBirth != journey.State.OriginalDateOfBirth ||
+        EditDetailsFieldState<EmailAddress>.FromRawValue(EmailAddress) != journey.State.OriginalEmailAddress ||
+        EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber) != journey.State.OriginalNationalInsuranceNumber ||
+        Gender != journey.State.OriginalGender;
 
     public IActionResult OnGet()
     {
-        FirstName = JourneyInstance!.State.FirstName;
-        MiddleName = JourneyInstance.State.MiddleName;
-        LastName = JourneyInstance.State.LastName;
-        DateOfBirth = JourneyInstance.State.DateOfBirth;
-        EmailAddress = JourneyInstance.State.EmailAddress.Parsed?.ToDisplayString() ?? JourneyInstance.State.EmailAddress.Raw;
-        NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.NationalInsuranceNumber.Raw;
-        Gender = JourneyInstance.State.Gender;
+        FirstName = journey.State.FirstName;
+        MiddleName = journey.State.MiddleName;
+        LastName = journey.State.LastName;
+        DateOfBirth = journey.State.DateOfBirth;
+        EmailAddress = journey.State.EmailAddress.Parsed?.ToDisplayString() ?? journey.State.EmailAddress.Raw;
+        NationalInsuranceNumber = journey.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? journey.State.NationalInsuranceNumber.Raw;
+        Gender = journey.State.Gender;
 
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         // NotAvailable is not a value the user is allowed to select in the UI. We only allow it
         // if it's a pre-existing value on the Person record and the user is leaving it unchanged.
         if (Gender == Core.Models.Gender.NotAvailable && _person!.Gender != Core.Models.Gender.NotAvailable)
@@ -104,72 +120,53 @@ public class IndexModel(
             return BadRequest();
         }
 
-        if (!NameChanged && !OtherDetailsChanged)
-        {
-            ModelState.AddModelError("", "Please change one or more of the person\u2019s details");
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
-        if (DateOfBirth.HasValue && DateOfBirth.Value > timeProvider.Today)
-        {
-            ModelState.AddModelError(nameof(DateOfBirth), "Person\u2019s date of birth must be in the past");
-        }
-
-        NationalInsuranceNumber? nationalInsuranceNumber = null;
-        if (NationalInsuranceNumber is not null && !Core.NationalInsuranceNumber.TryParse(NationalInsuranceNumber, out nationalInsuranceNumber))
-        {
-            ModelState.AddModelError(nameof(NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
-        }
-
-        EmailAddress? emailAddress = null;
-        if (EmailAddress is not null && !Core.EmailAddress.TryParse(EmailAddress, out emailAddress))
-        {
-            ModelState.AddModelError(nameof(EmailAddress), "Enter a valid email address");
-        }
-
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        var nextPage = NextPage;
-
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.FirstName = FirstName ?? "";
-            state.MiddleName = MiddleName ?? "";
-            state.LastName = LastName ?? "";
-            state.DateOfBirth = DateOfBirth;
-            state.EmailAddress = new(EmailAddress ?? "", emailAddress);
-            state.NationalInsuranceNumber = new(NationalInsuranceNumber ?? "", nationalInsuranceNumber);
-            state.Gender = Gender;
-
-            if (!NameChanged && state.NameChangeReason is not null)
+        return journey.AdvanceToNextQuestion(
+            NameChanged
+                ? linkGenerator.Persons.PersonDetail.EditDetails.NameChangeReason(journey.InstanceId)
+                : linkGenerator.Persons.PersonDetail.EditDetails.OtherDetailsChangeReason(journey.InstanceId),
+            state =>
             {
-                state.NameChangeReason = null;
-                state.NameChangeEvidence.Clear();
-            }
+                state.FirstName = FirstName ?? "";
+                state.MiddleName = MiddleName ?? "";
+                state.LastName = LastName ?? "";
+                state.DateOfBirth = DateOfBirth;
+                state.EmailAddress = new(EmailAddress ?? "", ParsedEmailAddress);
+                state.NationalInsuranceNumber = new(NationalInsuranceNumber ?? "", ParsedNationalInsuranceNumber);
+                state.Gender = Gender;
 
-            if (!OtherDetailsChanged && state.OtherDetailsChangeReason is not null)
-            {
-                state.OtherDetailsChangeReason = null;
-                state.OtherDetailsChangeReasonDetail = null;
-                state.OtherDetailsChangeEvidence.Clear();
-            }
-        });
+                if (!NameChanged && state.NameChangeReason is not null)
+                {
+                    state.NameChangeReason = null;
+                    state.NameChangeEvidence.Clear();
+                }
 
-        return Redirect(nextPage);
+                if (!OtherDetailsChanged && state.OtherDetailsChangeReason is not null)
+                {
+                    state.OtherDetailsChangeReason = null;
+                    state.OtherDetailsChangeReasonDetail = null;
+                    state.OtherDetailsChangeEvidence.Clear();
+                }
+            });
     }
 
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _person = await PersonService.GetPersonAsync(PersonId);
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Index(PersonId);
+
+        _person = await personService.GetPersonAsync(PersonId);
 
         if (_person is null)
         {
             context.Result = NotFound();
             return;
         }
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

@@ -1,18 +1,11 @@
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-public class EditDetailsState : IRegisterJourney
+public class EditDetailsState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.EditDetails,
-        typeof(EditDetailsState),
-        requestDataKeys: ["personId"],
-        appendUniqueKey: true);
-
     public string OriginalFirstName { get; set; } = "";
     public string OriginalMiddleName { get; set; } = "";
     public string OriginalLastName { get; set; } = "";
@@ -36,8 +29,6 @@ public class EditDetailsState : IRegisterJourney
     public string? OtherDetailsChangeReasonDetail { get; set; }
     public EvidenceUploadModel OtherDetailsChangeEvidence { get; set; } = new();
 
-    public bool Initialized { get; set; }
-
     [JsonIgnore]
     public bool NameChanged =>
         FirstName != OriginalFirstName ||
@@ -52,19 +43,6 @@ public class EditDetailsState : IRegisterJourney
         Gender != OriginalGender;
 
     [JsonIgnore]
-    public bool IsComplete =>
-        IsPersonalDetailsComplete &&
-        IsNameChangeReasonComplete &&
-        IsOtherDetailsChangeReasonComplete;
-
-    [JsonIgnore]
-    public bool IsPersonalDetailsComplete =>
-        FirstName is not null &&
-        LastName is not null &&
-        DateOfBirth.HasValue &&
-        (NameChanged || OtherDetailsChanged);
-
-    [JsonIgnore]
     public bool IsNameChangeReasonComplete =>
         !NameChanged ||
             (NameChangeReason.HasValue &&
@@ -76,30 +54,4 @@ public class EditDetailsState : IRegisterJourney
             (OtherDetailsChangeReason.HasValue &&
             (OtherDetailsChangeReason.Value is not PersonDetailsChangeReason.AnotherReason || OtherDetailsChangeReasonDetail is not null) &&
             OtherDetailsChangeEvidence.IsComplete);
-
-    public void EnsureInitialized(Person person)
-    {
-        if (Initialized)
-        {
-            return;
-        }
-
-        OriginalFirstName = person.FirstName;
-        OriginalMiddleName = person.MiddleName;
-        OriginalLastName = person.LastName;
-        OriginalDateOfBirth = person.DateOfBirth;
-        OriginalEmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(person.EmailAddress);
-        OriginalNationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(person.NationalInsuranceNumber);
-        OriginalGender = person.Gender;
-
-        FirstName = OriginalFirstName;
-        MiddleName = OriginalMiddleName;
-        LastName = OriginalLastName;
-        DateOfBirth = OriginalDateOfBirth;
-        EmailAddress = OriginalEmailAddress;
-        NationalInsuranceNumber = OriginalNationalInsuranceNumber;
-        Gender = OriginalGender;
-
-        Initialized = true;
-    }
 }
