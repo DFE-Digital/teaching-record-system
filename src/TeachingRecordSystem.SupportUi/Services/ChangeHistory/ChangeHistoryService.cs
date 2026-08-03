@@ -10,7 +10,6 @@ namespace TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 public class ChangeHistoryService(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
-    PersonInfoCache personInfoCache,
     IAuthorizationService authorizationService)
 {
     public async Task<ResultPage<TimelineItem>> GetChangeHistoryByPersonAsync(
@@ -165,16 +164,8 @@ public class ChangeHistoryService(
                 || (dqtSanctionCode is not null && dqtSanctionCodesWithReadPermission.Contains(dqtSanctionCode.Value));
         }).ToList();
 
-        var personInfo = await filteredProcesses
-            .SelectMany(p => p.PersonIds)
-            .Distinct()
-            .ToAsyncEnumerable()
-            .Select(async (Guid id, CancellationToken _) => await personInfoCache.GetPersonInfoAsync(id))
-            .Where(i => i is not null)
-            .ToDictionaryAsync(i => i!.PersonId, i => i!);
-
         var allResults = eventsWithUser.Select(e => MapLegacyEvent(e, personId))
-            .Concat(filteredProcesses.Select(p => MapProcess(p, personId, personInfo)))
+            .Concat(filteredProcesses.Select(p => MapProcess(p, personId)))
             .ToArray();
 
         var pageNumber = paginationOptions.PageNumber ?? 1;
@@ -209,12 +200,12 @@ public class ChangeHistoryService(
         return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.LegacyEvent, personId, timelineEvent.Event.CreatedUtc, timelineEvent)!;
     }
 
-    private TimelineItem MapProcess(Process process, Guid personId, IReadOnlyDictionary<Guid, PersonInfo> personInfo) =>
+    private TimelineItem MapProcess(Process process, Guid personId) =>
         new TimelineItem<ProcessChangeHistoryEntry>(
             TimelineItemType.Process,
             personId,
             process.CreatedOn,
-            new ProcessChangeHistoryEntry(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }, personInfo));
+            new ProcessChangeHistoryEntry(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }));
 
     private record EventWithUser
     {

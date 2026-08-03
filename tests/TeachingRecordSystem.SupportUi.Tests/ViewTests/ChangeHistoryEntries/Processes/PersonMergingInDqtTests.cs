@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
 
 namespace TeachingRecordSystem.SupportUi.Tests.ViewTests.ChangeHistoryEntries.Processes;
 
@@ -34,17 +33,7 @@ public class PersonMergingInDqtTests(HostFixture hostFixture) : ChangeHistoryEnt
 
 
         // Act
-        var entry = await GetEntryHtmlAsync(
-            process.ProcessId,
-            new Dictionary<string, object?>
-            {
-                [nameof(ChangeHistoryEntryViewModel.PersonId)] = person.PersonId,
-                [nameof(ChangeHistoryEntryViewModel.PersonInfo)] = new Dictionary<Guid, TeachingRecordSystem.Core.PersonInfo>()
-                {
-                    [person.PersonId] = new(person.PersonId, person.Trn),
-                    [mergedWithPerson.PersonId] = new(mergedWithPerson.PersonId, mergedWithPerson.Trn)
-                }
-            });
+        var entry = await GetEntryHtmlAsync(process.ProcessId, person.PersonId);
 
         // Assert
         AssertTitle(entry, $"Record merged with TRN {mergedWithPerson.Trn} and deactivated");
@@ -79,17 +68,7 @@ public class PersonMergingInDqtTests(HostFixture hostFixture) : ChangeHistoryEnt
         var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, changeReason: null, @event);
 
         // Act
-        var entry = await GetEntryHtmlAsync(
-            process.ProcessId,
-            new Dictionary<string, object?>
-            {
-                [nameof(ChangeHistoryEntryViewModel.PersonId)] = mergedWithPerson.PersonId,
-                [nameof(ChangeHistoryEntryViewModel.PersonInfo)] = new Dictionary<Guid, TeachingRecordSystem.Core.PersonInfo>()
-                {
-                    [person.PersonId] = new(person.PersonId, person.Trn),
-                    [mergedWithPerson.PersonId] = new(mergedWithPerson.PersonId, mergedWithPerson.Trn)
-                }
-            });
+        var entry = await GetEntryHtmlAsync(process.ProcessId, mergedWithPerson.PersonId);
 
         // Assert
         AssertTitle(entry, $"Record merged with TRN {person.Trn}");

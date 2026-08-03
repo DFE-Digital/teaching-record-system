@@ -5,15 +5,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEn
 
 public record ChangeHistoryEntryViewModel
 {
-    public required ChangeHistoryViewType ViewType { get; init; }
+    public required ChangeHistoryContext Context { get; init; }
     public required DateTime Timestamp { get; init; }
     public required string UserName { get; init; }
     public required Guid ProcessId { get; init; }
     public required ProcessType ProcessType { get; init; }
     public required IChangeReasonInfo? ChangeReason { get; init; }
     public required IReadOnlyCollection<IEvent> Events { get; init; }
-    public required IReadOnlyDictionary<Guid, PersonInfo>? PersonInfo { get; init; }
-    public required Guid? PersonId { get; init; }
 
     public bool ContainsEvent<T>() where T : IEvent => Events.OfType<T>().Any();
 
