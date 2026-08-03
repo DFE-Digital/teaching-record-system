@@ -10,7 +10,6 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
     public string? LastName { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public string? EmailAddress { get; set; }
-    public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
     public PersonCreateReason? Reason { get; set; }
@@ -54,12 +53,6 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
     public AddPersonPostRequestContentBuilder WithEmailAddress(string? emailAddress)
     {
         EmailAddress = emailAddress;
-        return this;
-    }
-
-    public AddPersonPostRequestContentBuilder WithMobileNumber(string? mobileNumber)
-    {
-        MobileNumber = mobileNumber;
         return this;
     }
 

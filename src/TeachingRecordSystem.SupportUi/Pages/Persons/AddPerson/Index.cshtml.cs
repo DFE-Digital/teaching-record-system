@@ -3,7 +3,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
-public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.AddPerson), StartsJourney]
+public class IndexModel(AddPersonJourneyCoordinator journey, SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public IActionResult OnGet() => Redirect(linkGenerator.Persons.AddPerson.PersonalDetails());
+    public IActionResult OnGet() =>
+        journey.AdvanceTo(
+            linkGenerator.Persons.AddPerson.PersonalDetails(journey.InstanceId),
+            new PushStepOptions { SetAsFirstStep = true });
 }
