@@ -57,16 +57,10 @@ public sealed class HostFixture : InitializeDbFixture
 
         TimeProvider = TimeProvider.System;
 
-        var referenceDataCache = new ReferenceDataCache(DbHelper.Instance.DbContextFactory);
-
         TestData = new(
             DbHelper.Instance.DbContextFactory,
-            referenceDataCache,
-            this.TimeProvider,
-            new ServiceCollection()
-                .AddSingleton(referenceDataCache)
-                .AddSingleton(this.TimeProvider)
-                .BuildServiceProvider());
+            new ReferenceDataCache(DbHelper.Instance.DbContextFactory),
+            this.TimeProvider);
 
         using (var rsa = RSA.Create())
         {

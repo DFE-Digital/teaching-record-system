@@ -6,7 +6,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.OneLogin;
-using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -45,9 +44,6 @@ public abstract class TestBase : IDisposable
     protected OneLoginUserMatchingSupportTaskService OneLoginSupportTaskService => HostFixture.Services.GetRequiredService<OneLoginUserMatchingSupportTaskService>();
 
     protected OneLoginService OneLoginService => HostFixture.Services.GetRequiredService<OneLoginService>();
-
-    protected RoutesToProfessionalStatusService RoutesToProfessionalStatusService =>
-        HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
 
     protected Mock<IAadUserService> AzureActiveDirectoryUserServiceMock =>
         TestScopedServices.GetCurrent().AzureActiveDirectoryUserServiceMock;

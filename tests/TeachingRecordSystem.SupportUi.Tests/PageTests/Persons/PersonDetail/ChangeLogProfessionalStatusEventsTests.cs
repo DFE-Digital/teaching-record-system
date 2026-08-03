@@ -196,7 +196,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        var changes = await RoutesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
+
+        var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
             new UpdateRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
@@ -290,7 +292,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        var changes = await RoutesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
+
+        var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
             new UpdateRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
@@ -364,7 +368,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        var changes = await RoutesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
+
+        var changes = await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
             new UpdateRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
@@ -427,7 +433,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
+
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
@@ -473,7 +481,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
+
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
@@ -503,7 +513,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
+
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
@@ -533,7 +545,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
+
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
@@ -563,7 +577,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+        var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
+
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,

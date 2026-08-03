@@ -1,7 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
+using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -153,38 +153,95 @@ public partial class TestData
                 throw new InvalidOperationException("RouteToProfessionalStatusId has not been set");
             }
 
+            Debug.Assert(person.Qualifications is not null);
+
             _createdByUser ??= SystemUser.SystemUserId;
 
-            // The service has to share the DbContext the rest of the builder chain is writing to, otherwise the
-            // person attributes it refreshes (QTS date, induction status etc.) would be overwritten by the stale
-            // copy the outer context saves afterwards.
-            var routesToProfessionalStatusService = ActivatorUtilities.CreateInstance<RoutesToProfessionalStatusService>(
-                testData.ServiceProvider,
-                dbContext);
+            var allRouteTypes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
+            var routeType = allRouteTypes.Single(r => r.RouteToProfessionalStatusTypeId == _routeToProfessionalStatusTypeId.Value);
+            var now = testData.TimeProvider.UtcNow;
 
-            var professionalStatus = await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
-                new CreateRouteToProfessionalStatusOptions
-                {
-                    PersonId = person.PersonId,
-                    RouteToProfessionalStatusTypeId = _routeToProfessionalStatusTypeId!.Value,
-                    Status = _status,
-                    CreatedBy = _createdByUser,
-                    SourceApplicationReference = _sourceApplicationReference,
-                    HoldsFrom = _holdsFrom,
-                    TrainingStartDate = _trainingStartDate,
-                    TrainingEndDate = _trainingEndDate,
-                    TrainingSubjectIds = _trainingSubjectIds,
-                    TrainingAgeSpecialismType = _trainingAgeSpecialismType,
-                    TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom,
-                    TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
-                    TrainingCountryId = _trainingCountryId,
-                    TrainingProviderId = _trainingProviderId,
-                    DegreeTypeId = _degreeTypeId,
-                    IsExemptFromInduction = _exemptFromInduction,
-                    ChangeReason = _changeReason,
-                    ChangeReasonDetail = _changeReasonDetail,
-                    EvidenceFile = _evidenceFile
-                });
+            var professionalStatus = new RouteToProfessionalStatus()
+            {
+                QualificationId = Guid.NewGuid(),
+                CreatedOn = now,
+                UpdatedOn = now,
+                PersonId = person.PersonId,
+                SourceApplicationUserId = null,
+                SourceApplicationReference = _sourceApplicationReference,
+                RouteToProfessionalStatusTypeId = _routeToProfessionalStatusTypeId.Value,
+                Status = _status,
+                HoldsFrom = _holdsFrom,
+                DegreeTypeId = _degreeTypeId,
+                ExemptFromInduction = _exemptFromInduction,
+                TrainingStartDate = _trainingStartDate,
+                TrainingEndDate = _trainingEndDate,
+                TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom,
+                TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
+                TrainingAgeSpecialismType = _trainingAgeSpecialismType,
+                TrainingCountryId = _trainingCountryId,
+                TrainingProviderId = _trainingProviderId,
+                TrainingSubjectIds = _trainingSubjectIds
+            };
+
+            var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person);
+            var oldInduction = EventModels.Induction.FromModel(person);
+
+            var professionalStatusType = routeType.ProfessionalStatusType;
+            var allRoutes = person.Qualifications.OfType<RouteToProfessionalStatus>().Append(professionalStatus).ToArray();
+
+            if (professionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            {
+                professionalStatus.RefreshExemptFromInductionDueToQtsDate();
+                person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allRouteTypes, allRoutes);
+            }
+
+            var newInduction = EventModels.Induction.FromModel(person);
+            var personAttributesUpdated = person.RefreshProfessionalStatusAttributes(professionalStatusType, allRouteTypes, allRoutes);
+            var qtlsStatusUpdated = _routeToProfessionalStatusTypeId.Value == RouteToProfessionalStatusType.QtlsAndSetMembershipId &&
+                person.RefreshQtlsStatus(allRoutes);
+
+            var changes = RouteToProfessionalStatusCreatedEventChanges.None |
+                (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
+                    ? RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate
+                    : 0) |
+                (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated
+                    ? RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate
+                    : 0) |
+                (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated
+                    ? RouteToProfessionalStatusCreatedEventChanges.PersonHasEyps
+                    : 0) |
+                (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
+                    ? RouteToProfessionalStatusCreatedEventChanges.PersonPqtsDate
+                    : 0) |
+                (newInduction.Status != oldInduction.Status
+                    ? RouteToProfessionalStatusCreatedEventChanges.PersonInductionStatus
+                    : 0) |
+                (newInduction.StatusWithoutExemption != oldInduction.StatusWithoutExemption
+                    ? RouteToProfessionalStatusCreatedEventChanges.PersonInductionStatusWithoutExemption
+                    : 0) |
+                (qtlsStatusUpdated ? RouteToProfessionalStatusCreatedEventChanges.PersonQtlsStatus : 0);
+
+            var createdEvent = new RouteToProfessionalStatusCreatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = now,
+                PersonId = person.PersonId,
+                RaisedBy = _createdByUser,
+                RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(professionalStatus),
+                PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
+                OldPersonAttributes = oldPersonAttributes,
+                ChangeReason = _changeReason,
+                ChangeReasonDetail = _changeReasonDetail,
+                EvidenceFile = _evidenceFile,
+                Changes = changes,
+                Induction = newInduction,
+                OldInduction = oldInduction,
+                AdditionalInformation = null
+            };
+
+            dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
+            dbContext.AddEventWithoutBroadcast(createdEvent);
 
             return professionalStatus.QualificationId;
         }

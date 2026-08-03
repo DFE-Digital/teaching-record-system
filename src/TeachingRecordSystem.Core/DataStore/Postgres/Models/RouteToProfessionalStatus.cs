@@ -38,7 +38,7 @@ public class RouteToProfessionalStatus : Qualification
     public string? DqtAgeRangeFrom { get; init; }
     public string? DqtAgeRangeTo { get; init; }
 
-    internal void RefreshExemptFromInductionDueToQtsDate()
+    public void RefreshExemptFromInductionDueToQtsDate()
     {
         if (HoldsFrom is null)
         {
